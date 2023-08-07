@@ -1,4 +1,4 @@
-# JetLinks-web-cli
+# low-code-ui
 
 ## 运行
 ``` shell
