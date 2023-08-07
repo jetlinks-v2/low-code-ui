@@ -73,7 +73,9 @@ export const useMenuStore = defineStore('menu', () => {
         menusMap.value.clear()
 
         if (resp.success) {
-            const routes = handleMenus(cloneDeep(resp.result), extraMenu, asyncRoutes) // 处理路由
+            // const routes = handleMenus(cloneDeep(resp.result), extraMenu, asyncRoutes) // 处理路由
+            const routes: any[] = []
+            routes.push(USER_CENTER_ROUTE) // 添加个人中心
             if (routes.length) {
               routes.push({
                 path: '/',
@@ -81,11 +83,10 @@ export const useMenuStore = defineStore('menu', () => {
               })
             }
 
-            routes.push(USER_CENTER_ROUTE) // 添加个人中心
-            authStore.handlePermission(resp.result) // 处理按钮权限
+            // authStore.handlePermission(resp.result) // 处理按钮权限
             menu.value = routes
-            handleMenusMap(routes, handleMenusMapById)
-            siderMenus.value = handleSiderMenu(cloneDeep(resp.result)) // 处理菜单
+            // handleMenusMap(routes, handleMenusMapById)
+            // siderMenus.value = handleSiderMenu(cloneDeep(resp.result)) // 处理菜单
         }
     }
 

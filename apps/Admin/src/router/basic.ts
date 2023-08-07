@@ -1,44 +1,22 @@
 import {RouteRecordItem} from "@jetlinks/types";
+import { BasicLayoutPage } from '@/layout'
 
 export const USER_CENTER_ROUTE: RouteRecordItem = {
-  path: '/account',
-  name: 'Account',
-  redirect: '/account/center',
-  component: () => import('@/views/login/index.vue'),
+  path: '/delivery',
+  name: 'Delivery',
+  redirect: '/delivery/center',
+  component: BasicLayoutPage,
   meta: {
-    title: '个人中心',
-    hideInMenu: true
+    title: '交付中心',
   },
   children: [
     {
-      path: '/account/center',
-      name: 'account/center',
+      path: '/delivery/center',
+      name: 'delivery/center',
       meta: {
-        title: '基本设置',
-        icon: '',
-        hideInMenu: false
+        title: '低码引擎',
       },
-      component: () => import('@/views/login/index.vue'),
-    },
-    {
-      path: '/account/NotificationSubscription',
-      name: 'account/NotificationSubscription',
-      meta: {
-        title: '通知订阅',
-        icon: '',
-        hideInMenu: false
-      },
-      component: () => import('@/views/login/index.vue'),
-    },
-    {
-      path: '/account/NotificationRecord',
-      name: 'account/NotificationRecord',
-      meta: {
-        title: '通知记录',
-        icon: '',
-        hideInMenu: false
-      },
-      component: () => import('@/views/login/index.vue'),
-    },
+      component: () => import('@/views/center/index.vue'),
+    }
   ]
 }
