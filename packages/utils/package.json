@@ -1,0 +1,27 @@
+{
+  "name": "@jetlinks/utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "module": "index.ts",
+  "scripts": {
+    "clean": "pnpm rimraf .turbo"
+  },
+  "keywords": [],
+  "files": [
+    "src",
+    "index.ts"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@jetlinks/constants": "workspace:^"
+  },
+  "dependencies": {
+    "@types/lodash-es": "^4.17.7",
+    "jetlinks-ui-components": "^1.0.26",
+    "jsencrypt": "^3.3.2",
+    "lodash-es": "^4.17.21",
+    "vue": "^3.3.4"
+  }
+}
