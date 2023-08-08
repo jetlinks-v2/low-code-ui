@@ -1,13 +1,13 @@
 <template>
-
+  <div>
+    <quick-edit-table></quick-edit-table>
+  </div>
 </template>
 
 <script>
 export default {
-  name: "index"
+  name: 'index',
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
