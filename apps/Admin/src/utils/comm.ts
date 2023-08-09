@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { downloadFileByUrl } from '@jetlinks/utils'
+import { message } from 'jetlinks-ui-components';
 
 export const downloadJson = (record: Record<string, any>, fileName: string, format?: string) => {
     const _time = dayjs(new Date()).format(format || 'YYYY_MM_DD')
@@ -9,3 +10,10 @@ export const downloadJson = (record: Record<string, any>, fileName: string, form
     const _url = URL.createObjectURL(blob);
     downloadFileByUrl(_url, _download, 'json')
 }
+
+export const onlyMessage = (msg: string, type: 'success' | 'error' | 'warning' = 'success') => {
+    message[type]({
+      content: msg,
+      key: type
+    })
+  }
