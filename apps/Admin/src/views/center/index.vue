@@ -17,7 +17,7 @@
             <template #title>
               查看
             </template>
-            <j-button type="link" style="padding: 0;" v-if="slotProps.state !== 'publish'">
+            <j-button type="link" style="padding: 0;" v-if="slotProps.state.value !== 'publish'">
               <AIcon type="EyeOutlined" />
             </j-button>
             <j-dropdown v-else>
@@ -43,12 +43,12 @@
           </j-tooltip>
 
 
-          <j-popconfirm title="确定删除？" :disabled="slotProps.state === 'publish'" @confirm="_del(slotProps.id)">
+          <j-popconfirm title="确定删除？" :disabled="slotProps.state.value === 'publish'" @confirm="_del(slotProps.id)">
             <j-tooltip>
               <template #title>
-                {{ slotProps.state === 'publish' ? '已发布状态的项目不支持删除' : '删除' }}
+                {{ slotProps.state.value === 'publish' ? '已发布状态的项目不支持删除' : '删除' }}
               </template>
-              <j-button type="link" style="padding: 0;" danger :disabled="slotProps.state === 'publish'">
+              <j-button type="link" style="padding: 0;" danger :disabled="slotProps.state.value === 'publish'">
                 <AIcon type="DeleteOutlined" />
               </j-button>
             </j-tooltip>
@@ -63,7 +63,7 @@
 <script lang="ts" setup name="index" >
 import Save from './Save/index.vue'
 import dayjs from 'dayjs';
-import { queryProject, delProject } from '@/api/center'
+import { queryProject, delProject } from '@/api/project'
 import { onlyMessage } from '@/utils/comm';
 
 const params = ref()
@@ -122,7 +122,7 @@ const columns = [
       type: 'select',
       options: [
         { label: '已发布', value: 'publish' },
-        { label: '未发布', value: 'unPublish' },
+        { label: '未发布', value: 'unpublished'},
       ],
     },
   },
@@ -178,3 +178,4 @@ const _del = async (id: string) => {
 </script>
 
 <style scoped></style>
+@/api/project

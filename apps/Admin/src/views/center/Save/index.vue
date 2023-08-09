@@ -27,7 +27,7 @@
 
 <script setup lang='ts' name="Save">
 import { _inputReg, _textReg } from '@/utils/regular'
-import { addProject, editProject } from '@/api/center'
+import { addProject, editProject } from '@/api/project'
 import { onlyMessage } from '@/utils/comm';
 
 const emit = defineEmits(['close']);
@@ -81,4 +81,4 @@ const handleCancel = () => {
 
 </script>
 
-<style scoped lang='less'></style>
+<style scoped lang='less'></style>@/api/project
