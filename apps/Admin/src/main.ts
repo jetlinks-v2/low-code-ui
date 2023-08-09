@@ -28,5 +28,8 @@ import './style.css'
     app.use(globalComponents)
     app.use(components)
 
+    if (process.env.NODE_ENV === "development") { // 开启性能标记
+      app.config.performance = true;
+    }
     app.mount('#app')
 })()
