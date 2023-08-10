@@ -67,7 +67,15 @@ export const useEngine = defineStore('engine', () => {
 
       expandedKeys.value = [...arrSet.values()]
     }
+  }
 
+  const expandedAll = () => {
+    const map = product.getDataMap()
+    expandedKeys.value = [...map.keys()]
+  }
+
+  const packUpAll = () => {
+    expandedKeys.value = []
   }
 
   const selectFile = (key: string) => {
@@ -101,5 +109,7 @@ export const useEngine = defineStore('engine', () => {
     removeFile,
     addFile,
     selectFile,
+    expandedAll,
+    packUpAll
   }
 })
