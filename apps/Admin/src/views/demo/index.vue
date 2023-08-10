@@ -46,7 +46,7 @@ const columns = [
 //   },
 // ])
 
-const data = ref([])
+const data: any = ref([])
 // 模拟生成大量数据
 for (let i = 1; i <= 10000; i++) {
   data.value.push({
