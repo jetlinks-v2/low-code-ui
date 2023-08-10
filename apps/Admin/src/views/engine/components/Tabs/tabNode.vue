@@ -50,22 +50,22 @@ const remove = () => {
   position: relative;
   display: inline-flex;
   align-items: center;
-  padding: 6px 12px;
-  background: transparent;
+  padding: 8px 12px;
+  background-color: #ececec;
   outline: none;
   cursor: pointer;
   gap: 12px;
   border-bottom: 4px solid transparent;
-  color: #f8f8f8;
+  color: #6a6a6a;
   transition: all .3s;
 
   &:hover {
-    background-color: #323844;
+    background-color: rgba(#ececec, .8);
   }
 
   &.active {
-    background-color: #3d424b;
-    border-color: #568af2;
+    background-color: #ffffff;
+    //border-color: #333;
   }
 
   .content {
