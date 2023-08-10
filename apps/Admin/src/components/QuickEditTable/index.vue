@@ -1,37 +1,36 @@
 <template>
   <div>
-
     <div
       class="scroll-container"
       :style="{
         height: containerHeight + 'px',
         'overflow-y': 'auto',
-        // 'overflow-x': 'auto', //横向滚动纯在问题，表头没有动
+        // 'overflow-x': 'auto', //横向滚动存在问题暂时没做，表头没有动
       }"
       @scroll="handleScroll"
     >
-    <div class="scroll-header" v-if="columns.length">
-      <div
-        ref="headerRef"
-        class="scroll-header-title"
-        v-for="i in columns"
-        :key="i.key"
-      >
-        <div class="scroll-header-title-item">
-          <span>{{ i.title }}</span>
-          <j-tooltip v-if="i.description">
-            <template #title>{{ i.description }}</template>
-            <AIcon
-              :type="i.iconType || 'QuestionCircleOutlined'"
-              style="margin-left: 5px"
-            />
-          </j-tooltip>
+      <div class="scroll-header" v-if="columns.length">
+        <div
+          ref="headerRef"
+          class="scroll-header-title"
+          v-for="i in columns"
+          :key="i.key"
+        >
+          <div class="scroll-header-title-item">
+            <span>{{ i.title }}</span>
+            <j-tooltip v-if="i.description">
+              <template #title>{{ i.description }}</template>
+              <AIcon
+                :type="i.iconType || 'QuestionCircleOutlined'"
+                style="margin-left: 5px"
+              />
+            </j-tooltip>
+          </div>
+        </div>
+        <div v-if="headerRight" style="width: 10px; height: 30px; opacity: 0">
+          表头滚动条位置(占位使用)
         </div>
       </div>
-      <div v-if="headerRight" style="width: 7px; height: 30px; opacity: 0">
-        表头滚动条位置
-      </div>
-    </div>
       <div
         class="scroll-content"
         :style="{ height: totalHeight + 'px', paddingTop: paddingTop + 'px' }"
@@ -51,9 +50,12 @@
               // cursor: !i.editable ? 'not-allowed' : '',
               'justify-content': 'center',
             }"
-            @click.stop="onClickListItem($event, i, index)"
           >
-            {{ i.value }}
+            <!-- todo需要判断editableType展示不同组件  -->
+            <div @click.stop="onClickListItem($event, i, index)">
+              <!-- todo文本框超出显示... -->
+              {{ i.value }}
+            </div>
           </div>
         </div>
       </div>
@@ -127,6 +129,8 @@ const generateSortedData = (columns, data) => {
 }
 
 const onClickListItem = (e, item, index) => {
+  // todo需要判断 editableType不同类型 卸载组件、加载不同组件
+
   editInputApp && removeApp()
   if (!item.editable) return
   const target = e.target
@@ -168,12 +172,15 @@ const initDataSource = (columns, data) => {
     const columnsEditable = columns?.map((i: any) => i.editable)
     return Object.keys(item).reduce((acc, key, index) => {
       acc[key] = {
-        key,
-        index,
+        key, //列 columns的key
+        index, //行 序号
         value: item[key],
-        editable: columnsEditable[index], //todo处理单个editable
-        editableType: 'input',
-        options: {},
+        editable: columnsEditable[index], //todo需要处理单条数据的editable
+        editableType: 'input', //编辑的类型
+        options: {
+          // todo选择框的数据
+          // todo依赖项(某一项变化 自己也变化)
+        }, // 其他配置项
       }
       return acc
     }, {})
@@ -298,8 +305,8 @@ const setListItemMaxWidth = () => {
 }
 
 .scroll-container::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
 }
 /*正常情况下滑块的样式*/
 .scroll-container::-webkit-scrollbar-thumb {

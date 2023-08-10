@@ -1,8 +1,8 @@
 <template>
-  <input
+  <j-input
     type="text"
     class="edit-input"
-    :value="value"
+    v-model:value="inputValue"
     @input="onInput"
     @blur="onBlur"
     @click="onClick"
@@ -21,7 +21,6 @@ const props = defineProps({
     default: () => {},
   },
 })
-
 
 const inputValue = ref(props.value)
 
@@ -46,6 +45,6 @@ const onBlur = () => {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  border: 1px solid orange;
+  // border: 1px solid orange;
 }
 </style>
