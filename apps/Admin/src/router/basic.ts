@@ -22,7 +22,7 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
     ]
   },
   {
-    path: '/engine',
+    path: '/engine/:id',
     name: 'Engine',
     component: () => import('@/views/engine/index.vue'),
     meta: {

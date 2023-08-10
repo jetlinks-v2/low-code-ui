@@ -14,3 +14,5 @@ export const queryProject = (data: any) => request.post(`/low-code/info/_query`,
 
 //项目列表不分页
 export const queryProjectNoPaging = (data: any) => request.post(`/low-code/info/_query/no-paging`,data)
+
+export const queryProjectDraft = (id: string) => request.post<Draft.Info>(`/low-code/info/draft/${id}/_detail`)

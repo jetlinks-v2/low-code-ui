@@ -1,13 +1,19 @@
 <template>
   <div class="content-files">
 <!--    <j-tabs v-model:activeKey="activeFile" hide-add type="editable-card" @edit="onEdit">-->
-<!--      <j-tab-pane v-for="item in files" :key="item.id" :tab="item.title" :closable="true" />-->
+<!--      <j-tab-pane v-for="item in files" :key="item.id" :tab="item.title" :closable="true">-->
+<!--        <Content-->
+<!--          v-bind="item"-->
+<!--        />-->
+<!--      </j-tab-pane>-->
 <!--    </j-tabs>-->
     <Tabs
       v-model:activeKey="activeFile"
       :options="files"
       @edit="onEdit"
+      @select="select"
     />
+    <Content/>
   </div>
 </template>
 
@@ -15,6 +21,7 @@
 import { storeToRefs } from 'pinia'
 import { useEngine } from '@/store'
 import Tabs from '../Tabs/tabs.vue'
+import Content from './content.vue'
 
 const engine = useEngine()
 
@@ -24,11 +31,17 @@ const onEdit = (targetKey) => {
   engine.removeFile(targetKey)
 }
 
+const select = (key) => {
+  engine.selectFile(key)
+}
+
 </script>
 
 <style scoped lang="less">
 .content-files {
-  border-top: 1px solid #515665;
+  //border-top: 1px solid #515665;
+  //border-bottom: 1px solid #515665;
+
   user-select: none;
 
   :deep(.ant-tabs-nav) {

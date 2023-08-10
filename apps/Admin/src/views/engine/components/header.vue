@@ -4,7 +4,7 @@
 
     </div>
     <div class="release">
-      <span style="color: #f8f8f8">发布</span>
+      <span >发布</span>
     </div>
   </div>
 </template>
