@@ -1,0 +1,37 @@
+.filed-container {
+    .filed-item {
+        margin: 10px;
+        border: 1px solid #eee;
+        padding: 10px;
+
+        .filed-item-title {
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .filed-item-children {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+
+            .filed-item-card {
+                width: calc(50% - 12px);
+                text-align: center;
+                background: #F9F9F9;
+                cursor: grab;
+                height: 50px;
+                color: #333333;
+                line-height: 50px;
+
+                &:hover {
+                    border: 1px solid #315efb;
+                    color: #315efb;
+                }
+
+                &[draggable="true"] {
+                    cursor: grabbing;
+                }
+            }
+        }
+    }
+}

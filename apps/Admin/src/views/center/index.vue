@@ -1,5 +1,5 @@
 <template>
-
+  <FormDesigner />
 </template>
 
 <script>
