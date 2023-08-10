@@ -1,6 +1,6 @@
 <template>
   <page-container>
-    <!-- <pro-search :columns="columns" target="code" @search="handleSearch" />
+    <pro-search :columns="columns" target="code" @search="handleSearch" />
     <JProTable ref="tableRef" model="TABLE" :columns="columns" :params="params" :request="queryProject">
       <template #headerTitle>
         <j-button type="primary" @click="handleSave('add')">新增</j-button>
@@ -18,7 +18,7 @@
             <template #title>
               查看
             </template>
-            <j-button type="link" style="padding: 0;" v-if="slotProps.state.value !== 'publish'">
+            <j-button type="link" style="padding: 0;" v-if="slotProps.state.value !== 'publish'" @click="_view(slotProps.id)">
               <AIcon type="EyeOutlined" />
             </j-button>
             <j-dropdown v-else>
@@ -57,8 +57,8 @@
         </j-space>
       </template>
     </JProTable>
-    <Save v-if="visible" @close="handleClose" :data="current" :type="modelType" /> -->
-    <Project :data="['1']"/>
+    <Save v-if="visible" @close="handleClose" :data="current" :type="modelType" />
+    <!-- <Project :data="['1']"/> -->
   </page-container>
 </template>
 
@@ -68,6 +68,7 @@ import dayjs from 'dayjs';
 import { queryProject, delProject } from '@/api/project'
 import { onlyMessage } from '@/utils/comm';
 import Project from '@/components/ProJect/index.vue'
+import { router } from '@jetlinks/router';
 
 const params = ref<any>({})
 const tableRef = ref<Record<string, any>>({});
@@ -159,6 +160,10 @@ const handleSave = (type: string, data?: any) => {
 const handleClose = () => {
   visible.value = false
   tableRef.value?.reload()
+}
+
+const _view = (id:string)=>{
+  router.replace(`/engine/${id}`)
 }
 
 const _del = async (id: string) => {

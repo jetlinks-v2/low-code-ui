@@ -8,27 +8,32 @@
             top: y + 'px'
          }">
             <j-menu v-if="props.type === 'list'" @click="handleClick">
-               <j-menu-item key="1">
-                  菜单1
-               </j-menu-item>
-               <j-menu-item key="2">
-                  菜单2
-               </j-menu-item>
-               <j-menu-item key="3">
-                  菜单3
-               </j-menu-item>
-               <j-sub-menu key="4">
-                  <template #title>菜单4</template>
-                  <j-menu-item key="4-1">菜单4-1</j-menu-item>
-                  <j-menu-item key="4-2">菜单4-2</j-menu-item>
-               </j-sub-menu>
+               <j-menu-item key="Profile">显示简介</j-menu-item>
+               <j-menu-item key="Cut">剪切</j-menu-item>
+               <j-menu-item key="Copy">复制</j-menu-item>
+               <j-menu-item key="Paste">粘贴</j-menu-item>
+               <j-menu-item key="Rename">重命名</j-menu-item>
+               <j-menu-item key="Delete">删除</j-menu-item>
             </j-menu>
 
-            <j-menu v-else>
-               <j-menu-item key="1">
-                  菜单1
-               </j-menu-item>
+            <j-menu v-else @click="handleClick">
+               <j-sub-menu key="Add" title="新建" style="width: 130px">
+                  <j-menu-item key="Module">模块</j-menu-item>
+                  <j-menu-item key="Resource">资源</j-menu-item>
 
+                  <j-sub-menu key="Page" title="页面" style="width: 130px">
+                     <j-menu-item style="width: 130px" key="HtmlPage">自定义html</j-menu-item>
+                     <j-menu-item style="width: 130px" key="ListPage">列表页模版</j-menu-item>
+                     <j-menu-item style="width: 130px" key="FormPage">表单页模版</j-menu-item>
+                  </j-sub-menu>
+
+                  <j-menu-item key="CRUD">增删改查</j-menu-item>
+                  <j-menu-item key="SQL">SQL</j-menu-item>
+                  <j-menu-item key="Function">函数</j-menu-item>
+               </j-sub-menu>
+               <j-menu-item key="Copy">
+                  复制
+               </j-menu-item>
             </j-menu>
          </div>
       </Teleport>
@@ -52,9 +57,9 @@ const props = defineProps({
       type: String,
       default: 'empty'
    },
-   id: {
-      type: String,
-      default: ''
+   data: {
+      type: Object,
+      default: {}
    },
    onSelect: {
       type: Function,
@@ -62,15 +67,15 @@ const props = defineProps({
 })
 
 const emit = defineEmits<{
-   select: [menuKey: string, divId?: string]
+   select: [menuKey: string, divData?: object]
 }>()
 
 
-const handleClick = (item:any) => {
+const handleClick = (item: any) => {
    if (props.type === 'list') {
-      emit('select',item.key,props.id)
+      emit('select', item.key, props.data)
    } else {
-      emit('select',item.key)
+      emit('select', item.key)
    }
 }
 
