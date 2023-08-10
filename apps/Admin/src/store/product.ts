@@ -36,7 +36,6 @@ const handleChildren = (children: Draft.Module, parentId: string): TreeData[] =>
         title: item.name,
         type: 'module',
         parentId: parentId,
-        selectable: false,
         children: hasChildren ? handleChildren(item, item.id) : []
       })
     })
