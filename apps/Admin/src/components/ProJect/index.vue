@@ -1,7 +1,7 @@
 
 <template>
-    <div >
-        <List v-if="isShow"/> 
+    <div>
+        <List v-if="!isShow"/> 
         <Empty v-else/>
     </div>
 </template>

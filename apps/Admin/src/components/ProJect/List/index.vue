@@ -1,12 +1,16 @@
 
 <template>
-  <div style="width: 600px;height: 600px;background-color: cadetblue;" >
+  <div class="content">
     <ContextMenu type="empty" @select="handleChange" >
-      <div v-for="item in arr"  style="width: 100px;height: 100px;background-color: aliceblue;" >
+
+      <!-- <div v-for="item in arr"  style="width: 100px;height: 100px;background-color: aliceblue;" >
         <ContextMenu type="list" :data="item" @select="handleChange">
           {{ item.name }}
         </ContextMenu>
-      </div>
+      </div> -->
+      <j-row :gutter="[16,16]">
+          <j-col :span="6" class="content-item">1</j-col>
+      </j-row>
     </ContextMenu>
   </div>
   <InputModal v-if="visible" @close="visible = false" @save="onSave" :provider="provider"/>
@@ -44,4 +48,9 @@ const handleChange = (key:any,data:any)=>{
 
 </script>
 
-<style scoped lang='less'></style>
+<style scoped lang='less'>
+.content{
+  background-color: cadetblue;
+  height: 600px;
+}
+</style>

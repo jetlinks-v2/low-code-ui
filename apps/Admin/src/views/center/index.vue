@@ -18,7 +18,7 @@
             <template #title>
               查看
             </template>
-            <j-button type="link" style="padding: 0;" v-if="slotProps.state.value !== 'publish'" @click="_view(slotProps.id)">
+            <j-button type="link" style="padding: 0;" v-if="slotProps.state.value !== 'publish'" @click="_view(slotProps.draftId)">
               <AIcon type="EyeOutlined" />
             </j-button>
             <j-dropdown v-else>
