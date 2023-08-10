@@ -6,6 +6,7 @@ import { initPackages } from './package'
 import { setupRouter } from '@/router/guard'
 import { initStoreBus } from '@/store'
 import globalComponents from '@jetlinks/components'
+import components from './components'
 import './style.css'
 
 (async () => {
@@ -25,6 +26,10 @@ import './style.css'
     await setupRouter()
 
     app.use(globalComponents)
+    app.use(components)
 
+    if (process.env.NODE_ENV === "development") { // 开启性能标记
+      app.config.performance = true;
+    }
     app.mount('#app')
 })()
