@@ -1,6 +1,5 @@
 <template>
   <div class="guide-steps" @click="handleClick" v-if="open" ref="maskRef">
-    <canvas ref="canvas"></canvas>
     <div class="info" style="position: absolute" ref="info">
       <p>{{ title }}</p>
       <p>{{ description }}</p>
@@ -40,7 +39,6 @@ const props = defineProps({
 
 const info = ref()
 const maskRef = ref()
-const canvas = ref()
 
 const title = computed(() => {
   return props.stepList[steps.value - 1]?.title || ''
@@ -62,7 +60,6 @@ const handleClick = () => {
 watch(
   () => steps.value,
   (val) => {
-    const ctx = canvas.value.getContext('2d');
     const elements = document.getElementsByClassName(`temp-element`) as any
     while (elements.length > 0) {
       elements[0].parentNode.removeChild(elements[0])
