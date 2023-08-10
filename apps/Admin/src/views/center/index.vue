@@ -1,13 +1,13 @@
 <template>
-
+  <div>
+    <TTT/>
+  </div>
 </template>
 
-<script>
-export default {
-  name: "index"
-}
+<script lang="ts" setup>
+import TTT from '@/components/ListPage/FilterModule/index.vue'
 </script>
 
-<style scoped>
+<style scoped lang="less">
 
 </style>
