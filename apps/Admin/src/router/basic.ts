@@ -28,5 +28,13 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
     meta: {
       title: '项目编辑器'
     }
-  }
+  },
+  {
+    path: '/demo',
+    name: 'Demo',
+    component: () => import('@/views/demo/index.vue'),
+    meta: {
+      title: '测试页'
+    }
+  },
 ]
