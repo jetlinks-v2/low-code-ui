@@ -1,16 +1,20 @@
 <template>
   <div class="tree-search">
     <div class="search-text">
-      <j-input placeholder="搜索" />
+      <j-input placeholder="搜索" >
+        <template #suffix>
+          <AIcon type="SearchOutlined" style="color: rgba(0, 0, 0, 0.45)" />
+        </template>
+      </j-input>
     </div>
     <div class="tool">
       <j-tooltip title="全部展开">
-        <div class="icon-button">
+        <div class="icon-button" @click="engine.expandedAll">
           <AIcon type="ArrowsAltOutlined" />
         </div>
       </j-tooltip>
       <j-tooltip title="全部收起">
-        <div class="icon-button">
+        <div class="icon-button" @click="engine.packUpAll">
           <AIcon type="ShrinkOutlined" />
         </div>
       </j-tooltip>
@@ -24,6 +28,9 @@
 </template>
 
 <script setup name="TreeSearch">
+import { useEngine } from '@/store'
+
+const engine = useEngine()
 
 const emit = defineEmits(['collapsed'])
 

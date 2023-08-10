@@ -1,19 +1,28 @@
 <template>
   <div class="content-files">
-<!--    <j-tabs v-model:activeKey="activeFile" hide-add type="editable-card" @edit="onEdit">-->
-<!--      <j-tab-pane v-for="item in files" :key="item.id" :tab="item.title" :closable="true">-->
-<!--        <Content-->
-<!--          v-bind="item"-->
-<!--        />-->
-<!--      </j-tab-pane>-->
-<!--    </j-tabs>-->
-    <Tabs
+    <j-tabs
       v-model:activeKey="activeFile"
-      :options="files"
+      hide-add
+      type="editable-card"
       @edit="onEdit"
-      @select="select"
-    />
-    <Content/>
+      @tabClick="select"
+    >
+      <template #moreIcon>
+        <AIcon type="MoreOutlined" />
+      </template>
+      <j-tab-pane v-for="item in files" :key="item.id" :tab="item.title" :closable="true">
+        <Content
+          v-bind="item"
+        />
+      </j-tab-pane>
+    </j-tabs>
+<!--    <Tabs-->
+<!--      v-model:activeKey="activeFile"-->
+<!--      :options="files"-->
+<!--      @edit="onEdit"-->
+<!--      @select="select"-->
+<!--    />-->
+<!--    <Content/>-->
   </div>
 </template>
 
@@ -32,7 +41,8 @@ const onEdit = (targetKey) => {
 }
 
 const select = (key) => {
-  engine.selectFile(key)
+  console.log(key)
+  // engine.selectFile(key)
 }
 
 </script>
@@ -49,30 +59,28 @@ const select = (key) => {
 
     .ant-tabs-tab {
       border-radius: 0 !important;
-      background-color: #21252b !important;
-      color: #f8f8f8 !important;
-      margin: 0 !important;
+      margin-left: 0px !important;
 
-      &:hover {
-        background-color: #323844 !important;
+      &:not(:first-child) {
+        margin-left: 2px !important;
       }
 
       &.ant-tabs-tab-active {
-        background-color: #3d424b !important;
-      }
+        background-color: #d6e4ff !important;
 
-      .anticon-close {
-        color: #f8f8f8 !important;
+        .ant-tabs-tab-btn {
+          color: #6a6a6a !important;
+        }
       }
     }
 
-    .ant-tabs-nav-wrap {
-      background-color: #21252b;
-    }
-
-    .ant-tabs-nav-more {
-      background-color: #21252b !important;
-      color: #fdd835;
+    .ant-tabs-nav-operations {
+      padding: 4px;
+      .ant-tabs-nav-more {
+        //background-color: #21252b !important;
+        //color: #fdd835;
+        padding: 2px 8px;
+      }
     }
   }
 }
