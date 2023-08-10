@@ -58,7 +58,6 @@
       </template>
     </JProTable>
     <Save v-if="visible" @close="handleClose" :data="current" :type="modelType" />
-    <!-- <Project :data="['1']"/> -->
   </page-container>
 </template>
 
@@ -67,7 +66,6 @@ import Save from './Save/index.vue'
 import dayjs from 'dayjs';
 import { queryProject, delProject } from '@/api/project'
 import { onlyMessage } from '@/utils/comm';
-import Project from '@/components/ProJect/index.vue'
 import { router } from '@jetlinks/router';
 
 const params = ref<any>({})
