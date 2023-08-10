@@ -45,16 +45,20 @@ import EnumType from '@/components/ListPage/FilterModule/components/EnumType.vue
 import StringType from '@/components/ListPage/FilterModule/components/StringType.vue'
 import NumberType from '@/components/ListPage/FilterModule/components/NumberType.vue'
 import DateType from '@/components/ListPage/FilterModule/components/DateType.vue'
+import { useConfigurationStore } from '@/store/filterModule'
 import { ref } from 'vue'
 
 const open = ref<boolean>(true)
 const type = ref('')
+const configurationStore = useConfigurationStore()
 const configuration = (data: any) => {
   type.value = data?.record?.type
   console.log(data)
 }
-const submit = () =>{
-
+const submit = () => {
+  const aa = configurationStore.getConfigurationInfo(type.value)
+  console.log(aa)
+  type.value = ''
 }
 </script>
 

@@ -1,7 +1,7 @@
 <template>
   <div class="enum-type">
     <p>配置数据来源</p>
-    <j-radio-group v-model:value="value" button-style="solid">
+    <j-radio-group v-model:value="state.value" button-style="solid">
       <j-space size="large">
         <j-radio-button value="data" class="check-btn">
           数据字典
@@ -11,13 +11,13 @@
         </j-radio-button>
       </j-space>
     </j-radio-group>
-    <div v-if="value === 'data'">
+    <div v-if="state.value === 'data'">
       <p class="tips">数据字典</p>
       <j-select
         style="width: 200px"
-        v-model:value="state.dateValue"
+        v-model:value="state.dataValue"
         showSearch
-        :options="dateOptions"
+        :options="dataOptions"
       />
     </div>
     <div v-else>
@@ -46,19 +46,25 @@
 </template>
 
 <script lang="ts" setup>
-import { store } from '@jetlinks/stores'
-
+import { useConfigurationStore } from '@/store/filterModule'
 const state = reactive({
-  dateValue: '',
+  value:'data',
+  dataValue: '',
   abilityValue: '',
   instructValue: '',
 })
-const systemStore = store.SystemStore
-console.log(systemStore);
-const value = ref('data')
-const dateOptions = ref([])
+const configurationStore = useConfigurationStore()
+const dataOptions = ref([])
 const abilityOptions = ref([])
 const instructOptions = ref([])
+
+watch(
+  () => state,
+  () => {
+    configurationStore.setConfigurationInfo(state, 'enum')
+  },
+  { immediate: true,deep:true },
+)
 </script>
 
 <style scoped lang="less">

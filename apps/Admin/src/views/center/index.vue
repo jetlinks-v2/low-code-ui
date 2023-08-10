@@ -57,6 +57,7 @@
       </template>
     </j-pro-table>
     <Save v-if="visible" @close="handleClose" :data="current" :type="modelType" />
+    <TTT/>
   </page-container>
 </template>
 
@@ -65,7 +66,7 @@ import Save from './Save/index.vue'
 import dayjs from 'dayjs';
 import { queryProject, delProject } from '@/api/project'
 import { onlyMessage } from '@/utils/comm';
-
+import TTT from '@/components/ListPage/FilterModule/index.vue';
 const params = ref()
 const tableRef = ref<Record<string, any>>({});
 const current = ref({})

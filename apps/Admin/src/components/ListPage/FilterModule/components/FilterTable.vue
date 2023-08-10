@@ -19,6 +19,7 @@
         ref="tableRef"
         size="small"
         :height="200"
+        onClick="handleClick"
       >
         <template #headerCell="{ column }">
           <template v-if="column.key === 'type'">
@@ -91,6 +92,7 @@
 
 <script lang="ts" setup>
 import { message } from 'ant-design-vue'
+import { log } from 'console'
 const tableRef = ref()
 const dataBind = ref<boolean>(false)
 const visible = ref<boolean>(false)
@@ -98,9 +100,6 @@ const confirmLoading = ref<boolean>(false)
 const loading = ref<boolean>(false)
 const emit = defineEmits(['configuration'])
 
-const configuration = (data: any) => {
-  emit('configuration', data)
-}
 //筛选类型
 const options = [
   {
@@ -163,7 +162,7 @@ const columns: any = [
       ],
     },
     doubleClick(record) {
-      return record?.id === ''
+      return record?.mark === 'add'
     },
   },
   {
@@ -300,19 +299,25 @@ const dataSource = ref([
   },
 ])
 //新增一列table
-const handleAdd = () => {
+const handleAdd = async () => {
   tableRef.value.cleanEditStatus()
   tableRef.value.addItem({
     id: '',
     name: '',
     type: 'string',
+    mark: 'add',
   })
+}
+//配置
+const configuration = (data: any) => {
+  tableRef.value.cleanEditStatus()
+  emit('configuration', data)
 }
 //删除
 const confirm = (data: any) => {
   loading.value = true
   return new Promise((resolve) => {
-    setTimeout(() => {
+    setTimeout(async () => {
       tableRef.value.removeItem(data.index)
       resolve(true)
       loading.value = false
