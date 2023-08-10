@@ -43,11 +43,13 @@ const props = defineProps({
 })
 
 const select = (key, e) => {
+  console.log(e)
   if (e.node?.type !== 'project') {
     engine.addFile({
-      id: e.node.key,
+      id: e.node.id,
       title: e.node.title,
-      type: e.node.type
+      type: e.node.type,
+      children: e.node.children
     })
   }
 }
