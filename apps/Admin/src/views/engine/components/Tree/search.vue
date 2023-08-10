@@ -53,7 +53,6 @@ const collapsedChange = () => {
   gap: 8px;
   align-items: center;
   padding: 6px 6px;
-  background-color: #323844;
 
   .search-text {
     flex: 1 1 auto;
@@ -69,12 +68,12 @@ const collapsedChange = () => {
       align-items: center;
       justify-content: center;
       border-radius: 4px;
-      color: #f8f8f8;
+      color: #424242;
       width: 26px;
       height: 26px;
 
       &:hover {
-        background-color: #3d424b;
+        background-color: #e1e1e1;
       }
     }
   }

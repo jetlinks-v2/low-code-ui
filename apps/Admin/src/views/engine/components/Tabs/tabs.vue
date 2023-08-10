@@ -45,7 +45,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:activeKey', 'remove'])
+const emit = defineEmits(['update:activeKey', 'remove', 'select'])
 
 const listDom = ref()
 const listContentDom = ref()
@@ -65,7 +65,6 @@ const handleTransformLeft = (key, index) => {
   const domList = listDom.value.querySelectorAll('.tab-node')
   const activeDom = domList[index].getBoundingClientRect()
   const listStyle = listDom.value.getBoundingClientRect()
-  console.log(activeDom, listStyle)
   if (activeDom.left < listStyle.left) {
     let count = 0
     domList.forEach((item, i) => {
@@ -84,22 +83,23 @@ const handleTransformLeft = (key, index) => {
 const instanceClick = (key, index) => {
   handleTransformLeft(key, index)
   emit('update:activeKey', key)
+  emit('select', key)
 }
 
-const getTansformMax = () => {
+const getTransformMax = () => {
   const listStyle = listDom.value.getBoundingClientRect()
   const listContentStyle = listContentDom.value.getBoundingClientRect()
   transformMax.value = listContentStyle.width - listStyle.width
 }
 
 const onContentResize = debounce(() => {
-  getTansformMax()
+  getTransformMax()
 }, 30)
 
 const onResize = debounce(() => {
   const index = props.options.findIndex(item => item.id === props.activeKey)
   if (index !== -1) {
-    getTansformMax()
+    getTransformMax()
     handleTransformLeft(props.activeKey, index)
   }
 }, 30)
@@ -130,7 +130,7 @@ const remove = (key) => {
 
 watch(() => JSON.stringify(props.options), () => {
   nextTick(() => {
-    getTansformMax()
+    getTransformMax()
   })
 }, { immediate: true })
 
@@ -151,7 +151,7 @@ watch(() => props.activeKey, () => {
   font-feature-settings: 'tnum';
   display: flex;
   overflow: hidden;
-  background-color: #21252b;
+  background-color: #f3f3f3;
 
   .tabs-list {
     position: relative;

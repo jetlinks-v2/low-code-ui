@@ -1,15 +1,22 @@
 import {defineStore} from "pinia";
+import { useProduct } from './product'
 
 type FileItemType = {
   id: string
   title: string
   type: string
+  parentName: string
+  parentId: string
 }
 
 export const useEngine = defineStore('engine', () => {
   const files = ref<FileItemType[]>([])
   const activeFile = ref()
   const content = ref()
+  const expandedKeys = ref<string[]>([])
+  const openFile = ref<any>()
+
+  const product = useProduct()
 
   /**
    * 当前选中的文件
@@ -39,15 +46,46 @@ export const useEngine = defineStore('engine', () => {
     files.value = arr.filter(item => item.id !== key)
   }
 
+  const getExpandsKeys = (id: string) => {
+    const arrSet: Set<string> = new Set([...expandedKeys.value])
+    const map = product.getDataMap()
+
+    let currentNode = map.get(id)
+
+    if (id !== activeFile.value) { // 不是当前选中项
+      openFile.value = currentNode
+    }
+
+    if (currentNode && !expandedKeys.value.includes(currentNode.parentId)) { // 当前节点的parentId不在expandedKeys中
+      while (currentNode) {
+        if (!arrSet.has(currentNode.id)) {
+          arrSet.add(currentNode.id)
+        }
+        const parentId = currentNode.parentId
+        currentNode = map.get(parentId)
+      }
+
+      expandedKeys.value = [...arrSet.values()]
+    }
+
+  }
+
+  const selectFile = (key: string) => {
+    getExpandsKeys(key)
+  }
+
   /**
    * 新增打开的文件
-   * @param key
+   * @param record
    */
-  const addFile = (record) => {
+  const addFile = (record: FileItemType) => {
     activeFile.value = record.id
-    if (!files.value.some(item => item.id === record)) {
+
+    if (!files.value.some(item => item.id === record.id)) {
       files.value.push(record)
     }
+
+    selectFile(record.id)
   }
 
   watch(() => activeFile.value, () => {
@@ -58,6 +96,10 @@ export const useEngine = defineStore('engine', () => {
     files,
     activeFile,
     content,
-    removeFile
+    expandedKeys,
+    openFile,
+    removeFile,
+    addFile,
+    selectFile,
   }
 })
