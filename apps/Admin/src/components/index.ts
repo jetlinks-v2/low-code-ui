@@ -4,6 +4,9 @@ import ImageUpload from "./Upload/Image/ImageUpload.vue";
 import QuickEditTable from './QuickEditTable/index.vue'
 import Search from './Search'
 import DragBox from "./DragBox";
+import Card from "./Card";
+import BadgeStatus from "./BadgeStatus";
+
 export default  {
     install(app: App) {
         app.component('TitleComponent', TitleComponent)
@@ -11,5 +14,7 @@ export default  {
           .component('QuickEditTable', QuickEditTable)
           .component('ProSearch', Search)
           .component('DragBox', DragBox)
+          .component('Card', Card)
+          .component('BadgeStatus', BadgeStatus)
     }
 }
