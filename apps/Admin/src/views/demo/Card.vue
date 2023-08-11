@@ -1,46 +1,17 @@
 <template>
-  <div class="content-warp">
-    <div style="width: 400px">
-      <Card
-        :active="true"
-      >
-        <template #img>
-          <div style="height: 88px;width: 88px; background-color: #dfdfdf;">
-            Image
-          </div>
-        </template>
-        <template #content>
-          <div>
-            123123
-          </div>
-        </template>
-      </Card>
-      <Card
-        :active="true"
-        status="error"
-      >
-        <template #img>
-          <div style="height: 88px;width: 88px; background-color: #dfdfdf;">
-            Image
-          </div>
-        </template>
-      </Card>
-      <Card
-        status="warning"
-        :actions="actions"
-      >
-        <template #img>
-          <div style="height: 88px;width: 88px; background-color: #dfdfdf;">
-            Image
-          </div>
-        </template>
-      </Card>
-    </div>
-  </div>
+  <Card
+    status="warning"
+    :actions="actions"
+  >
+    <template #img>
+      <div style="height: 88px;width: 88px; background-color: #dfdfdf;">
+        Image
+      </div>
+    </template>
+  </Card>
 </template>
 
-<script setup name="ContentWarp">
-
+<script setup>
 const handleView = (id) => {
   console.log(id)
 }
@@ -96,10 +67,8 @@ const actions = [
     },
   }
 ]
-
-
 </script>
 
-<style scoped lang="less">
+<style scoped>
 
 </style>

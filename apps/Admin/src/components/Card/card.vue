@@ -45,8 +45,17 @@
     </div>
     <ResizeObserver>
       <div class="card-footer" v-if="showTool && actions?.length">
-        <div class="card-button" v-for="item in actions">
-
+        <div :class="['card-button', item.key === 'delete' ? 'delete' : '']" v-for="item in actions">
+          <PermissionButton
+            v-if="item.permissionProps"
+            v-bind:="item.permissionProps"
+            :popConfirm="handleFunction(item.permissionProps.popConfirm)"
+            :tooltip="handleFunction(item.permissionProps.tooltip)"
+          >
+            <template #icon v-if="item.icon">
+              <AIcon :type="item.icon" />
+            </template>
+          </PermissionButton>
         </div>
       </div>
     </ResizeObserver>
@@ -57,7 +66,7 @@
 import Active from './active.vue'
 import { BadgeProps, BadgeColors } from '../BadgeStatus'
 import ResizeObserver from 'ant-design-vue/lib/vc-resize-observer';
-
+import {isFunction, isObject} from "lodash-es";
 
 const props = defineProps({
   ...BadgeProps(),
@@ -115,6 +124,15 @@ const stateColor = computed(() => {
 
 const cardClick = () => {
   emit('click')
+}
+
+const handleFunction = (item) => {
+  if (isFunction(item)) {
+    return item(props.record)
+  } else if (isObject(item)) {
+    return item
+  }
+  return undefined
 }
 
 </script>
@@ -232,6 +250,55 @@ const cardClick = () => {
         height: 100%;
         width: calc(44.65% + 34px);
         transform: skewX(-15deg);
+      }
+    }
+  }
+
+  .card-footer {
+    display: flex;
+    margin-top: 8px;
+    gap: 8px;
+
+    .card-button {
+      display: flex;
+      min-width: 0;
+      flex-grow: 1;
+
+      button {
+        width: 100%;
+        border-radius: 0;
+        background: #f6f6f6;
+        border: 1px solid #e6e6e6;
+        color: #2f54eb;
+      }
+
+      &.remove, &.more {
+        width: 80px;
+      }
+
+      &.remove {
+        background: @error-color-deprecated-bg;
+        border: 1px solid @error-color-outline;
+
+        span {
+          color: @error-color !important;
+        }
+
+        &:hover {
+          background-color: @error-color-hover;
+
+          span {
+            color: #fff !important;
+          }
+        }
+
+        &:active {
+          background-color: @error-color-active;
+
+          span {
+            color: #fff !important;
+          }
+        }
       }
     }
   }
