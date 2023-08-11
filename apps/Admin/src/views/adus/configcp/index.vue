@@ -11,8 +11,11 @@
                     <template #title>
                         <span>开启关系后，平台被关联方和关联方同时增加一条数据</span>
                     </template>
-                    <span style="cursor: pointer;">?</span>
-                </a-tooltip></template>
+                    <AIcon :type="'QuestionCircleOutlined'" />
+                </a-tooltip>
+
+
+            </template>
             <div v-if="checkedA" class="checkedA">
                 <table>
                     <tr>

@@ -19,6 +19,7 @@
           表头滚动条位置(占位使用)
         </div>
       </div>
+
       <div class="scroll-content" :style="{ height: totalHeight + 'px', paddingTop: paddingTop + 'px' }">
         <div v-for="(item, index) in visibleItems" :key="item.id" class="list-container">
           <div class="list-item" ref="listItemRef" v-for="(i, idx) in item" :key="idx" :style="{
@@ -27,12 +28,28 @@
             'justify-content': 'center',
           }">
             <!-- todo需要判断editableType展示不同组件  -->
-            <div @click.stop="onClickListItem($event, i, index)">
+
+            <div v-if="i.editableType === 'input'" style="width: 100%; text-align: center;"
+              @click.stop="onClickListItem($event, i, index)">
               <!-- todo文本框超出显示... -->
+              {{ i.value }}
+            </div>
+            <span @click.stop="onClickConfig($event, i, index)" v-else-if="i.editableType === 'button'"
+              class="configBtn">配置</span>
+            <a-checkbox v-else-if="i.editableType === 'radio'" v-model:checked="checked"></a-checkbox>
+            <!-- buttons -->
+            <div v-else-if="i.editableType === 'buttons'" class="btns">
+              <span size="small" @click.stop="acd('add')">新增</span>
+              <span size="small" style="margin: 0 5px;" @click.stop="acd('copy')">复制</span>
+              <span size="small" @click.stop="acd('dlt')">删除</span>
+            </div>
+
+            <div v-else @click.stop="onClickListItem($event, i, index)">
               {{ i.value }}
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -102,12 +119,15 @@ const generateSortedData = (columns, data) => {
     return sortedRowData
   })
 }
-
+const onClickConfig = (e, item, index) => {
+  console.log('配置', e, item, index);
+}
+const acd = (mark: string) => {
+  console.log(mark);
+}
 const onClickListItem = (e, item, index) => {
   console.log('列表项点击', e, item);
-
   // todo需要判断 editableType不同类型 卸载组件、加载不同组件
-
   editInputApp && removeApp()
   if (!item.editable) return
   const target = e.target
@@ -145,10 +165,10 @@ window.addEventListener('click', removeApp, false)
 
 const initDataSource = (columns, data) => {
   const _data = generateSortedData(columns, data)
-  console.log('_data', _data);
 
   return _data.map((item) => {
     const columnsEditable = columns?.map((i: any) => i.editable)
+    const editableTypeArr = columns?.map((i: any) => i.editableType)
     return Object.keys(item).reduce((acc, key, index) => {
       acc[key] = {
         key, //列 columns的key
@@ -156,7 +176,7 @@ const initDataSource = (columns, data) => {
         value: item[key],
         editable: columnsEditable[index], //todo需要处理单条数据的editable
         // editableType: 'input', //编辑的类型
-        editableType: 'input',
+        editableType: editableTypeArr[index],
         options: {
           // todo选择框的数据
           // todo依赖项(某一项变化 自己也变化)
@@ -323,5 +343,10 @@ const setListItemMaxWidth = () => {
 .scroll-container::-webkit-scrollbar-track:hover {
   -webkit-box-shadow: inset 0 0 6px rgba(178, 178, 178, 0.4);
   background-color: rgba(178, 178, 178, 0.01);
+}
+
+.configBtn,
+.btns span {
+  cursor: pointer;
 }
 </style>

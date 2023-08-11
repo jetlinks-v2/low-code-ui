@@ -1,26 +1,30 @@
 <!-- 增删改查/表结构-->
 <template>
-  <quick-edit-table :data="data" :columns="columns" @submit="handleSubmit"></quick-edit-table>
+  <div>
+    <quick-edit-table :data="data" :columns="columns" @submit="handleSubmit">
+    </quick-edit-table>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 
 const columns = [
-  { title: '序号', key: 'index', editable: false },
   {
-    title: '列',
-    key: 'column',
-    description: '蛇形命名',
+    title: '序号', key: 'index', editable: false, editableType: 'text'
+  },
+  {
+    title: '列', key: 'column', description: '蛇形命名',
     iconType: 'QuestionCircleOutlined',
     editable: false,
+    editableType: 'text'
   },
-  { title: '别名', key: 'alias', description: '驼峰命名', editable: false },
-  { title: '注释', key: 'comment', editable: false },
+  { title: '别名', key: 'alias', description: '驼峰命名', editable: false, editableType: 'text' },
+  { title: '注释', key: 'comment', editable: false, editableType: 'text' },
   { title: 'jdbcType', key: 'jdbcType', editable: true, editableType: 'select' },
   { title: 'javaType', key: 'javaType', editable: true, editableType: 'select' },
-  { title: '长度', key: 'length', editable: true },
-  { title: '精度', key: 'precision', editable: false },
+  { title: '长度', key: 'length', editable: true, editableType: 'text' },
+  { title: '精度', key: 'precision', editable: false, editableType: 'text' },
   { title: '只读', key: 'readOnly', editable: true, editableType: 'radio' },
   { title: '其他配置', key: 'otherConfig', editable: true, editableType: 'button' },
   { title: '操作', key: 'action', editable: true, editableType: 'buttons' },
