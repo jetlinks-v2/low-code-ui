@@ -1,9 +1,6 @@
+<!-- 增删改查/表结构-->
 <template>
-  <quick-edit-table
-    :data="data"
-    :columns="columns"
-    @submit="handleSubmit"
-  ></quick-edit-table>
+  <quick-edit-table :data="data" :columns="columns" @submit="handleSubmit"></quick-edit-table>
 </template>
 
 <script setup lang="ts">
@@ -20,13 +17,13 @@ const columns = [
   },
   { title: '别名', key: 'alias', description: '驼峰命名', editable: false },
   { title: '注释', key: 'comment', editable: false },
-  { title: 'jdbcType', key: 'jdbcType', editable: true },
-  { title: 'javaType', key: 'javaType', editable: true },
+  { title: 'jdbcType', key: 'jdbcType', editable: true, editableType: 'select' },
+  { title: 'javaType', key: 'javaType', editable: true, editableType: 'select' },
   { title: '长度', key: 'length', editable: true },
   { title: '精度', key: 'precision', editable: false },
-  { title: '只读', key: 'readOnly', editable: true },
-  { title: '其他配置', key: 'otherConfig', editable: true },
-  { title: '操作', key: 'action', editable: true },
+  { title: '只读', key: 'readOnly', editable: true, editableType: 'radio' },
+  { title: '其他配置', key: 'otherConfig', editable: true, editableType: 'button' },
+  { title: '操作', key: 'action', editable: true, editableType: 'buttons' },
 ]
 
 // const data = ref([
@@ -48,7 +45,7 @@ const columns = [
 
 const data: any = ref([])
 // 模拟生成大量数据
-for (let i = 1; i <= 10000; i++) {
+for (let i = 1; i <= 200; i++) {
   data.value.push({
     key: i, //测试数据 唯一id
     index: i, //序号

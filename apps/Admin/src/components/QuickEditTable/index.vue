@@ -1,29 +1,17 @@
 <template>
   <div>
-    <div
-      class="scroll-container"
-      :style="{
-        height: containerHeight + 'px',
-        'overflow-y': 'auto',
-        // 'overflow-x': 'auto', //横向滚动存在问题暂时没做，表头没有动
-      }"
-      @scroll="handleScroll"
-    >
+    <div class="scroll-container" :style="{
+      height: containerHeight + 'px',
+      'overflow-y': 'auto',
+      // 'overflow-x': 'auto', //横向滚动存在问题暂时没做，表头没有动
+    }" @scroll="handleScroll">
       <div class="scroll-header" v-if="columns.length">
-        <div
-          ref="headerRef"
-          class="scroll-header-title"
-          v-for="i in columns"
-          :key="i.key"
-        >
+        <div ref="headerRef" class="scroll-header-title" v-for="i in columns" :key="i.key">
           <div class="scroll-header-title-item">
             <span>{{ i.title }}</span>
             <j-tooltip v-if="i.description">
               <template #title>{{ i.description }}</template>
-              <AIcon
-                :type="i.iconType || 'QuestionCircleOutlined'"
-                style="margin-left: 5px"
-              />
+              <AIcon :type="i.iconType || 'QuestionCircleOutlined'" style="margin-left: 5px" />
             </j-tooltip>
           </div>
         </div>
@@ -31,26 +19,13 @@
           表头滚动条位置(占位使用)
         </div>
       </div>
-      <div
-        class="scroll-content"
-        :style="{ height: totalHeight + 'px', paddingTop: paddingTop + 'px' }"
-      >
-        <div
-          v-for="(item, index) in visibleItems"
-          :key="item.id"
-          class="list-container"
-        >
-          <div
-            class="list-item"
-            ref="listItemRef"
-            v-for="(i, idx) in item"
-            :key="idx"
-            :style="{
-              'background-color': i.editable ? '#f0f2f5' : '#e8e8e8',
-              // cursor: !i.editable ? 'not-allowed' : '',
-              'justify-content': 'center',
-            }"
-          >
+      <div class="scroll-content" :style="{ height: totalHeight + 'px', paddingTop: paddingTop + 'px' }">
+        <div v-for="(item, index) in visibleItems" :key="item.id" class="list-container">
+          <div class="list-item" ref="listItemRef" v-for="(i, idx) in item" :key="idx" :style="{
+            'background-color': i.editable ? '#f0f2f5' : '#e8e8e8',
+            // cursor: !i.editable ? 'not-allowed' : '',
+            'justify-content': 'center',
+          }">
             <!-- todo需要判断editableType展示不同组件  -->
             <div @click.stop="onClickListItem($event, i, index)">
               <!-- todo文本框超出显示... -->
@@ -129,6 +104,8 @@ const generateSortedData = (columns, data) => {
 }
 
 const onClickListItem = (e, item, index) => {
+  console.log('列表项点击', e, item);
+
   // todo需要判断 editableType不同类型 卸载组件、加载不同组件
 
   editInputApp && removeApp()
@@ -168,6 +145,8 @@ window.addEventListener('click', removeApp, false)
 
 const initDataSource = (columns, data) => {
   const _data = generateSortedData(columns, data)
+  console.log('_data', _data);
+
   return _data.map((item) => {
     const columnsEditable = columns?.map((i: any) => i.editable)
     return Object.keys(item).reduce((acc, key, index) => {
@@ -176,7 +155,8 @@ const initDataSource = (columns, data) => {
         index, //行 序号
         value: item[key],
         editable: columnsEditable[index], //todo需要处理单条数据的editable
-        editableType: 'input', //编辑的类型
+        // editableType: 'input', //编辑的类型
+        editableType: 'input',
         options: {
           // todo选择框的数据
           // todo依赖项(某一项变化 自己也变化)
@@ -259,6 +239,7 @@ const setListItemMaxWidth = () => {
 .list-container {
   display: flex;
 }
+
 .list-item {
   width: 100%;
   min-width: 100px;
@@ -294,6 +275,7 @@ const setListItemMaxWidth = () => {
   align-items: center;
   background-color: #ccc;
 }
+
 .scroll-header-title {
   width: 100%;
   min-width: 100px;
@@ -308,12 +290,14 @@ const setListItemMaxWidth = () => {
   width: 10px;
   height: 10px;
 }
+
 /*正常情况下滑块的样式*/
 .scroll-container::-webkit-scrollbar-thumb {
   background-color: #b2b2b2;
   border-radius: 10px;
   -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
 }
+
 /*鼠标悬浮在该类指向的控件上时滑块的样式*/
 .scroll-container:hover::-webkit-scrollbar-thumb {
   //   background-color: rgba(0, 0, 0, 0.2);
@@ -321,17 +305,20 @@ const setListItemMaxWidth = () => {
   border-radius: 10px;
   -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
 }
+
 /*鼠标悬浮在滑块上时滑块的样式*/
 .scroll-container::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 0, 0, 0.4);
   -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
 }
+
 /*正常时候的主干部分*/
 .scroll-container::-webkit-scrollbar-track {
   border-radius: 10px;
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
   //   background-color: white;
 }
+
 // /*鼠标悬浮在滚动条上的主干部分*/
 .scroll-container::-webkit-scrollbar-track:hover {
   -webkit-box-shadow: inset 0 0 6px rgba(178, 178, 178, 0.4);

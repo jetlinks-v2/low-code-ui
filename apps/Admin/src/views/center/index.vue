@@ -6,10 +6,13 @@
         <j-button type="primary" @click="handleSave('add')">新增</j-button>
       </template>
       <template #createTime="slotProps">
-        <span>{{ slotProps?.createTime ? dayjs(slotProps.createTime).format('YYYY-MM-DD HH:mm:ss') : '' }}</span>
+        {{ slotProps?.createTime ? dayjs(slotProps.createTime).format('YYYY-MM-DD HH:mm:ss') : '' }}
       </template>
       <template #description="slotProps">
         <div>{{ slotProps.description ? slotProps.description : '--' }}</div>
+      </template>
+      <template #state="slotProps">
+        {{ slotProps.state?.text }}
       </template>
       <template #action="slotProps">
         <j-space :size="16">
@@ -17,7 +20,7 @@
             <template #title>
               查看
             </template>
-            <j-button type="link" style="padding: 0;" v-if="slotProps.state.value !== 'publish'">
+            <j-button @click="view(slotProps)" type="link" style="padding: 0;" v-if="slotProps.state.value !== 'publish'">
               <AIcon type="EyeOutlined" />
             </j-button>
             <j-dropdown v-else>
@@ -118,11 +121,12 @@ const columns = [
     dataIndex: 'state',
     key: 'state',
     ellipsis: true,
+    scopedSlots: true,
     search: {
       type: 'select',
       options: [
         { label: '已发布', value: 'publish' },
-        { label: '未发布', value: 'unpublished'},
+        { label: '未发布', value: 'unpublished' },
       ],
     },
   },
@@ -152,10 +156,13 @@ const dataSource = [
 ]
 
 const handleSearch = (data: any) => {
-  console.log('data',data)
+  console.log('data', data)
   params.value = data
 }
+const view = (slotProps: object) => {
+  console.log('查看', slotProps);
 
+}
 const handleSave = (type: string, data?: any) => {
   modelType.value = type
   visible.value = true
