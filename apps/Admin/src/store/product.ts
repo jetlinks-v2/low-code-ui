@@ -1,6 +1,17 @@
 import {defineStore} from "pinia";
 import {queryProjectDraft} from "@/api/project";
 
+type TreeData = {
+  title: string
+  id: string
+  type: 'project' | 'module' | Draft.Provider
+  provider?: Draft.Provider
+
+  children?: TreeData[]
+  [key: string]: any
+}
+
+
 const handleModules = (modules: Draft.Module[]) => {
 
 }
@@ -18,14 +29,13 @@ const handleChildren = (children: Draft.Module, parentId: string): TreeData[] =>
 
   if (children.children) {
     children.children.forEach(item => {
-      const hasChildren = item.children?.length || item.functions?.length
+      const hasChildren = item.children?.length || item.functions?.length || item.resources?.length
 
       treeData.push({
         ...item,
         title: item.name,
         type: 'module',
         parentId: parentId,
-        selectable: !hasChildren,
         children: hasChildren ? handleChildren(item, item.id) : []
       })
     })
@@ -41,16 +51,18 @@ const handleChildren = (children: Draft.Module, parentId: string): TreeData[] =>
       })
     })
   }
+
+  if (children.resources) {
+    children.resources.forEach(item => {
+      treeData.push({
+        title: item.name,
+        type: item.provider,
+        parentId: parentId,
+        ...item
+      })
+    })
+  }
   return treeData
-}
-
-type TreeData = {
-  title: string
-  id: string
-  type: 'project' | 'module' | Draft.Provider
-
-  children?: TreeData[]
-  [key: string]: any
 }
 
 export const useProduct = defineStore('product', () => {
@@ -72,7 +84,28 @@ export const useProduct = defineStore('product', () => {
     return dataMap
   }
 
-  const addDataFileItem = (record: any) => {
+  const addProduct = (data: any[], record: any, parentId: string) => {
+    data.some(item => {
+      if (item.id === parentId) {
+        item.children = item.children?.length ? [...item.children, record] : [record]
+        return true
+      } else if (item.children) {
+        addProduct(item.children, record, parentId)
+      }
+      return false
+    })
+  }
+
+  const add = (record: any, parentId: string) => {
+    dataMap.set(record.id, record)
+    addProduct(data.value, record, parentId)
+  }
+
+  const update = (record: any) => {
+
+  }
+
+  const remove = (record: any) => {
 
   }
 
@@ -105,6 +138,7 @@ export const useProduct = defineStore('product', () => {
   return {
     data,
     queryProduct,
-    getDataMap
+    getDataMap,
+    add
   }
 })
