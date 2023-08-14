@@ -20,6 +20,7 @@
     "@jetlinks/utils": "workspace:^",
     "@jetlinks/vite": "workspace:^",
     "@vuemap/vue-amap": "^2.0.13",
+    "@vueuse/core": "^10.1.2",
     "dayjs": "^1.11.8",
     "jetlinks-ui-components": "^1.0.28",
     "lodash-es": "^4.17.21",

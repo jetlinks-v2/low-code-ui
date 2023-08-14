@@ -48,7 +48,7 @@ export const useContextMenu = (containerRef: any, menuRef: any) => {
 
     onUnmounted(() => {
         const div = containerRef.value;
-        div.removeEventListener("contextmenu", handleContextMenu);
+        div?.removeEventListener("contextmenu", handleContextMenu);
         window.removeEventListener("click", closeMenu, true);
         window.removeEventListener("contextmenu", closeMenu, true);
     })

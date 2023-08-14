@@ -17,22 +17,22 @@
             </j-menu>
 
             <j-menu v-else @click="handleClick">
-               <j-sub-menu key="Add" title="新建" style="width: 130px">
+               <j-sub-menu key="Add" title="新建" style="width: 150px;">
                   <j-menu-item key="Module">模块</j-menu-item>
-                  <j-menu-item key="Resource">资源</j-menu-item>
+                  <!-- <j-menu-item key="Resource">资源</j-menu-item> -->
 
-                  <j-sub-menu key="Page" title="页面" style="width: 130px">
-                     <j-menu-item style="width: 130px" key="HtmlPage">自定义html</j-menu-item>
-                     <j-menu-item style="width: 130px" key="ListPage">列表页模版</j-menu-item>
-                     <j-menu-item style="width: 130px" key="FormPage">表单页模版</j-menu-item>
+                  <j-sub-menu key="Page" title="页面" >
+                     <j-menu-item  key="HtmlPage">自定义html</j-menu-item>
+                     <j-menu-item  key="ListPage">列表页模版</j-menu-item>
+                     <j-menu-item  key="FormPage">表单页模版</j-menu-item>
                   </j-sub-menu>
 
                   <j-menu-item key="CRUD">增删改查</j-menu-item>
                   <j-menu-item key="SQL">SQL</j-menu-item>
                   <j-menu-item key="Function">函数</j-menu-item>
                </j-sub-menu>
-               <j-menu-item key="Copy">
-                  复制
+               <j-menu-item key="Paste">
+                  粘贴
                </j-menu-item>
             </j-menu>
          </div>
@@ -63,7 +63,7 @@ const props = defineProps({
    },
    onSelect: {
       type: Function,
-   }
+   },
 })
 
 const emit = defineEmits<{
@@ -83,7 +83,7 @@ const handleClick = (item: any) => {
 
 <style scoped lang='less'>
 .menu {
-   width: 150px;
+   // width: 150px;
    position: absolute;
 }
 </style>
