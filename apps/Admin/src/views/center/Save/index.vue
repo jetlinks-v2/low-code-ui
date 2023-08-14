@@ -3,14 +3,14 @@
     <j-modal :title="title" visible :maskClosable="false" width="600px" @ok="handleSave" @cancel="handleCancel"
         :confirmLoading="loading">
         <j-form :layout="'vertical'" ref="formRef" :model="modelRef">
-            <j-form-item label="项目标识" name="id" :rules="[
+            <j-form-item label="项目标识" name="id" validateFirst :rules="[
                 { required: true, message: '请输入项目标识' },
                 { max: 256, message: '最多输入256个字符' },
                 { pattern: _inputReg, message: '要求以小写字母开头，由字母+数字构成'},
             ]">
                 <j-input v-model:value="modelRef.id" placeholder="请输入项目标识" />
             </j-form-item>
-            <j-form-item label="项目名称" name="name" :rules="[
+            <j-form-item label="项目名称" name="name" validateFirst :rules="[
                 { required: true, message: '请输入项目名称' },
                 { max: 32, message: '最多输入32个字符' },
                 { min: 2, message: '最少输入2个字符' },
@@ -81,4 +81,4 @@ const handleCancel = () => {
 
 </script>
 
-<style scoped lang='less'></style>@/api/project
+<style scoped lang='less'></style>

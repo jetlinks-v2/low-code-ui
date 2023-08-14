@@ -15,31 +15,7 @@
             <j-dropdown :trigger="['contextmenu']">
               <span>{{ node.title }}</span>
               <template #overlay>
-                <j-menu
-                  mode="vertical"
-                  @click="({ key: menuKey }) => onContextMenuClick(node, menuKey)"
-                >
-                  <j-sub-menu key="Add" title="新建" style="width: 160px">
-                    <j-menu-item key="Module">模块</j-menu-item>
-                    <j-menu-item key="Resource">资源</j-menu-item>
-
-                    <j-sub-menu key="Page" title="页面" style="width: 160px">
-                      <j-menu-item style="width: 160px" key="HtmlPage">自定义html</j-menu-item>
-                      <j-menu-item style="width: 160px" key="ListPage">列表页模版</j-menu-item>
-                      <j-menu-item style="width: 160px" key="FormPage">表单页模版</j-menu-item>
-                    </j-sub-menu>
-
-                    <j-menu-item key="CRUD">增删改查</j-menu-item>
-                    <j-menu-item key="SQL">SQL</j-menu-item>
-                    <j-menu-item key="Function">函数</j-menu-item>
-                  </j-sub-menu>
-                  <j-menu-item v-if="node.type !== 'project'" key="Copy">复制</j-menu-item>
-                  <j-menu-item v-if="node.type !== 'project'" key="Paste">粘贴</j-menu-item>
-                  <j-menu-item v-if="node.type !== 'project'" key="Cut">剪切</j-menu-item>
-                  <j-menu-item v-if="node.type !== 'project'" key="Rename">重命名</j-menu-item>
-                  <j-menu-item v-if="node.type !== 'project'" key="Delete">删除</j-menu-item>
-                  <j-menu-item key="Profile">显示简介</j-menu-item>
-                </j-menu>
+                <RightMenu :node="node" />
               </template>
             </j-dropdown>
           </template>
@@ -53,8 +29,10 @@
 <script setup name="EngineTreeContent">
 import { useEngine } from '@/store'
 import { storeToRefs } from 'pinia'
+import RightMenu from './rightMenu.vue'
 
 const engine = useEngine()
+
 const { activeFile, expandedKeys } = storeToRefs(engine)
 
 const props = defineProps({
@@ -65,17 +43,15 @@ const props = defineProps({
 })
 
 const select = (key, e) => {
+  console.log(e)
   if (e.node?.type !== 'project') {
     engine.addFile({
-      id: e.node.key,
+      id: e.node.id,
       title: e.node.title,
-      type: e.node.type
+      type: e.node.type,
+      children: e.node.children
     })
   }
-}
-
-const onContextMenuClick = (node, menuKey) => {
-  console.log(node, menuKey)
 }
 
 </script>
