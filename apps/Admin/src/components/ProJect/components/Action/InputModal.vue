@@ -28,7 +28,6 @@ type Emits = {
 };
 const emit = defineEmits<Emits>();
 
-
 const props = defineProps({
     provider: {
         type: String,

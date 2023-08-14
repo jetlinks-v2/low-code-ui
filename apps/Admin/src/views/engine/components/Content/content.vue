@@ -5,7 +5,7 @@
 </template>
 
 <script setup name="ContentWarp">
-import Project from '@/components/ProJect/index.vue'
+import Project from '@/components/Project/index.vue'
 
 const props = defineProps({
     data: {
