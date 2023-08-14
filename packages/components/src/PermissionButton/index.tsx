@@ -57,7 +57,6 @@ const PermissionButton = defineComponent({
     return () => {
       const { popConfirm, tooltip, hasPermission, ...buttonProps } = props
 
-      console.log(buttonProps)
       const button = !slots.button ?
         h(Button,
           {
