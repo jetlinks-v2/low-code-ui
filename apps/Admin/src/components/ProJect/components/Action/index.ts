@@ -1,0 +1,39 @@
+export const providerList = [
+    {
+        value:'Module',
+        text:'模块'
+    },
+    {
+        value:'Resource',
+        text:'资源'
+    },
+    {
+        value:'Page',
+        text:'页面'
+    },
+
+    {
+        value:'HtmlPage',
+        text:'自定义html'
+    },
+    {
+        value:'ListPage',
+        text:'列表页模版'
+    },
+    {
+        value:'FormPage',
+        text:'表单页模版'
+    },
+    {
+        value:'SQL',
+        text:'SQL'
+    },
+    {
+        value:'Function',
+        text:'函数'
+    },
+    {
+        value:'CRUD',
+        text:'增删改查'
+    },
+]
