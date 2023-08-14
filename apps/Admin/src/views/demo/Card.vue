@@ -1,9 +1,15 @@
 <template>
   <div style="width: 30%;">
     <Card
-      status="warning"
+      status="offline"
       :actions="actions"
       :record="record"
+      statusText="测试文案"
+      :statusNames="{
+         online: 'processing',
+         offline: 'error',
+         notActive: 'warning',
+      }"
     >
       <template #img>
         <div style="height: 88px;width: 88px; background-color: #dfdfdf;">
@@ -35,7 +41,94 @@
       </template>
     </Card>
   </div>
-
+<!-- 卡片隐藏下面按钮操作 -->
+  <div style="width: 30%;margin-top: 24px">
+    <Card
+      status="online"
+      :actions="actions"
+      :record="record"
+      statusText="测试文案"
+      :statusNames="{
+         online: 'processing',
+         offline: 'error',
+         notActive: 'warning',
+      }"
+      :showTool="false"
+    >
+      <template #img>
+        <div style="height: 88px;width: 88px; background-color: #dfdfdf;">
+          Image
+        </div>
+      </template>
+      <template #content>
+        <h3 >
+          {{ record.name }}
+        </h3>
+        <j-row>
+          <j-col :span="12">
+            <div >
+              通知方式
+            </div>
+            <div>
+              {{ record.other.name }}
+            </div>
+          </j-col>
+          <j-col :span="12">
+            <div>
+              说明
+            </div>
+            <j-ellipsis>
+              此处是说明，
+            </j-ellipsis>
+          </j-col>
+        </j-row>
+      </template>
+    </Card>
+  </div>
+<!-- 卡片被选中 -->
+  <div style="width: 30%;margin-top: 24px">
+    <Card
+      status="notActive"
+      :actions="actions"
+      :record="record"
+      :active="true"
+      statusText="测试文案"
+      :statusNames="{
+         online: 'processing',
+         offline: 'error',
+         notActive: 'warning',
+      }"
+    >
+      <template #img>
+        <div style="height: 88px;width: 88px; background-color: #dfdfdf;">
+          Image
+        </div>
+      </template>
+      <template #content>
+        <h3 >
+          {{ record.name }}
+        </h3>
+        <j-row>
+          <j-col :span="12">
+            <div >
+              通知方式
+            </div>
+            <div>
+              {{ record.other.name }}
+            </div>
+          </j-col>
+          <j-col :span="12">
+            <div>
+              说明
+            </div>
+            <j-ellipsis>
+              此处是说明，
+            </j-ellipsis>
+          </j-col>
+        </j-row>
+      </template>
+    </Card>
+  </div>
 </template>
 
 <script setup>
