@@ -3,6 +3,7 @@
     <Card
       status="warning"
       :actions="actions"
+      :record="record"
     >
       <template #img>
         <div style="height: 88px;width: 88px; background-color: #dfdfdf;">
@@ -15,6 +16,14 @@
 </template>
 
 <script setup>
+
+const record = {
+  id: 'xxxxx',
+  other: {
+    name: '测试用法'
+  },
+  status: 1
+}
 const handleView = (id) => {
   console.log(id)
 }
@@ -23,16 +32,17 @@ const actions = [
   {
     key: 'view',
     text: '查看',
-    permissionProps: {
+    permissionProps: (data) => ({
       tooltip: {
         title: '查看',
       },
       hasPermission: false,
       icon: 'EyeOutlined',
-      onClick: (data) => {
+      onClick: (e) => {
+        console.log(data)
         handleView(data.id);
       },
-    },
+    }),
   },
   {
     key: 'view1',
@@ -53,22 +63,22 @@ const actions = [
   {
     key: 'delete',
     text: '删除',
-    permissionProps: {
+    permissionProps: (data) => ({
       tooltip: {
         title: '删除',
       },
-      popConfirm: (data) => ({
+      popConfirm: {
         title: data.status === 'error' ? '禁用' : '确认删除？',
         onConfirm: () => {
-
+          console.log(data)
         }
-      }),
+      },
       hasPermission: true,
       icon: 'EyeOutlined',
-      onClick: (data) => {
+      onClick: () => {
         handleView(data.id);
       },
-    },
+    }),
   }
 ]
 </script>

@@ -14,9 +14,7 @@
         >
           <PermissionButton
             v-if="item.permissionProps"
-            v-bind:="item.permissionProps"
-            :popConfirm="handleFunction(item.permissionProps.popConfirm)"
-            :tooltip="handleFunction(item.permissionProps.tooltip)"
+            v-bind:="handleFunction(item.permissionProps)"
             :danger="item.key === 'delete' "
             type="link"
           >
