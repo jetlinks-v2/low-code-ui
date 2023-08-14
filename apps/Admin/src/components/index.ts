@@ -6,7 +6,7 @@ import Search from './Search'
 import DragBox from "./DragBox";
 import Card from "./Card";
 import BadgeStatus from "./BadgeStatus";
-
+import ProImage from './Image/index.vue'
 export default  {
     install(app: App) {
         app.component('TitleComponent', TitleComponent)
@@ -16,5 +16,6 @@ export default  {
           .component('DragBox', DragBox)
           .component('Card', Card)
           .component('BadgeStatus', BadgeStatus)
+          .component('ProImage', ProImage)
     }
 }

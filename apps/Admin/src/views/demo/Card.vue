@@ -129,6 +129,9 @@
       </template>
     </Card>
   </div>
+  <pro-image
+    src="https://www.antdv.com/#error"
+  />
 </template>
 
 <script setup>

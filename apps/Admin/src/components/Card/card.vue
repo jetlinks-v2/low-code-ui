@@ -158,7 +158,6 @@ const onResize = debounce((e) => {
   const maxLength = parseInt(String(max / 100))
   const widthCount = 100 * len + deleteWidth
 
-  console.log(widthCount, max)
   if (widthCount > max ) {
     const cloneActions = cloneDeep(props.actions)
     const newActions = cloneActions.splice(0, maxLength - 1)
@@ -170,7 +169,6 @@ const onResize = debounce((e) => {
   } else {
     myActions.value = props.actions
   }
-  console.log('len', len, e)
 }, 100)
 
 </script>
