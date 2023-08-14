@@ -21,7 +21,7 @@
       </div>
 
       <div class="scroll-content" :style="{ height: totalHeight + 'px', paddingTop: paddingTop + 'px' }">
-        <div v-for="(item, index) in visibleItems" :key="item.id" class="list-container">
+        <div v-for="(item, index) in dataSource" :key="item.id" class="list-container">
           <div class="list-item" ref="listItemRef" v-for="(i, idx) in item" :key="idx" :style="{
             'background-color': i.editable ? '#f0f2f5' : '#e8e8e8',
             // cursor: !i.editable ? 'not-allowed' : '',
@@ -29,22 +29,37 @@
           }">
             <!-- todo需要判断editableType展示不同组件  -->
 
-            <div v-if="i.editableType === 'input'" style="width: 100%; text-align: center;"
-              @click.stop="onClickListItem($event, i, index)">
+            <div v-if="i.editableType === 'input'" style="width: 100%; text-align: center;" class="ipt_div"
+              @click.stop="onClickListItem($event, i, index, item)">
               <!-- todo文本框超出显示... -->
               {{ i.value }}
             </div>
-            <span @click.stop="onClickConfig($event, i, index)" v-else-if="i.editableType === 'button'"
-              class="configBtn">配置</span>
-            <a-checkbox v-else-if="i.editableType === 'radio'" v-model:checked="checked"></a-checkbox>
-            <!-- buttons -->
+
+            <a-select v-else-if="i.editableType === 'select_jdbc'" v-model:value="i.jdbcType_value"
+              style="width: 100%;height: 100%;" @change="jdbcChange(i, index)">
+              <a-select-option value="jack">Jack</a-select-option>
+              <a-select-option value="lucy">Lucy</a-select-option>
+            </a-select>
+
+            <a-select style="width: 100%;height: 100%;" v-model:value="i.javaType_value" @change="javaChange(i, index)"
+              v-else-if="i.editableType === 'select_java'">
+              <a-select-option value="jack1">Jack1</a-select-option>
+              <a-select-option value="lucy1">Lucy1</a-select-option>
+            </a-select>
+
+            <span @click.stop="onClickConfig($event, i, index)" v-else-if="i.editableType === 'button'" class="configBtn">
+              配置
+            </span>
+            <a-checkbox v-else-if="i.editableType === 'radio'" v-model:checked="i.isReadonly"
+              @change="readonlyChange($event, index)">
+            </a-checkbox>
             <div v-else-if="i.editableType === 'buttons'" class="btns">
-              <span size="small" @click.stop="acd('add')">新增</span>
-              <span size="small" style="margin: 0 5px;" @click.stop="acd('copy')">复制</span>
-              <span size="small" @click.stop="acd('dlt')">删除</span>
+              <span size="small" @click.stop="acd('add', i, index)">新增</span>
+              <span size="small" style="margin: 0 5px;" @click.stop="acd('copy', i, index)">复制</span>
+              <span size="small" @click.stop="acd('dlt', i, index)">删除</span>
             </div>
 
-            <div v-else @click.stop="onClickListItem($event, i, index)">
+            <div v-else @click.stop="onClickListItem($event, i, index, item)" class="ipt_div">
               {{ i.value }}
             </div>
           </div>
@@ -59,8 +74,8 @@
 import { ref, watch, toRefs, onMounted, createApp, reactive } from 'vue'
 import EditInput from './components/EditInput/index.vue'
 
-const emit = defineEmits(['submit'])
 
+const emit = defineEmits(['submit', 'submitDlt', 'submitSlt', 'submitCheckbox'])
 const props = defineProps({
   // 数据
   data: {
@@ -88,6 +103,7 @@ const props = defineProps({
     default: [],
   },
 })
+
 const { data } = toRefs(props)
 const { containerHeight, itemHeight, columns } = props
 
@@ -119,14 +135,44 @@ const generateSortedData = (columns, data) => {
     return sortedRowData
   })
 }
+// 其他配置
 const onClickConfig = (e, item, index) => {
   console.log('配置', e, item, index);
 }
-const acd = (mark: string) => {
-  console.log(mark);
+// 只读
+const readonlyChange = (e, index) => {
+  emit('submitCheckbox', {
+    value: e?.target?.checked,
+    key: 'readOnly',
+    index
+  })
 }
-const onClickListItem = (e, item, index) => {
-  console.log('列表项点击', e, item);
+//操作：新增编辑删除
+const acd = (mark: string, i: any, idx: number) => {
+  if (mark === 'dlt') {
+    emit('submitDlt', idx)
+  }
+}
+// 下拉change
+const jdbcChange = (i, line) => {
+  console.log('列--->', i.index, '行--->', line, '值--->', i.jdbcType_value,);
+  emit('submitSlt', {
+    key: 'jdbcType',
+    line: line,
+    column: i.index,
+    value: i.jdbcType_value
+  })
+}
+const javaChange = (i, line) => {
+  emit('submitSlt', {
+    key: 'javaType',
+    line: line,
+    column: i.index,
+    value: i.javaType_value
+  })
+}
+const onClickListItem = (e, item, index, data) => {
+  console.log('列表项点击', e, item, index, data, item.key);
   // todo需要判断 editableType不同类型 卸载组件、加载不同组件
   editInputApp && removeApp()
   if (!item.editable) return
@@ -165,16 +211,19 @@ window.addEventListener('click', removeApp, false)
 
 const initDataSource = (columns, data) => {
   const _data = generateSortedData(columns, data)
-
   return _data.map((item) => {
     const columnsEditable = columns?.map((i: any) => i.editable)
     const editableTypeArr = columns?.map((i: any) => i.editableType)
     return Object.keys(item).reduce((acc, key, index) => {
+      // console.log('ABC', item, key);
       acc[key] = {
         key, //列 columns的key
         index, //行 序号
         value: item[key],
-        editable: columnsEditable[index], //todo需要处理单条数据的editable
+        isReadonly: item.readOnly,
+        jdbcType_value: item.jdbcType,
+        javaType_value: item.javaType,
+        editable: columnsEditable[index], //todo需要处理单条数据的
         // editableType: 'input', //编辑的类型
         editableType: editableTypeArr[index],
         options: {
@@ -186,7 +235,6 @@ const initDataSource = (columns, data) => {
     }, {})
   })
 }
-
 // 处理为可编辑数据
 const dataSource = ref(initDataSource(columns, data.value))
 
@@ -205,43 +253,45 @@ const paddingTop = ref(startIndex.value * itemHeight)
 
 // 更新可见列表项
 const updateVisibleItems = () => {
-  visibleItems.value = dataSource.value.slice(startIndex.value, endIndex.value)
+  // visibleItems.value = dataSource.value.slice(startIndex.value, endIndex.value)
+  // console.log('a', dataSource.value);
+  visibleItems.value = dataSource.value
 }
 
 // 处理滚动事件
 const handleScroll = (event, v) => {
-  let scrollTop = event?.target?.scrollTop
-  // 计算可见区域的起始索引和结束索引
-  const start = Math.floor(scrollTop / itemHeight)
-  const end = start + Math.ceil(containerHeight / itemHeight)
+  // let scrollTop = event?.target?.scrollTop
+  // // 计算可见区域的起始索引和结束索引
+  // const start = Math.floor(scrollTop / itemHeight)
+  // const end = start + Math.ceil(containerHeight / itemHeight)
 
-  // 更新起始索引、结束索引和顶部内边距
-  startIndex.value = start
-  endIndex.value = end
-  paddingTop.value = startIndex.value * itemHeight
+  // // 更新起始索引、结束索引和顶部内边距
+  // startIndex.value = start
+  // endIndex.value = end
+  // paddingTop.value = startIndex.value * itemHeight
 }
 
 // 监听可见区域的起始索引和结束索引的变化
-watch(
-  [startIndex, endIndex],
-  (value) => {
-    if (dataSource.value.length > value[1]) {
-      headerRight.value = true
-    }
-    // 初始化可见列表项
-    updateVisibleItems()
-  },
-  {
-    immediate: true,
-  },
-)
-
+// watch(
+//   [startIndex, endIndex],
+//   (value) => {
+//     if (dataSource.value.length > value[1]) {
+//       headerRight.value = true
+//     }
+//     // 初始化可见列表项
+//     updateVisibleItems()
+//   },
+//   {
+//     immediate: true,
+//   },
+// )
+visibleItems.value = dataSource.value
 watch(data.value, (value) => {
+  console.log('监听data.vaue', value);
   // 更新dataSource、可见列表项
   dataSource.value = initDataSource(columns, value)
   updateVisibleItems()
 })
-
 onMounted(() => {
   setListItemMaxWidth()
 })
@@ -348,5 +398,11 @@ const setListItemMaxWidth = () => {
 .configBtn,
 .btns span {
   cursor: pointer;
+}
+
+.ipt_div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

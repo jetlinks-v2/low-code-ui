@@ -20,7 +20,7 @@
 import datacp from './datacp/index.vue'
 import tablecp from './tablecp/index.vue'
 import configcp from './configcp/index.vue'
-const activeKey = ref('configcp')
+const activeKey = ref('datacp')
 const verifyData = () => {
     console.log('校验');
 }
