@@ -10,6 +10,29 @@
           Image
         </div>
       </template>
+      <template #content>
+        <h3 >
+          {{ record.name }}
+        </h3>
+        <j-row>
+          <j-col :span="12">
+            <div >
+              通知方式
+            </div>
+            <div>
+              {{ record.other.name }}
+            </div>
+          </j-col>
+          <j-col :span="12">
+            <div>
+              说明
+            </div>
+            <j-ellipsis>
+              此处是说明，
+            </j-ellipsis>
+          </j-col>
+        </j-row>
+      </template>
     </Card>
   </div>
 
@@ -19,6 +42,7 @@
 
 const record = {
   id: 'xxxxx',
+  name: '测试card',
   other: {
     name: '测试用法'
   },
