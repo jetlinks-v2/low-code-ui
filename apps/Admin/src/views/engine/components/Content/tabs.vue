@@ -11,9 +11,7 @@
         <AIcon type="MoreOutlined" />
       </template>
       <j-tab-pane v-for="item in files" :key="item.id" :tab="item.title" :closable="true">
-        <Content
-          v-bind="item"
-        />
+        <Content :data="item"/>
       </j-tab-pane>
     </j-tabs>
 <!--    <Tabs-->

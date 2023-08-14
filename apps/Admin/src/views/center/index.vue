@@ -1,13 +1,14 @@
 <template>
   <page-container>
     <pro-search :columns="columns" target="code" @search="handleSearch" />
-    <j-pro-table ref="tableRef" model="TABLE" :columns="columns" :params="params" :request="queryProject">
+    <JProTable ref="tableRef" model="TABLE" :columns="columns" :params="params" :request="queryProject">
       <template #headerTitle>
         <j-button type="primary" @click="handleSave('add')">新增</j-button>
       </template>
       <template #createTime="slotProps">
         <span>{{ slotProps?.createTime ? dayjs(slotProps.createTime).format('YYYY-MM-DD HH:mm:ss') : '' }}</span>
       </template>
+      <template #state="slotProps">{{ slotProps.state?.text }}</template>
       <template #description="slotProps">
         <div>{{ slotProps.description ? slotProps.description : '--' }}</div>
       </template>
@@ -17,7 +18,7 @@
             <template #title>
               查看
             </template>
-            <j-button type="link" style="padding: 0;" v-if="slotProps.state.value !== 'publish'">
+            <j-button type="link" style="padding: 0;" v-if="slotProps.state.value !== 'publish'" @click="_view(slotProps.draftId)">
               <AIcon type="EyeOutlined" />
             </j-button>
             <j-dropdown v-else>
@@ -55,7 +56,7 @@
           </j-popconfirm>
         </j-space>
       </template>
-    </j-pro-table>
+    </JProTable>
     <Save v-if="visible" @close="handleClose" :data="current" :type="modelType" />
   </page-container>
 </template>
@@ -65,8 +66,9 @@ import Save from './Save/index.vue'
 import dayjs from 'dayjs';
 import { queryProject, delProject } from '@/api/project'
 import { onlyMessage } from '@/utils/comm';
+import { router } from '@jetlinks/router';
 
-const params = ref()
+const params = ref<any>({})
 const tableRef = ref<Record<string, any>>({});
 const current = ref({})
 const modelType = ref<string>('add')
@@ -118,6 +120,7 @@ const columns = [
     dataIndex: 'state',
     key: 'state',
     ellipsis: true,
+    scopedSlots: true,
     search: {
       type: 'select',
       options: [
@@ -140,16 +143,6 @@ const columns = [
   },
 ]
 
-const dataSource = [
-  {
-    id: '11',
-    state: 'publish'
-  },
-  {
-    id: '22',
-    state: 'unPublish'
-  }
-]
 
 const handleSearch = (data: any) => {
   console.log('data',data)
@@ -167,6 +160,10 @@ const handleClose = () => {
   tableRef.value?.reload()
 }
 
+const _view = (id:string)=>{
+  router.replace(`/engine/${id}`)
+}
+
 const _del = async (id: string) => {
   const res = await delProject(id)
   if (res.status === 200) {
@@ -178,4 +175,3 @@ const _del = async (id: string) => {
 </script>
 
 <style scoped></style>
-@/api/project
