@@ -1,14 +1,17 @@
 <template>
-  <Card
-    status="warning"
-    :actions="actions"
-  >
-    <template #img>
-      <div style="height: 88px;width: 88px; background-color: #dfdfdf;">
-        Image
-      </div>
-    </template>
-  </Card>
+  <div style="width: 30%;">
+    <Card
+      status="warning"
+      :actions="actions"
+    >
+      <template #img>
+        <div style="height: 88px;width: 88px; background-color: #dfdfdf;">
+          Image
+        </div>
+      </template>
+    </Card>
+  </div>
+
 </template>
 
 <script setup>
@@ -46,6 +49,7 @@ const actions = [
     key: 'view2',
     text: '查看2',
   },
+
   {
     key: 'delete',
     text: '删除',

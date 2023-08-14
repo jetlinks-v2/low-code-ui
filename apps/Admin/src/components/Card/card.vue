@@ -43,19 +43,33 @@
 
       </div>
     </div>
-    <ResizeObserver>
+    <ResizeObserver :onResize="onResize">
       <div class="card-footer" v-if="showTool && actions?.length">
-        <div :class="['card-button', item.key === 'delete' ? 'delete' : '']" v-for="item in actions">
+        <div :class="['card-button', item.key === 'delete' ? 'delete' : 'default']" v-for="item in myActions">
+          <OtherActions
+            v-if="item.key === 'others'"
+            :actions="item.actions"
+            :record="record"
+          />
+
           <PermissionButton
-            v-if="item.permissionProps"
+            v-else-if="item.permissionProps"
             v-bind:="item.permissionProps"
             :popConfirm="handleFunction(item.permissionProps.popConfirm)"
             :tooltip="handleFunction(item.permissionProps.tooltip)"
+            :danger="item.key === 'delete'"
+            style="width: 100%"
           >
-            <template #icon v-if="item.icon">
-              <AIcon :type="item.icon" />
+            <template #icon v-if="item.icon || item.key === 'delete'">
+              <AIcon :type="item.icon ? item.icon : 'DeleteOutlined'" />
             </template>
+            <span v-if="item.key !== 'delete'">
+              {{ item.text }}
+            </span>
           </PermissionButton>
+          <j-button v-else :icon="item.icon" @click="item.click" >
+            {{ item.text }}
+          </j-button>
         </div>
       </div>
     </ResizeObserver>
@@ -63,10 +77,11 @@
 </template>
 
 <script setup name="Card">
-import Active from './active.vue'
 import { BadgeProps, BadgeColors } from '../BadgeStatus'
 import ResizeObserver from 'ant-design-vue/lib/vc-resize-observer';
-import {isFunction, isObject} from "lodash-es";
+import {isFunction, isObject, debounce, cloneDeep} from "lodash-es";
+import Active from './active.vue'
+import OtherActions from './otherActions.vue'
 
 const props = defineProps({
   ...BadgeProps(),
@@ -126,6 +141,8 @@ const cardClick = () => {
   emit('click')
 }
 
+const myActions = ref([])
+
 const handleFunction = (item) => {
   if (isFunction(item)) {
     return item(props.record)
@@ -134,6 +151,29 @@ const handleFunction = (item) => {
   }
   return undefined
 }
+
+const onResize = debounce((e) => {
+  const len = props.actions?.length || 0
+  const hasDelete = props.actions.some(item => item.key === 'delete')
+  const deleteWidth = hasDelete ? 60 : 0
+  const max = e.width
+  const maxLength = parseInt(String(max / 100))
+  const widthCount = 100 * len + deleteWidth
+
+  console.log(widthCount, max)
+  if (widthCount > max ) {
+    const cloneActions = cloneDeep(props.actions)
+    const newActions = cloneActions.splice(0, maxLength - 1)
+    newActions.push({
+      key: 'others',
+      actions: cloneActions
+    })
+    myActions.value = newActions
+  } else {
+    myActions.value = props.actions
+  }
+  console.log('len', len, e)
+}, 100)
 
 </script>
 
@@ -260,11 +300,14 @@ const handleFunction = (item) => {
     gap: 8px;
 
     .card-button {
-      display: flex;
-      min-width: 0;
-      flex-grow: 1;
 
-      button {
+      &.default {
+        display: flex;
+        min-width: 0;
+        flex-grow: 1;
+      }
+
+      :deep(.ant-btn) {
         width: 100%;
         border-radius: 0;
         background: #f6f6f6;
@@ -272,21 +315,23 @@ const handleFunction = (item) => {
         color: #2f54eb;
       }
 
-      &.remove, &.more {
-        width: 80px;
-      }
+      &.delete {
+        width: 60px;
 
-      &.remove {
-        background: @error-color-deprecated-bg;
-        border: 1px solid @error-color-outline;
+        :deep(.ant-btn) {
+          background: @error-color-deprecated-bg;
+          border: 1px solid @error-color-outline;
+        }
+
 
         span {
           color: @error-color !important;
         }
 
         &:hover {
-          background-color: @error-color-hover;
-
+          :deep(.ant-btn) {
+            background: @error-color-hover;
+          }
           span {
             color: #fff !important;
           }

@@ -58,7 +58,7 @@ const PermissionButton = defineComponent({
       const { popConfirm, tooltip, hasPermission, ...buttonProps } = props
       const button = !slots.button ?
         h(Button, {...buttonProps, disabled: isPermission.value }, {
-          default: () => slots?.default(),
+          default: () => slots?.default?.(),
           icon: () => slots?.icon?.()
         }) :
         slots.button()
