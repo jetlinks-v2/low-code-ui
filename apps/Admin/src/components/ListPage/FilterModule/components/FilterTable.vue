@@ -1,25 +1,24 @@
 <template>
   <div className="filter-table">
-    <div class="tips">请选择页面支持的筛选项</div>
+    <div class="tips">{{ props.title }}</div>
     <j-button
       @click="syncData"
       myIcon="SyncOutlined"
       size="small"
-      :type="dataBind ? 'primary' : 'stroke'"
+      :type="props.dataBind ? 'primary' : 'stroke'"
     >
       同步数据绑定
     </j-button>
-    <div class="table">
+    <div class="table" v-if="props.asynData && props.dataBind">
       <j-data-table
         rowKey="code"
-        :columns="columns"
-        :data-source="dataSource"
+        :columns="props.columns"
+        :data-source="props.dataSource"
         :pagination="false"
         bordered
         ref="tableRef"
         size="small"
         :height="200"
-        onClick="handleClick"
       >
         <template #headerCell="{ column }">
           <template v-if="column.key === 'type'">
@@ -57,13 +56,14 @@
         </template>
       </j-data-table>
     </div>
+    <br />
     <j-button
       class="editable-add-btn"
       style="margin-bottom: 8px"
       type="link"
       @click="handleAdd"
     >
-      + 新增筛选项
+      + {{ props.addBtnName }}
     </j-button>
     <!--处理方式弹窗-->
     <j-modal
@@ -75,7 +75,11 @@
       class="handle-modal"
     >
       <j-row :gutter="16">
-        <j-col :span="8" v-for="(item, index) in handleOptions" :key="index">
+        <j-col
+          :span="8"
+          v-for="(item, index) in props.handleOptions"
+          :key="index"
+        >
           <j-card
             style="height: 150px"
             @click="() => handleSelect(item.value)"
@@ -92,111 +96,86 @@
 
 <script lang="ts" setup>
 import { message } from 'ant-design-vue'
-import { log } from 'console'
+const props = defineProps({
+  title: {
+    type: String,
+    default: '',
+  },
+  //是否完成数据绑定
+  dataBind: {
+    type: Boolean,
+    default: false,
+  },
+  //是否同步数据绑定
+  asynData: {
+    type: Boolean,
+    default: false,
+  },
+  //数据是否有变动
+  dataChange: {
+    type: Boolean,
+    default: false,
+  },
+  //处理方式弹窗activeKey
+  modelActiveKey: {
+    type: String,
+    default: '',
+  },
+  //表格col
+  columns: {
+    type: Array as PropType<any[]>,
+    default: () => [],
+    required: true,
+  },
+  //表格data
+  dataSource: {
+    type: Array as PropType<any[]>,
+    default: () => [],
+    required: true,
+  },
+  //处理类型
+  handleOptions: {
+    type: Array as PropType<any[]>,
+    default: () => [
+      {
+        value: '1',
+        label: '覆盖',
+        subLabel: '以功能下的数据覆盖页面已有内',
+      },
+      {
+        value: '2',
+        label: '追加',
+        subLabel: '在页面已有内容的基础上追加新增内容',
+      },
+      {
+        value: '3',
+        label: '忽略',
+        subLabel: '保留页面已有内容，忽略变动',
+      },
+    ],
+  },
+  //新增按钮名称
+  addBtnName: {
+    type: String,
+    default: '新增',
+  },
+})
 const tableRef = ref()
-const dataBind = ref<boolean>(false)
 const visible = ref<boolean>(false)
 const confirmLoading = ref<boolean>(false)
 const loading = ref<boolean>(false)
-const emit = defineEmits(['configuration'])
+const emit = defineEmits([
+  'configuration',
+  'confirm',
+  'syncData',
+  'handleAdd',
+  'handleOk',
+])
 
-//筛选类型
-const options = [
-  {
-    value: 'string',
-    label: 'string',
-  },
-  {
-    value: 'enum',
-    label: 'enum',
-  },
-  {
-    value: 'date',
-    label: 'date',
-  },
-  {
-    value: 'number',
-    label: 'number',
-  },
-]
+
 const activeKey = ref('1')
-//处理类型
-const handleOptions = [
-  {
-    value: '1',
-    label: '覆盖',
-    subLabel: '以功能下的数据覆盖页面已有内',
-  },
-  {
-    value: '2',
-    label: '追加',
-    subLabel: '在页面已有内容的基础上追加新增内容',
-  },
-  {
-    value: '3',
-    label: '忽略',
-    subLabel: '保留页面已有内容，忽略变动',
-  },
-]
-const columns: any = [
-  {
-    title: '标识',
-    dataIndex: 'id',
-    key: 'id',
-    ellipsis: true,
-    align: 'center',
-    width: 150,
-    type: 'text',
-    form: {
-      isVerify: true,
-      required: true,
-      rules: [
-        {
-          validator(_, value) {
-            if (!value) {
-              return Promise.reject('请输入标识')
-            }
-            return Promise.resolve()
-          },
-        },
-      ],
-    },
-    doubleClick(record) {
-      return record?.mark === 'add'
-    },
-  },
-  {
-    title: '筛选项名称',
-    dataIndex: 'name',
-    key: 'name',
-    ellipsis: true,
-    align: 'center',
-    width: 150,
-    type: 'text',
-    form: {
-      isVerify: true,
-      required: false,
-    },
-  },
-  {
-    title: '筛选项类型',
-    dataIndex: 'type',
-    key: 'type',
-    ellipsis: true,
-    align: 'center',
-    type: 'select',
-    options: options,
-    width: 150,
-  },
-  {
-    title: '操作',
-    key: 'action',
-    dataIndex: 'action',
-    ellipsis: true,
-    align: 'center',
-    width: 140,
-  },
-]
+
+//提示col
 const tipsColumns: any = [
   {
     title: '筛选项类型',
@@ -290,23 +269,10 @@ const data = [
     filterValues: '输入框',
   },
 ]
-//数据
-const dataSource = ref([
-  {
-    id: 'deviceId',
-    name: 'hhhh',
-    type: 'data',
-  },
-])
+
 //新增一列table
 const handleAdd = async () => {
-  tableRef.value.cleanEditStatus()
-  tableRef.value.addItem({
-    id: '',
-    name: '',
-    type: 'string',
-    mark: 'add',
-  })
+  emit('handleAdd', tableRef.value)
 }
 //配置
 const configuration = (data: any) => {
@@ -316,6 +282,7 @@ const configuration = (data: any) => {
 //删除
 const confirm = (data: any) => {
   loading.value = true
+  emit('confirm', data)
   return new Promise((resolve) => {
     setTimeout(async () => {
       tableRef.value.removeItem(data.index)
@@ -326,9 +293,20 @@ const confirm = (data: any) => {
 }
 //同步数据绑定
 const syncData = () => {
-  message.error('请先完成数据绑定')
-  message.success('已是最新数据')
-  dataBind.value = !dataBind.value
+  if (!props.dataBind) {
+    return message.error('请先完成数据绑定')
+  } else {
+    if (props.dataChange) {
+      openModel(props.modelActiveKey)
+      emit('syncData')
+    } else {
+      message.success('已是最新数据')
+    }
+  }
+}
+//打开弹窗
+const openModel = (value: any) => {
+  activeKey.value = value
   visible.value = true
 }
 //处理方式弹窗
@@ -339,9 +317,9 @@ const handleOk = () => {
     confirmLoading.value = false
     visible.value = false
   }, 1000)
+  emit('handleOk', activeKey.value)
 }
 const handleCancel = () => {
-  console.log(activeKey.value)
   visible.value = false
 }
 const handleSelect = (key: string) => {
