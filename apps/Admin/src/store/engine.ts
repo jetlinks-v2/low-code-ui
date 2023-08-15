@@ -15,6 +15,7 @@ export const useEngine = defineStore('engine', () => {
   const content = ref()
   const expandedKeys = ref<string[]>([])
   const openFile = ref<any>()
+  const copyFile = ref<string>('')
 
   const product = useProduct()
 
@@ -95,6 +96,15 @@ export const useEngine = defineStore('engine', () => {
 
     selectFile(record.id)
   }
+  
+
+    /**
+   * 复制文件
+   * @param record
+   */
+    const setCopyFile = (record: FileItemType) => {
+      copyFile.value = record.id
+    }
 
   watch(() => activeFile.value, () => {
     console.log(activeFile.value)
@@ -106,10 +116,12 @@ export const useEngine = defineStore('engine', () => {
     content,
     expandedKeys,
     openFile,
+    copyFile,
     removeFile,
     addFile,
     selectFile,
     expandedAll,
-    packUpAll
+    packUpAll,
+    setCopyFile
   }
 })

@@ -1,11 +1,11 @@
 <template>
   <div class="content-warp">
-    <Project />
+    <Project :data="props.data.children"/>
   </div>
 </template>
 
 <script setup name="ContentWarp">
-import Project from '@/components/ProJect/index.vue'
+import Project from '@/components/Project/index.vue'
 
 const props = defineProps({
     data: {
@@ -13,7 +13,6 @@ const props = defineProps({
         default: {}
     },
 })
-
 
 
 </script>
