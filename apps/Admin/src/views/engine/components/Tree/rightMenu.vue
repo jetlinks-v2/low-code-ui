@@ -6,7 +6,7 @@
   >
     <j-sub-menu key="Add" title="新建" style="width: 160px">
       <j-menu-item key="module">模块</j-menu-item>
-      <j-menu-item key="Resource">资源</j-menu-item>
+      <!-- <j-menu-item key="Resource">资源</j-menu-item> -->
 
       <j-sub-menu key="Page" title="页面" style="width: 160px">
         <j-menu-item style="width: 160px" key="HtmlPage">自定义html</j-menu-item>
@@ -20,7 +20,7 @@
     </j-sub-menu>
     <j-menu-item key="Copy">复制</j-menu-item>
     <j-menu-item key="Paste">粘贴</j-menu-item>
-    <j-menu-item key="Cut">剪切</j-menu-item>
+    <!-- <j-menu-item key="Cut">剪切</j-menu-item> -->
     <j-menu-item key="Rename">重命名</j-menu-item>
     <j-menu-item key="Delete">删除</j-menu-item>
     <j-menu-item key="Profile">显示简介</j-menu-item>

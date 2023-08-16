@@ -1,7 +1,7 @@
 
 <template>
     <div>
-        <List v-if="isShow" :data="props.data"/> 
+        <List v-if="isShow" :data="list" /> 
         <Empty v-else/>
     </div>
 </template>
@@ -15,13 +15,16 @@ const props = defineProps({
     data: {
         type: Array,
         default: []
-    }
+    },
 })
 
 const isShow = computed(() => props.data?.length > 0)
+const list = ref<any>([])
 
 watchEffect(()=>{
-    console.log('props.data-----',props.data)
+    if(props.data){
+        list.value = props.data
+    }
 })
 
 </script>

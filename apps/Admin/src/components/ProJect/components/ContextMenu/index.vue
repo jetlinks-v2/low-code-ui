@@ -9,9 +9,9 @@
          }">
             <j-menu v-if="props.type === 'list'" @click="handleClick">
                <j-menu-item key="Profile">显示简介</j-menu-item>
-               <j-menu-item key="Cut">剪切</j-menu-item>
+               <!-- <j-menu-item key="Cut">剪切</j-menu-item> -->
                <j-menu-item key="Copy">复制</j-menu-item>
-               <j-menu-item key="Paste">粘贴</j-menu-item>
+               <j-menu-item key="Paste" :disabled="disabled">粘贴</j-menu-item>
                <j-menu-item key="Rename">重命名</j-menu-item>
                <j-menu-item key="Delete">删除</j-menu-item>
             </j-menu>
@@ -31,7 +31,7 @@
                   <j-menu-item key="SQL">SQL</j-menu-item>
                   <j-menu-item key="Function">函数</j-menu-item>
                </j-sub-menu>
-               <j-menu-item key="Paste">
+               <j-menu-item key="Paste" :disabled="disabled">
                   粘贴
                </j-menu-item>
             </j-menu>
@@ -42,6 +42,9 @@
 
 <script setup lang='ts' name="ContextMenu">
 import { useContextMenu } from '@/hooks/useContextMenu';
+import { useEngine } from '@/store'
+
+const engine = useEngine()
 
 const containerRef = ref(null)
 const menuRef = ref<any>(null)
@@ -65,6 +68,8 @@ const props = defineProps({
       type: Function,
    },
 })
+
+const disabled = computed(()=>engine.copyFile==='')
 
 const emit = defineEmits<{
    select: [menuKey: string, divData?: object]

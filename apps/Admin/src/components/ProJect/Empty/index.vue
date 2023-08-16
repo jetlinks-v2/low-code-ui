@@ -58,12 +58,15 @@
          </div>
       </div>
    </div>
-   <InputModal v-if="visible" :provider="provider" @close="visible=false"/>
+   <InputModal v-if="visible" :provider="provider" @close="visible=false" @save="onSave"/>
 </template>
 
 <script setup lang='ts' name="Empty">
 import InputModal from '../components/Action/InputModal.vue'
 import { providerEnum } from '../index'
+import { useProduct } from '@/store'
+
+const product = useProduct()
 
 const props = defineProps({
    data: Object
@@ -77,6 +80,11 @@ const onClick = (type: string) => {
    console.log('type',type)
    provider.value = providerEnum[type]
    visible.value = true
+}
+
+const onSave = (data)=>{
+   product.add(data,data.parentId)
+   visible.value = false
 }
 
 </script>

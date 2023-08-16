@@ -1,6 +1,6 @@
 
 <template>
-  <j-modal visible :width="300" @cancel="emit('close')" @ok="" :footer="null">
+  <j-modal visible :width="300" @cancel="emit('close')"  :footer="null">
     <div class="item">
       <div class="item-text">确定删除“{{ props.data.name }}”?</div>
       <div class="item-btn">
