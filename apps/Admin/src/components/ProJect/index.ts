@@ -1,3 +1,6 @@
+import { randomString } from '@jetlinks/utils'
+import { cloneDeep } from "lodash-es";
+
 //key:前端菜单key,value:后端对应provider,
 export const providerEnum = {
     Module:'module',
@@ -26,3 +29,18 @@ export const providerList = Object.keys(providerMap).map(key=>({
     title:providerMap[key],
     value:key
 }))
+
+//重写id
+export const restId = (arr: any[]) => {
+    const list = cloneDeep(arr)
+    if (list && list.length === 0) return []
+    return list?.map(item => {
+      if (item.id) {
+        item.id = randomString(16)
+      }
+      if (item.children) {
+        item.children = restId(item.children)
+      }
+      return item
+    })
+  }
