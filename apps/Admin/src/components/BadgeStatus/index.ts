@@ -1,18 +1,4 @@
 import BadgeStatus from './badge.vue'
-export const BadgeProps = () => ({
-  status: {
-    type: [Number, String],
-    default: undefined
-  },
-  statusText: {
-    type: String,
-    default: '正常',
-  },
-  statusNames: {
-    type: Object,
-    default:()=>({'default':'default'})
-  },
-})
 
 export const BadgeColors = {
   'default': '102, 102, 102',
@@ -27,5 +13,26 @@ export const BadgeColors = {
   'level4': '153, 153, 153',
   'level5': '196, 196,  196'
 }
+
+export const BadgeProps = () => ({
+  status: {
+    type: [Number, String],
+    default: undefined
+  },
+  statusText: {
+    type: String,
+    default: '正常',
+  },
+  statusNames: {
+    type: Object,
+    default:()=>({'default':'default'})
+  },
+  statusColor: {
+    type: Object,
+    default: () => (BadgeColors)
+  }
+})
+
+
 
 export default BadgeStatus
