@@ -36,6 +36,7 @@
                 :status="status"
                 :text="statusText"
                 :statusNames="statusNames"
+                :statusColor="statusColor"
               />
             </div>
           </div>
@@ -80,6 +81,7 @@ import ResizeObserver from 'ant-design-vue/lib/vc-resize-observer';
 import {isFunction, isObject, debounce, cloneDeep} from "lodash-es";
 import Active from './active.vue'
 import OtherActions from './otherActions.vue'
+import { hexToRgb } from '@jetlinks/utils'
 
 const props = defineProps({
   ...BadgeProps(),
@@ -115,6 +117,7 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+
 })
 
 const slots = useSlots();
@@ -130,9 +133,11 @@ const bodyClass = computed(() => {
 })
 
 const stateColor = computed(() => {
+  const badgeColor = props.statusColor || BadgeColors
   const code = props.statusNames[props.status] || props.status
+  const c = hexToRgb(badgeColor[code]) || badgeColor[code]
 
-  return BadgeColors[code] || BadgeColors.default
+  return c || BadgeColors.default
 })
 
 const cardClick = () => {
