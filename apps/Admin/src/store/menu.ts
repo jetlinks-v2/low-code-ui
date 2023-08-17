@@ -7,7 +7,7 @@ import {handleMenus, handleMenusMap, handleSiderMenu} from '@/utils'
 import { getOwnMenuThree } from '@/api/menu'
 import { getGlobModules } from '@/router/globModules'
 import { extraMenu } from '@/router/extraMenu'
-import { USER_CENTER_ROUTE } from "@/router/basic";
+import { BASIC_ROUTERS} from "@/router/basic";
 import { useAuthStore } from '@/store/auth'
 
 const defaultOwnParams = [
@@ -74,8 +74,7 @@ export const useMenuStore = defineStore('menu', () => {
 
         if (resp.success) {
             // const routes = handleMenus(cloneDeep(resp.result), extraMenu, asyncRoutes) // 处理路由
-            const routes: any[] = []
-            routes.push(USER_CENTER_ROUTE) // 添加个人中心
+            const routes: any[] = BASIC_ROUTERS
             if (routes.length) {
               routes.push({
                 path: '/',

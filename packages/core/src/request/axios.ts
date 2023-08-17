@@ -110,6 +110,9 @@ export class Axios {
           this.showNotification('用户未登录', status)
           jumpLogin()
           break;
+        case 404:
+          const message = data.message || `${data?.error} ${data?.path}`
+          this.showNotification(message,status)
         default:
           break;
       }

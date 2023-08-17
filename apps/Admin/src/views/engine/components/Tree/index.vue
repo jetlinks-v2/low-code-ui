@@ -1,0 +1,92 @@
+<template>
+  <div class="engine-tree">
+    <drag-box v-show="visible" position="right" style="width: 320px">
+      <div style="overflow: hidden; height: 100%">
+        <div class="engine-tree-content">
+          <Search :collapsed="collapsed" @collapsed="collapsedChange" />
+          <Tree
+            :treeData="data"
+          />
+        </div>
+      </div>
+
+    </drag-box>
+
+    <div v-show="!collapsed" :class="productClass" @click="showTree">
+      项目
+    </div>
+  </div>
+
+</template>
+
+<script setup name="EngineTree">
+import Search from './search.vue'
+import Tree from './tree.vue'
+import { useProduct } from "@/store";
+import { storeToRefs } from 'pinia'
+
+const product = useProduct()
+
+const { data } = storeToRefs(product)
+
+const collapsed = ref(true)
+const visible = ref(true)
+const route = useRoute()
+
+const collapsedChange = (e) => {
+  collapsed.value = e
+  if (e === false) {
+    setTimeout(() => {
+      visible.value = false
+    }, 50)
+  }
+}
+
+const showTree = () => {
+  collapsed.value = true
+  visible.value = true
+}
+
+const productClass = computed(() => {
+  return {
+    'product': true,
+    'show': !visible.value
+  }
+})
+
+product.queryProduct(route.params.id)
+
+</script>
+
+<style scoped lang="less">
+.engine-tree {
+  //background-color: @layout-left;
+  min-width: 0;
+  transition: all .15s;
+  user-select: none;
+  border-right: 1px solid #d1d1d1;
+
+  .engine-tree-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 180px;
+    overflow: hidden;
+  }
+
+  .product {
+    display: none;
+    color: #f8f8f8;
+    padding: 12px 6px;
+    background-color: #323844;
+    cursor: pointer;
+    writing-mode: vertical-lr;
+
+    &.show {
+      display: block;
+    }
+  }
+}
+
+
+</style>

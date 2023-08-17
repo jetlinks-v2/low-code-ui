@@ -1,5 +1,6 @@
 import type { Slots } from 'vue'
 import { message } from 'jetlinks-ui-components'
+import { regular } from './regular'
 /**
  * 静态图片资源处理
  * @param path {String} 路径
@@ -61,4 +62,24 @@ export const getBase64ByImg = (img: File, callback: (base64Url: string) => void)
   reader.onload = (result: any) => {
     callback(result.target.result)
   }
+}
+
+export const hexToRgb = (hex: string) => {
+  // 判断是否是有效的16进制颜色代码
+  if (!regular.isColorReg(hex)) {
+    return null;
+  }
+
+  let _hex = hex.replace('#', '');
+  // 如果是3位的颜色代码，则将其扩展为6位
+  if (_hex.length === 3) {
+    _hex = _hex[0] + _hex[0] + _hex[1] + _hex[1] + _hex[2] + _hex[2];
+  }
+
+  // 分离RGB值
+  const r = parseInt(_hex.slice(0, 2), 16);
+  const g = parseInt(_hex.slice(2, 4), 16);
+  const b = parseInt(_hex.slice(4, 6), 16);
+
+  return `${r}, ${g}, ${b}`
 }
