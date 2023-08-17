@@ -36,4 +36,26 @@ export const providerList = [
         value:'CRUD',
         text:'增删改查'
     },
+    //接口数据的
+    {
+        value:'module',
+        text:'模块'
+    },
+    {
+        value:'rdb-crud',
+        text:'增删改查'
+    },
+
+    {
+        value:'rdb-sql-query',
+        text:'SQL'
+    },
+    {
+        value:'page-code',
+        text:'页面'
+    },
+    {
+        value:'script',
+        text:'函数'
+    }
 ]

@@ -1,5 +1,6 @@
-import {defineStore} from "pinia";
-import {queryProjectDraft} from "@/api/project";
+import { defineStore } from "pinia";
+import { queryProjectDraft } from "@/api/project";
+import { useEngine } from './engine'
 
 type TreeData = {
   title: string
@@ -25,7 +26,7 @@ const handleResources = (resources: Draft.Resource[]) => {
 }
 
 const handleChildren = (children: Draft.Module, parentId: string): TreeData[] => {
-  const treeData:TreeData[] = []
+  const treeData: TreeData[] = []
 
   if (children.children) {
     children.children.forEach(item => {
@@ -68,6 +69,8 @@ const handleChildren = (children: Draft.Module, parentId: string): TreeData[] =>
 export const useProduct = defineStore('product', () => {
   const data = ref<TreeData[]>([]) // 项目
   const dataMap: Map<string, any> = new Map()
+  const engine = useEngine()
+  const dataById = ref()
 
   const handleDataMap = (data?: TreeData[]) => {
     data?.forEach?.(item => {
@@ -85,28 +88,78 @@ export const useProduct = defineStore('product', () => {
   }
 
   const addProduct = (data: any[], record: any, parentId: string) => {
-    data.some(item => {
+    return data.map(item => {
       if (item.id === parentId) {
-        item.children = item.children?.length ? [...item.children, record] : [record]
-        return true
+        return {
+          ...item,
+          children: item.children?.length ? [...item.children, record] : [record]
+        }
+      }
+      if(item.children){
+        item.children = addProduct(item.children,record,parentId)
+      }
+      return item
+    })
+  }
+
+  const updateProduct = (data: any[], record: any) => {
+    return data.map(item => {
+      if (item.id === record.id) {
+        return { ...item, ...record }
       } else if (item.children) {
-        addProduct(item.children, record, parentId)
+        item.children = updateProduct(item.children, record)
+      }
+      return item
+    })
+  }
+  const removeProduct = (data: any[], record: any) => {
+    return data.filter(item => {
+      if (item.id === record.id) {
+        return false
+      }
+      if (item.children) {
+        item.children = removeProduct(item.children, record)
+      }
+      return true
+    })
+  }
+
+  const getProduct = (data: any[], id: string) => {
+    data.some(item => {
+      if (item.id === id) {
+        dataById.value = item
+        return true
+      }
+      if (item.children) {
+        getProduct(item.children, id)
       }
       return false
     })
+    return dataById.value
   }
 
   const add = (record: any, parentId: string) => {
     dataMap.set(record.id, record)
-    addProduct(data.value, record, parentId)
+    data.value = addProduct(data.value, record, parentId)
+    engine.updateFile(record, 'add')
+    console.log('add----', data.value)
   }
 
-  const update = (record: any) => {
-
+  const update = (record: any,) => {
+    dataMap.set(record.id, record)
+    data.value = updateProduct(data.value, record)
+    engine.updateFile(record, 'edit')
   }
 
   const remove = (record: any) => {
+    // dataMap.delete(record.id))
+    data.value = removeProduct(data.value, record)
+    dataMap.delete(record.id)
+    engine.updateFile(record, 'del')
+  }
 
+  const getById = (id: string) => {
+    return getProduct(data.value, id)
   }
 
   const queryProduct = async (id?: string) => {
@@ -139,6 +192,9 @@ export const useProduct = defineStore('product', () => {
     data,
     queryProduct,
     getDataMap,
-    add
+    add,
+    update,
+    remove,
+    getById
   }
 })

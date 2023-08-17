@@ -45,4 +45,12 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
       title: '测试页'
     }
   },
+  {
+    path: '/editor',
+    name: 'Editor',
+    component: () => import('@/views/demo/EditorModal.vue'),
+    meta: {
+      title: '测试页'
+    }
+  },
 ]
