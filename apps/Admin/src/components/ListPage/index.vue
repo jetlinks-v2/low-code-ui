@@ -31,7 +31,7 @@
         <div class="table-skeleton">
           <j-row justify="space-between" align="middle">
             <j-col :span="4">
-              <j-skeleton-button size="large" ref="ref2"/>
+              <j-skeleton-button size="large" ref="ref2" @click="OperationBtnsVisible = true"/>
             </j-col>
             <j-col :span="2">
               <j-space ref="ref6">
@@ -41,7 +41,7 @@
             </j-col>
           </j-row>
           <j-row :gutter="20">
-            <j-col :span="18">
+            <j-col :span="20">
               <j-skeleton-input
                 style="width: 100%; margin: 8px 0"
                 size="large"
@@ -53,7 +53,7 @@
                 v-for="item in 8"
               />
             </j-col>
-            <j-col :span="6">
+            <j-col :span="4">
               <j-skeleton-input
                 style="width: 100%; margin: 8px 0"
                 size="large"
@@ -75,6 +75,10 @@
       </div>
     </div>
     <Guide :stepList="steps" v-model:open="open"/>
+    <OperationBtns v-model:open="OperationBtnsVisible"/>
+    <j-button>
+      
+    </j-button>
   </div>
 </template>
 
@@ -82,6 +86,11 @@
 import Guide from './Guide/index.vue'
 import DataBind from './DataBind/index.vue';
 import type { GuideProps } from './Guide/type';
+import OperationBtns from './OperationBtns/index.vue';
+import { useOperationButton } from '@/store/operationButton';
+import { storeToRefs } from 'pinia';
+
+const { btnTree } = storeToRefs(useOperationButton());
 
 const ref1 = ref()
 const ref2 = ref()
@@ -95,6 +104,7 @@ const previewRef = ref()
 const test = ref()
 
 const open = ref(false)
+const OperationBtnsVisible = ref(false)
 
 const steps:GuideProps['stepsList'] = [
   {
