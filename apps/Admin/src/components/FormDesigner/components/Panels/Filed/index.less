@@ -1,0 +1,44 @@
+.filed-container {
+    .filed-item {
+        margin: 10px 0 10px 10px;
+        border: 1px solid #eee;
+        padding: 10px;
+
+        .filed-item-title {
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .filed-item-children {
+            display: flex;
+            flex-wrap: wrap;
+
+            .filed-item-card {
+                width: 50%;
+                padding: 5px;
+                text-align: center;
+                cursor: grab;
+                color: #333333;
+
+                &[draggable="true"] {
+                    cursor: grabbing;
+                }
+
+                .ant-card-body {
+                    padding: 10px;
+                }
+
+                .filed-item-card-item {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    span {
+                        margin-top: 5px;
+                    }
+                }
+            }
+        }
+    }
+}
