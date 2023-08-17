@@ -1,6 +1,7 @@
 <template>
   <div class="content-warp">
-    <Project :data="props.data.children" :key="props.key"/>
+    <Project :data="props.data.children"/>
+    
   </div>
 </template>
 
@@ -13,7 +14,6 @@ const props = defineProps({
         default: {}
     },
 })
-
 
 </script>
 
