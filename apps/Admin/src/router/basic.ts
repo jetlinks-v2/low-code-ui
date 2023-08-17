@@ -1,4 +1,4 @@
-import { RouteRecordItem } from "@jetlinks/types";
+import {RouteRecordItem} from "@jetlinks/types";
 import { BasicLayoutPage } from '@/layout'
 
 export const BASIC_ROUTERS: RouteRecordItem[] = [
@@ -29,20 +29,28 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
       title: '项目编辑器'
     }
   },
-  // {
-  //   path: '/demo',
-  //   name: 'Demo',
-  //   component: () => import('@/views/demo/index.vue'),
-  //   meta: {
-  //     title: '测试页'
-  //   }
-  // },
   {
-    path: '/adus',
-    name: 'adus',
-    component: () => import('@/views/adus/index.vue'),
+    path: '/demo',
+    name: 'Demo',
+    component: () => import('@/views/demo/index.vue'),
     meta: {
-      title: '增删改查'
+      title: '测试页'
     }
-  }
+  },
+  {
+    path: '/card',
+    name: 'Card',
+    component: () => import('@/views/demo/Card.vue'),
+    meta: {
+      title: '测试页'
+    }
+  },
+  {
+    path: '/editor',
+    name: 'Editor',
+    component: () => import('@/views/demo/EditorModal.vue'),
+    meta: {
+      title: '测试页'
+    }
+  },
 ]

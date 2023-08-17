@@ -1,4 +1,4 @@
-import {defineStore} from "pinia";
+import { defineStore } from "pinia";
 import { useProduct } from './product'
 
 type FileItemType = {
@@ -15,6 +15,7 @@ export const useEngine = defineStore('engine', () => {
   const content = ref()
   const expandedKeys = ref<string[]>([])
   const openFile = ref<any>()
+  const copyFile = ref<string>('')
 
   const product = useProduct()
 
@@ -67,7 +68,15 @@ export const useEngine = defineStore('engine', () => {
 
       expandedKeys.value = [...arrSet.values()]
     }
+  }
 
+  const expandedAll = () => {
+    const map = product.getDataMap()
+    expandedKeys.value = [...map.keys()]
+  }
+
+  const packUpAll = () => {
+    expandedKeys.value = []
   }
 
   const selectFile = (key: string) => {
@@ -88,6 +97,69 @@ export const useEngine = defineStore('engine', () => {
     selectFile(record.id)
   }
 
+
+  const updateTree = (data: any[], record: any) => {
+    return data.map(item => {
+      if (item.id === record.id) {
+        return { ...item, ...record }
+      } else if (item.children) {
+        item.children = updateTree(item.children, record)
+      }
+      return item
+    })
+  }
+
+  const addTree = (data: any[], record: any) => {
+   return  data.map(item => {
+      if (item.id === record.parentId) {
+        return {
+          ...item,
+          children: item.children?.length ? [...item.children, record] : [record]
+        }
+      } else if (item.children) {
+       item.children= addTree(item.children, record)
+      }
+      return item
+    })
+  }
+
+  const delTree = (data: any[], record: any) => {
+    return data.filter(item => {
+      if (item.id === record.id) {
+        return false
+      }
+      if (item.children) {
+        item.children = delTree(item.children, record)
+      }
+      return true
+    })
+  }
+
+  /**
+   * 更新文件
+   * @param record
+   */
+  const updateFile = (record: FileItemType, type: string) => {
+    switch (type) {
+      case 'add':
+        files.value= addTree(files.value, record); break
+      case 'edit':
+        files.value = updateTree(files.value, record);
+        break
+      case 'del':
+        files.value = delTree(files.value, record);
+        break
+    }
+  }
+
+  /**
+ * 复制文件
+ * @param record
+ */
+  const setCopyFile = (record: FileItemType) => {
+    copyFile.value = record.id
+  }
+
   watch(() => activeFile.value, () => {
     console.log(activeFile.value)
   }, { immediate: true })
@@ -98,8 +170,13 @@ export const useEngine = defineStore('engine', () => {
     content,
     expandedKeys,
     openFile,
+    copyFile,
     removeFile,
     addFile,
     selectFile,
+    expandedAll,
+    packUpAll,
+    setCopyFile,
+    updateFile
   }
 })

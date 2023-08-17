@@ -1,18 +1,16 @@
 <template>
   <page-container>
     <pro-search :columns="columns" target="code" @search="handleSearch" />
-    <j-pro-table ref="tableRef" model="TABLE" :columns="columns" :params="params" :request="queryProject">
+    <JProTable ref="tableRef" model="TABLE" :columns="columns" :params="params" :request="queryProject">
       <template #headerTitle>
         <j-button type="primary" @click="handleSave('add')">新增</j-button>
       </template>
       <template #createTime="slotProps">
-        {{ slotProps?.createTime ? dayjs(slotProps.createTime).format('YYYY-MM-DD HH:mm:ss') : '' }}
+        <span>{{ slotProps?.createTime ? dayjs(slotProps.createTime).format('YYYY-MM-DD HH:mm:ss') : '' }}</span>
       </template>
+      <template #state="slotProps">{{ slotProps.state?.text }}</template>
       <template #description="slotProps">
         <div>{{ slotProps.description ? slotProps.description : '--' }}</div>
-      </template>
-      <template #state="slotProps">
-        {{ slotProps.state?.text }}
       </template>
       <template #action="slotProps">
         <j-space :size="16">
@@ -20,7 +18,7 @@
             <template #title>
               查看
             </template>
-            <j-button @click="view(slotProps)" type="link" style="padding: 0;" v-if="slotProps.state.value !== 'publish'">
+            <j-button type="link" style="padding: 0;" v-if="slotProps.state.value !== 'publish'" @click="_view(slotProps.draftId)">
               <AIcon type="EyeOutlined" />
             </j-button>
             <j-dropdown v-else>
@@ -58,7 +56,7 @@
           </j-popconfirm>
         </j-space>
       </template>
-    </j-pro-table>
+    </JProTable>
     <Save v-if="visible" @close="handleClose" :data="current" :type="modelType" />
   </page-container>
 </template>
@@ -68,8 +66,9 @@ import Save from './Save/index.vue'
 import dayjs from 'dayjs';
 import { queryProject, delProject } from '@/api/project'
 import { onlyMessage } from '@/utils/comm';
+import { router } from '@jetlinks/router';
 
-const params = ref()
+const params = ref<any>({})
 const tableRef = ref<Record<string, any>>({});
 const current = ref({})
 const modelType = ref<string>('add')
@@ -126,7 +125,7 @@ const columns = [
       type: 'select',
       options: [
         { label: '已发布', value: 'publish' },
-        { label: '未发布', value: 'unpublished' },
+        { label: '未发布', value: 'unpublished'},
       ],
     },
   },
@@ -144,25 +143,12 @@ const columns = [
   },
 ]
 
-const dataSource = [
-  {
-    id: '11',
-    state: 'publish'
-  },
-  {
-    id: '22',
-    state: 'unPublish'
-  }
-]
 
 const handleSearch = (data: any) => {
-  console.log('data', data)
+  console.log('data',data)
   params.value = data
 }
-const view = (slotProps: object) => {
-  console.log('查看', slotProps);
 
-}
 const handleSave = (type: string, data?: any) => {
   modelType.value = type
   visible.value = true
@@ -172,6 +158,10 @@ const handleSave = (type: string, data?: any) => {
 const handleClose = () => {
   visible.value = false
   tableRef.value?.reload()
+}
+
+const _view = (id:string)=>{
+  router.replace(`/engine/${id}`)
 }
 
 const _del = async (id: string) => {
@@ -185,4 +175,3 @@ const _del = async (id: string) => {
 </script>
 
 <style scoped></style>
-@/api/project
