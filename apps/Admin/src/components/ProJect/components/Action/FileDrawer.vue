@@ -1,6 +1,6 @@
 
 <template>
-   <a-drawer visible :closable="false" @close="emit('close')" :get-container="false">
+   <j-drawer visible :closable="false" @close="emit('close')" :get-container="false">
       <div class="title">{{ props.data.name }} 简介</div>
       <div>
          添加时间：{{ props.data.others.createTime }}
@@ -14,8 +14,7 @@
       <div>位置：{{ location }}</div>
       <j-divider></j-divider>
       <div class="title">引用关系：</div>
-      
-   </a-drawer>
+   </j-drawer>
 </template>
 
 <script setup lang='ts' name="FileDrawer">
