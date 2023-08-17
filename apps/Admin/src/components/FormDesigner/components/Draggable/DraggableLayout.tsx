@@ -1,18 +1,28 @@
 
-import { get, isEmpty } from 'lodash-es';
-import { useProps, useTarget } from '../../hooks';
-import ControlInsertionPlugin from './ControlInsertionPlugin';
+import { isEmpty } from 'lodash-es';
+import { useProps } from '../../hooks';
+import { onEnd, onMove } from './ControlInsertionPlugin';
 import DraggableWrap from './DragGableWrap'
 import Selection from '../Selection'
 import { FormItem } from 'jetlinks-ui-components'
 import componentMap from '../../utils/componentMap';
-import LayoutInlineLayout from './LayoutInlineLayout';
+import { useFormDesignerStore } from '@/store';
+import GridLayout from './GridLayout';
+import TabsLayout from './TabsLayout';
+import CardLayout from './CardLayout';
+import CollapseLayout from './CollapseLayout';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
     props: {
-        data: Object,
-        parent: Object,
+        data: {
+            type: Object,
+            default: () => { }
+        },
+        parent: {
+            type: Array,
+            default: () => []
+        },
         isRoot: {
             type: Boolean,
             default: false
@@ -26,22 +36,19 @@ const DraggableLayout = defineComponent({
         }
     },
     setup(props) {
-        const _data = inject('FormDesigner')
-
-        const {
-            state,
-            isEditModel
-        } = useTarget()
+        const designer = useFormDesignerStore()
 
         const dragOptions = {
             swapThreshold: 1,
             group: {
                 name: 'j-canvas'
             },
-            parent: props.parent,
-            plugins: [ControlInsertionPlugin(_data)],
-            ControlInsertion: true
+            parent: props.parent
         }
+
+        const isEditModel = computed(() => {
+            return designer.model === 'edit'
+        })
 
         const handleMove = () => {
             return true
@@ -50,40 +57,46 @@ const DraggableLayout = defineComponent({
         const slots = {
             item: ({ element }) => {
                 switch (element.type) {
-                    // case 'grid':
-                    //     node = (<LayoutGridLayout key={element.id} data={element} parent={props.data}></LayoutGridLayout>)
-                    //     break
-                    // case 'table':
-                    //     node = (<LayoutTableLayout key={element.id} data={element} parent={props.data}></LayoutTableLayout>)
-                    //     break
-                    // case 'tabs':
-                    //     node = (<LayoutTabsLayout key={element.id} data={element} parent={props.data}></LayoutTabsLayout>)
-                    //     break
-                    // case 'collapse':
-                    //     node = (<LayoutCollapseLayout key={element.id} data={element} parent={props.data}></LayoutCollapseLayout>)
-                    //     break
-                    case 'inline':
-                        return (<LayoutInlineLayout key={element.id} data={element} parent={props.data}></LayoutInlineLayout>)
-                    default:
-                        let TypeComponent = ''
-                        if (unref(isEditModel) || get(state.fieldsLogicState.get(element), 'visible', undefined) !== 0) {
-                            // props
-                            const typeProps = useProps(state, element)
-
-                            console.log(element?.type)
-
-                            TypeComponent = componentMap?.[element?.type] // load.findComponent('FormTypes', element.type)
+                    case 'text':
+                        if (unref(isEditModel)) {
                             const params = {
                                 data: element,
                                 parent: props.data
                             }
-                            if (process.env.NODE_ENV === 'test') {
-                                params['data-field-id'] = `${element.id}`
-                            }
+                            const TypeComponent = componentMap?.[element?.type] || 'div'
                             return (
-                                <Selection hasWidthScale hasCopy hasDel hasDrag hasMask {...params}>
-                                    <FormItem {...typeProps.value}>
-                                        <TypeComponent data={element} params={typeProps.value}></TypeComponent>
+                                <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
+                                    <TypeComponent data={element} {...element.componentProps} />
+                                </Selection>
+                            )
+                        }
+                        break
+                    case 'card':
+                        return (<CardLayout key={element.key} data={element} parent={props.data}></CardLayout>)
+                    case 'grid':
+                        return (<GridLayout key={element.key} data={element} parent={props.data}></GridLayout>)
+                    case 'tabs':
+                        return (<TabsLayout key={element.key} data={element} parent={props.data}></TabsLayout>)
+                    case 'collapse':
+                        return (<CollapseLayout key={element.key} data={element} parent={props.data}></CollapseLayout>)
+                    default:
+                        if (unref(isEditModel) || componentMap?.[element?.type]) {
+                            const typeProps = useProps(element)
+                            const TypeComponent = componentMap?.[element?.type] || 'div'
+
+                            const params = {
+                                data: element,
+                                parent: props.data
+                            }
+
+                            const formItemProps = computed(() => {
+                                return { ...element?.formItemProps, label: element.name }
+                            })
+
+                            return (
+                                <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
+                                    <FormItem {...unref(formItemProps)}>
+                                        <TypeComponent {...unref(typeProps)} data={element} {...element.componentProps}></TypeComponent>
                                     </FormItem>
                                 </Selection>
                             )
@@ -92,11 +105,21 @@ const DraggableLayout = defineComponent({
                 }
             },
             footer() {
-                if (isEmpty(props.data) && !props.isRoot) {
+                const _style = {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                    minHeight: '60px',
+                }
+                if (isEmpty(props.data)) {
                     return (
-                        <div>
+                        <div style={{
+                            ..._style,
+                            background: !props.isRoot ? '#F2F8FF !important' : '',
+                        }}>
                             Drop here
-                        </div>
+                        </div >
                     )
                 }
                 return ''
@@ -109,11 +132,18 @@ const DraggableLayout = defineComponent({
                     list={props.data || []}
                     handle=".handle"
                     tag={props.tag}
-                    item-key="id"
+                    item-key="key"
                     move={handleMove}
                     {...dragOptions}
                     v-slots={slots}
                     componentData={useAttrs()} // tag的props和event
+                    onMove={(e) => {
+                        onMove(e, designer)
+                    }}
+                    model={designer.model}
+                    onEnd={(e) => {
+                        onEnd(e, designer)
+                    }}
                 />
             )
         };

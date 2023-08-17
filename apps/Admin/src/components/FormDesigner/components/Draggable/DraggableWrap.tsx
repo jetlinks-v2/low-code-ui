@@ -1,21 +1,26 @@
 import Draggable from 'vuedraggable'
-import { useTarget } from '../../hooks'
 import { isHTMLTag } from '@vue/shared'
+import { PropType } from 'vue'
 
 const DraggableWrap = defineComponent({
     name: 'DraggableWrap',
     inheritAttrs: false,
+    customOptions: {},
     components: {
         Draggable
     },
-    setup() {
-        const { isEditModel } = useTarget()
+    props: {
+        model: {
+            type: String as PropType<'preview' | 'edit'>,
+            default: 'edit'
+        }
+    },
+    setup(props) {
         return () => {
             const attrs: any = useAttrs()
-            if (unref(isEditModel)) {
+            if (props.model === 'edit') {
                 return (
-                    <Draggable
-                        {...attrs}>
+                    <Draggable {...attrs}>
                         {useSlots()}
                     </Draggable>
                 )

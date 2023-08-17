@@ -2,28 +2,22 @@
 import { filedData } from '../../../utils/defaultData'
 import { Scrollbar } from 'jetlinks-ui-components'
 import DragGableWrap from '../../Draggable/DragGableWrap'
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, omit } from 'lodash-es';
 import './index.less';
-import ControlInsertionPlugin from '../../Draggable/ControlInsertionPlugin';
-import { useTarget } from '@/components/FormDesigner/hooks';
-import { addContext } from '@/components/FormDesigner/utils/addContext';
+import { onMove, onEnd } from '../../Draggable/ControlInsertionPlugin';
 import { useFormDesignerStore } from '@/store';
+import generatorData from '@/components/FormDesigner/utils/generatorData';
+import { Card, AIcon } from 'jetlinks-ui-components';
 
 const Filed = defineComponent({
     name: 'Filed',
     inheritAttrs: false,
     setup() {
-        const _data: any = inject('FormDesigner')
-
         const designer = useFormDesignerStore()
 
-        const {
-            state,
-            setSelection
-        } = useTarget()
-
         const handleClone = (element) => {
-            return cloneDeep(element)
+            const item = { ...generatorData(omit(element, ['icon'])) }
+            return cloneDeep(item)
         }
 
         const handleMove = () => {
@@ -31,63 +25,65 @@ const Filed = defineComponent({
         }
 
         const dragOptions = {
-            ControlInsertion: true,
             dataSource: 'block',
             direction: 'horizontal',
             scroll: false,
-            plugins: [ControlInsertionPlugin(_data)]
-        }
-
-        const addStore = (element: any) => {
-            // const newElement = reactive(_data.wrapElement(cloneDeep(element)))
-            // state.store.push(newElement)
-            // addContext(newElement, state.store)
-            // nextTick(() => {
-            //     setSelection(newElement)
-            //     setTimeout(() => {
-            //         // _data.canvasScrollRef.value.setScrollTop(_data.canvasScrollRef.value.wrapRef.scrollHeight)
-            //     }, 100)
-            // })
         }
 
         const slots = {
             item: ({ element }) => {
                 return (
-                    <div class="filed-item-card" onClick={() => addStore(element)}>{element.name}</div>
+                    <div class="filed-item-card">
+                        <Card hoverable>
+                            <div class="filed-item-card-item">
+                                <AIcon type={element.icon} style={{ fontSize: '25px' }} />
+                                <span>{element.name}</span>
+                            </div>
+                        </Card>
+                    </div>
                 )
             }
         }
 
         return () => {
             return (
-                <Scrollbar>
-                    <div class="filed-container">
-                        {filedData.map((element) => {
-                            return (
-                                <div key={element.key} class="filed-item">
-                                    <div class="filed-item-title">{element.name}</div>
-                                    {
-                                        element.children?.length && (
-                                            <DragGableWrap
-                                                list={element.children}
-                                                clone={handleClone}
-                                                class="filed-item-children"
-                                                sort={false}
-                                                move={handleMove}
-                                                {...dragOptions}
-                                                group={
-                                                    { name: 'j-canvas', pull: 'clone', put: false }
-                                                }
-                                                item-key="null"
-                                                v-slots={slots}
-                                            ></DragGableWrap>
-                                        )
-                                    }
-                                </div>
-                            )
-                        })}
-                    </div>
-                </Scrollbar>
+                <div>
+                    <Scrollbar>
+                        <div class="filed-container">
+                            {filedData.map((element) => {
+                                return (
+                                    <div key={element.id} class="filed-item">
+                                        <div class="filed-item-title">{element.name}</div>
+                                        {
+                                            element.children?.length && (
+                                                <DragGableWrap
+                                                    list={element.children}
+                                                    clone={handleClone}
+                                                    class="filed-item-children"
+                                                    sort={false}
+                                                    move={handleMove}
+                                                    {...dragOptions}
+                                                    group={
+                                                        { name: 'j-canvas', pull: 'clone', put: false }
+                                                    }
+                                                    model="edit"
+                                                    item-key="null"
+                                                    v-slots={slots}
+                                                    onMove={(e) => {
+                                                        onMove(e, designer)
+                                                    }}
+                                                    onEnd={(e) => {
+                                                        onEnd(e, designer)
+                                                    }}
+                                                ></DragGableWrap>
+                                            )
+                                        }
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </Scrollbar>
+                </div>
             )
         };
     },

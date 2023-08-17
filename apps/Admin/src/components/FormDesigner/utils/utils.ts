@@ -1,9 +1,8 @@
-import { get, isEmpty, isArray, isObject } from "lodash-es"
+import { get, isArray } from "lodash-es"
 import { uid } from "./uid"
+import componentMap from "./componentMap"
 
-const fieldsRe = /^(input|textarea|number|radio|checkbox|select|time|date|rate|switch|slider|html|cascader|uploadfile|signature|region)$/
-
-export const checkIsField = (node) => fieldsRe.test(node.type)
+export const checkIsField = (node: any) => componentMap?.[node?.type]
 
 export const checkIdExistInLogic = (fieldId, logic) => {
     return new RegExp(`"${fieldId}"`).test(JSON.stringify(logic))
@@ -54,9 +53,9 @@ export const removeLogicDataById = (fieldId, logic) => {
     }
 }
 
-export const deepTraversal = (node, fn) => {
+export const deepTraversal = (node: any, fn: any) => {
     fn(node)
-    const nodes = node.list || node.rows || node.columns || node.children || []
+    const nodes = node.children || []
     nodes.forEach(e => {
         deepTraversal(e, fn)
     })
@@ -79,40 +78,17 @@ export const wrapElement = (element: any, fn?: any) => {
         if (!node.style) {
             node.style = {}
         }
-        if (!node.id) {
-            node.id = uid()
-        }
         if (!node.key) {
-            node.key = `${node.type}_${node.id}`
+            node.key = `${node.type}_${uid()}`
         }
-        // if (/^(grid|tabs|collapse|table|divider)$/.test(node.type)) {
-        //     node.style = {
-        //         width: '100%'
-        //     }
-        // }
+
         if (checkIsField(node)) {
             node.style = {
                 width: '100%'
             }
         }
-        // if (/^(tabs)$/.test(node.type)) {
-        //     node.columns = new Array(3).fill('').map((e, index) => {
-        //         const data = renderFieldData('tabsCol')
-        //         data.label = `Tab ${index + 1}`
-        //         data.options = {}
-        //         return data
-        //     })
-        // }
-        // if (/^(collapse)$/.test(node.type)) {
-        //     node.columns = new Array(3).fill('').map((e, index) => {
-        //         const data = renderFieldData('collapseCol')
-        //         data.label = `Tab ${index + 1}`
-        //         data.options = {}
-        //         return data
-        //     })
-        // }
 
-        fn && fn?.(node)
+        // fn && fn?.(node)
     })
     return result
 }
@@ -138,32 +114,32 @@ const calculateAverage = (count, total = 100) => {
     return result
 }
 
-export const syncWidthByPlatform = (node, platform, syncFullPlatform = false, value?: any) => {
-    // debugger
+export const syncWidthByPlatform = (node, _data) => {
     const _isArray = isArray(node)
-    if (!_isArray) {
-        if (isObject(node.style.width)) {
-            if (syncFullPlatform) {
-                node.style.width.pc = node.style.width.mobile = value + '%'
-            } else {
-                node.style.width[platform] = value + '%'
-            }
-        } else {
-            node.style.width = value + '%'
-        }
-    }
-    const otherNodes = _isArray ? node : node.context.parent.columns.filter(e => e !== node)
-    const averageWidths = calculateAverage(otherNodes.length, _isArray ? 100 : 100 - value)
-    otherNodes.forEach((node, index) => {
-        // const isFieldWidth = isObject(node.style.width)
-        // if (isFieldWidth) {
-        //     if (syncFullPlatform) {
-        //         node.style.width.pc = node.style.width.mobile = averageWidths[index] + '%'
-        //     } else {
-        //         node.style.width[platform] = averageWidths[index] + '%'
-        //     }
-        // } else {
-        //     node.style.width = averageWidths[index] + '%'
-        // }
-    })
+    console.log(_isArray)
+    // if (!_isArray) {
+    //     if (isObject(node.style.width)) {
+    //         if (syncFullPlatform) {
+    //             node.style.width.pc = node.style.width.mobile = value + '%'
+    //         } else {
+    //             node.style.width[platform] = value + '%'
+    //         }
+    //     } else {
+    //         node.style.width = value + '%'
+    //     }
+    // }
+    // const otherNodes = _isArray ? node : node.context.parent.columns.filter(e => e !== node)
+    // const averageWidths = calculateAverage(otherNodes.length, _isArray ? 100 : 100 - value)
+    // otherNodes.forEach((node, index) => {
+    //     // const isFieldWidth = isObject(node.style.width)
+    //     // if (isFieldWidth) {
+    //     //     if (syncFullPlatform) {
+    //     //         node.style.width.pc = node.style.width.mobile = averageWidths[index] + '%'
+    //     //     } else {
+    //     //         node.style.width[platform] = averageWidths[index] + '%'
+    //     //     }
+    //     // } else {
+    //     //     node.style.width = averageWidths[index] + '%'
+    //     // }
+    // })
 }

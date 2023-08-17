@@ -6,6 +6,10 @@ export declare type ISchema = {
     componentProps?: ComponentProps; // 组件的配置项
     type: string; // 组件类型
     formItemProps?: FormItemProps; // form-item的配置项
-    name: string; // 组件名称
+    name?: string; // 组件名称
     key?: string | number; // 标识
+    children?: ISchema[];
+    context?: any;
+    icon?: string;
+    visible?: boolean; // 字段是否显示
 }

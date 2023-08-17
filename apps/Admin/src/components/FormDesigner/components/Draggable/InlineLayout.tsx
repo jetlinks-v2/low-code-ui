@@ -1,5 +1,6 @@
-import { syncWidthByPlatform } from "../../utils/utils"
+import { useFormDesignerStore } from "@/store"
 import DraggableLayout from "./DraggableLayout"
+import './index.less'
 
 export default defineComponent({
     name: 'InlineLayout',
@@ -14,14 +15,16 @@ export default defineComponent({
         }
     },
     setup(props) {
-        const _data: any = inject('FormDesigner')
+        const designer = useFormDesignerStore()
 
-        watch(() => props.data.columns.length, (newVal, oldVal) => {
+        watch(() => props.data.children, (newVal, oldVal) => {
+            // console.log(newVal, oldVal)
             if (!newVal) {
-                props.data.context.delete()
+                // props.data.context.delete()
             }
             if (newVal !== oldVal) {
-                syncWidthByPlatform(props.data.columns, _data.state.platform, _data.props.layoutType === 1)
+                // console.log(newVal, oldVal)
+                // syncWidthByPlatform(props.data.columns, designer)
             }
         })
         const dragOptions = {
@@ -29,13 +32,12 @@ export default defineComponent({
         }
         return () => {
             return (
-                <div>
+                <div class={'inline-container'}>
                     <DraggableLayout
                         data-layout-type={'inline'}
-                        class={''}
                         type={'inline'}
                         {...dragOptions}
-                        data={props.data.columns}
+                        data={props.data.children}
                         parent={props.parent} />
                 </div>
             )
