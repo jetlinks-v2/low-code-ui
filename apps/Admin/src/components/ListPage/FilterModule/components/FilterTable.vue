@@ -21,7 +21,7 @@
         :height="200"
       >
         <template #headerCell="{ column }">
-          <template v-if="column.key === 'type'">
+          <template v-if="column.tips">
             <span>
               <j-popover trigger="hover">
                 <template #content>
@@ -37,7 +37,7 @@
                 </template>
                 <AIcon type="QuestionCircleOutlined" />
               </j-popover>
-              筛选项类型
+              {{ column.title }}
             </span>
           </template>
         </template>
@@ -171,7 +171,6 @@ const emit = defineEmits([
   'handleAdd',
   'handleOk',
 ])
-
 
 const activeKey = ref('1')
 

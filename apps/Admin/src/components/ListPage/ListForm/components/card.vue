@@ -1,82 +1,80 @@
 <template>
   <div class="card-center">
     <p>卡片样式</p>
-    <j-table-card
-      name=""
-      width="300px"
+    <Card
+      status="offline"
       :actions="actions"
-      :moreActions="moreActions"
-      :status="status"
+      :record="formState"
+      :statusText="formState.emphasisField"
+      :statusNames="{
+        online: 'processing',
+        offline: 'error',
+        notActive: 'warning',
+      }"
     >
-      <template #content>
-        <div>
-          <j-row type="flex" justify="space-between" align="bottom">
-            <j-col :span="10">
-              <j-avatar
-                shape="square"
-                :size="100"
-                :src="formState.customIcon"
-                @click="cardState.type = 'icon'"
-                class="card-icon"
-              >
-                <template #icon>
-                  <AIcon type="FileImageOutlined" />
-                </template>
-              </j-avatar>
-            </j-col>
-            <j-col :span="14">
-              <div>
-                <j-row type="flex" justify="space-between">
-                  <j-col :span="11">
-                    <div class="card-field" @click="cardState.type = 'field1'">
-                      <span>
-                        <j-ellipsis style="max-width: 240px">
-                          字段1
-                        </j-ellipsis>
-                      </span>
-                    </div>
-                  </j-col>
-                  <j-col :span="11">
-                    <div
-                      class="card-field"
-                      @click="cardState.type = 'emphasisField'"
-                    >
-                      <span>
-                        <j-ellipsis style="max-width: 240px">
-                          强调字段
-                        </j-ellipsis>
-                      </span>
-                    </div>
-                  </j-col>
-                </j-row>
-              </div>
-              <div style="padding-top: 22%">
-                <j-row type="flex" justify="space-between">
-                  <j-col :span="11">
-                    <div class="card-field" @click="cardState.type = 'field2'">
-                      <span>
-                        <j-ellipsis style="max-width: 240px">
-                          字段2
-                        </j-ellipsis>
-                      </span>
-                    </div>
-                  </j-col>
-                  <j-col :span="11">
-                    <div class="card-field" @click="cardState.type = 'field3'">
-                      <span>
-                        <j-ellipsis style="max-width: 240px">
-                          字段3
-                        </j-ellipsis>
-                      </span>
-                    </div></j-col
-                  >
-                </j-row>
-              </div>
-            </j-col>
-          </j-row>
-        </div>
+      <template #status>
+        {{ formState.customIcon }}
       </template>
-    </j-table-card>
+      <template #img>
+        <j-avatar
+          shape="square"
+          :size="100"
+          :src="formState.customIcon"
+          @click="cardState.type = 'customIcon'"
+          class="card-icon"
+        >
+          <template #icon>
+            <pro-image src="https://www.antdv.com/#error" />
+          </template>
+        </j-avatar>
+      </template>
+      <template #content>
+        <j-row>
+          <j-col
+            :span="12"
+            class="card-field"
+            @click="cardState.type = 'field1'"
+          >
+            <h3>
+              {{ formState.field1 || '字段1' }}
+            </h3>
+          </j-col>
+          <j-col
+            :span="12"
+            class="card-field"
+            @click="cardState.type = 'emphasisField'"
+          >
+            <div>
+              {{ formState.emphasisField || '强调字段' }}
+            </div>
+          </j-col>
+        </j-row>
+
+        <j-row>
+          <j-col
+            :span="12"
+            class="card-field"
+            @click="cardState.type = 'field2'"
+          >
+            <div>展示字段2</div>
+            <div>
+              {{ formState.field2 || '字段2' }}
+            </div>
+          </j-col>
+          <j-col
+            :span="12"
+            class="card-field"
+            @click="cardState.type = 'field3'"
+          >
+            <div>展示字段3</div>
+            <div>
+              {{ formState.field3 || '字段3' }}
+            </div>
+          </j-col>
+        </j-row>
+      </template>
+    </Card>
+
     <p class="tips">
       请选择卡片展示内容
       <j-tooltip placement="top" :get-popup-container="getPopupContainer">
@@ -95,7 +93,7 @@
         layout="vertical"
         style="padding: 10px"
       >
-        <div v-if="cardState.type === 'icon'">
+        <div v-if="cardState.type === 'customIcon'">
           <j-form-item
             label="自定义图标"
             name="customIcon"
@@ -185,8 +183,8 @@
               :options="options"
             />
           </j-form-item>
-          <j-form-item label="特殊样式" name="customIcon">
-            <j-monaco-editor v-model="formState.specialStyle" />
+          <j-form-item label="特殊样式" name="specialStyle">
+            <j-monaco-editor v-model="formState.specialStyle" language="css" />
           </j-form-item>
         </div>
         <j-form-item v-show="false">
@@ -200,11 +198,12 @@
 <script lang="ts" setup>
 import Upload from '@/components/Upload/Image/ImageUpload.vue'
 import { useListFormStore } from '@/store/listForm'
+import Card from '@/components/Card'
 const configurationStore = useListFormStore()
 const formRef = ref()
 //卡片样式点击类型
 const cardState = reactive({
-  type: 'icon', //icon,field1,field2,field3,emphasisField
+  type: 'customIcon', //customIcon,field1,field2,field3,emphasisField
 })
 //卡片展示内容form
 const formState = reactive({
@@ -229,14 +228,60 @@ const status = reactive({
   value: 'normal',
   color: '#00ff00',
 })
-const actions = reactive([
-  { name: '按钮1', icon: 'EditOutlined', onClick: () => {} },
-  { name: '按钮2', icon: 'StopOutlined', onClick: () => {} },
-])
-const moreActions = reactive([
-  { name: '按钮3', icon: 'DeleteOutlined', onClick: () => {} },
-  { name: '按钮4', icon: 'EditOutlined', onClick: () => {} },
-])
+const actions = [
+  {
+    key: 'view',
+    text: '查看',
+    permissionProps: (data) => ({
+      tooltip: {
+        title: '查看',
+      },
+      hasPermission: false,
+      icon: 'EyeOutlined',
+      onClick: (e) => {
+        console.log(data)
+        handleView(data.id)
+      },
+    }),
+  },
+  {
+    key: 'view1',
+    text: '查看1',
+    permissionProps: {
+      tooltip: {
+        title: '查看1',
+      },
+      hasPermission: false,
+      icon: 'EyeOutlined',
+    },
+  },
+  {
+    key: 'view2',
+    text: '查看2',
+  },
+
+  {
+    key: 'delete',
+    text: '删除',
+    permissionProps: (data) => ({
+      tooltip: {
+        title: '删除',
+      },
+      popConfirm: {
+        title: data.status === 'error' ? '禁用' : '确认删除？',
+        onConfirm: () => {
+          console.log(data)
+        },
+      },
+      hasPermission: true,
+      icon: 'EyeOutlined',
+      onClick: () => {
+        handleView(data.id)
+      },
+    }),
+  },
+]
+
 const validateValue = () => {
   const value = ['customIcon', 'field3', 'field2', 'field1']
   value.map((item: any) => {
@@ -297,20 +342,18 @@ defineExpose({
   }
 }
 .card-icon {
-  border: dashed 2px #ff9100;
+  height: 88px !important;
+  width: 88px !important;
   cursor: pointer;
   &:hover {
     background: rgba(255, 190, 105, 0.5);
+    border: dashed 2px #ff9100;
   }
 }
 .card-field {
-  border: dashed 2px #ff9100;
-  height: 30px;
-  text-align: center;
-  line-height: 28px;
   cursor: pointer;
   &:hover {
-    background: rgba(255, 190, 105, 0.5);
+    border: dashed 2px #ff9100;
   }
 }
 .tips {

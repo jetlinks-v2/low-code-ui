@@ -142,6 +142,7 @@ const columns: any = [
     type: 'select',
     options: options,
     width: 150,
+    tips:true
   },
   {
     title: '操作',
