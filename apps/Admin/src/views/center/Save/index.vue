@@ -6,7 +6,7 @@
             <j-form-item label="项目标识" name="id" validateFirst :rules="[
                 { required: true, message: '请输入项目标识' },
                 { max: 256, message: '最多输入256个字符' },
-                { pattern: _inputReg, message: '要求以小写字母开头，由字母+数字构成'},
+                { pattern: regular.inputReg, message: '要求以小写字母开头，由字母+数字构成' },
             ]">
                 <j-input v-model:value="modelRef.id" placeholder="请输入项目标识" />
             </j-form-item>
@@ -14,7 +14,7 @@
                 { required: true, message: '请输入项目名称' },
                 { max: 32, message: '最多输入32个字符' },
                 { min: 2, message: '最少输入2个字符' },
-                { pattern: _textReg, message: '只能为中文字符' },
+                { pattern: regular.textReg, message: '只能为中文字符' },
             ]">
                 <j-input v-model:value="modelRef.name" placeholder="请输入项目名称" />
             </j-form-item>
@@ -26,9 +26,10 @@
 </template>
 
 <script setup lang='ts' name="Save">
-import { _inputReg, _textReg } from '@/utils/regular'
+import { regular } from '@jetlinks/utils';
 import { addProject, editProject } from '@/api/project'
 import { onlyMessage } from '@/utils/comm';
+import { useRequest } from '@jetlinks/hooks'
 
 const emit = defineEmits(['close']);
 const props = defineProps({
@@ -42,7 +43,7 @@ const props = defineProps({
     }
 })
 
-const loading = ref<boolean>(false);
+// const loading = ref<boolean>(false);
 const formRef = ref<any>()
 const modelRef = reactive({
     id: props.data.id || '',
@@ -58,20 +59,20 @@ const title = computed(() => {
     }
 })
 
-const handleSave = async () => {
-    const data = await formRef.value.validate()
-    if (data) {
-        loading.value = true
-        const res =props.data.id? await editProject(data).finally(()=>{
-            loading.value = false
-        }): await addProject(data).finally(()=>{
-            loading.value = false
-        })
-        
-        if(res.status === 200){
+const { loading, run } = useRequest(props.data.id ? editProject : addProject,{
+    immediate:false,
+    onSuccess:(res)=>{
+        if(res.success){
             onlyMessage('操作成功')
             emit('close')
         }
+    }
+})
+
+const handleSave = async () => {
+    const data = await formRef.value.validate()
+    if (data) {
+        run(data)
     }
 }
 

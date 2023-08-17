@@ -129,6 +129,55 @@
       </template>
     </Card>
   </div>
+  <!-- 自定义颜色 -->
+  <div style="width: 30%;margin-top: 24px">
+    <Card
+      status="notActive"
+      :actions="actions"
+      :record="record"
+      :active="true"
+      statusText="测试文案"
+      :statusNames="{
+         online: 'processing',
+         error: 'error',
+         notActive: 'warning',
+      }"
+      :statusColor="{
+        'error': '',
+        'offline': '160,217,17',
+        'warning': '#13c2c2'
+      }"
+    >
+      <template #img>
+        <div style="height: 88px;width: 88px; background-color: #dfdfdf;">
+          Image1
+        </div>
+      </template>
+      <template #content>
+        <h3 >
+          {{ record.name }}
+        </h3>
+        <j-row>
+          <j-col :span="12">
+            <div >
+              通知方式
+            </div>
+            <div>
+              {{ record.other.name }}
+            </div>
+          </j-col>
+          <j-col :span="12">
+            <div>
+              说明
+            </div>
+            <j-ellipsis>
+              此处是说明，
+            </j-ellipsis>
+          </j-col>
+        </j-row>
+      </template>
+    </Card>
+  </div>
   <pro-image
     src="https://www.antdv.com/#error"
   />

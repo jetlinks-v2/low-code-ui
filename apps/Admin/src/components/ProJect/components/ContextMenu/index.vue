@@ -9,30 +9,30 @@
          }">
             <j-menu v-if="props.type === 'list'" @click="handleClick">
                <j-menu-item key="Profile">显示简介</j-menu-item>
-               <j-menu-item key="Cut">剪切</j-menu-item>
+               <!-- <j-menu-item key="Cut">剪切</j-menu-item> -->
                <j-menu-item key="Copy">复制</j-menu-item>
-               <j-menu-item key="Paste">粘贴</j-menu-item>
+               <j-menu-item key="Paste" :disabled="disabled">粘贴</j-menu-item>
                <j-menu-item key="Rename">重命名</j-menu-item>
                <j-menu-item key="Delete">删除</j-menu-item>
             </j-menu>
 
             <j-menu v-else @click="handleClick">
-               <j-sub-menu key="Add" title="新建" style="width: 130px">
+               <j-sub-menu key="Add" title="新建" style="width: 150px;">
                   <j-menu-item key="Module">模块</j-menu-item>
-                  <j-menu-item key="Resource">资源</j-menu-item>
+                  <!-- <j-menu-item key="Resource">资源</j-menu-item> -->
 
-                  <j-sub-menu key="Page" title="页面" style="width: 130px">
-                     <j-menu-item style="width: 130px" key="HtmlPage">自定义html</j-menu-item>
-                     <j-menu-item style="width: 130px" key="ListPage">列表页模版</j-menu-item>
-                     <j-menu-item style="width: 130px" key="FormPage">表单页模版</j-menu-item>
+                  <j-sub-menu key="Page" title="页面" >
+                     <j-menu-item  key="HtmlPage">自定义html</j-menu-item>
+                     <j-menu-item  key="ListPage">列表页模版</j-menu-item>
+                     <j-menu-item  key="FormPage">表单页模版</j-menu-item>
                   </j-sub-menu>
 
                   <j-menu-item key="CRUD">增删改查</j-menu-item>
                   <j-menu-item key="SQL">SQL</j-menu-item>
                   <j-menu-item key="Function">函数</j-menu-item>
                </j-sub-menu>
-               <j-menu-item key="Copy">
-                  复制
+               <j-menu-item key="Paste" :disabled="disabled">
+                  粘贴
                </j-menu-item>
             </j-menu>
          </div>
@@ -42,6 +42,9 @@
 
 <script setup lang='ts' name="ContextMenu">
 import { useContextMenu } from '@/hooks/useContextMenu';
+import { useEngine } from '@/store'
+
+const engine = useEngine()
 
 const containerRef = ref(null)
 const menuRef = ref<any>(null)
@@ -63,8 +66,10 @@ const props = defineProps({
    },
    onSelect: {
       type: Function,
-   }
+   },
 })
+
+const disabled = computed(()=>engine.copyFile==='')
 
 const emit = defineEmits<{
    select: [menuKey: string, divData?: object]
@@ -83,7 +88,7 @@ const handleClick = (item: any) => {
 
 <style scoped lang='less'>
 .menu {
-   width: 150px;
+   // width: 150px;
    position: absolute;
 }
 </style>
