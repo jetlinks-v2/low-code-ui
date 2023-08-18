@@ -16,4 +16,16 @@ export const onlyMessage = (msg: string, type: 'success' | 'error' | 'warning' =
       content: msg,
       key: type
     })
-  }
+}
+
+/**
+ * 根据正则处理字母大写
+ * @param str
+ * @param reg
+ */
+export const upperCase = (str: string, reg?: RegExp) => {
+  const _reg = reg || /[-_](.)/g
+  return str.replace(_reg, function(match, char) {
+    return char.toUpperCase();
+  });
+}
