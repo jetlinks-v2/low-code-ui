@@ -1,6 +1,6 @@
 
 <template>
-  <div class="content">
+  <div class="content" v-if="viewType === 'card'">
     <ContextMenu type="empty" @select="handleChange">
       <a-row :gutter="[8, 8]">
         <a-col :span="3" v-for="item in list" class="content-col">
@@ -17,10 +17,29 @@
       </a-row>
     </ContextMenu>
   </div>
+  <div v-else style="width: 1200px;">
+    <j-pro-table :columns="columns" :dataSource="list" model="TABLE" :noPagination="true" :childrenColumnName="'list'"
+      :customRow="(record) => ({onContextmenu: (e) => onContextmenu(e, record)})">
+      <template #type="{type}">
+        {{ providerMap[type] }}
+      </template>
+      <template #modifyTime="record">{{ record?.others?.modifyTime }}</template>
+    </j-pro-table>
+    <div v-if="visibleMenu" style="width: 150px;">
+      <j-menu @click="(e) => handleChange(e.key, menuData.data)" :style="menuData.style" class="tableMenu">
+        <j-menu-item key="Profile">显示简介</j-menu-item>
+        <j-menu-item key="Copy">复制</j-menu-item>
+        <j-menu-item key="Paste" :disabled="engine.copyFile === ''">粘贴</j-menu-item>
+        <j-menu-item key="Rename">重命名</j-menu-item>
+        <j-menu-item key="Delete">删除</j-menu-item>
+      </j-menu>
+    </div>
+  </div>
   <FileDrawer v-if="visibleFile" @close="visibleFile = false" :data="current" />
-  <InputModal v-if="visible" @close="visible = false" @save="onSave" :provider="provider" :data="current" :type="type" :name-list="nameList"/>
+  <InputModal v-if="visible" @close="visible = false" @save="onSave" :provider="provider" :data="current" :type="type"
+    :name-list="nameList" />
   <ToastModal v-if="visibleToast" @close="visibleToast = false" @save="onSave" :data="current" />
-  <DelModal v-if="visibleDel" @close="visibleDel = false" @save="onDel" :data="current" /> 
+  <DelModal v-if="visibleDel" @close="visibleDel = false" @save="onDel" :data="current" />
 </template>
 
 <script setup lang='ts' name="List">
@@ -48,6 +67,7 @@ const visible = ref<boolean>(false)
 const visibleFile = ref<boolean>(false)
 const visibleToast = ref<boolean>(false)
 const visibleDel = ref<boolean>(false)
+const visibleMenu = ref<boolean>(false)
 
 const provider = ref<string>('')
 const current = ref<any>({})
@@ -57,8 +77,38 @@ const selectSort = ref<number>(0)
 const list = ref<any>([])
 const nameList = ref<any>([])
 
+const viewType = ref<string>('card')
+const menuData = reactive({
+  style: {},
+  data: {}
+})
+
 const indexMap = new Map()
 const { ControlLeft, MetaLeft, KeyC, KeyV } = useMagicKeys()
+
+const columns = [
+  {
+    title: '名称',
+    dataIndex: 'title',
+    key: 'title',
+    ellipsis: true,
+  },
+  {
+    title: '种类',
+    dataIndex: 'type',
+    key: 'type',
+    scopedSlots: true,
+    ellipsis: true,
+
+  },
+  {
+    title: '修改时间',
+    dataIndex: 'modifyTime',
+    key: 'modifyTime',
+    scopedSlots: true,
+    ellipsis: true,
+  },
+]
 
 
 
@@ -75,8 +125,6 @@ const onDel = (data: any) => {
   visibleDel.value = false
 }
 
-
-
 const onPaste = (parentId?: string) => {
   const copyItem = product.getById(engine.copyFile)
   provider.value = copyItem.type
@@ -87,7 +135,23 @@ const onPaste = (parentId?: string) => {
   }
   visible.value = true
 }
-
+//table 右键菜单
+const onContextmenu = (e, record) => {
+  e.preventDefault()
+  visibleMenu.value = true
+  menuData.style = {
+    position: 'absolute',
+    left: e.clientX + "px",
+    top: e.clientY + "px",
+  }
+  menuData.data = record
+  //点击取消菜单
+  const cancel = () => {
+    visibleMenu.value = false
+    document.body.removeEventListener('click',cancel)
+  }
+  document.body.addEventListener('click', cancel)
+}
 
 const handleChange = (key: any, data?: any) => {
   // console.log(key)
@@ -131,7 +195,7 @@ const onClick = (id: string) => {
   selectSort.value = indexMap.get(id)
 }
 
-const onDbClick = (data:any)=>{
+const onDbClick = (data: any) => {
   engine.selectFile(data.id)
   engine.addFile(data)
 }
@@ -176,10 +240,10 @@ watchEffect(() => {
 
 watchEffect(() => {
   if (props.data.length !== 0) {
-    // console.log(props.data[0].id)
+    console.log(props.data)
     selectKey.value = props.data[0].id
     selectSort.value = 0
-    nameList.value = props.data.map(item=>item.name)
+    nameList.value = props.data.map(item => item.name)
     list.value = props.data.map((item, index) => {
       indexMap.set(item.id, index)
       return item
@@ -220,5 +284,9 @@ watchEffect(() => {
     }
   }
 
+}
+
+.tableMenu {
+  background-color: #e0e0e063;
 }
 </style>

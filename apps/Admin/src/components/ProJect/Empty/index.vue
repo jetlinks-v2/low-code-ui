@@ -104,6 +104,7 @@ const onSave = (data)=>{
 
       &:hover {
          background-color: #80ace5;
+         color: #EEE;
       }
    }
 }
@@ -130,6 +131,7 @@ const onSave = (data)=>{
 
          &:hover {
             background-color: #80ace5;
+            color: #EEE;
          }
       }
    }
@@ -167,6 +169,7 @@ const onSave = (data)=>{
 
             &:hover {
                background-color: #80ace5;
+               color: #EEE;
             }
          }
 
@@ -181,6 +184,7 @@ const onSave = (data)=>{
 
             &:hover {
                background-color: #80ace5;
+               color: #EEE;
             }
          }
       }
@@ -199,6 +203,7 @@ const onSave = (data)=>{
 
          &:hover {
             background-color: #80ace5;
+            color: #EEE;
          }
       }
    }
