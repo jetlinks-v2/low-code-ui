@@ -11,7 +11,7 @@
         <j-button type="link">校验</j-button>
         <j-button
           type="link"
-          v-if="designer.model === 'edit'"
+          v-if="isEditModel"
           @click="onPreview('preview')"
           >预览</j-button
         >
@@ -21,10 +21,13 @@
   </div>
 </template>
   
-  <script lang="ts" setup>
-import { useFormDesignerStore } from '@/store/designer'
+<script lang="ts" setup>
+import { inject, computed, unref } from 'vue'
+const designer: any = inject('FormDesigner')
 
-const designer = useFormDesignerStore()
+const isEditModel = computed(() => {
+  return unref(designer?.model) === 'edit'
+})
 
 const onPreview = (_type: 'preview' | 'edit') => {
   designer.setModel(_type)
@@ -41,5 +44,6 @@ const onPreview = (_type: 'preview' | 'edit') => {
   height: 50px;
   padding: 0 20px;
   margin-bottom: 1px;
+  border-bottom: 1px solid #eee;
 }
 </style>

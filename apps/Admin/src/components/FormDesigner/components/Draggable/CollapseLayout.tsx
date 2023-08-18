@@ -4,7 +4,6 @@ import Selection from '../Selection/index'
 import { Collapse, CollapsePanel } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
-import { useFormDesignerStore } from '@/store/designer'
 
 export default defineComponent({
   name: 'CollapseLayout',
@@ -21,7 +20,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const designer = useFormDesignerStore()
+    const designer: any = inject('FormDesigner')
 
     const list = computed(() => {
       return props.data?.children || []
@@ -30,11 +29,11 @@ export default defineComponent({
     const handleAdd = () => {
       props.data.context?.appendItem()
       const addData = unref(list).slice(-1)
-      designer.setSelection(addData)
+      designer?.setSelection(addData)
     }
 
     const isEditModel = computed(() => {
-      return designer.model === 'edit'
+      return unref(designer?.model) === 'edit'
     })
 
     return () => {
