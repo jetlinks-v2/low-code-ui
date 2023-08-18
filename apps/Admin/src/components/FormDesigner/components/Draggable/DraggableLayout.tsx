@@ -6,7 +6,6 @@ import DraggableWrap from './DragGableWrap'
 import Selection from '../Selection'
 import { FormItem } from 'jetlinks-ui-components'
 import componentMap from '../../utils/componentMap';
-import { useFormDesignerStore } from '@/store';
 import GridLayout from './GridLayout';
 import TabsLayout from './TabsLayout';
 import CardLayout from './CardLayout';
@@ -20,7 +19,7 @@ const DraggableLayout = defineComponent({
             default: () => { }
         },
         parent: {
-            type: Array,
+            type: [Array, Object],
             default: () => []
         },
         isRoot: {
@@ -36,7 +35,7 @@ const DraggableLayout = defineComponent({
         }
     },
     setup(props) {
-        const designer = useFormDesignerStore()
+        const designer: any = inject('FormDesigner')
 
         const dragOptions = {
             swapThreshold: 1,
@@ -47,7 +46,7 @@ const DraggableLayout = defineComponent({
         }
 
         const isEditModel = computed(() => {
-            return designer.model === 'edit'
+            return unref(designer.model) === 'edit'
         })
 
         const handleMove = () => {
@@ -93,10 +92,13 @@ const DraggableLayout = defineComponent({
                                 return { ...element?.formItemProps, label: element.name }
                             })
 
+                            // console.log(element.componentProps)
+
                             return (
                                 <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                                     <FormItem {...unref(formItemProps)}>
                                         <TypeComponent {...unref(typeProps)} data={element} {...element.componentProps}></TypeComponent>
+                                        {/* <div>{ element.componentProps.description }</div> */}
                                     </FormItem>
                                 </Selection>
                             )
@@ -140,7 +142,7 @@ const DraggableLayout = defineComponent({
                     onMove={(e) => {
                         onMove(e, designer)
                     }}
-                    model={designer.model}
+                    model={unref(designer.model)}
                     onEnd={(e) => {
                         onEnd(e, designer)
                     }}

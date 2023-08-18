@@ -6,7 +6,7 @@
           <p>表单布局</p>
           <j-form-item label="标签对齐方式" name="layout">
             <j-radio-group
-              v-model:value="designer.selected.componentProps.layout"
+              v-model:value="modelRef.componentProps.layout"
               button-style="solid"
             >
               <j-radio-button value="horizontal">Horizontal</j-radio-button>
@@ -29,7 +29,7 @@
               <component
                 @change="onChange"
                 :is="Panels[item.key]"
-                v-bind="{ type: _type, value: designer.selected }"
+                v-bind="{ type: _type, value: modelRef }"
               />
             </j-collapse-panel>
           </j-collapse>
@@ -40,8 +40,7 @@
 </template>
   
 <script lang="ts" setup>
-import { useFormDesignerStore } from '@/store/designer'
-import { ref, reactive, unref, computed } from 'vue'
+import { ref, reactive, unref, computed, inject } from 'vue'
 import { Scrollbar } from 'jetlinks-ui-components'
 import Base from './components/Base.vue'
 import InputLimit from './components/InputLimit.vue'
@@ -52,12 +51,12 @@ import Status from './components/Status.vue'
 import Source from './components/Source.vue'
 import { map } from 'lodash-es'
 
-const designer = useFormDesignerStore()
+const designer: any = inject('FormDesigner')
 const formRef = ref<any>()
-const modelRef = reactive({ ...designer.selected })
+const modelRef = reactive({ ...unref(designer.selected) })
 
 const _type = computed(() => {
-  return designer.selected?.type || ''
+  return designer.selected?.value?.type || 'root'
 })
 
 const Panels = {
@@ -141,13 +140,12 @@ const panelsList = computed(() => {
 const activeKey = ref<string[]>(map(panelsList.value, 'key'))
 
 watchEffect(() => {
-  console.log(designer.selected)
-  Object.assign(modelRef, designer.selected)
+  Object.assign(modelRef, unref(designer.selected))
 })
 
 const onChange = (value: any) => {
-  if (designer.selected?.context?.updateProps) {
-    designer.selected?.context?.updateProps(value)
+  if (designer.selected?.value?.context?.updateProps) {
+    designer.selected?.value?.context?.updateProps(value)
   }
 }
 </script>

@@ -4,7 +4,6 @@ import Selection from '../Selection/index'
 import { Col } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
-import { useFormDesignerStore } from '@/store'
 
 export default defineComponent({
     name: 'GridLayout',
@@ -21,7 +20,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const designer = useFormDesignerStore()
+        const designer: any = inject('FormDesigner')
         const list = computed(() => {
             return props.data?.children || []
         })
@@ -33,7 +32,7 @@ export default defineComponent({
         }
 
         const isEditModel = computed(() => {
-            return designer.model === 'edit'
+            return unref(designer?.model) === 'edit'
         })
         return () => {
             return (

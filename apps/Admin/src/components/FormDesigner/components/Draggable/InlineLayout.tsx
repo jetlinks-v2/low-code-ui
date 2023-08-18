@@ -1,4 +1,3 @@
-import { useFormDesignerStore } from "@/store"
 import DraggableLayout from "./DraggableLayout"
 import './index.less'
 
@@ -15,18 +14,16 @@ export default defineComponent({
         }
     },
     setup(props) {
-        const designer = useFormDesignerStore()
-
-        watch(() => props.data.children, (newVal, oldVal) => {
-            // console.log(newVal, oldVal)
-            if (!newVal) {
-                // props.data.context.delete()
-            }
-            if (newVal !== oldVal) {
-                // console.log(newVal, oldVal)
-                // syncWidthByPlatform(props.data.columns, designer)
-            }
-        })
+        // watch(() => props.data.children, (newVal, oldVal) => {
+        //     // console.log(newVal, oldVal)
+        //     if (!newVal) {
+        //         // props.data.context.delete()
+        //     }
+        //     if (newVal !== oldVal) {
+        //         // console.log(newVal, oldVal)
+        //         // syncWidthByPlatform(props.data.columns, designer)
+        //     }
+        // })
         const dragOptions = {
             direction: 'horizontal'
         }
