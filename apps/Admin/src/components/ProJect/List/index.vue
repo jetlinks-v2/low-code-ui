@@ -4,7 +4,7 @@
     <ContextMenu type="empty" @select="handleChange">
       <a-row :gutter="[8, 8]">
         <a-col :span="3" v-for="item in list" class="content-col">
-          <div @click="onClick(item.id)" :class="{
+          <div @click="onClick(item.id)" @dblclick="onDbClick(item)" :class="{
             'content-item': true,
             'active': selectKey === item.id
           }">
@@ -18,7 +18,7 @@
     </ContextMenu>
   </div>
   <FileDrawer v-if="visibleFile" @close="visibleFile = false" :data="current" />
-  <InputModal v-if="visible" @close="visible = false" @save="onSave" :provider="provider" :data="current" :type="type" />
+  <InputModal v-if="visible" @close="visible = false" @save="onSave" :provider="provider" :data="current" :type="type" :name-list="nameList"/>
   <ToastModal v-if="visibleToast" @close="visibleToast = false" @save="onSave" :data="current" />
   <DelModal v-if="visibleDel" @close="visibleDel = false" @save="onDel" :data="current" /> 
 </template>
@@ -42,7 +42,6 @@ const props = defineProps({
     type: [Object],
     default: []
   },
-  tabKey: String
 })
 
 const visible = ref<boolean>(false)
@@ -56,7 +55,7 @@ const type = ref<string>('Add')
 const selectKey = ref<string>('')
 const selectSort = ref<number>(0)
 const list = ref<any>([])
-
+const nameList = ref<any>([])
 
 const indexMap = new Map()
 const { ControlLeft, MetaLeft, KeyC, KeyV } = useMagicKeys()
@@ -64,7 +63,7 @@ const { ControlLeft, MetaLeft, KeyC, KeyV } = useMagicKeys()
 
 
 const onSave = (data?: any) => {
-  console.log('save', data)
+  // console.log('save', data)
   if (data) {
     visible.value = false
     type.value === 'Add' ? product.add(data, data.parentId) : product.update(data)
@@ -132,6 +131,11 @@ const onClick = (id: string) => {
   selectSort.value = indexMap.get(id)
 }
 
+const onDbClick = (data:any)=>{
+  engine.selectFile(data.id)
+  engine.addFile(data)
+}
+
 const handleSort = (sort) => {
   const listLength = indexMap.size
   // const colNumber = listLength / 8
@@ -175,6 +179,7 @@ watchEffect(() => {
     // console.log(props.data[0].id)
     selectKey.value = props.data[0].id
     selectSort.value = 0
+    nameList.value = props.data.map(item=>item.name)
     list.value = props.data.map((item, index) => {
       indexMap.set(item.id, index)
       return item
