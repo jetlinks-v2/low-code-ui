@@ -9,10 +9,10 @@
     >
       <div v-if="!state.configurationShow">
         <p>数据展示方式</p>
-        <div class="j-check-button">
+        <div class="j-check-btn">
           <div
             :class="[
-              'j-check-button-item',
+              'j-check-btn-item',
               state.configured.includes('list') ? 'selected' : '',
             ]"
             @click="configuredChange('list')"
@@ -22,7 +22,7 @@
 
           <div
             :class="[
-              'j-check-button-item',
+              'j-check-btn-item',
               state.configured.includes('card') ? 'selected' : '',
             ]"
             @click="configuredChange('card')"
@@ -135,19 +135,27 @@ defineExpose({
     padding: 0;
   }
 }
-.j-check-button {
+.j-check-btn {
   display: flex;
   width: 100%;
-  .j-check-button-item:first-child {
+  gap: 0;
+  .j-check-btn-item:first-child {
     border-left: 1px solid #d9d9d9;
     border-radius: 2px 0 0 2px;
   }
-  .j-check-button-item {
+  .j-check-btn-item:last-child {
+    border-left: 1px solid #d9d9d9;
+    border-radius: 2px 0 0 2px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
+  .j-check-btn-item {
     width: 150px;
     position: relative;
     display: inline-block;
     height: 32px;
     margin: 0;
+    gap: 0;
     padding: 0 15px;
     color: rgba(0, 0, 0, 0.85);
     font-size: 14px;
@@ -159,11 +167,12 @@ defineExpose({
     text-align: center;
     cursor: pointer;
     &:hover {
-      color: var(--ant-primary-color);
+      color: var(--ant-primary-color) !important;
+      background: #fff;
     }
 
     &.selected {
-      color: #fff;
+      color: #fff !important;
       background: var(--ant-primary-color);
       border-color: var(--ant-primary-color);
     }

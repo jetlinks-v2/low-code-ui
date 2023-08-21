@@ -23,7 +23,7 @@
             status="notActive"
             :actions="slotProps?.actions"
             :record="slotProps?.formState"
-            :statusText="slotProps?.emphasisField || '强调字段'"
+            :statusText="slotProps[cardConfig?.emphasisField] || '强调字段'"
             :statusNames="{
               online: 'processing',
               offline: 'error',
@@ -35,7 +35,7 @@
               <j-avatar
                 shape="square"
                 :size="100"
-                :src="cardConfig?.customIcon"
+                :src="slotProps[cardConfig?.dynamicIcon] ? cardConfig?.customIcon :slotProps[cardConfig?.dynamicIcon]"
                 class="card-icon"
               >
                 <template #icon>
@@ -47,7 +47,7 @@
               <j-row>
                 <j-col :span="12">
                   <h3>
-                    {{ slotProps?.deviceId1 || '字段1' }}
+                    {{ slotProps[cardConfig?.field1] || '字段1' }}
                   </h3>
                 </j-col>
                 <j-col :span="12">
@@ -59,13 +59,13 @@
                 <j-col :span="12">
                   <div>展示字段2</div>
                   <div>
-                    {{ slotProps?.deviceId2 || '字段2' }}
+                    {{ slotProps[cardConfig?.field2] || '字段2' }}
                   </div>
                 </j-col>
                 <j-col :span="12">
                   <div>展示字段3</div>
                   <div>
-                    {{ slotProps?.deviceId3 || '字段3' }}
+                    {{ slotProps[cardConfig?.field3] || '字段3' }}
                   </div>
                 </j-col>
               </j-row>
