@@ -10,7 +10,7 @@
           }">
             <ContextMenu type="list" :data="item" @select="handleChange">
               <div class="box">{{ providerMap[item.type] }}</div>
-              <span>{{ item.name }}</span>
+              <j-ellipsis style="width: 100px">{{ item.name }}</j-ellipsis>
             </ContextMenu>
           </div>
         </a-col>
@@ -223,7 +223,7 @@ onKeyStroke(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'], (e) => {
 })
 
 watchEffect(() => {
-  if (props.data?.[0].parentId === engine.activeFile) {
+  if (props.data?.[0].parentId === engine.activeFile && viewType.value === 'card') {
     if (ControlLeft.value && KeyC.value || MetaLeft.value && KeyC.value) {
       const item = list.value.find(it => it.id === selectKey.value)
       engine.setCopyFile(item)
@@ -257,7 +257,7 @@ watchEffect(() => {
 <style scoped lang='less'>
 .content {
   background-color: #dddddd;
-  height: 600px;
+  height: calc(100vh - 80px);
 
   .content-col {
     display: flex;
