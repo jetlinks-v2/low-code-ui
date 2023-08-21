@@ -1,10 +1,12 @@
 <template>
   <div class="engine">
     <Header />
-    <div class="engine-warp">
-      <Tree />
-      <Content />
-    </div>
+    <DragContent>
+      <div class="engine-warp">
+          <Tree />
+          <Content />
+      </div>
+    </DragContent>
   </div>
 </template>
 

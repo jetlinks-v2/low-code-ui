@@ -5,7 +5,7 @@ import FormDesigner from './FormDesigner/index.vue';
 
 import QuickEditTable from './QuickEditTable/index.vue'
 import Search from './Search'
-import DragBox from "./DragBox";
+import DragBox, { DragContent } from "./DragBox";
 import Card from "./Card";
 import BadgeStatus from "./BadgeStatus";
 import ProImage from './Image/index.vue'
@@ -19,6 +19,7 @@ export default  {
           .component('QuickEditTable', QuickEditTable)
           .component('ProSearch', Search)
           .component('DragBox', DragBox)
+          .component('DragContent', DragContent)
           .component('Card', Card)
           .component('BadgeStatus', BadgeStatus)
           .component('ProImage', ProImage)
