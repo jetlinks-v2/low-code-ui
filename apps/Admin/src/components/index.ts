@@ -5,6 +5,8 @@ import FormDesigner from './FormDesigner/index.vue';
 
 import QuickEditTable from './QuickEditTable/index.vue'
 import Search from './Search'
+import Menu from './Menu/index.vue'
+import Project from './ProJect/index.vue'
 import DragBox, { DragContent } from "./DragBox";
 import Card from "./Card";
 import BadgeStatus from "./BadgeStatus";
@@ -25,5 +27,7 @@ export default  {
           .component('ProImage', ProImage)
           .component('EditorModal', EditorModal)
           .component('CRUD', CRUD)
+          .component('Menu', Menu)
+          .component('Project',Project)
     }
 }
