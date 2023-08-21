@@ -2,7 +2,7 @@
   <j-tree
     :tree-data="btnTree"
     :show-icon="false"
-    draggable
+    :draggable="draggable"
     block-node
     :selectable="false"
     :defaultExpandAll="true"
@@ -15,9 +15,6 @@
     <template #title="{ dataRef, title }">
       <span class="title">{{ title }}</span>
       <slot name="config" :data="dataRef"></slot>
-      <!-- <j-button type="link" v-if="dataRef.type == 'customer' && dataRef.level === 0" @click="handleAddBtn(dataRef.key)">+下级</j-button>
-      <j-button type="link" @click="handleEditBtn(dataRef)">配置</j-button>
-      <j-button type="link" @click="handleDel(dataRef.key)">删除</j-button> -->
     </template>
   </j-tree>
 </template>
@@ -38,6 +35,10 @@ const props = defineProps({
   btnList: {
     type: Array as PropType<any[]>,
     default: () => [],
+  },
+  draggable: {
+    type: Boolean,
+    default: true,
   }
 })
 

@@ -11,7 +11,11 @@
           <j-row justify="space-between">
             <j-col :span="8">
               <j-space>
-                <j-skeleton-button size="large" ref="ref1" style="background-color: aqua;"/>
+                <j-skeleton-button
+                  size="large"
+                  ref="ref1"
+                  class="config-item filter"
+                />
                 <j-skeleton-button size="large" />
                 <j-skeleton-input style="width: 200px" size="large" />
               </j-space>
@@ -31,12 +35,18 @@
         <div class="table-skeleton">
           <j-row justify="space-between" align="middle">
             <j-col :span="4">
-              <j-skeleton-button size="large" ref="ref2" @click="OperationBtnsVisible = true"/>
+              <j-skeleton-button
+                class="config-item btn"
+                :class="{ animation: !btnTree.length && !open }"
+                size="large"
+                ref="ref2"
+                @click="OperationBtnsVisible = true"
+              />
             </j-col>
             <j-col :span="2">
-              <j-space ref="ref6">
+              <j-space ref="ref6" class="config-item type">
                 <j-skeleton-input style="width: 32px" />
-                <j-skeleton-input style="width: 32px" ref="test"/>
+                <j-skeleton-input style="width: 32px" ref="test" />
               </j-space>
             </j-col>
           </j-row>
@@ -46,6 +56,7 @@
                 style="width: 100%; margin: 8px 0"
                 size="large"
                 ref="ref3"
+                class="config-item column-data"
               />
               <j-skeleton-input
                 style="width: 100%; margin: 8px 0"
@@ -58,6 +69,9 @@
                 style="width: 100%; margin: 8px 0"
                 size="large"
                 ref="ref4"
+                @click="OperationColumnsVisible = true"
+                class="config-item column-operation"
+                :class="{ animation: !columnsTree.length && !open, filter: columnsTree.length }"
               />
               <j-skeleton-input
                 style="width: 100%; margin: 8px 0"
@@ -68,29 +82,32 @@
           </j-row>
           <j-row justify="end" style="margin-top: 20px">
             <j-col :span="10">
-              <j-skeleton-input style="width: 100%" size="large" ref="ref5" />
+              <j-skeleton-input
+                style="width: 100%"
+                size="large"
+                ref="ref5"
+                class="config-item pagination"
+              />
             </j-col>
           </j-row>
         </div>
       </div>
     </div>
-    <Guide :stepList="steps" v-model:open="open"/>
-    <OperationBtns v-model:open="OperationBtnsVisible"/>
-    <j-button>
-      
-    </j-button>
+    <Guide :stepList="steps" v-model:open="open" />
+    <OperationBtns v-model:open="OperationBtnsVisible" />
+    <OperationColumns v-model:open="OperationColumnsVisible" />
+    <j-button> </j-button>
   </div>
 </template>
 
 <script setup lang="ts" name="ListPage">
 import Guide from './Guide/index.vue'
-import DataBind from './DataBind/index.vue';
-import type { GuideProps } from './Guide/type';
-import OperationBtns from './OperationBtns/index.vue';
-import { useOperationButton } from '@/store/operationButton';
-import { storeToRefs } from 'pinia';
+import DataBind from './DataBind/index.vue'
+import type { GuideProps } from './Guide/type'
+import { OperationBtns, OperationColumns } from './Operation'
+import { useOperationButton } from '@/store/operationButton'
 
-const { btnTree } = storeToRefs(useOperationButton());
+const { btnTree, columnsTree } = useOperationButton()
 
 const ref1 = ref()
 const ref2 = ref()
@@ -105,8 +122,9 @@ const test = ref()
 
 const open = ref(false)
 const OperationBtnsVisible = ref(false)
+const OperationColumnsVisible = ref(false)
 
-const steps:GuideProps['stepsList'] = [
+const steps: GuideProps['stepsList'] = [
   {
     title: '步骤1',
     description: '选择后端功能作为列表页的数据来源',
@@ -162,22 +180,19 @@ const steps:GuideProps['stepsList'] = [
       {
         el: menuRef.value,
       },
-    ]
-  },
-  {
-    title: '步骤4',
-    description: '如果该页面需要作为系统菜单，请在这里配置基本信息',
-    placement: 'right',
-    target: () => [
-      {
-        el: previewRef.value,
-      },
-    ]
+    ],
   },
 ]
 </script>
 
 <style scoped lang="less">
+@filterBg: #fbd9ab;
+@btnBg: #bbffff;
+@typeBg: #e1c1ff;
+@columnDataBg: #e5fcc1;
+@columnOperationBg: #ffffaf;
+@paginationBg: #f8cfd4;
+
 .list-page {
   height: 100%;
   .left-menu {
@@ -193,6 +208,7 @@ const steps:GuideProps['stepsList'] = [
       align-items: center;
       justify-content: center;
       margin: 10px;
+      cursor: pointer;
     }
   }
   .right-skeleton {
@@ -213,19 +229,53 @@ const steps:GuideProps['stepsList'] = [
       background-color: #ffffff;
     }
   }
+
+  .config-item {
+    cursor: pointer;
+    &.filter:hover {
+      background-color: @filterBg !important;
+    }
+    &.btn:hover {
+      background-color: @btnBg !important;
+    }
+    &.type:hover {
+      background-color: @typeBg !important;
+    }
+    &.column-data:hover {
+      background-color: @columnDataBg !important;
+    }
+    &.column-operation:hover {
+      background-color: @columnOperationBg !important;
+    }
+    &.pagination:hover {
+      background-color: @paginationBg !important;
+    }
+  }
 }
 .animation {
-  animation: blink 2s infinite;
-  @keyframes blink {
-    0% {
-      background-color: rgba(188, 242, 242, 1);
-    }
-    50% {
-      background-color: rgba(188, 242, 242, 0);
-    }
-    100% {
-      background-color: rgba(188, 242, 242, 1);
-    }
+  animation: blink 1.5s infinite;
+  &.filter {
+    background-color: @filterBg;
+  }
+  &.btn {
+    background-color: @btnBg;
+  }
+  &.type {
+    background-color: @typeBg;
+  }
+  &.column-data {
+    background-color: @columnDataBg;
+  }
+  &.column-operation {
+    background-color: @columnOperationBg;
+  }
+  &.pagination {
+    background-color: @paginationBg;
+  }
+}
+@keyframes blink {
+  50% {
+    background-color: transparent;
   }
 }
 </style>

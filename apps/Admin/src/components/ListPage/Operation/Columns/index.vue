@@ -3,13 +3,14 @@
     :mask-closable="false"
     width="25vw"
     :visible="_visible"
-    title="添加按钮"
+    title="操作列"
     @close="close"
     destroy-on-close
     :z-index="1000"
-    placement="right"
+    placement="left"
   >
     <BtnsList
+      v-model:data="columnsTree"
       v-if="steps == 'BtnsList'"
       v-model:steps="steps"
     />
@@ -27,11 +28,11 @@
     </template>
   </j-drawer>
 </template>
-<script setup lang="ts" name="OperationBtns">
+<script setup lang="ts" name="OperationColumns">
 import BtnsList from './components/BtnsList.vue'
 import Editbtn from './components/EditBtn.vue'
 import BtnsType from './components/BtnsType.vue'
-import { BtnProps } from './type'
+import { BtnProps } from '../type'
 import { useOperationButton } from '@/store/operationButton'
 import { storeToRefs } from 'pinia'
 
@@ -49,7 +50,7 @@ const props = defineProps({
 
 const operationButtonStore = useOperationButton()
 
-const { btnTree } = storeToRefs(operationButtonStore)
+const { columnsTree } = storeToRefs(operationButtonStore)
 
 const steps = ref('BtnsList')
 const _visible = computed({

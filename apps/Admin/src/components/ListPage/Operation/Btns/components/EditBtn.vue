@@ -12,8 +12,8 @@
 </template>
 
 <script setup lang="ts" name="EditBtn">
-import Edit from '../../Components/Edit.vue';
-import { useOperationButton } from '@/store';
+import Edit from '../../components/Edit.vue';
+import { useOperationButton } from '@/store/operationButton';
 interface Emit {
   (e: 'update:steps', value: string): void
 }

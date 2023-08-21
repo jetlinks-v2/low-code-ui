@@ -2,7 +2,7 @@
   <div class="edit-btn">
     <j-form :model="form" layout="vertical" ref="formRef" :rules="rules">
       <j-form-item label="请输入按钮名称" v-if="activeBtn.type == 'customer'">
-        <j-input v-model:value="form.title"></j-input>
+        <j-input v-model:value="form.title" :maxlength="8"></j-input>
       </j-form-item>
       <j-form-item label="图标">
         <AIcon
@@ -22,8 +22,8 @@
               >
                 <j-select-option
                   v-for="item in functions"
-                  :value="item.fullId"
-                  :key="item.fullId"
+                  :value="item.id"
+                  :key="item.id"
                   >{{ item.name }}</j-select-option
                 >
               </j-select>
@@ -45,7 +45,7 @@
             </j-form-item>
           </j-col>
         </j-row>
-        <j-form-item label="调用页面" v-if="activeBtn.type === 'add'">
+        <j-form-item label="调用页面" v-if="activeBtn.type === 'add' || activeBtn.type === 'detail'">
           <j-select v-model:value="form.pages" placeholder="请选择调用页面">
             <j-select-option
               v-for="item in pages"
@@ -95,7 +95,7 @@ const treeToArr = (data: any[]) => {
     if (item.functions && item.functions.length) {
       functions.value.push(...item.functions)
     }
-    if(item.type !== 'ListPage') {
+    if(item.type == 'page-code') {
       pages.value.push(omit(item, 'children'))
     }
     if (item.children) {
@@ -110,7 +110,8 @@ const commands = [
   { label: 'add', value: 'add' },
   { label: 'import', value: 'import' },
   { label: 'export', value: 'export' },
-  { label: 'delete', value: 'delete' }
+  { label: 'delete', value: 'delete' },
+  { label: 'update', value: 'update' }
 ]
 
 const visible = ref(false)

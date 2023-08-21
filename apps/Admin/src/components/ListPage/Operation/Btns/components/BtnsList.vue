@@ -15,10 +15,10 @@
   </div>
 </template>
 <script setup lang="ts" name="BtnsList">
-import { BtnProps } from '../type';
+import { BtnProps } from '../../type';
 import { useOperationButton } from '@/store/operationButton';
 import { storeToRefs } from 'pinia';
-import BtnTree from '../../Components/BtnTree.vue';
+import BtnTree from '../../components/BtnTree.vue';
 
 interface Emit {
   (e: 'update:steps', value: string): void;
