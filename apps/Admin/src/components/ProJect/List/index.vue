@@ -19,19 +19,19 @@
   </div>
   <div v-else style="width: 1200px;">
     <j-pro-table :columns="columns" :dataSource="list" model="TABLE" :noPagination="true" :childrenColumnName="'list'"
-      :customRow="(record) => ({onContextmenu: (e) => onContextmenu(e, record)})">
-      <template #type="{type}">
+      :customRow="(record) => ({ onContextmenu: (e) => onContextmenu(e, record) })">
+      <template #type="{ type }">
         {{ providerMap[type] }}
       </template>
       <template #modifyTime="record">{{ record?.others?.modifyTime }}</template>
     </j-pro-table>
     <div v-if="visibleMenu" style="width: 150px;">
       <j-menu @click="(e) => handleChange(e.key, menuData.data)" :style="menuData.style" class="tableMenu">
-        <j-menu-item key="Profile">显示简介</j-menu-item>
-        <j-menu-item key="Copy">复制</j-menu-item>
-        <j-menu-item key="Paste" :disabled="engine.copyFile === ''">粘贴</j-menu-item>
-        <j-menu-item key="Rename">重命名</j-menu-item>
-        <j-menu-item key="Delete">删除</j-menu-item>
+        <j-menu-item :key="actionMap['Profile'].key">{{ actionMap['Profile'].value }}</j-menu-item>
+        <j-menu-item :key="actionMap['Copy'].key">{{ actionMap['Copy'].value }}</j-menu-item>
+        <j-menu-item :key="actionMap['Paste'].key" :disabled="engine.copyFile === ''">{{ actionMap['Paste'].value }}</j-menu-item>
+        <j-menu-item :key="actionMap['Rename'].key">{{ actionMap['Rename'].value }}</j-menu-item>
+        <j-menu-item :key="actionMap['Delete'].key">{{ actionMap['Delete'].value }}</j-menu-item>
       </j-menu>
     </div>
   </div>
@@ -49,7 +49,7 @@ import FileDrawer from '../components/Action/FileDrawer.vue'
 import ToastModal from '../components/Action/ToastModal.vue'
 import DelModal from '../components/Action/DelModal.vue'
 import { onlyMessage } from '@jetlinks/utils';
-import { providerEnum, providerMap, restId } from '../index'
+import { providerMap, restId,actionMap } from '../index'
 import { onKeyStroke, useMagicKeys } from '@vueuse/core'
 import { useProduct, useEngine } from '@/store'
 
@@ -148,14 +148,14 @@ const onContextmenu = (e, record) => {
   //点击取消菜单
   const cancel = () => {
     visibleMenu.value = false
-    document.body.removeEventListener('click',cancel)
+    document.body.removeEventListener('click', cancel)
   }
   document.body.addEventListener('click', cancel)
 }
 
 const handleChange = (key: any, data?: any) => {
-  // console.log(key)
-  provider.value = providerEnum[key]
+  // console.log('key',key)
+  provider.value = key
   if (!data) {
     if (key === 'Paste') {
       onPaste()

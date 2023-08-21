@@ -74,6 +74,7 @@
 
     </JProTable>
     <Save v-if="visible" @close="handleClose" :data="current" :type="modelType" />
+    <Menu v-if="visibleMenu" @close="visibleMenu=false"/>
   </page-container>
 </template>
 
@@ -83,12 +84,14 @@ import dayjs from 'dayjs';
 import { queryProject, delProject, enableProject, disabledProject } from '@/api/project'
 import { onlyMessage } from '@/utils/comm';
 import { router } from '@jetlinks/router';
+import Menu from './Menu/index.vue'
 
 const params = ref<any>({})
 const tableRef = ref<Record<string, any>>({});
 const current = ref({})
 const modelType = ref<string>('add')
 const visible = ref<boolean>(false)
+const visibleMenu = ref<boolean>(false)
 
 const columns = [
   {
@@ -203,6 +206,7 @@ const getActions = (record) => {
         icon: 'EyeOutlined',
         onClick: () => {
           console.log(record)
+          visibleMenu.value = true
         }
       },
     },

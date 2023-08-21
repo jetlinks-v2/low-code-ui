@@ -10,7 +10,7 @@
       </div>
       <j-divider></j-divider>
       <div class="title">通用：</div>
-      <div>类型：{{ type }} - {{ providerMap[props.data.type] }}</div>
+      <div>类型：{{ type }} - {{ providerMap, providerEnum[props.data.type] }}</div>
       <div>位置：{{ location }}</div>
       <j-divider></j-divider>
       <div class="title">引用关系：</div>
@@ -20,7 +20,7 @@
 
 <script setup lang='ts' name="FileDrawer">
 import { useProduct } from '@/store'
-import { providerMap} from '../../index'
+import { providerMap, providerEnum } from '../../index'
 import { cloneDeep } from 'lodash-es';
 
 const product = useProduct()
@@ -32,23 +32,23 @@ const props = defineProps({
    },
 })
 const emit = defineEmits(['close'])
-const web = ['page-html','page-list','page-form','page-code']
+const web = [providerEnum.HtmlPage, providerEnum.FormPage, providerEnum.ListPage, providerEnum.Page]
 const location = ref()
 const relation = ref<any>()
 const dataMap = new Map()
 
-const type = computed(()=>{
-   if(props.data.type === 'module'){
+const type = computed(() => {
+   if (props.data.type === 'module') {
       return '通用能力'
-   }else if(web.includes(props.data.type)){
+   } else if (web.includes(props.data.type)) {
       return '前端资源'
-   }else{
+   } else {
       return '后端功能'
    }
 })
 
 const handleDataMap = (data) => {
-    data?.forEach?.(item => {
+   data?.forEach?.(item => {
       const { children, ...extra } = item
       // if( item.id ==='jwQhhpTh2cnw6n5G'){
       //    dataMap.set(item.id, {
@@ -62,38 +62,37 @@ const handleDataMap = (data) => {
       // }
       dataMap.set(item.id, extra)
       if (children?.length) {
-        handleDataMap(item.children)
+         handleDataMap(item.children)
       }
-    })
-  }
+   })
+}
 
-const getRelation = ()=>{
+const getRelation = () => {
    handleDataMap(cloneDeep(product.data))
 
    const arr = [...dataMap.values()]
-   relation.value = arr.filter(item=>item?.others?.useList?.includes(props.data.id))?.map(it=>{
-      if(it.type === 'module'){
+   relation.value = arr.filter(item => item?.others?.useList?.includes(props.data.id))?.map(it => {
+      if (it.type === 'module') {
          return `通用能力-${it.title}`
-      }else if(web.includes(it.type)){
+      } else if (web.includes(it.type)) {
          return `前端资源-${it.title}`
-      }else{
+      } else {
          return `后端能力-${it.title}`
       }
    })
    // console.log('arr----',arr,relation.value)
 }
 
-onMounted(()=>{
+onMounted(() => {
    // console.log('----------',props.data)
-   location.value = product.getParent(props.data).map((item:any)=>item.title).join(' -> ')
+   location.value = product.getParent(props.data).map((item: any) => item.title).join(' -> ')
    getRelation()
 })
 
 </script>
 
-<style scoped lang='less'> 
-.title{
-   font-size: 22px;
-   margin-bottom: 10px;
-}
+<style scoped lang='less'> .title {
+    font-size: 22px;
+    margin-bottom: 10px;
+ }
 </style>
