@@ -19,7 +19,7 @@
         <j-button type="link">变更</j-button>
       </j-form-item>
       <j-form-item>
-        <j-button type="link" @click="validOperationBtn">校验</j-button>
+        <j-button type="link">校验</j-button>
       </j-form-item>
       <j-form-item v-if="!open">
         <j-button @click="emits('update:open', true)">操作向导</j-button>
@@ -31,7 +31,6 @@
 <script setup lang="ts" name="DataBind">
 import { useProduct } from '@/store'
 import { omit } from 'lodash-es'
-import { validOperationBtn } from '../Operation';
 
 interface Emit {
   (e: 'update:open', value: boolean): void

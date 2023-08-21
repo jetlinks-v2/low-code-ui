@@ -3,7 +3,7 @@
     <DataBind ref="dataBindRef" v-model:open="open" />
     <div style="display: flex; height: 100%; width: 100%">
       <div class="left-menu">
-        <div class="menus" ref="menuRef">菜单配置</div>
+        <div class="menus" ref="menuRef" @click="MenuConfigVisible = true">菜单配置</div>
         <div class="menus" ref="previewRef">预览</div>
       </div>
       <div class="right-skeleton">
@@ -15,6 +15,7 @@
                   size="large"
                   ref="ref1"
                   class="config-item filter"
+                  @click="FilterModuleVisible = true"
                 />
                 <j-skeleton-button size="large" />
                 <j-skeleton-input style="width: 200px" size="large" />
@@ -44,7 +45,7 @@
               />
             </j-col>
             <j-col :span="2">
-              <j-space ref="ref6" class="config-item type">
+              <j-space ref="ref6" class="config-item type" @click="ListFormVisible = true">
                 <j-skeleton-input style="width: 32px" />
                 <j-skeleton-input style="width: 32px" ref="test" />
               </j-space>
@@ -57,6 +58,7 @@
                 size="large"
                 ref="ref3"
                 class="config-item column-data"
+                @click="ListDataVisible = true"
               />
               <j-skeleton-input
                 style="width: 100%; margin: 8px 0"
@@ -87,6 +89,7 @@
                 size="large"
                 ref="ref5"
                 class="config-item pagination"
+                @click="PagingConfigVisible = true"
               />
             </j-col>
           </j-row>
@@ -96,6 +99,11 @@
     <Guide :stepList="steps" v-model:open="open" />
     <OperationBtns v-model:open="OperationBtnsVisible" />
     <OperationColumns v-model:open="OperationColumnsVisible" />
+    <FilterModule v-model:open="FilterModuleVisible"/>
+    <ListData v-model:open="ListDataVisible" />
+    <ListForm v-model:open="ListFormVisible" />
+    <PagingConfig v-model:open="PagingConfigVisible" />
+    <MenuConfig v-model:open="MenuConfigVisible" />
     <j-button> </j-button>
   </div>
 </template>
@@ -103,6 +111,11 @@
 <script setup lang="ts" name="ListPage">
 import Guide from './Guide/index.vue'
 import DataBind from './DataBind/index.vue'
+import FilterModule from './FilterModule/index.vue'
+import ListData from './ListData/index.vue'
+import ListForm from './ListForm/index.vue'
+import PagingConfig from './PagingConfig/index.vue'
+import MenuConfig from './MenuConfig/index.vue'
 import type { GuideProps } from './Guide/type'
 import { OperationBtns, OperationColumns } from './Operation'
 import { useOperationButton } from '@/store/operationButton'
@@ -123,6 +136,11 @@ const test = ref()
 const open = ref(false)
 const OperationBtnsVisible = ref(false)
 const OperationColumnsVisible = ref(false)
+const FilterModuleVisible = ref(false)
+const ListDataVisible = ref(false)
+const ListFormVisible = ref(false)
+const PagingConfigVisible = ref(false)
+const MenuConfigVisible = ref(false)
 
 const steps: GuideProps['stepsList'] = [
   {

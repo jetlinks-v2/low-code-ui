@@ -5,7 +5,7 @@
       placement="right"
       :closable="false"
       :visible="open"
-      @close="onClose"
+      @close="emits('update:open', false)"
     >
       <Menu :pageName="pageName" ref="menuRef" />
     </j-drawer>
@@ -13,7 +13,27 @@
 </template>
 <script setup lang="ts">
 import Menu from '@/components/ListPage/MenuConfig/components/menu.vue'
-const open = ref<boolean>(false)
+
+interface Emit {
+  (e: 'update:open', value: boolean): void
+}
+
+const emits = defineEmits<Emit>()
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+const open = computed({
+  get() {
+    return props.open
+  },
+  set(val: boolean) {
+    emits('update:open', val)
+  },
+})
 const dialogVisible = ref<boolean>(false)
 const menuRef = ref()
 const pageName = ref('')
@@ -23,9 +43,6 @@ const form = reactive({
   icon: '',
 })
 
-defineExpose({
-  open: open.value,
-})
 </script>
 <style lang="less" scoped>
 .card {

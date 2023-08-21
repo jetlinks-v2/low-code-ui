@@ -5,7 +5,7 @@
       placement="bottom"
       :closable="true"
       :visible="open"
-      @close="open = false"
+      @close="emits('update:open', false)"
       height="520px"
     >
       <Table
@@ -60,7 +60,26 @@ import NumberType from '@/components/ListPage/FilterModule/components/NumberType
 import DateType from '@/components/ListPage/FilterModule/components/DateType.vue'
 import { useFilterModuleStore } from '@/store/filterModule'
 
-const open = ref<boolean>(false)
+interface Emit {
+  (e: 'update:open', value: boolean): void
+}
+
+const emits = defineEmits<Emit>()
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+const open = computed({
+  get() {
+    return props.open
+  },
+  set(val: boolean) {
+    emits('update:open', val)
+  },
+})
 const type = ref('')
 const title = ref('请选择页面支持的筛选项')
 const addBtnName =ref('新增筛选项')

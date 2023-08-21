@@ -2,6 +2,7 @@ import type { App } from 'vue'
 import TitleComponent from './TitleComponent/index.vue'
 import ImageUpload from "./Upload/Image/ImageUpload.vue";
 import FormDesigner from './FormDesigner/index.vue';
+import ListPage from './ListPage/index.vue';
 
 import QuickEditTable from './QuickEditTable/index.vue'
 import Search from './Search'
@@ -22,5 +23,6 @@ export default  {
           .component('BadgeStatus', BadgeStatus)
           .component('ProImage', ProImage)
           .component('EditorModal', EditorModal)
+          .component('ListPage', ListPage)
     }
 }
