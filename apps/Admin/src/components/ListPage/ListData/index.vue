@@ -5,7 +5,7 @@
       placement="bottom"
       :closable="true"
       :visible="open"
-      @close="open = false"
+      @close="emits('update:open', false)"
       height="520px"
     >
       <Table
@@ -173,7 +173,27 @@
 import Table from '@/components/ListPage/FilterModule/components/FilterTable.vue'
 import Config from '@/components/ListPage/ListData/compnents/Configuration.vue'
 import { useListDataStore } from '@/store/listData'
-const open = ref<boolean>(true)
+
+interface Emit {
+  (e: 'update:open', value: boolean): void
+}
+
+const emits = defineEmits<Emit>()
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+const open = computed({
+  get() {
+    return props.open
+  },
+  set(val: boolean) {
+    emits('update:open', val)
+  },
+})
 const title = ref('请配置数据列表需要展示的表头')
 const addBtnName = ref('新增表头')
 const configurationStore = useListDataStore()
@@ -471,9 +491,6 @@ const submit = () => {
   configurationStore.setDatasource(dataSource.value)
   configState.type = ''
 }
-defineExpose({
-  open: open.value,
-})
 </script>
 
 <style scoped lang="less">

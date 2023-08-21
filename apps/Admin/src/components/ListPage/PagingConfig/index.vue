@@ -5,7 +5,7 @@
       placement="top"
       :closable="false"
       :visible="open"
-      @close="onClose"
+      @close=" emits('update:open', false)"
     >
       <p>请配置分页器支持的单页数据量</p>
       <div style="display: flex; flex-flow: wrap">
@@ -38,7 +38,29 @@ const pagingData = ref([
   { pageSize: 48 },
   { pageSize: 96 },
 ])
-const open = ref<boolean>(true)
+
+
+interface Emit {
+  (e: 'update:open', value: boolean): void
+}
+
+const emits = defineEmits<Emit>()
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+const open = computed({
+  get() {
+    return props.open
+  },
+  set(val: boolean) {
+    emits('update:open', val)
+  },
+})
+
 const onAdd = () => {
   const value = pagingData.value[pagingData.value.length - 1].pageSize
   console.log(value)
@@ -65,8 +87,5 @@ const blur = () => {
     return a.pageSize - b.pageSize
   })
 }
-defineExpose({
-  open: open.value,
-})
 </script>
 <style lang="less" scoped></style>
