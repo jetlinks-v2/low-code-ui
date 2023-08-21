@@ -17,6 +17,9 @@ importers:
       jetlinks-ui-components:
         specifier: ^1.0.29
         version: 1.0.29(vue-router@4.2.4)(vue@3.3.4)
+      latest:
+        specifier: ^0.2.0
+        version: 0.2.0
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -4586,6 +4589,7 @@ packages:
       '@vueuse/router': 9.13.0(vue-router@4.2.2)(vue@3.3.4)
       ant-design-vue: 3.2.20(vue@3.3.4)
       colorpicker-v3: 2.10.2
+      jetlinks-ui-components: 1.0.29(vue-router@4.2.2)(vue@3.3.4)
       lodash-es: 4.17.21
       monaco-editor: 0.40.0
       sortablejs: 1.15.0
@@ -4604,6 +4608,7 @@ packages:
       '@vueuse/router': 9.13.0(vue-router@4.2.4)(vue@3.3.4)
       ant-design-vue: 3.2.20(vue@3.3.4)
       colorpicker-v3: 2.10.2
+      jetlinks-ui-components: 1.0.29(vue-router@4.2.4)(vue@3.3.4)
       lodash-es: 4.17.21
       monaco-editor: 0.40.0
       sortablejs: 1.15.0
@@ -4736,6 +4741,13 @@ packages:
   /kolorist@1.8.0:
     resolution: {integrity: sha512-Y+60/zizpJ3HRH8DCss+q95yr6145JXZo46OTpFvDZWLfRCE4qChOyk1b26nMaNpfHHgxagk9dXT5OP0Tfe+dQ==}
     dev: true
+
+  /latest@0.2.0:
+    resolution: {integrity: sha512-nsIM/FjwLcsKZ1KDAw5CivnM26zzMs3zGBL4SdjYXHI5tMcOWjGhFDMBKIum4WNAkZmeVw7zU1jR2H2UiKoQVA==}
+    hasBin: true
+    dependencies:
+      npm: 2.15.12
+    dev: false
 
   /less@4.1.3:
     resolution: {integrity: sha512-w16Xk/Ta9Hhyei0Gpz9m7VS8F28nieJaL/VyShID7cYvP6IL5oHeL6p4TXSDJqZE/lNv0oJ2pGVjJsRkfwm5FA==}
@@ -5231,6 +5243,83 @@ packages:
     dependencies:
       path-key: 4.0.0
     dev: true
+
+  /npm@2.15.12:
+    resolution: {integrity: sha512-WMoAJ518W0vHjWy1abYnTeyG9YQpSoYGPxAx7d0C0L7U7Jo44bZsrvTjccmDohCJGxpasdKfqsKsl6o/RUPx6A==}
+    hasBin: true
+    dev: false
+    bundledDependencies:
+      - abbrev
+      - ansi
+      - ansi-regex
+      - ansicolors
+      - ansistyles
+      - archy
+      - async-some
+      - block-stream
+      - char-spinner
+      - chmodr
+      - chownr
+      - cmd-shim
+      - columnify
+      - config-chain
+      - dezalgo
+      - editor
+      - fs-vacuum
+      - fs-write-stream-atomic
+      - fstream
+      - fstream-npm
+      - github-url-from-git
+      - github-url-from-username-repo
+      - glob
+      - graceful-fs
+      - hosted-git-info
+      - imurmurhash
+      - inflight
+      - inherits
+      - ini
+      - init-package-json
+      - lockfile
+      - lru-cache
+      - minimatch
+      - mkdirp
+      - node-gyp
+      - nopt
+      - normalize-git-url
+      - normalize-package-data
+      - npm-cache-filename
+      - npm-install-checks
+      - npm-package-arg
+      - npm-registry-client
+      - npm-user-validate
+      - npmlog
+      - once
+      - opener
+      - osenv
+      - path-is-inside
+      - read
+      - read-installed
+      - read-package-json
+      - readable-stream
+      - realize-package-specifier
+      - request
+      - retry
+      - rimraf
+      - semver
+      - sha
+      - slide
+      - sorted-object
+      - spdx-license-ids
+      - strip-ansi
+      - tar
+      - text-table
+      - uid-number
+      - umask
+      - validate-npm-package-license
+      - validate-npm-package-name
+      - which
+      - wrappy
+      - write-file-atomic
 
   /nprogress@0.2.0:
     resolution: {integrity: sha512-I19aIingLgR1fmhftnbWWO3dXc0hSxqHQHQb3H8m+K3TnEn/iSeTZZOyvKXWqQESMwuUVnatlCnZdLBZZt2VSA==}

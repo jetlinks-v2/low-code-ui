@@ -30,8 +30,15 @@
             卡片列表
           </div>
         </div>
+        <div v-if="state.configured.includes('card')">
+          <p class="title">卡片配置</p>
+          <j-button style="width: 300px" @click="state.configurationShow = true"
+            >配置</j-button
+          >
+        </div>
+
         <div v-if="state.configured?.length === 2">
-          <p>默认形态</p>
+          <p class="title">默认形态</p>
           <j-radio-group v-model:value="state.defaultForm" button-style="solid">
             <j-radio-button value="list" class="check-btn">
               数据列表
@@ -80,7 +87,6 @@ const state = reactive({
 //卡片配置返回
 const back = () => {
   state.configurationShow = false
-  state.configured = ['list']
 }
 const configurationStore = useListFormStore()
 //取消
@@ -100,7 +106,6 @@ const submit = async () => {
     state.configurationShow = false
   }
   data.type = state.type
-  console.log(data, 111)
 }
 //已配置数据展示方式，默认数据列表
 const configuredChange = (value: string) => {
@@ -114,8 +119,6 @@ const configuredChange = (value: string) => {
   }
   state.defaultForm =
     state.configured?.length === 1 ? state.configured[0] : 'list'
-  state.configurationShow =
-    state.configured.includes('card') && value === 'card'
 }
 defineExpose({
   open: open.value,
@@ -165,5 +168,8 @@ defineExpose({
       border-color: var(--ant-primary-color);
     }
   }
+}
+.title {
+  margin-top: 20px;
 }
 </style>

@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useConfigurationStore } from '@/store/filterModule'
+import { useFilterModuleStore } from '@/store/filterModule'
 const state = reactive({
   accuracy: 'year',
   defaultValue: 'not',
@@ -29,7 +29,7 @@ const options = [
   { value: 'year', label: '年-月-日' },
   { value: 'hour', label: '时-分-秒' },
 ]
-const configurationStore = useConfigurationStore()
+const configurationStore = useFilterModuleStore()
 
 watch(
   () => state,

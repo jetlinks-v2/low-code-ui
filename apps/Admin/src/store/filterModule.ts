@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const useConfigurationStore = defineStore('configuration', () => {
+export const useFilterModuleStore = defineStore('filterModule', () => {
   const configurationInfo = ref<any>({
     enum: {},
     string: {},

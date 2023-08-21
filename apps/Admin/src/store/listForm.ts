@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const useListFormStore = defineStore('configuration', () => {
+export const useListFormStore = defineStore('listForm', () => {
   const listFormInfo = ref<any>({
     customIcon: '',
     dynamicIcon: '',
@@ -8,7 +8,11 @@ export const useListFormStore = defineStore('configuration', () => {
     field2: '',
     field3: '',
     emphasisField: '',
-    specialStyle: undefined,
+    specialStyle: `{
+      "error": "",
+      "offline": "",
+      "warning": "#13c2c2"
+    }`,
   })
 
   /**

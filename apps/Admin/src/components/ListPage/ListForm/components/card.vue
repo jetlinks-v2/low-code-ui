@@ -2,19 +2,17 @@
   <div class="card-center">
     <p>卡片样式</p>
     <Card
-      status="offline"
+      status="notActive"
       :actions="actions"
       :record="formState"
-      :statusText="formState.emphasisField"
+      :statusText="formState.emphasisField || '强调字段'"
       :statusNames="{
         online: 'processing',
         offline: 'error',
         notActive: 'warning',
       }"
+      :statusColor="statusColor"
     >
-      <template #status>
-        {{ formState.customIcon }}
-      </template>
       <template #img>
         <j-avatar
           shape="square"
@@ -41,12 +39,10 @@
           </j-col>
           <j-col
             :span="12"
-            class="card-field"
+            class="emphasisField-bg"
             @click="cardState.type = 'emphasisField'"
           >
-            <div>
-              {{ formState.emphasisField || '强调字段' }}
-            </div>
+            <div class="emphasisField-text"></div>
           </j-col>
         </j-row>
 
@@ -109,7 +105,8 @@
               placeholder="请先配置列表数据"
               v-model:value="formState.dynamicIcon"
               showSearch
-              :options="options"
+              :options="title"
+               :field-names="{ label: 'name', value: 'id'}"
             />
           </j-form-item>
         </div>
@@ -129,7 +126,8 @@
               placeholder="请先配置列表数据"
               v-model:value="formState.field1"
               showSearch
-              :options="options"
+              :options="title"
+               :field-names="{ label: 'name', value: 'id'}"
             />
           </j-form-item>
         </div>
@@ -149,7 +147,8 @@
               placeholder="请先配置列表数据"
               v-model:value="formState.field2"
               showSearch
-              :options="options"
+              :options="title"
+               :field-names="{ label: 'name', value: 'id'}"
             />
           </j-form-item>
         </div>
@@ -169,7 +168,8 @@
               placeholder="请先配置列表数据"
               v-model:value="formState.field3"
               showSearch
-              :options="options"
+              :options="title"
+               :field-names="{ label: 'name', value: 'id'}"
             />
           </j-form-item>
         </div>
@@ -180,11 +180,12 @@
               placeholder="请先配置列表数据"
               v-model:value="formState.emphasisField"
               showSearch
-              :options="options"
+              :options="title"
+               :field-names="{ label: 'name', value: 'id'}"
             />
           </j-form-item>
           <j-form-item label="特殊样式" name="specialStyle">
-            <j-monaco-editor v-model="formState.specialStyle" language="css" />
+            <EditorModal v-model:value="formState.specialStyle" language="css"/>
           </j-form-item>
         </div>
         <j-form-item v-show="false">
@@ -198,8 +199,12 @@
 <script lang="ts" setup>
 import Upload from '@/components/Upload/Image/ImageUpload.vue'
 import { useListFormStore } from '@/store/listForm'
+import { useListDataStore } from '@/store/listData'
 import Card from '@/components/Card'
+import EditorModal from '@/components/EditorModal'
 const configurationStore = useListFormStore()
+const listDataStore = useListDataStore()
+const title = ref()
 const formRef = ref()
 //卡片样式点击类型
 const cardState = reactive({
@@ -213,7 +218,7 @@ const formState = reactive({
   field2: '',
   field3: '',
   emphasisField: '',
-  specialStyle: undefined,
+  specialStyle: '',
 })
 const options: any = ref([])
 //上传icon格式
@@ -223,11 +228,6 @@ const getPopupContainer = (trigger: HTMLElement) => {
   return trigger.parentElement
 }
 //卡片
-const status = reactive({
-  text: '正常',
-  value: 'normal',
-  color: '#00ff00',
-})
 const actions = [
   {
     key: 'view',
@@ -290,6 +290,7 @@ const validateValue = () => {
       onCheck()
     }
   })
+  statusColor.value = JSON.parse(formState.specialStyle)
 }
 const onCheck = async () => {
   try {
@@ -316,9 +317,19 @@ watch(
   { immediate: true, deep: true },
 )
 const init = () => {
+  console.log(configurationStore,'configurationStore');
+  title.value = listDataStore.getDatasource()
+  console.log(title.value, 'title');
+  
   const data = { ...configurationStore.getListFormInfo() }
   Object.assign(formState, data)
+  statusColor.value = JSON.parse(formState.specialStyle)
 }
+const statusColor = ref({
+  error: '',
+  offline: '',
+  warning: '#13c2c2',
+})
 onMounted(() => {
   init()
 })
@@ -354,6 +365,25 @@ defineExpose({
   cursor: pointer;
   &:hover {
     border: dashed 2px #ff9100;
+  }
+}
+.emphasisField-bg {
+  position: absolute;
+  top: 30px;
+  right: -12px;
+  display: flex;
+  justify-content: center;
+  width: 100px;
+  padding: 2px 0;
+  transform: skewX(45deg);
+  z-index: 99999999;
+  cursor: pointer;
+  &:hover {
+    border: dashed 2px #ff9100;
+  }
+  .emphasisField-text {
+    transform: skewX(-45deg);
+    height: 20px;
   }
 }
 .tips {

@@ -22,31 +22,30 @@
 
     <div class="content">
       <div class="title">特殊样式</div>
-      <j-monaco-editor
-        v-model="state.specialStyle"
-        language="css"
-        style="width: 500px"
-      />
+      <div style="width: 500px">
+        <EditorModal v-model:value="state.specialStyle" language="css" />
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {useListDataStore} from "@/store/listData";
+import { useListDataStore } from '@/store/listData'
+import EditorModal from '@/components/EditorModal'
 const props = defineProps({
   showSwitch: {
     type: Boolean,
     default: true,
   },
-  type: {
-    type: String,
-    default: '',
+  config: {
+    type: Object,
+    default: {},
   },
 })
 const state = reactive({
-  checked: props.type === 'object' ? false : true,
-  colLayout: 'left',
-  specialStyle: undefined,
+  checked: props.config?.type === 'object' ? false : true,
+  colLayout: props.config?.config?.colLayout || 'left',
+  specialStyle: props.config?.config?.specialStyle || '',
 })
 const configurationStore = useListDataStore()
 

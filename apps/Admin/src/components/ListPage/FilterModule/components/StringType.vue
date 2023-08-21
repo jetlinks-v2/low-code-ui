@@ -6,11 +6,11 @@
 </template>
 
 <script lang="ts" setup>
-import { useConfigurationStore } from '@/store/filterModule'
+import { useFilterModuleStore } from '@/store/filterModule'
 const state = reactive({
   value: '',
 })
-const configurationStore = useConfigurationStore()
+const configurationStore = useFilterModuleStore()
 
 watch(
   () => state,

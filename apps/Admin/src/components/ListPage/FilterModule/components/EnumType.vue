@@ -46,14 +46,14 @@
 </template>
 
 <script lang="ts" setup>
-import { useConfigurationStore } from '@/store/filterModule'
+import { useFilterModuleStore } from '@/store/filterModule'
 const state = reactive({
   value:'data',
   dataValue: '',
   abilityValue: '',
   instructValue: '',
 })
-const configurationStore = useConfigurationStore()
+const configurationStore = useFilterModuleStore()
 const dataOptions = ref([])
 const abilityOptions = ref([])
 const instructOptions = ref([])

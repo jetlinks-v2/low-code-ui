@@ -58,13 +58,13 @@ import EnumType from '@/components/ListPage/FilterModule/components/EnumType.vue
 import StringType from '@/components/ListPage/FilterModule/components/StringType.vue'
 import NumberType from '@/components/ListPage/FilterModule/components/NumberType.vue'
 import DateType from '@/components/ListPage/FilterModule/components/DateType.vue'
-import { useConfigurationStore } from '@/store/filterModule'
+import { useFilterModuleStore } from '@/store/filterModule'
 
-const open = ref<boolean>(true)
+const open = ref<boolean>(false)
 const type = ref('')
 const title = ref('请选择页面支持的筛选项')
 const addBtnName =ref('新增筛选项')
-const configurationStore = useConfigurationStore()
+const configurationStore = useFilterModuleStore()
 
 //是否完成数据绑定
 const dataBind = ref(true)
@@ -185,8 +185,8 @@ const handleOk = (value:any) => {
 }
 //保存
 const submit = () => {
-  const aa = configurationStore.getConfigurationInfo(type.value)
-  console.log(aa)
+  const configInfo = configurationStore.getConfigurationInfo(type.value)
+  console.log(configInfo)
   type.value = ''
 }
 defineExpose({
