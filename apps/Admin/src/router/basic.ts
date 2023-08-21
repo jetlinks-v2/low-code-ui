@@ -53,4 +53,12 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
       title: '测试页'
     }
   },
+  {
+    path: '/test',
+    name: 'Test',
+    component: () => import('@/views/test/index.vue'),
+    meta: {
+      title: '测试'
+    }
+  }
 ]
