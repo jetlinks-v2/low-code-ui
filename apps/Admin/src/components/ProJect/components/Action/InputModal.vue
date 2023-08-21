@@ -5,6 +5,7 @@
             <j-form-item name="title" validateFirst :rules="[
                 { max: 64, message: '最多输入64个字符' },
                 { pattern: regular.modalReg, message: '字母+数字+下划线组成，并以字母开头' },
+                { validator: isOnlyName, trigger: 'change' }
             ]">
                 <template #label>
                     {{ `${titleType} ${props.provider ? providerMap[props.provider] : ''}` }}
@@ -45,6 +46,10 @@ const props = defineProps({
         type: String,
         default: 'Add'
     },
+    nameList:{
+        type:Array,
+        default:[]
+    }
 })
 
 const modelRef = reactive({
@@ -56,8 +61,16 @@ const modelRef = reactive({
 })
 const formRef = ref()
 
-// const title = computed(() => providerList.find(item => item.value === props.provider)?.text)
 const titleType = computed(() => props.type === 'Add' ? '新增' : '重命名')
+
+const isOnlyName = async (_,value)=>{
+    const pass = props.nameList.find(item=>item===value)
+    if(value && pass){
+        return Promise.reject(`名称"{${value}}"已被占用，请重新命名`)
+    }else{
+        return Promise.resolve()
+    }
+}
 
 onKeyStroke('Enter', async () => {
     const res = await formRef.value.validate()
@@ -69,12 +82,6 @@ onKeyStroke('Enter', async () => {
     }
 })
 
-// const handleOk = async () => {
-//     const res = await formRef.value.validate()
-//     if (res) {
-//         emit('save', modelRef.name)
-//     }
-// }
 
 </script>
 

@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { useProduct } from './product'
+import dayjs from "dayjs";
 
 type FileItemType = {
   id: string
@@ -101,7 +102,14 @@ export const useEngine = defineStore('engine', () => {
   const updateTree = (data: any[], record: any) => {
     return data.map(item => {
       if (item.id === record.id) {
-        return { ...item, ...record }
+        return { 
+          ...item, 
+          ...record,
+          others:{
+            ...item.others,
+            modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss')
+          }
+         }
       } else if (item.children) {
         item.children = updateTree(item.children, record)
       }
@@ -112,9 +120,17 @@ export const useEngine = defineStore('engine', () => {
   const addTree = (data: any[], record: any) => {
    return  data.map(item => {
       if (item.id === record.parentId) {
+        const add = {
+          ...record,
+          others:{
+            createTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            useList:[]
+          },
+        }
         return {
           ...item,
-          children: item.children?.length ? [...item.children, record] : [record]
+          children: item.children?.length ? [...item.children, add] : [add]
         }
       } else if (item.children) {
        item.children= addTree(item.children, record)
