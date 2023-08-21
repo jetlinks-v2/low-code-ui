@@ -26,12 +26,6 @@
 <script setup name="AddRemoveUpdateQuery">
 
 import {upperCase} from "@/utils/comm";
-import { downFile } from '@/api/basis'
-
-
-downFile().then(res => {
-  console.log(res)
-})
 
 const columns = [
   {

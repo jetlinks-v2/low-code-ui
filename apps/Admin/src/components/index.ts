@@ -8,6 +8,7 @@ import Card from "./Card";
 import BadgeStatus from "./BadgeStatus";
 import ProImage from './Image/index.vue'
 import EditorModal from './EditorModal'
+import CRUD from './Database'
 export default  {
     install(app: App) {
         app.component('TitleComponent', TitleComponent)
@@ -19,5 +20,6 @@ export default  {
           .component('BadgeStatus', BadgeStatus)
           .component('ProImage', ProImage)
           .component('EditorModal', EditorModal)
+          .component('CRUD', CRUD)
     }
 }
