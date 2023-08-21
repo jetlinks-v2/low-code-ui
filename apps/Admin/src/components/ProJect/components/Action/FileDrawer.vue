@@ -91,7 +91,8 @@ onMounted(() => {
 
 </script>
 
-<style scoped lang='less'> .title {
+<style scoped lang='less'> 
+.title {
     font-size: 22px;
     margin-bottom: 10px;
  }

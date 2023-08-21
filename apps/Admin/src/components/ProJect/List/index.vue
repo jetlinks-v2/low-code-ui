@@ -36,8 +36,7 @@
     </div>
   </div>
   <FileDrawer v-if="visibleFile" @close="visibleFile = false" :data="current" />
-  <InputModal v-if="visible" @close="visible = false" @save="onSave" :provider="provider" :data="current" :type="type"
-    :name-list="nameList" />
+  <InputModal v-if="visible" @close="visible = false" @save="onSave" :provider="provider" :data="current" :type="type" :name-list="nameList"/>
   <ToastModal v-if="visibleToast" @close="visibleToast = false" @save="onSave" :data="current" />
   <DelModal v-if="visibleDel" @close="visibleDel = false" @save="onDel" :data="current" />
 </template>

@@ -3,7 +3,6 @@ import { withModifiers } from 'vue'
 import './index.less'
 import { AIcon } from 'jetlinks-ui-components'
 import { checkIsField } from '../../utils/utils'
-import { useFormDesignerStore } from '@/store'
 import { cloneDeep } from 'lodash-es'
 
 const Selection = defineComponent({
@@ -45,18 +44,16 @@ const Selection = defineComponent({
     },
   },
   setup(props) {
-    const designer = useFormDesignerStore()
+    const designer: any = inject('FormDesigner')
     const slots = useSlots()
-    // const isWarning = ref(false)
     const isField = checkIsField(props.data)
-    const elementRef = ref()
 
     const Selected = computed(() => {
-      return props?.data?.key !== undefined && designer.selected?.key === props?.data?.key
+      return props?.data?.key !== undefined && designer.selected?.value?.key === props?.data?.key
     })
 
     const isEditModel = computed(() => {
-      return designer.model === 'edit'
+      return unref(designer?.model) === 'edit'
     })
 
     const handleClick = () => {
@@ -105,7 +102,6 @@ const Selection = defineComponent({
             unref(isEditModel) && 'edit-hover'
           ]}
           {...useAttrs()}
-          ref={elementRef}
           onClick={withModifiers(handleClick, ['stop'])}
         >
           {slots?.default()}
