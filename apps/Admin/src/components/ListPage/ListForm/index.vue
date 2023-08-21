@@ -5,7 +5,7 @@
       placement="left"
       :closable="true"
       :visible="open"
-      @close="open = false"
+      @close="emits('update:open', false)"
     >
       <div v-if="!state.configurationShow">
         <p>数据展示方式</p>
@@ -75,7 +75,28 @@
 <script lang="ts" setup>
 import { useListFormStore } from '@/store/listForm'
 import Card from '@/components/ListPage/ListForm/components/Card.vue'
-const open = ref<boolean>(true)
+
+interface Emit {
+  (e: 'update:open', value: boolean): void
+}
+
+const emits = defineEmits<Emit>()
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+const open = computed({
+  get() {
+    return props.open
+  },
+  set(val: boolean) {
+    emits('update:open', val)
+  },
+})
+
 const cardRef = ref()
 //数组展示方式，卡片配置显示隐藏
 const state = reactive({
@@ -120,9 +141,6 @@ const configuredChange = (value: string) => {
   state.defaultForm =
     state.configured?.length === 1 ? state.configured[0] : 'list'
 }
-defineExpose({
-  open: open.value,
-})
 </script>
 
 <style lang="less" scoped>

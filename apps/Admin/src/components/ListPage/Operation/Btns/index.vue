@@ -1,6 +1,5 @@
 <template>
   <j-drawer
-    :mask-closable="false"
     width="25vw"
     :visible="_visible"
     title="添加按钮"
