@@ -1,340 +1,83 @@
 <template>
-  <div>
-    <div
-      class="scroll-container"
-      :style="{
-        height: containerHeight + 'px',
-        'overflow-y': 'auto',
-        // 'overflow-x': 'auto', //横向滚动存在问题暂时没做，表头没有动
-      }"
-      @scroll="handleScroll"
-    >
-      <div class="scroll-header" v-if="columns.length">
-        <div
-          ref="headerRef"
-          class="scroll-header-title"
-          v-for="i in columns"
-          :key="i.key"
+  <div class="quick-table-warp">
+    <ResizeObserver :onResize="onResize">
+      <div class="quick-table-container">
+        <Header
+          :columns="myColumns"
+          :serial="serial"
+        />
+        <Body
+          :columns="myColumns"
+          :serial="serial"
+          :data="data"
+          :height="height"
         >
-          <div class="scroll-header-title-item">
-            <span>{{ i.title }}</span>
-            <j-tooltip v-if="i.description">
-              <template #title>{{ i.description }}</template>
-              <AIcon
-                :type="i.iconType || 'QuestionCircleOutlined'"
-                style="margin-left: 5px"
-              />
-            </j-tooltip>
-          </div>
-        </div>
-        <div v-if="headerRight" style="width: 10px; height: 30px; opacity: 0">
-          表头滚动条位置(占位使用)
-        </div>
+          <template v-for="(_, name) in $slots" #[name]="slotData">
+            <slot :name="name" v-bind="slotData || {}" />
+          </template>
+        </Body>
       </div>
-      <div
-        class="scroll-content"
-        :style="{ height: totalHeight + 'px', paddingTop: paddingTop + 'px' }"
-      >
-        <div
-          v-for="(item, index) in visibleItems"
-          :key="item.id"
-          class="list-container"
-        >
-          <div
-            class="list-item"
-            ref="listItemRef"
-            v-for="(i, idx) in item"
-            :key="idx"
-            :style="{
-              'background-color': i.editable ? '#f0f2f5' : '#e8e8e8',
-              // cursor: !i.editable ? 'not-allowed' : '',
-              'justify-content': 'center',
-            }"
-          >
-            <!-- todo需要判断editableType展示不同组件  -->
-            <div @click.stop="onClickListItem($event, i, index)">
-              <!-- todo文本框超出显示... -->
-              {{ i.value }}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </ResizeObserver>
+
   </div>
 </template>
 
-<script setup lang="ts" name="QuickEditTable">
-import { ref, watch, toRefs, onMounted, createApp, reactive } from 'vue'
-import EditInput from './components/EditInput/index.vue'
+<script setup name="QuickEditTable">
+import { ref, provide } from 'vue'
+import ResizeObserver from 'ant-design-vue/lib/vc-resize-observer';
+import { Header, Body } from './components'
+import {HeaderProps, BodyProps, SCROLL_LEFT} from './data'
+import {debounce} from "lodash-es";
 
-const emit = defineEmits(['submit'])
+const emit = defineEmits(['submit', 'submitDlt', 'submitSlt', 'submitCheckbox'])
 
 const props = defineProps({
-  // 数据
-  data: {
-    type: Array,
-    default: [],
-  },
-  // 容器高度
-  containerHeight: {
-    type: Number,
-    default: 400,
-  },
-  // 列表项高度
-  itemHeight: {
-    type: Number,
-    default: 20,
-  },
-  // 缓冲区大小
-  bufferSize: {
-    type: Number,
-    default: 5,
-  },
+  ...BodyProps(),
   // 标题数据
-  columns: {
-    type: Array,
-    default: [],
-  },
-})
-const { data } = toRefs(props)
-const { containerHeight, itemHeight, columns } = props
-
-const headerRef = ref()
-const headerRight = ref(false)
-const listItemRef = ref()
-const headerOffsetWidths = ref()
-
-let editInputApp = null
-const state = reactive({
-  index: -1,
-  key: '',
-  value: '',
+  ...HeaderProps()
 })
 
-/**
- * 根据给定的列和数据生成排序后的数据。
- *
- * @param {Array} columns - 表示列的对象数组。
- * @param {Array} data - 表示数据的对象数组。
- * @return {Array} 表示排序后的数据的对象数组。
- */
-const generateSortedData = (columns, data) => {
-  return data.map((item) => {
-    const sortedRowData = {}
-    columns.forEach((column) => {
-      sortedRowData[column.key] = item[column.key]
-    })
-    return sortedRowData
-  })
-}
+const myColumns = ref([])
+const left = ref(0)
 
-const onClickListItem = (e, item, index) => {
-  // todo需要判断 editableType不同类型 卸载组件、加载不同组件
+provide(SCROLL_LEFT, left)
 
-  editInputApp && removeApp()
-  if (!item.editable) return
-  const target = e.target
-  const oFrag = document.createDocumentFragment()
-  editInputApp = createApp(EditInput, {
-    value: item.value,
-    setValue,
-  })
-  if (editInputApp) {
-    editInputApp.mount(oFrag)
-    target.appendChild(oFrag)
-    target.querySelector('.edit-input').focus()
-    // target.querySelector('.edit-input').select()
-  }
-  setData({ index, key: item.key, value: item.value })
-}
+const onResize = debounce((e) => {
+  const { width } = e
 
-const setData = ({ index = -1, key = '', value = '' }) => {
-  state.index = index
-  state.key = key
-  state.value = value
-}
-const setValue = (value) => {
-  state.value = value
-  emit('submit', { ...state })
-}
+  const hasSerial = 'serial' in props && props.serial !== false
+  const serialWidth = hasSerial ? 80 : 0
 
-const removeApp = () => {
-  editInputApp && editInputApp.unmount()
-  setData({})
-}
+  const hasWidth = props.columns.filter(item => item.width)
 
-// 监听点击 移除app
-window.addEventListener('click', removeApp, false)
+  const hasWidthCount = hasWidth.reduce((prev,curr) => {
+    return prev + curr.width
+  }, 0)
 
-const initDataSource = (columns, data) => {
-  const _data = generateSortedData(columns, data)
-  return _data.map((item) => {
-    const columnsEditable = columns?.map((i: any) => i.editable)
-    return Object.keys(item).reduce((acc, key, index) => {
-      acc[key] = {
-        key, //列 columns的key
-        index, //行 序号
-        value: item[key],
-        editable: columnsEditable[index], //todo需要处理单条数据的editable
-        editableType: 'input', //编辑的类型
-        options: {
-          // todo选择框的数据
-          // todo依赖项(某一项变化 自己也变化)
-        }, // 其他配置项
-      }
-      return acc
-    }, {})
-  })
-}
+  const average = ((width - serialWidth - hasWidthCount) / (props.columns.length - hasWidth.length))
+  let array = []
 
-// 处理为可编辑数据
-const dataSource = ref(initDataSource(columns, data.value))
-
-const visibleItems = ref([])
-const bufferSize = 5 // 缓冲区大小
-
-// 计算总高度
-const totalHeight = ref(dataSource.value.length * itemHeight)
-
-// 计算可见区域的起始索引和结束索引
-const startIndex = ref(0)
-const endIndex = ref(Math.ceil(containerHeight / itemHeight))
-
-// 计算滚动容器的顶部内边距
-const paddingTop = ref(startIndex.value * itemHeight)
-
-// 更新可见列表项
-const updateVisibleItems = () => {
-  visibleItems.value = dataSource.value.slice(startIndex.value, endIndex.value)
-}
-
-// 处理滚动事件
-const handleScroll = (event, v) => {
-  let scrollTop = event?.target?.scrollTop
-  // 计算可见区域的起始索引和结束索引
-  const start = Math.floor(scrollTop / itemHeight)
-  const end = start + Math.ceil(containerHeight / itemHeight)
-
-  // 更新起始索引、结束索引和顶部内边距
-  startIndex.value = start
-  endIndex.value = end
-  paddingTop.value = startIndex.value * itemHeight
-}
-
-// 监听可见区域的起始索引和结束索引的变化
-watch(
-  [startIndex, endIndex],
-  (value) => {
-    if (dataSource.value.length > value[1]) {
-      headerRight.value = true
+  array = props.columns.map(item => {
+    const min = average < 100 ? 100 : average
+    const _w = item.width || min
+    return {
+      ...item,
+      width: _w
     }
-    // 初始化可见列表项
-    updateVisibleItems()
-  },
-  {
-    immediate: true,
-  },
-)
-
-watch(data.value, (value) => {
-  // 更新dataSource、可见列表项
-  dataSource.value = initDataSource(columns, value)
-  updateVisibleItems()
-})
-
-onMounted(() => {
-  setListItemMaxWidth()
-})
-
-// 设置列表项的最大宽度
-const setListItemMaxWidth = () => {
-  headerOffsetWidths.value = headerRef.value.map((item) => item.offsetWidth)
-  listItemRef.value.forEach((item) => {
-    item.style.maxWidth = headerOffsetWidths.value[item.index] - 10 + 'px'
   })
-}
+
+  if (hasSerial) {
+    array.unshift({
+      dataIndex: 'serial_number',
+      title: '序号',
+      width: serialWidth
+    })
+  }
+
+  myColumns.value = array
+}, 100)
 </script>
 
 <style scoped lang="less">
-.list-container {
-  display: flex;
-}
-.list-item {
-  width: 100%;
-  min-width: 100px;
-  display: flex;
-  justify-items: center;
-  align-items: center;
-  border: 1px solid #ccc;
-  position: relative;
-}
 
-.scroll-container {
-  position: relative;
-  border: 1px solid #ccc;
-  overflow: hidden;
-  margin-top: 30px;
-}
-
-.scroll-content {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-}
-
-.scroll-header {
-  position: fixed;
-  margin-top: -30px;
-  height: 30px;
-  // border: 1px solid #ccc;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #ccc;
-}
-.scroll-header-title {
-  width: 100%;
-  min-width: 100px;
-  height: 100%;
-  border: 1px solid #ccc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.scroll-container::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-/*正常情况下滑块的样式*/
-.scroll-container::-webkit-scrollbar-thumb {
-  background-color: #b2b2b2;
-  border-radius: 10px;
-  -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
-}
-/*鼠标悬浮在该类指向的控件上时滑块的样式*/
-.scroll-container:hover::-webkit-scrollbar-thumb {
-  //   background-color: rgba(0, 0, 0, 0.2);
-  background-color: #b2b2b2;
-  border-radius: 10px;
-  -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
-}
-/*鼠标悬浮在滑块上时滑块的样式*/
-.scroll-container::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.4);
-  -webkit-box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.1);
-}
-/*正常时候的主干部分*/
-.scroll-container::-webkit-scrollbar-track {
-  border-radius: 10px;
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
-  //   background-color: white;
-}
-// /*鼠标悬浮在滚动条上的主干部分*/
-.scroll-container::-webkit-scrollbar-track:hover {
-  -webkit-box-shadow: inset 0 0 6px rgba(178, 178, 178, 0.4);
-  background-color: rgba(178, 178, 178, 0.01);
-}
 </style>
