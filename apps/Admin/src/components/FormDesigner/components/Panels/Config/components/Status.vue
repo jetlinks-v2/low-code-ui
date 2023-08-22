@@ -31,7 +31,7 @@
       ]"
     >
       <j-radio-group
-        v-model:value="_data.componentProps.required"
+        v-model:value="_data.editable"
         button-style="solid"
         @change="onChange"
       >

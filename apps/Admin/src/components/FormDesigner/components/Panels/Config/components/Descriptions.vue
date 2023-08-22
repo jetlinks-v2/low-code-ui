@@ -1,8 +1,8 @@
 <template>
   <div>
     <p>配置后会在该配置项名称后方展示</p>
-    <j-form-item :name="['componentProps', 'descriptions']" label="说明内容">
-      <j-textarea @change="onChange" :rows="3" :maxlength="100" placeholder="请输入100字以内文字" v-model:value="_data.componentProps.descriptions" />
+    <j-form-item :name="['componentProps', 'description']" label="说明内容">
+      <j-textarea @change="onChange" :rows="3" :maxlength="100" placeholder="请输入100字以内文字" v-model:value="_data.componentProps.description" />
     </j-form-item>
   </div>
 </template>

@@ -3,6 +3,7 @@ import Selection from '../Selection/index'
 import { Tabs, TabPane } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
+import { cloneDeep } from 'lodash-es'
 
 export default defineComponent({
     name: 'TabsLayout',
@@ -17,6 +18,14 @@ export default defineComponent({
             type: Array,
             default: () => []
         },
+        path: {
+            type: Array,
+            default: () => []
+        },
+        index: {
+            type: Number,
+            default: 0
+        }
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
@@ -34,6 +43,11 @@ export default defineComponent({
             return unref(designer?.model) === 'edit'
         })
         return () => {
+            const _path = cloneDeep(props?.path || []);
+            const _index = props?.index || 0;
+            if(props.data?.formItemProps?.name) {
+                _path[_index] = props.data.formItemProps.name
+            }
             return (
                 <Selection {...useAttrs()} style={{ padding: '16px' }} hasDel={true} hasCopy={true} hasDrag={true} hasAdd={true} data={props.data} parent={props.parent}>
                     {
@@ -53,7 +67,10 @@ export default defineComponent({
                                                 <DraggableLayout
                                                     data-layout-type={'tabs-item'}
                                                     data={element.children}
-                                                    parent={element} />
+                                                    parent={element}
+                                                    path={_path}
+                                                    index={_index + 1}
+                                                />
                                             </Selection>
                                         </TabPane>
                                     )

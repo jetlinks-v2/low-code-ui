@@ -8,7 +8,7 @@
     </div>
     <div class="right">
       <j-space>
-        <j-button type="link">校验</j-button>
+        <j-button type="link" @click="onCheck">校验</j-button>
         <j-button
           type="link"
           v-if="isEditModel"
@@ -23,6 +23,8 @@
   
 <script lang="ts" setup>
 import { inject, computed, unref } from 'vue'
+import { checkedConfig } from '../../utils/utils'
+
 const designer: any = inject('FormDesigner')
 
 const isEditModel = computed(() => {
@@ -32,6 +34,10 @@ const isEditModel = computed(() => {
 const onPreview = (_type: 'preview' | 'edit') => {
   designer.setModel(_type)
   designer.setSelection('root')
+}
+
+const onCheck = () => {
+  checkedConfig(unref(designer.formData))
 }
 </script>
 

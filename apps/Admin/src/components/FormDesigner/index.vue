@@ -4,9 +4,11 @@
     <div class="box">
       <div class="left"><Filed /></div>
       <div class="right">
-        <Canvas :data="formData"></Canvas>
+        <Canvas :data="formData" ref="formRef"></Canvas>
       </div>
-      <div class="config" v-if="isShowConfig"><Config /></div>
+      <div class="config" v-if="isShowConfig && model !== 'preview'">
+        <Config />
+      </div>
     </div>
   </div>
 </template>
@@ -16,7 +18,7 @@ import Header from './components/Header/index.vue'
 import Canvas from './components/Panels/Canvas/index'
 import Config from './components/Panels/Config/index.vue'
 import Filed from './components/Panels/Filed/index'
-import { provide, ref } from 'vue'
+import { provide, ref, reactive, watch, toRaw } from 'vue'
 import { ISchema } from './typings'
 
 const initData = {
@@ -24,6 +26,7 @@ const initData = {
   key: 'root',
   componentProps: {
     layout: 'horizontal',
+    size: 'default',
   },
   children: [],
 }
@@ -46,12 +49,15 @@ const model = ref<'preview' | 'edit'>('edit') // 预览；编辑
 const formData = ref<ISchema>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
 const selected = ref<ISchema>() // 被选择数据
+const formState = reactive<any>({})
+
+const formRef = ref<any>()
 
 // 设置数据被选中
 const setSelection = (node: any) => {
   let result: any = {}
   if (node === 'root') {
-    result = initData
+    result = formData.value
   } else {
     if (Array.isArray(node)) {
       result = node?.[0]
@@ -67,14 +73,71 @@ const setModel = (_type: 'preview' | 'edit') => {
   model.value = _type
 }
 
+const getFieldChildrenData = (data: ISchema[]) => {
+  let obj: any = {}
+  data.map((item: any) => {
+    obj = {
+      ...obj,
+      ...getFieldData(item),
+    }
+  })
+  return obj
+}
+
+const getFieldData = (data: ISchema) => {
+  let obj: any = undefined
+  if (data.children && data.children?.length) {
+    obj = getFieldChildrenData(data?.children)
+  }
+  let _obj: any = {}
+  if (data?.formItemProps?.name) {
+    _obj[data?.formItemProps?.name] = obj
+  } else {
+    _obj = obj
+  }
+  return _obj
+}
+
 provide('FormDesigner', {
   model,
   formData,
   isShowConfig,
   selected,
+  formState,
   setSelection,
   setModel,
 })
+
+const onSave = () => {
+  if (model.value !== 'edit') {
+    formRef.value
+      .validateFields()
+      .then((values) => {
+        console.log('Received values of form: ', values)
+        console.log('formState: ', toRaw(formState))
+      })
+      .catch((info) => {
+        console.log('Validate Failed:', info)
+      })
+  }
+}
+
+watch(
+  () => model.value,
+  (newValue: 'preview' | 'edit') => {
+    if (newValue === 'preview') {
+      const obj: any = getFieldData(formData.value)
+      Object.assign(formState, {})
+      Object.assign(formState, obj)
+    }
+  },
+  {
+    deep: true,
+    immediate: true,
+  },
+)
+
+defineExpose({ onSave })
 </script>
 
 <style lang="less" scoped>

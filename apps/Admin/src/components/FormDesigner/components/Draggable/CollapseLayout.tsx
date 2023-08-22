@@ -4,6 +4,7 @@ import Selection from '../Selection/index'
 import { Collapse, CollapsePanel } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
+import { cloneDeep } from 'lodash-es'
 
 export default defineComponent({
   name: 'CollapseLayout',
@@ -18,6 +19,14 @@ export default defineComponent({
       type: Array,
       default: () => []
     },
+    path: {
+      type: Array,
+      default: () => []
+    },
+    index: {
+      type: Number,
+      default: 0
+    }
   },
   setup(props) {
     const designer: any = inject('FormDesigner')
@@ -37,6 +46,11 @@ export default defineComponent({
     })
 
     return () => {
+      const _path = cloneDeep(props?.path || []);
+      const _index = props?.index || 0;
+      if (props.data?.formItemProps?.name) {
+        _path[_index] = props.data.formItemProps.name
+      }
       return (
         <Selection {...useAttrs()} style={{ padding: '16px' }} hasCopy={true} hasDel={true} hasDrag={true} data={props.data} parent={props.parent}>
           {
@@ -57,7 +71,10 @@ export default defineComponent({
                           <DraggableLayout
                             data={element.children}
                             data-layout-type={'item'}
-                            parent={element} />
+                            parent={element}
+                            path={_path}
+                            index={_index + 1}
+                          />
                         </Selection>
                       </CollapsePanel>
                     )

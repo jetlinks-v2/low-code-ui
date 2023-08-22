@@ -21,6 +21,11 @@ const basic: ISchema[] = [
         icon: 'EditOutlined',
     },
     {
+        type: 'input-number',
+        name: '数字输入',
+        icon: 'SnippetsOutlined'
+    },
+    {
         type: 'select-card',
         name: '选项',
         icon: 'CopyOutlined',
@@ -44,19 +49,14 @@ const basic: ISchema[] = [
         icon: 'OrderedListOutlined',
     },
     {
-        type: 'switch',
-        name: '开关',
-        icon: 'BarsOutlined',
-    },
-    {
-        type: 'upload-button',
-        name: '按钮上传',
+        type: 'upload',
+        name: '上传',
         icon: 'DownloadOutlined',
     },
     {
-        type: 'upload-draggable',
-        name: '拖拽上传',
-        icon: 'CloudDownloadOutlined',
+        type: 'switch',
+        name: '开关',
+        icon: 'BarsOutlined',
     },
     {
         type: 'form',

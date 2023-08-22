@@ -1,46 +1,31 @@
 <template>
   <Scrollbar>
     <div class="config-container">
+      <p>页面搭建</p>
       <j-form ref="formRef" :model="modelRef" layout="vertical">
-        <template v-if="_type === 'root'">
-          <p>表单布局</p>
-          <j-form-item label="标签对齐方式" name="layout">
-            <j-radio-group
-              v-model:value="modelRef.componentProps.layout"
-              button-style="solid"
-            >
-              <j-radio-button value="horizontal">Horizontal</j-radio-button>
-              <j-radio-button value="vertical">Vertical</j-radio-button>
-              <j-radio-button value="inline">Inline</j-radio-button>
-            </j-radio-group>
-          </j-form-item>
-        </template>
-        <template v-else>
-          <p>页面搭建</p>
-          <j-collapse
-            v-model:activeKey="activeKey"
-            :expand-icon-position="'right'"
+        <j-collapse
+          v-model:activeKey="activeKey"
+          :expand-icon-position="'right'"
+        >
+          <j-collapse-panel
+            v-for="item in panelsList"
+            :key="item.key"
+            :header="item.header"
           >
-            <j-collapse-panel
-              v-for="item in panelsList"
-              :key="item.key"
-              :header="item.header"
-            >
-              <component
-                @change="onChange"
-                :is="Panels[item.key]"
-                v-bind="{ type: _type, value: modelRef }"
-              />
-            </j-collapse-panel>
-          </j-collapse>
-        </template>
+            <component
+              @change="onChange"
+              :is="Panels[item.key]"
+              v-bind="{ type: _type, value: modelRef }"
+            />
+          </j-collapse-panel>
+        </j-collapse>
       </j-form>
     </div>
   </Scrollbar>
 </template>
   
 <script lang="ts" setup>
-import { ref, reactive, unref, computed, inject } from 'vue'
+import { ref, reactive, unref, computed, inject, watchEffect } from 'vue'
 import { Scrollbar } from 'jetlinks-ui-components'
 import Base from './components/Base.vue'
 import InputLimit from './components/InputLimit.vue'
@@ -49,6 +34,7 @@ import Descriptions from './components/Descriptions.vue'
 import Event from './components/Event.vue'
 import Status from './components/Status.vue'
 import Source from './components/Source.vue'
+import Form from './components/Form.vue'
 import { map } from 'lodash-es'
 
 const designer: any = inject('FormDesigner')
@@ -67,21 +53,30 @@ const Panels = {
   Event,
   Status,
   Source,
+  Form,
 }
 
 const panelsList = computed(() => {
   const arr: any[] = []
-  arr.push({
-    key: 'Base',
-    header: '基础信息',
-  })
-  if (['input', 'textarea', 'input-password'].includes(unref(_type))) {
+  if(['root'].includes(unref(_type))) {
+    arr.push({
+      key: 'Form',
+      header: '表单样式',
+    })
+  }
+  if (!['root'].includes(unref(_type))) {
+    arr.push({
+      key: 'Base',
+      header: '基础信息',
+    })
+  }
+  if (['input', 'textarea', 'input-password', 'input-number'].includes(unref(_type))) {
     arr.push({
       key: 'InputLimit',
       header: '输入限制',
     })
   }
-  if (['input', 'textarea', 'input-password'].includes(unref(_type))) {
+  if (['input', 'textarea', 'input-password', 'input-number'].includes(unref(_type))) {
     arr.push({
       key: 'Check',
       header: '失焦校验',
@@ -94,7 +89,7 @@ const panelsList = computed(() => {
     })
   }
   if (
-    ['input', 'textarea', 'select-card', 'input-password', 'switch'].includes(
+    ['input', 'textarea', 'select-card', 'input-password', 'switch', 'input-number', 'tree-select'].includes(
       unref(_type),
     )
   ) {
@@ -105,17 +100,20 @@ const panelsList = computed(() => {
   }
   if (
     [
+      'root',
       'text',
       'input',
       'textarea',
       'select-card',
       'input-password',
       'switch',
+      'input-number',
+      'tree-select'
     ].includes(unref(_type))
   ) {
     arr.push({
       key: 'Event',
-      header: '交互事件',
+      header: '整体配置',
     })
   }
   if (
@@ -126,6 +124,8 @@ const panelsList = computed(() => {
       'select-card',
       'input-password',
       'switch',
+      'input-number',
+      'tree-select'
     ].includes(unref(_type))
   ) {
     arr.push({
@@ -148,10 +148,24 @@ const onChange = (value: any) => {
     designer.selected?.value?.context?.updateProps(value)
   }
 }
+
+const onSave = () => {
+  formRef.value
+      .validateFields()
+      .then((values) => {
+        console.log('Received values of form: ', values)
+      })
+      .catch((info) => {
+        console.log('Validate Failed:', info)
+      })
+}
+
+defineExpose({ onSave })
 </script>
 
 <style lang="less" scoped>
 .config-container {
   height: 100%;
+  margin-top: 10px;
 }
 </style>

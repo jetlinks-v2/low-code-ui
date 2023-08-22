@@ -88,9 +88,9 @@ const Selection = defineComponent({
     }
     const TagComponent = isHTMLTag(props?.tag) ? props.tag : resolveComponent(props?.tag)
 
-    const maskNode = (<div class={'mask'}></div>)
+    const maskNode = (<div class={['handle', 'mask']}></div>)
 
-    const _hasDrag = computed(() => { return props.hasDrag })
+    // const _hasDrag = computed(() => { return props.hasDrag })
 
     return () => {
       return (
@@ -106,7 +106,7 @@ const Selection = defineComponent({
         >
           {slots?.default()}
           <span></span>
-          {
+          {/* {
             // 拖拽按钮
             unref(isEditModel) && Selected.value && unref(_hasDrag) && (
               <div class={['topLeft']}>
@@ -116,7 +116,7 @@ const Selection = defineComponent({
                 />
               </div>
             )
-          }
+          } */}
           {
             unref(isEditModel) && Selected.value && (
               <div class="bottomRight">

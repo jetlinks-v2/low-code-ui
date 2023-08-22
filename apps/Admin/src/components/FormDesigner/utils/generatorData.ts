@@ -1,5 +1,5 @@
 import { uid } from "./uid"
-import { checkIsField } from "./utils"
+import { checkIsField, generateOptions } from "./utils"
 
 const handleProps = (node: any) => {
     const result: any = { ...node.componentProps }
@@ -10,6 +10,7 @@ const handleProps = (node: any) => {
         result.style = {
             width: '100%'
         }
+        result.description = result?.description || ''
     }
     if (!result?.placeholder) {
         if (/^(select)$/.test(node.type)) {
@@ -23,28 +24,47 @@ const handleProps = (node: any) => {
     switch (node.type) {
         case 'input':
             result.maxLength = result?.maxLength || 64
-            result.description = result?.description || ''
             break
         case 'textarea':
             result.maxLength = result?.maxLength || 200
-            result.description = result?.description || ''
             break
         case 'input-password':
             result.maxLength = result?.maxLength || 64
+            break
+        case 'input-number':
+            result.max = result?.max || Infinity
+            result.min = result?.min || Infinity
+            result.precision = result?.precision || 2
+            break
+        case 'select-card':
+            result.options = generateOptions(3)
+            result.mode = ''
+            break
+        case 'select':
+            result.options = generateOptions(3)
+            result.mode = ''
+            break
+        case 'tree-select':
+            result.treeData = generateOptions(3)
+            result.showSearch = false
+            result.mode = ''
+            result.treeCheckStrictly = false
+            break
     }
     return result
 }
 
 const generatorData = (node: any) => {
-    const result: any = { ...node, visible: true }
+    const result: any = { ...node, visible: true, editable: true }
     if (!result.key) {
         result.key = `${result.type}_${uid()}`
     }
     if (checkIsField(result)) {
-        result.label = result?.name
         result.formItemProps = {
             name: '',
+            label: result?.name,
             required: false,
+            rules: [],
             ...result?.formItemProps
         }
     }
