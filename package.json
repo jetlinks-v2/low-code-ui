@@ -13,6 +13,7 @@
     "release:only": "changeset publish --registry=https://registry.jetlinks.cn/"
   },
   "devDependencies": {
+    "@babel/types": "7.22.5",
     "@jetlinks/lint": "workspace:^",
     "@jetlinks/tsconfig": "workspace:*",
     "@jetlinks/types": "workspace:^",
@@ -34,6 +35,7 @@
   "dependencies": {
     "@changesets/cli": "^2.26.2",
     "@jetlinks/utils": "workspace:^",
+    "@vue/compiler-sfc": "3.2.40",
     "jetlinks-ui-components": "^1.0.28",
     "lodash-es": "^4.17.21"
   }

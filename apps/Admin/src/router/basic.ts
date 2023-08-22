@@ -1,7 +1,26 @@
-import {RouteRecordItem} from "@jetlinks/types";
+import { RouteRecordItem } from '@jetlinks/types'
 import { BasicLayoutPage } from '@/layout'
 
 export const BASIC_ROUTERS: RouteRecordItem[] = [
+  {
+    path: '/customHTML',
+    name: 'CustomHTML',
+    redirect: '/customHTML/center',
+    component: BasicLayoutPage,
+    meta: {
+      title: 'DDD',
+    },
+    children: [
+      {
+        path: '/customHTML/center',
+        name: 'customHTML/center',
+        meta: {
+          title: '自定义HTML',
+        },
+        component: () => import('@/views/test/index.vue'),
+      },
+    ],
+  },
   {
     path: '/delivery',
     name: 'Delivery',
@@ -18,23 +37,23 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
           title: '低码引擎',
         },
         component: () => import('@/views/center/index.vue'),
-      }
-    ]
+      },
+    ],
   },
   {
     path: '/engine/:id',
     name: 'Engine',
     component: () => import('@/views/engine/index.vue'),
     meta: {
-      title: '项目编辑器'
-    }
+      title: '项目编辑器',
+    },
   },
   {
     path: '/demo',
     name: 'Demo',
     component: () => import('@/views/demo/index.vue'),
     meta: {
-      title: '测试页'
-    }
+      title: '测试页',
+    },
   },
 ]
