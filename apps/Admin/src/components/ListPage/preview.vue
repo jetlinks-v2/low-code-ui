@@ -58,11 +58,11 @@ const dataColumns: any = ref([])
 const searchColumns: any = ref([])
 const typeChangeShow = ref(false)
 //操作按钮
-const actions = ref([
-  {
+const actions = ref([{
     key: 'view',
     text: '查看',
     icon: 'EyeOutlined',
+    type:'primary',
     permissionProps: (data) => ({
       tooltip: {
         title: '查看',
@@ -78,7 +78,8 @@ const actions = ref([
   {
     key: 'view1',
     text: '查看1',
-    icon: 'EyeOutlined',
+    icon: 'FormOutlined',
+    type:'primary',
     permissionProps: (data) => ({
       tooltip: {
         title: '查看',
@@ -94,19 +95,31 @@ const actions = ref([
   {
     key: 'view2',
     text: '查看2',
+    type:'dashed',
+    icon: 'FrownOutlined',
+    permissionProps: (data) => ({
+      tooltip: {
+        title: '查看',
+      },
+      hasPermission: false,
+      onClick: (e) => {
+        console.log(data)
+        handleView(data.id)
+      },
+    }),
   },
 
   {
     key: 'delete',
     text: '删除',
-    icon: 'EyeOutlined',
-
+    icon: 'DeleteOutlined',
+    type:'primary',
     permissionProps: (data) => ({
       tooltip: {
         title: '删除',
       },
       popConfirm: {
-        popTitle: data.status === 'error' ? '禁用' : '确认删除？',
+        title: data?.status === 'error' ? '禁用' : '确认删除？',
         onConfirm: () => {
           console.log(data, 'onConfirm')
         },
@@ -116,8 +129,7 @@ const actions = ref([
       //   handleView(data.id)
       // },
     }),
-  },
-])
+  },])
 //table头部按钮
 const headerActions = ref([{
     key: 'view',
@@ -139,7 +151,7 @@ const headerActions = ref([{
   {
     key: 'view1',
     text: '查看1',
-    icon: 'EyeOutlined',
+    icon: 'FormOutlined',
     type:'primary',
     permissionProps: (data) => ({
       tooltip: {
@@ -157,12 +169,13 @@ const headerActions = ref([{
     key: 'view2',
     text: '查看2',
     type:'dashed',
+    icon: 'HeatMapOutlined',
   },
 
   {
     key: 'delete',
     text: '删除',
-    icon: 'EyeOutlined',
+    icon: 'DeleteOutlined',
     type:'primary',
     permissionProps: (data) => ({
       tooltip: {

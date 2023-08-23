@@ -140,7 +140,7 @@ import PagingConfig from './PagingConfig/index.vue'
 import MenuConfig from './MenuConfig/index.vue'
 import type { GuideProps } from './Guide/type'
 import OperationColumns from './Operation/index.vue'
-import { OperationBtns, OperationColumns } from './Operation'
+
 import { useOperationButton } from '@/store/operationButton'
 import { router } from '@jetlinks/router'
 

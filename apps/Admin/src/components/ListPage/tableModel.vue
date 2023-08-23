@@ -10,24 +10,22 @@
     >
       <template #headerTitle>
         <PermissionButton
-          v-for="(item, index) in props.headerActions"
+          v-for="item in props.headerActions"
           :key="item.key"
           :type="item.type"
-          v-bind:="handleFunction(item.permissionProps, slotProps)"
+          v-bind:="handleFunction(item.permissionProps)"
           style="margin-right: 10px"
           :danger="item.key === 'delete'"
-          :popConfirm="
-            handleFunction(item.permissionProps, slotProps)?.popConfirm
-          "
+          :popConfirm="handleFunction(item.permissionProps)?.popConfirm"
         >
-          <AIcon v-if="item.icon" :type="item?.icon" />
+        <!-- <AIcon v-if="item.icon" :type="item?.icon" /> -->
           {{ item?.text }}
         </PermissionButton>
       </template>
 
       <template #action="slotProps">
         <PermissionButton
-          v-for="(item, index) in slotProps?.actions"
+          v-for="item in slotProps?.actions"
           :key="item.key"
           type="link"
           v-bind:="handleFunction(item.permissionProps, slotProps)"
@@ -38,7 +36,7 @@
           "
         >
           <AIcon v-if="item.icon" :type="item?.icon" />
-          {{ item?.text }}
+          <!-- {{ item?.text }} -->
           <j-divider type="vertical" />
         </PermissionButton>
       </template>
@@ -162,7 +160,7 @@ const props = defineProps({
   },
 })
 
-const handleFunction = (item: any, data: any) => {
+const handleFunction = (item: any, data?: any) => {
   if (isFunction(item)) {
     return item(data)
   } else if (isObject(item)) {
