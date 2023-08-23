@@ -27,6 +27,7 @@ export default  {
           .component('BadgeStatus', BadgeStatus)
           .component('ProImage', ProImage)
           .component('EditorModal', EditorModal)
+          .component('ListPage', ListPage)
           .component('CRUD', CRUD)
           .component('Menu', Menu)
           .component('Project',Project)
