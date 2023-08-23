@@ -140,7 +140,15 @@ import PagingConfig from './PagingConfig/index.vue'
 import MenuConfig from './MenuConfig/index.vue'
 import type { GuideProps } from './Guide/type'
 import OperationColumns from './Operation/index.vue'
+import { router } from '@jetlinks/router'
 
+
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => {},
+  }
+})
 const ref1 = ref()
 const ref2 = ref()
 const ref3 = ref()
