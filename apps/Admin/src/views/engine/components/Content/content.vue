@@ -1,23 +1,25 @@
 <template>
   <div class="content-warp">
-    <Project :data="props.data.children" v-if="props.data.type==='module'"/>
-    <FormDesigner v-else-if="props.data.type === 'page-form'"/>
-    <ListPage :data="props.data" v-else-if="props.data.type === 'page-list'"/>
+    <Project v-if="props.data.type === providerEnum.Module" :data="props.data.children" />
+    <FormDesigner v-else-if="props.data.type === providerEnum.FormPage" />
+    <CRUD v-else-if="data.type === providerEnum.CRUD" />
   </div>
 </template>
 
 <script setup name="ContentWarp">
-import Project from '@/components/ProJect/index.vue'
+import { providerEnum } from '@/components/ProJect/index'
 
 const props = defineProps({
-    data: {
-        type: Object,
-        default: {}
-    },
+  data: {
+    type: Object,
+    default: {}
+  },
 })
 
 </script>
 
 <style scoped lang="less">
-
+.content-warp {
+  height: 100%;
+}
 </style>

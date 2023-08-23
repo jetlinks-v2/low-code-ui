@@ -1,12 +1,6 @@
 <template>
-  <j-input
-    type="text"
-    class="edit-input"
-    v-model:value="inputValue"
-    @input="onInput"
-    @blur="onBlur"
-    @click="onClick"
-  />
+  <j-input type="text" class="edit-input" maxlength="16" v-model:value="inputValue" @input="onInput" @blur="onBlur"
+    @click="onClick" />
 </template>
 
 <script setup lang="ts" name="EditInput">
@@ -18,7 +12,7 @@ const props = defineProps({
   },
   setValue: {
     type: Function,
-    default: () => {},
+    default: () => { },
   },
 })
 
@@ -33,6 +27,7 @@ const onClick = (e: Event) => {
 }
 
 const onBlur = () => {
+
   props.setValue(inputValue.value)
 }
 </script>
