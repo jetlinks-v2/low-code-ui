@@ -21,20 +21,26 @@
 
 <script lang="ts" setup>
 import { useFilterModuleStore } from '@/store/filterModule'
+interface Emit {
+  (e: 'update:state', value: any): void
+}
+
+const emits = defineEmits<Emit>()
+const configurationStore = useFilterModuleStore()
+const data = configurationStore.getConfigurationInfo('date')
 const state = reactive({
-  accuracy: 'year',
-  defaultValue: 'not',
+  accuracy:data?.accuracy || 'year',
+  defaultValue:data?.defaultValue || 'not',
 })
 const options = [
   { value: 'year', label: '年-月-日' },
   { value: 'hour', label: '时-分-秒' },
 ]
-const configurationStore = useFilterModuleStore()
 
 watch(
   () => state,
   () => {
-    configurationStore.setConfigurationInfo(state, 'date')
+    emits('update:state', state)
   },
   { immediate: true, deep: true },
 )

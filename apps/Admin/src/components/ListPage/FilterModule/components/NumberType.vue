@@ -5,6 +5,7 @@
       v-model:value="state.max"
       class="input"
       :precision="0"
+      :min="state.min"
       :max="9999"
       :step="1"
     />
@@ -13,7 +14,7 @@
       v-model:value="state.min"
       class="input"
       :precision="0"
-      :max="9999"
+      :max="state.max"
       :step="1"
     />
   </div>
@@ -21,16 +22,22 @@
 
 <script lang="ts" setup>
 import { useFilterModuleStore } from '@/store/filterModule'
-const state = reactive({
-  max: '',
-  min: '',
-})
+interface Emit {
+  (e: 'update:state', value: any): void
+}
+
+const emits = defineEmits<Emit>()
 const configurationStore = useFilterModuleStore()
+const data = configurationStore.getConfigurationInfo('number')
+const state = reactive({
+  max: data?.max || null,
+  min: data?.min || null,
+})
 
 watch(
   () => state,
   () => {
-    configurationStore.setConfigurationInfo(state, 'number')
+    emits('update:state', state)
   },
   { immediate: true, deep: true },
 )

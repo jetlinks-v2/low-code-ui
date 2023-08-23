@@ -5,7 +5,7 @@
       placement="top"
       :closable="false"
       :visible="open"
-      @close=" emits('update:open', false)"
+      @close="emits('update:open', false)"
     >
       <p>请配置分页器支持的单页数据量</p>
       <div style="display: flex; flex-flow: wrap">
@@ -32,13 +32,14 @@
   </div>
 </template>
 <script setup lang="ts">
+import { usePagingConfigStore } from '@/store/pagingConfig'
+const pagingConfigStore = usePagingConfigStore()
 const pagingData = ref([
   { pageSize: 12 },
   { pageSize: 24 },
   { pageSize: 48 },
   { pageSize: 96 },
 ])
-
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -86,6 +87,10 @@ const blur = () => {
   pagingData.value?.sort((a, b) => {
     return a.pageSize - b.pageSize
   })
+  pagingConfigStore.setPagingDataInfo(pagingData.value)
 }
+onMounted(() => {
+  pagingData.value = pagingConfigStore.getPagingDataInfo()
+})
 </script>
 <style lang="less" scoped></style>

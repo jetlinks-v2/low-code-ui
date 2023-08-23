@@ -75,10 +75,12 @@
 <script lang="ts" setup>
 import { useListFormStore } from '@/store/listForm'
 import Card from '@/components/ListPage/ListForm/components/Card.vue'
+import { cloneDeep } from 'lodash-es'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
 }
+const configurationStore = useListFormStore()
 
 const emits = defineEmits<Emit>()
 const props = defineProps({
@@ -90,6 +92,13 @@ const props = defineProps({
 
 const open = computed({
   get() {
+    if (props.open) {
+      const data = cloneDeep(configurationStore.getListFormType())
+      state.configurationShow = false
+      state.type = data.type
+      state.configured = data.configured
+      state.defaultForm = data.defaultForm
+    }
     return props.open
   },
   set(val: boolean) {
@@ -109,12 +118,18 @@ const state = reactive({
 const back = () => {
   state.configurationShow = false
 }
-const configurationStore = useListFormStore()
 //取消
 const cancel = () => {
   if (state.configurationShow) {
     back()
   } else {
+    if (props.open) {
+      const data = cloneDeep(configurationStore.getListFormType())
+      state.configurationShow = false
+      state.type = data.type
+      state.configured = data.configured
+      state.defaultForm = data.defaultForm
+    }
     open.value = false
   }
 }
@@ -122,9 +137,14 @@ const cancel = () => {
 const submit = async () => {
   let data: any = {}
   const vaildate = await cardRef.value?.vaildate()
-  if (vaildate) {
+  console.log(vaildate)
+
+  if (vaildate && state.configurationShow) {
     data = { ...configurationStore.getListFormInfo() }
     state.configurationShow = false
+  } else if (!state.configurationShow) {
+    open.value = false
+    configurationStore.setListFormType(state)
   }
   data.type = state.type
 }

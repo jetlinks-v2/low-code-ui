@@ -47,13 +47,19 @@
 
 <script lang="ts" setup>
 import { useFilterModuleStore } from '@/store/filterModule'
-const state = reactive({
-  value:'data',
-  dataValue: '',
-  abilityValue: '',
-  instructValue: '',
-})
+interface Emit {
+  (e: 'update:state', value: any): void
+}
+
+const emits = defineEmits<Emit>()
 const configurationStore = useFilterModuleStore()
+const data = configurationStore.getConfigurationInfo('enum')
+const state = reactive({
+  value:data?.value || 'data',
+  dataValue:data?.dataValue || '',
+  abilityValue:data?.abilityValue || '',
+  instructValue:data?.instructValue || '',
+})
 const dataOptions = ref([])
 const abilityOptions = ref([])
 const instructOptions = ref([])
@@ -61,7 +67,7 @@ const instructOptions = ref([])
 watch(
   () => state,
   () => {
-    configurationStore.setConfigurationInfo(state, 'enum')
+    emits('update:state', state)
   },
   { immediate: true,deep:true },
 )

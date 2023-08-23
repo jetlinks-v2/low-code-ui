@@ -113,6 +113,7 @@
                     <j-input
                       style="width: 450px"
                       v-model:value="configState.trueValue"
+                      maxLength="16"
                     />
                   </j-col>
                 </j-row>
@@ -123,6 +124,7 @@
                     <j-input
                       style="width: 450px"
                       v-model:value="configState.falseValue"
+                      maxLength="16"
                     />
                   </j-col>
                 </j-row>
@@ -423,7 +425,6 @@ const configuration = (data: any) => {
   configState.falseValue = data?.record?.config?.falseValue || '否'
   configState.trueValue = data?.record?.config?.trueValue || '是'
   configState.fileValue = data?.record?.config?.fileValue
-  console.log(data?.record?.config, 'configRow')
 }
 //处理方式弹窗
 const handleOk = (value: any) => {
