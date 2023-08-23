@@ -1,9 +1,11 @@
 <template>
   <div class="list-page">
-    <DataBind ref="dataBindRef" v-model:open="open" />
+    <DataBind ref="dataBindRef" v-model:open="open" @valid="handleValid" @modify="dataBind.data.function = ''"/>
     <div style="display: flex; height: 100%; width: 100%">
       <div class="left-menu">
-        <div class="menus" ref="menuRef" @click="MenuConfigVisible = true">菜单配置</div>
+        <div class="menus" ref="menuRef" @click="MenuConfigVisible = true">
+          菜单配置
+        </div>
         <div class="menus" ref="previewRef">预览</div>
       </div>
       <div class="right-skeleton">
@@ -36,18 +38,24 @@
         <div class="table-skeleton">
           <j-row justify="space-between" align="middle">
             <j-col :span="4">
-              <j-skeleton-button
-                class="config-item btn"
-                :class="{ animation: !btnTree.length && !open }"
-                size="large"
-                ref="ref2"
-                @click="OperationBtnsVisible = true"
-              />
+              <j-badge :count="btnTreeRef?.errorList.length">
+                <j-skeleton-button
+                  class="config-item btn"
+                  size="large"
+                  ref="ref2"
+                  :class="{ 'config-done': btnTreeRef?.columnsTree.length, 'animation': !btnTreeRef?.columnsTree.length }"
+                  @click="OperationBtnsVisible = true"
+                />
+              </j-badge>
             </j-col>
             <j-col :span="2">
-              <j-space ref="ref6" class="config-item type" @click="ListFormVisible = true">
+              <j-space
+                ref="ref6"
+                class="config-item type"
+                @click="ListFormVisible = true"
+              >
                 <j-skeleton-input style="width: 32px" />
-                <j-skeleton-input style="width: 32px" ref="test" />
+                <j-skeleton-input style="width: 32px" />
               </j-space>
             </j-col>
           </j-row>
@@ -67,14 +75,22 @@
               />
             </j-col>
             <j-col :span="4">
-              <j-skeleton-input
-                style="width: 100%; margin: 8px 0"
-                size="large"
-                ref="ref4"
-                @click="OperationColumnsVisible = true"
-                class="config-item column-operation"
-                :class="{ animation: !columnsTree.length && !open, filter: columnsTree.length }"
-              />
+              <j-badge
+                :count="columnsRef?.errorList.length"
+                style="width: 100%"
+                :numberStyle="{
+                  width: 'auto',
+                }"
+              >
+                <j-skeleton-input
+                  style="width: 100%; margin: 8px 0"
+                  size="large"
+                  ref="ref4"
+                  @click="OperationColumnsVisible = true"
+                  class="config-item column-operation"
+                  :class="{ 'config-done': columnsRef?.columnsTree.length }"
+                />
+              </j-badge>
               <j-skeleton-input
                 style="width: 100%; margin: 8px 0"
                 size="large"
@@ -97,9 +113,17 @@
       </div>
     </div>
     <Guide :stepList="steps" v-model:open="open" />
-    <OperationBtns v-model:open="OperationBtnsVisible" />
-    <OperationColumns v-model:open="OperationColumnsVisible" />
-    <FilterModule v-model:open="FilterModuleVisible"/>
+    <OperationColumns
+      v-model:open="OperationBtnsVisible"
+      type="btns"
+      ref="btnTreeRef"
+    />
+    <OperationColumns
+      v-model:open="OperationColumnsVisible"
+      type="columns"
+      ref="columnsRef"
+    />
+    <FilterModule v-model:open="FilterModuleVisible" />
     <ListData v-model:open="ListDataVisible" />
     <ListForm v-model:open="ListFormVisible" />
     <PagingConfig v-model:open="PagingConfigVisible" />
@@ -117,10 +141,7 @@ import ListForm from './ListForm/index.vue'
 import PagingConfig from './PagingConfig/index.vue'
 import MenuConfig from './MenuConfig/index.vue'
 import type { GuideProps } from './Guide/type'
-import { OperationBtns, OperationColumns } from './Operation'
-import { useOperationButton } from '@/store/operationButton'
-
-const { btnTree, columnsTree } = useOperationButton()
+import OperationColumns from './Operation/index.vue'
 
 const ref1 = ref()
 const ref2 = ref()
@@ -131,7 +152,6 @@ const ref6 = ref()
 const dataBindRef = ref()
 const menuRef = ref()
 const previewRef = ref()
-const test = ref()
 
 const open = ref(false)
 const OperationBtnsVisible = ref(false)
@@ -201,6 +221,28 @@ const steps: GuideProps['stepsList'] = [
     ],
   },
 ]
+
+
+const btnTreeRef = ref()
+
+const columnsRef = ref()
+/**
+ * 校验
+ */
+const handleValid = async () => {
+  const res = await btnTreeRef.value?.valid()
+  columnsRef.value?.valid()
+}
+
+
+const dataBind = ref({
+  data: {
+    function: '',
+    command: '',
+  }
+})
+provide('dataBind', dataBind)
+
 </script>
 
 <style scoped lang="less">
@@ -250,6 +292,27 @@ const steps: GuideProps['stepsList'] = [
 
   .config-item {
     cursor: pointer;
+    &.animation {
+      animation: blink 1s infinite;
+      &.filter {
+        background-color: @filterBg;
+      }
+      &.btn {
+        background-color: @btnBg;
+      }
+      &.type {
+        background-color: @typeBg;
+      }
+      &.column-data {
+        background-color: @columnDataBg;
+      }
+      &.column-operation {
+        background-color: @columnOperationBg;
+      }
+      &.pagination {
+        background-color: @paginationBg;
+      }
+    }
     &.filter:hover {
       background-color: @filterBg !important;
     }
@@ -270,8 +333,7 @@ const steps: GuideProps['stepsList'] = [
     }
   }
 }
-.animation {
-  animation: blink 1.5s infinite;
+.config-done {
   &.filter {
     background-color: @filterBg;
   }
@@ -291,6 +353,7 @@ const steps: GuideProps['stepsList'] = [
     background-color: @paginationBg;
   }
 }
+
 @keyframes blink {
   50% {
     background-color: transparent;
