@@ -4,7 +4,7 @@
     <div style="display: flex; height: 100%; width: 100%">
       <div class="left-menu">
         <div class="menus" ref="menuRef" @click="MenuConfigVisible = true">菜单配置</div>
-        <div class="menus" ref="previewRef">预览</div>
+        <div class="menus" ref="previewRef" @click="goPreview">预览</div>
       </div>
       <div class="right-skeleton">
         <div class="search-skeleton">
@@ -119,6 +119,7 @@ import MenuConfig from './MenuConfig/index.vue'
 import type { GuideProps } from './Guide/type'
 import { OperationBtns, OperationColumns } from './Operation'
 import { useOperationButton } from '@/store/operationButton'
+import { router } from '@jetlinks/router'
 
 const { btnTree, columnsTree } = useOperationButton()
 
@@ -142,6 +143,9 @@ const ListFormVisible = ref(false)
 const PagingConfigVisible = ref(false)
 const MenuConfigVisible = ref(false)
 
+const goPreview = () => {
+  router.push('/preview')
+}
 const steps: GuideProps['stepsList'] = [
   {
     title: '步骤1',
