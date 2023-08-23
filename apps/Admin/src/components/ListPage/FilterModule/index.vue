@@ -14,9 +14,9 @@
         :asynData="asynData"
         :dataChange="dataChange"
         :title="title"
-        :addBtnName =addBtnName
+        :addBtnName="addBtnName"
         :dataSource="dataSource"
-        :modelActiveKey=activeKey
+        :modelActiveKey="activeKey"
         @handleAdd="handleAdd"
         @configuration="configuration"
         @confirm="confirm"
@@ -34,10 +34,10 @@
             返回
           </template>
         </a-page-header>
-        <EnumType v-if="type === 'enum'" />
-        <StringType v-if="type === 'string'" />
-        <NumberType v-if="type === 'number'" />
-        <DateType v-if="type === 'date'" />
+        <EnumType v-if="type === 'enum'" @update:state="newValue => subValue = newValue"/>
+        <StringType v-if="type === 'string'" @update:state="newValue => subValue = newValue"/>
+        <NumberType v-if="type === 'number'" @update:state="newValue => subValue = newValue"/>
+        <DateType v-if="type === 'date'" @update:state="newValue => subValue = newValue"/>
       </div>
 
       <template #footer v-if="type !== ''">
@@ -82,9 +82,9 @@ const open = computed({
 })
 const type = ref('')
 const title = ref('请选择页面支持的筛选项')
-const addBtnName =ref('新增筛选项')
+const addBtnName = ref('新增筛选项')
 const configurationStore = useFilterModuleStore()
-
+const subValue =ref({})
 //是否完成数据绑定
 const dataBind = ref(true)
 //是否同步数据绑定
@@ -161,7 +161,7 @@ const columns: any = [
     type: 'select',
     options: options,
     width: 150,
-    tips:true
+    tips: true,
   },
   {
     title: '操作',
@@ -175,13 +175,28 @@ const columns: any = [
 //数据
 const dataSource = ref([
   {
-    id: 'deviceId',
-    name: 'hhhh',
+    id: 'deviceId1',
+    name: 'date类型',
     type: 'date',
+  },
+  {
+    id: 'deviceId2',
+    name: '枚举类型',
+    type: 'enum',
+  },
+  {
+    id: 'deviceId3',
+    name: '数字类型',
+    type: 'number',
+  },
+  {
+    id: 'deviceId4',
+    name: '字符串类型',
+    type: 'string',
   },
 ])
 //新增一列table
-const handleAdd = async (table:any) => { 
+const handleAdd = async (table: any) => {
   table.addItem({
     id: '',
     name: '',
@@ -191,26 +206,37 @@ const handleAdd = async (table:any) => {
 }
 //删除
 const confirm = (data: any) => {
-  console.log(data,'confirm')
-
+  console.log(data, 'confirm')
 }
+const configRow = ref()
 //配置
 const configuration = (data: any) => {
   type.value = data?.record?.type
+  configRow.value = data?.record
 }
 //处理方式弹窗
-const handleOk = (value:any) => {
+const handleOk = (value: any) => {
   activeKey.value = value
 }
+
 //保存
 const submit = () => {
-  const configInfo = configurationStore.getConfigurationInfo(type.value)
-  console.log(configInfo)
+  configurationStore.setConfigurationInfo(subValue.value,type.value)
+  const dataRow = dataSource.value?.find(
+    (item: any) => item?.id === configRow.value?.id,
+  )
+  if (dataRow) {
+    dataRow.config = { ...subValue.value }
+  }
+  configurationStore.setData(dataSource.value)
   type.value = ''
 }
-defineExpose({
-  open: open.value,
-})
+watch(
+  () => dataSource.value,
+  () => {
+    configurationStore.setData(dataSource.value)
+  },
+)
 </script>
 
 <style scoped lang="less"></style>

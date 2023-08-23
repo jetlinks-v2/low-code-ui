@@ -52,7 +52,7 @@
             class="card-field"
             @click="cardState.type = 'field2'"
           >
-            <div>展示字段2</div>
+            <div>{{formState.field2Titel||'展示字段2'}}</div>
             <div>
               {{ formState.field2 || '字段2' }}
             </div>
@@ -62,7 +62,7 @@
             class="card-field"
             @click="cardState.type = 'field3'"
           >
-            <div>展示字段3</div>
+            <div>{{formState.field3Titel||'展示字段3'}}</div>
             <div>
               {{ formState.field3 || '字段3' }}
             </div>
@@ -105,8 +105,8 @@
               placeholder="请先配置列表数据"
               v-model:value="formState.dynamicIcon"
               showSearch
-              :options="title"
-               :field-names="{ label: 'name', value: 'id'}"
+              :options="titleOptions"
+              :field-names="{ label: 'name', value: 'id' }"
             />
           </j-form-item>
         </div>
@@ -126,8 +126,8 @@
               placeholder="请先配置列表数据"
               v-model:value="formState.field1"
               showSearch
-              :options="title"
-               :field-names="{ label: 'name', value: 'id'}"
+              :options="titleOptions"
+              :field-names="{ label: 'name', value: 'id' }"
             />
           </j-form-item>
         </div>
@@ -147,8 +147,9 @@
               placeholder="请先配置列表数据"
               v-model:value="formState.field2"
               showSearch
-              :options="title"
-               :field-names="{ label: 'name', value: 'id'}"
+              :options="titleOptions"
+              :field-names="{ label: 'name', value: 'id' }"
+              @change="field2Change"
             />
           </j-form-item>
         </div>
@@ -168,8 +169,9 @@
               placeholder="请先配置列表数据"
               v-model:value="formState.field3"
               showSearch
-              :options="title"
-               :field-names="{ label: 'name', value: 'id'}"
+              :options="titleOptions"
+              :field-names="{ label: 'name', value: 'id' }"
+              @change="field3Change"
             />
           </j-form-item>
         </div>
@@ -180,12 +182,15 @@
               placeholder="请先配置列表数据"
               v-model:value="formState.emphasisField"
               showSearch
-              :options="title"
-               :field-names="{ label: 'name', value: 'id'}"
+              :options="titleOptions"
+              :field-names="{ label: 'name', value: 'id' }"
             />
           </j-form-item>
           <j-form-item label="特殊样式" name="specialStyle">
-            <EditorModal v-model:value="formState.specialStyle" language="css"/>
+            <EditorModal
+              v-model:value="formState.specialStyle"
+              language="css"
+            />
           </j-form-item>
         </div>
         <j-form-item v-show="false">
@@ -204,7 +209,7 @@ import Card from '@/components/Card'
 import EditorModal from '@/components/EditorModal'
 const configurationStore = useListFormStore()
 const listDataStore = useListDataStore()
-const title = ref()
+const titleOptions = ref([])
 const formRef = ref()
 //卡片样式点击类型
 const cardState = reactive({
@@ -214,13 +219,15 @@ const cardState = reactive({
 const formState = reactive({
   customIcon: '',
   dynamicIcon: '',
+  field2Titel: '',
+  field3Titel: '',
   field1: '',
   field2: '',
   field3: '',
   emphasisField: '',
   specialStyle: '',
 })
-const options: any = ref([])
+
 //上传icon格式
 const accept = '.jpg,.jpeg,.png'
 //悬浮提示自动调整位置
@@ -239,7 +246,7 @@ const actions = [
       hasPermission: false,
       icon: 'EyeOutlined',
       onClick: (e) => {
-        console.log(data)
+        console.log(data,'data')
         handleView(data.id)
       },
     }),
@@ -309,21 +316,18 @@ const onCheck = async () => {
     return false
   }
 }
-watch(
-  () => cardState.type,
-  () => {
-    options.value = [{ value: cardState.type, label: cardState.type }]
-  },
-  { immediate: true, deep: true },
-)
+const field2Change = (value:any,options:any) => {
+
+  formState.field2Titel = options.name
+}
+const field3Change = (value:any,options:any) => {
+  formState.field3Titel = options.name
+}
 const init = () => {
-  console.log(configurationStore,'configurationStore');
-  title.value = listDataStore.getDatasource()
-  console.log(title.value, 'title');
-  
-  const data = { ...configurationStore.getListFormInfo() }
+  titleOptions.value = listDataStore.getDatasource() || []
+  const data = { ...(configurationStore.getListFormInfo() || {}) }
   Object.assign(formState, data)
-  statusColor.value = JSON.parse(formState.specialStyle)
+  statusColor.value = JSON.parse(formState.specialStyle || '{}')
 }
 const statusColor = ref({
   error: '',
