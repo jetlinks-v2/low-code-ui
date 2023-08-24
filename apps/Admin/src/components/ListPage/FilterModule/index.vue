@@ -23,7 +23,7 @@
         @handleOk="handleOk"
         v-if="type === ''"
       />
-      <div v-else>
+      <div v-if="type !== ''">
         <a-page-header
           title="配置筛选项"
           sub-title="配置筛选项"

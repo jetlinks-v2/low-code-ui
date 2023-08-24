@@ -40,13 +40,22 @@
         />
       </j-card>
     </div>
+    <!-- 批量导入 -->
+    <Import
+      v-if="importVisible"
+      @close="importVisible = false"
+      @save="importVisible = false"
+    />
   </div>
 </template>
 <script setup lang="ts">
 import { useAllListDataStore } from '@/store/listForm'
-import ProTable from '@/components/ListPage/Preview/components/tableModel.vue'
+import ProTable from '@/components/ListPage/Preview/components/TableModel.vue'
 import dayjs from 'dayjs'
 import { router } from '@jetlinks/router'
+import Import from './components/Import.vue'
+const importVisible = ref<boolean>(true)
+
 const route = useRoute()
 const id = route.params.id
 const listDataStore = useAllListDataStore()
@@ -343,6 +352,51 @@ const typeData = () => {
 const typeChange = (e: any) => {
   model.value = e?.target?.value
 }
+const headerActionsFormat = (data: any) => {
+  const finalData = data?.map((item: any) => {
+    return {
+      key: item.key,
+      text: item.title,
+      icon: item.icon,
+      type: 'primary',
+      command: item.command,
+      permissionProps: (data) => ({
+        tooltip: {
+          title: item.title,
+        },
+        hasPermission: false,
+        popConfirm:
+          item.command === 'Delete'
+            ? {
+                title: data?.status === 'error' ? '禁用' : '确认删除？',
+                onConfirm: () => {
+                  console.log(data, 'onConfirm')
+                },
+              }
+            : false,
+        onClick: (e) => {
+          console.log(data, 'data')
+          // handleView(data.id)
+        },
+      }),
+      children: headerActionsFormat(item?.children || []),
+    }
+  })
+  return finalData
+}
+//表头按钮
+const handleHeaderActions = () => {
+  const btnData = listDataStore.getALLlistDataInfo(id)?.addButton || []
+  headerActions.value = headerActionsFormat(btnData)
+}
+//table操作按钮
+const handleRowActions = () => {
+  const btnData = listDataStore.getALLlistDataInfo(id)?.actionsButton || []
+  console.log(btnData)
+  console.log(headerActionsFormat(btnData), 'btnData')
+
+  actions.value = headerActionsFormat(btnData)
+}
 //table数据
 const query = (_params: Record<string, any>) =>
   new Promise((resolve) => {
@@ -394,6 +448,10 @@ onMounted(() => {
   searchData()
   //table形态选择
   typeData()
+  //table头部按钮
+  handleHeaderActions()
+  //table操作按钮
+  handleRowActions()
 })
 </script>
 <style lang="less" scoped>
