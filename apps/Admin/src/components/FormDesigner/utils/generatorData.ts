@@ -6,18 +6,24 @@ const handleProps = (node: any) => {
     if (!result?.style) {
         result.style = {}
     }
+    result.description = result?.description || ''
     if (checkIsField(node) && node.type !== 'switch') {
         result.style = {
             width: '100%'
         }
-        result.description = result?.description || ''
     }
     if (!result?.placeholder) {
-        if (/^(select)$/.test(node.type)) {
+        if (/^(select|select-card|tree-select)$/.test(node.type)) {
             result.placeholder = '请选择'
         }
         if (/^(input|textarea|input-password)$/.test(node.type)) {
             result.placeholder = '请输入'
+        }
+        if (/^(date-picker)$/.test(node.type)) {
+            result.placeholder = '请选择日期'
+        }
+        if (/^(time-picker)$/.test(node.type)) {
+            result.placeholder = '请选择时间'
         }
     }
 
@@ -50,8 +56,23 @@ const handleProps = (node: any) => {
             result.mode = ''
             result.treeCheckStrictly = false
             break
+        case 'upload':
+            result.listType = 'text'
+            result.maxCount = 1
+            break
     }
+
     return result
+}
+
+const handleFormItemProps = (node: any) => {
+    return {
+        name: '',
+        label: node?.name,
+        required: false,
+        rules: [],
+        ...node?.formItemProps
+    }
 }
 
 const generatorData = (node: any) => {
@@ -60,14 +81,9 @@ const generatorData = (node: any) => {
         result.key = `${result.type}_${uid()}`
     }
     if (checkIsField(result)) {
-        result.formItemProps = {
-            name: '',
-            label: result?.name,
-            required: false,
-            rules: [],
-            ...result?.formItemProps
-        }
+        result.formItemProps = handleFormItemProps(node)
     }
+
     result.componentProps = handleProps(node)
 
     if (Array.isArray(node?.children) && node?.children?.length > 0) {

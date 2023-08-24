@@ -1,7 +1,7 @@
 
 import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
-import { Collapse, CollapsePanel } from 'jetlinks-ui-components'
+import { Collapse, CollapsePanel, FormItem } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
 import { cloneDeep } from 'lodash-es'
@@ -45,49 +45,75 @@ export default defineComponent({
       return unref(designer?.model) === 'edit'
     })
 
+    const _formItemProps = computed(() => {
+      return props.data?.formItemProps
+    })
+
+    const _isLayout = computed(() => {
+      return props.data?.formItemProps.isLayout
+    })
+
     return () => {
       const _path = cloneDeep(props?.path || []);
       const _index = props?.index || 0;
       if (props.data?.formItemProps?.name) {
         _path[_index] = props.data.formItemProps.name
       }
+
+      const addButton = () => {
+        return unref(isEditModel) &&
+          <div class="draggable-add">
+            <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}>添加面板</div>
+          </div>
+      }
+
+      const renderContent = () => {
+        return (
+          unref(list)?.length ? <Collapse data-layout-type={'collapse'} {...props.data.componentProps}>
+            {
+              unref(list).map((element) => {
+                return (
+                  <CollapsePanel key={element.key} {...element.componentProps}>
+                    <Selection
+                      class={'drag-area'}
+                      data={element}
+                      tag="div"
+                      hasCopy={true}
+                      hasDel={true}
+                      parent={unref(list)}
+                      style={{
+                        padding: '20px 10px'
+                      }}
+                    >
+                      <DraggableLayout
+                        data={element.children}
+                        data-layout-type={'item'}
+                        parent={element}
+                        path={_path}
+                        index={_index + 1}
+                      />
+                    </Selection>
+                  </CollapsePanel>
+                )
+              })
+            }
+          </Collapse> : (unref(isEditModel) ? <div class="draggable-empty">折叠面板</div> : <div></div>)
+        )
+      }
       return (
         <Selection {...useAttrs()} style={{ padding: '16px' }} hasCopy={true} hasDel={true} hasDrag={true} data={props.data} parent={props.parent}>
           {
-            unref(list).length ?
-              <Collapse data-layout-type={'collapse'} {...props.data.componentProps}>
-                {
-                  unref(list).map((element) => {
-                    return (
-                      <CollapsePanel key={element.key} {...element.componentProps}>
-                        <Selection
-                          class={'drag-area'}
-                          hasDel={true}
-                          data={element}
-                          tag="div"
-                          hasCopy={true}
-                          parent={unref(list)}
-                        >
-                          <DraggableLayout
-                            data={element.children}
-                            data-layout-type={'item'}
-                            parent={element}
-                            path={_path}
-                            index={_index + 1}
-                          />
-                        </Selection>
-                      </CollapsePanel>
-                    )
-                  })
-                }
-              </Collapse> :
-              (unref(isEditModel) ? <div class="draggable-empty">折叠面板</div> : <div></div>)
-          }
-          {
-            unref(isEditModel) &&
-            <div class="draggable-add">
-              <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}>添加面板</div>
-            </div>
+            unref(_isLayout) ?
+              <FormItem {...unref(_formItemProps)}>
+                {renderContent()}
+                {addButton()}
+              </FormItem>
+              : (
+                <>
+                  {renderContent()}
+                  {addButton()}
+                </>
+              )
           }
         </Selection>
       )

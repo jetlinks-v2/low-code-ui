@@ -3,7 +3,7 @@ import componentMap from "./componentMap"
 import { ISchema } from "../typings"
 import { concat } from "lodash-es"
 
-export const checkIsField = (node: any) => node?.type && (componentMap?.[node?.type] || ['grid', 'card', 'tabs', 'collapse'].includes(node?.type))
+export const checkIsField = (node: any) => node?.type && (componentMap?.[node?.type]) // || ['grid', 'card', 'tabs', 'collapse'].includes(node?.type))
 
 // 生成多个选项
 export const generateOptions = (len: number) => {
@@ -27,7 +27,7 @@ const checkKey = (obj: any, arr: string[]) => {
 const checkedConfigItem = (node: ISchema) => {
     const _type = node.type || 'root'
     let arr: string[] = []
-    if(['input', 'textarea', 'switch', 'select'].includes(_type)) {
+    if (['input', 'textarea', 'switch', 'select'].includes(_type)) {
         arr = concat(arr, checkKey(node?.formItemProps, ['name', 'label']))
     }
 
@@ -54,4 +54,19 @@ export const checkedConfig = (node: ISchema) => {
     }
 
     return _rules
+}
+
+export const updateData = (list: ISchema[], item: ISchema) => {
+    return (list || []).map(_item => {
+        if (_item.key === item.key) {
+            return {
+                ..._item,
+                ...item
+            }
+        }
+        return {
+            ..._item,
+            children: updateData(_item?.children || [], item)
+        }
+    })
 }

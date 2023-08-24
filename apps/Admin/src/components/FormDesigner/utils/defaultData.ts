@@ -1,7 +1,7 @@
 import { ISchema } from "../typings";
 
 // 基础组件
-const basic: ISchema[] = [
+export const basic: ISchema[] = [
     {
         type: 'input',
         name: '文本框',
@@ -83,24 +83,34 @@ const basic: ISchema[] = [
         name: '日期选择',
         icon: 'ContactsOutlined',
     },
-    {
-        type: 'range-picker',
-        name: '日期范围',
-        icon: 'FundOutlined',
-    },
+    // {
+    //     type: 'range-picker',
+    //     name: '日期范围',
+    //     icon: 'FundOutlined',
+    // },
     {
         type: 'time-picker',
         name: '时间选择',
         icon: 'BlockOutlined',
     },
+    // {
+    //     type: 'time-range-picker',
+    //     name: '时间范围',
+    //     icon: 'AuditOutlined',
+    // },
     {
-        type: 'time-range-picker',
-        name: '时间范围',
+        type: 'table',
+        name: '表格',
         icon: 'AuditOutlined',
-    }
+    },
+    {
+        type: 'geo',
+        name: '地区',
+        icon: 'FundOutlined',
+    },
 ]
 
-const layout: ISchema[] = [
+export const layout: ISchema[] = [
     {
         type: 'card',
         name: '卡片',
@@ -108,6 +118,9 @@ const layout: ISchema[] = [
         componentProps: {
             title: '卡片',
             extra: ''
+        },
+        formItemProps: {
+            isLayout: false
         },
         children: [
             {
@@ -162,22 +175,10 @@ const layout: ISchema[] = [
         type: 'tabs',
         name: '选项卡',
         icon: 'ScheduleOutlined',
-        children: [
-            // {
-            //     type: 'tabs-item',
-            //     children: [],
-            //     componentProps: {
-            //         tab: 'Tab 1'
-            //     }
-            // },
-            // {
-            //     type: 'tabs-item',
-            //     children: [],
-            //     componentProps: {
-            //         tab: 'Tab 2'
-            //     }
-            // }
-        ],
+        children: [],
+        formItemProps: {
+            isLayout: false
+        },
         componentProps: {
             type: '',
             tabPosition: 'top',
@@ -189,27 +190,27 @@ const layout: ISchema[] = [
         type: 'collapse',
         name: '折叠面板',
         icon: 'CopyOutlined',
+        children: [],
+        formItemProps: {
+            isLayout: false
+        },
+        componentProps: {}
+    },
+    {
+        type: 'space',
+        name: '弹性间距',
+        icon: 'AppstoreOutlined',
         children: [
             // {
-            //     type: 'collapse-item',
+            //     type: 'space-item',
             //     children: [],
-            //     componentProps: {
-            //         header: 'Collapse 1'
-            //     }
             // },
-            // {
-            //     type: 'collapse-item',
-            //     children: [],
-            //     componentProps: {
-            //         header: 'Collapse 2'
-            //     }
-            // }
         ],
         componentProps: {}
     },
 ]
 // 高级组件
-const pro: ISchema[] = [
+export const pro: ISchema[] = [
     {
         type: 'input',
         name: '产品选择',

@@ -10,7 +10,9 @@ import componentMap from '../../utils/componentMap';
 import GridLayout from './GridLayout';
 import TabsLayout from './TabsLayout';
 import CardLayout from './CardLayout';
+import SpaceLayout from './SpaceLayout';
 import CollapseLayout from './CollapseLayout';
+import { watch } from 'vue';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -51,7 +53,6 @@ const DraggableLayout = defineComponent({
             group: {
                 name: 'j-canvas'
             },
-            parent: props.parent
         }
 
         const isEditModel = computed(() => {
@@ -83,6 +84,8 @@ const DraggableLayout = defineComponent({
                         break
                     case 'card':
                         return (<CardLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></CardLayout>)
+                    case 'space':
+                        return (<SpaceLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></SpaceLayout>)
                     case 'grid':
                         return (<GridLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></GridLayout>)
                     case 'tabs':
@@ -163,6 +166,8 @@ const DraggableLayout = defineComponent({
                     alignItems: 'center',
                     height: '100%',
                     minHeight: '60px',
+                    // padding: '0 300px',
+                    minWidth: '100px'
                 }
                 if (isEmpty(props.data)) {
                     return (

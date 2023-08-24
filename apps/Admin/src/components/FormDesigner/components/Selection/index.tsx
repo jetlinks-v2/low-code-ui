@@ -28,7 +28,7 @@ const Selection = defineComponent({
     },
     hasDrag: {
       type: Boolean,
-      default: false
+      default: true
     },
     hasDel: {
       type: Boolean,
@@ -49,7 +49,7 @@ const Selection = defineComponent({
     const isField = checkIsField(props.data)
 
     const Selected = computed(() => {
-      return props?.data?.key !== undefined && designer.selected?.value?.key === props?.data?.key
+      return props?.data?.key !== undefined && designer.selected?.key === props?.data?.key
     })
 
     const isEditModel = computed(() => {
@@ -88,15 +88,16 @@ const Selection = defineComponent({
     }
     const TagComponent = isHTMLTag(props?.tag) ? props.tag : resolveComponent(props?.tag)
 
-    const maskNode = (<div class={['handle', 'mask']}></div>)
+    const maskNode = (<div class={['mask']}></div>) // 'handle', 
 
-    // const _hasDrag = computed(() => { return props.hasDrag })
+    const _hasDrag = computed(() => { return props.hasDrag })
 
     return () => {
       return (
         <TagComponent
           class={[
             'selectElement',
+            unref(_hasDrag) && 'handle',
             !isField && 'borderless',
             unref(isEditModel) && Selected.value && 'Selected',
             unref(isEditModel) && 'edit-hover'
@@ -105,7 +106,7 @@ const Selection = defineComponent({
           onClick={withModifiers(handleClick, ['stop'])}
         >
           {slots?.default()}
-          <span></span>
+          {/* <span></span> */}
           {/* {
             // 拖拽按钮
             unref(isEditModel) && Selected.value && unref(_hasDrag) && (

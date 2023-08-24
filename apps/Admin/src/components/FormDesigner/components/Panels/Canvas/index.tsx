@@ -25,7 +25,7 @@ export default defineComponent({
       height: '100%',
       boxSizing: 'border-box'
     }
-    
+
     const renderContent = () => {
       const typeProps = useProps(designer, true) // 根结点，也是form的props
       const arr: any[] = []

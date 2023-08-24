@@ -14,4 +14,5 @@ export declare type ISchema = {
     visible?: boolean; // 字段是否显示
     editable?: boolean; // 编辑时是否可修改
     dependence?: any[]; // 显示依赖
+    // isLayout?: boolean; // 是否为布局组件: 
 }

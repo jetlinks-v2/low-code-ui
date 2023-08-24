@@ -18,8 +18,9 @@ import Header from './components/Header/index.vue'
 import Canvas from './components/Panels/Canvas/index'
 import Config from './components/Panels/Config/index.vue'
 import Filed from './components/Panels/Filed/index'
-import { provide, ref, reactive, watch, toRaw } from 'vue'
+import { provide, ref, reactive, watch, toRaw, unref } from 'vue'
 import { ISchema } from './typings'
+// import { updateData } from './utils/utils'
 
 const initData = {
   type: 'root',
@@ -48,7 +49,7 @@ const props = defineProps({
 const model = ref<'preview' | 'edit'>('edit') // 预览；编辑
 const formData = ref<ISchema>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
-const selected = ref<ISchema>() // 被选择数据
+const selected = reactive<any>({}) // 被选择数据
 const formState = reactive<any>({})
 
 const formRef = ref<any>()
@@ -65,8 +66,8 @@ const setSelection = (node: any) => {
       result = node
     }
   }
-  selected.value = result
-  isShowConfig.value = selected.value?.key === result?.key
+  Object.assign(selected, result)
+  isShowConfig.value = selected?.key === result?.key
 }
 
 const setModel = (_type: 'preview' | 'edit') => {
@@ -98,6 +99,15 @@ const getFieldData = (data: ISchema) => {
   return _obj
 }
 
+// 修改数据
+// const modifyItem = (item: ISchema) => {
+//     if(unref(formData)?.key === item?.key) {
+//       Object.assign(formData, item)
+//     } else {
+//       Object.assign(formData, updateData(unref(formData)?.children || [], item))
+//     }
+// }
+
 provide('FormDesigner', {
   model,
   formData,
@@ -105,7 +115,7 @@ provide('FormDesigner', {
   selected,
   formState,
   setSelection,
-  setModel,
+  setModel
 })
 
 const onSave = () => {
