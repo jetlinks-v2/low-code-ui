@@ -52,7 +52,7 @@
             class="card-field"
             @click="cardState.type = 'field2'"
           >
-            <div>{{formState.field2Titel||'展示字段2'}}</div>
+            <div>{{ formState.field2Titel || '展示字段2' }}</div>
             <div>
               {{ formState.field2 || '字段2' }}
             </div>
@@ -62,7 +62,7 @@
             class="card-field"
             @click="cardState.type = 'field3'"
           >
-            <div>{{formState.field3Titel||'展示字段3'}}</div>
+            <div>{{ formState.field3Titel || '展示字段3' }}</div>
             <div>
               {{ formState.field3 || '字段3' }}
             </div>
@@ -203,12 +203,15 @@
 
 <script lang="ts" setup>
 import Upload from '@/components/Upload/Image/ImageUpload.vue'
-import { useListFormStore } from '@/store/listForm'
-import { useListDataStore } from '@/store/listData'
-import Card from '@/components/Card'
+import { useAllListDataStore } from '@/store/listForm'
+
 import EditorModal from '@/components/EditorModal'
-const configurationStore = useListFormStore()
-const listDataStore = useListDataStore()
+const props = defineProps({
+  id: {
+    type: null,
+  },
+})
+const configurationStore = useAllListDataStore()
 const titleOptions = ref([])
 const formRef = ref()
 //卡片样式点击类型
@@ -246,7 +249,7 @@ const actions = [
       hasPermission: false,
       icon: 'EyeOutlined',
       onClick: (e) => {
-        console.log(data,'data')
+        console.log(data, 'data')
         handleView(data.id)
       },
     }),
@@ -309,31 +312,35 @@ const onCheck = async () => {
       formState.field2 !== '' &&
       formState.field3 !== ''
     ) {
-      configurationStore.setListFormInfo(formState)
+      configurationStore.setALLlistDataInfo('listFormInfo', formState, props.id)
       return true
     }
   } catch (errorInfo) {
     return false
   }
 }
-const field2Change = (value:any,options:any) => {
-
+const field2Change = (value: any, options: any) => {
   formState.field2Titel = options.name
 }
-const field3Change = (value:any,options:any) => {
+const field3Change = (value: any, options: any) => {
   formState.field3Titel = options.name
-}
-const init = () => {
-  titleOptions.value = listDataStore.getDatasource() || []
-  const data = { ...(configurationStore.getListFormInfo() || {}) }
-  Object.assign(formState, data)
-  statusColor.value = JSON.parse(formState.specialStyle || '{}')
 }
 const statusColor = ref({
   error: '',
   offline: '',
   warning: '#13c2c2',
 })
+const init = () => {
+  titleOptions.value =
+    configurationStore.getALLlistDataInfo(props.id).datasource || []
+  const data = configurationStore.getALLlistDataInfo(props.id).listFormInfo
+  console.log(data, 'titleOptions.value')
+
+  Object.assign(formState, data)
+  statusColor.value = JSON.parse(formState.specialStyle || '{}')
+  console.log(statusColor.value, 'statusColor');
+}
+
 onMounted(() => {
   init()
 })

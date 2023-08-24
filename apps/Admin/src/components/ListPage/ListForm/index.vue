@@ -58,7 +58,7 @@
             返回
           </template>
         </a-page-header>
-        <Card ref="cardRef" />
+        <Card ref="cardRef" :id="props.id" />
       </div>
       <template #footer>
         <j-button style="float: right" type="primary" @click="submit">
@@ -73,14 +73,14 @@
 </template>
 
 <script lang="ts" setup>
-import { useListFormStore } from '@/store/listForm'
-import Card from '@/components/ListPage/ListForm/components/Card.vue'
+import { useAllListDataStore } from '@/store/listForm'
+import Card from '@/components/ListPage/ListForm/components/card.vue'
 import { cloneDeep } from 'lodash-es'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
 }
-const configurationStore = useListFormStore()
+const configurationStore = useAllListDataStore()
 
 const emits = defineEmits<Emit>()
 const props = defineProps({
@@ -88,13 +88,17 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  id: {
+    type: null,
+  },
 })
 
 const open = computed({
   get() {
     if (props.open) {
-      const data = cloneDeep(configurationStore.getListFormType())
-      state.configurationShow = false
+      const data = cloneDeep(
+        configurationStore.getALLlistDataInfo(props.id)?.showType,
+      )
       state.type = data.type
       state.configured = data.configured
       state.defaultForm = data.defaultForm
@@ -124,7 +128,9 @@ const cancel = () => {
     back()
   } else {
     if (props.open) {
-      const data = cloneDeep(configurationStore.getListFormType())
+      const data = cloneDeep(
+        configurationStore.getALLlistDataInfo(props.id)?.showType,
+      )
       state.configurationShow = false
       state.type = data.type
       state.configured = data.configured
@@ -140,11 +146,13 @@ const submit = async () => {
   console.log(vaildate)
 
   if (vaildate && state.configurationShow) {
-    data = { ...configurationStore.getListFormInfo() }
+    data = { ...configurationStore.getALLlistDataInfo(props.id)?.listFormInfo }
+
     state.configurationShow = false
   } else if (!state.configurationShow) {
     open.value = false
-    configurationStore.setListFormType(state)
+    delete state.configurationShow
+    configurationStore.setALLlistDataInfo('showType', state, props.id)
   }
   data.type = state.type
 }

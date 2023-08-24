@@ -1,9 +1,16 @@
 <template>
   <div class="list-page">
-    <DataBind ref="dataBindRef" v-model:open="open" @valid="handleValid" @modify="dataBind.data.function = ''"/>
+    <DataBind
+      ref="dataBindRef"
+      v-model:open="open"
+      @valid="handleValid"
+      @modify="dataBind.data.function = ''"
+    />
     <div style="display: flex; height: 100%; width: 100%">
       <div class="left-menu">
-        <div class="menus" ref="menuRef" @click="MenuConfigVisible = true">菜单配置</div>
+        <div class="menus" ref="menuRef" @click="MenuConfigVisible = true">
+          菜单配置
+        </div>
         <div class="menus" ref="previewRef" @click="goPreview">预览</div>
       </div>
       <div class="right-skeleton">
@@ -41,7 +48,10 @@
                   class="config-item btn"
                   size="large"
                   ref="ref2"
-                  :class="{ 'config-done': btnTreeRef?.columnsTree.length, 'animation': !btnTreeRef?.columnsTree.length }"
+                  :class="{
+                    'config-done': btnTreeRef?.columnsTree.length,
+                    animation: !btnTreeRef?.columnsTree.length,
+                  }"
                   @click="OperationBtnsVisible = true"
                 />
               </j-badge>
@@ -121,11 +131,11 @@
       type="columns"
       ref="columnsRef"
     />
-    <FilterModule v-model:open="FilterModuleVisible" />
-    <ListData v-model:open="ListDataVisible" />
-    <ListForm v-model:open="ListFormVisible" />
-    <PagingConfig v-model:open="PagingConfigVisible" />
-    <MenuConfig v-model:open="MenuConfigVisible" />
+    <FilterModule v-model:open="FilterModuleVisible" :id="props.data.id" />
+    <ListData v-model:open="ListDataVisible" :id="props.data.id" />
+    <ListForm v-model:open="ListFormVisible" :id="props.data.id" />
+    <PagingConfig v-model:open="PagingConfigVisible" :id="props.data.id" />
+    <MenuConfig v-model:open="MenuConfigVisible" :id="props.data.id" />
     <j-button> </j-button>
   </div>
 </template>
@@ -141,14 +151,15 @@ import MenuConfig from './MenuConfig/index.vue'
 import type { GuideProps } from './Guide/type'
 import OperationColumns from './Operation/index.vue'
 import { router } from '@jetlinks/router'
-
+import { useAllListDataStore } from '@/store/listForm'
 
 const props = defineProps({
   data: {
     type: Object,
     default: () => {},
-  }
+  },
 })
+const configurationStore = useAllListDataStore()
 const ref1 = ref()
 const ref2 = ref()
 const ref3 = ref()
@@ -169,7 +180,8 @@ const PagingConfigVisible = ref(false)
 const MenuConfigVisible = ref(false)
 
 const goPreview = () => {
-  router.push('/preview')
+  router.push(`/preview/${props.data.id}`)
+  console.log(props.data, 'props.data')
 }
 const steps: GuideProps['stepsList'] = [
   {
@@ -231,7 +243,6 @@ const steps: GuideProps['stepsList'] = [
   },
 ]
 
-
 const btnTreeRef = ref()
 
 const columnsRef = ref()
@@ -241,17 +252,39 @@ const columnsRef = ref()
 const handleValid = async () => {
   const res = await btnTreeRef.value?.valid()
   columnsRef.value?.valid()
+  console.log(
+    configurationStore.getALLlistDataInfo(props.data.id),
+    'getALLlistDataInfo',
+  )
 }
-
 
 const dataBind = ref({
   data: {
     function: '',
     command: '',
-  }
+  },
 })
 provide('dataBind', dataBind)
-
+watch(
+  () => btnTreeRef?.value?.columnsTree,
+  () => {
+    configurationStore.setALLlistDataInfo(
+      'addButton',
+      btnTreeRef?.value?.columnsTree,
+      props.data.id,
+    )
+  },
+)
+watch(
+  () => columnsRef?.value?.columnsTree,
+  () => {
+    configurationStore.setALLlistDataInfo(
+      'actionsButton',
+      columnsRef?.value?.columnsTree,
+      props.data.id,
+    )
+  },
+)
 </script>
 
 <style scoped lang="less">

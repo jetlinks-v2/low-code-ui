@@ -42,6 +42,7 @@
             configState.type !== 'array'
           "
           :config="configRow"
+          @update:state="newValue => subValue = newValue"
         >
           <template #demonstrations v-if="configState.type !== 'geoPoint'">
             <div class="content">
@@ -174,7 +175,7 @@
 <script lang="ts" setup>
 import Table from '@/components/ListPage/FilterModule/components/FilterTable.vue'
 import Config from '@/components/ListPage/ListData/compnents/Configuration.vue'
-import { useListDataStore } from '@/store/listData'
+import { useAllListDataStore } from '@/store/listForm'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -185,6 +186,9 @@ const props = defineProps({
   open: {
     type: Boolean,
     default: false,
+  },
+  id: {
+    type: null,
   },
 })
 
@@ -198,7 +202,8 @@ const open = computed({
 })
 const title = ref('请配置数据列表需要展示的表头')
 const addBtnName = ref('新增表头')
-const configurationStore = useListDataStore()
+const configurationStore = useAllListDataStore()
+const subValue =ref({})
 const configState = reactive({
   type: '',
 
@@ -473,23 +478,28 @@ const typeDataFliter = (value: string) => {
 }
 //保存
 const submit = () => {
-  const configInfo = configurationStore.getListDataInfo()
+  const configInfo = configurationStore.getALLlistDataInfo(
+    props.id,
+  )?.listDataInfo
+console.log(configInfo,'configInfo');
 
   const dataRow = dataSource.value?.find(
     (item: any) => item?.id === configRow.value?.id,
   )
   if (dataRow) {
-    console.log(dataRow?.type, 'dataRow')
     const typeData = typeDataFliter(dataRow?.type)
-
     const data = {
       ...configInfo,
       ...typeData,
+      ...subValue.value
     }
-    dataRow.config = { ...data }
+    dataRow['config'] = { ...data }
   }
-  console.log(dataSource.value, 'configState')
-  configurationStore.setDatasource(dataSource.value)
+  configurationStore.setALLlistDataInfo(
+    'datasource',
+    dataSource.value,
+    props.id,
+  )
   configState.type = ''
 }
 </script>

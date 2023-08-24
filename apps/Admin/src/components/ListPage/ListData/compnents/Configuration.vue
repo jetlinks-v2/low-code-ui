@@ -30,7 +30,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useListDataStore } from '@/store/listData'
 import EditorModal from '@/components/EditorModal'
 const props = defineProps({
   showSwitch: {
@@ -42,17 +41,20 @@ const props = defineProps({
     default: {},
   },
 })
+interface Emit {
+  (e: 'update:state', value: any): void
+}
+const emits = defineEmits<Emit>()
 const state = reactive({
   checked: props.config?.type === 'object' ? false : true,
   colLayout: props.config?.config?.colLayout || 'left',
   specialStyle: props.config?.config?.specialStyle || '',
 })
-const configurationStore = useListDataStore()
 
 watch(
   () => state,
   () => {
-    configurationStore.setListDataInfo(state)
+    emits('update:state', state)
   },
   { immediate: true, deep: true },
 )

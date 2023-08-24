@@ -21,14 +21,20 @@
 </template>
 
 <script lang="ts" setup>
-import { useFilterModuleStore } from '@/store/filterModule'
+import { useAllListDataStore } from '@/store/listForm'
 interface Emit {
   (e: 'update:state', value: any): void
 }
-
+const props = defineProps({
+  id: {
+    type: null,
+  },
+})
 const emits = defineEmits<Emit>()
-const configurationStore = useFilterModuleStore()
-const data = configurationStore.getConfigurationInfo('number')
+const configurationStore = useAllListDataStore()
+const data = configurationStore.getALLlistDataInfo(props.id).configurationInfo
+  ?.number
+
 const state = reactive({
   max: data?.max || null,
   min: data?.min || null,

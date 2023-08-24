@@ -32,8 +32,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { usePagingConfigStore } from '@/store/pagingConfig'
-const pagingConfigStore = usePagingConfigStore()
+import { useAllListDataStore } from '@/store/listForm'
+const pagingConfigStore = useAllListDataStore()
 const pagingData = ref([
   { pageSize: 12 },
   { pageSize: 24 },
@@ -51,10 +51,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  id: {
+    type: null,
+  },
 })
 
 const open = computed({
   get() {
+    if (props.open) {
+      pagingData.value = pagingConfigStore.getALLlistDataInfo(props.id).pagingData
+      console.log(pagingConfigStore.getALLlistDataInfo(props.id));
+      
+    }
     return props.open
   },
   set(val: boolean) {
@@ -87,10 +95,8 @@ const blur = () => {
   pagingData.value?.sort((a, b) => {
     return a.pageSize - b.pageSize
   })
-  pagingConfigStore.setPagingDataInfo(pagingData.value)
+  pagingConfigStore.setALLlistDataInfo('pagingData',pagingData.value,props.id)
 }
-onMounted(() => {
-  pagingData.value = pagingConfigStore.getPagingDataInfo()
-})
+
 </script>
 <style lang="less" scoped></style>

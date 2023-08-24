@@ -34,10 +34,10 @@
             返回
           </template>
         </a-page-header>
-        <EnumType v-if="type === 'enum'" @update:state="newValue => subValue = newValue"/>
-        <StringType v-if="type === 'string'" @update:state="newValue => subValue = newValue"/>
-        <NumberType v-if="type === 'number'" @update:state="newValue => subValue = newValue"/>
-        <DateType v-if="type === 'date'" @update:state="newValue => subValue = newValue"/>
+        <EnumType v-if="type === 'enum'" @update:state="newValue => subValue = newValue" :id="props.id"/>
+        <StringType v-if="type === 'string'" @update:state="newValue => subValue = newValue" :id="props.id"/>
+        <NumberType v-if="type === 'number'" @update:state="newValue => subValue = newValue" :id="props.id"/>
+        <DateType v-if="type === 'date'" @update:state="newValue => subValue = newValue" :id="props.id"/>
       </div>
 
       <template #footer v-if="type !== ''">
@@ -58,7 +58,7 @@ import EnumType from '@/components/ListPage/FilterModule/components/EnumType.vue
 import StringType from '@/components/ListPage/FilterModule/components/StringType.vue'
 import NumberType from '@/components/ListPage/FilterModule/components/NumberType.vue'
 import DateType from '@/components/ListPage/FilterModule/components/DateType.vue'
-import { useFilterModuleStore } from '@/store/filterModule'
+import { useAllListDataStore } from '@/store/listForm'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -70,6 +70,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  id: {
+    type: null,
+  }
 })
 
 const open = computed({
@@ -83,7 +86,7 @@ const open = computed({
 const type = ref('')
 const title = ref('请选择页面支持的筛选项')
 const addBtnName = ref('新增筛选项')
-const configurationStore = useFilterModuleStore()
+const configurationStore = useAllListDataStore()
 const subValue =ref({})
 //是否完成数据绑定
 const dataBind = ref(true)
@@ -221,20 +224,21 @@ const handleOk = (value: any) => {
 
 //保存
 const submit = () => {
-  configurationStore.setConfigurationInfo(subValue.value,type.value)
+  configurationStore.setALLlistDataInfo(type.value,subValue.value,props.id)
+  console.log(type.value,subValue.value,props.id);
   const dataRow = dataSource.value?.find(
     (item: any) => item?.id === configRow.value?.id,
   )
   if (dataRow) {
-    dataRow.config = { ...subValue.value }
+    dataRow['config'] = { ...subValue.value }
   }
-  configurationStore.setData(dataSource.value)
+  configurationStore.setALLlistDataInfo('searchData',dataSource.value,props.id)
   type.value = ''
 }
 watch(
   () => dataSource.value,
   () => {
-    configurationStore.setData(dataSource.value)
+    configurationStore.setALLlistDataInfo('searchData',dataSource.value,props.id)
   },
 )
 </script>

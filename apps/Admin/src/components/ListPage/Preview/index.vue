@@ -43,26 +43,25 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useListDataStore } from '@/store/listData'
-import { useListFormStore } from '@/store/listForm'
-import { useFilterModuleStore } from '@/store/filterModule'
-import { usePagingConfigStore } from '@/store/pagingConfig'
-import ProTable from '@/components/ListPage/tableModel.vue'
+import { useAllListDataStore } from '@/store/listForm'
+import ProTable from '@/components/ListPage/Preview/components/tableModel.vue'
 import dayjs from 'dayjs'
 import { router } from '@jetlinks/router'
-const listDataStore = useListDataStore()
-const listFormStore = useListFormStore()
-const filterModuleStore = useFilterModuleStore()
-const pagingConfigStore = usePagingConfigStore()
+const route = useRoute()
+const id = route.params.id
+const listDataStore = useAllListDataStore()
+const allData = ref<any>({})
+
 const dataColumns: any = ref([])
 const searchColumns: any = ref([])
 const typeChangeShow = ref(false)
 //操作按钮
-const actions = ref([{
+const actions = ref([
+  {
     key: 'view',
     text: '查看',
     icon: 'EyeOutlined',
-    type:'primary',
+    type: 'primary',
     permissionProps: (data) => ({
       tooltip: {
         title: '查看',
@@ -71,7 +70,7 @@ const actions = ref([{
 
       onClick: (e) => {
         console.log(data, 'data')
-        handleView(data.id)
+        // handleView(data.id)
       },
     }),
   },
@@ -79,7 +78,7 @@ const actions = ref([{
     key: 'view1',
     text: '查看1',
     icon: 'FormOutlined',
-    type:'primary',
+    type: 'primary',
     permissionProps: (data) => ({
       tooltip: {
         title: '查看',
@@ -88,14 +87,14 @@ const actions = ref([{
 
       onClick: (e) => {
         console.log(data)
-        handleView(data.id)
+        // handleView(data.id)
       },
     }),
   },
   {
     key: 'view2',
     text: '查看2',
-    type:'dashed',
+    type: 'dashed',
     icon: 'FrownOutlined',
     permissionProps: (data) => ({
       tooltip: {
@@ -104,7 +103,7 @@ const actions = ref([{
       hasPermission: false,
       onClick: (e) => {
         console.log(data)
-        handleView(data.id)
+        // handleView(data.id)
       },
     }),
   },
@@ -113,7 +112,7 @@ const actions = ref([{
     key: 'delete',
     text: '删除',
     icon: 'DeleteOutlined',
-    type:'primary',
+    type: 'primary',
     permissionProps: (data) => ({
       tooltip: {
         title: '删除',
@@ -129,13 +128,15 @@ const actions = ref([{
       //   handleView(data.id)
       // },
     }),
-  },])
+  },
+])
 //table头部按钮
-const headerActions = ref([{
+const headerActions = ref([
+  {
     key: 'view',
     text: '查看',
     icon: 'EyeOutlined',
-    type:'primary',
+    type: 'primary',
     permissionProps: (data) => ({
       tooltip: {
         title: '查看',
@@ -144,7 +145,7 @@ const headerActions = ref([{
 
       onClick: (e) => {
         console.log(data, 'data')
-        handleView(data.id)
+        // handleView(data.id)
       },
     }),
   },
@@ -152,7 +153,7 @@ const headerActions = ref([{
     key: 'view1',
     text: '查看1',
     icon: 'FormOutlined',
-    type:'primary',
+    type: 'primary',
     permissionProps: (data) => ({
       tooltip: {
         title: '查看',
@@ -161,14 +162,14 @@ const headerActions = ref([{
 
       onClick: (e) => {
         console.log(data)
-        handleView(data.id)
+        // handleView(data.id)
       },
     }),
   },
   {
     key: 'view2',
     text: '查看2',
-    type:'dashed',
+    type: 'dashed',
     icon: 'HeatMapOutlined',
   },
 
@@ -176,7 +177,7 @@ const headerActions = ref([{
     key: 'delete',
     text: '删除',
     icon: 'DeleteOutlined',
-    type:'primary',
+    type: 'primary',
     permissionProps: (data) => ({
       tooltip: {
         title: '删除',
@@ -192,7 +193,8 @@ const headerActions = ref([{
       //   handleView(data.id)
       // },
     }),
-  },])
+  },
+])
 //卡片样式
 const cardConfig = ref({
   customIcon: '',
@@ -241,7 +243,7 @@ const pagination = reactive({
   pageSizeOptions: ['12', '24', '48', '96'], //自定义每页显示多少条数据
 })
 const pagingData = () => {
-  const paging = pagingConfigStore.getPagingDataInfo() || []
+  const paging = allData.value?.pagingData || []
   let map = new Map()
   for (let item of paging) {
     map.set(item, item.pageSize)
@@ -251,7 +253,7 @@ const pagingData = () => {
 }
 //table头部
 const tableHeader = () => {
-  const cloumn = listDataStore.getDatasource() || []
+  const cloumn = allData.value?.datasource || []
   dataColumns.value = cloumn?.map((item: any) => {
     return {
       title: item.name,
@@ -309,7 +311,7 @@ const componentPropsSwitch = (item: any) => {
 }
 //筛选search
 const searchData = () => {
-  const cloumnS = filterModuleStore.getData() || []
+  const cloumnS = allData.value?.searchData || []
   searchColumns.value = cloumnS?.map((item: any) => {
     const placeholder = item.type === 'date' ? '请选择' : '请输入'
     const componentProps = componentPropsSwitch(item) || {}
@@ -330,7 +332,7 @@ const searchData = () => {
 }
 //table形态选择
 const typeData = () => {
-  const showType = listFormStore.getListFormType() || {}
+  const showType = allData.value?.showType || {}
   typeChangeShow.value = showType.configured?.length === 2
   model.value =
     showType.configured?.length === 2
@@ -340,7 +342,6 @@ const typeData = () => {
 
 const typeChange = (e: any) => {
   model.value = e?.target?.value
-  console.log(model.value, 'e:model.value')
 }
 //table数据
 const query = (_params: Record<string, any>) =>
@@ -382,10 +383,11 @@ const back = () => {
 }
 
 onMounted(() => {
+  allData.value = listDataStore.getALLlistDataInfo(id)
   //分页
   pagingData()
   //卡片样式
-  cardConfig.value = listFormStore.getListFormInfo() || {}
+  cardConfig.value = allData.value?.listFormInfo || {}
   //列表头部
   tableHeader()
   //筛选search
