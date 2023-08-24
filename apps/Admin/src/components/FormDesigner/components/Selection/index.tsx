@@ -49,7 +49,7 @@ const Selection = defineComponent({
     const isField = checkIsField(props.data)
 
     const Selected = computed(() => {
-      return props?.data?.key !== undefined && designer.selected?.value?.key === props?.data?.key
+      return props?.data?.key !== undefined && designer.selected?.key === props?.data?.key
     })
 
     const isEditModel = computed(() => {

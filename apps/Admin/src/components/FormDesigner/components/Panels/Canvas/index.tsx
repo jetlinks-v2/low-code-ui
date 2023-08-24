@@ -1,5 +1,5 @@
 import { useProps } from "@/components/FormDesigner/hooks"
-import { Form, Scrollbar, Button } from 'jetlinks-ui-components'
+import { Form, Scrollbar } from 'jetlinks-ui-components'
 import DraggableLayout from "../../Draggable/DraggableLayout"
 import './index.less'
 import { cloneDeep, omit } from "lodash-es"

@@ -1,10 +1,10 @@
 <template>
   <div class="container">
-    <Header />
+    <Header @save="onSave" />
     <div class="box">
       <div class="left"><Filed /></div>
       <div class="right">
-        <Canvas :data="formData" ref="formRef"></Canvas>
+        <Canvas :data="formData"></Canvas>
       </div>
       <div class="config" v-if="isShowConfig && model !== 'preview'">
         <Config />
@@ -18,7 +18,7 @@ import Header from './components/Header/index.vue'
 import Canvas from './components/Panels/Canvas/index'
 import Config from './components/Panels/Config/index.vue'
 import Filed from './components/Panels/Filed/index'
-import { provide, ref, reactive, watch, toRaw, unref } from 'vue'
+import { provide, ref, reactive, watch} from 'vue'
 import { ISchema } from './typings'
 // import { updateData } from './utils/utils'
 
@@ -99,32 +99,24 @@ const getFieldData = (data: ISchema) => {
   return _obj
 }
 
-// 修改数据
-// const modifyItem = (item: ISchema) => {
-//     if(unref(formData)?.key === item?.key) {
-//       Object.assign(formData, item)
-//     } else {
-//       Object.assign(formData, updateData(unref(formData)?.children || [], item))
-//     }
-// }
-
 provide('FormDesigner', {
   model,
   formData,
   isShowConfig,
   selected,
   formState,
+  formRef,
   setSelection,
   setModel
 })
 
 const onSave = () => {
   if (model.value !== 'edit') {
-    formRef.value
+    formRef?.value
       .validateFields()
       .then((values) => {
         console.log('Received values of form: ', values)
-        console.log('formState: ', toRaw(formState))
+        // console.log('formState: ', toRaw(formState))
       })
       .catch((info) => {
         console.log('Validate Failed:', info)

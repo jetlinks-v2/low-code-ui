@@ -38,9 +38,9 @@ const handleProps = (node: any) => {
             result.maxLength = result?.maxLength || 64
             break
         case 'input-number':
-            result.max = result?.max || Infinity
-            result.min = result?.min || Infinity
-            result.precision = result?.precision || 2
+            result.max = undefined
+            result.min = undefined
+            result.precision = undefined
             break
         case 'select-card':
             result.options = generateOptions(3)

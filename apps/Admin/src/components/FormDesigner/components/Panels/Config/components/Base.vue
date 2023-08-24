@@ -14,13 +14,14 @@
           'collapse',
           'space',
           'collapse-item',
-          'tabs-item'
+          'tabs-item',
         ].includes(type)
       "
     >
       <j-form-item
         label="名称"
         :name="['formItemProps', 'label']"
+        v-if="type !== 'text'"
         :rules="[
           {
             required: true,
@@ -31,19 +32,15 @@
       >
         <j-input
           placeholder="请输入"
+          :maxlength="64"
           v-model:value="target.formItemProps.label"
         />
       </j-form-item>
       <j-form-item
         label="标识"
         :name="['formItemProps', 'name']"
-        :rules="[
-          {
-            required: true,
-            message: '请输入',
-            trigger: 'change',
-          },
-        ]"
+        required
+        :rules="rules"
       >
         <j-input
           placeholder="请输入"
@@ -80,6 +77,7 @@
           <j-input
             placeholder="请输入"
             v-model:value="target.componentProps.placeholder"
+            :maxlength="32"
           />
         </j-form-item>
       </template>
@@ -184,6 +182,7 @@
         >
           <j-input
             placeholder="请输入"
+            :maxlength="64"
             v-model:value="target.componentProps.title"
           />
         </j-form-item>
@@ -200,7 +199,12 @@
           />
         </j-form-item>
         <template v-if="target.formItemProps.isLayout">
-          <j-form-item label="标识" :name="['formItemProps', 'name']" required>
+          <j-form-item
+            label="标识"
+            :name="['formItemProps', 'name']"
+            required
+            :rules="rules"
+          >
             <j-input
               placeholder="请输入"
               v-model:value="target.formItemProps.name"
@@ -209,6 +213,7 @@
           <j-form-item label="名称" :name="['formItemProps', 'label']" required>
             <j-input
               placeholder="请输入"
+              :maxlength="64"
               v-model:value="target.formItemProps.label"
             />
           </j-form-item>
@@ -218,10 +223,16 @@
         <j-form-item label="名称" :name="['componentProps', 'header']" required>
           <j-input
             placeholder="请输入"
+            :maxlength="64"
             v-model:value="target.componentProps.header"
           />
         </j-form-item>
-        <j-form-item label="标识" :name="['formItemProps', 'name']" required>
+        <j-form-item
+          label="标识"
+          :name="['formItemProps', 'name']"
+          required
+          :rules="rules"
+        >
           <j-input
             placeholder="请输入"
             v-model:value="target.formItemProps.name"
@@ -232,10 +243,16 @@
         <j-form-item label="名称" :name="['componentProps', 'tab']" required>
           <j-input
             placeholder="请输入"
+            :maxlength="64"
             v-model:value="target.componentProps.tab"
           />
         </j-form-item>
-        <j-form-item label="标识" :name="['formItemProps', 'name']" required>
+        <j-form-item
+          label="标识"
+          :name="['formItemProps', 'name']"
+          required
+          :rules="rules"
+        >
           <j-input
             placeholder="请输入"
             v-model:value="target.formItemProps.name"
@@ -260,4 +277,12 @@ const onSwitch = (_checked: boolean) => {
   target.value.formItemProps.label = _checked ? target.value.name : undefined
   target.value.formItemProps.name = undefined
 }
+
+const rules = [
+  { max: 64, message: '最多可输入64个字符' },
+  {
+    pattern: /^[a-zA-Z0-9_\-]+$/,
+    message: '标识只能由数字、字母、下划线、中划线组成',
+  },
+]
 </script>

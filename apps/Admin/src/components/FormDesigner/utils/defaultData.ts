@@ -50,7 +50,7 @@ export const basic: ISchema[] = [
     },
     {
         type: 'upload',
-        name: '上传',
+        name: '上传(未)',
         icon: 'DownloadOutlined',
     },
     {
@@ -60,7 +60,7 @@ export const basic: ISchema[] = [
     },
     {
         type: 'form',
-        name: '内嵌表单',
+        name: '内嵌表单(未)',
         icon: 'CalendarOutlined',
     },
     {
@@ -73,11 +73,11 @@ export const basic: ISchema[] = [
         name: '树选择',
         icon: 'CopyOutlined',
     },
-    {
-        type: 'tree',
-        name: '左侧树',
-        icon: 'DownloadOutlined',
-    },
+    // {
+    //     type: 'tree',
+    //     name: '左侧树',
+    //     icon: 'DownloadOutlined',
+    // },
     {
         type: 'date-picker',
         name: '日期选择',
@@ -100,12 +100,15 @@ export const basic: ISchema[] = [
     // },
     {
         type: 'table',
-        name: '表格',
+        name: '表格(未)',
         icon: 'AuditOutlined',
+        componentProps: {
+
+        }
     },
     {
         type: 'geo',
-        name: '地区',
+        name: '地区(未)',
         icon: 'FundOutlined',
     },
 ]
@@ -180,7 +183,7 @@ export const layout: ISchema[] = [
             isLayout: false
         },
         componentProps: {
-            type: '',
+            type: 'line',
             tabPosition: 'top',
             align: 'top',
             hidden: false
@@ -200,13 +203,12 @@ export const layout: ISchema[] = [
         type: 'space',
         name: '弹性间距',
         icon: 'AppstoreOutlined',
-        children: [
-            // {
-            //     type: 'space-item',
-            //     children: [],
-            // },
-        ],
-        componentProps: {}
+        children: [],
+        componentProps: {
+            align: 'start',
+            direction: 'horizontal',
+            size: 8
+        }
     },
 ]
 // 高级组件

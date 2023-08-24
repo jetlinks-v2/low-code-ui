@@ -32,6 +32,9 @@ import Status from './components/Status.vue'
 import Source from './components/Source.vue'
 import Form from './components/Form.vue'
 import Grid from './components/Grid.vue'
+import UploadLimit from './components/UploadLimit.vue'
+import TabsConfig from './components/TabsConfig.vue'
+import Space from './components/Space.vue'
 import { map } from 'lodash-es'
 import { getConfigList } from './utils'
 import { useTarget } from '../../../hooks'
@@ -54,6 +57,9 @@ const Panels = {
   Source,
   Form,
   Grid,
+  UploadLimit,
+  TabsConfig,
+  Space
 }
 
 const panelsList = computed(() => {
