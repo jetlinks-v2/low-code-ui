@@ -9,18 +9,7 @@
       model="TABLE"
     >
       <template #headerTitle>
-        <PermissionButton
-          v-for="item in props.headerActions"
-          :key="item.key"
-          :type="item.type"
-          v-bind:="handleFunction(item.permissionProps)"
-          style="margin-right: 10px"
-          :danger="item.key === 'delete'"
-          :popConfirm="handleFunction(item.permissionProps)?.popConfirm"
-        >
-        <!-- <AIcon v-if="item.icon" :type="item?.icon" /> -->
-          {{ item?.text }}
-        </PermissionButton>
+        <HeaderButton :headerActions="props.headerActions" />
       </template>
 
       <template #action="slotProps">
@@ -30,13 +19,13 @@
           type="link"
           v-bind:="handleFunction(item.permissionProps, slotProps)"
           style="padding: 0"
-          :danger="item.key === 'delete'"
+          :danger="item.command === 'Delete'"
           :popConfirm="
             handleFunction(item.permissionProps, slotProps)?.popConfirm
           "
         >
           <AIcon v-if="item.icon" :type="item?.icon" />
-          <!-- {{ item?.text }} -->
+          <span v-else>{{ item?.text }}</span>
           <j-divider type="vertical" />
         </PermissionButton>
       </template>
@@ -50,7 +39,7 @@
       model="CARD"
     >
       <template #headerTitle>
-        <j-button type="primary" @click="handleSave('add')">新增</j-button>
+        <HeaderButton :headerActions="props.headerActions" />
       </template>
       <template #card="slotProps">
         <Card
@@ -122,6 +111,7 @@
 </template>
 <script setup lang="ts">
 import Card from '@/components/Card'
+import HeaderButton from '@/components/ListPage/Preview/components/HederActions.vue'
 import { isFunction, isObject } from 'lodash-es'
 const props = defineProps({
   model: {
@@ -159,7 +149,7 @@ const props = defineProps({
     default: () => [],
   },
 })
-
+const isShowDropdown = ref('')
 const handleFunction = (item: any, data?: any) => {
   if (isFunction(item)) {
     return item(data)
