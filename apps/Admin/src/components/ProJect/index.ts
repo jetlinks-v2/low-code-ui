@@ -30,6 +30,34 @@ export const providerList = Object.keys(providerMap).map(key=>({
     value:key
 }))
 
+//右键操作类
+export const actionMap = {
+  Profile:{
+    key:'Profile',
+    value:'显示简介'
+  },
+  Add:{
+    key:'Add',
+    value:'新建'
+  },
+  Copy:{
+    key:'Copy',
+    value:'复制'
+  },
+  Paste:{
+    key:'Paste',
+    value:'粘贴'
+  },
+  Rename:{
+    key:'Rename',
+    value:'重命名'
+  },
+  Delete:{
+    key:'Delete',
+    value:'删除'
+  },
+}
+
 //重写id
 export const restId = (arr: any[]) => {
     const list = cloneDeep(arr)

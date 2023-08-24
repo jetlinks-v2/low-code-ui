@@ -73,6 +73,7 @@ const Filed = defineComponent({
                                                 onEnd={(e) => {
                                                     onEnd(e, designer)
                                                 }}
+                                                data-layout-type={'filed-item'}
                                             ></DragGableWrap>
                                         )
                                     }

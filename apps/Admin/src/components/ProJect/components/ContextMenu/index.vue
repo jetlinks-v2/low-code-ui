@@ -8,32 +8,30 @@
             top: y + 'px'
          }">
             <j-menu v-if="props.type === 'list'" @click="handleClick">
-               <j-menu-item key="Profile">显示简介</j-menu-item>
+               <j-menu-item :key="actionMap['Profile'].key">{{actionMap['Profile'].value}}</j-menu-item>
                <!-- <j-menu-item key="Cut">剪切</j-menu-item> -->
-               <j-menu-item key="Copy">复制</j-menu-item>
-               <j-menu-item key="Paste" :disabled="disabled">粘贴</j-menu-item>
-               <j-menu-item key="Rename">重命名</j-menu-item>
-               <j-menu-item key="Delete">删除</j-menu-item>
+               <j-menu-item :key="actionMap['Copy'].key">{{actionMap['Copy'].value  }}</j-menu-item>
+               <j-menu-item :key="actionMap['Paste'].key" :disabled="disabled">{{actionMap['Paste'].value  }}</j-menu-item>
+               <j-menu-item :key="actionMap['Rename'].key">{{actionMap['Rename'].value  }}</j-menu-item>
+               <j-menu-item :key="actionMap['Delete'].key">{{actionMap['Delete'].value  }}</j-menu-item>
             </j-menu>
 
             <j-menu v-else @click="handleClick">
-               <j-sub-menu key="Add" title="新建" style="width: 150px;">
-                  <j-menu-item key="Module">模块</j-menu-item>
+               <j-sub-menu :key="actionMap['Add'].key" :title="actionMap['Add'].value" style="width: 150px;">
+                  <j-menu-item :key="providerEnum.Module">{{ providerMap[providerEnum.Module] }}</j-menu-item>
                   <!-- <j-menu-item key="Resource">资源</j-menu-item> -->
 
-                  <j-sub-menu key="Page" title="页面" >
-                     <j-menu-item  key="HtmlPage">自定义html</j-menu-item>
-                     <j-menu-item  key="ListPage">列表页模版</j-menu-item>
-                     <j-menu-item  key="FormPage">表单页模版</j-menu-item>
+                  <j-sub-menu :key="providerEnum.Page" :title="providerMap[providerEnum.Page]" >
+                     <j-menu-item  :key="providerEnum.HtmlPage">{{ providerMap[providerEnum.HtmlPage] }}</j-menu-item>
+                     <j-menu-item  :key="providerEnum.ListPage">{{ providerMap[providerEnum.ListPage] }}</j-menu-item>
+                     <j-menu-item  :key="providerEnum.FormPage">{{ providerMap[providerEnum.FormPage] }}</j-menu-item>
                   </j-sub-menu>
 
-                  <j-menu-item key="CRUD">增删改查</j-menu-item>
-                  <j-menu-item key="SQL">SQL</j-menu-item>
-                  <j-menu-item key="Function">函数</j-menu-item>
+                  <j-menu-item :key="providerEnum.CRUD">{{ providerMap[providerEnum.CRUD] }}</j-menu-item>
+                  <j-menu-item :key="providerEnum.SQL">{{ providerMap[providerEnum.SQL] }}</j-menu-item>
+                  <j-menu-item :key="providerEnum.Function">{{ providerMap[providerEnum.Function] }}</j-menu-item>
                </j-sub-menu>
-               <j-menu-item key="Paste" :disabled="disabled">
-                  粘贴
-               </j-menu-item>
+               <j-menu-item :key="actionMap['Paste'].key" :disabled="disabled">{{actionMap['Paste'].value  }}</j-menu-item>
             </j-menu>
          </div>
       </Teleport>
@@ -43,6 +41,7 @@
 <script setup lang='ts' name="ContextMenu">
 import { useContextMenu } from '@/hooks/useContextMenu';
 import { useEngine } from '@/store'
+import { providerEnum,providerMap,actionMap } from '../../index'
 
 const engine = useEngine()
 

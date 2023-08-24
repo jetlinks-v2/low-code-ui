@@ -13,11 +13,21 @@ const props = defineProps({
     type: String,
     default: 'left'
   },
+  max: {
+    type: Number,
+    default: 50
+  },
+  min: {
+    type: Number,
+    default: 50
+  },
   style: {
     type: Object,
     default: () => ({})
   }
 })
+
+const emit = defineEmits(['move'])
 
 const dragBox = ref()
 const dragBoxLine = ref()
@@ -33,8 +43,12 @@ const lineClass = computed(() => {
 })
 
 useDragBox(dragBoxLine, dragBox, {
-  max: 1880,
-  position: ['left', 'right'].includes(props.position) ? 'x' : 'y'
+  max: props.max,
+  min: props.min,
+  position: ['left', 'right'].includes(props.position) ? 'x' : 'y',
+  move: (v) => {
+    emit('move', v)
+  }
 })
 
 
@@ -49,6 +63,11 @@ useDragBox(dragBoxLine, dragBox, {
 
   .drag-box-line {
     position: absolute;
+    z-index: 9;
+
+    &:hover {
+      background-color: #dfdfdf;
+    }
 
     &.left, &.right {
       height: 100%;
