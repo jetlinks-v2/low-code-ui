@@ -5,11 +5,14 @@ import {FormPreview} from './FormDesigner/index';
 
 import QuickEditTable from './QuickEditTable/index.vue'
 import Search from './Search'
-import DragBox from "./DragBox";
+import Menu from './Menu/index.vue'
+import Project from './ProJect/index.vue'
+import DragBox, { DragContent } from "./DragBox";
 import Card from "./Card";
 import BadgeStatus from "./BadgeStatus";
 import ProImage from './Image/index.vue'
 import EditorModal from './EditorModal'
+import CRUD from './Database'
 export default  {
     install(app: App) {
         app.component('TitleComponent', TitleComponent)
@@ -18,9 +21,13 @@ export default  {
           .component('QuickEditTable', QuickEditTable)
           .component('ProSearch', Search)
           .component('DragBox', DragBox)
+          .component('DragContent', DragContent)
           .component('Card', Card)
           .component('BadgeStatus', BadgeStatus)
           .component('ProImage', ProImage)
           .component('EditorModal', EditorModal)
+          .component('CRUD', CRUD)
+          .component('Menu', Menu)
+          .component('Project',Project)
     }
 }

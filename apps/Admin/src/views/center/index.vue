@@ -1,11 +1,11 @@
 <template>
   <page-container>
     <pro-search :columns="columns" target="code" @search="handleSearch" />
-    <JProTable ref="tableRef" model="TABLE" :columns="columns" :params="params" :request="queryProject">
+    <JProTable ref="tableRef" model="CARD" :columns="columns" :params="params" :request="queryProject" :gridColumn="3">
       <template #headerTitle>
         <j-button type="primary" @click="handleSave('add')">新增</j-button>
       </template>
-      <template #createTime="slotProps">
+      <!-- <template #createTime="slotProps">
         <span>{{ slotProps?.createTime ? dayjs(slotProps.createTime).format('YYYY-MM-DD HH:mm:ss') : '' }}</span>
       </template>
       <template #state="slotProps">{{ slotProps.state?.text }}</template>
@@ -55,24 +55,43 @@
             </j-tooltip>
           </j-popconfirm>
         </j-space>
+      </template> -->
+
+      <template #card="record">
+        <Card :actions="getActions(record)" :record="record" :status="record.runningState.value"
+          @click="_view(record.draftId)" :statusText="record.runningState.text" :statusNames="{
+            enabled: 'processing',
+            disabled: 'error',
+          }">
+          <template #content>
+            <div>项目标识：{{ record.id }}</div>
+            <div>项目名称：{{ record.name }}</div>
+            <div>创建时间：{{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}</div>
+            <div>最近发布：{{ record.createTime ? dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}</div>
+          </template>
+        </Card>
       </template>
+
     </JProTable>
     <Save v-if="visible" @close="handleClose" :data="current" :type="modelType" />
+    <Menu v-if="visibleMenu" @close="visibleMenu=false"/>
   </page-container>
 </template>
 
 <script lang="ts" setup name="index" >
 import Save from './Save/index.vue'
 import dayjs from 'dayjs';
-import { queryProject, delProject } from '@/api/project'
+import { queryProject, delProject, enableProject, disabledProject } from '@/api/project'
 import { onlyMessage } from '@/utils/comm';
 import { router } from '@jetlinks/router';
+import Menu from './Menu/index.vue'
 
 const params = ref<any>({})
 const tableRef = ref<Record<string, any>>({});
 const current = ref({})
 const modelType = ref<string>('add')
 const visible = ref<boolean>(false)
+const visibleMenu = ref<boolean>(false)
 
 const columns = [
   {
@@ -125,7 +144,7 @@ const columns = [
       type: 'select',
       options: [
         { label: '已发布', value: 'publish' },
-        { label: '未发布', value: 'unpublished'},
+        { label: '未发布', value: 'unpublished' },
       ],
     },
   },
@@ -143,9 +162,77 @@ const columns = [
   },
 ]
 
+const getActions = (record) => {
+  return [
+    {
+      key: 'edit',
+      text: '编辑',
+      permissionProps: (data) => ({
+        tooltip: {
+          title: '编辑',
+        },
+        hasPermission: false,
+        icon: 'EditOutlined',
+        onClick: () => {
+          handleSave('edit', data)
+        },
+      }),
+    },
+    {
+      key: 'action',
+      text: record.runningState.value === 'enabled' ? '禁用' : '启用',
+      permissionProps: {
+        tooltip: {
+          title: record.runningState.value === 'enabled' ? '禁用' : '启用',
+        },
+        popConfirm: {
+          title: record.runningState.value === 'enabled' ? '确认禁用？' : '确认启用？',
+          onConfirm: () => {
+            _action(record.id,record.runningState.value)
+          }
+        },
+        hasPermission: true,
+        // icon: 'EyeOutlined',
+      },
+    },
+    {
+      key: 'menu',
+      text: '菜单管理',
+      permissionProps: {
+        tooltip: {
+          title: '菜单管理',
+        },
+        hasPermission: true,
+        icon: 'EyeOutlined',
+        onClick: () => {
+          console.log(record)
+          visibleMenu.value = true
+        }
+      },
+    },
+    {
+      key: 'delete',
+      text: '删除',
+      permissionProps: (data) => ({
+        tooltip: {
+          title: data?.runningState.value === 'enabled' ? '启用状态的项目不支持删除' : '删除',
+        },
+
+        popConfirm: {
+          title: '确认删除？',
+          onConfirm: () => {
+            _del(data.id)
+          }
+        },
+        hasPermission: true,
+        // disabled:true,
+      }),
+    }
+  ]
+}
+
 
 const handleSearch = (data: any) => {
-  console.log('data',data)
   params.value = data
 }
 
@@ -160,13 +247,21 @@ const handleClose = () => {
   tableRef.value?.reload()
 }
 
-const _view = (id:string)=>{
+const _view = (id: string) => {
   router.replace(`/engine/${id}`)
 }
 
 const _del = async (id: string) => {
   const res = await delProject(id)
   if (res.status === 200) {
+    onlyMessage('操作成功')
+    tableRef.value?.reload()
+  }
+}
+
+const _action = async (id: string, type: string) => {
+  const res = type === 'enabled' ? await disabledProject(id) : await enableProject(id)
+  if(res.status === 200){
     onlyMessage('操作成功')
     tableRef.value?.reload()
   }

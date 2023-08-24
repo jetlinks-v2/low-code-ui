@@ -4,7 +4,7 @@
       <div>自由选配为 {{ props.data?.name }} 项目添加能力，快速完成项目搭建</div>
       <div class="module">
          <div>通用能力</div>
-         <div class="module-card" @click="onClick('Module')">
+         <div class="module-card" @click="onClick(providerEnum.Module)">
             <div>模块</div>
             <div>使用模块对项目进行分层管理</div>
          </div>
@@ -17,11 +17,11 @@
                <div>快速搭建业务功能页</div>
             </div>
             <div>
-               <div @click="onClick('HtmlPage')" style="height: 50px;width: 100px;" class="card-div" >自定义html</div>
-               <div @click="onClick('FormPage')" style="height: 95px;width: 100px;margin-top: 5px;" class="card-div">表单页模板</div>
+               <div @click="onClick(providerEnum.HtmlPage)" style="height: 50px;width: 100px;" class="card-div" >自定义html</div>
+               <div @click="onClick(providerEnum.FormPage)" style="height: 95px;width: 100px;margin-top: 5px;" class="card-div">表单页模板</div>
             </div>
             <div style="margin-left: 5px;">
-               <div @click="onClick('ListPage')" class="card-div" style="width: 100px;height: 85px;">列表页模板</div>
+               <div @click="onClick(providerEnum.ListPage)" class="card-div" style="width: 100px;height: 85px;">列表页模板</div>
                <div class="card-div" style="width: 100px;height: 60px;margin-top: 5px;">步骤式弹窗</div>
             </div>
          </div>
@@ -31,11 +31,11 @@
          <div class="java-card">
             <div class="left">
                <div style="display: flex;margin-bottom: 10px;">
-                  <div class="card-div" style="height: 60px;" @click="onClick('CRUD')">
+                  <div class="card-div" style="height: 60px;" @click="onClick(providerEnum.CRUD)">
                      <span>增删改查</span>
                      <span>用于管理业务数据、提供增删改查等能力</span>
                   </div>
-                  <div class="card-div" style="width: 150px;margin-left: 10px;" @click="onClick('SQL')">
+                  <div class="card-div" style="width: 150px;margin-left: 10px;" @click="onClick(providerEnum.SQL)">
                      <span>SQL</span>
                      <span>定制化查询能力</span>
                   </div>
@@ -51,7 +51,7 @@
                </div>
             </div>
 
-            <div class="right"  @click="onClick('Function')">
+            <div class="right"  @click="onClick(providerEnum.Function)">
                <div>函数</div>
                <div>使用脚本自定义业务逻辑</div>
             </div>
@@ -77,8 +77,8 @@ const provider = ref()
 const visible = ref<boolean>(false)
 
 const onClick = (type: string) => {
-   console.log('type',type)
-   provider.value = providerEnum[type]
+   // console.log('type',type)
+   provider.value = type
    visible.value = true
 }
 
@@ -104,6 +104,7 @@ const onSave = (data)=>{
 
       &:hover {
          background-color: #80ace5;
+         color: #EEE;
       }
    }
 }
@@ -130,6 +131,7 @@ const onSave = (data)=>{
 
          &:hover {
             background-color: #80ace5;
+            color: #EEE;
          }
       }
    }
@@ -167,6 +169,7 @@ const onSave = (data)=>{
 
             &:hover {
                background-color: #80ace5;
+               color: #EEE;
             }
          }
 
@@ -181,6 +184,7 @@ const onSave = (data)=>{
 
             &:hover {
                background-color: #80ace5;
+               color: #EEE;
             }
          }
       }
@@ -199,6 +203,7 @@ const onSave = (data)=>{
 
          &:hover {
             background-color: #80ace5;
+            color: #EEE;
          }
       }
    }

@@ -64,7 +64,6 @@ export default defineComponent({
                         unref(list).length ? <Tabs data-layout-type={'tabs'} {...props.data.componentProps}>
                             {
                                 unref(list).map((element) => {
-                                    console.log(element.componentProps)
                                     return (
                                         <TabPane key={element.key} {...element.componentProps}>
                                             <Selection

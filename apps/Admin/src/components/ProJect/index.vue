@@ -1,6 +1,6 @@
 
 <template>
-    <div>
+    <div style="width: 100%;">
         <List v-if="isShow" :data="list" /> 
         <Empty v-else/>
     </div>

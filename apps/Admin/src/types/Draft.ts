@@ -150,4 +150,6 @@ namespace Draft {
     type: 'html' | 'form' | 'list' | string
     code: string
   }
+
+  export type Command = 'GetTypes' | 'CheckTableName' | 'GetColumns' | 'CreateScriptCompletion'
 }
