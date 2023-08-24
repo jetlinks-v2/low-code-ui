@@ -20,7 +20,6 @@
 </template>
 <script setup lang="ts">
 import type { PropType } from 'vue';
-import { useOperationButton } from '@/store/operationButton';
 import type {
   AntTreeNodeDropEvent,
   TreeProps,
@@ -50,7 +49,6 @@ const btnTree = computed({
     emits('update:btnList', val)
   }
 })
-const operationButtonStore = useOperationButton();
 /**点击配置按钮 */
 const emits = defineEmits<Emit>();
 

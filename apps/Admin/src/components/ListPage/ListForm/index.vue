@@ -76,6 +76,7 @@
 import { useAllListDataStore } from '@/store/listForm'
 import Card from '@/components/ListPage/ListForm/components/card.vue'
 import { cloneDeep } from 'lodash-es'
+import { validListForm } from './utils/valid'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -169,6 +170,16 @@ const configuredChange = (value: string) => {
   state.defaultForm =
     state.configured?.length === 1 ? state.configured[0] : 'list'
 }
+
+const errorList = ref<any[]>([])
+const valid = () => {
+  errorList.value = validListForm(state, configurationStore.getALLlistDataInfo(props.id)?.listFormInfo)
+}
+
+defineExpose({
+  valid,
+  errorList
+})
 </script>
 
 <style lang="less" scoped>

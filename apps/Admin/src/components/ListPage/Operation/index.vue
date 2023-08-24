@@ -1,31 +1,33 @@
 <template>
-  <j-drawer
-    width="25vw"
-    :visible="_visible"
-    :title="type == 'columns' ? '操作列' : '添加按钮'"
-    @close="close"
-    destroy-on-close
-    :z-index="1000"
-    :placement="type == 'columns' ? 'left' : 'right'"
-  >
-    <BtnsList
-      v-model:data="columnsTree"
-      v-if="steps == 'BtnsList'"
-      v-model:steps="steps"
-    />
-    <Editbtn
-      v-else-if="steps == 'EditBtns'"
-      v-model:steps="steps"
-      ref="EditBtnsRef"
-    />
-    <BtnsType v-else-if="steps == 'BtnsType'" v-model:steps="steps" />
-    <template #footer v-if="steps == 'EditBtns'">
-      <a-button style="margin-right: 8px" @click="steps = 'BtnsList'"
-        >取消</a-button
-      >
-      <a-button type="primary" @click="save">确定</a-button>
-    </template>
-  </j-drawer>
+  <div class="operation-drawer">
+    <j-drawer
+      width="25vw"
+      :visible="_visible"
+      :title="type == 'columns' ? '操作列' : '添加按钮'"
+      @close="close"
+      destroy-on-close
+      :z-index="1000"
+      :placement="type == 'columns' ? 'left' : 'right'"
+    >
+      <BtnsList
+        v-model:data="columnsTree"
+        v-if="steps == 'BtnsList'"
+        v-model:steps="steps"
+      />
+      <Editbtn
+        v-else-if="steps == 'EditBtns'"
+        v-model:steps="steps"
+        ref="EditBtnsRef"
+      />
+      <BtnsType v-else-if="steps == 'BtnsType'" v-model:steps="steps" />
+      <template #footer v-if="steps == 'EditBtns'">
+        <a-button style="margin-right: 8px" @click="steps = 'BtnsList'"
+          >取消</a-button
+        >
+        <a-button type="primary" @click="save">确定</a-button>
+      </template>
+    </j-drawer>
+  </div>
 </template>
 <script setup lang="ts" name="OperationColumns">
 import BtnsList from './components/BtnsList.vue'
@@ -57,6 +59,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  initData: {
+    type: Object,
+    default: () => {}
+  }
 })
 
 const columnsTree = ref<OperationConfigTreeItem[]>([])
@@ -104,6 +110,12 @@ const valid = async () => {
   })
 }
 
+watch(() => props.initData, (val) => {
+  if(val) {
+    columnsTree.value = props.initData?.configurations?.code ? JSON.parse(props.initData?.configurations?.code) : []
+  }
+})
+
 provide(activeBtnKey, activeBtn)
 provide(columnsTreeKey, columnsTree)
 provide(editTypeKey, editType)
@@ -117,4 +129,5 @@ defineExpose({
   valid,
   errorList,
 })
+
 </script>

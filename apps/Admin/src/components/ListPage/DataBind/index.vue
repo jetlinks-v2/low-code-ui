@@ -5,7 +5,8 @@
         <j-select
           v-model:value="dataBind.data.function"
           style="width: 200px"
-          :disabled="dataBind.data.function !== ''"
+          :disabled="dataBind.data.function && dataBind.data.function !== ''"
+          placeholder="请选择功能"
         >
           <j-select-option
             v-for="item in functions"
@@ -16,11 +17,19 @@
           </j-select-option>
         </j-select>
       </j-form-item>
-      <j-form-item v-if="functions.find(item => item.id === dataBind.data.function)?.provider === 'rdb-sql-query'">
+      <j-form-item v-if="functions!.find(item => item.id === dataBind.data.function)?.provider === 'rdb-sql-query'">
         <j-select
           v-model:value="dataBind.data.command"
           style="width: 200px"
-        ></j-select>
+        >
+        <j-select-option
+          v-for="item in commands"
+          :value="item.id"
+          :key="item.id"
+        >
+          {{ item.name }}
+        </j-select-option>
+      </j-select>
       </j-form-item>
       <j-form-item>
         <j-button type="link" @click="handleModify">变更</j-button>
@@ -43,6 +52,8 @@
 <script setup lang="ts" name="DataBind">
 import { useProduct } from '@/store'
 import { storeToRefs } from 'pinia'
+import { queryCommand } from '@/api/project'
+import { functionsKey } from '../keys';
 
 const visible = ref(false)
 const handleValid = () => {
@@ -66,24 +77,37 @@ const props = defineProps({
 
 const { data } = storeToRefs(useProduct())
 
-const functions = computed(() => {
-  let arr: any[] = []
-  const treeToArr = (data: any[]) => {
-    data.forEach((item) => {
-      if (item.functions && item.functions.length) {
-        arr.push(...item.functions)
+const functions = inject(functionsKey)
+
+const commands = ref([
+  { name: '新增数据', id: 'Add' },
+  { name: '导入数据', id: 'Import' },
+  { name: '导出数据', id: 'Export' },
+  { name: '删除数据', id: 'Delete' },
+  { name: '更新数据', id: 'Update' },
+])
+
+/**查询功能下的指令 */
+const findCommand = async () => {
+  const params = {
+    modules: [
+        {
+        id: data.value?.[0].id,
+        name: data.value?.[0].name,
+        functions: [
+          functions!.value?.find(item => item.id === dataBind.data.function)
+        ]
       }
-      if (item.children) {
-        treeToArr(item.children)
-      }
-    })
+    ]
   }
-  treeToArr(data.value)
-  return arr
-})
+  const res = await queryCommand(params)
+  if(res.success) {
+    commands.value = res.result?.[0].command
+  }
+}
 
 const handleModify = () => {
-  if(dataBind.value.data.function && dataBind.value.data.function !== ''){
+  if(dataBind.data.function && dataBind.data.function !== ''){
     visible.value = true
   }
 }
@@ -92,6 +116,14 @@ const handleOk = () => {
   emits('modify')
   visible.value = false
 }
+
+
+watch(() => dataBind.data.function, () => {
+  if(dataBind.data?.function) {
+    dataBind.functionInfo = functions!.value.find(item => item.id === dataBind.data.function)
+    findCommand();
+  }
+}, {immediate: true, deep: true})
 /**树形结构转一维数组 */
 </script>
 
@@ -100,6 +132,7 @@ const handleOk = () => {
   padding: 20px;
   background-color: #ffffff;
   box-shadow: 0 1px 4px #0015291f;
+  margin-bottom: 5px;
 }
 .text {
   text-align: center;

@@ -34,10 +34,26 @@
             返回
           </template>
         </a-page-header>
-        <EnumType v-if="type === 'enum'" @update:state="newValue => subValue = newValue" :id="props.id"/>
-        <StringType v-if="type === 'string'" @update:state="newValue => subValue = newValue" :id="props.id"/>
-        <NumberType v-if="type === 'number'" @update:state="newValue => subValue = newValue" :id="props.id"/>
-        <DateType v-if="type === 'date'" @update:state="newValue => subValue = newValue" :id="props.id"/>
+        <EnumType
+          v-if="type === 'enum'"
+          @update:state="(newValue) => (subValue = newValue)"
+          :id="props.id"
+        />
+        <StringType
+          v-if="type === 'string'"
+          @update:state="(newValue) => (subValue = newValue)"
+          :id="props.id"
+        />
+        <NumberType
+          v-if="type === 'number'"
+          @update:state="(newValue) => (subValue = newValue)"
+          :id="props.id"
+        />
+        <DateType
+          v-if="type === 'date'"
+          @update:state="(newValue) => (subValue = newValue)"
+          :id="props.id"
+        />
       </div>
 
       <template #footer v-if="type !== ''">
@@ -59,6 +75,7 @@ import StringType from '@/components/ListPage/FilterModule/components/StringType
 import NumberType from '@/components/ListPage/FilterModule/components/NumberType.vue'
 import DateType from '@/components/ListPage/FilterModule/components/DateType.vue'
 import { useAllListDataStore } from '@/store/listForm'
+import { validFilterModule } from './utils/valid'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -72,7 +89,7 @@ const props = defineProps({
   },
   id: {
     type: null,
-  }
+  },
 })
 
 const open = computed({
@@ -87,13 +104,13 @@ const type = ref('')
 const title = ref('请选择页面支持的筛选项')
 const addBtnName = ref('新增筛选项')
 const configurationStore = useAllListDataStore()
-const subValue =ref({})
+const subValue = ref({})
 //是否完成数据绑定
-const dataBind = ref(true)
+const dataBind = ref(false)
 //是否同步数据绑定
 const asynData = ref(true)
 //数据是否有变动
-const dataChange = ref(true)
+const dataChange = ref(false)
 //处理方式弹窗activeKey
 const activeKey = ref('1')
 //筛选类型
@@ -175,29 +192,10 @@ const columns: any = [
     width: 140,
   },
 ]
+
+const dataBinds: any = inject('dataBind')
 //数据
-const dataSource = ref([
-  {
-    id: 'deviceId1',
-    name: 'date类型',
-    type: 'date',
-  },
-  {
-    id: 'deviceId2',
-    name: '枚举类型',
-    type: 'enum',
-  },
-  {
-    id: 'deviceId3',
-    name: '数字类型',
-    type: 'number',
-  },
-  {
-    id: 'deviceId4',
-    name: '字符串类型',
-    type: 'string',
-  },
-])
+const dataSource = ref([])
 //新增一列table
 const handleAdd = async (table: any) => {
   table.addItem({
@@ -224,22 +222,62 @@ const handleOk = (value: any) => {
 
 //保存
 const submit = () => {
-  configurationStore.setALLlistDataInfo(type.value,subValue.value,props.id)
-  console.log(type.value,subValue.value,props.id);
+  configurationStore.setALLlistDataInfo(type.value, subValue.value, props.id)
+  console.log(type.value, subValue.value, props.id)
   const dataRow = dataSource.value?.find(
     (item: any) => item?.id === configRow.value?.id,
   )
   if (dataRow) {
     dataRow['config'] = { ...subValue.value }
   }
-  configurationStore.setALLlistDataInfo('searchData',dataSource.value,props.id)
+  configurationStore.setALLlistDataInfo(
+    'searchData',
+    dataSource.value,
+    props.id,
+  )
   type.value = ''
 }
+
+/**
+ * 校验筛选模块配置
+ */
+const errorList:any = ref([])
+const valid = () => {
+  errorList.value = validFilterModule(dataSource.value)
+}
+
+defineExpose({
+  valid,
+  errorList,
+})
 watch(
   () => dataSource.value,
   () => {
-    configurationStore.setALLlistDataInfo('searchData',dataSource.value,props.id)
+    configurationStore.setALLlistDataInfo(
+      'searchData',
+      dataSource.value,
+      props.id,
+    )
   },
+)
+
+watch(
+  () => dataBinds,
+  () => {
+    if(dataBinds.functionInfo) {
+      dataBind.value = true;
+    } else {
+      dataBind.value = false
+    }
+    dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(item => {
+      return {
+        id: item.name,
+        name: item.name,
+        type: 'string'
+      }
+    })
+  },
+  { immediate: true, deep: true },
 )
 </script>
 

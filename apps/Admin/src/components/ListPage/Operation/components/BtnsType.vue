@@ -78,7 +78,7 @@ const type = inject(typeKey)
 const emits = defineEmits<Emit>()
 const handleEditBtn = (type: string, title: string, icon: string) => {
   if (editType!.value === 'add') {
-    activeBtn!.value = { type, title, icon, command: type, functions: dataBind.value.data?.function }
+    activeBtn!.value = { type, title, icon, command: type, functions: dataBind.data?.function }
   } else {
     activeBtn!.value = Object.assign(activeBtn!.value, { type, title, icon })
   }

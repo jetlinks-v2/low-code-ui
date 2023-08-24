@@ -1,47 +1,49 @@
 <template>
-  <j-space v-if="type == 'columns'">
-    <span>展示</span>
-    <j-switch v-model:checked="showColumns"></j-switch>
-  </j-space>
-  <template v-if="showColumns">
-    <div v-if="!columnsTree?.length">
-      <p>
-        {{
-          type == 'columns'
-            ? '请配置对单条数据支持操作'
-            : '请配置当前页面需要的操作按钮'
-        }}
-      </p>
-      <j-button @click="handleAddBtn()">{{
-        type == 'columns' ? '添加操作' : '添加按钮'
-      }}</j-button>
-    </div>
-    <div v-else>
-      <BtnTree
-        v-model:btn-list="columnsTree"
-        :draggable="type === 'columns' ? false : true"
-      >
-        <template #config="{ data }">
-          <j-button
-            type="link"
-            v-if="
-              data.type === 'customer' && data.level === 0 && type !== 'columns'
-            "
-            @click="handleAddBtn(data.key)"
-            >+下级</j-button
-          >
-          <j-button
-            type="link"
-            @click="handleEditBtn(data)"
-            :class="{ error: errorList!.find((item) => item.key == data.key) }"
-            >配置</j-button
-          >
-          <j-button type="link" @click="handleDel(data.key)">删除</j-button>
-        </template>
-      </BtnTree>
-      <j-button type="text" @click="handleAddBtn()">+ {{ type == 'columns' ? '添加操作' : '添加按钮' }}</j-button>
-    </div>
-  </template>
+  <div class="btns-list">
+    <j-space v-if="type == 'columns'">
+      <span>展示</span>
+      <j-switch v-model:checked="showColumns"></j-switch>
+    </j-space>
+    <template v-if="showColumns">
+      <div v-if="!columnsTree?.length">
+        <p>
+          {{
+            type == 'columns'
+              ? '请配置对单条数据支持操作'
+              : '请配置当前页面需要的操作按钮'
+          }}
+        </p>
+        <j-button @click="handleAddBtn()">{{
+          type == 'columns' ? '添加操作' : '添加按钮'
+        }}</j-button>
+      </div>
+      <div v-else>
+        <BtnTree
+          v-model:btn-list="columnsTree"
+          :draggable="type === 'columns' ? false : true"
+        >
+          <template #config="{ data }">
+            <j-button
+              type="link"
+              v-if="
+                data.type === 'customer' && data.level === 0 && type !== 'columns'
+              "
+              @click="handleAddBtn(data.key)"
+              >+下级</j-button
+            >
+            <j-button
+              type="link"
+              @click="handleEditBtn(data)"
+              :class="{ error: errorList!.find((item) => item.key == data.key) }"
+              >配置</j-button
+            >
+            <j-button type="link" @click="handleDel(data.key)">删除</j-button>
+          </template>
+        </BtnTree>
+        <j-button type="text" @click="handleAddBtn()">+ {{ type == 'columns' ? '添加操作' : '添加按钮' }}</j-button>
+      </div>
+    </template>
+  </div>
 </template>
 <script setup lang="ts" name="BtnsList">
 import BtnTree from './BtnTree.vue'

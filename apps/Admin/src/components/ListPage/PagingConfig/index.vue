@@ -8,7 +8,7 @@
       @close="emits('update:open', false)"
     >
       <p>请配置分页器支持的单页数据量</p>
-      <div style="display: flex; flex-flow: wrap">
+      <div style="display: flex; flex-flow: wrap;align-items: center;">
         <div v-for="(item, index) in pagingData" :key="index">
           <j-input-number
             style="margin: 10px"
@@ -21,12 +21,13 @@
             @pressEnter="blur()"
           />
           <span v-if="index < pagingData.length - 1">,</span>
-          <span
-            v-if="index === pagingData.length - 1 && pagingData.length < 99"
+          
+        </div>
+        <span
+            v-if="pagingData.length < 99"
           >
             <j-button type="text" @click="onAdd">+</j-button>
-          </span>
-        </div>
+        </span>
       </div>
     </j-drawer>
   </div>
@@ -71,11 +72,10 @@ const open = computed({
 })
 
 const onAdd = () => {
-  const value = pagingData.value[pagingData.value.length - 1].pageSize
-  console.log(value)
+  const value = pagingData.value[pagingData.value.length - 1]?.pageSize
 
   pagingData.value.push({
-    pageSize: value + 1,
+    pageSize: value ? value + 1 : 12,
   })
   blur()
 }
@@ -98,5 +98,22 @@ const blur = () => {
   pagingConfigStore.setALLlistDataInfo('pagingData',pagingData.value,props.id)
 }
 
+/**
+ * 校验
+ */
+const errorList = ref<string[]>([])
+const valid = () => {
+  if(pagingData.value.length) {
+    errorList.value = []
+  } else {
+    errorList.value = ['请配置分页器支持的单页数据量']
+  }
+  return errorList.value
+}
+
+defineExpose({
+  valid,
+  errorList
+})
 </script>
 <style lang="less" scoped></style>

@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia'
-import { cloneDeep } from 'lodash-es'
+import { clone, cloneDeep } from 'lodash-es'
 
 export const useAllListDataStore = defineStore('allListData', () => {
-  const listData = ref<any>([])
+  const listData = ref<any>(new Map())
   const listDataInfo = ref<any>({})
   const oranging = reactive<any>({
-    id: '',
     listFormInfo: {
       customIcon: '',
       dynamicIcon: '',
@@ -51,29 +50,27 @@ export const useAllListDataStore = defineStore('allListData', () => {
    * @param type
    */
   const setALLlistDataInfo = (type: string, data: any, id: string) => {
-    const index = listData.value.findIndex((item: any) => item.id === id)
-    console.log(index)
+    const record = listData.value.get(id)
 
     const configurationInfo =
       type === 'enum' ||
       type === 'string' ||
       type === 'number' ||
       type === 'date'
-    if (index !== -1) {
+    if (record) {
       if (configurationInfo) {
-        listData.value[index].configurationInfo[type] = data
+        record.configurationInfo[type] = data
       } else {
-        listData.value[index][type] = data
+        record[type] = data
       }
     } else {
-      listDataInfo.value = { ...oranging }
+      listDataInfo.value = cloneDeep(oranging)
       if (configurationInfo) {
         listDataInfo.value.configurationInfo[type] = data
       } else {
         listDataInfo.value[type] = data
       }
-      listDataInfo.value.id = id
-      listData.value.push(listDataInfo.value)
+      listData.value.set(id, listDataInfo.value)
     }
   }
   /**
@@ -84,7 +81,7 @@ export const useAllListDataStore = defineStore('allListData', () => {
   const getALLlistDataInfo = (id: any) => {
     console.log(id)
 
-    const data = listData.value.find((item: any) => item.id === id)
+    const data = listData.value.get(id)
     console.log(data)
 
     if (data) {
@@ -95,6 +92,8 @@ export const useAllListDataStore = defineStore('allListData', () => {
   }
 
   return {
+    listData,
+    listDataInfo,
     setALLlistDataInfo,
     getALLlistDataInfo,
   }

@@ -53,13 +53,12 @@
               <j-select
                 v-model:value="form.command"
                 placeholder="请选择调用指令"
-                disabled
               >
                 <j-select-option
                   v-for="item in commands"
-                  :value="item.value"
-                  :key="item.value"
-                  >{{ item.label }}</j-select-option
+                  :value="item.id"
+                  :key="item.id"
+                  >{{ item.name }}</j-select-option
                 >
               </j-select>
             </j-form-item>
@@ -67,7 +66,11 @@
         </j-row>
         <j-form-item
           label="调用页面"
-          v-if="activeBtn?.type === 'Add' || activeBtn?.type === 'Update' || activeBtn?.type === 'Detail'"
+          v-if="
+            activeBtn?.type === 'Add' ||
+            activeBtn?.type === 'Update' ||
+            activeBtn?.type === 'Detail'
+          "
           :validateStatus="errorMessage['pages'] ? 'error' : 'success'"
         >
           <template #extra v-if="errorMessage['pages']">
@@ -79,7 +82,7 @@
               :value="item.id"
               :key="item.id"
             >
-              {{ item.title }}
+              {{ item.name }}
             </j-select-option>
           </j-select>
         </j-form-item>
@@ -95,15 +98,17 @@
 import UploadIcon from './UploadIcon.vue'
 import { FormInstance } from 'jetlinks-ui-components'
 import { useProduct } from '@/store'
-import { omit } from 'lodash-es'
 import EditorModal from '@/components/EditorModal'
-import { activeBtnKey, errorListKey } from '../keys'
+import { activeBtnKey, errorListKey, editTypeKey } from '../keys'
+import { queryCommand } from '@/api/project'
+import { providerEnum } from '@/components/ProJect'
+import { functionsKey, pagesKey } from '../../keys'
 interface Emit {
   (e: 'update:steps', value: string): void
 }
 const props = defineProps({
   data: {
-    type: Array as PropType<Record<string, any>>,
+    type: Object as PropType<Record<string, any>>,
     default: () => {},
   },
   steps: {
@@ -112,11 +117,16 @@ const props = defineProps({
 })
 
 const activeBtn = inject(activeBtnKey)
+const editType = inject(editTypeKey)
 const errorList = inject(errorListKey)
+const functions = inject(functionsKey)
+const pages = inject(pagesKey)
 const errorMessage = computed(() => {
   let data = {}
-  let result = errorList!.value?.filter((item) => item.key === activeBtn?.value.key)
-  console.log(result);
+  let result = errorList!.value?.filter(
+    (item) => item.key === activeBtn?.value.key,
+  )
+  console.log(result)
   if (result) {
     result.forEach((item) => {
       data[item.errorKey] = item.message
@@ -126,33 +136,26 @@ const errorMessage = computed(() => {
 })
 const productStore = useProduct()
 
-const functions = ref<any[]>([])
-const pages = ref<any[]>([])
+const commands = ref()
 
-/**树形结构转一维数组 */
-const treeToArr = (data: any[]) => {
-  data.forEach((item) => {
-    if (item.functions && item.functions.length) {
-      functions.value.push(...item.functions)
-    }
-    if (item.type == 'page-code') {
-      pages.value.push(omit(item, 'children'))
-    }
-    if (item.children) {
-      treeToArr(item.children)
-    }
-  })
+/**查询功能下的指令 */
+const findCommand = async () => {
+  const params = {
+    modules: [
+      {
+        id: productStore.data?.[0].id,
+        name: productStore.data?.[0].name,
+        functions: [
+          functions!.value?.find((item) => item.id === form.functions),
+        ],
+      },
+    ],
+  }
+  const res = await queryCommand(params)
+  if (res.success) {
+    commands.value = res.result?.[0].command
+  }
 }
-
-treeToArr(productStore.data)
-
-const commands = [
-  { label: '新增数据', value: 'Add' },
-  { label: '导入数据', value: 'Import' },
-  { label: '导出数据', value: 'Export' },
-  { label: '删除数据', value: 'Delete' },
-  { label: '更新数据', value: 'Update' },
-]
 
 const formRef = ref<FormInstance>()
 const form = reactive({
@@ -161,7 +164,12 @@ const form = reactive({
   type: props.data.type,
   script: props.data.script,
   key: props.data.key,
-  functions: props.data.functions,
+  functions:
+    editType!.value === 'add' &&
+    functions!.value.find((item) => item.id === props.data.functions)
+      ?.provider === providerEnum.SQL
+      ? ''
+      : props.data.functions,
   pages: props.data.pages,
   command: props.data.command,
 })
@@ -177,6 +185,15 @@ const submit = async () => {
     : undefined
 }
 
+watch(
+  () => form.functions,
+  () => {
+    if (form.functions && form.functions !== '') {
+      findCommand()
+    }
+  },
+  { immediate: true },
+)
 defineExpose({
   submit,
 })
