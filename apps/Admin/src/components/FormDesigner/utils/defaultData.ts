@@ -211,22 +211,34 @@ const layout: ISchema[] = [
 // 高级组件
 const pro: ISchema[] = [
     {
-        type: 'input',
-        name: '产品选择',
+        type: 'tissue',
+        name: '组织选择',
         icon: 'UngroupOutlined',
     },
     {
-        type: 'textarea',
-        name: '组织选择',
+        type: 'user',
+        name: '用户选择',
         icon: 'CopyOutlined',
     },
     {
-        type: 'select',
-        name: '设备选择',
+        type: 'role',
+        name: '角色选择',
         icon: 'ForkOutlined',
     }
 ]
 
+const iot: ISchema[] = [
+    {
+        type: 'product',
+        name: '产品选择',
+        icon: 'icon-chanpin'
+    },
+    {
+        type: 'device',
+        name: '设备选择',
+        icon: 'icon-shebei'
+    }
+]
 export const filedData = [
     {
         id: 'basic',
@@ -242,5 +254,9 @@ export const filedData = [
         id: 'pro',
         name: '高级组件',
         children: [...pro]
+    },{
+        id: 'iot',
+        name: 'iot组件',
+        children: [...iot]
     }
 ]
