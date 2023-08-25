@@ -27,7 +27,7 @@ const defaultOptions: any = {
 type Run = (...args: any[]) => void
 
 export const useRequest = <T = any, S = any>(
-  request: (...args: any[]) => Promise<AxiosResponseRewrite<T>>,
+  request: Promise<AxiosResponseRewrite<T>>,
   options: Partial<RequestOptions<T, S>> = defaultOptions
 ): {
   data: Ref<S | undefined>,
