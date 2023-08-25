@@ -5,58 +5,6 @@
       <template #headerTitle>
         <j-button type="primary" @click="handleSave('add')">新增</j-button>
       </template>
-      <!-- <template #createTime="slotProps">
-        <span>{{ slotProps?.createTime ? dayjs(slotProps.createTime).format('YYYY-MM-DD HH:mm:ss') : '' }}</span>
-      </template>
-      <template #state="slotProps">{{ slotProps.state?.text }}</template>
-      <template #description="slotProps">
-        <div>{{ slotProps.description ? slotProps.description : '--' }}</div>
-      </template>
-      <template #action="slotProps">
-        <j-space :size="16">
-          <j-tooltip>
-            <template #title>
-              查看
-            </template>
-            <j-button type="link" style="padding: 0;" v-if="slotProps.state.value !== 'publish'" @click="_view(slotProps.draftId)">
-              <AIcon type="EyeOutlined" />
-            </j-button>
-            <j-dropdown v-else>
-              <j-button type="link" style="padding: 0">
-                <AIcon type="EyeOutlined" />
-              </j-button>
-              <template #overlay>
-                <j-menu>
-                  <j-menu-item>查看草稿</j-menu-item>
-                  <j-menu-item>查看已发布项目</j-menu-item>
-                </j-menu>
-              </template>
-            </j-dropdown>
-          </j-tooltip>
-
-          <j-tooltip>
-            <template #title>
-              编辑
-            </template>
-            <j-button type="link" style="padding: 0;" @click="handleSave('edit', slotProps)">
-              <AIcon type="EditOutlined" />
-            </j-button>
-          </j-tooltip>
-
-
-          <j-popconfirm title="确定删除？" :disabled="slotProps.state.value === 'publish'" @confirm="_del(slotProps.id)">
-            <j-tooltip>
-              <template #title>
-                {{ slotProps.state.value === 'publish' ? '已发布状态的项目不支持删除' : '删除' }}
-              </template>
-              <j-button type="link" style="padding: 0;" danger :disabled="slotProps.state.value === 'publish'">
-                <AIcon type="DeleteOutlined" />
-              </j-button>
-            </j-tooltip>
-          </j-popconfirm>
-        </j-space>
-      </template> -->
-
       <template #card="record">
         <Card :actions="getActions(record)" :record="record" :status="record.runningState.value"
           @click="_view(record.draftId)" :statusText="record.runningState.text" :statusNames="{
