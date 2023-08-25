@@ -52,7 +52,11 @@ export const onMove = (e: any, _data: any) => {
 }
 
 export const onEnd = (e: any, _data: any) => {
-    resetStates()
-    addContext(e.item?._underlying_vm_, e?.to?.__draggable_component__?.list)
-    _data.setSelection(e.item._underlying_vm_)
+    resetStates() 
+    if(e.to?.dataset?.layoutType !== 'filed-item') {
+        // field的数据
+        // _data.addFieldData(e.item?._underlying_vm_)
+        addContext(e.item?._underlying_vm_, e?.to?.__draggable_component__?.list)
+        _data.setSelection(e.item._underlying_vm_)
+    }
 }
