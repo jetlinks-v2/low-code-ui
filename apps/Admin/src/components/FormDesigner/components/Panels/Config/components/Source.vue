@@ -11,28 +11,8 @@
   </div>
 </template>
     
-    <script lang="ts" setup>
-import { reactive, watchEffect } from 'vue'
-const props = defineProps({
-  value: {
-    type: Object,
-    default: () => {},
-  },
-  type: {
-    type: String,
-    default: '',
-  },
-})
-const emits = defineEmits(['update:value', 'change'])
+<script lang="ts" setup>
+import { useTarget } from "../../../../hooks"
 
-const _data = reactive({ ...props.value })
-
-watchEffect(() => {
-  Object.assign(_data, props.value)
-})
-
-const onChange = () => {
-  emits('update:value', _data)
-  emits('change', _data)
-}
+const { target } = useTarget()
 </script>

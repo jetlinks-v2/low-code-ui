@@ -4,6 +4,7 @@
       v-model:activeKey="activeFile"
       hide-add
       type="editable-card"
+      class="content-tabs"
       @edit="onEdit"
       @tabClick="select"
     >
@@ -49,37 +50,60 @@ const select = (key) => {
 .content-files {
   //border-top: 1px solid #515665;
   //border-bottom: 1px solid #515665;
-
+  height: 100%;
   user-select: none;
 
-  :deep(.ant-tabs-nav) {
-    margin: 0;
+  .content-tabs {
+    height: 100%;
 
-    .ant-tabs-tab {
-      border-radius: 0 !important;
-      margin-left: 0px !important;
+    &>:deep(.ant-tabs) {
+      height: 100%;
 
-      &:not(:first-child) {
-        margin-left: 2px !important;
-      }
-
-      &.ant-tabs-tab-active {
-        background-color: #d6e4ff !important;
-
-        .ant-tabs-tab-btn {
-          color: #6a6a6a !important;
+      &>.ant-tabs-content-holder {
+        height: calc(100% - 36px);
+        &>.ant-tabs-content {
+          height: 100%;
         }
       }
-    }
 
-    .ant-tabs-nav-operations {
-      padding: 4px;
-      .ant-tabs-nav-more {
-        //background-color: #21252b !important;
-        //color: #fdd835;
-        padding: 2px 8px;
+      &>.ant-tabs-nav {
+        margin: 0;
+
+        &>.ant-tabs-nav-operations {
+          padding: 4px;
+          .ant-tabs-nav-more {
+            //background-color: #21252b !important;
+            //color: #fdd835;
+            padding: 2px 8px;
+          }
+        }
+
+        &>.ant-tabs-nav-wrap {
+          &>.ant-tabs-nav-list {
+            &>.ant-tabs-tab {
+              border-radius: 0 !important;
+              margin-left: 0px !important;
+
+              &:not(:first-child) {
+                margin-left: 2px !important;
+              }
+
+              &.ant-tabs-tab-active {
+                background-color: #d6e4ff !important;
+
+                .ant-tabs-tab-btn {
+                  color: #6a6a6a !important;
+                }
+              }
+            }
+          }
+        }
+
       }
     }
+
   }
+
+
 }
 </style>

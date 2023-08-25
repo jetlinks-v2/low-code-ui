@@ -1,6 +1,6 @@
 <template>
-  <div class="engine-tree">
-    <drag-box v-show="visible" position="right" style="width: 320px">
+  <div class="engine-tree" :style="{ flex: `0 0 ${collapsed ? width : 34}px` }">
+    <drag-box v-show="visible" position="right" :max="200" @move="move">
       <div style="overflow: hidden; height: 100%">
         <div class="engine-tree-content">
           <Search :collapsed="collapsed" @collapsed="collapsedChange" />
@@ -32,6 +32,7 @@ const { data } = storeToRefs(product)
 const collapsed = ref(true)
 const visible = ref(true)
 const route = useRoute()
+const width = ref(320)
 
 const collapsedChange = (e) => {
   collapsed.value = e
@@ -45,6 +46,10 @@ const collapsedChange = (e) => {
 const showTree = () => {
   collapsed.value = true
   visible.value = true
+}
+
+const move = (v) => {
+  width.value = v + 1
 }
 
 const productClass = computed(() => {
@@ -62,7 +67,6 @@ product.queryProduct(route.params.id)
 .engine-tree {
   //background-color: @layout-left;
   min-width: 0;
-  transition: all .15s;
   user-select: none;
   border-right: 1px solid #d1d1d1;
 

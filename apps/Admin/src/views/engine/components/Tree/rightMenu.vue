@@ -24,18 +24,20 @@
     <j-menu-item key="Profile">显示简介</j-menu-item> -->
     <j-menu-item :key="actionMap['Profile'].key">{{actionMap['Profile'].value}}</j-menu-item>
     <j-menu-item :key="actionMap['Copy'].key">{{actionMap['Copy'].value  }}</j-menu-item>
-    <j-menu-item :key="actionMap['Paste'].key" :disabled="disabled">{{actionMap['Paste'].value  }}</j-menu-item>
+    <j-menu-item :key="actionMap['Paste'].key" :disabled="!!copyFile">{{actionMap['Paste'].value  }}</j-menu-item>
     <j-menu-item :key="actionMap['Rename'].key">{{actionMap['Rename'].value  }}</j-menu-item>
     <j-menu-item :key="actionMap['Delete'].key">{{actionMap['Delete'].value  }}</j-menu-item>
   </j-menu>
 </template>
 
 <script setup name="RightClickMenu">
-import {useProduct} from "@/store";
+import { useProduct, useEngine } from "@/store";
 import { randomString } from '@jetlinks/utils'
 import {providerMap, providerEnum,actionMap} from  '@/components/ProJect/index'
+import { storeToRefs } from 'pinia'
 
 const product = useProduct()
+const engine = useEngine()
 
 const props = defineProps({
   node: {
@@ -43,10 +45,13 @@ const props = defineProps({
     default: () => ({})
   }
 })
+
+const {copyFile} = storeToRefs(engine)
+
 const onContextMenuClick = (node, menuKey) => {
   console.log(node, menuKey)
   switch(menuKey) {
-    case 'module':
+    case providerEnum.Module:
       product.add({
         id: randomString(16),
         title: '测试新增_'+menuKey,
@@ -55,13 +60,12 @@ const onContextMenuClick = (node, menuKey) => {
         parentId: node.parentId
       }, node.parentId)
       break
-    case 'Resource':
-    case 'HtmlPage':
-    case 'ListPage':
-    case 'FormPage':
-    case 'CRUD':
-    case 'SQL':
-    case 'Function':
+    case providerEnum.HtmlPage:
+    case providerEnum.ListPage:
+    case providerEnum.FormPage:
+    case providerEnum.CRUD:
+    case providerEnum.SQL:
+    case providerEnum.Function:
       product.add({
         id: randomString(16),
         title: '测试新增_'+menuKey,
