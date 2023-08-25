@@ -22,6 +22,7 @@
     "jetlinks-ui-components": "^1.0.29",
     "jsencrypt": "^3.3.2",
     "lodash-es": "^4.17.21",
+    "pubsub-js": "^1.9.4",
     "vue": "^3.3.4"
   }
 }
