@@ -18,7 +18,7 @@ export default  {
     install(app: App) {
         app.component('TitleComponent', TitleComponent)
           .component('ImageUpload', ImageUpload)
-          .component('FormDesigner', FormDesigner)
+          .component('FormPreview', FormPreview)
           .component('QuickEditTable', QuickEditTable)
           .component('ProSearch', Search)
           .component('DragBox', DragBox)
@@ -27,6 +27,7 @@ export default  {
           .component('BadgeStatus', BadgeStatus)
           .component('ProImage', ProImage)
           .component('EditorModal', EditorModal)
+          .component('ListPage', ListPage)
           .component('CRUD', CRUD)
           .component('Menu', Menu)
           .component('Project',Project)

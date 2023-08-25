@@ -1,7 +1,7 @@
 import { ISchema } from "../typings";
 
 // 基础组件
-const basic: ISchema[] = [
+export const basic: ISchema[] = [
     {
         type: 'input',
         name: '文本框',
@@ -19,6 +19,11 @@ const basic: ISchema[] = [
         type: 'textarea',
         name: '文本域',
         icon: 'EditOutlined',
+    },
+    {
+        type: 'input-number',
+        name: '数字输入',
+        icon: 'SnippetsOutlined'
     },
     {
         type: 'select-card',
@@ -44,23 +49,18 @@ const basic: ISchema[] = [
         icon: 'OrderedListOutlined',
     },
     {
+        type: 'upload',
+        name: '上传(未)',
+        icon: 'DownloadOutlined',
+    },
+    {
         type: 'switch',
         name: '开关',
         icon: 'BarsOutlined',
     },
     {
-        type: 'upload-button',
-        name: '按钮上传',
-        icon: 'DownloadOutlined',
-    },
-    {
-        type: 'upload-draggable',
-        name: '拖拽上传',
-        icon: 'CloudDownloadOutlined',
-    },
-    {
         type: 'form',
-        name: '内嵌表单',
+        name: '内嵌表单(未)',
         icon: 'CalendarOutlined',
     },
     {
@@ -73,34 +73,47 @@ const basic: ISchema[] = [
         name: '树选择',
         icon: 'CopyOutlined',
     },
-    {
-        type: 'tree',
-        name: '左侧树',
-        icon: 'DownloadOutlined',
-    },
+    // {
+    //     type: 'tree',
+    //     name: '左侧树',
+    //     icon: 'DownloadOutlined',
+    // },
     {
         type: 'date-picker',
         name: '日期选择',
         icon: 'ContactsOutlined',
     },
-    {
-        type: 'range-picker',
-        name: '日期范围',
-        icon: 'FundOutlined',
-    },
+    // {
+    //     type: 'range-picker',
+    //     name: '日期范围',
+    //     icon: 'FundOutlined',
+    // },
     {
         type: 'time-picker',
         name: '时间选择',
         icon: 'BlockOutlined',
     },
+    // {
+    //     type: 'time-range-picker',
+    //     name: '时间范围',
+    //     icon: 'AuditOutlined',
+    // },
     {
-        type: 'time-range-picker',
-        name: '时间范围',
+        type: 'table',
+        name: '表格(未)',
         icon: 'AuditOutlined',
-    }
+        componentProps: {
+
+        }
+    },
+    {
+        type: 'geo',
+        name: '地区(未)',
+        icon: 'FundOutlined',
+    },
 ]
 
-const layout: ISchema[] = [
+export const layout: ISchema[] = [
     {
         type: 'card',
         name: '卡片',
@@ -108,6 +121,9 @@ const layout: ISchema[] = [
         componentProps: {
             title: '卡片',
             extra: ''
+        },
+        formItemProps: {
+            isLayout: false
         },
         children: [
             {
@@ -162,24 +178,12 @@ const layout: ISchema[] = [
         type: 'tabs',
         name: '选项卡',
         icon: 'ScheduleOutlined',
-        children: [
-            // {
-            //     type: 'tabs-item',
-            //     children: [],
-            //     componentProps: {
-            //         tab: 'Tab 1'
-            //     }
-            // },
-            // {
-            //     type: 'tabs-item',
-            //     children: [],
-            //     componentProps: {
-            //         tab: 'Tab 2'
-            //     }
-            // }
-        ],
+        children: [],
+        formItemProps: {
+            isLayout: false
+        },
         componentProps: {
-            type: '',
+            type: 'line',
             tabPosition: 'top',
             align: 'top',
             hidden: false
@@ -189,27 +193,26 @@ const layout: ISchema[] = [
         type: 'collapse',
         name: '折叠面板',
         icon: 'CopyOutlined',
-        children: [
-            // {
-            //     type: 'collapse-item',
-            //     children: [],
-            //     componentProps: {
-            //         header: 'Collapse 1'
-            //     }
-            // },
-            // {
-            //     type: 'collapse-item',
-            //     children: [],
-            //     componentProps: {
-            //         header: 'Collapse 2'
-            //     }
-            // }
-        ],
+        children: [],
+        formItemProps: {
+            isLayout: false
+        },
         componentProps: {}
+    },
+    {
+        type: 'space',
+        name: '弹性间距',
+        icon: 'AppstoreOutlined',
+        children: [],
+        componentProps: {
+            align: 'start',
+            direction: 'horizontal',
+            size: 8
+        }
     },
 ]
 // 高级组件
-const pro: ISchema[] = [
+export const pro: ISchema[] = [
     {
         type: 'input',
         name: '产品选择',

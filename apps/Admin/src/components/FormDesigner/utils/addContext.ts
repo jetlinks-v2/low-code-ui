@@ -127,12 +127,12 @@ const onAppendItem = (node: any) => {
             break
         case 'tabs':
             _props.componentProps = {
-                tab: 'Tab' + (node.children?.length + 1)
+                tab: 'Tab' + uid(6)
             }
             break
         case 'collapse':
             _props.componentProps = {
-                header: 'Collapse' + (node.children?.length + 1)
+                header: 'Collapse' + uid(6)
             }
             break
     }
@@ -239,6 +239,9 @@ export const addContext = (node: any, parent: any, fn?: any) => {
                     break
             }
         },
+        modifyItem(props){
+            // node = { ...props }
+        }
     }
     Object.defineProperty(node, 'context', {
         value: context,

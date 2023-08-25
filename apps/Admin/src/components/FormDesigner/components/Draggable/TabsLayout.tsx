@@ -1,8 +1,9 @@
 import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
-import { Tabs, TabPane } from 'jetlinks-ui-components'
+import { Tabs, TabPane, FormItem } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
+import { cloneDeep } from 'lodash-es'
 
 export default defineComponent({
     name: 'TabsLayout',
@@ -17,6 +18,14 @@ export default defineComponent({
             type: Array,
             default: () => []
         },
+        path: {
+            type: Array,
+            default: () => []
+        },
+        index: {
+            type: Number,
+            default: 0
+        }
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
@@ -33,9 +42,24 @@ export default defineComponent({
         const isEditModel = computed(() => {
             return unref(designer?.model) === 'edit'
         })
+
+        const _formItemProps = computed(() => {
+            return props.data?.formItemProps
+        })
+
+        const _isLayout = computed(() => {
+            return props.data?.formItemProps.isLayout
+        })
+
         return () => {
-            return (
-                <Selection {...useAttrs()} style={{ padding: '16px' }} hasDel={true} hasCopy={true} hasDrag={true} hasAdd={true} data={props.data} parent={props.parent}>
+            const _path = cloneDeep(props?.path || []);
+            const _index = props?.index || 0;
+            if (props.data?.formItemProps?.name) {
+                _path[_index] = props.data.formItemProps.name
+            }
+
+            const renderContent = () => {
+                return <>
                     {
                         unref(list).length ? <Tabs data-layout-type={'tabs'} {...props.data.componentProps}>
                             {
@@ -49,11 +73,17 @@ export default defineComponent({
                                                 hasCopy={true}
                                                 hasDel={true}
                                                 parent={unref(list)}
+                                                style={{
+                                                    padding: '20px 10px'
+                                                }}
                                             >
                                                 <DraggableLayout
                                                     data-layout-type={'tabs-item'}
                                                     data={element.children}
-                                                    parent={element} />
+                                                    parent={element}
+                                                    path={_path}
+                                                    index={_index + 1}
+                                                />
                                             </Selection>
                                         </TabPane>
                                     )
@@ -66,6 +96,18 @@ export default defineComponent({
                         <div class="draggable-add">
                             <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}>添加选项卡</div>
                         </div>
+                    }
+                </>
+            }
+
+            return (
+                <Selection {...useAttrs()} style={{ padding: '16px' }} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
+                    {
+                        unref(_isLayout) ?
+                            <FormItem {...unref(_formItemProps)}>
+                                {renderContent()}
+                            </FormItem>
+                            : renderContent()
                     }
                 </Selection>
             )
