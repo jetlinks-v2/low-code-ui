@@ -58,13 +58,6 @@ import { SETTING_FORM_MODEL, SETTING_FORM_REF } from "@/components/Database/util
 import {inject} from "vue";
 import Spec from './Spec.vue'
 
-const props = defineProps({
-  form: {
-    type: Object,
-    default: () => ({})
-  }
-})
-
 const model = inject(SETTING_FORM_MODEL, {})
 const formRef = inject(SETTING_FORM_REF)
 
@@ -108,9 +101,10 @@ const rules = {
   max: [
     {
       validator(_, value) {
-        setTimeout(() => {
-          formRef.value.clearValidate(['validator', 'configuration', 'min'])
-        }, 1000)
+        if (value < model.value.validator.configuration.min) {
+          formRef.value.validateFields(['validator', 'configuration', 'min'])
+          return Promise.reject()
+        }
         return Promise.resolve()
       }
     }

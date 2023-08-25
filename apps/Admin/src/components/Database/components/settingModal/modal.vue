@@ -10,8 +10,7 @@
       :model="formModel"
       layout="vertical"
     >
-<!--      <component :is="componentName" :form="formRef" />-->
-      <NumberItem v-if="visible === 'number'" />
+      <component :is="componentName" :form="formRef" />
     </j-form>
   </j-modal>
 </template>
@@ -35,7 +34,6 @@ const emit = defineEmits(['cancel', 'save'])
 
 const formRef = ref()
 const formModel = ref({})
-const visible = ref('')
 
 provide(SETTING_FORM_MODEL, formModel)
 provide(SETTING_FORM_REF, formRef)
@@ -98,7 +96,6 @@ const componentName = computed(() => {
         spec,
         ...setting
       }
-      visible.value = 'number'
       return NumberItem;
     case 'List':
       formModel.value = {
@@ -135,92 +132,6 @@ const save = () => {
     }
   })
 }
-
-const handleComponents = () => {
-  const { javaType, ...setting } = props.data
-
-  const spec = {
-    canImport: false,
-    canExport: false
-  }
-  console.log(javaType)
-  switch(javaType) {
-    case 'Enum':
-      formModel.value = {
-        dictionary: {
-          dictionaryId: undefined,
-          multiple: undefined
-        },
-        spec,
-        ...setting
-      }
-      return EnumItem;
-    case 'String':
-    case 'Byte':
-    case 'Long':
-      formModel.value = {
-        defaultValueSpec: {
-          fixValue: undefined
-        },
-        validator: {
-          provider: undefined,
-          configuration: {
-            message: undefined,
-            group: undefined
-          }
-        },
-        spec,
-        ...setting
-      }
-      return StringItem;
-    case 'Double':
-    case 'Int':
-    case 'Float':
-    case 'BigDecimal':
-    case 'BigInteger':
-      formModel.value = {
-        defaultValueSpec: {
-          fixValue: undefined
-        },
-        validator: {
-          provider: undefined,
-          configuration: {
-            message: undefined,
-            group: undefined,
-            classType: javaType,
-            regexp: undefined
-          }
-        },
-        spec,
-        ...setting
-      }
-      visible.value = 'number'
-      return NumberItem;
-    case 'List':
-      formModel.value = {
-        defaultValueSpec: {
-          fixValue: undefined
-        },
-        spec,
-        ...setting
-      }
-      return ListItem;
-    case 'Map':
-
-      formModel.value = {
-        others: {
-
-        },
-        spec,
-        ...setting
-      }
-      return MapItem;
-  }
-}
-
-watch(() => props.data.javaType, () =>{
-  handleComponents()
-}, { immediate: true })
 
 </script>
 
