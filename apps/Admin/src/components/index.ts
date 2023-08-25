@@ -1,6 +1,8 @@
 import type { App } from 'vue'
 import TitleComponent from './TitleComponent/index.vue'
 import ImageUpload from "./Upload/Image/ImageUpload.vue";
+import FormDesigner from './FormDesigner/index.vue';
+import ListPage from './ListPage/index.vue';
 import {FormPreview} from './FormDesigner/index';
 
 import QuickEditTable from './QuickEditTable/index.vue'
@@ -26,6 +28,7 @@ export default  {
           .component('BadgeStatus', BadgeStatus)
           .component('ProImage', ProImage)
           .component('EditorModal', EditorModal)
+          .component('ListPage', ListPage)
           .component('CRUD', CRUD)
           .component('Menu', Menu)
           .component('Project',Project)
