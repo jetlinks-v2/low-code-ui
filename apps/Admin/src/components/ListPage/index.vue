@@ -18,10 +18,12 @@
     <OperationColumns
       v-model:open="visibles.OperationBtnsVisible"
       type="btns"
+      :initData="allListData?.addButton"
       ref="btnTreeRef"
     />
     <OperationColumns
       v-model:open="visibles.OperationColumnsVisible"
+      :initData="allListData?.actionsButton"
       type="columns"
       ref="columnsRef"
     />
@@ -30,7 +32,7 @@
       :id="props.data.id"
       ref="filterModuleRef"
     />
-    <ListData v-model:open="visibles.ListDataVisible" :id="props.data.id" />
+    <ListData v-model:open="visibles.ListDataVisible" :id="props.data.id" ref="listDataRef"/>
     <ListForm v-model:open="visibles.ListFormVisible" :id="props.data.id" ref="listFormRef"/>
     <PagingConfig
       v-model:open="visibles.PagingConfigVisible"
@@ -53,7 +55,7 @@ import OperationColumns from './Operation/index.vue'
 import { router } from '@jetlinks/router'
 import { useAllListDataStore } from '@/store/listForm'
 import { omit } from 'lodash-es'
-import { functionsKey, pagesKey } from './keys'
+import { functionsKey, pagesKey, DATA_BIND } from './keys'
 import { useProduct } from '@/store'
 
 const props = defineProps({
@@ -79,6 +81,9 @@ const visibles = reactive({
   MenuConfigVisible: false,
 })
 
+const allListData = computed(() => {
+  return configurationStore.getALLlistDataInfo(props.data.id)
+})
 const handleVisible = (key: string, value: boolean) => {
   visibles[key] = value
 }
@@ -103,10 +108,11 @@ const columnsRef = ref()
 const filterModuleRef = ref()
 const pagingConfigRef = ref()
 const listFormRef = ref()
+const listDataRef = ref()
 const handleValid = async () => {
   const res = await btnTreeRef.value?.valid()
   columnsRef.value?.valid()
-  // filterModuleRef.value?.valid()
+  filterModuleRef.value?.valid()
   pagingConfigRef.value?.valid()
   listFormRef.value?.valid()
 }
@@ -116,7 +122,9 @@ const errorCount = computed(() => {
     btn: btnTreeRef.value?.errorList.length,
     actions: columnsRef.value?.errorList.length,
     pagination: pagingConfigRef.value?.errorList.length,
-    listForm: listFormRef.value?.errorList.length
+    listForm: listFormRef.value?.errorList.length,
+    filterModule: filterModuleRef.value?.errorList.length,
+    listData: listDataRef.value?.errorList.length
   }
 })
 
@@ -124,6 +132,9 @@ const configDone = computed(() => {
   return {
     btn: btnTreeRef.value?.columnsTree.length,
     actions: columnsRef.value?.columnsTree.length,
+    filterModule: configurationStore.getALLlistDataInfo(props.data.id)?.searchData?.length,
+    listData: configurationStore.getALLlistDataInfo(props.data.id)?.datasource?.length,
+    pagination: configurationStore.getALLlistDataInfo(props.data.id)?.pagingData?.length,
   }
 })
 

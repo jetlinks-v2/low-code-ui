@@ -21,6 +21,7 @@
         @configuration="configuration"
         @confirm="confirm"
         @handleOk="handleOk"
+        @handleChange="handleChange"
         v-if="configState.type === ''"
       />
       <div v-else>
@@ -377,6 +378,16 @@ const handleAdd = async (table: any) => {
 //删除
 const confirm = (data: any) => {
   console.log(data, 'confirm')
+}
+
+const handleChange = (data) => {
+  dataSource.value = data;
+  // submit()
+  configurationStore.setALLlistDataInfo(
+    'datasource',
+    dataSource.value,
+    props.id,
+  )
 }
 const configRow = ref()
 //配置

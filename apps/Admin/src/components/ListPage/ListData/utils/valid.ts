@@ -1,4 +1,4 @@
-export const validFilterModule = async (list: any[]): Promise<any[]> => {
+export const validListData = async (list: any[]): Promise<any[]> => {
   console.log(list);
   let errorList: any = [];
   list.forEach(item => {

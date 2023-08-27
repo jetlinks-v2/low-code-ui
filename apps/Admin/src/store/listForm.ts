@@ -35,6 +35,11 @@ export const useAllListDataStore = defineStore('allListData', () => {
     listDataInfo: {},
     datasource: [],
     searchData: [],
+    dataBind: {
+      function: undefined,
+      command: undefined,
+      functionInfo: []
+    },
     configurationInfo: {
       enum: {},
       string: {},

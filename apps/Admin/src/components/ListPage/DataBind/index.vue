@@ -5,7 +5,7 @@
         <j-select
           v-model:value="dataBind.data.function"
           style="width: 200px"
-          :disabled="dataBind.data.function && dataBind.data.function !== ''"
+          :disabled="functionDisabled"
           placeholder="请选择功能"
         >
           <j-select-option
@@ -53,7 +53,7 @@
 import { useProduct } from '@/store'
 import { storeToRefs } from 'pinia'
 import { queryCommand } from '@/api/project'
-import { functionsKey } from '../keys';
+import { functionsKey, DATA_BIND } from '../keys';
 
 const visible = ref(false)
 const handleValid = () => {
@@ -76,6 +76,10 @@ const props = defineProps({
 })
 
 const { data } = storeToRefs(useProduct())
+
+const functionDisabled = computed(() => {
+  return dataBind.data.function && dataBind.data.function !== ''
+})
 
 const functions = inject(functionsKey)
 
@@ -107,7 +111,7 @@ const findCommand = async () => {
 }
 
 const handleModify = () => {
-  if(dataBind.data.function && dataBind.data.function !== ''){
+  if(dataBind?.data?.function !== ''){
     visible.value = true
   }
 }
@@ -118,12 +122,13 @@ const handleOk = () => {
 }
 
 
-watch(() => dataBind.data.function, () => {
-  if(dataBind.data?.function) {
+watchEffect(() => {
+  if(dataBind?.data?.function) {
     dataBind.functionInfo = functions!.value.find(item => item.id === dataBind.data.function)
     findCommand();
   }
-}, {immediate: true, deep: true})
+})
+
 /**树形结构转一维数组 */
 </script>
 

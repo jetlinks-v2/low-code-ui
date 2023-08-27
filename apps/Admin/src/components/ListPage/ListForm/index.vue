@@ -32,9 +32,11 @@
         </div>
         <div v-if="state.configured.includes('card')">
           <p class="title">卡片配置</p>
-          <j-button style="width: 300px" @click="state.configurationShow = true"
-            >配置</j-button
-          >
+          <j-badge :count="errorList.length">
+            <j-button :style="{width: '300px', border: errorList.length ? '1px solid red' : ''}" @click="state.configurationShow = true" :class="{ 'error-boder': errorList.length }"
+              >配置</j-button
+            >
+          </j-badge>
         </div>
 
         <div v-if="state.configured?.length === 2">
@@ -58,7 +60,7 @@
             返回
           </template>
         </a-page-header>
-        <Card ref="cardRef" :id="props.id" />
+        <Card ref="cardRef" :id="props.id" :errorList="errorList"/>
       </div>
       <template #footer>
         <j-button style="float: right" type="primary" @click="submit">

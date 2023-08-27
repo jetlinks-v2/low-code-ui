@@ -17,10 +17,12 @@
         :addBtnName="addBtnName"
         :dataSource="dataSource"
         :modelActiveKey="activeKey"
+        :errorList="errorList"
         @handleAdd="handleAdd"
         @configuration="configuration"
         @confirm="confirm"
         @handleOk="handleOk"
+        @handleChange="(data) => dataSource = data"
         v-if="type === ''"
       />
       <div v-if="type !== ''">
@@ -242,8 +244,8 @@ const submit = () => {
  * 校验筛选模块配置
  */
 const errorList:any = ref([])
-const valid = () => {
-  errorList.value = validFilterModule(dataSource.value)
+const valid = async () => {
+  errorList.value = await validFilterModule(dataSource.value)
 }
 
 defineExpose({

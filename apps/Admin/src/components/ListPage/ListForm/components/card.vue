@@ -33,9 +33,11 @@
             class="card-field"
             @click="cardState.type = 'field1'"
           >
-            <h3>
-              {{ formState.field1 || '字段1' }}
-            </h3>
+            <ErrorItem :errorData="errorData('field1')">
+              <h3>
+                {{ formState.field1 || '字段1' }}
+              </h3>
+            </ErrorItem>
           </j-col>
           <j-col
             :span="12"
@@ -111,25 +113,27 @@
           </j-form-item>
         </div>
         <div v-if="cardState.type === 'field1'">
-          <j-form-item
-            label="字段1"
-            name="field1"
-            :rules="[
-              {
-                required: true,
-                message: '请选择字段1!',
-              },
-            ]"
-          >
-            <j-select
-              width="200px"
-              placeholder="请先配置列表数据"
-              v-model:value="formState.field1"
-              showSearch
-              :options="titleOptions"
-              :field-names="{ label: 'name', value: 'id' }"
-            />
-          </j-form-item>
+          <ErrorItem :errorData="errorList?.[0]">
+            <j-form-item
+              label="字段1"
+              name="field1"
+              :rules="[
+                {
+                  required: true,
+                  message: '请选择字段1!',
+                },
+              ]"
+            >
+              <j-select
+                width="200px"
+                placeholder="请先配置列表数据"
+                v-model:value="formState.field1"
+                showSearch
+                :options="titleOptions"
+                :field-names="{ label: 'name', value: 'id' }"
+              />
+            </j-form-item>
+          </ErrorItem>
         </div>
         <div v-if="cardState.type === 'field2'">
           <j-form-item
@@ -176,16 +180,18 @@
           </j-form-item>
         </div>
         <div v-if="cardState.type === 'emphasisField'">
-          <j-form-item label="强调字段" name="emphasisField">
-            <j-select
-              width="200px"
-              placeholder="请先配置列表数据"
-              v-model:value="formState.emphasisField"
-              showSearch
-              :options="titleOptions"
-              :field-names="{ label: 'name', value: 'id' }"
-            />
-          </j-form-item>
+          <ErrorItem :errorData="errorData('emphasisField')">
+            <j-form-item label="强调字段" name="emphasisField">
+              <j-select
+                width="200px"
+                placeholder="请先配置列表数据"
+                v-model:value="formState.emphasisField"
+                showSearch
+                :options="titleOptions"
+                :field-names="{ label: 'name', value: 'id' }"
+              />
+            </j-form-item>
+          </ErrorItem>
           <j-form-item label="特殊样式" name="specialStyle">
             <EditorModal
               v-model:value="formState.specialStyle"
@@ -204,12 +210,16 @@
 <script lang="ts" setup>
 import Upload from '@/components/Upload/Image/ImageUpload.vue'
 import { useAllListDataStore } from '@/store/listForm'
-
+import { ErrorItem } from '../..';
 import EditorModal from '@/components/EditorModal'
 const props = defineProps({
   id: {
     type: null,
   },
+  errorList: {
+    type: Array,
+    default: () => []
+  }
 })
 const configurationStore = useAllListDataStore()
 const titleOptions = ref([])
@@ -231,6 +241,11 @@ const formState = reactive({
   specialStyle: '',
 })
 
+const errorData = computed(() => {
+  return (val: string) => {
+    return props.errorList?.find((item: any) => item.key == val)
+  }
+})
 //上传icon格式
 const accept = '.jpg,.jpeg,.png'
 //悬浮提示自动调整位置
