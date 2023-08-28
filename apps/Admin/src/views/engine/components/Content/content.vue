@@ -2,6 +2,8 @@
   <div class="content-warp">
     <Project v-if="props.data.type === providerEnum.Module" :data="props.data.children" />
     <FormDesigner v-else-if="props.data.type === providerEnum.FormPage" />
+    <CRUD v-else-if="data.type === providerEnum.CRUD" />
+    <ListPage v-else-if="data.type === providerEnum.ListPage" :data="props.data"/>
   </div>
 </template>
 
