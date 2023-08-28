@@ -36,6 +36,7 @@
 
 <script setup lang='ts' name="Menu">
 
+import { cloneDeep } from 'lodash-es';
 import TreeDrag from './TreeDrag/index.vue'
 import { randomString } from '@jetlinks/utils';
 
@@ -100,9 +101,8 @@ const onCount = (data) => {
 }
 
 const onTree = (data) => {
-    console.log('data-----', data)
     treeData.value = data
-    emit('change',data)
+    emit('change', data)
 }
 
 
@@ -112,11 +112,16 @@ onMounted(() => {
             id: 'html1',
             name: 'html-1',
             icon: 'EyeOutlined',
+            url:"/html1",
+            owner:'iot',
+            // code:'html1'
         },
         {
             id: 'html2',
             name: 'html-2',
-            icon: 'EyeOutlined'
+            icon: 'EyeOutlined',
+            url:"/html2",
+            owner:'iot',
         },
         {
             id: 'html3',

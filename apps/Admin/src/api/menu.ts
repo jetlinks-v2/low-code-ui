@@ -11,4 +11,4 @@ export const getOwnMenuThree = (data: any) => request.post<any>('/menu/user-own/
 export const getAllMenuTree = (data: any) => request.post<any>('/menu/_all/tree', data)
 
 //修改菜单
-export const saveMenu = (data: any) => request.patch(`/menu`, data);
+export const saveMenu = (data: any) => request.patch(`/menu/iot/_all`, data);

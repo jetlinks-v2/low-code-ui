@@ -22,7 +22,6 @@ const handleSave =async () => {
     }
 }
 const onChange = (item)=>{
-    console.log('meme',item)
     menuData.value = item
 }
 

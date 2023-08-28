@@ -55,11 +55,11 @@ type TreeDataItem = TreeProps['treeData'][];
 
 const props = defineProps({
     list: Array,
-    treeData:Array
+    treeData: Array
 })
 type Emits = {
     (e: 'changeCount', data: any): void;
-    (e:'changeTree',data:any):void
+    (e: 'changeTree', data: any): void
 };
 const emit = defineEmits<Emits>();
 
@@ -71,21 +71,33 @@ const visibleDel = ref<boolean>(false)
 
 
 const countMap = ref(new Map())
+const newMap = ref<any>({})
 
 const handleTree = (tree) => {
     const arr = cloneDeep(tree)
     arr.forEach(item => {
         if (item.options?.pageId) {
-            if (!countMap.value.has(item.options.pageId)) {
-                countMap.value.set(item.options.pageId, 0)
-            } else {
-                const sum = countMap.value.get(item.options.pageId)
-                countMap.value.set(item.options.pageId, sum + 1)
+            // if (item.options?.pageId in newMap.value) {
+            //     newMap.value[item.options?.pageId] = newMap.value[item.options?.pageId] + 1
+            // } else {
+            //     newMap.value[item.options?.pageId] = 1
+            // }
+            if(countMap.value.has(item.options.pageId)){
+                // debugger;
+                console.log('-------',countMap.value.get(item.options.pageId))
+                const sum = countMap.value.get(item.options.pageId) + 1
+                console.log('sum',sum)
+                countMap.value.set(item.options.pageId,sum)
+            }else{
+                console.log('set----')
+                countMap.value.set(item.options.pageId,1)
+                console.log(countMap.value.get(item.options.pageId))
             }
         }
         if (item.children) {
             handleTree(item.children)
         }
+        return;
     });
 }
 
@@ -184,6 +196,7 @@ watch(
     () => props.list,
     (val: any) => {
         countMap.value.clear()
+        newMap.value = {}
         treeData.value = [...treeData.value, ...val]
         handleTree([...treeData.value, ...val])
     },
@@ -193,17 +206,28 @@ watch(
 watch(
     () => countMap.value,
     (val) => {
+        console.log('changeCount', val)
         emit('changeCount', val)
     },
     { deep: true, immediate: true }
 )
 
+// watch(
+//     () => newMap.value,
+//     (val) => {
+//         console.log('changeCount', val)
+//         // emit('changeCount', val)
+//     },
+//     { deep: true, immediate: true }
+// )
+
 watch(
-    ()=>treeData.value,
-    (val)=>{
-        emit('changeTree',val)
+    () => treeData.value,
+    (val) => {
+        // console.log('changeTree', val)
+        emit('changeTree', val)
     },
-    {deep:true,immediate:true}
+    { deep: true, immediate: true }
 )
 
 const getTree = async () => {
@@ -223,8 +247,9 @@ const getTree = async () => {
         ],
     };
     const res = await getAllMenuTree(params)
-    if(res.status === 200){
-        treeData.value =  res.result
+    if (res.status === 200) {
+        treeData.value = res.result
+        handleTree(res.result)
     }
 }
 
