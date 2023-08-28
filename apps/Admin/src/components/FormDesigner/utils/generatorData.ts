@@ -59,6 +59,8 @@ const handleProps = (node: any) => {
         case 'upload':
             result.listType = 'text'
             result.maxCount = 1
+            result.size = 2
+            result.unit = 'M'
             break
     }
 
@@ -80,7 +82,7 @@ const generatorData = (node: any) => {
     if (!result.key) {
         result.key = `${result.type}_${uid()}`
     }
-    if (checkIsField(result)) {
+    if (checkIsField(result) || result.type === 'table') {
         result.formItemProps = handleFormItemProps(node)
     }
 

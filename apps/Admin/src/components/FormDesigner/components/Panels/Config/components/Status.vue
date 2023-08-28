@@ -18,7 +18,7 @@
     <j-form-item
       label="编辑状态是否支持修改"
       v-if="!['text', 'table'].includes(type)"
-      :name="['componentProps', 'required']"
+      :name="['editable']"
       :rules="[
         {
           required: true,

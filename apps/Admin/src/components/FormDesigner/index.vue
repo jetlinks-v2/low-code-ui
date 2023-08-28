@@ -7,7 +7,7 @@
         <Canvas :data="formData"></Canvas>
       </div>
       <div class="config" v-if="isShowConfig && model !== 'preview'">
-        <Config />
+        <Config ref="configRef" />
       </div>
     </div>
   </div>
@@ -51,8 +51,9 @@ const formData = ref<ISchema>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
 const selected = reactive<any>({}) // 被选择数据
 const formState = reactive<any>({})
-
+const errorKey = ref<string[]>([])
 const formRef = ref<any>()
+const configRef = ref<any>()
 
 // 设置数据被选中
 const setSelection = (node: any) => {
@@ -92,10 +93,15 @@ const getFieldData = (data: ISchema) => {
   }
   let _obj: any = {}
   if (data?.formItemProps?.name) {
-    _obj[data?.formItemProps?.name] = obj
+    if(data.type === 'table') {
+      _obj[data?.formItemProps?.name] = [obj]
+    } else {
+      _obj[data?.formItemProps?.name] = obj
+    }
   } else {
     _obj = obj
   }
+  console.log(obj)
   return _obj
 }
 
@@ -106,6 +112,7 @@ provide('FormDesigner', {
   selected,
   formState,
   formRef,
+  errorKey,
   setSelection,
   setModel
 })

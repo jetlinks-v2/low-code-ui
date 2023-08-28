@@ -1,14 +1,29 @@
 <template>
   <div>
     <j-form-item required :name="['componentProps', 'accept']" label="格式">
-      <j-select mode="multiple" placeholder="请选择" v-model:value="target.componentProps.accept">
+      <j-select
+        mode="multiple"
+        placeholder="请选择"
+        v-model:value="target.componentProps.accept"
+      >
         <j-select-option value=".jpg">.jpg</j-select-option>
+        <j-select-option value=".jpeg">.jpeg</j-select-option>
+        <j-select-option value=".png">.png</j-select-option>
+        <j-select-option value=".doc">.doc</j-select-option>
       </j-select>
     </j-form-item>
     <j-form-item required :name="['componentProps', 'size']" label="单个大小">
       <j-input-group compact>
-        <j-input-number style="width: 60%" v-model:value="target.componentProps.size" />
-        <j-select :defaultValue="'M'" style="width: 40%" v-model:value="target.componentProps.unit">
+        <j-input-number
+          style="width: 60%"
+          v-model:value="target.componentProps.size"
+          :min="0"
+        />
+        <j-select
+          :defaultValue="'M'"
+          style="width: 40%"
+          v-model:value="target.componentProps.unit"
+        >
           <j-select-option value="M">M</j-select-option>
         </j-select>
       </j-input-group>
