@@ -1,4 +1,4 @@
-import { Table, CardSelect, InputNumber, Input, Textarea, Select, InputPassword, Switch, TreeSelect, DatePicker, TimePicker } from 'jetlinks-ui-components'
+import { CardSelect, InputNumber, Input, Textarea, Select, InputPassword, Switch, TreeSelect, DatePicker, TimePicker } from 'jetlinks-ui-components'
 import { Text, Upload, Geo, Form } from '../components/Components/index'
 
 const componentMap = {
@@ -13,7 +13,7 @@ const componentMap = {
     'upload': Upload,
     'tree-select': TreeSelect,
     'date-picker': DatePicker,
-    'table': Table,
+    // 'table': QuickEditTable,
     'time-picker': TimePicker,
     'geo': Geo,
     'form': Form

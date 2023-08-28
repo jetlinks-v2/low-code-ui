@@ -12,6 +12,7 @@ import TabsLayout from './TabsLayout';
 import CardLayout from './CardLayout';
 import SpaceLayout from './SpaceLayout';
 import CollapseLayout from './CollapseLayout';
+import TableLayout from './TableLayout'
 import { watch } from 'vue';
 
 const DraggableLayout = defineComponent({
@@ -92,6 +93,8 @@ const DraggableLayout = defineComponent({
                         return (<TabsLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></TabsLayout>)
                     case 'collapse':
                         return (<CollapseLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></CollapseLayout>)
+                    case 'table': 
+                        return (<TableLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></TableLayout>)
                     default:
                         if (unref(isEditModel) || componentMap?.[element?.type]) {
                             const typeProps = useProps(element)
@@ -132,6 +135,18 @@ const DraggableLayout = defineComponent({
                                 }
                             )
 
+                            const onChange = (...arg) => {
+                                if(!element?.onChange) return 
+                                if(['input', 'input-number'].includes(element.type)){
+                                    let customFn = new Function('e', element?.onChange)
+                                    customFn.call(arg?.[0])
+                                }
+                                if(['select', 'switch'].includes(element.type)){
+                                    let customFn = new Function('value', 'option', element?.onChange)
+                                    customFn.call(arg?.[0], arg?.[1])
+                                }
+                            }
+
                             return (
                                 <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                                     <FormItem {...unref(formItemProps)} name={_path}>
@@ -149,6 +164,7 @@ const DraggableLayout = defineComponent({
                                                 // v-model={[designer.formState[_path[0]], 'value']}
                                                 v-model:value={value.value}
                                                 v-model:checked={checked.value}
+                                                onChange={onChange}
                                             ></TypeComponent>
                                         }
                                         <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{element.componentProps?.description}</div>
@@ -166,7 +182,6 @@ const DraggableLayout = defineComponent({
                     alignItems: 'center',
                     height: '100%',
                     minHeight: '60px',
-                    // padding: '0 300px',
                     minWidth: '100px'
                 }
                 if (isEmpty(props.data)) {
