@@ -63,7 +63,7 @@ export default defineComponent({
       const addButton = () => {
         return unref(isEditModel) &&
           <div class="draggable-add">
-            <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}>添加面板</div>
+            <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}><span>添加面板</span></div>
           </div>
       }
 

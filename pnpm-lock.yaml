@@ -13,6 +13,9 @@ importers:
       jetlinks-ui-components:
         specifier: ^1.0.29
         version: 1.0.29(vue-router@4.2.4)(vue@3.3.4)
+      latest:
+        specifier: ^0.2.0
+        version: 0.2.0
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -245,7 +248,7 @@ importers:
         version: 3.2.20(vue@3.3.4)
       jetlinks-ui-components:
         specifier: ^1.0.26
-        version: 1.0.26(vue-router@4.2.4)(vue@3.3.4)
+        version: 1.0.29(vue-router@4.2.4)(vue@3.3.4)
     devDependencies:
       '@jetlinks/tsconfig':
         specifier: workspace:*
@@ -371,7 +374,7 @@ importers:
         version: 1.4.0(debug@4.3.4)
       jetlinks-ui-components:
         specifier: ^1.0.26
-        version: 1.0.26(vue-router@4.2.4)(vue@3.3.4)
+        version: 1.0.29(vue-router@4.2.4)(vue@3.3.4)
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -455,13 +458,16 @@ importers:
         version: 4.17.7
       jetlinks-ui-components:
         specifier: ^1.0.26
-        version: 1.0.26(vue-router@4.2.4)(vue@3.3.4)
+        version: 1.0.29(vue-router@4.2.4)(vue@3.3.4)
       jsencrypt:
         specifier: ^3.3.2
         version: 3.3.2
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      pubsub-js:
+        specifier: ^1.9.4
+        version: 1.9.4
       vue:
         specifier: ^3.3.4
         version: 3.3.4
@@ -5759,6 +5765,10 @@ packages:
 
   /pseudomap@1.0.2:
     resolution: {integrity: sha512-b/YwNhb8lk1Zz2+bXXpS/LK9OisiZZ1SNsSLxN1x2OXVEhW2Ckr/7mWE5vrC1ZTiJlD9g19jWszTmJsB+oEpFQ==}
+    dev: false
+
+  /pubsub-js@1.9.4:
+    resolution: {integrity: sha512-hJYpaDvPH4w8ZX/0Fdf9ma1AwRgU353GfbaVfPjfJQf1KxZ2iHaHl3fAUw1qlJIR5dr4F3RzjGaWohYUEyoh7A==}
     dev: false
 
   /punycode@2.3.0:

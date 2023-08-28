@@ -41,7 +41,7 @@ const onPreview = (_type: 'preview' | 'edit') => {
 }
 
 const onCheck = () => {
-  checkedConfig(unref(designer.formData))
+  designer.errorKey.value = checkedConfig(unref(designer.formData))
 }
 
 const onInput = () => {

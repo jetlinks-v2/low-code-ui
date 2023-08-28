@@ -84,7 +84,7 @@ export default defineComponent({
                     {
                         unref(isEditModel) &&
                         <div class="draggable-add">
-                            <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}>添加数据</div>
+                            <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}><span>添加数据</span></div>
                         </div>
                     }
                 </Selection>
