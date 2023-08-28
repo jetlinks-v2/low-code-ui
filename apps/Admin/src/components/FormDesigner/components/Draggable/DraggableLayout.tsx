@@ -66,6 +66,7 @@ const DraggableLayout = defineComponent({
 
         const slots = {
             item: ({ element }) => {
+                console.log(element)
                 const _path: string[] = cloneDeep(props?.path || []);
                 const _index: number = props?.index || 0;
                 switch (element.type) {
@@ -161,10 +162,10 @@ const DraggableLayout = defineComponent({
                                                 data={element}
                                                 {...element.componentProps}
                                                 size={designer.formData.value?.componentProps.size}
-                                                // v-model={[designer.formState[_path[0]], 'value']}
                                                 v-model:value={value.value}
                                                 v-model:checked={checked.value}
                                                 onChange={onChange}
+                                                disabled={unref(designer.mode) === 'edit' && !element?.editable}
                                             ></TypeComponent>
                                         }
                                         <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{element.componentProps?.description}</div>

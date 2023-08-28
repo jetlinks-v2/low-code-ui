@@ -19,8 +19,4 @@ const props = defineProps({
 
 </script>
 
-<style scoped lang="less">
-.content-warp {
-  height: 100%;
-}
-</style>
+<style scoped lang="less"></style>

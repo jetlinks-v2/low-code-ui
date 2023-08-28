@@ -46,31 +46,6 @@ const formData = ref<ISchema>() // 表单数据
 const formState = reactive<any>({})
 const formRef = ref<any>()
 
-// const getFieldChildrenData = (data: ISchema[]) => {
-//   let obj: any = {}
-//   data.map((item: any) => {
-//     obj = {
-//       ...obj,
-//       ...getFieldData(item),
-//     }
-//   })
-//   return obj
-// }
-
-// const getFieldData = (data: ISchema) => {
-//   let obj: any = undefined
-//   if (data.children && data.children?.length) {
-//     obj = getFieldChildrenData(data?.children)
-//   }
-//   let _obj: any = {}
-//   if (data?.formItemProps?.name) {
-//     _obj[data?.formItemProps?.name] = obj
-//   } else {
-//     _obj = obj
-//   }
-//   return _obj
-// }
-
 watch(
   () => props.list,
   () => {

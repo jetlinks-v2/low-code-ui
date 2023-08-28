@@ -20,7 +20,7 @@ import Config from './components/Panels/Config/index.vue'
 import Filed from './components/Panels/Filed/index'
 import { provide, ref, reactive, watch} from 'vue'
 import { ISchema } from './typings'
-// import { updateData } from './utils/utils'
+import { omit } from 'lodash-es'
 
 const initData = {
   type: 'root',
@@ -33,17 +33,14 @@ const initData = {
 }
 
 const props = defineProps({
-  // inlineMax: { // inline横排最多展示的组件个数
-  //   type: Number,
-  //   default: 4,
-  // },
-  // fileUploadURI: { // 上传组件的action
-  //   type: String,
-  // },
   value: {
     type: Object,
     default: () => {},
   },
+  mode: { // 是否为编辑
+    type: String as PropType<'add' | 'edit'>,
+    default: 'edit'
+  }
 })
 
 const model = ref<'preview' | 'edit'>('edit') // 预览；编辑
@@ -94,14 +91,13 @@ const getFieldData = (data: ISchema) => {
   let _obj: any = {}
   if (data?.formItemProps?.name) {
     if(data.type === 'table') {
-      _obj[data?.formItemProps?.name] = [obj]
+      _obj[data?.formItemProps?.name] = [omit(obj, ['actions', 'index'])]
     } else {
       _obj[data?.formItemProps?.name] = obj
     }
   } else {
     _obj = obj
   }
-  console.log(obj)
   return _obj
 }
 
@@ -113,6 +109,7 @@ provide('FormDesigner', {
   formState,
   formRef,
   errorKey,
+  mode: props?.mode,
   setSelection,
   setModel
 })
@@ -135,8 +132,8 @@ watch(
   () => model.value,
   (newValue: 'preview' | 'edit') => {
     if (newValue === 'preview') {
-      const obj: any = getFieldData(formData.value)
       Object.assign(formState, {})
+      const obj: any = getFieldData(formData.value)
       Object.assign(formState, obj)
     }
   },

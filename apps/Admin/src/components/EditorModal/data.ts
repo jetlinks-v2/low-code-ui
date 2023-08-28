@@ -5,7 +5,7 @@ export const defaultProps = () => ({
   },
   language: {
     type: String,
-    default: 'json'
+    default: 'javascript'
   },
   title: {
     type: String,
