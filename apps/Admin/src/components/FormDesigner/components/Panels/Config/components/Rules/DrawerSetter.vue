@@ -25,13 +25,13 @@
           <j-form-item label="错误信息" name="message">
             <j-textarea placeholder="请输入" v-model:value="ruleModel.message" />
           </j-form-item>
-          <!-- <j-form-item label="格式校验" name="pattern">
-            <j-select placeholder="请选择" v-model:value="ruleModel.pattern">
-
+          <j-form-item label="格式校验" name="pattern">
+            <j-select placeholder="请选择" v-model:value="regRef" @change="handleChange">
+              <j-select-option v-for="item in patternList" :value="item.value">{{ item.text }} </j-select-option>
             </j-select>
-          </j-form-item> -->
-          <j-form-item label="正则表达式" name="pattern">
-            <j-textarea placeholder="请输入" v-model:value="ruleModel.pattern" />
+          </j-form-item>
+          <j-form-item label="正则表达式" name="pattern" >
+            <j-textarea placeholder="请输入" v-model:value="inputRef" />
           </j-form-item>
           <j-form-item label="最小长度限制" name="min">
             <j-input-number placeholder="请输入" style="width: 100%;" v-model:value="ruleModel.min" />
@@ -62,6 +62,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive, unref, watchEffect } from 'vue'
+import {patternList} from './index'
 const props = defineProps({
   value: {
     type: Object,
@@ -76,7 +77,7 @@ const emits = defineEmits(['change'])
 
 const visible = ref<boolean>(false)
 const formRef = ref<any>()
-const ruleModel = reactive({
+const ruleModel = reactive<any>({
   message: undefined,
   max: undefined,
   min: undefined,
@@ -85,12 +86,39 @@ const ruleModel = reactive({
   pattern: undefined,
   validator: undefined,
 })
+const regRef = ref<any>(undefined)
+const inputRef = ref<any>('')
+
+
+
+const handleChange = (e:any)=>{
+    const reg = new RegExp(e)
+    ruleModel.pattern = reg
+}
+
+watch(
+  ()=>inputRef.value,
+  (val)=>{
+    const params = patternList.find(item=>item.value === val)
+    if(params){
+      regRef.value = val
+    }else{
+      regRef.value = undefined
+    }
+  }
+)
 
 watchEffect(() => {
+  // console.log('props.value',props.value)
   Object.assign(ruleModel, props.value)
+  if(props.value.pattern){
+    const reg = `${props.value.pattern}` 
+    inputRef.value = reg.slice(1,reg.length-1)
+  }
 })
 
 const onClickItem = () => {
+  // console.log('ruleModel',ruleModel)
   emits('change', unref(ruleModel), props.index)
   visible.value = true
 }
