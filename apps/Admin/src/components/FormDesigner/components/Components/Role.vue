@@ -1,5 +1,5 @@
 <template>
-   <j-tree-select :tree-data="treeData" v-model:value="_value" @change="valueChange" :multiple="multiple">
+   <j-tree-select :tree-data="treeData" v-model:value="_value" @change="valueChange" :multiple="mode ==='multiple'" :disabled="disabled">
     </j-tree-select>
 </template>
 
@@ -10,7 +10,11 @@ const props = defineProps({
         type:Array,
         default:[]
     },
-    multiple:{
+    mode:{
+        type:String,
+        default:''
+    },
+    disabled:{
         type:Boolean,
         default:false
     }

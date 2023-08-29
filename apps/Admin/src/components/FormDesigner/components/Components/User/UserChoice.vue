@@ -34,7 +34,8 @@
                         selectedRowKeys: _selectedRowKeys,
                         onSelect: onSelectChange,
                         onSelectNone: () => _selectedRowKeys = [],
-                        onSelectAll: selectAll
+                        onSelectAll: selectAll,
+                        type: mode === 'multiple' ? 'checkbox' : 'radio'
                     }">
                     <template #status="slotProps">
                         <BadgeStatus :status="slotProps.status" :text="slotProps.status === 1 ? '正常' : '禁用'" :statusNames="{
@@ -52,7 +53,16 @@
 import { getDepartmentList_api } from '@/api/user'
 import { getUserList, getRoleList, getTissue } from '@/api/form'
 const sourceType = ref('tissue')
-const props = defineProps(['selected'])
+const props = defineProps({
+    selected:{
+        type:Array,
+        default:[]
+    },
+    mode:{
+        type:String,
+        default:''
+    }
+})
 const emit = defineEmits(['closeModal', 'selectedUser'])
 const searchValue = ref();
 const treeData = ref([]);
@@ -115,13 +125,17 @@ const expandedKeys: any = ref([]);
 const _selectedRowKeys: any = ref([])
 
 const onSelectChange = (row: any, selected: Boolean) => {
-    const arr: any = new Set(_selectedRowKeys.value)
-    if (selected) {
-        arr.add(row.id)
-    } else {
-        arr.delete(row.id)
+    if(props.mode !== 'multiple'){
+        _selectedRowKeys.value = [row.id]
+    }else{
+        const arr: any = new Set(_selectedRowKeys.value)
+        if (selected) {
+            arr.add(row.id)
+        } else {
+            arr.delete(row.id)
+        }
+        _selectedRowKeys.value = [...arr.values()];
     }
-    _selectedRowKeys.value = [...arr.values()];
 }
 
 const selectAll = (selected: Boolean, selectedRows: any, changeRows: any) => {

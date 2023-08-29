@@ -108,7 +108,7 @@ export const basic: ISchema[] = [
     },
     {
         type: 'geo',
-        name: '地区(未)',
+        name: '地区',
         icon: 'FundOutlined',
     },
 ]
@@ -214,7 +214,7 @@ export const layout: ISchema[] = [
 // 高级组件
 export const pro: ISchema[] = [
     {
-        type: 'tissue',
+        type: 'org',
         name: '组织选择',
         icon: 'UngroupOutlined',
     },

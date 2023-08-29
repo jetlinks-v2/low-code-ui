@@ -1,7 +1,7 @@
 <template>
-  <a-select v-model:value="selectData" :open="false" :showArrow="false" @focus="showModal" :options="selectOptions"   mode="multiple">
+  <a-select v-model:value="selectData" :open="false" :showArrow="false" @focus="showModal" :options="selectOptions"   :mode="mode" :disabled="disabled">
   </a-select>
-  <UserChoice v-if="modalVisible" @closeModal="closeModal" @selectedUser="selectedUser" :selected="selectData"></UserChoice>
+  <UserChoice v-if="modalVisible" @closeModal="closeModal" @selectedUser="selectedUser" :selected="selectData" :mode="mode"></UserChoice>
 </template>
 
 <script lang="ts" setup>
@@ -12,7 +12,11 @@ const props = defineProps({
         type:Array,
         default:[]
     },
-    multiple:{
+    mode:{
+        type:String,
+        default:''
+    },
+    disabled:{
         type:Boolean,
         default:false
     }
@@ -33,7 +37,6 @@ const closeModal = () =>{
 const selectedUser = (data:any) =>{
   modalVisible.value = false
   selectData.value = data
-  emit('update:value',selectData.value)
 }
 
 const queryUser = () =>{
@@ -53,7 +56,12 @@ const queryUser = () =>{
 queryUser()
 
 watch(()=>props.value,()=>{
+  console.log(props.value)
   selectData.value = props.value
+})
+watch(()=>selectData.value, ()=>{
+  
+  emit('update:value',selectData.value)
 })
 </script>
 <style lang="less" scoped>

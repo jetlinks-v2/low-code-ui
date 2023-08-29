@@ -1,5 +1,5 @@
 import Text from './Text.vue'
-import Tissue from './Tissue.vue'
+import Org from './Org.vue'
 import Role from './Role.vue'
 import User from './User/index.vue'
 import Product from './Product.vue'
@@ -10,7 +10,7 @@ import Form from './Form.vue'
 
 export {
     Text,
-    Tissue,
+    Org,
     Role,
     User,
     Product,

@@ -15,7 +15,8 @@
                               selectedRowKeys: _selectedRowKeys,
                               onSelect: onSelectChange,
                               onSelectNone: onSelectNone,
-                              onSelectAll: onAllSelect
+                              onSelectAll: onAllSelect,
+                              type: mode === 'multiple' ? 'checkbox' : 'radio'
                           }"
         class="table"
       >
@@ -86,6 +87,7 @@ const props = defineProps({
   },
 })
 const type = inject('type')
+const mode = inject('mode')
 const columns = [
 {
         title: 'ID',
@@ -137,19 +139,24 @@ const handleSearch = () =>{
 }
 let selectData:any = []
 const onSelectChange = (row: any) => {
-    const arr = new Set(_selectedRowKeys.value);
-    const index = _selectedRowKeys.value.indexOf(row.id);
-    if(index === -1){
-        arr.add(row.id)
-        selectData.push({
-          name:row.name,
-          id:row.id
-        })
+    if(mode !== 'multiple'){
+        _selectedRowKeys.value = [row.id]
+        selectData = [{name:row.name,id:row.id}]
     }else{
-        arr.delete(row.id)
-        selectData.splice(index,1)
+        const arr = new Set(_selectedRowKeys.value);
+        const index = _selectedRowKeys.value.indexOf(row.id);
+        if(index === -1){
+            arr.add(row.id)
+            selectData.push({
+            name:row.name,
+            id:row.id
+            })
+        }else{
+            arr.delete(row.id)
+            selectData.splice(index,1)
+        }
+        _selectedRowKeys.value = [...arr.values()];
     }
-    _selectedRowKeys.value = [...arr.values()];
 };
 
 const onSelectNone = () => {

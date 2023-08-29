@@ -1,11 +1,34 @@
 <template>
-    <Iot></Iot>
-  </template>
+    <Iot v-model:value="_value"></Iot>
+</template>
   
-  <script lang="ts" setup>
-  import Iot from './iotComponents/index.vue'
-  import {  provide } from 'vue'
-  provide('type','device')
-  </script>
-  <style lang="less" scoped>
-  </style>
+<script lang="ts" setup>
+import Iot from './iotComponents/index.vue'
+import {  provide } from 'vue'
+const props =  defineProps({
+  value:{
+    type:Array,
+    default:[]
+  },
+  mode:{
+    type:String,
+    default:''
+  },
+  disabled:{
+    type:Boolean,
+    default:false
+  }
+})
+const _value:any = ref([])
+const emit = defineEmits(['update:value'])
+provide('type','device')
+provide('mode',props.mode)
+watch(()=>props.value,()=>{
+   _value.value = props.value
+})
+watch(()=>_value.value,()=>{
+  emit('update:value',_value.value)
+})
+</script>
+<style lang="less" scoped>
+</style>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <j-button type="primary" @click="visible=true">{{ type === 'product' ? '产品选择' : '设备选择' }}</j-button>
+    <j-button type="primary" @click="visible=true" :disabled="disabled">{{ type === 'product' ? '产品选择' : '设备选择' }}</j-button>
     <SelectModal v-if="visible" @close="closeModal" @update-data="updateData" :select="selectData"></SelectModal>
     <div class="select">
       <div v-for="(item) in selectData" class="selectItem">
@@ -13,6 +13,19 @@
 
 <script lang="ts" setup>
 import SelectModal from './modal.vue'
+const props = defineProps({
+  value:{
+    type:Array,
+    default:[]
+  },
+  disabled:{
+    type:Boolean,
+    default:false
+  }
+})
+
+const type = inject('type')
+const emit = defineEmits(['update:value'])
 const selectData = ref()
 const visible =ref(false)
 const closeModal = () =>{
@@ -26,6 +39,12 @@ const cancelSelect = (id:string)=>{
   const index = selectData.value.includes(id)
   selectData.value.splice(index,1)
 } 
+watch(()=>props.value,()=>{
+  selectData.value = props.value
+})
+watch(()=>selectData.value,()=>{
+  emit('update:value',selectData.value)
+})
 </script>
 <style lang="less" scoped>
 .select{

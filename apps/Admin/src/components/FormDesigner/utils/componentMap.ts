@@ -1,10 +1,10 @@
 import { Table, CardSelect, InputNumber, Input, Textarea, Select, InputPassword, Switch, TreeSelect, DatePicker, TimePicker } from 'jetlinks-ui-components'
-import { Text,Tissue,Role,User,Product,Device,Upload, Geo, Form } from '../components/Components/index'
+import { Text,Org,Role,User,Product,Device,Upload, Geo, Form } from '../components/Components/index'
 
 const componentMap = {
     'input': Input,
     'text': Text,
-    'tissue': Tissue,
+    'org': Org,
     'role': Role,
     'user': User,
     'product': Product,
