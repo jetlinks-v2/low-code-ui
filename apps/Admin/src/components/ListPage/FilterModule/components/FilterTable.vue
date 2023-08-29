@@ -42,8 +42,13 @@
             </span>
           </template>
         </template>
+        <template #id="{ data }">
+          <ErrorItem :errorData="errorData(data.record.id)" :border="false">
+            <span>{{ data.record?.name, data }}</span>
+          </ErrorItem>
+        </template>
         <template #name="{ data }">
-          <ErrorItem :errorData="errorData(data.record.id)">
+          <ErrorItem :errorData="errorData(data.record.id)" :border="false">
             <span>{{ data.record?.name, data }}</span>
           </ErrorItem>
         </template>

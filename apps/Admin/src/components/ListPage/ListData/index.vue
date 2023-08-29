@@ -17,6 +17,7 @@
         :addBtnName="addBtnName"
         :dataSource="dataSource"
         :modelActiveKey="activeKey"
+        :errorList="errorList"
         @handleAdd="handleAdd"
         @configuration="configuration"
         @confirm="confirm"
@@ -178,6 +179,7 @@ import Table from '@/components/ListPage/FilterModule/components/FilterTable.vue
 import Config from '@/components/ListPage/ListData/compnents/Configuration.vue'
 import { useAllListDataStore } from '@/store/listForm'
 import { DATA_BIND } from '../keys'
+import { validListData } from './utils/valid'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -475,7 +477,12 @@ console.log(configInfo,'configInfo');
   configState.type = ''
 }
 
-const errorList = ref([])
+const errorList = ref<any[]>([])
+const valid = async () => {
+  console.log(dataSource.value);
+  errorList.value = await validListData(dataSource.value)
+}
+
 watch(
   () => dataBinds,
   () => {
@@ -496,7 +503,8 @@ watch(
 )
 
 defineExpose({
-  errorList
+  errorList,
+  valid
 })
 </script>
 

@@ -115,6 +115,7 @@ const handleValid = async () => {
   filterModuleRef.value?.valid()
   pagingConfigRef.value?.valid()
   listFormRef.value?.valid()
+  listDataRef.value?.valid()
 }
 
 const errorCount = computed(() => {
@@ -135,6 +136,7 @@ const configDone = computed(() => {
     filterModule: configurationStore.getALLlistDataInfo(props.data.id)?.searchData?.length,
     listData: configurationStore.getALLlistDataInfo(props.data.id)?.datasource?.length,
     pagination: configurationStore.getALLlistDataInfo(props.data.id)?.pagingData?.length,
+    ListForm: configurationStore.getALLlistDataInfo(props.data.id)?.showType
   }
 })
 
@@ -191,10 +193,21 @@ watch(
     )
   },
 )
+
+const showGuide = computed(() => {
+  return !props.data.configuration?.code
+})
+
+watchEffect(() => {
+  if(showGuide.value) {
+    visibles.GuideVisible = true
+  }
+})
 </script>
 
 <style scoped lang="less">
 .list-page {
   height: 100%;
+  position: relative;
 }
 </style>

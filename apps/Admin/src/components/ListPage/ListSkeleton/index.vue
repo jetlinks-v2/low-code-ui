@@ -66,6 +66,10 @@
                 <j-space
                   ref="ref6"
                   class="config-item type"
+                  :class="{
+                    'config-done': configDone?.ListForm,
+                    animation: !configDone?.ListForm && !visibles.GuideVisible,
+                  }"
                   @click="handleVisible('ListFormVisible')"
                 >
                   <j-skeleton-input style="width: 32px" />
@@ -79,16 +83,20 @@
             style="height: 60%; overflow: hidden; padding: 20px"
           >
             <j-col :span="20">
-              <j-skeleton-input
-                size="large"
-                ref="ref3"
-                class="config-item column-data skeletion-input"
-                :class="{
-                  'config-done': configDone?.listData,
-                  animation: !configDone?.listData && !visibles.GuideVisible,
-                }"
-                @click="handleVisible('ListDataVisible')"
-              />
+              <j-badge :count="errorCount?.listData" style="width: 100%" :numberStyle="{
+                  width: 'auto',
+                }">
+                <j-skeleton-input
+                  size="large"
+                  ref="ref3"
+                  class="config-item column-data skeletion-input"
+                  :class="{
+                    'config-done': configDone?.listData,
+                    animation: !configDone?.listData && !visibles.GuideVisible,
+                  }"
+                  @click="handleVisible('ListDataVisible')"
+                />
+              </j-badge>
               <j-skeleton-input
                 class="skeletion-input"
                 size="large"
@@ -151,7 +159,7 @@
   <Guide :stepList="steps" v-model:open="visibles.GuideVisible" />
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="listSkeleton">
 import Guide from '../Guide/index.vue'
 import type { GuideProps } from '../Guide/type'
 
@@ -252,6 +260,10 @@ watchEffect(() => {
   ]
   console.log(props.dataBindRef)
 })
+
+watch(() => props.visibles, () => {
+  console.log(props.visibles);
+}, {immediate: true, deep: true})
 </script>
 
 <style scoped lang="less">

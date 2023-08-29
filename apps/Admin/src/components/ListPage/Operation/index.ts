@@ -59,7 +59,7 @@ export const validOperationsBtn = async (tree: OperationConfigTreeItem[]) => {
       }
     });
   }
-
+  console.log(errorItems);
   validate(tree);
 
   if (errorItems.length > 0) {

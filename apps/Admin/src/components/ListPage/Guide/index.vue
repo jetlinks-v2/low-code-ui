@@ -148,7 +148,7 @@ watch(
   (val) => {
     nextTick(() => {
       if (val[0] && val[1]) {
-        handleClick()
+        steps.value = 1
       }
       if (!val[1]) {
         steps.value = 0
@@ -174,6 +174,7 @@ watch(
     position: absolute;
     right: 20px;
     top: 72px;
+    z-index: 1001;
   }
 }
 </style>

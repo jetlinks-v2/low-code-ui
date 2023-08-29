@@ -20,6 +20,7 @@
       <j-form-item v-if="showCommand">
         <j-select
           v-model:value="dataBind.data.command"
+          :disabled="commandDisabled"
           style="width: 200px"
         >
         <j-select-option
@@ -67,7 +68,7 @@ interface Emit {
 }
 
 const emits = defineEmits<Emit>()
-const dataBind: any = inject(DATA_BIND)
+const dataBind = inject(DATA_BIND)
 const props = defineProps({
   open: {
     type: Boolean,
@@ -81,8 +82,12 @@ const functionDisabled = computed(() => {
   return dataBind.data.function && dataBind.data.function !== ''
 })
 
+const commandDisabled = computed(() => {
+  return dataBind.data.command && dataBind.data.command !== ''
+})
+
 const showCommand = computed(() => {
-  return functions!.value.find(item => item.id === dataBind.data.function)?.provider === 'rdb-sql-query'
+  return ['rdb-sql-query', 'rdb-crud'].includes(functions!.value.find(item => item.id === dataBind.data.function)?.provider || '')
 })
 
 const functions = inject(functionsKey)

@@ -1,6 +1,6 @@
 <template>
   <div class="error-item" ref="errorItemRef">
-    <div :class="{'error-border': !!errorData}">
+    <div :class="{'error-border': !!errorData && border}">
       <slot></slot>
     </div>
     <p class="error-message" v-if="errorData?.message">{{ errorData.message }}</p>
@@ -8,20 +8,23 @@
 </template>
 
 <script setup lang="ts">
+import { PropType } from 'vue';
+
 const props = defineProps({
   errorData: {
-    type: Object,
+    type: Object as PropType<{ message: string }>,
     default: () => {}
-  }
+  },
+  border: {
+    type: Boolean,
+    default: true
+  },
 })
 
 const errorItemRef = ref()
 
 onMounted(() => {
   console.log(errorItemRef.value.child);
-})
-const message = computed(() => {
-  console.log(props.errorData);
 })
 </script>
 
@@ -33,6 +36,7 @@ const message = computed(() => {
     }
     .error-message{
       color: red;
+      margin: 0;
     }
   }
 </style>
