@@ -11,40 +11,62 @@
       </j-page-header>
     </div>
     <div style="padding: 30px">
-      <pro-search
-        :columns="searchColumns"
-        target="code"
-        @search="handleSearch"
-      />
-      <j-card>
-        <j-radio-group
-          v-model:value="model"
-          class="right-button"
-          v-if="typeChangeShow"
-          @change="typeChange"
-        >
-          <j-radio-button value="list">
-            <AIcon class="right-button-icon" type="UnorderedListOutlined" />
-          </j-radio-button>
-          <j-radio-button value="card">
-            <AIcon class="right-button-icon" type="AppstoreOutlined" />
-          </j-radio-button>
-        </j-radio-group>
-        <ProTable
-          :query="query"
-          :pagination="pagination"
-          :model="model"
-          :cardConfig="cardConfig"
-          :dataColumns="dataColumns"
-          :headerActions="headerActions"
+      <div style="padding: 30px; background-color: #f2f2f2">
+        <pro-search
+          :columns="searchColumns"
+          target="code"
+          @search="handleSearch"
         />
-      </j-card>
+
+        <div style="background-color: #ffffff">
+          <j-radio-group
+            v-model:value="model"
+            class="right-button"
+            v-if="typeChangeShow"
+            @change="typeChange"
+          >
+            <j-radio-button value="list">
+              <AIcon class="right-button-icon" type="UnorderedListOutlined" />
+            </j-radio-button>
+            <j-radio-button value="card">
+              <AIcon class="right-button-icon" type="AppstoreOutlined" />
+            </j-radio-button>
+          </j-radio-group>
+          <ProTable
+            :query="query"
+            :pagination="pagination"
+            :model="model"
+            :cardConfig="cardConfig"
+            :dataColumns="dataColumns"
+            :headerActions="headerActions"
+            @openJson = "(newValue) => (jsonData = newValue)"
+          />
+        </div>
+      </div>
     </div>
     <!-- 批量导入 -->
     <Import
-      v-if="importVisible"
+      v-model:open="importVisible"
       @close="importVisible = false"
       @save="importVisible = false"
+    />
+    <!-- 批量导出 -->
+    <Export
+      v-model:open="exmportVisible"
+      @close="exmportVisible = false"
+      @save="exmportVisible = false"
+    />
+    <!-- 新增 -->
+    <Add
+      v-model:open="addVisible"
+      @close="addVisible = false"
+      @save="addVisible = false"
+    />
+    <!-- 查看 -->
+    <JsonPreview
+      v-model:open="jsonData.previewVisible"
+      :json="jsonData.value"
+      @close="jsonData.previewVisible = false"
     />
   </div>
 </template>
@@ -54,13 +76,21 @@ import ProTable from '@/components/ListPage/Preview/components/TableModel.vue'
 import dayjs from 'dayjs'
 import { router } from '@jetlinks/router'
 import Import from './components/Import.vue'
-const importVisible = ref<boolean>(true)
+import Export from './components/Export.vue'
+import Add from './components/Add.vue'
+import JsonPreview from './components/JsonPreview.vue'
+const importVisible = ref<boolean>(false)
+const exmportVisible = ref<boolean>(false)
+const addVisible = ref<boolean>(false)
 
 const route = useRoute()
 const id = route.params.id
 const listDataStore = useAllListDataStore()
 const allData = ref<any>({})
-
+const jsonData = ref<any>({
+  previewVisible:false,
+  value:{}
+})
 const dataColumns: any = ref([])
 const searchColumns: any = ref([])
 const typeChangeShow = ref(false)
@@ -222,6 +252,10 @@ const dataSource = [
     deviceId2: 'discussion2',
     deviceId3: 'discussion3',
     deviceId4: 'discussion4',
+    deviceId5: 'https://aliyuncdn.antdv.com/form/static/logo-blue.png',
+    deviceId6: 'discussion2',
+    deviceId7: { url: 'https://aliyuncdn.antdv.com/form/static/logo-blue.png' },
+    deviceId8: 'discussion4',
   },
   {
     deviceId1: 'discussion1',
@@ -263,7 +297,7 @@ const pagingData = () => {
 //table头部
 const tableHeader = () => {
   const cloumn = allData.value?.datasource || []
-  dataColumns.value = cloumn?.map((item: any) => {
+  dataColumns.value = cloumn?.map((item: any, index: number) => {
     return {
       title: item.name,
       dataIndex: item.id,
@@ -275,8 +309,6 @@ const tableHeader = () => {
     }
   })
   if (actions.value?.length !== 0) {
-    console.log(actions.value?.length, 'actions.value?.length')
-
     dataColumns.value.push({
       title: '操作',
       key: 'action',
@@ -352,34 +384,40 @@ const typeData = () => {
 const typeChange = (e: any) => {
   model.value = e?.target?.value
 }
-const headerActionsFormat = (data: any) => {
+const actionsBtnFormat = (data: any) => {
   const finalData = data?.map((item: any) => {
     return {
-      key: item.key,
-      text: item.title,
-      icon: item.icon,
+      key: item?.key,
+      text: item?.title,
+      icon: item?.icon,
       type: 'primary',
-      command: item.command,
-      permissionProps: (data) => ({
+      command: item?.command,
+      pages: item?.pages,
+      permissionProps: (data: any) => ({
         tooltip: {
-          title: item.title,
+          title: item?.title,
         },
         hasPermission: false,
         popConfirm:
-          item.command === 'Delete'
+          item?.command === 'Delete'
             ? {
                 title: data?.status === 'error' ? '禁用' : '确认删除？',
                 onConfirm: () => {
                   console.log(data, 'onConfirm')
+                  item?.script
                 },
               }
             : false,
-        onClick: (e) => {
-          console.log(data, 'data')
+        onClick: () => {
+          console.log(data, 'datafdnh')
+          importVisible.value = data?.command === 'Import'
+          exmportVisible.value = data?.command === 'Export'
+          addVisible.value = data?.command === 'Add'
+          item?.script
           // handleView(data.id)
         },
       }),
-      children: headerActionsFormat(item?.children || []),
+      children: actionsBtnFormat(item?.children || []),
     }
   })
   return finalData
@@ -387,26 +425,35 @@ const headerActionsFormat = (data: any) => {
 //表头按钮
 const handleHeaderActions = () => {
   const btnData = listDataStore.getALLlistDataInfo(id)?.addButton || []
-  headerActions.value = headerActionsFormat(btnData)
+  headerActions.value = actionsBtnFormat(btnData)
 }
 //table操作按钮
 const handleRowActions = () => {
   const btnData = listDataStore.getALLlistDataInfo(id)?.actionsButton || []
-  console.log(btnData)
-  console.log(headerActionsFormat(btnData), 'btnData')
-
-  actions.value = headerActionsFormat(btnData)
+  actions.value = actionsBtnFormat(btnData)
 }
 //table数据
 const query = (_params: Record<string, any>) =>
   new Promise((resolve) => {
-    const data = dataSource.map((item, index) => {
+    let map = new Map()
+    dataColumns.value.map((item: any, index: number) => {
+      map.set(item.key, { config: item.config, key: item.key })
+    })
+    const newData = [...map.values()]
+    let data: any = []
+    data = dataSource.map((item, index) => {
+      for (let i in item) {
+        const datasourceItem = newData?.find(
+          (e: any) => e.key === i && e.config,
+        )
+
+        if (datasourceItem && !item[i]?.config) {
+          item[i] = { value: item[i], config: datasourceItem.config }
+        }
+      }
       return {
+        ...item,
         key: index,
-        deviceId1: item.deviceId1,
-        deviceId2: item.deviceId2,
-        deviceId3: item.deviceId3,
-        deviceId4: item.deviceId4,
         actions: actions.value,
       }
     })
@@ -428,7 +475,6 @@ const query = (_params: Record<string, any>) =>
 const model = ref('list')
 const params = ref()
 const handleSearch = (data: any) => {
-  console.log('data', data)
   params.value = data
 }
 //退出预览
@@ -455,6 +501,9 @@ onMounted(() => {
 })
 </script>
 <style lang="less" scoped>
+.list-form-preview {
+  background-color: #d7d7d7;
+}
 .ant-page-header {
   padding: 2px 20px 2px 20px;
 }

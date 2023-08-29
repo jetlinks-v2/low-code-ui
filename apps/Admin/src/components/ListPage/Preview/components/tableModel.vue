@@ -11,23 +11,54 @@
       <template #headerTitle>
         <HeaderButton :headerActions="props.headerActions" />
       </template>
-
-      <template #action="slotProps">
-        <PermissionButton
-          v-for="item in slotProps?.actions"
-          :key="item.key"
-          type="link"
-          v-bind:="handleFunction(item.permissionProps, slotProps)"
-          style="padding: 0"
-          :danger="item.command === 'Delete'"
-          :popConfirm="
-            handleFunction(item.permissionProps, slotProps)?.popConfirm
-          "
-        >
-          <AIcon v-if="item.icon" :type="item?.icon" />
-          <span v-else>{{ item?.text }}</span>
-          <j-divider type="vertical" />
-        </PermissionButton>
+      <template
+        v-for="item in props?.dataColumns"
+        :key="item.key"
+        #[item.key]="slotProps"
+      >
+        <div v-if="item.key !== 'action'">
+          <div v-if="slotProps[item.key]?.config">
+            <span v-if="item?.config?.type === 'object' && isShowIcon">
+              <AIcon
+                type="SearchOutlined"
+                @click="jsonOpen(slotProps[item.key]?.value)"
+              />
+            </span>
+            <span v-else-if="item?.config?.type === 'file' && isShowFileIcon">
+              <img
+                style="width: 30px; height: 30px"
+                :src="dataFormat(item?.config, slotProps[item.key]?.value)"
+              />
+            </span>
+            <span v-else>
+              {{ dataFormat(item?.config, slotProps[item.key]?.value) }}
+            </span>
+          </div>
+          <div v-else>
+            <j-ellipsis style="max-width: 240px">
+              {{ slotProps[item.key] }}
+            </j-ellipsis>
+          </div>
+        </div>
+        <div v-if="item?.key === 'action'">
+          <PermissionButton
+            v-for="item in slotProps?.actions"
+            :key="item.key"
+            type="link"
+            v-bind:="handleFunction(item.permissionProps, slotProps)"
+            style="padding: 0"
+            :danger="item.command === 'Delete'"
+            :popConfirm="
+              handleFunction(item.permissionProps, slotProps)?.popConfirm
+            "
+          >
+            <AIcon v-if="item.icon" :type="item?.icon" />
+            <img v-else-if="item?.icon?.includes('http')" :src="item.icon" /> 
+         
+            <span v-else>   {{ item.text }}</span>
+            <j-divider type="vertical" />
+          </PermissionButton>
+        </div>
       </template>
     </JProTable>
     <JProTable
@@ -79,8 +110,43 @@
           <template #content>
             <j-row>
               <j-col :span="12">
-                <h3>
-                  {{ slotProps[props?.cardConfig?.field1] || '字段1' }}
+                <span
+                  v-if="
+                    slotProps[props?.cardConfig?.field1]?.config?.type ===
+                      'object' && isShowIcon
+                  "
+                >
+                  <AIcon
+                    type="SearchOutlined"
+                    @click="
+                      jsonOpen(slotProps[props?.cardConfig?.field1]?.value)
+                    "
+                  />
+                </span>
+                <span
+                  v-else-if="
+                    slotProps[props?.cardConfig?.field1]?.config?.type ===
+                      'file' && isShowFileIcon
+                  "
+                >
+                  <img
+                    style="width: 30px; height: 30px"
+                    :src="
+                      dataFormat(
+                        slotProps[props?.cardConfig?.field1]?.config,
+                        slotProps[props?.cardConfig?.field1]?.value,
+                      )
+                    "
+                  />
+                </span>
+                <h3 v-else>
+                  {{
+                    dataFormat(
+                      slotProps[props?.cardConfig?.field1]?.config,
+                      slotProps[props?.cardConfig?.field1]?.value,
+                    ) || '字段1'
+                  }}
+                  <!-- {{ slotProps[props?.cardConfig?.field1] || '字段1' }} -->
                 </h3>
               </j-col>
               <j-col :span="12">
@@ -92,13 +158,89 @@
               <j-col :span="12">
                 <div>{{ props?.cardConfig?.field2Titel }}</div>
                 <div>
-                  {{ slotProps[props?.cardConfig?.field2] || '字段2' }}
+                  <span
+                    v-if="
+                      slotProps[props?.cardConfig?.field2]?.config?.type ===
+                        'object' && isShowIcon
+                    "
+                  >
+                    <AIcon
+                      type="SearchOutlined"
+                      @click="
+                        jsonOpen(slotProps[props?.cardConfig?.field2]?.value)
+                      "
+                    />
+                  </span>
+                  <span
+                    v-else-if="
+                      slotProps[props?.cardConfig?.field2]?.config?.type ===
+                        'file' && isShowFileIcon
+                    "
+                  >
+                    <img
+                      style="width: 30px; height: 30px"
+                      :src="
+                        dataFormat(
+                          slotProps[props?.cardConfig?.field2]?.config,
+                          slotProps[props?.cardConfig?.field2]?.value,
+                        )
+                      "
+                    />
+                  </span>
+                  <span v-else>
+                    {{
+                      dataFormat(
+                        slotProps[props?.cardConfig?.field2]?.config,
+                        slotProps[props?.cardConfig?.field2]?.value,
+                      ) || '字段2'
+                    }}
+                  </span>
+
+                  <!-- {{ slotProps[props?.cardConfig?.field2] || '字段2' }} -->
                 </div>
               </j-col>
               <j-col :span="12">
                 <div>{{ props?.cardConfig?.field3Titel }}</div>
                 <div>
-                  {{ slotProps[props?.cardConfig?.field3] || '字段3' }}
+                  <span
+                    v-if="
+                      slotProps[props?.cardConfig?.field3]?.config?.type ===
+                        'object' && isShowIcon
+                    "
+                  >
+                    <AIcon
+                      type="SearchOutlined"
+                      @click="
+                        jsonOpen(slotProps[props?.cardConfig?.field3]?.value)
+                      "
+                    />
+                  </span>
+                  <span
+                    v-else-if="
+                      slotProps[props?.cardConfig?.field3]?.config?.type ===
+                        'file' && isShowFileIcon
+                    "
+                  >
+                    <img
+                      style="width: 30px; height: 30px"
+                      :src="
+                        dataFormat(
+                          slotProps[props?.cardConfig?.field3]?.config,
+                          slotProps[props?.cardConfig?.field3]?.value,
+                        )
+                      "
+                    />
+                  </span>
+                  <span v-else>
+                    {{
+                      dataFormat(
+                        slotProps[props?.cardConfig?.field3]?.config,
+                        slotProps[props?.cardConfig?.field3]?.value,
+                      ) || '字段3'
+                    }}
+                  </span>
+
+                  <!-- {{ slotProps[props?.cardConfig?.field3] || '字段3' }} -->
                 </div>
               </j-col>
             </j-row>
@@ -113,6 +255,7 @@
 import Card from '@/components/Card'
 import HeaderButton from '@/components/ListPage/Preview/components/HederActions.vue'
 import { isFunction, isObject } from 'lodash-es'
+import dayjs from 'dayjs'
 const props = defineProps({
   model: {
     type: String,
@@ -149,7 +292,102 @@ const props = defineProps({
     default: () => [],
   },
 })
-const isShowDropdown = ref('')
+const isShowIcon = ref(false)
+const isShowFileIcon = ref(false)
+const emit = defineEmits(['openJson'])
+const dataFormat = (data: any, value: any) => {
+  console.log(data, value, 'dataFormat')
+  let format: any
+  let type = data?.type
+  if (
+    data?.type === 'int' ||
+    data?.type === 'long' ||
+    data?.type === 'text' ||
+    data?.type === 'double' ||
+    data?.type === 'float'
+  ) {
+    type = 'content'
+  } else if (
+    data?.type === 'file' ||
+    data?.type === 'enum' ||
+    data?.type === 'array'
+  ) {
+    type = 'fileSource'
+  }
+  switch (type) {
+    case 'object':
+      if (data?.demonstrations === 'json') {
+        isShowIcon.value = false
+        format = JSON.parse(JSON.stringify(value))
+      } else {
+        isShowIcon.value = true
+      }
+      break
+
+    case 'date':
+      format = dayjs(value).format(data?.dateValue || 'YYYY-MM-DD')
+      break
+    case 'content':
+      switch (data.inputValue) {
+        case 'x%':
+          format = value + '%' || ''
+          break
+        case '%x':
+          format = '%' + value || ''
+          break
+        case 'xxxx%xxxx':
+          console.log(value, 'value')
+
+          format = value?.slice(0, 4) + '%' + value?.slice(4) || ''
+          break
+        case '':
+          format = value || ''
+          break
+      }
+      break
+
+    case 'boolean':
+      if (value) {
+        format = data?.trueValue || '是'
+      } else {
+        format = data?.falseValue || '否'
+      }
+      break
+    case 'fileSource':
+      switch (data.fileValue) {
+        case 'url':
+          format = value?.url || ''
+          break
+        case 'icon':
+          isShowFileIcon.value = true
+          format = value?.url || ''
+          break
+        case 'fileName':
+          format = value?.name + '.' + value.type || ''
+          break
+        case 'xxx ; xxx':
+          format = value?.slice(0, 3) + ';' + value?.slice(43) || ''
+          break
+
+        case 'xxx/xxx':
+          format = value?.slice(0, 3) + '/' + value?.slice(3) || ''
+          break
+        case 'xxx、xxx':
+          format = value?.slice(0, 3) + '、' + value?.slice(3) || ''
+          break
+      }
+
+      break
+    case 'geoPoint':
+      format = value || ''
+  }
+  return format
+}
+const jsonOpen = (value: any) => {
+  console.log(value, 'kjsfdsdlk')
+
+  emit('openJson', { previewVisible: true, value: value })
+}
 const handleFunction = (item: any, data?: any) => {
   if (isFunction(item)) {
     return item(data)

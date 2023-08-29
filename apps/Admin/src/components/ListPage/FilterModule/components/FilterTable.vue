@@ -283,11 +283,9 @@ const confirm = (data: any) => {
   loading.value = true
   emit('confirm', data)
   return new Promise((resolve) => {
-    setTimeout(async () => {
-      tableRef.value.removeItem(data.index)
-      resolve(true)
-      loading.value = false
-    }, 1000)
+    tableRef.value.removeItem(data.index)
+    resolve(true)
+    loading.value = false
   })
 }
 //同步数据绑定

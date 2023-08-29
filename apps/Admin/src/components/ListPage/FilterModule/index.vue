@@ -9,6 +9,7 @@
       height="520px"
     >
       <Table
+        v-if="type === ''"
         :columns="columns"
         :dataBind="dataBind"
         :asynData="asynData"
@@ -19,9 +20,7 @@
         :modelActiveKey="activeKey"
         @handleAdd="handleAdd"
         @configuration="configuration"
-        @confirm="confirm"
         @handleOk="handleOk"
-        v-if="type === ''"
       />
       <div v-if="type !== ''">
         <a-page-header
@@ -34,10 +33,26 @@
             返回
           </template>
         </a-page-header>
-        <EnumType v-if="type === 'enum'" @update:state="newValue => subValue = newValue" :id="props.id"/>
-        <StringType v-if="type === 'string'" @update:state="newValue => subValue = newValue" :id="props.id"/>
-        <NumberType v-if="type === 'number'" @update:state="newValue => subValue = newValue" :id="props.id"/>
-        <DateType v-if="type === 'date'" @update:state="newValue => subValue = newValue" :id="props.id"/>
+        <EnumType
+          v-if="type === 'enum'"
+          :id="props.id"
+          @update:state="(newValue) => (subValue = newValue)"
+        />
+        <StringType
+          v-if="type === 'string'"
+          :id="props.id"
+          @update:state="(newValue) => (subValue = newValue)"
+        />
+        <NumberType
+          v-if="type === 'number'"
+          :id="props.id"
+          @update:state="(newValue) => (subValue = newValue)"
+        />
+        <DateType
+          v-if="type === 'date'"
+          :id="props.id"
+          @update:state="(newValue) => (subValue = newValue)"
+        />
       </div>
 
       <template #footer v-if="type !== ''">
@@ -54,10 +69,13 @@
 
 <script lang="ts" setup>
 import Table from '@/components/ListPage/FilterModule/components/FilterTable.vue'
-import EnumType from '@/components/ListPage/FilterModule/components/EnumType.vue'
-import StringType from '@/components/ListPage/FilterModule/components/StringType.vue'
-import NumberType from '@/components/ListPage/FilterModule/components/NumberType.vue'
-import DateType from '@/components/ListPage/FilterModule/components/DateType.vue'
+import {
+  EnumType,
+  StringType,
+  NumberType,
+  DateType,
+} from '@/components/ListPage/FilterModule/components/index'
+
 import { useAllListDataStore } from '@/store/listForm'
 
 interface Emit {
@@ -72,7 +90,7 @@ const props = defineProps({
   },
   id: {
     type: null,
-  }
+  },
 })
 
 const open = computed({
@@ -87,7 +105,7 @@ const type = ref('')
 const title = ref('请选择页面支持的筛选项')
 const addBtnName = ref('新增筛选项')
 const configurationStore = useAllListDataStore()
-const subValue =ref({})
+const subValue = ref({})
 //是否完成数据绑定
 const dataBind = ref(true)
 //是否同步数据绑定
@@ -206,11 +224,9 @@ const handleAdd = async (table: any) => {
     type: 'string',
     mark: 'add',
   })
+  // const data = await table?.getData();
 }
-//删除
-const confirm = (data: any) => {
-  console.log(data, 'confirm')
-}
+
 const configRow = ref()
 //配置
 const configuration = (data: any) => {
@@ -224,21 +240,29 @@ const handleOk = (value: any) => {
 
 //保存
 const submit = () => {
-  configurationStore.setALLlistDataInfo(type.value,subValue.value,props.id)
-  console.log(type.value,subValue.value,props.id);
+  configurationStore.setALLlistDataInfo(type.value, subValue.value, props.id)
+  console.log(type.value, subValue.value, props.id)
   const dataRow = dataSource.value?.find(
     (item: any) => item?.id === configRow.value?.id,
   )
   if (dataRow) {
     dataRow['config'] = { ...subValue.value }
   }
-  configurationStore.setALLlistDataInfo('searchData',dataSource.value,props.id)
+  configurationStore.setALLlistDataInfo(
+    'searchData',
+    dataSource.value,
+    props.id,
+  )
   type.value = ''
 }
 watch(
   () => dataSource.value,
   () => {
-    configurationStore.setALLlistDataInfo('searchData',dataSource.value,props.id)
+    configurationStore.setALLlistDataInfo(
+      'searchData',
+      dataSource.value,
+      props.id,
+    )
   },
 )
 </script>

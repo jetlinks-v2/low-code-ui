@@ -6,27 +6,16 @@
       :closable="true"
       :visible="open"
       @close="emits('update:open', false)"
+      :footer-style="{ textAlign: 'right' }"
     >
       <div v-if="!state.configurationShow">
         <p>数据展示方式</p>
         <div class="j-check-btn">
-          <div
-            :class="[
-              'j-check-btn-item',
-              state.configured.includes('list') ? 'selected' : '',
-            ]"
-            @click="configuredChange('list')"
-          >
+          <div :class="classList" @click="configuredChange('list')">
             数据列表
           </div>
 
-          <div
-            :class="[
-              'j-check-btn-item',
-              state.configured.includes('card') ? 'selected' : '',
-            ]"
-            @click="configuredChange('card')"
-          >
+          <div :class="classCard" @click="configuredChange('card')">
             卡片列表
           </div>
         </div>
@@ -61,12 +50,10 @@
         <Card ref="cardRef" :id="props.id" />
       </div>
       <template #footer>
-        <j-button style="float: right" type="primary" @click="submit">
+        <j-button style="margin-right: 8px" type="primary" @click="submit">
           确定
         </j-button>
-        <j-button style="float: right; margin-right: 8px" @click="cancel">
-          取消
-        </j-button>
+        <j-button @click="cancel"> 取消 </j-button>
       </template>
     </j-drawer>
   </div>
@@ -108,6 +95,18 @@ const open = computed({
   set(val: boolean) {
     emits('update:open', val)
   },
+})
+const classCard = computed(() => {
+  return {
+    'j-check-btn-item': true,
+    selected: state.configured.includes('card'),
+  }
+})
+const classList = computed(() => {
+  return {
+    'j-check-btn-item': true,
+    selected: state.configured.includes('list'),
+  }
 })
 
 const cardRef = ref()
