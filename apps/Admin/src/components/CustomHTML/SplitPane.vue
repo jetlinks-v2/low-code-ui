@@ -5,7 +5,7 @@ import 'splitpanes/dist/splitpanes.css'
 
 <template>
   <splitpanes>
-    <pane :size="60" :min-size="10">
+    <pane :size="100" :min-size="10">
       <splitpanes horizontal>
         <pane :size="80" :min-size="20">
           <slot name="editor"></slot>
@@ -14,9 +14,6 @@ import 'splitpanes/dist/splitpanes.css'
           <slot name="console"></slot>
         </pane>
       </splitpanes>
-    </pane>
-    <pane :size="40" :min-size="10">
-      <slot name="preview"></slot>
     </pane>
   </splitpanes>
 </template>

@@ -10,7 +10,6 @@ import {
 } from 'vue'
 import srcdoc from '../output/srcdoc.html?raw'
 import { compileModulesForPreview } from '../output/moduleComplier'
-import type { WatchStopHandle } from 'vue'
 import { Store } from '../types'
 import { ReplStore } from '../store'
 
@@ -24,7 +23,6 @@ if (props.code) {
 const preview = ref()
 const runtimeError = ref()
 let sandBox: any
-let stopUpdateWatcher: WatchStopHandle
 
 watch(
   () => store.getImportMap(),
@@ -48,18 +46,17 @@ onMounted(() => {
 
 onUnmounted(() => {
   sandBox.removeEventListener('load', () => {
-    watchEffect(updatePreview)
+    updatePreview
   })
-  stopUpdateWatcher && stopUpdateWatcher()
 })
 
 function createSandBox() {
   if (sandBox) {
-    stopUpdateWatcher && stopUpdateWatcher()
     preview.value.removeChild(sandBox)
   }
 
   sandBox = document.createElement('iframe')
+  sandBox.id = 'previewFrame'
   sandBox.setAttribute(
     'sandbox',
     [
@@ -86,15 +83,15 @@ function createSandBox() {
   sandBox.srcdoc = sandBoxSrc
   preview.value.appendChild(sandBox)
   sandBox.addEventListener('load', () => {
-    stopUpdateWatcher = watchEffect(updatePreview)
+    updatePreview()
   })
 }
 
 function updatePreview() {
   if (!useVueMode.value) return
-  // if (import.meta.env.PROD) {
-  //   console.clear()
-  // }
+  if (import.meta.env.PROD) {
+    console.clear()
+  }
   runtimeError.value = undefined
 
   try {
@@ -143,6 +140,10 @@ function updatePreview() {
     runtimeError.value = (error as Error).message
   }
 }
+
+defineExpose({
+  updatePreview,
+})
 </script>
 
 <template>
@@ -157,7 +158,6 @@ function updatePreview() {
     height: 100%;
     border: none;
     background-color: #fff;
-    padding: 5px;
   }
 }
 </style>

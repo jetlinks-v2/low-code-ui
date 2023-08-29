@@ -81,7 +81,6 @@ const CropperModal = defineComponent({
           const formData = new FormData()
           formData.append('file', data, new Date().getTime() + '.jpg')
           imgUrl.value = data
-          loading.value = true
           // 上传文件
           run(formData)
         } else {

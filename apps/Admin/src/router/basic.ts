@@ -17,7 +17,7 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
         meta: {
           title: '自定义HTML',
         },
-        component: () => import('@/views/test/index.vue'),
+        component: () => import('@/components/CustomHTML/index.vue'),
       },
     ],
   },
@@ -55,5 +55,29 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
     meta: {
       title: '测试页',
     },
+  },
+  {
+    path: '/card',
+    name: 'Card',
+    component: () => import('@/views/demo/Card.vue'),
+    meta: {
+      title: '测试页'
+    }
+  },
+  {
+    path: '/editor',
+    name: 'Editor',
+    component: () => import('@/views/demo/EditorModal.vue'),
+    meta: {
+      title: '测试页'
+    }
+  },
+  {
+    path: '/quick',
+    name: 'Quick',
+    component: () => import('@/views/demo/add.vue'),
+    meta: {
+      title: '测试页'
+    }
   },
 ]

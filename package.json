@@ -36,7 +36,7 @@
     "@changesets/cli": "^2.26.2",
     "@jetlinks/utils": "workspace:^",
     "@vue/compiler-sfc": "3.2.40",
-    "jetlinks-ui-components": "^1.0.28",
+    "jetlinks-ui-components": "^1.0.29",
     "lodash-es": "^4.17.21"
   }
 }

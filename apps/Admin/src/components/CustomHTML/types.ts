@@ -10,15 +10,17 @@ export type PreviewMode = 'js' | 'css' | 'ssr'
 export class File {
   filename: string
   code: string
+  hidden?: boolean
   compiled = {
     js: '',
     css: '',
     ssr: '',
   }
 
-  constructor(filename: string, code = '') {
+  constructor(filename: string, code = '', hidden?: boolean) {
     this.filename = filename
     this.code = code
+    this.hidden = hidden
   }
 
   get language() {

@@ -29,22 +29,42 @@ function formatMessage(err: string | Error): string {
 </script>
 
 <template>
-  <div class="error-content">
-    <span class="message" v-if="!dismissed && error">
+  <div class="message-content">
+    <span class="error-message" v-if="!dismissed && error">
       {{ formatMessage(props.error) }}
     </span>
+    <span v-else class="runtime-message"> 运行正常</span>
   </div>
 </template>
 
 <style lang="less" scoped>
-@editor-text-default: rgb(255, 0, 0);
-.error-content {
+@editor-error-color: rgb(255, 0, 0);
+@editor-default-color: rgb(0, 255, 191);
+.message-content {
   width: 100%;
   height: 100%;
   padding: 5px;
   background-color: #1e1e1e;
-  .message {
-    color: @editor-text-default;
+  .error-message {
+    color: @editor-error-color;
+  }
+  .runtime-message {
+    color: @editor-default-color;
+    &::after {
+      overflow: hidden;
+      display: inline-block;
+      vertical-align: bottom;
+      animation: ellipsis 2s infinite;
+      content: '\2026';
+    }
+    @keyframes ellipsis {
+      from {
+        width: 2px;
+      }
+      to {
+        width: 15px;
+      }
+    }
   }
 }
 </style>

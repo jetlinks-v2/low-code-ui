@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+const $slots = useSlots()
 defineProps({
   title: String,
 })
@@ -7,7 +7,10 @@ defineProps({
 
 <template>
   <div class="editor-container">
-    <div class="title">{{ title }}</div>
+    <div class="title">
+      <slot name="title"></slot>
+      {{ $slots.title ? '' : title }}
+    </div>
     <slot></slot>
   </div>
 </template>
@@ -22,6 +25,8 @@ defineProps({
     padding: 5px;
     color: #fff;
     border-bottom: 1px #2a2a2a solid;
+    display: flex;
+    justify-content: flex-start;
   }
 }
 </style>
