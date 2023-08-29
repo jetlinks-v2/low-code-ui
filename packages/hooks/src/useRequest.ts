@@ -27,7 +27,7 @@ const defaultOptions: any = {
 type Run = (...args: any[]) => void
 
 export const useRequest = <T = any, S = any>(
-  request: Promise<AxiosResponseRewrite<T>>,
+  request: () => Promise<AxiosResponseRewrite<T>>,
   options: Partial<RequestOptions<T, S>> = defaultOptions
 ): {
   data: Ref<S | undefined>,
@@ -42,6 +42,7 @@ export const useRequest = <T = any, S = any>(
     }
    
     async function run(...arg: any) {
+      console.log(request, isFunction(request))
         if (request && isFunction(request)) {
             loading.value = true
             try {
@@ -63,6 +64,7 @@ export const useRequest = <T = any, S = any>(
 
         }
     }
+
 
     if (_options.immediate) { // 主动触发
         run()

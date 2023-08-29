@@ -3,6 +3,8 @@ export const TYPE_PROVIDE = Symbol('crud_java_type')
 export const SETTING_FORM_MODEL = Symbol('setting_form_model')
 export const SETTING_FORM_REF = Symbol('setting_form_ref')
 
+export const CRUD_COLUMNS = Symbol('crud_columns')
+
 export const DataActions = [
   {
     label: '导入',

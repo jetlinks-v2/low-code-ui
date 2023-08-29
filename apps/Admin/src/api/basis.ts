@@ -11,6 +11,6 @@ export const getDetails_api = (data: any) => request.post<any>(`/system/config/s
  * @param command
  * @param data
  */
-export const executeReq = (provider: Draft.Provider, command: Draft.Command) => request.post(`/low-code/editor/function-provider/${provider}/${command}/execute`, {})
+export const executeReq = (provider: Draft.Provider, command: Draft.Command, data: any = {}) => request.post(`/low-code/editor/function-provider/${provider}/${command}/execute`, data)
 
-
+export const getAssetType = () => request.get('/asset/types')

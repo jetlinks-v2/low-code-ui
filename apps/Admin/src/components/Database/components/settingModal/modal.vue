@@ -10,12 +10,12 @@
       :model="formModel"
       layout="vertical"
     >
-      <component :is="componentName" :form="formRef" />
+      <component :is="componentName" />
     </j-form>
   </j-modal>
 </template>
 
-<script setup lang="jsx" name="typeModal">
+<script setup name="TypeModal">
 import EnumItem from './Enum.vue'
 import ListItem from './List.vue'
 import MapItem from './Map.vue'
@@ -39,7 +39,7 @@ provide(SETTING_FORM_MODEL, formModel)
 provide(SETTING_FORM_REF, formRef)
 
 const componentName = computed(() => {
-  const { javaType, ...setting } = props.data
+  const { javaType } = props.data
 
   const spec = {
     canImport: false,
@@ -54,7 +54,7 @@ const componentName = computed(() => {
           multiple: undefined
         },
         spec,
-        ...setting
+        ...props.data
       }
       return EnumItem;
     case 'String':
@@ -72,7 +72,7 @@ const componentName = computed(() => {
           }
         },
         spec,
-        ...setting
+        ...props.data
       }
       return StringItem;
     case 'Double':
@@ -90,30 +90,32 @@ const componentName = computed(() => {
             message: undefined,
             group: undefined,
             classType: javaType,
-            regexp: undefined
+            regexp: undefined,
+            min: undefined,
+            max: undefined
           }
         },
         spec,
-        ...setting
+        ...props.data
       }
       return NumberItem;
     case 'List':
       formModel.value = {
-        defaultValueSpec: {
-          fixValue: undefined
+        others: {
+          valueJavaType: undefined
         },
         spec,
-        ...setting
+        ...props.data
       }
       return ListItem;
     case 'Map':
-
       formModel.value = {
         others: {
-
+          keyJavaType: undefined,
+          valueJavaType: undefined
         },
         spec,
-        ...setting
+        ...props.data
       }
       return MapItem;
   }

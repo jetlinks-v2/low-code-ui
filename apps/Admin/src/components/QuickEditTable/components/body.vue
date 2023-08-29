@@ -5,7 +5,7 @@
         <div
           v-for="(a, index) in updateList"
           class="body-row"
-          :style="{ transform: `translateY(${a.offectTop}px)`, height: cellHeight+'px'}"
+          :style="{ transform: `translateY(${a.offsetTop}px)`, height: cellHeight+'px'}"
           :key="a._quick_id"
         >
           <div

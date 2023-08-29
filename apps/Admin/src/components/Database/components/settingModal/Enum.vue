@@ -36,21 +36,29 @@
 <script setup name="CRUDSettingEnum">
 import { SETTING_FORM_MODEL } from "@/components/Database/util";
 import Spec from './Spec.vue'
-import {inject} from "vue";
+import { inject } from "vue";
+import { useRequest } from '@jetlinks/hooks'
+import { dictionaryList } from "@/api/dictionary";
 
-const options = ref()
+const { data: options } = useRequest(dictionaryList, {
+  onSuccess(res) {
+    if (res) {
+      return res.result.map(item => ({ ...item, label: item.name, value: item.id }))
+    }
+    return []
+  }
+})
 
 const model = inject(SETTING_FORM_MODEL, {})
 const visible = ref(false)
 const change = (key) => {
-  console.log(key)
   if (key && model.jdbcType !== 'BIGINT') {
     visible.value = true
   }
 }
 
 const save = () => {
-  model.jdbcType = 'BIGINT'
+  model.value.jdbcType = 'BIGINT'
   visible.value = false
 }
 

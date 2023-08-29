@@ -6,43 +6,49 @@
     <QuickEditTable
       serial
       :data="dataSource"
-      :columns="columns"
+      :columns="myColumns"
       :height="500"
       :scroll="{x: 1300, y: 500}"
     >
-      <template #column="{record, index}">
-        <span v-if="index < maxLen">{{ record.column }}</span>
-        <j-input v-else v-model:value="record.column" @change="() => { alias(record.column, record) }" />
+      <template #serial="{record, index}">
+        <div class="serial">
+          <AIcon type="KeyOutlined" :class="{primary: index === 1}" />
+          <span>{{ index }}</span>
+        </div>
+      </template>
+      <template #name="{record, index}">
+        <span v-if="index <= maxLen">{{ record.name }}</span>
+        <j-input v-else v-model:value="record.name" @change="() => { alias(record.name, record) }" />
       </template>
       <template #comment="{record, index}">
-        <span v-if="index < maxLen">{{ record.comment }}</span>
+        <span v-if="index <= maxLen">{{ record.comment }}</span>
         <j-input v-else v-model:value="record.comment" :maxLength="16"/>
       </template>
       <template #javaType="{record, index}">
-        <span v-if="index < maxLen">{{record.javaType}}</span>
+        <span v-if="index <= maxLen">{{record.javaType}}</span>
         <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => JavaTypeChange(record)" />
       </template>
       <template #jdbcType="{record, index}">
-        <span v-if="index < maxLen">{{record.jdbcType}}</span>
+        <span v-if="index <= maxLen">{{record.jdbcType}}</span>
         <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" />
       </template>
       <template #length="{ record, index }">
-        <span v-if="index < maxLen">{{record.length}}</span>
+        <span v-if="index <= maxLen">{{record.length}}</span>
         <j-input-number v-else v-model:value="record.length" :precision="0" style="width: 100%;" />
       </template>
       <template #scale="{ record, index }">
-        <span v-if="index < maxLen">{{record.scale}}</span>
+        <span v-if="index <= maxLen">{{record.scale}}</span>
         <j-input-number v-else v-model:value="record.scale" :precision="0" style="width: 100%;" />
       </template>
       <template #updatable="{ record }">
         <ReadOnly v-model:value="record.updatable" />
       </template>
       <template #setting="{ record, index }">
-        <span v-if="index < maxLen"></span>
+        <span v-if="index <= maxLen"></span>
         <template v-else>
           <j-tooltip
-            v-if="!record.javaType"
-            title="请先选择javaType"
+            v-if="!record.javaType || ['Boolean', 'DateTime'].includes(record.javaType)"
+            :title=" ['Boolean', 'DateTime'].includes(record.javaType) ? '该javaType不支持配置' : '请先选择javaType'"
           >
             <j-button disabled>
               配置
@@ -57,7 +63,7 @@
       <template #action="{ record, index }">
         <j-space>
           <PermissionButton
-            v-if="index >= (maxLen ? maxLen - 1 : maxLen)"
+            v-if="index > (maxLen ? maxLen - 1 : maxLen)"
             type="link"
             class="action-btn"
             :hasPermission="true"
@@ -67,7 +73,7 @@
             <AIcon type="PlusSquareOutlined" />
           </PermissionButton>
           <PermissionButton
-            v-if="index >= maxLen"
+            v-if="index > maxLen"
             type="link"
             class="action-btn"
             :hasPermission="true"
@@ -77,7 +83,7 @@
             <AIcon type="CopyOutlined" />
           </PermissionButton>
           <PermissionButton
-            v-if="index >= maxLen"
+            v-if="index > maxLen"
             type="link"
             class="action-btn"
             :hasPermission="true"
@@ -102,17 +108,32 @@
 </template>
 
 <script setup name="CRUDTable">
-import { upperCase } from "@/utils/comm";
+import {onlyMessage, upperCase} from "@/utils/comm";
 import { executeReq } from '@/api/basis'
 import { cloneDeep, debounce, omit } from 'lodash-es'
-import { TYPE_PROVIDE} from "@/components/Database/util";
+import { TYPE_PROVIDE, CRUD_COLUMNS } from "@/components/Database/util";
 import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly } from './components'
 import { provide } from 'vue'
+import { defaultSetting, defaultTreeSetting } from './setting'
 
-const columns = [
+const props = defineProps({
+  tree: {
+    type: Boolean,
+    default: false
+  },
+  columns: {
+    type: Array,
+    default: () => []
+  },
+  tableName: {
+
+  }
+})
+
+const myColumns = [
   {
     title: '列',
-    dataIndex: 'column',
+    dataIndex: 'name',
     width: 200,
     tooltip: '蛇形命名'
   },
@@ -165,41 +186,31 @@ const columns = [
 ]
 
 const tableName = ref()
-const maxLen = ref(3)
+const maxLen = ref(defaultSetting.length)
 
+const dataSource = ref(props.columns ? props.columns : defaultSetting)
 
-const dataSource = ref([
-  {
-    column: 'id',
-    alias: 'Id',
-    description: '主键ID',
-    javaType: 'String',
-    jdbcType: 'VARCHAR',
-    length: 11,
-    precision: undefined,
-    updatable: true,
-  },
-  {
-    column: 'cus_id',
-    alias: 'cusId',
-    description: 'cusId',
-    javaType: 'String',
-    jdbcType: 'VARCHAR',
-    length: 12,
-    precision: undefined,
-    updatable: true,
-  }
-])
 const typesOptions = ref([])
 const setting = reactive({
   visible: false,
   data: undefined
 })
 
+const CrudColumns = inject(CRUD_COLUMNS)
+
 provide(TYPE_PROVIDE, typesOptions)
+
+const dataSourceChange = () => {
+  CrudColumns.value = dataSource.value.filter(item => item.name).map(item => ({
+    dataIndex: item.name,
+    title: item.comment
+  }))
+}
+
 const updateDataSource = (record, index) => {
-  const _record = omit(record, ['index', '_quick_id', 'offectTop'])
+  const _record = omit(record, ['index', '_quick_id', 'offsetTop'])
   dataSource.value.splice(index, 0, _record)
+  dataSourceChange()
 }
 
 const add = (index) => {
@@ -226,6 +237,7 @@ const copy = (record, index) => {
 
 const deleteFn = async (index) => {
   dataSource.value.splice(index, 1)
+  dataSourceChange()
 }
 
 const JavaTypeChange = (record) => {
@@ -247,31 +259,47 @@ const settingCancel = () => {
 }
 
 const settingSave = (data) => {
-  console.log(data)
   dataSource.value.splice(data.index - 1, 1, data)
   settingCancel()
 }
 
-
-const tableNameChange = debounce(() => {
-  executeReq('rdb-crud', 'CheckTableName').then(res => {
+const tableNameChange = debounce((e) => {
+  executeReq('rdb-crud', 'CheckTableName', { tableName: e.target.value }).then(res => {
     console.log(res)
     if(res.success && res.result) {
-
+      onlyMessage('', "warning")
     }
   })
 }, 300)
 
 const getTypes = () => {
   executeReq('rdb-crud', 'GetTypes').then(res => {
-    console.log(res)
     if (res.success && res.result) {
       typesOptions.value = res.result
     }
   })
 }
 
+watch(() => props.tree, () => {
+  const isTreeNow = dataSource.value.some(item => item.name === 'parent_id')
+  const arr = JSON.parse(JSON.stringify(dataSource.value))
+
+  if (props.tree) {
+    if (!isTreeNow) {
+      const other = arr.slice(5, arr.length )
+      dataSource.value = defaultTreeSetting.concat(other)
+      maxLen.value = 9
+    }
+  } else {
+    if (isTreeNow) {
+      dataSource.value = defaultSetting.concat(arr.slice(9, arr.length))
+      maxLen.value = 5
+    }
+  }
+}, { immediate: true })
+
 getTypes()
+dataSourceChange()
 
 </script>
 
@@ -283,6 +311,22 @@ getTypes()
   }
   :deep(.action-btn) {
     padding: 4px 8px !important;
+  }
+
+  .serial {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    :deep(.anticon-key) {
+      transform: rotate(-45deg);
+      font-size: 16px;
+      color: #7f7f7f;
+    }
+
+    .primary {
+      color: #fa8c16;
+    }
   }
 }
 </style>

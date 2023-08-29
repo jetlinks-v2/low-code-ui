@@ -1,7 +1,7 @@
 import { randomString } from '@jetlinks/utils'
 export const dataAddID = (data: any[], rowHeight: number) => {
   return data.map((item, index ) => {
-    item.offectTop = (index) * rowHeight
+    item.offsetTop = (index) * rowHeight
     item.index = index + 1
 
     if (!item._quick_id) {

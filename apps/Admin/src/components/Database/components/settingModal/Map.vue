@@ -1,5 +1,5 @@
 <template>
-  <j-form-item label="key" name="key">
+  <j-form-item label="key" :name="['others', 'keyJavaType']" required>
     <j-select
       :options="[
         {
@@ -11,14 +11,16 @@
           value: 'Integer'
         },
       ]"
+      v-model:value="model.others.keyJavaType"
     />
   </j-form-item>
-  <j-form-item label="value" name="value">
+  <j-form-item label="value" :name="['others', 'valueJavaType']" required>
     <j-select
       :options="options"
       :fieldNames="{
         label: 'text'
       }"
+      v-model:value="model.others.valueJavaType"
     />
   </j-form-item>
   <j-form-item label="数据操作" name="spec">
