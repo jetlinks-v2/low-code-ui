@@ -92,12 +92,7 @@
         style="padding: 10px"
       >
         <div v-if="cardState.type === 'customIcon'">
-          <j-form-item
-            label="自定义图标"
-            name="customIcon"
-            :rules="[{ required: true, message: '请上传图标!' }]"
-            class="upload-icon"
-          >
+          <j-form-item label="自定义图标" name="customIcon" class="upload-icon">
             <Upload v-model:value="formState.customIcon" :accept="accept" />
           </j-form-item>
 
@@ -136,16 +131,7 @@
           </ErrorItem>
         </div>
         <div v-if="cardState.type === 'field2'">
-          <j-form-item
-            label="字段2"
-            name="field2"
-            :rules="[
-              {
-                required: true,
-                message: '请选择字段2!',
-              },
-            ]"
-          >
+          <j-form-item label="字段2" name="field2">
             <j-select
               width="200px"
               placeholder="请先配置列表数据"
@@ -158,16 +144,7 @@
           </j-form-item>
         </div>
         <div v-if="cardState.type === 'field3'">
-          <j-form-item
-            label="字段3"
-            name="field3"
-            :rules="[
-              {
-                required: true,
-                message: '请选择字段3!',
-              },
-            ]"
-          >
+          <j-form-item label="字段3" name="field3">
             <j-select
               width="200px"
               placeholder="请先配置列表数据"
@@ -263,10 +240,7 @@ const actions = [
       },
       hasPermission: false,
       icon: 'EyeOutlined',
-      onClick: (e) => {
-        console.log(data, 'data')
-        handleView(data.id)
-      },
+      onClick: (e) => {},
     }),
   },
   {
@@ -300,15 +274,13 @@ const actions = [
       },
       hasPermission: true,
       icon: 'EyeOutlined',
-      onClick: () => {
-        handleView(data.id)
-      },
+      onClick: () => {},
     }),
   },
 ]
 
 const validateValue = () => {
-  const value = ['customIcon', 'field3', 'field2', 'field1']
+  const value = ['field1']
   value.map((item: any) => {
     if (formState[item] === '') {
       cardState.type = item
@@ -321,12 +293,7 @@ const onCheck = async () => {
   try {
     await formRef.value.validateFields()
     validateValue()
-    if (
-      formState.customIcon !== '' &&
-      formState.field1 !== '' &&
-      formState.field2 !== '' &&
-      formState.field3 !== ''
-    ) {
+    if (formState.field1 !== '') {
       configurationStore.setALLlistDataInfo('listFormInfo', formState, props.id)
       return true
     }
@@ -353,7 +320,7 @@ const init = () => {
 
   Object.assign(formState, data)
   statusColor.value = JSON.parse(formState.specialStyle || '{}')
-  console.log(statusColor.value, 'statusColor');
+  console.log(statusColor.value, 'statusColor')
 }
 
 onMounted(() => {

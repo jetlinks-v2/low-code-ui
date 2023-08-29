@@ -19,7 +19,7 @@
         ref="tableRef"
         size="small"
         :height="200"
-        @change="(data) => handleChange(data)"
+@change="(data) => handleChange(data)"
       >
         <template #headerCell="{ column }">
           <template v-if="column.tips">
@@ -42,13 +42,8 @@
             </span>
           </template>
         </template>
-        <template #id="{ data }">
-          <ErrorItem :errorData="errorData(data.record.id)" :border="false">
-            <span>{{ data.record?.name, data }}</span>
-          </ErrorItem>
-        </template>
-        <template #name="{ data }">
-          <ErrorItem :errorData="errorData(data.record.id)" :border="false">
+<template #name="{ data }">
+          <ErrorItem :errorData="errorData(data.record.id)">
             <span>{{ data.record?.name, data }}</span>
           </ErrorItem>
         </template>
@@ -171,7 +166,7 @@ const props = defineProps({
     type: String,
     default: '新增',
   },
-  //校验错误
+//校验错误
   errorList: {
     type: Array,
     default: () => []
@@ -187,7 +182,7 @@ const emit = defineEmits([
   'syncData',
   'handleAdd',
   'handleOk',
-  'handleChange'
+'handleChange'
 ])
 
 const handleChange = (data) => {
@@ -310,13 +305,10 @@ const configuration = (data: any) => {
 const confirm = (data: any) => {
   loading.value = true
   emit('confirm', data)
-  return new Promise((resolve) => {
-    setTimeout(async () => {
-      tableRef.value.removeItem(data.index)
-      resolve(true)
-      loading.value = false
-    }, 1000)
-  })
+  tableRef.value.removeItem(data.index)
+  const dataSource = tableRef.value.getData()
+  console.log(dataSource)
+  loading.value = false
 }
 //同步数据绑定
 const syncData = () => {

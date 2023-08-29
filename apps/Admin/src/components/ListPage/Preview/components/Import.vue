@@ -85,32 +85,48 @@
 
 <script setup lang="ts">
 import { message } from 'ant-design-vue'
-
+import { useTransition } from '@vueuse/core'
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false,
+  },
+})
 const emit = defineEmits(['close', 'save'])
-const visible = ref(true)
+const visible = ref(false)
 const formRef = ref()
+const baseNumber = ref(0)
 const modelRef = reactive({
   upload: [],
   fileType: 'xlsx',
 })
 const progressVisible = ref(false)
-const percent = ref(0)
 const confirmLoading = ref<boolean>(false)
-
+const percent = useTransition(baseNumber, {
+  duration: 1500,
+  transition: [0.75, 0, 0.25, 1],
+})
 const handleCancel = () => {
   emit('close', true)
 }
 
 const handleOk = async () => {
   await formRef?.value?.validateFields()
-  visible.value = false
+  emit('close', true)
   progressVisible.value = true
-  for (let i = 0; i < 100; i++) {
-    setTimeout(() => {
-      percent.value++
-    }, 1000)
-  }
+  baseNumber.value = 100
 }
+watch(
+  () => props.open,
+  (val) => {
+    visible.value = val
+    if (val) {
+      modelRef.upload = []
+      baseNumber.value =
+        percent.value === 100 && baseNumber.value === 100 ? 0 : 100
+    }
+  },
+)
 </script>
 
 <style scoped lang="less">

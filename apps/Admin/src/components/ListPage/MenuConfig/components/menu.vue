@@ -26,14 +26,14 @@
               <j-tooltip placement="top">
                 <template #title>
                   <p>
-                    中文名将应用于系统菜单名称、面包屑等位置，建议设置2-8个字符
+                    中文名将应用于系统菜单名称、面包屑等位置，建议设置2-16个字符
                   </p>
                 </template>
                 <AIcon type="InfoCircleOutlined" />
               </j-tooltip>
             </span>
           </template>
-          <j-input v-model:value="form.name" />
+          <j-input v-model:value="form.name" maxlength="16" />
         </j-form-item>
         <j-form-item
           label="icon"

@@ -9,6 +9,7 @@
       height="520px"
     >
       <Table
+        v-if="configState.type === ''"
         :columns="columns"
         :dataBind="dataBind"
         :asynData="asynData"
@@ -23,7 +24,6 @@
         @confirm="confirm"
         @handleOk="handleOk"
         @handleChange="handleChange"
-        v-if="configState.type === ''"
       />
       <div v-else>
         <a-page-header
@@ -44,7 +44,7 @@
             configState.type !== 'array'
           "
           :config="configRow"
-          @update:state="newValue => subValue = newValue"
+          @update:state="(newValue) => (subValue = newValue)"
         >
           <template #demonstrations v-if="configState.type !== 'geoPoint'">
             <div class="content">
@@ -88,10 +88,10 @@
                 v-if="configState.type === 'object'"
               >
                 <j-space size="large">
-                  <j-radio-button value="left" class="check-btn">
+                  <j-radio-button value="json" class="check-btn">
                     json展示
                   </j-radio-button>
-                  <j-radio-button value="center" class="check-btn">
+                  <j-radio-button value="page" class="check-btn">
                     页面展示
                   </j-radio-button>
                 </j-space>
@@ -207,11 +207,11 @@ const open = computed({
 const title = ref('请配置数据列表需要展示的表头')
 const addBtnName = ref('新增表头')
 const configurationStore = useAllListDataStore()
-const subValue =ref({})
+const subValue = ref({})
 const configState = reactive({
   type: '',
 
-  demonstrations: '', //object类型
+  demonstrations: 'json', //object类型
   dateValue: '', //date类型
   inputValue: '', //int/long/text/float/double类型
   falseValue: '否', //boolean类型
@@ -398,9 +398,9 @@ const configuration = (data: any) => {
   configState.type = data?.record?.type
   configRow.value = data?.record
 
-  configState.demonstrations = data?.record?.config?.demonstrations
+  configState.demonstrations = data?.record?.config?.demonstrations || 'json'
   configState.dateValue = data?.record?.config?.dateValue
-  configState.inputValue = data?.record?.config?.inputValue
+  configState.inputValue = data?.record?.config?.inputValue || ''
   configState.falseValue = data?.record?.config?.falseValue || '否'
   configState.trueValue = data?.record?.config?.trueValue || '是'
   configState.fileValue = data?.record?.config?.fileValue
@@ -425,27 +425,27 @@ const typeDataFliter = (value: string) => {
   }
   switch (type) {
     case 'object':
-      data = { demonstrations: configState.demonstrations }
+      data = { demonstrations: configState.demonstrations, type: value }
       break
 
     case 'date':
-      data = { dateValue: configState.dateValue }
+      data = { dateValue: configState.dateValue, type: value }
       break
 
     case 'content':
-      data = { inputValue: configState.inputValue }
+      data = { inputValue: configState.inputValue, type: value }
       break
 
     case 'boolean':
       data = {
         falseValue: configState.falseValue,
         trueValue: configState.trueValue,
+        type: value,
       }
       break
 
     case 'fileSource':
-      data = { fileValue: configState.fileValue }
-      console.log(data, 'data')
+      data = { fileValue: configState.fileValue, type: value }
       break
   }
   return data
@@ -455,7 +455,7 @@ const submit = () => {
   const configInfo = configurationStore.getALLlistDataInfo(
     props.id,
   )?.listDataInfo
-console.log(configInfo,'configInfo');
+  console.log(configInfo, 'configInfo')
 
   const dataRow = dataSource.value?.find(
     (item: any) => item?.id === configRow.value?.id,
@@ -465,7 +465,7 @@ console.log(configInfo,'configInfo');
     const data = {
       ...configInfo,
       ...typeData,
-      ...subValue.value
+      ...subValue.value,
     }
     dataRow['config'] = { ...data }
   }

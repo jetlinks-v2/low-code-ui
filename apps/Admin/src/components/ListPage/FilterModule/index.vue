@@ -9,6 +9,7 @@
       height="520px"
     >
       <Table
+        v-if="type === ''"
         :columns="columns"
         :dataBind="dataBind"
         :asynData="asynData"
@@ -20,10 +21,7 @@
         :errorList="errorList"
         @handleAdd="handleAdd"
         @configuration="configuration"
-        @confirm="confirm"
         @handleOk="handleOk"
-        @handleChange="(data) => dataSource = data"
-        v-if="type === ''"
       />
       <div v-if="type !== ''">
         <a-page-header
@@ -38,23 +36,23 @@
         </a-page-header>
         <EnumType
           v-if="type === 'enum'"
-          @update:state="(newValue) => (subValue = newValue)"
           :id="props.id"
+          @update:state="(newValue) => (subValue = newValue)"
         />
         <StringType
           v-if="type === 'string'"
-          @update:state="(newValue) => (subValue = newValue)"
           :id="props.id"
+          @update:state="(newValue) => (subValue = newValue)"
         />
         <NumberType
           v-if="type === 'number'"
-          @update:state="(newValue) => (subValue = newValue)"
           :id="props.id"
+          @update:state="(newValue) => (subValue = newValue)"
         />
         <DateType
           v-if="type === 'date'"
-          @update:state="(newValue) => (subValue = newValue)"
           :id="props.id"
+          @update:state="(newValue) => (subValue = newValue)"
         />
       </div>
 
@@ -72,10 +70,13 @@
 
 <script lang="ts" setup>
 import Table from '@/components/ListPage/FilterModule/components/FilterTable.vue'
-import EnumType from '@/components/ListPage/FilterModule/components/EnumType.vue'
-import StringType from '@/components/ListPage/FilterModule/components/StringType.vue'
-import NumberType from '@/components/ListPage/FilterModule/components/NumberType.vue'
-import DateType from '@/components/ListPage/FilterModule/components/DateType.vue'
+import {
+  EnumType,
+  StringType,
+  NumberType,
+  DateType,
+} from '@/components/ListPage/FilterModule/components/index'
+
 import { useAllListDataStore } from '@/store/listForm'
 import { validFilterModule } from './utils/valid'
 import { DATA_BIND } from '../keys'
@@ -201,17 +202,15 @@ const dataBinds: any = inject(DATA_BIND)
 const dataSource = ref([])
 //新增一列table
 const handleAdd = async (table: any) => {
-  table.addItem({
+  table?.addItem({
     id: '',
     name: '',
     type: 'string',
     mark: 'add',
   })
+  // const data = await table?.getData();
 }
-//删除
-const confirm = (data: any) => {
-  console.log(data, 'confirm')
-}
+
 const configRow = ref()
 //配置
 const configuration = (data: any) => {
@@ -227,12 +226,19 @@ const handleOk = (value: any) => {
 const submit = () => {
   configurationStore.setALLlistDataInfo(type.value, subValue.value, props.id)
   console.log(type.value, subValue.value, props.id)
+  configurationStore.setALLlistDataInfo(type.value, subValue.value, props.id)
+  console.log(type.value, subValue.value, props.id)
   const dataRow = dataSource.value?.find(
     (item: any) => item?.id === configRow.value?.id,
   )
   if (dataRow) {
     dataRow['config'] = { ...subValue.value }
   }
+  configurationStore.setALLlistDataInfo(
+    'searchData',
+    dataSource.value,
+    props.id,
+  )
   configurationStore.setALLlistDataInfo(
     'searchData',
     dataSource.value,
@@ -256,6 +262,11 @@ defineExpose({
 watch(
   () => dataSource.value,
   () => {
+    configurationStore.setALLlistDataInfo(
+      'searchData',
+      dataSource.value,
+      props.id,
+    )
     configurationStore.setALLlistDataInfo(
       'searchData',
       dataSource.value,
