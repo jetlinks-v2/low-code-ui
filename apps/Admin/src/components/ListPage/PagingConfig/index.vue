@@ -8,31 +8,35 @@
       @close="emits('update:open', false)"
     >
       <p>请配置分页器支持的单页数据量</p>
-      <div style="display: flex; flex-flow: wrap">
-        <div v-for="(item, index) in pagingData" :key="index">
-          <j-input-number
-            style="margin: 10px"
-            v-model:value="item.pageSize"
-            :min="1"
-            :precision="0"
-            :max="9999"
-            :step="1"
-            @blur="blur()"
-            @pressEnter="blur()"
-          />
-          <span v-if="index < pagingData.length - 1">,</span>
+      <ErrorItem :errorData="errorData('pageList')">
+        <div style="display: flex; flex-flow: wrap;align-items: center;">
+          <div v-for="(item, index) in pagingData" :key="index">
+            <j-input-number
+              style="margin: 10px"
+              v-model:value="item.pageSize"
+              :min="1"
+              :precision="0"
+              :max="9999"
+              :step="1"
+              @blur="blur()"
+              @pressEnter="blur()"
+            />
+            <span v-if="index < pagingData.length - 1">,</span>
+            
+          </div>
           <span
-            v-if="index === pagingData.length - 1 && pagingData.length < 99"
-          >
-            <j-button type="text" @click="onAdd">+</j-button>
+              v-if="pagingData.length < 99"
+            >
+              <j-button type="text" @click="onAdd">+</j-button>
           </span>
         </div>
-      </div>
+      </ErrorItem>
     </j-drawer>
   </div>
 </template>
 <script setup lang="ts">
 import { useAllListDataStore } from '@/store/listForm'
+import { ErrorItem } from '../index'
 const pagingConfigStore = useAllListDataStore()
 const pagingData = ref([
   { pageSize: 12 },
@@ -56,6 +60,11 @@ const props = defineProps({
   },
 })
 
+const errorData = computed(() => {
+  return (val: string) => {
+    return errorList.value?.find((item: any) => item.key === val)
+  }
+})
 const open = computed({
   get() {
     if (props.open) {
@@ -71,11 +80,10 @@ const open = computed({
 })
 
 const onAdd = () => {
-  const value = pagingData.value[pagingData.value.length - 1].pageSize
-  console.log(value)
+  const value = pagingData.value[pagingData.value.length - 1]?.pageSize
 
   pagingData.value.push({
-    pageSize: value + 1,
+    pageSize: value ? value + 1 : 12,
   })
   blur()
 }
@@ -98,5 +106,17 @@ const blur = () => {
   pagingConfigStore.setALLlistDataInfo('pagingData',pagingData.value,props.id)
 }
 
+/**
+ * 校验
+ */
+const errorList = ref<any[]>([])
+const valid = () => {
+  errorList.value = pagingData.value.length ? [] : [{key: 'pageList', message: '请配置分页器支持的单页数据量'}]
+}
+
+defineExpose({
+  valid,
+  errorList
+})
 </script>
 <style lang="less" scoped></style>

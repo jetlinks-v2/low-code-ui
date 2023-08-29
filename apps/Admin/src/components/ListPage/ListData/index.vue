@@ -176,6 +176,7 @@
 import Table from '@/components/ListPage/FilterModule/components/FilterTable.vue'
 import Config from '@/components/ListPage/ListData/compnents/Configuration.vue'
 import { useAllListDataStore } from '@/store/listForm'
+import { DATA_BIND } from '../keys'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -363,48 +364,8 @@ const columns: any = [
   },
 ]
 //数据
-const dataSource = ref([
-  {
-    id: 'deviceId1',
-    name: 'date',
-    type: 'date',
-  },
-  {
-    id: 'deviceId2',
-    name: 'object',
-    type: 'object',
-  },
-  {
-    id: 'deviceId3',
-    name: 'int',
-    type: 'int',
-  },
-  {
-    id: 'deviceId4',
-    name: 'boolean',
-    type: 'boolean',
-  },
-  {
-    id: 'deviceId5',
-    name: 'geoPoint',
-    type: 'geoPoint',
-  },
-  {
-    id: 'deviceId6',
-    name: 'float',
-    type: 'float',
-  },
-  {
-    id: 'deviceId7',
-    name: 'file',
-    type: 'file',
-  },
-  {
-    id: 'deviceId8',
-    name: 'array',
-    type: 'array',
-  },
-])
+const dataBinds:any = inject(DATA_BIND)
+const dataSource = ref()
 //新增一列table
 const handleAdd = async (table: any) => {
   table.addItem({
@@ -417,6 +378,16 @@ const handleAdd = async (table: any) => {
 //删除
 const confirm = (data: any) => {
   console.log(data, 'confirm')
+}
+
+const handleChange = (data) => {
+  dataSource.value = data;
+  // submit()
+  configurationStore.setALLlistDataInfo(
+    'datasource',
+    dataSource.value,
+    props.id,
+  )
 }
 const configRow = ref()
 //配置
@@ -502,6 +473,30 @@ const submit = () => {
   )
   configState.type = ''
 }
+
+const errorList = ref([])
+watch(
+  () => dataBinds,
+  () => {
+    if(dataBinds.functionInfo) {
+      dataBind.value = true;
+    } else {
+      dataBind.value = false
+    }
+    dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(item => {
+      return {
+        id: item.name,
+        name: item.name,
+        type: 'string'
+      }
+    })
+  },
+  { immediate: true, deep: true },
+)
+
+defineExpose({
+  errorList
+})
 </script>
 
 <style scoped lang="less">

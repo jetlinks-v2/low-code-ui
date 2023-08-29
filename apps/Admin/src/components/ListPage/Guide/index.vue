@@ -83,6 +83,7 @@ watch(
       props.stepList[val - 1].target?.()[0]?.el,
       props.stepList[val - 1]?.placement,
     )[0]
+    console.log(props.stepList[val - 1].target);
     props.stepList[val - 1].target?.().forEach((item) => {
       item.el.style.backgroundColor = <string>item.backgroundColor
       item.el.style.pointerEvents = 'none'

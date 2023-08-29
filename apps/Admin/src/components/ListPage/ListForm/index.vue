@@ -21,9 +21,11 @@
         </div>
         <div v-if="state.configured.includes('card')">
           <p class="title">卡片配置</p>
-          <j-button style="width: 300px" @click="state.configurationShow = true"
-            >配置</j-button
-          >
+          <j-badge :count="errorList.length">
+            <j-button :style="{width: '300px', border: errorList.length ? '1px solid red' : ''}" @click="state.configurationShow = true" :class="{ 'error-boder': errorList.length }"
+              >配置</j-button
+            >
+          </j-badge>
         </div>
 
         <div v-if="state.configured?.length === 2">
@@ -47,7 +49,7 @@
             返回
           </template>
         </a-page-header>
-        <Card ref="cardRef" :id="props.id" />
+        <Card ref="cardRef" :id="props.id" :errorList="errorList"/>
       </div>
       <template #footer>
         <j-button style="margin-right: 8px" type="primary" @click="submit">
@@ -63,6 +65,7 @@
 import { useAllListDataStore } from '@/store/listForm'
 import Card from '@/components/ListPage/ListForm/components/card.vue'
 import { cloneDeep } from 'lodash-es'
+import { validListForm } from './utils/valid'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -168,6 +171,16 @@ const configuredChange = (value: string) => {
   state.defaultForm =
     state.configured?.length === 1 ? state.configured[0] : 'list'
 }
+
+const errorList = ref<any[]>([])
+const valid = () => {
+  errorList.value = validListForm(state, configurationStore.getALLlistDataInfo(props.id)?.listFormInfo)
+}
+
+defineExpose({
+  valid,
+  errorList
+})
 </script>
 
 <style lang="less" scoped>

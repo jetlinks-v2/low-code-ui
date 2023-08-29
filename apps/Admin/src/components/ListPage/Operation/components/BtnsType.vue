@@ -56,6 +56,7 @@ import {
   activeBtnKey,
   editTypeKey,
   typeKey,
+  DATA_BIND
 } from '../keys'
 interface Emit {
   (e: 'update:steps', value: string): void
@@ -72,13 +73,13 @@ const props = defineProps({
 
 const activeBtn = inject(activeBtnKey)
 const editType = inject(editTypeKey)
-const dataBind:any = inject('dataBind')
+const dataBind:any = inject(DATA_BIND)
 const type = inject(typeKey)
 
 const emits = defineEmits<Emit>()
 const handleEditBtn = (type: string, title: string, icon: string) => {
   if (editType!.value === 'add') {
-    activeBtn!.value = { type, title, icon, command: type, functions: dataBind.value.data?.function }
+    activeBtn!.value = { type, title, icon, command: type, functions: dataBind.data?.function }
   } else {
     activeBtn!.value = Object.assign(activeBtn!.value, { type, title, icon })
   }

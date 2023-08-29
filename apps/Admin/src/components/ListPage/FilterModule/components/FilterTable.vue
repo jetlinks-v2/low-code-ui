@@ -19,6 +19,7 @@
         ref="tableRef"
         size="small"
         :height="200"
+        @change="(data) => handleChange(data)"
       >
         <template #headerCell="{ column }">
           <template v-if="column.tips">
@@ -40,6 +41,11 @@
               {{ column.title }}
             </span>
           </template>
+        </template>
+        <template #name="{ data }">
+          <ErrorItem :errorData="errorData(data.record.id)">
+            <span>{{ data.record?.name, data }}</span>
+          </ErrorItem>
         </template>
         <template #action="{ data }">
           <span>
@@ -96,6 +102,7 @@
 
 <script lang="ts" setup>
 import { message } from 'ant-design-vue'
+import { ErrorItem } from '../..';
 const props = defineProps({
   title: {
     type: String,
@@ -159,6 +166,11 @@ const props = defineProps({
     type: String,
     default: '新增',
   },
+  //校验错误
+  errorList: {
+    type: Array,
+    default: () => []
+  }
 })
 const tableRef = ref()
 const visible = ref<boolean>(false)
@@ -170,9 +182,20 @@ const emit = defineEmits([
   'syncData',
   'handleAdd',
   'handleOk',
+  'handleChange'
 ])
 
+const handleChange = (data) => {
+  emit('handleChange', data)
+}
+
 const activeKey = ref('1')
+
+const errorData = computed(() => {
+  return (val: string) => {
+    return props.errorList?.find((item: any) => item.key === val)
+  }
+})
 
 //提示col
 const tipsColumns: any = [

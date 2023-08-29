@@ -18,6 +18,7 @@
         :addBtnName="addBtnName"
         :dataSource="dataSource"
         :modelActiveKey="activeKey"
+        :errorList="errorList"
         @handleAdd="handleAdd"
         @configuration="configuration"
         @handleOk="handleOk"
@@ -77,6 +78,8 @@ import {
 } from '@/components/ListPage/FilterModule/components/index'
 
 import { useAllListDataStore } from '@/store/listForm'
+import { validFilterModule } from './utils/valid'
+import { DATA_BIND } from '../keys'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -90,6 +93,7 @@ const props = defineProps({
   },
   id: {
     type: null,
+  },
   },
 })
 
@@ -107,11 +111,11 @@ const addBtnName = ref('新增筛选项')
 const configurationStore = useAllListDataStore()
 const subValue = ref({})
 //是否完成数据绑定
-const dataBind = ref(true)
+const dataBind = ref(false)
 //是否同步数据绑定
 const asynData = ref(true)
 //数据是否有变动
-const dataChange = ref(true)
+const dataChange = ref(false)
 //处理方式弹窗activeKey
 const activeKey = ref('1')
 //筛选类型
@@ -193,29 +197,10 @@ const columns: any = [
     width: 140,
   },
 ]
+
+const dataBinds: any = inject(DATA_BIND)
 //数据
-const dataSource = ref([
-  {
-    id: 'deviceId1',
-    name: 'date类型',
-    type: 'date',
-  },
-  {
-    id: 'deviceId2',
-    name: '枚举类型',
-    type: 'enum',
-  },
-  {
-    id: 'deviceId3',
-    name: '数字类型',
-    type: 'number',
-  },
-  {
-    id: 'deviceId4',
-    name: '字符串类型',
-    type: 'string',
-  },
-])
+const dataSource = ref([])
 //新增一列table
 const handleAdd = async (table: any) => {
   table.addItem({
@@ -242,6 +227,8 @@ const handleOk = (value: any) => {
 const submit = () => {
   configurationStore.setALLlistDataInfo(type.value, subValue.value, props.id)
   console.log(type.value, subValue.value, props.id)
+  configurationStore.setALLlistDataInfo(type.value, subValue.value, props.id)
+  console.log(type.value, subValue.value, props.id)
   const dataRow = dataSource.value?.find(
     (item: any) => item?.id === configRow.value?.id,
   )
@@ -253,8 +240,26 @@ const submit = () => {
     dataSource.value,
     props.id,
   )
+  configurationStore.setALLlistDataInfo(
+    'searchData',
+    dataSource.value,
+    props.id,
+  )
   type.value = ''
 }
+
+/**
+ * 校验筛选模块配置
+ */
+const errorList:any = ref([])
+const valid = async () => {
+  errorList.value = await validFilterModule(dataSource.value)
+}
+
+defineExpose({
+  valid,
+  errorList,
+})
 watch(
   () => dataSource.value,
   () => {
@@ -263,7 +268,31 @@ watch(
       dataSource.value,
       props.id,
     )
+    configurationStore.setALLlistDataInfo(
+      'searchData',
+      dataSource.value,
+      props.id,
+    )
   },
+)
+
+watch(
+  () => dataBinds,
+  () => {
+    if(dataBinds.functionInfo) {
+      dataBind.value = true;
+    } else {
+      dataBind.value = false
+    }
+    dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(item => {
+      return {
+        id: item.name,
+        name: item.name,
+        type: 'string'
+      }
+    })
+  },
+  { immediate: true, deep: true },
 )
 </script>
 
