@@ -1,6 +1,8 @@
 import type { App } from 'vue'
 import TitleComponent from './TitleComponent/index.vue'
 import ImageUpload from "./Upload/Image/ImageUpload.vue";
+import FormDesigner from './FormDesigner/index.vue';
+import ListPage from './ListPage/index.vue';
 import {FormPreview} from './FormDesigner/index';
 
 import QuickEditTable from './QuickEditTable/index.vue'
@@ -13,6 +15,7 @@ import BadgeStatus from "./BadgeStatus";
 import ProImage from './Image/index.vue'
 import EditorModal from './EditorModal'
 import CRUD from './Database'
+import {BooleanSelect, EmptySelect} from './Select'
 export default  {
     install(app: App) {
         app.component('TitleComponent', TitleComponent)
@@ -26,8 +29,11 @@ export default  {
           .component('BadgeStatus', BadgeStatus)
           .component('ProImage', ProImage)
           .component('EditorModal', EditorModal)
+          .component('ListPage', ListPage)
           .component('CRUD', CRUD)
           .component('Menu', Menu)
           .component('Project',Project)
+          .component('EmptySelect',EmptySelect)
+          .component('BooleanSelect',BooleanSelect)
     }
 }

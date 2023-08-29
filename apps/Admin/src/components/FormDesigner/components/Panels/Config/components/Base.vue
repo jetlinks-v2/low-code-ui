@@ -15,6 +15,7 @@
           'space',
           'collapse-item',
           'tabs-item',
+          'table-item'
         ].includes(type)
       "
     >
@@ -44,6 +45,7 @@
       >
         <j-input
           placeholder="请输入"
+          :maxlength="64"
           v-model:value="target.formItemProps.name"
         />
       </j-form-item>
@@ -125,6 +127,7 @@
             v-model:value="target.componentProps.maxCount"
             placeholder="请输入"
             :precision="0"
+            :min="1"
           />
         </j-form-item>
       </template>
@@ -207,6 +210,7 @@
           >
             <j-input
               placeholder="请输入"
+              :maxlength="64"
               v-model:value="target.formItemProps.name"
             />
           </j-form-item>
@@ -235,6 +239,7 @@
         >
           <j-input
             placeholder="请输入"
+            :maxlength="64"
             v-model:value="target.formItemProps.name"
           />
         </j-form-item>
@@ -255,6 +260,28 @@
         >
           <j-input
             placeholder="请输入"
+            :maxlength="64"
+            v-model:value="target.formItemProps.name"
+          />
+        </j-form-item>
+      </template>
+      <template v-if="['table-item'].includes(type)">
+        <j-form-item label="名称" :name="['componentProps', 'title']" required>
+          <j-input
+            placeholder="请输入"
+            :maxlength="64"
+            v-model:value="target.componentProps.title"
+          />
+        </j-form-item>
+        <j-form-item
+          label="标识"
+          :name="['formItemProps', 'name']"
+          required
+          :rules="rules"
+        >
+          <j-input
+            placeholder="请输入"
+            :maxlength="64"
             v-model:value="target.formItemProps.name"
           />
         </j-form-item>

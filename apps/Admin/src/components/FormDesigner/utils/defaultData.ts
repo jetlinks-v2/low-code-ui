@@ -100,11 +100,10 @@ export const basic: ISchema[] = [
     // },
     {
         type: 'table',
-        name: '表格(未)',
+        name: '表格(ing)',
         icon: 'AuditOutlined',
-        componentProps: {
-
-        }
+        componentProps: {},
+        children: []
     },
     {
         type: 'geo',
