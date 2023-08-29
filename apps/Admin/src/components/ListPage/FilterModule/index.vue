@@ -94,7 +94,6 @@ const props = defineProps({
   id: {
     type: null,
   },
-  },
 })
 
 const open = computed({
@@ -203,7 +202,7 @@ const dataBinds: any = inject(DATA_BIND)
 const dataSource = ref([])
 //新增一列table
 const handleAdd = async (table: any) => {
-  table.addItem({
+  table?.addItem({
     id: '',
     name: '',
     type: 'string',

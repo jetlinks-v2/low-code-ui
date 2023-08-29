@@ -22,6 +22,7 @@
         @configuration="configuration"
         @confirm="confirm"
         @handleOk="handleOk"
+        @handleChange="handleChange"
       />
       <div v-else>
         <a-page-header
