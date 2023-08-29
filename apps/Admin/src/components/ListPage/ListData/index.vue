@@ -177,6 +177,7 @@
 import Table from '@/components/ListPage/FilterModule/components/FilterTable.vue'
 import Config from '@/components/ListPage/ListData/compnents/Configuration.vue'
 import { useAllListDataStore } from '@/store/listForm'
+import { DATA_BIND } from '../keys'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -364,7 +365,7 @@ const columns: any = [
   },
 ]
 //数据
-const dataBinds:any = inject('dataBind')
+const dataBinds:any = inject(DATA_BIND)
 const dataSource = ref()
 //新增一列table
 const handleAdd = async (table: any) => {
@@ -474,6 +475,7 @@ console.log(configInfo,'configInfo');
   configState.type = ''
 }
 
+const errorList = ref([])
 watch(
   () => dataBinds,
   () => {
@@ -492,6 +494,10 @@ watch(
   },
   { immediate: true, deep: true },
 )
+
+defineExpose({
+  errorList
+})
 </script>
 
 <style scoped lang="less">

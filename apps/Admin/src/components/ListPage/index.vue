@@ -168,7 +168,7 @@ const dataBind = reactive({
   },
   functionInfo: undefined,
 })
-provide('dataBind', dataBind)
+provide(DATA_BIND, dataBind)
 provide(functionsKey, functions)
 provide(pagesKey, pages)
 watch(

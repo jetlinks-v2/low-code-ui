@@ -78,6 +78,7 @@ import NumberType from '@/components/ListPage/FilterModule/components/NumberType
 import DateType from '@/components/ListPage/FilterModule/components/DateType.vue'
 import { useAllListDataStore } from '@/store/listForm'
 import { validFilterModule } from './utils/valid'
+import { DATA_BIND } from '../keys'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -195,7 +196,7 @@ const columns: any = [
   },
 ]
 
-const dataBinds: any = inject('dataBind')
+const dataBinds: any = inject(DATA_BIND)
 //数据
 const dataSource = ref([])
 //新增一列table
