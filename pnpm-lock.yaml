@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -23,6 +23,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      pubsub-js:
+        specifier: ^1.9.4
+        version: 1.9.4
     devDependencies:
       '@jetlinks/lint':
         specifier: workspace:^
@@ -114,6 +117,9 @@ importers:
       dayjs:
         specifier: ^1.11.8
         version: 1.11.8
+      jetlinks-ui-components:
+        specifier: ^1.0.29
+        version: 1.0.29(vue-router@4.2.2)(vue@3.3.4)
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -145,9 +151,6 @@ importers:
       dotenv:
         specifier: ^16.1.4
         version: 16.1.4
-      jetlinks-ui-components:
-        specifier: ^1.0.30
-        version: 1.0.30(vue-router@4.2.2)(vue@3.3.4)
       pkg-types:
         specifier: ^1.0.3
         version: 1.0.3
@@ -252,7 +255,7 @@ importers:
         version: 3.2.20(vue@3.3.4)
       jetlinks-ui-components:
         specifier: ^1.0.26
-        version: 1.0.30(vue-router@4.2.4)(vue@3.3.4)
+        version: 1.0.29(vue-router@4.2.4)(vue@3.3.4)
     devDependencies:
       '@jetlinks/tsconfig':
         specifier: workspace:*
@@ -336,8 +339,8 @@ importers:
         specifier: ^3.2.20
         version: 3.2.20(vue@3.3.4)
       jetlinks-ui-components:
-        specifier: ^1.0.29
-        version: 1.0.30(vue-router@4.2.2)(vue@3.3.4)
+        specifier: ^1.0.26
+        version: 1.0.26(vue-router@4.2.2)(vue@3.3.4)
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -377,8 +380,8 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0(debug@4.3.4)
       jetlinks-ui-components:
-        specifier: ^1.0.29
-        version: 1.0.30(vue-router@4.2.4)(vue@3.3.4)
+        specifier: ^1.0.26
+        version: 1.0.29(vue-router@4.2.4)(vue@3.3.4)
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -461,8 +464,8 @@ importers:
         specifier: ^4.17.7
         version: 4.17.7
       jetlinks-ui-components:
-        specifier: ^1.0.29
-        version: 1.0.30(vue-router@4.2.4)(vue@3.3.4)
+        specifier: ^1.0.26
+        version: 1.0.29(vue-router@4.2.4)(vue@3.3.4)
       jsencrypt:
         specifier: ^3.3.2
         version: 3.3.2
@@ -2006,6 +2009,7 @@ packages:
 
   /@types/web-bluetooth@0.0.16:
     resolution: {integrity: sha512-oh8q2Zc32S6gd/j50GowEjKLoOVOwHP/bWVjKJInBwQqdOYMdPrf1oVlelTlyfFK3CKxL1uahMDAr+vy8T7yMQ==}
+    dev: false
 
   /@types/web-bluetooth@0.0.17:
     resolution: {integrity: sha512-4p9vcSmxAayx72yn70joFoL44c9MO/0+iVEBIQXe3v2h2SiAsEIo/G5v6ObFWvNKRFjbrVadNf9LqEEZeQPzdA==}
@@ -2326,6 +2330,7 @@ packages:
 
   /@vue/devtools-api@6.5.0:
     resolution: {integrity: sha512-o9KfBeaBmCKl10usN4crU53fYtC1r7jJwdGKjPT24t348rHxgfpZ0xL3Xm/gLUYnc0oTp8LAmrxOeLyu6tbk2Q==}
+    dev: false
 
   /@vue/reactivity-transform@3.3.4:
     resolution: {integrity: sha512-MXgwjako4nu5WFLAjpBnCj/ieqcjE2aJBINUNQzkZQfzIZA4xn+0fV1tIYBJvvva3N3OvKGofRLvQIwEQPpaXw==}
@@ -2439,6 +2444,7 @@ packages:
       '@vueuse/shared': 7.7.1(vue@3.3.4)
       vue: 3.3.4
       vue-demi: 0.14.5(vue@3.3.4)
+    dev: false
 
   /@vueuse/core@9.13.0(vue@3.3.4):
     resolution: {integrity: sha512-pujnclbeHWxxPRqXWmdkKV5OX4Wk4YeK7wusHqRwU0Q7EFusHoqNA/aPhB6KCh9hEqJkLAJo7bb0Lh9b+OIVzw==}
@@ -2450,12 +2456,14 @@ packages:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
+    dev: false
 
   /@vueuse/metadata@10.1.2:
     resolution: {integrity: sha512-3mc5BqN9aU2SqBeBuWE7ne4OtXHoHKggNgxZR2K+zIW4YLsy6xoZ4/9vErQs6tvoKDX6QAqm3lvsrv0mczAwIQ==}
 
   /@vueuse/metadata@9.13.0:
     resolution: {integrity: sha512-gdU7TKNAUVlXXLbaF+ZCfte8BjRJQWPCa2J55+7/h+yDtzw3vOoGQDRXzI6pyKyo6bXFT5/QoPE4hAknExjRLQ==}
+    dev: false
 
   /@vueuse/router@9.13.0(vue-router@4.2.2)(vue@3.3.4):
     resolution: {integrity: sha512-lcL6auSUGMGZMdDzZJb02QDe909AChzMXoxqFS3gL2E8mHmIx0SrNor+33UkqvvBPi18vXpDq/R7tPd9fxWwTg==}
@@ -2468,6 +2476,7 @@ packages:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
+    dev: false
 
   /@vueuse/router@9.13.0(vue-router@4.2.4)(vue@3.3.4):
     resolution: {integrity: sha512-lcL6auSUGMGZMdDzZJb02QDe909AChzMXoxqFS3gL2E8mHmIx0SrNor+33UkqvvBPi18vXpDq/R7tPd9fxWwTg==}
@@ -2503,6 +2512,7 @@ packages:
     dependencies:
       vue: 3.3.4
       vue-demi: 0.14.5(vue@3.3.4)
+    dev: false
 
   /@vueuse/shared@9.13.0(vue@3.3.4):
     resolution: {integrity: sha512-UrnhU+Cnufu4S6JLCPZnkWh0WwZGUp72ktOF2DFptMlOs3TOdVv8xJN53zhHGARmVOsz5KqOls09+J1NR6sBKw==}
@@ -2511,6 +2521,7 @@ packages:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
+    dev: false
 
   /acorn-jsx@5.3.2(acorn@7.4.1):
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -3072,6 +3083,7 @@ packages:
       vue: 3.3.4
     transitivePeerDependencies:
       - '@vue/composition-api'
+    dev: false
 
   /combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
@@ -3208,6 +3220,7 @@ packages:
 
   /debug@3.2.7:
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
+    requiresBuild: true
     peerDependencies:
       supports-color: '*'
     peerDependenciesMeta:
@@ -3749,9 +3762,6 @@ packages:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
     dev: true
 
-  /fast-plist@0.1.3:
-    resolution: {integrity: sha512-d9cEfo/WcOezgPLAC/8t8wGb6YOD6JTCPMw2QcG2nAdFmyY+9rTUizCTaGjIZAloWENTEUMAPpkUAIJJJ0i96A==}
-
   /fastq@1.15.0:
     resolution: {integrity: sha512-wBrocU2LCXXa+lWBt8RoIRD89Fi8OdABODa/kEnyeyjS5aZO5/GNvI5sEINADqP/h8M29UHTHUb53sUu5Ihqdw==}
     dependencies:
@@ -4219,6 +4229,7 @@ packages:
   /iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
+    requiresBuild: true
     dependencies:
       safer-buffer: 2.1.2
     optional: true
@@ -4611,12 +4622,31 @@ packages:
       '@pkgjs/parseargs': 0.11.0
     dev: true
 
-  /jetlinks-ui-components@1.0.29(vue-router@4.2.4)(vue@3.3.4):
+  /jetlinks-ui-components@1.0.26(vue-router@4.2.2)(vue@3.3.4):
+    resolution: {integrity: sha512-Z+bCto9LdUBSZb2XwLsYMErNSDvNQxiZYyzWQapIwNXrzSSyCaqIKobgPGjPovw/xqqLGAuXX3IVLSq9uC65oA==}
+    engines: {node: '>=18.14.0'}
+    dependencies:
+      '@vueuse/core': 9.13.0(vue@3.3.4)
+      '@vueuse/router': 9.13.0(vue-router@4.2.2)(vue@3.3.4)
+      ant-design-vue: 3.2.20(vue@3.3.4)
+      colorpicker-v3: 2.10.2
+      jetlinks-ui-components: 1.0.29(vue-router@4.2.2)(vue@3.3.4)
+      lodash-es: 4.17.21
+      monaco-editor: 0.40.0
+      sortablejs: 1.15.0
+      vuedraggable: 4.1.0(vue@3.3.4)
+    transitivePeerDependencies:
+      - '@vue/composition-api'
+      - vue
+      - vue-router
+    dev: false
+
+  /jetlinks-ui-components@1.0.29(vue-router@4.2.2)(vue@3.3.4):
     resolution: {integrity: sha512-GmmygPxyHsoh1eaSzaXDzt2a65+ChnjSIL4mDh/gzMH7eWzFqYowrEUYM8xCGXza0HqTHt4SNMv764UD651IDw==}
     engines: {node: '>=18.14.0'}
     dependencies:
       '@vueuse/core': 9.13.0(vue@3.3.4)
-      '@vueuse/router': 9.13.0(vue-router@4.2.4)(vue@3.3.4)
+      '@vueuse/router': 9.13.0(vue-router@4.2.2)(vue@3.3.4)
       ant-design-vue: 3.2.20(vue@3.3.4)
       colorpicker-v3: 2.10.2
       lodash-es: 4.17.21
@@ -4629,30 +4659,8 @@ packages:
       - vue-router
     dev: false
 
-  /jetlinks-ui-components@1.0.30(vue-router@4.2.2)(vue@3.3.4):
-    resolution: {integrity: sha512-cZmrU3rk0E/zX1vsdCjDYMOMjpzfie2SmReWtfKJVAN1DF0/pas7L9GyNnRZqhYxa1WIA5RELL/ODc3vPS32kA==}
-    engines: {node: '>=18.14.0'}
-    dependencies:
-      '@vueuse/core': 9.13.0(vue@3.3.4)
-      '@vueuse/router': 9.13.0(vue-router@4.2.2)(vue@3.3.4)
-      ant-design-vue: 3.2.20(vue@3.3.4)
-      colorpicker-v3: 2.10.2
-      lodash-es: 4.17.21
-      monaco-editor: 0.40.0
-      monaco-editor-core: 0.41.0
-      monaco-editor-textmate: 4.0.0(monaco-editor@0.40.0)(monaco-textmate@3.0.1)
-      monaco-textmate: 3.0.1(onigasm@2.2.5)
-      monaco-volar: 0.4.0
-      onigasm: 2.2.5
-      sortablejs: 1.15.0
-      vuedraggable: 4.1.0(vue@3.3.4)
-    transitivePeerDependencies:
-      - '@vue/composition-api'
-      - vue
-      - vue-router
-
-  /jetlinks-ui-components@1.0.30(vue-router@4.2.4)(vue@3.3.4):
-    resolution: {integrity: sha512-cZmrU3rk0E/zX1vsdCjDYMOMjpzfie2SmReWtfKJVAN1DF0/pas7L9GyNnRZqhYxa1WIA5RELL/ODc3vPS32kA==}
+  /jetlinks-ui-components@1.0.29(vue-router@4.2.4)(vue@3.3.4):
+    resolution: {integrity: sha512-GmmygPxyHsoh1eaSzaXDzt2a65+ChnjSIL4mDh/gzMH7eWzFqYowrEUYM8xCGXza0HqTHt4SNMv764UD651IDw==}
     engines: {node: '>=18.14.0'}
     dependencies:
       '@vueuse/core': 9.13.0(vue@3.3.4)
@@ -4661,11 +4669,6 @@ packages:
       colorpicker-v3: 2.10.2
       lodash-es: 4.17.21
       monaco-editor: 0.40.0
-      monaco-editor-core: 0.41.0
-      monaco-editor-textmate: 4.0.0(monaco-editor@0.40.0)(monaco-textmate@3.0.1)
-      monaco-textmate: 3.0.1(onigasm@2.2.5)
-      monaco-volar: 0.4.0
-      onigasm: 2.2.5
       sortablejs: 1.15.0
       vuedraggable: 4.1.0(vue@3.3.4)
     transitivePeerDependencies:
@@ -5114,36 +5117,12 @@ packages:
       pkg-types: 1.0.3
       ufo: 1.2.0
 
-  /monaco-editor-core@0.41.0:
-    resolution: {integrity: sha512-uQuc4pqUmFv9ipwshPzaNvqCgqCgJIQmZCsUc4slLUk024aEJMbeKHcL+TQhAskXKyguFv6CRhF4lFaZYLHLpg==}
-
-  /monaco-editor-textmate@4.0.0(monaco-editor@0.40.0)(monaco-textmate@3.0.1):
-    resolution: {integrity: sha512-Clwup5LJzVfwURQrS+odSEC5/hZBEG36pQnvBKt4OtBndF8r2xLeXUZcK/AqEBK2u0Npy7frFp9hG7m66Ol9hA==}
-    peerDependencies:
-      monaco-editor: 0.x.x
-      monaco-textmate: ^3.0.0
-    dependencies:
-      monaco-editor: 0.40.0
-      monaco-textmate: 3.0.1(onigasm@2.2.5)
-
   /monaco-editor@0.40.0:
     resolution: {integrity: sha512-1wymccLEuFSMBvCk/jT1YDW/GuxMLYwnFwF9CDyYCxoTw2Pt379J3FUhwy9c43j51JdcxVPjwk0jm0EVDsBS2g==}
+    dev: false
 
   /monaco-editor@0.41.0:
     resolution: {integrity: sha512-1o4olnZJsiLmv5pwLEAmzHTE/5geLKQ07BrGxlF4Ri/AXAc2yyDGZwHjiTqD8D/ROKUZmwMA28A+yEowLNOEcA==}
-
-  /monaco-textmate@3.0.1(onigasm@2.2.5):
-    resolution: {integrity: sha512-ZxxY3OsqUczYP1sGqo97tu+CJmMBwuSW+dL0WEBdDhOZ5G1zntw72hvBc68ZQAirosWvbDKgN1dL5k173QtFww==}
-    peerDependencies:
-      onigasm: ^2.0.0
-    dependencies:
-      fast-plist: 0.1.3
-      onigasm: 2.2.5
-
-  /monaco-volar@0.4.0:
-    resolution: {integrity: sha512-QnUg8cs17BOLacmuIki0Zri0tPQOHOw14LcQFKWigyIo2ChRJnO7grhxQsHOdyOL7vkHxSkMno84wIT8+sEv/A==}
-    dependencies:
-      onigasm: 2.2.5
 
   /mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -5160,6 +5139,7 @@ packages:
 
   /ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
+    requiresBuild: true
     optional: true
 
   /muggle-string@0.2.2:
@@ -5413,11 +5393,6 @@ packages:
     dependencies:
       mimic-fn: 4.0.0
     dev: true
-
-  /onigasm@2.2.5:
-    resolution: {integrity: sha512-F+th54mPc0l1lp1ZcFMyL/jTs2Tlq4SqIHKIXGZOR/VkHkF9A7Fr5rRr5+ZG/lWeRsyrClLYRq7s/yFQ/XhWCA==}
-    dependencies:
-      lru-cache: 5.1.1
 
   /open@8.4.2:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
@@ -5796,6 +5771,7 @@ packages:
 
   /prr@1.0.1:
     resolution: {integrity: sha512-yPw4Sng1gWghHQWj0B3ZggWUm4qVbPwPFcRG8KyxiU7J2OHFSoEHKS+EZ3fv5l1t9CyCiop6l/ZYeWbrgoQejw==}
+    requiresBuild: true
     optional: true
 
   /pseudomap@1.0.2:
@@ -6085,6 +6061,7 @@ packages:
 
   /sax@1.2.4:
     resolution: {integrity: sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==}
+    requiresBuild: true
     optional: true
 
   /scroll-into-view-if-needed@2.2.31:
@@ -6256,9 +6233,11 @@ packages:
 
   /sortablejs@1.14.0:
     resolution: {integrity: sha512-pBXvQCs5/33fdN1/39pPL0NZF20LeRbLQ5jtnheIPN9JQAaufGjKdWduZn4U7wCtVuzKhmRkI0DFYHYRbB2H1w==}
+    dev: false
 
   /sortablejs@1.15.0:
     resolution: {integrity: sha512-bv9qgVMjUMf89wAvM6AxVvS/4MX3sPeN0+agqShejLU5z5GX4C75ow1O2e5k4L6XItUyAK3gH6AxSbXrOM5e8w==}
+    dev: false
 
   /source-map-js@1.0.2:
     resolution: {integrity: sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==}
@@ -7129,6 +7108,7 @@ packages:
     dependencies:
       '@vue/devtools-api': 6.5.0
       vue: 3.3.4
+    dev: false
 
   /vue-router@4.2.4(vue@3.3.4):
     resolution: {integrity: sha512-9PISkmaCO02OzPVOMq2w82ilty6+xJmQrarYZDkjZBfl4RvYAlt4PKnEX21oW4KTtWfa9OuO/b3qk1Od3AEdCQ==}
@@ -7183,6 +7163,7 @@ packages:
     dependencies:
       sortablejs: 1.14.0
       vue: 3.3.4
+    dev: false
 
   /warning@4.0.3:
     resolution: {integrity: sha512-rpJyN222KWIvHJ/F53XSZv0Zl/accqHR8et1kpaMTD/fLCRxtV8iX8czMzY7sVZupTI3zcUTg8eycS2kNF9l6w==}

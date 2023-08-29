@@ -92,15 +92,20 @@ const Selection = defineComponent({
 
     const _hasDrag = computed(() => { return props.hasDrag })
 
+    const _error = computed(() => {
+      return designer.errorKey?.value.includes(props.data?.key)
+    })
+
     return () => {
       return (
         <TagComponent
           class={[
             'selectElement',
-            unref(_hasDrag) && 'handle',
+            unref(isEditModel) && unref(_hasDrag) && 'handle',
             !isField && 'borderless',
             unref(isEditModel) && Selected.value && 'Selected',
-            unref(isEditModel) && 'edit-hover'
+            unref(isEditModel) && 'edit-hover',
+            unref(isEditModel) && unref(_error) && 'Warning'
           ]}
           {...useAttrs()}
           onClick={withModifiers(handleClick, ['stop'])}

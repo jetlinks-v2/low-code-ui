@@ -158,7 +158,9 @@ export const useEngine = defineStore('engine', () => {
   const updateFile = (record: FileItemType, type: string) => {
     switch (type) {
       case 'add':
-        files.value= addTree(files.value, record); break
+        files.value= addTree(files.value, record); 
+        addFile(record)
+        break
       case 'edit':
         files.value = updateTree(files.value, record);
         break
