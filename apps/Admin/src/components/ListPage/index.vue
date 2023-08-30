@@ -191,6 +191,9 @@ watch(
     )
   },
 )
+onMounted(() => {
+  configurationStore.saveListDataInfo()
+})
 </script>
 
 <style scoped lang="less">

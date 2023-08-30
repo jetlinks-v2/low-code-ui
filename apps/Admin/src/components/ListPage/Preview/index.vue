@@ -52,9 +52,9 @@
     />
     <!-- 批量导出 -->
     <Export
-      v-model:open="exmportVisible"
-      @close="exmportVisible = false"
-      @save="exmportVisible = false"
+      v-model:open="exportVisible"
+      @close="exportVisible = false"
+      @save="exportVisible = false"
     />
     <!-- 新增 -->
     <Add
@@ -80,7 +80,7 @@ import Export from './components/Export.vue'
 import Add from './components/Add.vue'
 import JsonPreview from './components/JsonPreview.vue'
 const importVisible = ref<boolean>(false)
-const exmportVisible = ref<boolean>(false)
+const exportVisible = ref<boolean>(false)
 const addVisible = ref<boolean>(false)
 
 const route = useRoute()
@@ -238,8 +238,8 @@ const headerActions = ref([
 const cardConfig = ref({
   customIcon: '',
   dynamicIcon: '',
-  field2Titel: '',
-  field3Titel: '',
+  field2Title: '',
+  field3Title: '',
   field1: '',
   field2: '',
   field3: '',

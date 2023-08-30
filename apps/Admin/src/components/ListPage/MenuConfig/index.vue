@@ -34,14 +34,9 @@ const open = computed({
     emits('update:open', val)
   },
 })
-const dialogVisible = ref<boolean>(false)
+
 const menuRef = ref()
 const pageName = ref('')
-const form = reactive({
-  systemMenu: true,
-  name: '',
-  icon: '',
-})
 
 </script>
 <style lang="less" scoped>
