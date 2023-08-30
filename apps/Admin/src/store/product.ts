@@ -204,7 +204,6 @@ const findParent=(data, target, result) =>{
     return arr;
   }
 
-
   const queryProduct = async (id?: string) => {
     if (!id) return
     dataMap.clear()
