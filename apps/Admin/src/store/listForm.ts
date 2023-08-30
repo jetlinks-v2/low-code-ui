@@ -4,12 +4,12 @@ import { clone, cloneDeep } from 'lodash-es'
 export const useAllListDataStore = defineStore('allListData', () => {
   const listData = ref<any>(new Map())
   const listDataInfo = ref<any>({})
-  const oranging = reactive<any>({
+  const InitialValue = reactive<any>({
     listFormInfo: {
       customIcon: '',
       dynamicIcon: '',
-      field2Titel: '',
-      field3Titel: '',
+      field2Title: '',
+      field3Title: '',
       field1: '',
       field2: '',
       field3: '',
@@ -38,7 +38,7 @@ export const useAllListDataStore = defineStore('allListData', () => {
     dataBind: {
       function: undefined,
       command: undefined,
-      functionInfo: []
+      functionInfo: [],
     },
     configurationInfo: {
       enum: {},
@@ -46,8 +46,8 @@ export const useAllListDataStore = defineStore('allListData', () => {
       number: {},
       date: {},
     },
-    addButton: [],//表头按钮
-    actionsButton: [],//row操作按钮
+    addButton: [], //表头按钮
+    actionsButton: [], //row操作按钮
   })
   /**
    * 设置信息
@@ -69,7 +69,7 @@ export const useAllListDataStore = defineStore('allListData', () => {
         record[type] = data
       }
     } else {
-      listDataInfo.value = cloneDeep(oranging)
+      listDataInfo.value = cloneDeep(InitialValue)
       if (configurationInfo) {
         listDataInfo.value.configurationInfo[type] = data
       } else {
@@ -84,22 +84,38 @@ export const useAllListDataStore = defineStore('allListData', () => {
    * @returns
    */
   const getALLlistDataInfo = (id: any) => {
-    console.log(id)
-
     const data = listData.value.get(id)
-    console.log(data)
-
     if (data) {
       return data
     } else {
-      return cloneDeep(oranging)
+      return cloneDeep(InitialValue)
     }
   }
-
+  /**
+   *
+   * @returns 保存所有数据
+   */
+  const saveListDataInfo = () => {
+    const data = JSON.stringify(listDataInfo.value)
+    const subValue = {
+      type: 'list',
+      code: data,
+    }
+    return subValue
+  }
+  /**
+   * 初始值
+   */
+  const getInitialDataInfo = (value: any) => {
+    const data = JSON.parse(value)
+    listDataInfo.value = { ...data }
+  }
   return {
     listData,
     listDataInfo,
     setALLlistDataInfo,
     getALLlistDataInfo,
+    saveListDataInfo,
+    getInitialDataInfo,
   }
 })
