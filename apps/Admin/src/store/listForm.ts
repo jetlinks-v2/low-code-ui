@@ -98,8 +98,10 @@ export const useAllListDataStore = defineStore('allListData', () => {
   const saveListDataInfo = () => {
     const data = JSON.stringify(listDataInfo.value)
     const subValue = {
-      type: 'list',
-      code: data,
+      configuration: {
+        type: 'list',
+        code: data,
+      },
     }
     return subValue
   }
