@@ -1,6 +1,7 @@
 <template>
   <j-menu
     mode="vertical"
+    :value="''"
     v-if="node.type !== 'project'"
     @click="({ key: menuKey }) => onContextMenuClick(node, menuKey)"
   >
@@ -17,22 +18,18 @@
         <j-menu-item :key="providerEnum.SQL">{{ providerMap[providerEnum.SQL] }}</j-menu-item>
          <j-menu-item :key="providerEnum.Function">{{ providerMap[providerEnum.Function] }}</j-menu-item>
     </j-sub-menu>
-    <!-- <j-menu-item key="Copy">复制</j-menu-item>
-    <j-menu-item key="Paste">粘贴</j-menu-item>
-    <j-menu-item key="Rename">重命名</j-menu-item>
-    <j-menu-item key="Delete">删除</j-menu-item>
-    <j-menu-item key="Profile">显示简介</j-menu-item> -->
     <j-menu-item :key="actionMap['Profile'].key">{{actionMap['Profile'].value}}</j-menu-item>
     <j-menu-item :key="actionMap['Copy'].key">{{actionMap['Copy'].value  }}</j-menu-item>
     <j-menu-item :key="actionMap['Paste'].key" :disabled="!!copyFile">{{actionMap['Paste'].value  }}</j-menu-item>
     <j-menu-item :key="actionMap['Rename'].key">{{actionMap['Rename'].value  }}</j-menu-item>
     <j-menu-item :key="actionMap['Delete'].key">{{actionMap['Delete'].value  }}</j-menu-item>
   </j-menu>
+
 </template>
 
 <script setup name="RightClickMenu">
 import { useProduct, useEngine } from "@/store";
-import { randomString } from '@jetlinks/utils'
+
 import {providerMap, providerEnum,actionMap} from  '@/components/ProJect/index'
 import { storeToRefs } from 'pinia'
 
@@ -46,31 +43,41 @@ const props = defineProps({
   }
 })
 
-const {copyFile} = storeToRefs(engine)
+const emit = defineEmits(['click'])
+
+const { copyFile } = storeToRefs(engine)
 
 const onContextMenuClick = (node, menuKey) => {
-  console.log(node, menuKey)
+
   switch(menuKey) {
     case providerEnum.Module:
-      product.add({
-        id: randomString(16),
-        title: '测试新增_'+menuKey,
-        type: menuKey,
-        selectable: false,
-        parentId: node.parentId
-      }, node.parentId)
-      break
     case providerEnum.HtmlPage:
     case providerEnum.ListPage:
     case providerEnum.FormPage:
     case providerEnum.CRUD:
     case providerEnum.SQL:
     case providerEnum.Function:
-      product.add({
-        id: randomString(16),
-        title: '测试新增_'+menuKey,
-        type: menuKey
-      }, node.id)
+      const isModule = node.type === providerEnum.Module
+      let _arr = node.data.children || []
+      if (!isModule) {
+        _arr = product.getById(node.parentId)?.children || []
+      }
+      emit('click', {
+        data: undefined,
+        cacheData: node.data,
+        provider: menuKey,
+        nameList: _arr.map(item => item.name),
+        type: 'Add'
+      })
+      break;
+    case actionMap.Rename.key:
+      emit('click', {
+        data: node.data,
+        cacheData: node.data,
+        provider: menuKey,
+        nameList: (product.getById(node.parentId)?.children || []).map(item => item.name),
+        type: 'Rename'
+      })
       break;
   }
 

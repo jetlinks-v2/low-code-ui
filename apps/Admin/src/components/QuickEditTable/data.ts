@@ -19,6 +19,10 @@ export const BodyProps = () => ({
     type: Number,
     default: 0
   },
+  scroll: {
+    type: Object,
+    default: () => ({})
+  },
   slots: {
     type: Object,
     default: () => ({})

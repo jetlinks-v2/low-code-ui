@@ -15,6 +15,7 @@ import BadgeStatus from "./BadgeStatus";
 import ProImage from './Image/index.vue'
 import EditorModal from './EditorModal'
 import CRUD from './Database'
+import {BooleanSelect, EmptySelect} from './Select'
 export default  {
     install(app: App) {
         app.component('TitleComponent', TitleComponent)
@@ -32,5 +33,7 @@ export default  {
           .component('CRUD', CRUD)
           .component('Menu', Menu)
           .component('Project',Project)
+          .component('EmptySelect',EmptySelect)
+          .component('BooleanSelect',BooleanSelect)
     }
 }
