@@ -9,6 +9,7 @@ import globalComponents from '@jetlinks/components'
 import components from './components'
 import './style.css'
 
+
 (async () => {
     const app = createApp(App)
     

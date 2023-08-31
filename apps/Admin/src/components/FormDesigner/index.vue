@@ -70,6 +70,7 @@ const onSaveData = () => {
       formDesigner: unref(formData),
     },
   }
+  console.log('props.data',props.data)
   product.update(obj)
 }
 
