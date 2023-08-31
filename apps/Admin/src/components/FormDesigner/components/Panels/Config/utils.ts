@@ -6,30 +6,35 @@ export const getConfigList = (_type: string) => {
             header: '表单样式',
         })
     }
+
     if (!['root'].includes(unref(_type))) {
         arr.push({
             key: 'Base',
             header: '基础信息',
         })
     }
+
     if (['upload'].includes(unref(_type))) {
         arr.push({
             key: 'UploadLimit',
             header: '上传限制'
         })
     }
+
     if (['tabs'].includes(unref(_type))) {
         arr.push({
             key: 'TabsConfig',
             header: '选项卡配置'
         })
     }
+
     if (['space'].includes(unref(_type))) {
         arr.push({
             key: 'Space',
             header: '弹性间距配置'
         })
     }
+
     if (
         ['input-password', 'input-number'].includes(
             unref(_type),
@@ -40,22 +45,14 @@ export const getConfigList = (_type: string) => {
             header: '输入限制',
         })
     }
-    if (
-        !['collapse-item', 'tabs-item', 'grid', 'card', 'tabs', 'collapse', 'space', 'root', 'text'].includes(
-            unref(_type),
-        )
-    ) {
-        arr.push({
-            key: 'Rules',
-            header: '校验规则',
-        })
-    }
+
     if (['select-card'].includes(unref(_type))) {
         arr.push({
             key: 'Source',
             header: '数据来源',
         })
     }
+
     if (
         [
             'input',
@@ -120,6 +117,7 @@ export const getConfigList = (_type: string) => {
             'table',
             'geo',
             'card',
+            'root',
             'org',
             'role',
             'user',
@@ -129,7 +127,7 @@ export const getConfigList = (_type: string) => {
     ) {
         arr.push({
             key: 'Status',
-            header: '状态配置',
+            header: '高级配置',
         })
     }
 

@@ -6,9 +6,9 @@
         v-model:value="target.componentProps.layout"
         button-style="solid"
       >
-        <j-radio-button value="horizontal">Horizontal</j-radio-button>
-        <j-radio-button value="vertical">Vertical</j-radio-button>
-        <j-radio-button value="inline">Inline</j-radio-button>
+        <j-radio-button value="horizontal">水平</j-radio-button>
+        <j-radio-button value="vertical">垂直</j-radio-button>
+        <j-radio-button value="inline">内联</j-radio-button>
       </j-radio-group>
     </j-form-item>
     <j-form-item label="组件尺寸" name="size">
