@@ -76,28 +76,21 @@ const newMap = ref<any>({})
 const handleTree = (tree) => {
     const arr = cloneDeep(tree)
     arr.forEach(item => {
+      if (item.options) {
         if (item.options?.pageId) {
-            // if (item.options?.pageId in newMap.value) {
-            //     newMap.value[item.options?.pageId] = newMap.value[item.options?.pageId] + 1
-            // } else {
-            //     newMap.value[item.options?.pageId] = 1
-            // }
-            if(countMap.value.has(item.options.pageId)){
-                // debugger;
-                console.log('-------',countMap.value.get(item.options.pageId))
-                const sum = countMap.value.get(item.options.pageId) + 1
-                console.log('sum',sum)
-                countMap.value.set(item.options.pageId,sum)
-            }else{
-                console.log('set----')
-                countMap.value.set(item.options.pageId,1)
-                console.log(countMap.value.get(item.options.pageId))
-            }
+          if(countMap.value.has(item.options.pageId)){
+            // debugger;
+            const sum = countMap.value.get(item.options.pageId) + 1
+            countMap.value.set(item.options.pageId,sum)
+          }else{
+            countMap.value.set(item.options.pageId,1)
+          }
         }
         if (item.children) {
-            handleTree(item.children)
+          handleTree(item.children)
         }
-        return;
+      }
+      return;
     });
 }
 
@@ -187,18 +180,16 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
     } else {
         treeData.value = data;
     }
-
 }
-
-
 
 watch(
     () => props.list,
     (val: any) => {
         countMap.value.clear()
         newMap.value = {}
+      console.log(props.list)
         treeData.value = [...treeData.value, ...val]
-        handleTree([...treeData.value, ...val])
+        handleTree(treeData.value)
     },
     { immediate: true }
 )
