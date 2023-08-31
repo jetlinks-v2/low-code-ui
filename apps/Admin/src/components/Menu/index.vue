@@ -38,9 +38,9 @@
 import TreeDrag from './TreeDrag/index.vue'
 import { randomString } from '@jetlinks/utils';
 
-import { cloneDeep } from 'lodash-es';
-import TreeDrag from './TreeDrag/index.vue'
-import { randomString } from '@jetlinks/utils';
+// import { cloneDeep } from 'lodash-es';
+// import TreeDrag from './TreeDrag/index.vue'
+// import { randomString } from '@jetlinks/utils';
 
 const props = defineProps({
     projectData: {
