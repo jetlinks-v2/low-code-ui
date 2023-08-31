@@ -134,8 +134,8 @@ const columns = [
 const _selectedRowKeys:any = ref([])
 const emit = defineEmits(['close','updateData'])
 const params = ref()
-const handleSearch = () =>{
-
+const handleSearch = (i:any) =>{
+    params.value = i
 }
 let selectData:any = []
 const onSelectChange = (row: any) => {

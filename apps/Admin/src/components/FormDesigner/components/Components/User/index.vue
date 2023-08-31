@@ -36,7 +36,7 @@ const closeModal = () =>{
 
 const selectedUser = (data:any) =>{
   modalVisible.value = false
-  selectData.value = data
+  emit('update:value',data)
 }
 
 const queryUser = () =>{
@@ -56,12 +56,7 @@ const queryUser = () =>{
 queryUser()
 
 watch(()=>props.value,()=>{
-  console.log(props.value)
   selectData.value = props.value
-})
-watch(()=>selectData.value, ()=>{
-  
-  emit('update:value',selectData.value)
 })
 </script>
 <style lang="less" scoped>

@@ -51,7 +51,6 @@ onMounted(()=>{
 watch(()=>props.value,()=>{
     _value.value = props.value
 })
-const options = ref([])
 </script>
 <style lang="less" scoped>
 </style>

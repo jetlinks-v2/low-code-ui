@@ -1,10 +1,11 @@
 <template>
-    <j-tree-select :tree-data="treeData" v-model:value="_value" @change="valueChange" :multiple="mode === 'multiple'" :disabled="disabled">
+    <j-tree-select :tree-data="data" :value="_value" @change="valueChange" :multiple="mode === 'multiple'" :disabled="disabled">
     </j-tree-select>
 </template>
 
 <script lang="ts" setup>
 import { getDepartmentList_api } from '@/api/user'
+import { useRequest } from '@jetlinks/hooks';
 const props = defineProps({
     value:{
         type:Array,
@@ -23,10 +24,9 @@ const emit = defineEmits(['update:value'])
 
 const _value = ref()
 
-const valueChange = () =>{
-    emit('update:value',_value.value)
+const valueChange = (value:any) =>{
+    emit('update:value',value)
 }
-const treeData = ref();
 const dealTreeData = (tree:any)=>{
     return tree.map((item:any)=>{
         if(item?.children){
@@ -43,17 +43,15 @@ const dealTreeData = (tree:any)=>{
         }   
     })
 } 
-const getTreeData = () =>{
-    getDepartmentList_api().then((res:any)=>{
-        if(res.status === 200 && res.result){
-         treeData.value = dealTreeData(res.result)
-        }
-    })
-}
-getTreeData()
+const { data  } =useRequest(getDepartmentList_api,{
+    onSuccess(res){
+        return dealTreeData(res.result)
+    }
+})
+
 watch(()=>props.value,()=>{
     _value.value = props.value
-})
+},{deep:true,immediate:true})
 
 
 </script>

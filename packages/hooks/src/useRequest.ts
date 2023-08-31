@@ -54,6 +54,7 @@ export const useRequest = <T = any, S = any>(
               if (resp?.success) {
                 const successData = await _options.onSuccess?.(resp)
                 data.value = successData || get(resp, _options.formatName!)
+                console.log(data.value)
               } else {
                 _options.onError?.(resp)
               }

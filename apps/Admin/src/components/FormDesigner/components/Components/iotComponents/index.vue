@@ -25,15 +25,15 @@ const props = defineProps({
 })
 
 const type = inject('type')
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['updateValue'])
 const selectData = ref()
 const visible =ref(false)
 const closeModal = () =>{
   visible.value = false
 }
 const updateData = (data:any) =>{
-  selectData.value = data
   visible.value = false
+  emit('updateValue',data)
 }
 const cancelSelect = (id:string)=>{
   const index = selectData.value.includes(id)
@@ -41,10 +41,7 @@ const cancelSelect = (id:string)=>{
 } 
 watch(()=>props.value,()=>{
   selectData.value = props.value
-})
-watch(()=>selectData.value,()=>{
-  emit('update:value',selectData.value)
-})
+},{deep:true,immediate:true})
 </script>
 <style lang="less" scoped>
 .select{

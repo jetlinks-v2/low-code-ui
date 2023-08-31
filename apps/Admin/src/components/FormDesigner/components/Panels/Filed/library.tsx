@@ -46,7 +46,6 @@ const Library = defineComponent({
 
         return () => {
             return (
-                <Scrollbar height={'100%'}>
                     <div class="filed-container">
                         {filedData.map((element) => {
                             return (
@@ -81,7 +80,6 @@ const Library = defineComponent({
                             )
                         })}
                     </div>
-                </Scrollbar>
             )
         };
     },
