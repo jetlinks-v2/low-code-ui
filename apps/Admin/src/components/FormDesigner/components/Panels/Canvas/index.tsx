@@ -30,9 +30,16 @@ export default defineComponent({
       const typeProps = useProps(designer, true) // 根结点，也是form的props
       const arr: any[] = []
       const Layout = (<DraggableLayout path={cloneDeep(arr)} index={0} data-layout-type={'root'} style={[_style]} data={unref(designer.formData)?.children} parent={unref(designer.formData)} isRoot></DraggableLayout>)
+
       return (
         <div style={{ height: '100%' }}>
-          <Form ref={designer.formRef} model={designer.formState} {...omit(unref(designer.formData)?.componentProps, 'size')} onClick={unref(isEditModel) && handleClick} {...unref(typeProps)}>
+          <Form
+            ref={designer.formRef}
+            model={designer.formState}
+            {...omit(unref(designer.formData)?.componentProps, ['size', 'children'])}
+            onClick={unref(isEditModel) && handleClick}
+            {...unref(typeProps)}
+          >
             {Layout}
           </Form>
         </div>
