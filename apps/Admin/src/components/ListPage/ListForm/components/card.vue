@@ -54,7 +54,7 @@
             class="card-field"
             @click="cardState.type = 'field2'"
           >
-            <div>{{ formState.field2Titel || '展示字段2' }}</div>
+            <div>{{ formState.field2Title || '展示字段2' }}</div>
             <div>
               {{ formState.field2 || '字段2' }}
             </div>
@@ -64,7 +64,7 @@
             class="card-field"
             @click="cardState.type = 'field3'"
           >
-            <div>{{ formState.field3Titel || '展示字段3' }}</div>
+            <div>{{ formState.field3Title || '展示字段3' }}</div>
             <div>
               {{ formState.field3 || '字段3' }}
             </div>
@@ -209,8 +209,8 @@ const cardState = reactive({
 const formState = reactive({
   customIcon: '',
   dynamicIcon: '',
-  field2Titel: '',
-  field3Titel: '',
+  field2Title: '',
+  field3Title: '',
   field1: '',
   field2: '',
   field3: '',
@@ -302,10 +302,10 @@ const onCheck = async () => {
   }
 }
 const field2Change = (value: any, options: any) => {
-  formState.field2Titel = options.name
+  formState.field2Title = options.name
 }
 const field3Change = (value: any, options: any) => {
-  formState.field3Titel = options.name
+  formState.field3Title = options.name
 }
 const statusColor = ref({
   error: '',

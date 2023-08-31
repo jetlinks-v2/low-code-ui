@@ -53,9 +53,9 @@
             "
           >
             <AIcon v-if="item.icon" :type="item?.icon" />
-            <img v-else-if="item?.icon?.includes('http')" :src="item.icon" /> 
-         
-            <span v-else>   {{ item.text }}</span>
+            <img v-else-if="item?.icon?.includes('http')" :src="item.icon" />
+
+            <span v-else> {{ item.text }}</span>
             <j-divider type="vertical" />
           </PermissionButton>
         </div>
@@ -156,7 +156,7 @@
 
             <j-row>
               <j-col :span="12">
-                <div>{{ props?.cardConfig?.field2Titel }}</div>
+                <div>{{ props?.cardConfig?.field2Title }}</div>
                 <div>
                   <span
                     v-if="
@@ -200,7 +200,7 @@
                 </div>
               </j-col>
               <j-col :span="12">
-                <div>{{ props?.cardConfig?.field3Titel }}</div>
+                <div>{{ props?.cardConfig?.field3Title }}</div>
                 <div>
                   <span
                     v-if="
@@ -278,8 +278,8 @@ const props = defineProps({
     default: {
       customIcon: '',
       dynamicIcon: '',
-      field2Titel: '',
-      field3Titel: '',
+      field2Title: '',
+      field3Title: '',
       field1: '',
       field2: '',
       field3: '',
@@ -296,7 +296,6 @@ const isShowIcon = ref(false)
 const isShowFileIcon = ref(false)
 const emit = defineEmits(['openJson'])
 const dataFormat = (data: any, value: any) => {
-  console.log(data, value, 'dataFormat')
   let format: any
   let type = data?.type
   if (
@@ -304,7 +303,8 @@ const dataFormat = (data: any, value: any) => {
     data?.type === 'long' ||
     data?.type === 'text' ||
     data?.type === 'double' ||
-    data?.type === 'float'
+    data?.type === 'float' ||
+    data?.type === 'string'
   ) {
     type = 'content'
   } else if (
@@ -336,8 +336,6 @@ const dataFormat = (data: any, value: any) => {
           format = '%' + value || ''
           break
         case 'xxxx%xxxx':
-          console.log(value, 'value')
-
           format = value?.slice(0, 4) + '%' + value?.slice(4) || ''
           break
         case '':
@@ -384,8 +382,6 @@ const dataFormat = (data: any, value: any) => {
   return format
 }
 const jsonOpen = (value: any) => {
-  console.log(value, 'kjsfdsdlk')
-
   emit('openJson', { previewVisible: true, value: value })
 }
 const handleFunction = (item: any, data?: any) => {

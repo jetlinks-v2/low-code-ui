@@ -9,17 +9,20 @@
     >
       同步数据绑定
     </j-button>
-    <div class="table" v-if="props.asynData && props.dataBind">
+    <div class="table" v-if="bindShow || props.show">
       <j-data-table
+        class="ant-table-striped"
         rowKey="code"
-        :columns="props.columns"
-        :data-source="props.dataSource"
-        :pagination="false"
         bordered
         ref="tableRef"
         size="small"
+        :columns="props.columns"
+        :data-source="props.dataSource"
         :height="200"
-@change="(data) => handleChange(data)"
+        :row-class-name="
+          (_record, index) => (_record?.mark === 'add' ? 'table-striped' : null)
+        "
+        @change="(data) => handleChange(data)"
       >
         <template #headerCell="{ column }">
           <template v-if="column.tips">
@@ -82,7 +85,6 @@
       title="数据绑定内容有变动，请选择处理方式"
       @ok="handleOk"
       @cancel="handleCancel"
-      :confirmLoading="confirmLoading"
       class="handle-modal"
     >
       <j-row :gutter="16">
@@ -106,20 +108,30 @@
 </template>
 
 <script lang="ts" setup>
-import { message } from 'ant-design-vue'
-import { ErrorItem } from '../..';
+import { onlyMessage } from '@/utils/comm'
+import { ErrorItem } from '../..'
+import type { PropType } from 'vue'
 const props = defineProps({
   title: {
     type: String,
     default: '',
+  },
+  show: {
+    type: Boolean,
+    default: false,
   },
   //是否完成数据绑定
   dataBind: {
     type: Boolean,
     default: false,
   },
-  //是否同步数据绑定
-  asynData: {
+  //是否同步
+  asyncData: {
+    type: Boolean,
+    default: false,
+  },
+  //配置是否修改
+  configChange: {
     type: Boolean,
     default: false,
   },
@@ -152,7 +164,7 @@ const props = defineProps({
       {
         value: '1',
         label: '覆盖',
-        subLabel: '以功能下的数据覆盖页面已有内',
+        subLabel: '以功能下的数据覆盖页面已有内容',
       },
       {
         value: '2',
@@ -171,15 +183,15 @@ const props = defineProps({
     type: String,
     default: '新增',
   },
-//校验错误
+  //校验错误
   errorList: {
     type: Array,
-    default: () => []
-  }
+    default: () => [],
+  },
 })
 const tableRef = ref()
 const visible = ref<boolean>(false)
-const confirmLoading = ref<boolean>(false)
+
 const loading = ref<boolean>(false)
 const emit = defineEmits([
   'configuration',
@@ -187,7 +199,7 @@ const emit = defineEmits([
   'syncData',
   'handleAdd',
   'handleOk',
-'handleChange'
+  'handleChange',
 ])
 
 const handleChange = (data) => {
@@ -302,29 +314,36 @@ const handleAdd = async () => {
   emit('handleAdd', tableRef.value)
 }
 //配置
-const configuration = (data: any) => {
+const configuration = async (data: any) => {
   tableRef.value.cleanEditStatus()
-  emit('configuration', data)
+  const dataSource = await tableRef.value.getData()
+  emit('configuration', data, dataSource)
 }
 //删除
 const confirm = (data: any) => {
   loading.value = true
   emit('confirm', data)
   tableRef.value.removeItem(data.index)
-  const dataSource = tableRef.value.getData()
-  console.log(dataSource)
   loading.value = false
 }
+const bindShow = ref(false)
+//是否同步数据绑定
+const asyncData = ref(props.asyncData)
 //同步数据绑定
-const syncData = () => {
+const syncData = async () => {
   if (!props.dataBind) {
-    return message.error('请先完成数据绑定')
+    bindShow.value = false
+    return onlyMessage('请先完成数据绑定', 'error')
+  }
+  if (!asyncData.value) {
+    bindShow.value = true
+    asyncData.value = true
   } else {
-    if (props.dataChange) {
+    const data = await tableRef.value?.getData()
+    if (data?.length !== props.dataSource?.length || props.configChange) {
       openModel(props.modelActiveKey)
-      emit('syncData')
     } else {
-      message.success('已是最新数据')
+      onlyMessage('已是最新数据', 'success')
     }
   }
 }
@@ -334,14 +353,11 @@ const openModel = (value: any) => {
   visible.value = true
 }
 //处理方式弹窗
-const handleOk = () => {
-  console.log(activeKey.value)
-  confirmLoading.value = true
-  setTimeout(() => {
-    confirmLoading.value = false
-    visible.value = false
-  }, 1000)
-  emit('handleOk', activeKey.value)
+const handleOk = async () => {
+  const dataSource = await tableRef.value.getData()
+  tableRef.value.cleanEditStatus()
+  emit('handleOk', activeKey.value, dataSource)
+  visible.value = false
 }
 const handleCancel = () => {
   visible.value = false
@@ -379,5 +395,9 @@ const handleSelect = (key: string) => {
       background: #bce8fb;
     }
   }
+}
+
+.ant-table-striped :deep(.table-striped) td {
+  background-color: #f2fcfe;
 }
 </style>

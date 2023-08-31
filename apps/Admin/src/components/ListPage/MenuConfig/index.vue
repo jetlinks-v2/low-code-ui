@@ -7,14 +7,20 @@
       :visible="open"
       @close="emits('update:open', false)"
     >
-      <Menu :pageName="pageName" ref="menuRef" :errorList="errorList"/>
+      <Menu
+        :pageName="pageName"
+        ref="menuRef"
+        @update:form="(newValue) => (subValue = newValue)"
+        :errorList="errorList"
+      />
+      <j-button type="primary" @click="submit"> 确定 </j-button>
     </j-drawer>
   </div>
 </template>
 <script setup lang="ts">
 import Menu from '@/components/ListPage/MenuConfig/components/menu.vue'
 import { validMenu } from './utils/valid'
-
+import { useAllListDataStore } from '@/store/listForm'
 interface Emit {
   (e: 'update:open', value: boolean): void
 }
@@ -25,8 +31,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  data: {
+    type: Object,
+    default: () => {},
+  },
 })
-
+const configurationStore = useAllListDataStore()
 const open = computed({
   get() {
     return props.open
@@ -35,13 +45,13 @@ const open = computed({
     emits('update:open', val)
   },
 })
-const dialogVisible = ref<boolean>(false)
+const subValue = ref({})
 const menuRef = ref()
 const pageName = ref('')
-const form = reactive({
-  systemMenu: true,
-  name: '',
-  icon: '',
+const formData = ref({})
+onMounted(() => {
+  pageName.value = props.data?.title || ''
+  formData.value =  configurationStore.getALLlistDataInfo( props.data?.id)?.menu || {}
 })
 
 const errorList = ref<any[]>([])
@@ -57,6 +67,18 @@ defineExpose({
   errorList,
   valid
 })
+watch(
+  () => props.data,
+  (val) => {
+    pageName.value = val.title || ''
+  },
+)
+watch(
+  () => subValue.value,
+  (val) => {
+    configurationStore.setALLlistDataInfo('menu', val, props.data?.id)
+  },
+)
 </script>
 <style lang="less" scoped>
 .card {

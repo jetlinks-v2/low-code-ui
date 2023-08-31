@@ -145,8 +145,6 @@ const cancel = () => {
 const submit = async () => {
   let data: any = {}
   const vaildate = await cardRef.value?.vaildate()
-  console.log(vaildate)
-
   if (vaildate && state.configurationShow) {
     data = { ...configurationStore.getALLlistDataInfo(props.id)?.listFormInfo }
 

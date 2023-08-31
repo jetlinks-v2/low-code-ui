@@ -1,5 +1,5 @@
 <template>
-  <div class="list-form-preview">
+  <div class="list-form-preview" v-if="props.show">
     <div class="header">
       <j-page-header>
         <template #subTitle>
@@ -39,7 +39,7 @@
             :cardConfig="cardConfig"
             :dataColumns="dataColumns"
             :headerActions="headerActions"
-            @openJson = "(newValue) => (jsonData = newValue)"
+            @openJson="(newValue) => (jsonData = newValue)"
           />
         </div>
       </div>
@@ -52,9 +52,9 @@
     />
     <!-- 批量导出 -->
     <Export
-      v-model:open="exmportVisible"
-      @close="exmportVisible = false"
-      @save="exmportVisible = false"
+      v-model:open="exportVisible"
+      @close="exportVisible = false"
+      @save="exportVisible = false"
     />
     <!-- 新增 -->
     <Add
@@ -74,209 +74,52 @@
 import { useAllListDataStore } from '@/store/listForm'
 import ProTable from '@/components/ListPage/Preview/components/TableModel.vue'
 import dayjs from 'dayjs'
-import { router } from '@jetlinks/router'
 import Import from './components/Import.vue'
 import Export from './components/Export.vue'
 import Add from './components/Add.vue'
 import JsonPreview from './components/JsonPreview.vue'
+
+const props = defineProps({
+  show: {
+    type: Boolean,
+    default: false,
+  },
+  id: {
+    type: null,
+  },
+})
+const emits = defineEmits()
 const importVisible = ref<boolean>(false)
-const exmportVisible = ref<boolean>(false)
+const exportVisible = ref<boolean>(false)
 const addVisible = ref<boolean>(false)
 
-const route = useRoute()
-const id = route.params.id
+const id = props.id
 const listDataStore = useAllListDataStore()
 const allData = ref<any>({})
 const jsonData = ref<any>({
-  previewVisible:false,
-  value:{}
+  previewVisible: false,
+  value: {},
 })
 const dataColumns: any = ref([])
 const searchColumns: any = ref([])
 const typeChangeShow = ref(false)
 //操作按钮
-const actions = ref([
-  {
-    key: 'view',
-    text: '查看',
-    icon: 'EyeOutlined',
-    type: 'primary',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '查看',
-      },
-      hasPermission: false,
-
-      onClick: (e) => {
-        console.log(data, 'data')
-        // handleView(data.id)
-      },
-    }),
-  },
-  {
-    key: 'view1',
-    text: '查看1',
-    icon: 'FormOutlined',
-    type: 'primary',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '查看',
-      },
-      hasPermission: false,
-
-      onClick: (e) => {
-        console.log(data)
-        // handleView(data.id)
-      },
-    }),
-  },
-  {
-    key: 'view2',
-    text: '查看2',
-    type: 'dashed',
-    icon: 'FrownOutlined',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '查看',
-      },
-      hasPermission: false,
-      onClick: (e) => {
-        console.log(data)
-        // handleView(data.id)
-      },
-    }),
-  },
-
-  {
-    key: 'delete',
-    text: '删除',
-    icon: 'DeleteOutlined',
-    type: 'primary',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '删除',
-      },
-      popConfirm: {
-        title: data?.status === 'error' ? '禁用' : '确认删除？',
-        onConfirm: () => {
-          console.log(data, 'onConfirm')
-        },
-      },
-      hasPermission: true,
-      // onClick: () => {
-      //   handleView(data.id)
-      // },
-    }),
-  },
-])
+const actions = ref([])
 //table头部按钮
-const headerActions = ref([
-  {
-    key: 'view',
-    text: '查看',
-    icon: 'EyeOutlined',
-    type: 'primary',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '查看',
-      },
-      hasPermission: false,
-
-      onClick: (e) => {
-        console.log(data, 'data')
-        // handleView(data.id)
-      },
-    }),
-  },
-  {
-    key: 'view1',
-    text: '查看1',
-    icon: 'FormOutlined',
-    type: 'primary',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '查看',
-      },
-      hasPermission: false,
-
-      onClick: (e) => {
-        console.log(data)
-        // handleView(data.id)
-      },
-    }),
-  },
-  {
-    key: 'view2',
-    text: '查看2',
-    type: 'dashed',
-    icon: 'HeatMapOutlined',
-  },
-
-  {
-    key: 'delete',
-    text: '删除',
-    icon: 'DeleteOutlined',
-    type: 'primary',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '删除',
-      },
-      popConfirm: {
-        title: data?.status === 'error' ? '禁用' : '确认删除？',
-        onConfirm: () => {
-          console.log(data, 'onConfirm')
-        },
-      },
-      hasPermission: true,
-      // onClick: () => {
-      //   handleView(data.id)
-      // },
-    }),
-  },
-])
+const headerActions = ref([])
 //卡片样式
 const cardConfig = ref({
   customIcon: '',
   dynamicIcon: '',
-  field2Titel: '',
-  field3Titel: '',
+  field2Title: '',
+  field3Title: '',
   field1: '',
   field2: '',
   field3: '',
   emphasisField: '',
   specialStyle: '',
 })
-const dataSource = [
-  {
-    deviceId1: 'https://aliyuncdn.antdv.com/form/static/logo-blue.png',
-    deviceId2: 'discussion2',
-    deviceId3: 'discussion3',
-    deviceId4: 'discussion4',
-    deviceId5: 'https://aliyuncdn.antdv.com/form/static/logo-blue.png',
-    deviceId6: 'discussion2',
-    deviceId7: { url: 'https://aliyuncdn.antdv.com/form/static/logo-blue.png' },
-    deviceId8: 'discussion4',
-  },
-  {
-    deviceId1: 'discussion1',
-    deviceId2: 'discussion2',
-    deviceId3: 'discussion3',
-    deviceId4: 'discussion4',
-  },
-  {
-    deviceId1:
-      'https://gw.alipayobjects.com/zos/rmsportal/nBVXkrFdWHxbZlmMbsaH.svg',
-    deviceId2: 'discussion2',
-    deviceId3: 'discussion3',
-    deviceId4: 'discussion4',
-  },
-  {
-    deviceId1: 'discussion1',
-    deviceId2: 'discussion2',
-    deviceId3: 'discussion3',
-    deviceId4: 'discussion4',
-  },
-]
+const dataSource = []
 
 //分页
 const pagination = reactive({
@@ -481,7 +324,7 @@ const handleSearch = (data: any) => {
 }
 //退出预览
 const back = () => {
-  router.go(-1)
+  emits('back')
 }
 
 onMounted(() => {
@@ -505,6 +348,12 @@ onMounted(() => {
 <style lang="less" scoped>
 .list-form-preview {
   background-color: #d7d7d7;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9999;
+  height: 100vh;
+  width: 100vw;
 }
 .ant-page-header {
   padding: 2px 20px 2px 20px;

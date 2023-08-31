@@ -1,5 +1,6 @@
 <template>
   <div class="list-page">
+    <Preview :show="showPreview" :id="props.data.id" @back="() => (showPreview = false)"/>
     <DataBind
       ref="dataBindRef"
       v-model:open="visibles.GuideVisible"
@@ -31,8 +32,16 @@
       :id="props.data.id"
       ref="filterModuleRef"
     />
-    <ListData v-model:open="visibles.ListDataVisible" :id="props.data.id" ref="listDataRef"/>
-    <ListForm v-model:open="visibles.ListFormVisible" :id="props.data.id" ref="listFormRef"/>
+    <ListData
+      v-model:open="visibles.ListDataVisible"
+      :id="props.data.id"
+      ref="listDataRef"
+    />
+    <ListForm
+      v-model:open="visibles.ListFormVisible"
+      :id="props.data.id"
+      ref="listFormRef"
+    />
     <PagingConfig
       v-model:open="visibles.PagingConfigVisible"
       :id="props.data.id"
@@ -51,10 +60,10 @@ import PagingConfig from './PagingConfig/index.vue'
 import MenuConfig from './MenuConfig/index.vue'
 import ListSkeleton from './ListSkeleton/index.vue'
 import OperationColumns from './Operation/index.vue'
-import { router } from '@jetlinks/router'
+import Preview from './Preview/index.vue'
 import { useAllListDataStore } from '@/store/listForm'
-import { omit, reject } from 'lodash-es'
-import { functionsKey, pagesKey, DATA_BIND, BASE_INFO } from './keys'
+import { omit } from 'lodash-es'
+import { DATA_BIND, BASE_INFO } from './keys'
 import { useProduct } from '@/store'
 
 const props = defineProps({
@@ -66,6 +75,7 @@ const props = defineProps({
 const configurationStore = useAllListDataStore()
 const productStore = useProduct()
 
+const showPreview = ref(false)
 const menuRef = ref()
 
 const visibles = reactive({
@@ -88,8 +98,7 @@ const handleVisible = (key: string, value: boolean) => {
   visibles[key] = value
 }
 const goPreview = () => {
-  router.push(`/preview/${props.data.id}`)
-  console.log(props.data, 'props.data')
+  showPreview.value = true
 }
 
 /**
@@ -184,8 +193,6 @@ const dataBind = reactive({
 const filterModule = ref<any[]>([])
 const listData = ref<any[]>([])
 provide(DATA_BIND, dataBind)
-provide(functionsKey, functions)
-provide(pagesKey, pages)
 provide(BASE_INFO, props.data)
 provide('FILTER_MODULE', filterModule)
 provide('LIST_DATA', listData)
