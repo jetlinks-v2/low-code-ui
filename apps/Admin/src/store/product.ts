@@ -180,7 +180,7 @@ const findParent=(data, target, result) =>{
     console.log('add----', data.value)
   }
 
-  const update = (record: any,) => {
+  const update = (record: any) => {
     dataMap.set(record.id, record)
     data.value = updateProduct(data.value, record)
     engine.updateFile(record, 'edit')

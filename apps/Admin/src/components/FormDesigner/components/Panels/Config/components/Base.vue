@@ -111,6 +111,7 @@
         >
           <j-radio-group
             v-model:value="target.componentProps.listType"
+            @change="onChange"
             button-style="solid"
           >
             <j-radio-button :value="'text'">文件</j-radio-button>
@@ -303,6 +304,10 @@ const type = computed(() => {
 const onSwitch = (_checked: boolean) => {
   target.value.formItemProps.label = _checked ? target.value.name : undefined
   target.value.formItemProps.name = undefined
+}
+
+const onChange = ()=>{
+  target.value.componentProps.accept = undefined
 }
 
 const rules = [
