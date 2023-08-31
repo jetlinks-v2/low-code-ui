@@ -8,31 +8,20 @@
 
       <div class="release-content">
         <div class="release-step">
-          <div style="width: 60%;">
-            <j-steps :current="step">
-              <j-step title="状态确认">
-                <template #icon>
-                </template>
-              </j-step>
-              <j-step title="系统菜单">
-                <template #icon>
-                </template>
-              </j-step>
-              <j-step title="完成">
-                <template #icon>
-                </template>
-              </j-step>
-            </j-steps>
-          </div>
-          <div>
-            <j-space>
-              <j-button>取消</j-button>
-              <j-button v-if="step !== 1" @click="prev">上一步</j-button>
-              <j-button v-if="step !== 3" @click="next">下一步</j-button>
-              <j-button>保存</j-button>
-              <j-button>部署</j-button>
-            </j-space>
-          </div>
+          <j-steps :current="step">
+            <j-step title="状态确认">
+              <template #icon>
+              </template>
+            </j-step>
+            <j-step title="系统菜单">
+              <template #icon>
+              </template>
+            </j-step>
+            <j-step title="完成">
+              <template #icon>
+              </template>
+            </j-step>
+          </j-steps>
         </div>
         <div class="release-step-content" v-if="loading">
           <Status v-show="step === 1" :theme="theme" />
@@ -40,6 +29,12 @@
 
         </div>
       </div>
+    </div>
+    <div class="release-footer">
+      <j-button>取消</j-button>
+      <j-button v-if="step !== 1" @click="prev">上一步</j-button>
+      <j-button v-if="step !== 3" @click="next">下一步</j-button>
+      <j-button>完成</j-button>
     </div>
   </div>
 </template>
@@ -86,7 +81,7 @@ product.queryProduct(route.params.id, () => {
 
   .release-body {
     padding: 24px;
-    height: calc(100% - 56px);
+    height: calc(100% - 112px);
 
     .release-content {
       display: flex;
@@ -106,8 +101,13 @@ product.queryProduct(route.params.id, () => {
         height: calc(100% - 56px);
       }
     }
+  }
 
-
+  .release-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 12px 24px;
   }
 }
 </style>
