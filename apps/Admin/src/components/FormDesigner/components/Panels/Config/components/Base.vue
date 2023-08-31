@@ -2,7 +2,12 @@
   <div>
     <template v-if="!['collapse-item', 'tabs-item'].includes(type)">
       <j-form-item required label="组件类型" name="type">
-        <j-select :disabled="true" :value="target.type" />
+        <j-select
+          :value="target.type"
+          @change="onTypeChange"
+          :options="typeOptions"
+          :disabled="true"
+        />
       </j-form-item>
     </template>
     <template
@@ -15,7 +20,7 @@
           'space',
           'collapse-item',
           'tabs-item',
-          'table-item'
+          'table-item',
         ].includes(type)
       "
     >
@@ -287,12 +292,42 @@
         </j-form-item>
       </template>
     </template>
+
+    <!-- 规则校验 -->
+    <template v-if="rulesVisible">
+      <j-form-item>
+        <Rule v-model:value="target.formItemProps.rules" @change="onChange" />
+      </j-form-item>
+    </template>
+
+    <!-- 说明 -->
+    <template v-if="descVisible">
+      <j-form-item :name="['componentProps', 'description']">
+        <template #label>
+          说明内容<j-tooltip title="配置后会在该配置项名称后方展示">
+            <AIcon type="QuestionCircleOutlined" />
+          </j-tooltip>
+        </template>
+        <j-textarea
+          :rows="2"
+          :maxlength="100"
+          placeholder="请输入100字以内文字"
+          v-model:value="target.componentProps.description"
+        />
+      </j-form-item>
+    </template>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, inject, unref } from 'vue'
 import { useTarget } from '../../../../hooks'
+import Rule from './Rules/Rule.vue'
+import { basic } from '@/components/FormDesigner/utils/defaultData'
+import { omit } from 'lodash-es'
+import generatorData from '@/components/FormDesigner/utils/generatorData'
+
+const designer: any = inject('FormDesigner')
 
 const { target } = useTarget()
 
@@ -305,6 +340,42 @@ const onSwitch = (_checked: boolean) => {
   target.value.formItemProps.name = undefined
 }
 
+const descVisible = computed(() => {
+  return [
+    'input',
+    'textarea',
+    'select-card',
+    'input-password',
+    'switch',
+    'input-number',
+    'tree-select',
+    'select',
+    'date-picker',
+    'time-picker',
+    'table',
+    'geo',
+    'card',
+  ].includes(unref(type))
+})
+
+const rulesVisible = computed(() => {
+  return ![
+    'collapse-item',
+    'tabs-item',
+    'grid',
+    'card',
+    'tabs',
+    'collapse',
+    'space',
+    'root',
+    'text',
+  ].includes(unref(type))
+})
+
+const onChange = (arr: any[]) => {
+  target.value.formItemProps.rules = arr
+}
+
 const rules = [
   { max: 64, message: '最多可输入64个字符' },
   {
@@ -312,4 +383,21 @@ const rules = [
     message: '标识只能由数字、字母、下划线、中划线组成',
   },
 ]
+
+const typeOptions = computed(() => {
+  return basic.map((item) => {
+    return {
+      label: item.name,
+      value: item.type,
+    }
+  })
+})
+
+const onTypeChange = (val: string) => {
+  // const item = basic.find((item) => item?.type === val)
+  // Object.assign(designer.selected, {
+  //   ...generatorData(omit(item, ['icon'])),
+  //   key: target.value?.key,
+  // })
+}
 </script>

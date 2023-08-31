@@ -13,7 +13,6 @@ const componentMap = {
     'upload': Upload,
     'tree-select': TreeSelect,
     'date-picker': DatePicker,
-    // 'table': QuickEditTable,
     'time-picker': TimePicker,
     'geo': Geo,
     'form': Form

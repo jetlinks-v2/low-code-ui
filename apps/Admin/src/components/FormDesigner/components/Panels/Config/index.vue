@@ -25,9 +25,6 @@ import { ref, computed, watchEffect, inject, watch, unref } from 'vue'
 import { Scrollbar } from 'jetlinks-ui-components'
 import Base from './components/Base.vue'
 import InputLimit from './components/InputLimit.vue'
-import Rules from './components/Rules/index.vue'
-import Descriptions from './components/Descriptions.vue'
-import Event from './components/Event.vue'
 import Status from './components/Status.vue'
 import Source from './components/Source.vue'
 import Form from './components/Form.vue'
@@ -52,9 +49,6 @@ const _type = computed(() => {
 const Panels = {
   Base,
   InputLimit,
-  Rules,
-  Descriptions,
-  Event,
   Status,
   Source,
   Form,
@@ -96,8 +90,6 @@ watch(
     deep: true
   },
 )
-
-// defineExpose({ onSave })
 </script>
 
 <style lang="less" scoped>

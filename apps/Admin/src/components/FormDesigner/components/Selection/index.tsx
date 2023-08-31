@@ -2,8 +2,9 @@ import { isHTMLTag } from '@vue/shared'
 import { withModifiers } from 'vue'
 import './index.less'
 import { AIcon } from 'jetlinks-ui-components'
-import { checkIsField } from '../../utils/utils'
-import { cloneDeep } from 'lodash-es'
+import { checkIsField, extractCssClass, insertCustomCssToHead } from '../../utils/utils'
+import { cloneDeep, set } from 'lodash-es'
+import ContextMenu from '../ContextMenu/index.vue'
 
 const Selection = defineComponent({
   name: 'Selection',
@@ -34,19 +35,21 @@ const Selection = defineComponent({
       type: Boolean,
       default: false
     },
-    // hasAdd: {
-    //   type: Boolean,
-    //   default: false
-    // },
     hasCopy: {
       type: Boolean,
       default: false
     },
+    path: {
+      type: Array,
+      default: () => []
+    },
   },
-  setup(props) {
+  setup(props, { expose }) {
     const designer: any = inject('FormDesigner')
     const slots = useSlots()
     const isField = checkIsField(props.data)
+    const cssClassList = ref<string[]>([])
+    const visible = ref<boolean>(true)
 
     const Selected = computed(() => {
       return props?.data?.key !== undefined && designer.selected?.key === props?.data?.key
@@ -88,7 +91,7 @@ const Selection = defineComponent({
     }
     const TagComponent = isHTMLTag(props?.tag) ? props.tag : resolveComponent(props?.tag)
 
-    const maskNode = (<div class={['mask']}></div>) // 'handle', 
+    const maskNode = (<div class={['mask']}></div>)
 
     const _hasDrag = computed(() => { return props.hasDrag })
 
@@ -96,23 +99,50 @@ const Selection = defineComponent({
       return designer.errorKey?.value.includes(props.data?.key)
     })
 
+    watchEffect(() => {
+      const arr = extractCssClass(props.data.componentProps?.cssCode)
+      cssClassList.value = arr
+      insertCustomCssToHead(props.data.componentProps?.cssCode, props.data?.key)
+    })
+
+    const setVisible = (bool: boolean) => {
+      visible.value = bool
+    }
+
+    const setOptions = (arr: any[]) => {
+      props.data.context?.updateProps(arr, 'options')
+    }
+
+    const setValue = (_val: any) => {
+      if (Array.isArray(props.path) && props.path?.length) {
+        set(designer.formState, props.path, _val)
+      }
+    }
+
+    const setDisabled = (bool: boolean) => {
+      props.data.context?.updateProps(bool, 'disabled')
+    }
+
+    expose({ setVisible, setOptions, setValue, setDisabled })
+
     return () => {
-      return (
-        <TagComponent
-          class={[
-            'selectElement',
-            unref(isEditModel) && unref(_hasDrag) && 'handle',
-            !isField && 'borderless',
-            unref(isEditModel) && Selected.value && 'Selected',
-            unref(isEditModel) && 'edit-hover',
-            unref(isEditModel) && unref(_error) && 'Warning'
-          ]}
-          {...useAttrs()}
-          onClick={withModifiers(handleClick, ['stop'])}
-        >
-          {slots?.default()}
-          {/* <span></span> */}
-          {/* {
+      return visible.value ? (
+        // <ContextMenu>
+          <TagComponent
+            class={[
+              'selectElement',
+              unref(isEditModel) && unref(_hasDrag) && 'handle',
+              !isField && 'borderless',
+              unref(isEditModel) && Selected.value && 'Selected',
+              unref(isEditModel) && 'edit-hover',
+              unref(isEditModel) && unref(_error) && 'Warning',
+              ...unref(cssClassList)
+            ]}
+            {...useAttrs()}
+            onClick={withModifiers(handleClick, ['stop'])}
+          >
+            {slots?.default()}
+            {/* {
             // 拖拽按钮
             unref(isEditModel) && Selected.value && unref(_hasDrag) && (
               <div class={['topLeft']}>
@@ -123,36 +153,38 @@ const Selection = defineComponent({
               </div>
             )
           } */}
-          {
-            unref(isEditModel) && Selected.value && (
-              <div class="bottomRight">
-                {
-                  props.hasCopy && (
-                    <div
-                      class="action"
-                      onClick={withModifiers(() => { handleAction('copy') }, ['stop'])}
-                    >
-                      <AIcon type="CopyOutlined" />
-                    </div>
-                  )
-                }
-                {props.hasDel && (
-                  <div
-                    class="action"
-                    onClick={withModifiers(() => { handleAction('remove') }, ['stop'])}
-                  >
-                    <AIcon type="DeleteOutlined" />
-                  </div>
-                )}
-              </div>
-            )
-          }
-
-          {
-            unref(isEditModel) && props.hasMask && maskNode
-          }
-        </TagComponent>
-      )
+            {
+              unref(isEditModel) && Selected.value && (
+                <div class="bottomRight">
+                  {
+                    props.hasCopy && (
+                      <div
+                        class="action"
+                        onClick={withModifiers(() => { handleAction('copy') }, ['stop'])}
+                      >
+                        <AIcon type="CopyOutlined" />
+                      </div>
+                    )
+                  }
+                  {
+                    props.hasDel && (
+                      <div
+                        class="action"
+                        onClick={withModifiers(() => { handleAction('remove') }, ['stop'])}
+                      >
+                        <AIcon type="DeleteOutlined" />
+                      </div>
+                    )
+                  }
+                </div>
+              )
+            }
+            {
+              unref(isEditModel) && props.hasMask && maskNode
+            }
+          </TagComponent>
+        // </ContextMenu>
+      ) : <></>
     }
   }
 })

@@ -38,7 +38,7 @@ const props = defineProps({
     type: String as PropType<'add' | 'edit'>,
     default: 'add',
   },
-  list: {
+  data: {
     type: Object
   },
 })
@@ -47,9 +47,9 @@ const formState = reactive<any>({})
 const formRef = ref<any>()
 
 watch(
-  () => props.list,
-  () => {
-    formData.value = (props?.list || initData) as ISchema
+  () => props.data?.other?.formDesigner,
+  (newVal) => {
+    formData.value = (newVal || initData) as ISchema
   },
   {
     deep: true,
