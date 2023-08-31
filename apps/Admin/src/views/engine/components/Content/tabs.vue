@@ -40,7 +40,7 @@ const onEdit = (targetKey) => {
 }
 
 const select = (key) => {
-  console.log(key)
+  // console.log(key)
   engine.selectFile(key)
 }
 
