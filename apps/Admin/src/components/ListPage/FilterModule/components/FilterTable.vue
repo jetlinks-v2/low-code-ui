@@ -13,12 +13,11 @@
       <j-data-table
         class="ant-table-striped"
         rowKey="code"
-        :columns="props.columns"
-        :data-source="props.dataSource"
-        :pagination="false"
         bordered
         ref="tableRef"
         size="small"
+        :columns="props.columns"
+        :data-source="props.dataSource"
         :height="200"
         :row-class-name="
           (_record, index) => (_record?.mark === 'add' ? 'table-striped' : null)
@@ -313,7 +312,7 @@ const handleAdd = async () => {
 const configuration = async (data: any) => {
   tableRef.value.cleanEditStatus()
   const dataSource = await tableRef.value.getData()
-  emit('configuration', data,dataSource)
+  emit('configuration', data, dataSource)
 }
 //删除
 const confirm = (data: any) => {

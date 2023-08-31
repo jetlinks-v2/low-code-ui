@@ -46,6 +46,11 @@ export const useAllListDataStore = defineStore('allListData', () => {
       number: {},
       date: {},
     },
+    menu: {
+      systemMenu: true,
+      name: '',
+      icon: '',
+    },
     addButton: [], //表头按钮
     actionsButton: [], //row操作按钮
   })

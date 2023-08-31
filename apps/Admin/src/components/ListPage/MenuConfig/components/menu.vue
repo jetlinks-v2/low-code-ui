@@ -16,7 +16,6 @@
             {
               required: true,
               message: '建议设置2-16个字符',
-              trigger: 'change',
             },
           ]"
         >
@@ -26,7 +25,7 @@
               <j-tooltip placement="top">
                 <template #title>
                   <p>
-                    中文名将应用于系统菜单名称、面包屑等位置，建议设置2-16个字符
+                    中文名将应用于系统菜单名称、面包屑等位置，建议设置2-8个字符
                   </p>
                 </template>
                 <AIcon type="InfoCircleOutlined" />
@@ -42,7 +41,6 @@
             {
               required: true,
               message: '请上传图标',
-              trigger: 'change',
             },
           ]"
           style="flex: 0 0 186px"
@@ -59,6 +57,9 @@
             </span>
           </div>
         </j-form-item>
+        <j-form-item v-show="false">
+          <j-button type="primary" html-type="submit" @click="onCheck" />
+        </j-form-item>
       </j-form>
     </div>
   </div>
@@ -70,20 +71,35 @@
 </template>
 <script setup lang="ts">
 import ChooseIconDialog from '@/components/ListPage/MenuConfig/components/icon.vue'
+const emits = defineEmits()
 const props = defineProps({
   pageName: {
     type: String,
     default: '',
   },
+  formData: {
+    type: Object,
+    default: () => {},
+  },
 })
 const dialogVisible = ref<boolean>(false)
 const form = reactive({
-  systemMenu: true,
-  name: '',
-  icon: '',
+  systemMenu: props.formData?.systemMenu || true,
+  name: props.formData?.name || '',
+  icon: props.formData?.icon || '',
 })
+const basicFormRef = ref()
+
+const onCheck = async () => {
+  try {
+    const values = await basicFormRef.value.validateFields()
+    return values
+  } catch (errorInfo) {
+    return errorInfo
+  }
+}
 defineExpose({
-  form: form,
+  vaildate: onCheck,
 })
 </script>
 <style lang="less" scoped>

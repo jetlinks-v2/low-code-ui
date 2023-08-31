@@ -1,5 +1,6 @@
 <template>
   <div class="list-page">
+    <Preview :show="showPreview" :id="props.data.id" @back="() => (showPreview = false)"/>
     <DataBind
       ref="dataBindRef"
       v-model:open="visibles.GuideVisible"
@@ -32,14 +33,22 @@
       :id="props.data.id"
       ref="filterModuleRef"
     />
-    <ListData v-model:open="visibles.ListDataVisible" :id="props.data.id" ref="listDataRef"/>
-    <ListForm v-model:open="visibles.ListFormVisible" :id="props.data.id" ref="listFormRef"/>
+    <ListData
+      v-model:open="visibles.ListDataVisible"
+      :id="props.data.id"
+      ref="listDataRef"
+    />
+    <ListForm
+      v-model:open="visibles.ListFormVisible"
+      :id="props.data.id"
+      ref="listFormRef"
+    />
     <PagingConfig
       v-model:open="visibles.PagingConfigVisible"
       :id="props.data.id"
       ref="pagingConfigRef"
     />
-    <MenuConfig v-model:open="visibles.MenuConfigVisible" :id="props.data.id" />
+    <MenuConfig v-model:open="visibles.MenuConfigVisible" :data="props.data" />
   </div>
 </template>
 
@@ -52,6 +61,7 @@ import PagingConfig from './PagingConfig/index.vue'
 import MenuConfig from './MenuConfig/index.vue'
 import ListSkeleton from './ListSkeleton/index.vue'
 import OperationColumns from './Operation/index.vue'
+import Preview from './Preview/index.vue'
 import { router } from '@jetlinks/router'
 import { useAllListDataStore } from '@/store/listForm'
 import { omit } from 'lodash-es'
@@ -66,7 +76,7 @@ const props = defineProps({
 })
 const configurationStore = useAllListDataStore()
 const productStore = useProduct()
-
+const showPreview = ref(false)
 const dataBindRef = ref()
 const menuRef = ref()
 
@@ -88,8 +98,7 @@ const handleVisible = (key: string, value: boolean) => {
   visibles[key] = value
 }
 const goPreview = () => {
-  router.push(`/preview/${props.data.id}`)
-  console.log(props.data, 'props.data')
+  showPreview.value = true
 }
 /**
  * 数据绑定变更
@@ -124,7 +133,7 @@ const errorCount = computed(() => {
     pagination: pagingConfigRef.value?.errorList.length,
     listForm: listFormRef.value?.errorList.length,
     filterModule: filterModuleRef.value?.errorList.length,
-    listData: listDataRef.value?.errorList.length
+    listData: listDataRef.value?.errorList.length,
   }
 })
 
@@ -132,9 +141,12 @@ const configDone = computed(() => {
   return {
     btn: btnTreeRef.value?.columnsTree.length,
     actions: columnsRef.value?.columnsTree.length,
-    filterModule: configurationStore.getALLlistDataInfo(props.data.id)?.searchData?.length,
-    listData: configurationStore.getALLlistDataInfo(props.data.id)?.datasource?.length,
-    pagination: configurationStore.getALLlistDataInfo(props.data.id)?.pagingData?.length,
+    filterModule: configurationStore.getALLlistDataInfo(props.data.id)
+      ?.searchData?.length,
+    listData: configurationStore.getALLlistDataInfo(props.data.id)?.datasource
+      ?.length,
+    pagination: configurationStore.getALLlistDataInfo(props.data.id)?.pagingData
+      ?.length,
   }
 })
 

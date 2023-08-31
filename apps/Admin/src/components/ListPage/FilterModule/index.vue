@@ -155,9 +155,22 @@ const columns: any = [
       required: true,
       rules: [
         {
-          validator(_, value) {
+          validator(data: any, value: any) {
             if (!value) {
               return Promise.reject('请输入标识')
+            } else {
+              const addId = data?.field.split('.')
+              if (Number(addId[1])) {
+                const same = dataSource.value?.findIndex(
+                  (i: any) => i?.id === value,
+                )
+                if (
+                  same !== -1 &&
+                  Number(addId[1]) > dataSource.value?.length - 1
+                ) {
+                  return Promise.reject('标识重复，请重新输入！')
+                }
+              }
             }
             return Promise.resolve()
           },
@@ -178,7 +191,17 @@ const columns: any = [
     type: 'text',
     form: {
       isVerify: true,
-      required: false,
+      required: true,
+      rules: [
+        {
+          validator(_, value) {
+            if (!value) {
+              return Promise.reject('请输入名称')
+            }
+            return Promise.resolve()
+          },
+        },
+      ],
     },
   },
   {
