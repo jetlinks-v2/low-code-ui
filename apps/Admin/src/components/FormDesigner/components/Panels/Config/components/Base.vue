@@ -22,7 +22,7 @@
       <j-form-item
         label="名称"
         :name="['formItemProps', 'label']"
-        v-if="type !== 'text'"
+        v-if="!['text','org','role','user','product','device'].includes(type)"
         :rules="[
           {
             required: true,
@@ -83,7 +83,7 @@
           />
         </j-form-item>
       </template>
-      <template v-if="['select-card', 'tree-select', 'select'].includes(type)">
+      <template v-if="['select-card', 'tree-select', 'select' , 'org' , 'role' , 'user','product','device'].includes(type)">
         <j-form-item
           label="类型"
           :name="['componentProps', 'mode']"
@@ -297,6 +297,7 @@ import { useTarget } from '../../../../hooks'
 const { target } = useTarget()
 
 const type = computed(() => {
+  console.log(target.value?.type)
   return target.value?.type
 })
 

@@ -70,7 +70,12 @@ export const getConfigList = (_type: string) => {
             'time-picker',
             'table',
             'geo',
-            'card'
+            'card',
+            'org',
+            'role',
+            'user',
+            'product',
+            'device'
         ].includes(unref(_type))
     ) {
         arr.push({
@@ -114,7 +119,12 @@ export const getConfigList = (_type: string) => {
             'time-picker',
             'table',
             'geo',
-            'card'
+            'card',
+            'org',
+            'role',
+            'user',
+            'product',
+            'device'
         ].includes(unref(_type))
     ) {
         arr.push({

@@ -17,7 +17,7 @@
 import Header from './components/Header/index.vue'
 import Canvas from './components/Panels/Canvas/index'
 import Config from './components/Panels/Config/index.vue'
-import Filed from './components/Panels/Filed/index'
+import Filed from './components/Panels/Filed/index.vue'
 import { provide, ref, reactive, watch} from 'vue'
 import { ISchema } from './typings'
 // import { updateData } from './utils/utils'
