@@ -23,6 +23,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      pubsub-js:
+        specifier: ^1.9.4
+        version: 1.9.4
     devDependencies:
       '@jetlinks/lint':
         specifier: workspace:^
@@ -469,6 +472,9 @@ importers:
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
+      pubsub-js:
+        specifier: ^1.9.4
+        version: 1.9.4
       vue:
         specifier: ^3.3.4
         version: 3.3.4
@@ -4628,25 +4634,7 @@ packages:
       '@vueuse/router': 9.13.0(vue-router@4.2.2)(vue@3.3.4)
       ant-design-vue: 3.2.20(vue@3.3.4)
       colorpicker-v3: 2.10.2
-      jetlinks-ui-components: 1.0.30(vue-router@4.2.2)(vue@3.3.4)
-      lodash-es: 4.17.21
-      monaco-editor: 0.40.0
-      sortablejs: 1.15.0
-      vuedraggable: 4.1.0(vue@3.3.4)
-    transitivePeerDependencies:
-      - '@vue/composition-api'
-      - vue
-      - vue-router
-    dev: false
-
-  /jetlinks-ui-components@1.0.29(vue-router@4.2.2)(vue@3.3.4):
-    resolution: {integrity: sha512-GmmygPxyHsoh1eaSzaXDzt2a65+ChnjSIL4mDh/gzMH7eWzFqYowrEUYM8xCGXza0HqTHt4SNMv764UD651IDw==}
-    engines: {node: '>=18.14.0'}
-    dependencies:
-      '@vueuse/core': 9.13.0(vue@3.3.4)
-      '@vueuse/router': 9.13.0(vue-router@4.2.2)(vue@3.3.4)
-      ant-design-vue: 3.2.20(vue@3.3.4)
-      colorpicker-v3: 2.10.2
+      jetlinks-ui-components: 1.0.29(vue-router@4.2.2)(vue@3.3.4)
       lodash-es: 4.17.21
       monaco-editor: 0.40.0
       sortablejs: 1.15.0
@@ -5832,6 +5820,10 @@ packages:
 
   /pseudomap@1.0.2:
     resolution: {integrity: sha512-b/YwNhb8lk1Zz2+bXXpS/LK9OisiZZ1SNsSLxN1x2OXVEhW2Ckr/7mWE5vrC1ZTiJlD9g19jWszTmJsB+oEpFQ==}
+    dev: false
+
+  /pubsub-js@1.9.4:
+    resolution: {integrity: sha512-hJYpaDvPH4w8ZX/0Fdf9ma1AwRgU353GfbaVfPjfJQf1KxZ2iHaHl3fAUw1qlJIR5dr4F3RzjGaWohYUEyoh7A==}
     dev: false
 
   /punycode@2.3.0:

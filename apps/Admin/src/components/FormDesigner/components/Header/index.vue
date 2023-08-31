@@ -3,7 +3,7 @@
     <div class="left">
       <j-space :size="24">
         <span>提供多种方式帮助你快速添加表单页内容</span>
-        <j-button type="primary">快速添加</j-button>
+        <QuickAdd />
       </j-space>
     </div>
     <div class="right">
@@ -26,6 +26,7 @@
 <script lang="ts" setup>
 import { inject, computed, unref } from 'vue'
 import { checkedConfig } from '../../utils/utils'
+import QuickAdd from '../QuickAdd/index.vue'
 
 const designer: any = inject('FormDesigner')
 
@@ -41,7 +42,7 @@ const onPreview = (_type: 'preview' | 'edit') => {
 }
 
 const onCheck = () => {
-  checkedConfig(unref(designer.formData))
+  designer.errorKey.value = checkedConfig(unref(designer.formData))
 }
 
 const onInput = () => {

@@ -57,7 +57,7 @@ export const useEngine = defineStore('engine', () => {
     if (id !== activeFile.value) { // 不是当前选中项
       openFile.value = currentNode
     }
-
+    console.log(expandedKeys.value, arrSet, currentNode.parentId)
     if (currentNode && !expandedKeys.value.includes(currentNode.parentId)) { // 当前节点的parentId不在expandedKeys中
       while (currentNode) {
         if (!arrSet.has(currentNode.id)) {
@@ -158,7 +158,9 @@ export const useEngine = defineStore('engine', () => {
   const updateFile = (record: FileItemType, type: string) => {
     switch (type) {
       case 'add':
-        files.value= addTree(files.value, record); break
+        files.value= addTree(files.value, record); 
+        addFile(record)
+        break
       case 'edit':
         files.value = updateTree(files.value, record);
         break

@@ -135,6 +135,16 @@ const onAppendItem = (node: any) => {
                 header: 'Collapse' + uid(6)
             }
             break
+        case 'table':
+            _props.componentProps = {
+                title: '列名' + uid(6)
+            }
+            _props.formItemProps = {
+                name: '',
+                required: false,
+                rules: []
+            }
+            break
     }
     return _props
 }
@@ -149,34 +159,10 @@ export const addContext = (node: any, parent: any, fn?: any) => {
     }
     fn && fn(node)
     const context = {
-        updateProps(_props) {
-            node = { ..._props }
-        },
-        get root() {
-            let result = {}
-            switch (node.type) {
-                case 'grid':
-                    result = node
-                    break
-                default:
-                    result = parent.context.root
+        updateProps(_val, key) {
+            if (node?.componentProps && key) {
+                node.componentProps[key] = _val
             }
-            return result
-        },
-        state: node,
-        parent,
-        get parents() {
-            const result: any = []
-            let cursor = node
-            while (cursor) {
-                result.unshift(cursor)
-                if (cursor.context.parent && !Array.isArray(cursor.context.parent)) {
-                    cursor = cursor.context.parent
-                } else {
-                    cursor = ''
-                }
-            }
-            return result
         },
         copy() {
             const index = arr.indexOf(node)
@@ -195,26 +181,60 @@ export const addContext = (node: any, parent: any, fn?: any) => {
             let _props = onAppendItem(node)
             if (_props) {
                 const newNode = generatorData(_props)
+                if (node.type === 'table') {
+                    const _index = node.children?.findIndex(i => i.formItemProps?.name === 'actions')
+                    if (_index === -1) {
+                        node.children.push(newNode)
+                    } else {
+                        addContext(newNode, node)
+                        node.children.splice(node.children.length - 1, 0, newNode)
+                        return
+                    }
+                } else {
+                    node.children.push(newNode)
+                }
+                addContext(newNode, node)
+            }
+        },
+        appendTableAction() {
+            let _props: any = {
+                type: node.type + '-item',
+                children: [],
+                componentProps: {
+                    title: '操作',
+                    width: 60,
+                },
+                formItemProps: {
+                    name: 'actions',
+                    required: false,
+                    rules: []
+                }
+            };
+            if (_props) {
+                const newNode = generatorData(_props)
                 node.children.push(newNode)
                 addContext(newNode, node)
             }
         },
-        get columns() {
-            const result: any[] = []
-            switch (node.type) {
-                case 'table':
-                    node.rows.forEach((item0, index0) => {
-                        item0.columns.forEach((item1, index1) => {
-                            if (!index0) {
-                                result.push([])
-                            }
-                            result[index1].push(item1)
-                        })
-                    })
-                    break
-                default:
+        appendTableIndex() {
+            let _props: any = {
+                type: node.type + '-item',
+                children: [],
+                componentProps: {
+                    title: '索引',
+                    width: 60,
+                },
+                formItemProps: {
+                    name: 'index',
+                    required: false,
+                    rules: []
+                }
+            };
+            if (_props) {
+                const newNode = generatorData(_props)
+                addContext(newNode, node)
+                node.children.splice(0, 0, newNode)
             }
-            return result
         },
         del(type) {
             const {
@@ -239,9 +259,6 @@ export const addContext = (node: any, parent: any, fn?: any) => {
                     break
             }
         },
-        modifyItem(props){
-            // node = { ...props }
-        }
     }
     Object.defineProperty(node, 'context', {
         value: context,

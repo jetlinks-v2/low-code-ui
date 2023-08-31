@@ -21,13 +21,10 @@
 </template>
   
 <script lang="ts" setup>
-import { ref, computed, watchEffect } from 'vue'
+import { ref, computed, watchEffect, inject, watch, unref } from 'vue'
 import { Scrollbar } from 'jetlinks-ui-components'
 import Base from './components/Base.vue'
 import InputLimit from './components/InputLimit.vue'
-import Rules from './components/Rules/index.vue'
-import Descriptions from './components/Descriptions.vue'
-import Event from './components/Event.vue'
 import Status from './components/Status.vue'
 import Source from './components/Source.vue'
 import Form from './components/Form.vue'
@@ -43,6 +40,8 @@ const formRef = ref<any>()
 
 const { target } = useTarget()
 
+const designer: any = inject('FormDesigner')
+
 const _type = computed(() => {
   return target?.value?.type || 'root'
 })
@@ -50,16 +49,13 @@ const _type = computed(() => {
 const Panels = {
   Base,
   InputLimit,
-  Rules,
-  Descriptions,
-  Event,
   Status,
   Source,
   Form,
   Grid,
   UploadLimit,
   TabsConfig,
-  Space
+  Space,
 }
 
 const panelsList = computed(() => {
@@ -73,8 +69,7 @@ watchEffect(() => {
 })
 
 const onSave = () => {
-  formRef.value
-    .validateFields()
+  formRef.value?.validateFields()
     .then((values) => {
       console.log('Received values of form: ', values)
     })
@@ -83,7 +78,18 @@ const onSave = () => {
     })
 }
 
-defineExpose({ onSave })
+watch(
+  () => designer.errorKey?.value,
+  (newValue) => {
+    if(unref(newValue)?.length) {
+      onSave()
+    }
+  },
+  {
+    immediate: true,
+    deep: true
+  },
+)
 </script>
 
 <style lang="less" scoped>
