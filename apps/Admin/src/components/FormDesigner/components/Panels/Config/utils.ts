@@ -55,6 +55,54 @@ export const getConfigList = (_type: string) => {
 
     if (
         [
+            'input',
+            'textarea',
+            'select-card',
+            'input-password',
+            'switch',
+            'input-number',
+            'tree-select',
+            'select',
+            'date-picker',
+            'time-picker',
+            'table',
+            'geo',
+            'card',
+            'org',
+            'role',
+            'user',
+            'product',
+            'device'
+        ].includes(unref(_type))
+    ) {
+        arr.push({
+            key: 'Descriptions',
+            header: '说明',
+        })
+    }
+    if (
+        [
+            'root',
+            'text',
+            'input',
+            'textarea',
+            'select-card',
+            'input-password',
+            'switch',
+            'input-number',
+            'tree-select',
+            'select',
+            'date-picker',
+            'time-picker'
+        ].includes(unref(_type))
+    ) {
+        arr.push({
+            key: 'Event',
+            header: '整体配置',
+        })
+    }
+    if (
+        [
             'text',
             'input',
             'textarea',
@@ -69,7 +117,12 @@ export const getConfigList = (_type: string) => {
             'table',
             'geo',
             'card',
-            'root'
+            'root',
+            'org',
+            'role',
+            'user',
+            'product',
+            'device'
         ].includes(unref(_type))
     ) {
         arr.push({

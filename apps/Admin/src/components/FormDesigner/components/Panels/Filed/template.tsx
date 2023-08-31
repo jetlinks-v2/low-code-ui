@@ -8,8 +8,8 @@ import { onMove, onEnd } from '../../Draggable/ControlInsertionPlugin';
 import generatorData from '@/components/FormDesigner/utils/generatorData';
 import { Card, AIcon } from 'jetlinks-ui-components';
 
-const Filed = defineComponent({
-    name: 'Filed',
+const Library = defineComponent({
+    name: 'Library',
     inheritAttrs: false,
     setup() {
         const designer: any = inject('FormDesigner')
@@ -87,4 +87,4 @@ const Filed = defineComponent({
     },
 });
 
-export default Filed;
+export default Library;
