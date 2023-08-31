@@ -26,7 +26,6 @@ const scrollLeft = inject(SCROLL_LEFT, 0)
 
 const width = computed(() => {
   return props.columns.reduce((prev,curr) => {
-    console.log(prev, curr.width)
     return prev + curr.width
   }, 0)
 })

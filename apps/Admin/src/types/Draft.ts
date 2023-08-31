@@ -77,7 +77,7 @@ namespace Draft {
      * 根据provider不同
      */
     configuration: RdbCrud | RdbSqlQuery | Script | PageCode
-    others: Record<string, any>
+    others: Record<'menu', MenuType> | Record<string, any>
   }
 
   export type Resource = {
@@ -94,7 +94,10 @@ namespace Draft {
      * 根据provider不同
      */
     configuration: RdbCrud | RdbSqlQuery | Script | File | PageCode
-    others: Record<string, any>
+    /**
+     * 前端自定义
+     */
+    others: Record<'menu', MenuType> | Record<string, any>
   }
 
   export type RdbCrud = {
@@ -152,4 +155,23 @@ namespace Draft {
   }
 
   export type Command = 'GetTypes' | 'CheckTableName' | 'GetColumns' | 'CreateScriptCompletion'
+
+  export type MenuType = {
+    /**
+     * 页面名称
+     */
+    pageName: string
+    /**
+     * 是否为主菜单
+     */
+    main: boolean
+    /**
+     * 菜单名称
+     */
+    name?: string
+    /**
+     * 菜单icon
+     */
+    icon?: string
+  }
 }

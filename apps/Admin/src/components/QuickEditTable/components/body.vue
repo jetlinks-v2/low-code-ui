@@ -1,15 +1,11 @@
 <template>
-  <div class="quick-table--body" :style="{ height: height ? height + 'px' : 'auto' }">
+  <div class="quick-table--body" :style="bodyStyle">
     <j-scrollbar @scroll="scroll">
       <div class="body-container" ref="bodyRef" :style="{ height: bodyHeight + 'px'}">
         <div
           v-for="(a, index) in updateList"
-          :class="{
-            'body-row': true,
-            'body-row-top': index === 0,
-            'body-row-bottom': updateList.length - 1 === index
-           }"
-          :style="{ transform: `translateY(${a.offetTop}px)`, height: cellHeight+'px'}"
+          class="body-row"
+          :style="{ transform: `translateY(${a.offsetTop}px)`, height: cellHeight+'px'}"
           :key="a._quick_id"
         >
           <div
@@ -89,14 +85,19 @@ const handlePosition = (height) => {
 }
 
 const scroll = ({scrollTop, scrollLeft}) => {
-  console.log(scrollLeft)
   left.value = scrollLeft
   handlePosition(scrollTop)
 }
 
+const bodyStyle = computed(() => {
+  return {
+    height: props.scroll?.y !== undefined ? props.scroll.y + 'px' : undefined
+  }
+})
+
 const maxLength = () => {
-  if (props.height) {
-    maxLen.value = Math.round(props.height / cellHeight)
+  if ( props.scroll?.y) {
+    maxLen.value = Math.round( props.scroll.y / cellHeight)
     endIndex.value = maxLen.value + 2
     update()
   }
@@ -104,17 +105,10 @@ const maxLength = () => {
 
 maxLength()
 
-onMounted(() => {
-  nextTick(() => {
-    bodyRef.value.addEventListener('scroll', scroll)
-  })
-})
-
 watch(() => JSON.stringify(props.data), () => {
-  const cloneData = JSON.parse(JSON.stringify(props.data || []))
-  myData.value = dataAddID(cloneData, cellHeight)
+  myData.value = dataAddID(props.data, cellHeight)
   update()
-})
+}, { immediate: true })
 
 </script>
 
@@ -128,7 +122,7 @@ watch(() => JSON.stringify(props.data), () => {
     .body-row {
       display: flex;
       position: absolute;
-      transition: background-color .1s ease;
+      transition: transform .2s,top .2s,height .2s,background-color .1s;
 
       &:hover {
         background-color: rgb(248, 248, 248);

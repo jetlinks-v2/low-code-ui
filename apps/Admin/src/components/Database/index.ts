@@ -1,3 +1,3 @@
-import Data from './data.vue'
+import Crud from './crud.vue'
 
-export default Data
+export default Crud

@@ -204,8 +204,7 @@ const findParent=(data, target, result) =>{
     return arr;
   }
 
-
-  const queryProduct = async (id?: string) => {
+  const queryProduct = async (id?: string, cb?: () => void) => {
     if (!id) return
     dataMap.clear()
     const resp = await queryProjectDraft(id)
@@ -228,6 +227,7 @@ const findParent=(data, target, result) =>{
       } else {
         data.value = []
       }
+      cb?.()
     }
   }
 
