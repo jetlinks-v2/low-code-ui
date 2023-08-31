@@ -30,6 +30,14 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
     }
   },
   {
+    path: '/release/:id',
+    name: 'Release',
+    component: () => import('@/views/release/index.vue'),
+    meta: {
+      title: '项目发布'
+    }
+  },
+  {
     path: '/demo',
     name: 'Demo',
     component: () => import('@/views/demo/index.vue'),
@@ -60,6 +68,14 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
     meta: {
       title: '测试页'
     }
+  },
+    {
+    path: '/preview/:id',
+    name: 'Preview',
+    meta: {
+      title: '预览',
+    },
+    component: () => import('@/components/ListPage/Preview/index.vue'),
   },
     {
     path: '/preview/:id',

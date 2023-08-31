@@ -26,6 +26,8 @@ const emit = defineEmits(['save', 'cancel'])
 
 const myValue = ref(props.value)
 
+const title = computed(()=>props.language==='javascript'?'交互事件':'样式配置')
+
 const cancel = () => {
   emit('cancel')
 }

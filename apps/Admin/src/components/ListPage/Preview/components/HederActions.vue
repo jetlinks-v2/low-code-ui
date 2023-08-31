@@ -50,7 +50,6 @@ const props = defineProps({
     default: () => [],
   },
 })
-
 const handleFunction = (item: any, data?: any) => {
   if (isFunction(item)) {
     return item(data)
