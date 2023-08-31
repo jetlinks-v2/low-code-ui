@@ -1,7 +1,6 @@
-export const validFilterModule = async (list: any[]): Promise<any[]> => {
-  console.log(list);
+export const validFilterModule = (list: any[]) => {
   let errorList: any = [];
-  list.forEach(item => {
+  list?.forEach(item => {
     if(!item.name || item.name === '') {
       errorList.push({
         key: item.id,
@@ -15,9 +14,5 @@ export const validFilterModule = async (list: any[]): Promise<any[]> => {
       })
     }
   })
-  if (errorList.length > 0) {
-    return errorList;
-  } else {
-    return [];
-  }
+  return errorList
 };

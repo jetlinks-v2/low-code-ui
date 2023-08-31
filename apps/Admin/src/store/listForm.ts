@@ -84,10 +84,8 @@ export const useAllListDataStore = defineStore('allListData', () => {
    * @returns
    */
   const getALLlistDataInfo = (id: any) => {
-    console.log(id)
 
     const data = listData.value.get(id)
-    console.log(data)
 
     if (data) {
       return data

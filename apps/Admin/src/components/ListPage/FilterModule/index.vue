@@ -251,8 +251,12 @@ const submit = () => {
  * 校验筛选模块配置
  */
 const errorList:any = ref([])
-const valid = async () => {
-  errorList.value = await validFilterModule(dataSource.value)
+const valid = () => {
+  return new Promise((resolve, reject) => {
+    errorList.value = validFilterModule(dataSource.value)
+    if(errorList.value.length) reject(errorList.value)
+    else resolve([])
+  })
 }
 
 defineExpose({

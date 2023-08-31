@@ -111,7 +111,11 @@ const blur = () => {
  */
 const errorList = ref<any[]>([])
 const valid = () => {
-  errorList.value = pagingData.value.length ? [] : [{key: 'pageList', message: '请配置分页器支持的单页数据量'}]
+  return new Promise((resolve, reject) => {
+    errorList.value = pagingData.value.length ? [] : [{key: 'pageList', message: '请配置分页器支持的单页数据量'}]
+    if(errorList.value.length) reject(errorList.value)
+    else resolve([])
+  })
 }
 
 defineExpose({

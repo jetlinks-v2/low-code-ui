@@ -478,9 +478,12 @@ const submit = () => {
 }
 
 const errorList = ref<any[]>([])
-const valid = async () => {
-  console.log(dataSource.value);
-  errorList.value = await validListData(dataSource.value)
+const valid = () => {
+  return new Promise((resolve, reject) => {
+    errorList.value = validListData(dataSource.value)
+    if(errorList.value.length) reject(errorList.value)
+    else resolve([])
+  })
 }
 
 watch(

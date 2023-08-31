@@ -3,8 +3,7 @@
     <DataBind
       ref="dataBindRef"
       v-model:open="visibles.GuideVisible"
-      @valid="handleValid"
-      @modify="handleDataBindChange"
+      @valid="validate"
     />
     <ListSkeleton
       :visibles="visibles"
@@ -39,7 +38,7 @@
       :id="props.data.id"
       ref="pagingConfigRef"
     />
-    <MenuConfig v-model:open="visibles.MenuConfigVisible" :id="props.data.id" />
+    <MenuConfig v-model:open="visibles.MenuConfigVisible" :id="props.data.id" ref="menuConfigRef"/>
   </div>
 </template>
 
@@ -54,8 +53,8 @@ import ListSkeleton from './ListSkeleton/index.vue'
 import OperationColumns from './Operation/index.vue'
 import { router } from '@jetlinks/router'
 import { useAllListDataStore } from '@/store/listForm'
-import { omit } from 'lodash-es'
-import { functionsKey, pagesKey, DATA_BIND } from './keys'
+import { omit, reject } from 'lodash-es'
+import { functionsKey, pagesKey, DATA_BIND, BASE_INFO } from './keys'
 import { useProduct } from '@/store'
 
 const props = defineProps({
@@ -67,7 +66,6 @@ const props = defineProps({
 const configurationStore = useAllListDataStore()
 const productStore = useProduct()
 
-const dataBindRef = ref()
 const menuRef = ref()
 
 const visibles = reactive({
@@ -84,6 +82,8 @@ const visibles = reactive({
 const allListData = computed(() => {
   return configurationStore.getALLlistDataInfo(props.data.id)
 })
+
+
 const handleVisible = (key: string, value: boolean) => {
   visibles[key] = value
 }
@@ -91,31 +91,40 @@ const goPreview = () => {
   router.push(`/preview/${props.data.id}`)
   console.log(props.data, 'props.data')
 }
-/**
- * 数据绑定变更
- */
-const handleDataBindChange = () => {
-  dataBind.data.function = undefined
-  dataBind.data.command = undefined
-  dataBind.functionInfo = undefined
-}
 
 /**
  * 校验
  */
+const dataBindRef = ref()
 const btnTreeRef = ref()
 const columnsRef = ref()
 const filterModuleRef = ref()
 const pagingConfigRef = ref()
 const listFormRef = ref()
 const listDataRef = ref()
-const handleValid = async () => {
-  const res = await btnTreeRef.value?.valid()
-  columnsRef.value?.valid()
-  filterModuleRef.value?.valid()
-  pagingConfigRef.value?.valid()
-  listFormRef.value?.valid()
-  listDataRef.value?.valid()
+const menuConfigRef = ref()
+const validate = async () => {
+  const promiseArr = [
+    btnTreeRef.value?.valid(),
+    columnsRef.value?.valid(),
+    filterModuleRef.value?.valid(),
+    pagingConfigRef.value?.valid(),
+    listFormRef.value?.valid(),
+    listDataRef.value?.valid(),
+    menuConfigRef.value?.valid(),
+    dataBindRef.value?.valid(),
+  ]
+  return new Promise((resolve) => {
+    Promise.all(promiseArr)
+    .then((res) => {
+      console.log(res);
+      resolve(res)
+    })
+    .catch((err) => {
+      console.log(err);
+      throw err
+    })
+  })
 }
 
 const errorCount = computed(() => {
@@ -125,7 +134,8 @@ const errorCount = computed(() => {
     pagination: pagingConfigRef.value?.errorList.length,
     listForm: listFormRef.value?.errorList.length,
     filterModule: filterModuleRef.value?.errorList.length,
-    listData: listDataRef.value?.errorList.length
+    listData: listDataRef.value?.errorList.length,
+    menuConfig: menuConfigRef.value?.errorList.length
   }
 })
 
@@ -136,7 +146,7 @@ const configDone = computed(() => {
     filterModule: configurationStore.getALLlistDataInfo(props.data.id)?.searchData?.length,
     listData: configurationStore.getALLlistDataInfo(props.data.id)?.datasource?.length,
     pagination: configurationStore.getALLlistDataInfo(props.data.id)?.pagingData?.length,
-    ListForm: configurationStore.getALLlistDataInfo(props.data.id)?.showType
+    ListForm: configurationStore.getALLlistDataInfo(props.data.id)?.showType,
   }
 })
 
@@ -170,9 +180,15 @@ const dataBind = reactive({
   },
   functionInfo: undefined,
 })
+
+const filterModule = ref<any[]>([])
+const listData = ref<any[]>([])
 provide(DATA_BIND, dataBind)
 provide(functionsKey, functions)
 provide(pagesKey, pages)
+provide(BASE_INFO, props.data)
+provide('FILTER_MODULE', filterModule)
+provide('LIST_DATA', listData)
 watch(
   () => btnTreeRef?.value?.columnsTree,
   () => {

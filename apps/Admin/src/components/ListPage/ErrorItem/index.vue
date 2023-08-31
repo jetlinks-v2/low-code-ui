@@ -12,7 +12,7 @@ import { PropType } from 'vue';
 
 const props = defineProps({
   errorData: {
-    type: Object as PropType<{ message: string }>,
+    type: Object as PropType<Record<string, any>>,
     default: () => {}
   },
   border: {

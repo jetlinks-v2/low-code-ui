@@ -1,5 +1,4 @@
-export const validListData = async (list: any[]): Promise<any[]> => {
-  console.log(list);
+export const validListData = (list: any[]) => {
   let errorList: any = [];
   list?.forEach(item => {
     for(let key in item) {
@@ -11,6 +10,5 @@ export const validListData = async (list: any[]): Promise<any[]> => {
       }
     }
   })
-  console.log(errorList);
-  return errorList.length ? errorList : [];
+  return errorList
 };

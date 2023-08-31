@@ -409,6 +409,8 @@ const actionsBtnFormat = (data: any) => {
               }
             : false,
         onClick: () => {
+          const fn = new Function(item.script)
+          fn();
           console.log(data, 'datafdnh')
           importVisible.value = data?.command === 'Import'
           exmportVisible.value = data?.command === 'Export'

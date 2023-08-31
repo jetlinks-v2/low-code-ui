@@ -31,7 +31,7 @@
                 placeholder="请选择调用功能"
               >
                 <j-select-option
-                  v-for="item in functions"
+                  v-for="item in functionOptions"
                   :value="item.id"
                   :key="item.id"
                   >{{ item.name }}</j-select-option
@@ -52,7 +52,7 @@
                   disabled
                 >
                   <j-select-option
-                    v-for="item in commands"
+                    v-for="item in commandOptions"
                     :value="item.id"
                     :key="item.id"
                     >{{ item.name }}</j-select-option
@@ -102,10 +102,9 @@ import { FormInstance } from 'jetlinks-ui-components'
 import { useProduct } from '@/store'
 import EditorModal from '@/components/EditorModal'
 import { activeBtnKey, errorListKey, editTypeKey } from '../keys'
-import { queryCommand } from '@/api/project'
 import { providerEnum } from '@/components/ProJect'
-import { functionsKey, pagesKey } from '../../keys'
 import { ErrorItem } from '../..'
+import { useFunctions } from '@/components/hooks/useFunctions'
 interface Emit {
   (e: 'update:steps', value: string): void
 }
@@ -122,8 +121,8 @@ const props = defineProps({
 const activeBtn = inject(activeBtnKey)
 const editType = inject(editTypeKey)
 const errorList = inject(errorListKey)
-const functions = inject(functionsKey)
-const pages = inject(pagesKey)
+
+const { functionOptions, commandOptions, pages, handleFunction } = useFunctions()
 const errorMessage = computed(() => {
   let data = {}
   let result = errorList!.value?.filter(
@@ -140,29 +139,6 @@ const errorMessage = computed(() => {
 const iconType = computed(() => {
   return activeBtn?.value.icon && activeBtn?.value.type !== 'customer'
 })
-const productStore = useProduct()
-
-const commands = ref()
-
-/**查询功能下的指令 */
-const findCommand = async () => {
-  const params = {
-    modules: [
-      {
-        id: productStore.data?.[0].id,
-        name: productStore.data?.[0].name,
-        functions: [
-          functions!.value?.find((item) => item.id === form.functions),
-        ],
-      },
-    ],
-  }
-  const res = await queryCommand(params)
-  if (res.success) {
-    commands.value = res.result?.[0].command
-    form.command = commands.value.find(item => item.id === form.type)?.id
-  }
-}
 
 const formRef = ref<FormInstance>()
 const form = reactive({
@@ -173,7 +149,7 @@ const form = reactive({
   key: props.data.key,
   functions:
     editType!.value === 'add' &&
-    functions!.value.find((item) => item.id === props.data.functions)
+    functionOptions!.value.find((item) => item.id === props.data.functions)
       ?.provider === providerEnum.Function
       ? ''
       : props.data.functions,
@@ -210,11 +186,15 @@ watch(
   () => form.functions,
   () => {
     if (form.functions && form.functions !== '') {
-      findCommand()
+      handleFunction(form.functions)
     }
   },
   { immediate: true },
 )
+
+watch(() => commandOptions.value, () => {
+  form.command = commandOptions.value.find(item => item.id === form.type)?.id
+})
 defineExpose({
   submit,
 })

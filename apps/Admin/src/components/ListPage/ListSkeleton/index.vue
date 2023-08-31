@@ -1,13 +1,15 @@
 <template>
   <div class="list-skeleton">
     <div class="left-menu">
-      <div
-        class="menus"
-        ref="menuRef"
-        @click="handleVisible('MenuConfigVisible')"
-      >
-        菜单配置
-      </div>
+      <j-badge :count="errorCount?.menuConfig">
+        <div
+          class="menus"
+          ref="menuRef"
+          @click="handleVisible('MenuConfigVisible')"
+        >
+          菜单配置
+        </div>
+      </j-badge>
       <div class="menus" ref="previewRef" @click="emits('goPreview')">预览</div>
     </div>
     <div class="right-skeleton">
@@ -155,8 +157,8 @@
         </div>
       </div>
     </div>
+    <Guide :stepList="steps" v-model:open="visibles.GuideVisible" />
   </div>
-  <Guide :stepList="steps" v-model:open="visibles.GuideVisible" />
 </template>
 
 <script setup lang="ts" name="listSkeleton">
@@ -283,17 +285,19 @@ watch(() => props.visibles, () => {
   }
   .left-menu {
     background-color: #ffffff;
-    writing-mode: vertical-lr;
     display: flex;
+    flex-direction: column;
+    padding: 10px 0 0 10px;
     .menus {
       height: 120px;
+      writing-mode: vertical-lr;
       width: 50px;
       background-color: #f2f2f2;
       text-align: center;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 10px;
+      margin-bottom: 10px;
       cursor: pointer;
     }
   }
