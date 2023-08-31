@@ -82,10 +82,10 @@ const handleProps = (node: any) => {
 
 const handleFormItemProps = (node: any) => {
     return {
-        name: '',
         label: node?.name,
         required: false,
         rules: [],
+        name: node?.key,
         ...node?.formItemProps
     }
 }
@@ -96,7 +96,7 @@ const generatorData = (node: any) => {
         result.key = `${result.type}_${uid()}`
     }
     if (checkIsField(result) || result.type === 'table') {
-        result.formItemProps = handleFormItemProps(node)
+        result.formItemProps = handleFormItemProps(result)
     }
 
     result.componentProps = {

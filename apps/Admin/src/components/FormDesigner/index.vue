@@ -60,6 +60,9 @@ const formRef = ref<any>()
 const configRef = ref<any>()
 const refList = ref<any>({})
 
+const collectVisible = ref<boolean>(false)
+const collectData = ref<any>()
+
 const product = useProduct()
 
 const onSaveData = () => {
@@ -133,9 +136,11 @@ provide('FormDesigner', {
   errorKey,
   mode: props?.mode,
   refList,
+  collectVisible,
+  collectData,
   setSelection,
   setModel,
-  onSaveData
+  onSaveData,
 })
 
 const onSave = () => {

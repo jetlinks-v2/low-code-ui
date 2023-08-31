@@ -1,6 +1,4 @@
-
-import { filedData } from '../../../utils/defaultData'
-import { Scrollbar } from 'jetlinks-ui-components'
+import { Scrollbar, Empty } from 'jetlinks-ui-components'
 import DragGableWrap from '../../Draggable/DragGableWrap'
 import { cloneDeep, omit } from 'lodash-es';
 import './index.less';
@@ -8,11 +6,13 @@ import { onMove, onEnd } from '../../Draggable/ControlInsertionPlugin';
 import generatorData from '@/components/FormDesigner/utils/generatorData';
 import { Card, AIcon } from 'jetlinks-ui-components';
 
-const Library = defineComponent({
-    name: 'Library',
+const Template = defineComponent({
+    name: 'Template',
     inheritAttrs: false,
     setup() {
         const designer: any = inject('FormDesigner')
+
+        const list = ref<any[]>([])
 
         const handleClone = (element) => {
             const item = { ...generatorData(omit(element, ['icon'])) }
@@ -48,38 +48,42 @@ const Library = defineComponent({
             return (
                 <Scrollbar height={'100%'}>
                     <div class="filed-container">
-                        {filedData.map((element) => {
-                            return (
-                                <div key={element.id} class="filed-item">
-                                    <div class="filed-item-title">{element.name}</div>
-                                    {
-                                        element.children?.length && (
-                                            <DragGableWrap
-                                                list={element.children}
-                                                clone={handleClone}
-                                                class="filed-item-children"
-                                                sort={false}
-                                                move={handleMove}
-                                                {...dragOptions}
-                                                group={
-                                                    { name: 'j-canvas', pull: 'clone', put: false }
-                                                }
-                                                model="edit"
-                                                item-key="null"
-                                                v-slots={slots}
-                                                onMove={(e) => {
-                                                    onMove(e, designer)
-                                                }}
-                                                onEnd={(e) => {
-                                                    onEnd(e, designer)
-                                                }}
-                                                data-layout-type={'filed-item'}
-                                            ></DragGableWrap>
-                                        )
-                                    }
-                                </div>
-                            )
-                        })}
+                        {
+                            list.value.length ?
+                                list.value.map((element) => {
+                                    return (
+                                        <div key={element.id} class="filed-item">
+                                            <div class="filed-item-title">{element.name}</div>
+                                            {
+                                                element.children?.length && (
+                                                    <DragGableWrap
+                                                        list={element.children}
+                                                        clone={handleClone}
+                                                        class="filed-item-children"
+                                                        sort={false}
+                                                        move={handleMove}
+                                                        {...dragOptions}
+                                                        group={
+                                                            { name: 'j-canvas', pull: 'clone', put: false }
+                                                        }
+                                                        model="edit"
+                                                        item-key="null"
+                                                        v-slots={slots}
+                                                        onMove={(e) => {
+                                                            onMove(e, designer)
+                                                        }}
+                                                        onEnd={(e) => {
+                                                            onEnd(e, designer)
+                                                        }}
+                                                        data-layout-type={'filed-item'}
+                                                    ></DragGableWrap>
+                                                )
+                                            }
+                                        </div>
+                                    )
+                                })
+                                : <Empty style={{ marginTop: '200px' }} />
+                        }
                     </div>
                 </Scrollbar>
             )
@@ -87,4 +91,4 @@ const Library = defineComponent({
     },
 });
 
-export default Library;
+export default Template;

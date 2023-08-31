@@ -77,6 +77,7 @@ const DraggableLayout = defineComponent({
                 })
 
                 if(unref(_hidden)) return ''
+
                 switch (element.type) {
                     case 'text':
                         if (unref(isEditModel)) {

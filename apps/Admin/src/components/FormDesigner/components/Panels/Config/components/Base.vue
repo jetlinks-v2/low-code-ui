@@ -332,7 +332,6 @@ const designer: any = inject('FormDesigner')
 const { target } = useTarget()
 
 const type = computed(() => {
-  console.log(target.value?.type)
   return target.value?.type
 })
 
