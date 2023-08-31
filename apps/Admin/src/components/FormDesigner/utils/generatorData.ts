@@ -69,7 +69,7 @@ const handleProps = (node: any) => {
         case 'upload':
             result.listType = 'text'
             result.maxCount = 1
-            result.size = 2
+            result.fileSize = 2
             result.unit = 'M'
             break
         case 'grid':

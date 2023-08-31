@@ -222,6 +222,8 @@ onKeyStroke(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'], (e) => {
 })
 
 watchEffect(() => {
+  if (!props.data?.length) return
+
   if (props.data?.[0].parentId === engine.activeFile && viewType.value === 'card') {
     if (ControlLeft.value && KeyC.value || MetaLeft.value && KeyC.value) {
       const item = list.value.find(it => it.id === selectKey.value)
