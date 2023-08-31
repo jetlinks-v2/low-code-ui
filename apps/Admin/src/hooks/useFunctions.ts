@@ -1,6 +1,7 @@
 import { useProduct } from "@/store";
 import { queryCommand } from "@/api/project";
-import { providerEnum } from "../ProJect";
+import { providerEnum } from "../components/ProJect";
+import { storeToRefs } from "pinia";
 
 type CommandType = {
   id: string
@@ -13,7 +14,7 @@ export const useFunctions = () => {
   const functionOptions = ref<Draft.Function[]>([])
   const commandOptions = ref<CommandType[]>([])
   const pages = ref<Draft.Resource[]>([])
-  const { data } = useProduct()
+  const { data } = storeToRefs(useProduct())
   
   /**
    * 获取草稿下的所有功能和页面资源
@@ -31,7 +32,7 @@ export const useFunctions = () => {
       }
     })
   }
-  findFunctionsPages(data)
+  findFunctionsPages(data.value)
 
   /***
    * 查询功能下的的指令
@@ -41,8 +42,8 @@ export const useFunctions = () => {
     const params = {
       modules: [
           {
-          id: data?.[0].id,
-          name: data?.[0].name,
+          id: data.value?.[0].id,
+          name: data.value?.[0].name,
           functions: functionOptions!.value?.filter(item => item.id === functionId)
         }
       ]
