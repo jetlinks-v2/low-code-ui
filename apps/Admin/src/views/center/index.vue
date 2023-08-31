@@ -1,7 +1,17 @@
 <template>
   <page-container>
     <pro-search :columns="columns" target="code" @search="handleSearch" />
-    <JProTable ref="tableRef" model="CARD" :columns="columns" :params="params" :request="queryProject" :gridColumn="3">
+    <JProTable
+      ref="tableRef"
+      model="CARD"
+      :columns="columns"
+      :params="params"
+      :defaultParams="{
+        sorts: [{ name: 'createTime', order: 'desc' }],
+      }"
+      :request="queryProject"
+      :gridColumn="3"
+    >
       <template #headerTitle>
         <j-button type="primary" @click="handleSave('add')">新增</j-button>
       </template>
