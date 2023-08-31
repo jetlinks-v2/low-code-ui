@@ -1,6 +1,6 @@
 <template>
-  <a-select v-model:value="selectData" :open="false" :showArrow="false" @focus="showModal" :options="selectOptions"   :mode="mode" :disabled="disabled">
-  </a-select>
+  <j-select v-model:value="selectData" :open="false" :showArrow="false" @focus="showModal" :options="selectOptions"   :mode="mode" :disabled="disabled">
+  </j-select>
   <UserChoice v-if="modalVisible" @closeModal="closeModal" @selectedUser="selectedUser" :selected="selectData" :mode="mode"></UserChoice>
 </template>
 
@@ -57,6 +57,9 @@ queryUser()
 
 watch(()=>props.value,()=>{
   selectData.value = props.value
+},{
+  deep:true,
+  immediate:true
 })
 </script>
 <style lang="less" scoped>

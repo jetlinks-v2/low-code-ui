@@ -290,6 +290,9 @@ onMounted(() => {
 })
 watch(() => selectId.value, () => {
     tableRef.value.reload()
+},{
+    deep:true,
+    immediate:true
 })
 
 </script>
