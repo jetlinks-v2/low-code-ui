@@ -10,6 +10,9 @@
 </template>
 
 <script setup name="EngineHeader">
+import { useProduct } from '@/store'
+
+const product = useProduct()
 
 const router = useRouter()
 const route = useRoute()
@@ -24,6 +27,7 @@ const onRelease = () => {
 
 const quit = () => {
   router.push('/delivery/center')
+  product.initProjectState()
 }
 </script>
 

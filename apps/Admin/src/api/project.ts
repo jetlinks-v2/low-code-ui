@@ -27,3 +27,5 @@ export const queryProjectDraft = (id: string) => request.post<Draft.Info>(`/low-
  * 查询功能下的指令
  */
 export const queryCommand = (data: any) => request.post(`/low-code/editor/support/commands`, data)
+
+export const updateDraft = (id, data: any) => request.post(`/low-code/editor/draft/${id}/_update`, data)
