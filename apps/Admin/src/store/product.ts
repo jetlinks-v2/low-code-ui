@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { queryProjectDraft } from "@/api/project";
 import { useEngine } from './engine'
 import dayjs from 'dayjs';
+import { cloneDeep } from "lodash-es";
 
 type TreeData = {
   title: string
@@ -131,13 +132,15 @@ const findParent=(data, target, result) =>{
   }
 
   const updateProduct = (data: any[], record: any) => {
-    return data.map(item => {
+    const arr= cloneDeep(data)
+    return arr.map(item => {
       if (item.id === record.id) {
         return { 
           ...item, 
           ...record,
           others:{
             ...item.others,
+            ...record.others,
             modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss')
           }
          }
@@ -177,7 +180,7 @@ const findParent=(data, target, result) =>{
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
     engine.updateFile(record, 'add')
-    console.log('add----', data.value)
+    // console.log('add----', data.value)
   }
 
   const update = (record: any) => {
@@ -241,4 +244,6 @@ const findParent=(data, target, result) =>{
     getById,
     getParent
   }
+},{
+  persist: false
 })

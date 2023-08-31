@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { useProduct } from './product'
 import dayjs from "dayjs";
+import { cloneDeep } from "lodash-es";
 
 type FileItemType = {
   id: string
@@ -8,6 +9,7 @@ type FileItemType = {
   type: string
   parentName: string
   parentId: string
+  [key: string]: any
 }
 
 export const useEngine = defineStore('engine', () => {
@@ -100,13 +102,15 @@ export const useEngine = defineStore('engine', () => {
 
 
   const updateTree = (data: any[], record: any) => {
-    return data.map(item => {
+    const arr  = cloneDeep(data)
+    return arr.map(item => {
       if (item.id === record.id) {
         return { 
           ...item, 
           ...record,
           others:{
             ...item.others,
+            ...record.others,
             modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss')
           }
          }
@@ -197,4 +201,6 @@ export const useEngine = defineStore('engine', () => {
     setCopyFile,
     updateFile
   }
+},{
+  persist:false
 })
