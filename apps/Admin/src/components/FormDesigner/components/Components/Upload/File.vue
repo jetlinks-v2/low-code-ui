@@ -18,6 +18,7 @@
         </div>
       </template>
     </a-upload-dragger>
+    <div class="bottom">单个大小限制{{ fileSize }}{{ unit }}</div>
   </div>
 </template>
   
@@ -124,6 +125,10 @@ const onBlur = () => {
 
   :deep(.ant-upload.ant-upload-drag) {
     margin-top: 10px;
+  }
+  .bottom{
+    margin-top: 20px;
+    color: #9c9c9c;
   }
 }
 

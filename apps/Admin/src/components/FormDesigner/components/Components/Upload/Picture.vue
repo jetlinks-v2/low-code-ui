@@ -1,35 +1,37 @@
 <template>
   <a-upload dragger name="file" v-model:file-list="fileList" list-type="picture-card" :max-count="maxCount" :headers="{
     'X-Access-Token': LocalStore.get(TOKEN_KEY)
-  }"  :before-upload="beforeUpload">
-    <div>
-      <p class="ant-upload-drag-icon">
+  }" :before-upload="beforeUpload" :accept="accept" :disabled="fileList.length >= maxCount">
+
+    <div v-if="maxCount > 1 || fileList.length < maxCount ">
+      <p class="icon">
         <AIcon type="CloudUploadOutlined" />
       </p>
-      <p class="ant-upload-hint">将图片拖动到此处，或点击上传</p>
+      <p >将图片拖动到此处，或点击上传</p>
     </div>
 
-
-    <template #itemRender="{file,actions}">
-      <div class="render" >
-          <a-image :src="file.url">
-            <template #previewMask>
-              <AIcon type="EyeOutlined" />
-              <AIcon type="DeleteOutlined" style="margin-left: 10px;" @click="actions.remove()"/>
-            </template>
-          </a-image>
-          <div class='render-name' >
-            <j-input v-model:value="file.name" v-if="dbId === file.uid && dbRef" @blur="onBlur" ref="nameRef"></j-input>
-            <div @dblclick="onDbClick(file)" v-else>  <j-ellipsis > {{ file.name }}</j-ellipsis></div>
-          </div>
+    <template #itemRender="{ file, actions }">
+      <div class="render">
+        <a-image :src="file.url">
+          <template #previewMask>
+            <AIcon type="EyeOutlined" />
+            <AIcon type="DeleteOutlined" style="margin-left: 10px;" @click="actions.remove()" />
+          </template>
+        </a-image>
+        <div class='render-name'>
+          <j-input v-model:value="file.name" v-if="dbId === file.uid && dbRef" @blur="onBlur" ref="nameRef"></j-input>
+          <div @dblclick="onDbClick(file)" v-else> <j-ellipsis> {{ file.name }}</j-ellipsis></div>
+        </div>
       </div>
     </template>
   </a-upload>
+  <div class="bottom">单个大小限制{{ fileSize }}{{ unit }}</div>
   <!-- <a-modal :visible="previewRef.previewVisible" :title="previewRef.previewTitle" :footer="null"  :width="400" @cancel="handleCancel">
     <img alt="example" style="width: 100%" :src="previewRef.previewImage" />
   </a-modal> -->
 
-  <CropperModal v-if="cropper.visible" :img="cropper.img" title="图片剪切" @cancel="cropper.visible = false" :openServer="false" @ok="saveImage" />
+  <CropperModal v-if="cropper.visible" :img="cropper.img" title="图片剪切" @cancel="cropper.visible = false"
+    :openServer="false" @ok="saveImage" />
 </template>
     
 <script lang="ts" setup>
@@ -75,8 +77,7 @@ const fileList = ref<any>([])
 
 const dbRef = ref<boolean>(false)
 const dbId = ref<string>('')
-const nameRef =ref()
-
+const nameRef = ref()
 
 
 
@@ -94,8 +95,8 @@ const saveImage = async (url: string) => {
         file,
         response: res.result,
         url: base64Url,
-        name:file.name,
-        uid:randomString(16)
+        name: file.name,
+        uid: randomString(16)
       })
     })
   }
@@ -108,13 +109,9 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   const isType = props.accept?.length ? props.accept?.join('').includes(arr[arr.length - 1]) : true
 
 
-  fileToUpload.value = file
-  getBase64ByImg(file, base64Url => {
-    cropper.img = base64Url
-    cropper.visible = true
-  })
+
   // return false
-  return new Promise((resolve) => {
+  return new Promise(() => {
     if (maxSize < file.size) {
       onlyMessage(`文件大小必须小于${props.fileSize}${props.unit}`, 'error')
       return false
@@ -122,6 +119,11 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
       onlyMessage(`格式错误，请重新上传`, 'error')
       return false
     } else {
+      fileToUpload.value = file
+      getBase64ByImg(file, base64Url => {
+        cropper.img = base64Url
+        cropper.visible = true
+      })
       return false
       // resolve(file)
     }
@@ -131,10 +133,10 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
 const onDbClick = (file) => {
   dbId.value = file.uid
   dbRef.value = true
-  nextTick(()=>{
+  nextTick(() => {
     nameRef.value.focus()
   })
-  
+
 }
 
 const onBlur = () => {
@@ -144,38 +146,23 @@ const onBlur = () => {
 }
 
 
-// const handleChange = async (info: UploadChangeParam) => {
-//   console.log('------------', info)
-//   if (!info.file.status) return
-//   if (info.file.status === 'done') {
-//     console.log('info', info)
-//   }
-// };
-
-// const handleCancel = ()=>{
-//   previewRef.previewVisible = false
-//   previewRef.previewTitle = ''
-// }
-
-// const handlePreview = (file) => {
-//   console.log('----', fileList.value)
-//   previewRef.previewVisible = true
-//   previewRef.previewTitle = file.response.name
-//   previewRef.previewImage = file.response.accessUrl
-// }
 
 
 </script>
 
 <style scoped lang='less'>
-
 .render {
   padding: 8px;
   border: 1px solid #d9d9d9;
   height: 100%;
-  .render-name{
+
+  .render-name {
     margin-top: 10px;
     width: 100%;
   }
+}
+.bottom{
+  margin-top: 20px;
+  color: #9c9c9c;
 }
 </style>
