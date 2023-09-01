@@ -1,4 +1,4 @@
-<template>
+<template xmlns="">
   <div class="content-warp">
     <ProjectEmpty v-if="props.data.type === 'project'" :data="data"/>
     <Project v-else-if="props.data.type === providerEnum.Module" :data="props.data.children" />

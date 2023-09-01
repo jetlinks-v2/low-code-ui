@@ -23,6 +23,15 @@ export const useEngine = defineStore('engine', () => {
 
   const product = useProduct()
 
+  const initEngineState = () => {
+    activeFile.value = null
+    copyFile.value = ''
+    openFile.value = null
+    expandedKeys.value = []
+    content.value = []
+    files.value = []
+  }
+
   /**
    * 当前选中的文件
    * @param key
@@ -147,34 +156,23 @@ export const useEngine = defineStore('engine', () => {
     })
   }
 
-  const delTree = (data: any[], record: any) => {
-    return data.filter(item => {
-      if (item.id === record.id) {
-        return false
-      }
-      if (item.children) {
-        item.children = delTree(item.children, record)
-      }
-      return true
-    })
-  }
-
   /**
    * 更新文件
    * @param record
    */
-  const updateFile = (record: FileItemType, type: string) => {
-    switch (type) {
-      case 'add':
-        files.value= addTree(files.value, record); 
-        addFile(record)
-        break
-      case 'edit':
-        files.value = updateTree(files.value, record);
-        break
-      case 'del':
-        files.value = delTree(files.value, record);
-        break
+  const updateFile = (record: any, type: string) => {
+      const index = files.value.findIndex(item => item.id !== record.id)
+
+      if (index !== -1) {
+        files.value = files.value.map(item => {
+          return product.getById(item.id)
+        })
+      }
+    if (['del', 'edit'].includes(type)) {
+      type === 'del' ? files.value.splice(index,1) : files.value.splice(index,0, record)
+    } else if (type === 'add') {
+      files.value.push(record)
+      addFile(record)
     }
   }
 
@@ -186,9 +184,9 @@ export const useEngine = defineStore('engine', () => {
     copyFile.value = record.id
   }
 
-  watch(() => activeFile.value, () => {
-    console.log(activeFile.value)
-  }, { immediate: true })
+  // watch(() => activeFile.value, () => {
+  //   console.log(activeFile.value)
+  // }, { immediate: true })
 
   return {
     files,
@@ -203,7 +201,8 @@ export const useEngine = defineStore('engine', () => {
     expandedAll,
     packUpAll,
     setCopyFile,
-    updateFile
+    updateFile,
+    initEngineState
   }
 },{
   persist:false
