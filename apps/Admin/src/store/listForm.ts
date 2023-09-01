@@ -47,7 +47,8 @@ export const useAllListDataStore = defineStore('allListData', () => {
       date: {},
     },
     menu: {
-      systemMenu: true,
+      pageName:'',
+      main: true,
       name: '',
       icon: '',
     },

@@ -195,6 +195,7 @@ const emit = defineEmits([
   'handleAdd',
   'handleOk',
   'handleChange',
+  'update:data'
 ])
 
 const handleChange = (data) => {
@@ -331,7 +332,9 @@ const syncData = async () => {
     return onlyMessage('请先完成数据绑定', 'error')
   }
   if (!asyncData.value) {
+    const bindData = await tableRef.value?.getData()
     bindShow.value = true
+    emit('update:data', bindData)
     asyncData.value = true
   } else {
     const data = await tableRef.value?.getData()

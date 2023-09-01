@@ -23,6 +23,7 @@
         @handleAdd="handleAdd"
         @configuration="configuration"
         @handleOk="handleOk"
+        @update:data="(value) => (dataSource = value)"
       />
       <div v-else>
         <a-page-header title="表头配置" sub-title="" @back="goBack">
@@ -202,7 +203,6 @@ const configurationStore = useAllListDataStore()
 const subValue = ref({})
 const configState = reactive({
   type: '',
-
   demonstrations: 'json', //object类型
   dateValue: '', //date类型
   inputValue: '', //int/long/text/float/double类型
@@ -385,7 +385,7 @@ const columns: any = [
 ]
 //数据
 const dataBinds: any = inject(DATA_BIND)
-const dataSource = ref()
+const dataSource = ref([])
 //新增一列table
 const handleAdd = async (table: any) => {
   table?.addItem({
@@ -439,9 +439,9 @@ const handleOk = (value: any, data: any) => {
     case '3':
       source = dataSource.value?.map((item) => {
         return {
-          id: item.name,
-          name: item.name,
-          type: item.type,
+          id: item?.id,
+          name: item?.name,
+          type: item?.type,
         }
       })
       break
