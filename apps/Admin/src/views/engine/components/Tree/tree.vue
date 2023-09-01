@@ -61,15 +61,9 @@ const menuState = reactive({
 })
 
 const select = (key, e) => {
-  console.log(e)
-  if (e.node?.type !== 'project') {
-    engine.addFile({
-      id: e.node.id,
-      title: e.node.title,
-      type: e.node.type,
-      children: e.node.children
-    })
-  }
+  engine.addFile({
+    ...e.node.dataRef
+  })
 }
 
 const close = () => {
@@ -85,9 +79,11 @@ const save = ({ name }) => {
   const node = menuState.cacheData
   const parentId = node.type === providerEnum.Module ? node.id : node.parentId
   product.add({
+    name,
     id: randomString(16),
     title: name,
     type: menuState.provider,
+    provider: menuState.provider,
     parentId: parentId
   }, parentId)
   close()
@@ -102,8 +98,7 @@ const menuClick = (record) => {
 
 <style scoped lang="less">
 .tree-content-warp {
-  flex: 0 0 auto;
-  min-height: 0;
+  height: calc(100% - 44px);
 
   .tree-content-body {
     height: 100%;

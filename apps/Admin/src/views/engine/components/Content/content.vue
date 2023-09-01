@@ -1,14 +1,17 @@
-<template>
+<template xmlns="">
   <div class="content-warp">
-    <Project v-if="props.data.type === providerEnum.Module" :data="props.data.children" />
+    <ProjectEmpty v-if="props.data.type === 'project'" :data="data"/>
+    <Project v-else-if="props.data.type === providerEnum.Module" :data="props.data.children" />
     <FormDesigner v-else-if="props.data.type === providerEnum.FormPage" :data="props.data" />
-    <CRUD v-else-if="data.type === providerEnum.CRUD" />
+    <CustomHTML v-else-if="data.type === providerEnum.HtmlPage" :data="props.data"/>
+    <CRUD v-else-if="data.type === providerEnum.CRUD" v-bind="data"/>
     <ListPage v-else-if="data.type === providerEnum.ListPage" :data="props.data"/>
   </div>
 </template>
 
 <script setup name="ContentWarp">
 import { providerEnum } from '@/components/ProJect/index'
+import ProjectEmpty from '@/components/ProJect/Empty/index.vue'
 
 const props = defineProps({
   data: {

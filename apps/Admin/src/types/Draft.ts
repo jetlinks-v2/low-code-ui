@@ -112,11 +112,12 @@ namespace Draft {
     /**
      * 关系数据相关配置
      */
-    relation: Record<string, any>
+    relation: RelationType
     /**
      * 资产数据权限控制相关配置
      */
-    asset: Record<string, any>
+    asset: AssetType
+    tree: boolean
   }
 
   export type RdbCrudColumns = {
@@ -173,5 +174,19 @@ namespace Draft {
      * 菜单icon
      */
     icon?: string
+  }
+
+  export type AssetType = {
+    enabled: boolean
+    assetIdColumn: string
+    assetType?: string
+    assetTypeName?: string
+    correlatesAssets?: boolean
+  }
+
+  export type RelationType = {
+    enabled: boolean
+    relationType: string
+    relationTypeName?: string
   }
 }

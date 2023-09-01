@@ -1,8 +1,10 @@
 import { defineStore } from "pinia";
-import { queryProjectDraft } from "@/api/project";
+import { queryProjectDraft, updateDraft} from "@/api/project";
 import { useEngine } from './engine'
 import dayjs from 'dayjs';
-import { cloneDeep } from "lodash-es";
+import { throttle, cloneDeep, omit } from 'lodash-es'
+import { Integrate } from '@/utils/project'
+import { providerEnum } from  '@/components/ProJect/index'
 
 type TreeData = {
   title: string
@@ -13,20 +15,7 @@ type TreeData = {
   [key: string]: any
 }
 
-
-const handleModules = (modules: Draft.Module[]) => {
-
-}
-
-const handleFunctions = (functions: Draft.Function[]) => {
-
-}
-
-const handleResources = (resources: Draft.Resource[]) => {
-
-}
-
-const handleChildren = (children: Draft.Module, parentId: string): TreeData[] => {
+const handleChildren = (children: any, parentId: string): TreeData[] => {
   const treeData: TreeData[] = []
 
   if (children.children) {
@@ -36,7 +25,7 @@ const handleChildren = (children: Draft.Module, parentId: string): TreeData[] =>
       treeData.push({
         ...item,
         title: item.name,
-        type: 'module',
+        type: providerEnum.Module,
         parentId: parentId,
         children: hasChildren ? handleChildren(item, item.id) : []
       })
@@ -67,11 +56,21 @@ const handleChildren = (children: Draft.Module, parentId: string): TreeData[] =>
   return treeData
 }
 
+/**
+ * 保存草稿
+ */
+const updateProductReq = throttle((data: any[]) => {
+  const integrateData = Integrate(data)
+  updateDraft(integrateData.draftId, integrateData)
+}, 1000)
+
 export const useProduct = defineStore('product', () => {
   const data = ref<TreeData[]>([]) // 项目
   const dataMap: Map<string, any> = new Map()
-  const engine = useEngine()
   const dataById = ref()
+  const info = ref()
+
+  const engine = useEngine()
 
   const handleDataMap = (data?: TreeData[]) => {
     data?.forEach?.(item => {
@@ -180,13 +179,14 @@ const findParent=(data, target, result) =>{
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
     engine.updateFile(record, 'add')
-    // console.log('add----', data.value)
+    updateProductReq(data.value)
   }
 
   const update = (record: any) => {
-    dataMap.set(record.id, record)
+    dataMap.set(record.id, omit(record, ['children']))
     data.value = updateProduct(data.value, record)
     engine.updateFile(record, 'edit')
+    updateProductReq(data.value)
   }
 
   const remove = (record: any) => {
@@ -194,6 +194,7 @@ const findParent=(data, target, result) =>{
     data.value = removeProduct(data.value, record)
     dataMap.delete(record.id)
     engine.updateFile(record, 'del')
+    updateProductReq(data.value)
   }
   //通过id查找对应节点
   const getById = (id: string) => {
@@ -213,36 +214,43 @@ const findParent=(data, target, result) =>{
     const resp = await queryProjectDraft(id)
     if (resp.success) {
       const result = resp.result
-      const firstModule = result.modules?.[0]
-      if (firstModule) {
-        const treeData: TreeData[] = []
-        const children: TreeData[] = handleChildren(firstModule, firstModule.id)
-        treeData.push({
-          ...firstModule,
-          id: firstModule.id,
-          title: firstModule.name,
-          type: 'project',
-          selectable: false,
-          children: children
-        })
-        handleDataMap(treeData);
-        data.value = treeData
-      } else {
-        data.value = []
-      }
+      const treeData: TreeData[] = []
+      const children: TreeData[] = result.modules?.[0] ? handleChildren(result.modules[0], result.id) : []
+      treeData.push({
+        version: result.version,
+        draftName: result.draftName,
+        draftId: result.draftId,
+        id: result.id,
+        title: result.name,
+        type: 'project',
+        children: children
+      })
+      handleDataMap(treeData);
+      data.value = treeData
+      info.value = omit(result, ['modules'])
       cb?.()
     }
   }
 
+  const initProjectState = () => {
+    data.value = []
+    dataMap.clear()
+    dataById.value = null
+
+    engine.initEngineState()
+  }
+
   return {
     data,
+    info,
     queryProduct,
     getDataMap,
     add,
     update,
     remove,
     getById,
-    getParent
+    getParent,
+    initProjectState
   }
 },{
   persist: false
