@@ -51,7 +51,7 @@ const props = defineProps({
 
 const emit = defineEmits(['change'])
 
-const leftList = ref<any>([])
+const leftList = ref<any>(props.projectData || [])
 const addTree = ref<any>([])
 const treeData = ref<any>([])
 
@@ -106,34 +106,6 @@ const onTree = (data) => {
     treeData.value = data
     emit('change', data)
 }
-
-
-onMounted(() => {
-    const test = [
-        {
-            id: 'html1',
-            name: 'html-1',
-            icon: 'EyeOutlined',
-            url:"/html1",
-            owner:'iot',
-            // code:'html1'
-        },
-        {
-            id: 'html2',
-            name: 'html-2',
-            icon: 'EyeOutlined',
-            url:"/html2",
-            owner:'iot',
-        },
-        {
-            id: 'html3',
-            name: 'html-3',
-            icon: 'EyeOutlined'
-        }
-    ]
-    leftList.value = test
-})
-
 
 </script>
 

@@ -90,7 +90,7 @@ const source = ref([])
  */
 const getResource = () => {
   const _map = product.getDataMap()
-  const list = [..._map.values()].filter(item => !!item.others.menu)
+  const list = [..._map.values()].filter(item => item.others && item.others.menu)
   source.value = list.map(item => ({ ...item, isCheck: 0}))
   startCheck()
 }
@@ -101,8 +101,6 @@ const getResource = () => {
 const startCheck = () => {
 
 }
-
-getResource()
 
 </script>
 
