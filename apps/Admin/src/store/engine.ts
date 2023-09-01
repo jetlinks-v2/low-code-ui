@@ -59,7 +59,7 @@ export const useEngine = defineStore('engine', () => {
     files.value = arr.filter(item => item.id !== key)
   }
 
-  const getExpandsKeys = (id: string) => {
+  const getExpandsKeys = (id: string, type?: string) => {
     console.log(id)
     const arrSet: Set<string> = new Set([...expandedKeys.value])
     const map = product.getDataMap()
@@ -69,8 +69,8 @@ export const useEngine = defineStore('engine', () => {
     if (id !== activeFile.value) { // 不是当前选中项
       openFile.value = currentNode
     }
-    console.log(expandedKeys.value, arrSet, currentNode.parentId)
-    if (currentNode && !expandedKeys.value.includes(currentNode.parentId)) { // 当前节点的parentId不在expandedKeys中
+
+    if (currentNode && !expandedKeys.value.includes(currentNode.parentId) && type !== 'project') { // 当前节点的parentId不在expandedKeys中
       while (currentNode) {
         if (!arrSet.has(currentNode.id)) {
           arrSet.add(currentNode.id)
@@ -92,8 +92,8 @@ export const useEngine = defineStore('engine', () => {
     expandedKeys.value = []
   }
 
-  const selectFile = (key: string) => {
-    getExpandsKeys(key)
+  const selectFile = (key: string, type?: string) => {
+    getExpandsKeys(key, type)
   }
 
   /**
@@ -102,14 +102,16 @@ export const useEngine = defineStore('engine', () => {
    */
   const addFile = (record: FileItemType) => {
     activeFile.value = record.id
-
+    const type = record.type
     if (!files.value.some(item => item.id === record.id)) {
       const cloneRecord = cloneDeep(record)
-      delete cloneRecord.children
+      if (type === 'project') {
+        delete cloneRecord.children
+      }
       files.value.push(cloneRecord)
     }
 
-    selectFile(record.id)
+    selectFile(record.id, type)
   }
 
 
