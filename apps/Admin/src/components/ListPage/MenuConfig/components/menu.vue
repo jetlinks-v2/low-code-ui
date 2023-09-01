@@ -3,12 +3,12 @@
     <div class="card">
       <h3>基本信息</h3>
       <p>页面名称</p>
-      <j-input v-model:value="props.pageName" disabled />
+      <j-input v-model:value="form.pageName" disabled />
 
       <h3 class="title">设置该页面为系统主菜单</h3>
       <j-form ref="basicFormRef" :model="form" class="basic-form">
-        <j-form-item name="systemMenu">
-          <j-switch v-model:checked="form.systemMenu" />
+        <j-form-item name="main">
+          <j-switch v-model:checked="form.main" />
         </j-form-item>
         <j-form-item
           name="name"
@@ -73,10 +73,6 @@
 import ChooseIconDialog from '@/components/ListPage/MenuConfig/components/icon.vue'
 const emits = defineEmits()
 const props = defineProps({
-  pageName: {
-    type: String,
-    default: '',
-  },
   formData: {
     type: Object,
     default: () => {},
@@ -84,7 +80,8 @@ const props = defineProps({
 })
 const dialogVisible = ref<boolean>(false)
 const form = reactive({
-  systemMenu: props.formData?.systemMenu || true,
+  pageName: props.formData?.pageName || '',
+  main: props.formData?.main || true,
   name: props.formData?.name || '',
   icon: props.formData?.icon || '',
 })
@@ -98,6 +95,12 @@ const onCheck = async () => {
     return errorInfo
   }
 }
+watch(
+  () => [form.pageName, form.main, form.name, form.icon],
+  () => {
+    emits('update:form',form)
+  },
+)
 defineExpose({
   vaildate: onCheck,
 })
