@@ -68,9 +68,9 @@ const product = useProduct()
 const onSaveData = () => {
   const obj = {
     ...props.data,
-    others: {
-      ...props?.data?.others,
-      formDesigner: unref(formData),
+    configuration: {
+      type: 'form',
+      code: JSON.stringify(unref(formData)),
     },
   }
   product.update(obj)
@@ -174,7 +174,9 @@ watch(
 watch(
   () => props.data,
   (newVal) => {
-    formData.value = newVal?.others?.formDesigner || initData
+    try {
+      formData.value = JSON.parse(newVal?.configuration?.code) || initData
+    } catch (error) {}
   },
   {
     deep: true,
