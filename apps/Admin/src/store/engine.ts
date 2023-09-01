@@ -105,7 +105,9 @@ export const useEngine = defineStore('engine', () => {
     activeFile.value = record.id
 
     if (!files.value.some(item => item.id === record.id)) {
-      files.value.push(record)
+      const cloneRecord = cloneDeep(record)
+      delete cloneRecord.children
+      files.value.push(cloneRecord)
     }
 
     selectFile(record.id)
