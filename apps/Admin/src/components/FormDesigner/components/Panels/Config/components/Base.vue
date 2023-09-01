@@ -27,7 +27,9 @@
       <j-form-item
         label="名称"
         :name="['formItemProps', 'label']"
-        v-if="!['text','org','role','user','product','device'].includes(type)"
+        v-if="
+          !['text', 'org', 'role', 'user', 'product', 'device'].includes(type)
+        "
         :rules="[
           {
             required: true,
@@ -88,7 +90,20 @@
           />
         </j-form-item>
       </template>
-      <template v-if="['select-card', 'tree-select', 'select' , 'org' , 'role' , 'user','product','device'].includes(type)">
+      <template
+        v-if="
+          [
+            'select-card',
+            'tree-select',
+            'select',
+            'org',
+            'role',
+            'user',
+            'product',
+            'device',
+          ].includes(type)
+        "
+      >
         <j-form-item
           label="类型"
           :name="['componentProps', 'mode']"
@@ -327,13 +342,13 @@ import Rule from './Rules/Rule.vue'
 import { basic } from '@/components/FormDesigner/utils/defaultData'
 import { omit } from 'lodash-es'
 import generatorData from '@/components/FormDesigner/utils/generatorData'
+import { getBrotherList } from '../../../../utils/utils'
 
 const designer: any = inject('FormDesigner')
 
 const { target } = useTarget()
 
 const type = computed(() => {
-  console.log(target.value?.type)
   return target.value?.type
 })
 
@@ -379,10 +394,23 @@ const onChange = (arr: any[]) => {
 }
 
 const rules = [
+  {
+    required: true,
+    message: '请输入标识',
+  },
   { max: 64, message: '最多可输入64个字符' },
   {
     pattern: /^[a-zA-Z0-9_\-]+$/,
     message: '标识只能由数字、字母、下划线、中划线组成',
+  },
+  {
+    validator(_rule: any, value: string) {
+      if (!value) return Promise.resolve()
+      const arr = getBrotherList(target.value.key, designer.formData.value.children)
+      const flag = arr.filter(item => item.key !== target.value.key).find(i => i?.formItemProps?.name === value)
+      if (flag) return Promise.reject('标识已存在')
+      return Promise.resolve()
+    },
   },
 ]
 

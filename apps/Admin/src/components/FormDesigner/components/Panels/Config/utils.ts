@@ -46,59 +46,10 @@ export const getConfigList = (_type: string) => {
         })
     }
 
-    if (['select-card'].includes(unref(_type))) {
+    if (['select-card', 'tree-select', 'select-card'].includes(unref(_type))) {
         arr.push({
             key: 'Source',
             header: '数据来源',
-        })
-    }
-
-    if (
-        [
-            'input',
-            'textarea',
-            'select-card',
-            'input-password',
-            'switch',
-            'input-number',
-            'tree-select',
-            'select',
-            'date-picker',
-            'time-picker',
-            'table',
-            'geo',
-            'card',
-            'org',
-            'role',
-            'user',
-            'product',
-            'device'
-        ].includes(unref(_type))
-    ) {
-        arr.push({
-            key: 'Descriptions',
-            header: '说明',
-        })
-    }
-    if (
-        [
-            'root',
-            'text',
-            'input',
-            'textarea',
-            'select-card',
-            'input-password',
-            'switch',
-            'input-number',
-            'tree-select',
-            'select',
-            'date-picker',
-            'time-picker'
-        ].includes(unref(_type))
-    ) {
-        arr.push({
-            key: 'Event',
-            header: '整体配置',
         })
     }
     if (

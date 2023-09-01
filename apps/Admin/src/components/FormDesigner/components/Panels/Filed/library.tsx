@@ -1,6 +1,5 @@
 
 import { filedData } from '../../../utils/defaultData'
-import { Scrollbar } from 'jetlinks-ui-components'
 import DragGableWrap from '../../Draggable/DragGableWrap'
 import { cloneDeep, omit } from 'lodash-es';
 import './index.less';

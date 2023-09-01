@@ -1,5 +1,5 @@
 
-import { cloneDeep, get, isEmpty, set } from 'lodash-es';
+import { cloneDeep, get, isEmpty, omit, set } from 'lodash-es';
 import { useProps } from '../../hooks';
 import { onEnd, onMove } from './ControlInsertionPlugin';
 import DraggableWrap from './DragGableWrap'
@@ -13,6 +13,7 @@ import SpaceLayout from './SpaceLayout';
 import CollapseLayout from './CollapseLayout';
 import TableLayout from './TableLayout'
 import { watch, PropType } from 'vue';
+import { queryOptions } from '../../utils/utils';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -65,7 +66,7 @@ const DraggableLayout = defineComponent({
 
         const slots = {
             getWidgetRef: (path) => {
-                let foundRef = designer.refList.value[path]
+                let foundRef = unref(designer.refList)?.[path]
                 return foundRef
             },
             item: ({ element }) => {
@@ -77,6 +78,7 @@ const DraggableLayout = defineComponent({
                 })
 
                 if(unref(_hidden)) return ''
+
                 switch (element.type) {
                     case 'text':
                         if (unref(isEditModel)) {
@@ -110,6 +112,7 @@ const DraggableLayout = defineComponent({
                             const TypeComponent = componentMap?.[element?.type] || 'div'
 
                             const selectRef = ref<any>(null)
+                            const options = ref<any[]>(element?.componentProps?.options || [])
 
                             const params = {
                                 data: element,
@@ -178,24 +181,33 @@ const DraggableLayout = defineComponent({
                                 registerToRefList(_path, selectRef.value)
                             })
 
+                            if(!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
+                                queryOptions(element.componentProps.source).then(resp => {
+                                    options.value = resp
+                                })
+                            }
+
                             return (
                                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                                     <FormItem {...unref(formItemProps)} name={_path}>
                                         {
-                                            unref(isEditModel) ? <TypeComponent
+                                            unref(isEditModel) ? 
+                                            <TypeComponent
                                                 {...unref(typeProps)}
                                                 data={element}
-                                                {...element.componentProps}
-                                                size={designer.formData.value?.componentProps.size}
-                                            ></TypeComponent> : <TypeComponent
+                                                {...omit(element.componentProps, ['description'])}
+                                                size={unref(designer.formData)?.componentProps.size}
+                                            ></TypeComponent> : 
+                                            <TypeComponent
                                                 {...unref(typeProps)}
                                                 data={element}
-                                                {...element.componentProps}
-                                                size={designer.formData.value?.componentProps.size}
+                                                {...omit(element.componentProps, ['description'])}
+                                                size={unref(designer.formData)?.componentProps.size}
                                                 v-model:value={value.value}
                                                 v-model:checked={checked.value}
                                                 onChange={onChange}
                                                 disabled={element?.componentProps?.disabled || (unref(designer.mode) === 'edit' && !element?.componentProps?.editable)}
+                                                options={unref(options)}
                                             ></TypeComponent>
                                         }
                                         <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{element.componentProps?.description}</div>
