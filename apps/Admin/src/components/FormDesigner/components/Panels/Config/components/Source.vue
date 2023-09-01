@@ -16,18 +16,40 @@
         placeholder="请选择"
         v-model:value="target.componentProps.source.dictionary"
       >
-        <j-select-option v-for="item in dic" :key="item.id" :value="item.id">{{
-          item.name
-        }}</j-select-option>
+        <j-select-option v-for="item in dic" :key="item.id" :value="item.id">
+          {{ item.name }}
+        </j-select-option>
       </j-select>
     </j-form-item>
     <j-form-item v-else>
       <j-row :gutter="16">
         <j-col :span="12">
-          <j-select placeholder="请选择后端能力"></j-select>
+          <j-select
+            v-model:value="target.componentProps.source.functionId"
+            placeholder="请选择"
+          >
+            <j-select-option
+              v-for="item in functionList"
+              :key="item.id"
+              :value="item.id"
+            >
+              {{ item.name }}
+            </j-select-option>
+          </j-select>
         </j-col>
         <j-col :span="12">
-          <j-select placeholder="请选择指令"></j-select>
+          <j-select
+            v-model:value="target.componentProps.source.commandId"
+            placeholder="请选择"
+          >
+            <j-select-option
+              v-for="item in commandList"
+              :key="item.id"
+              :value="item.id"
+            >
+              {{ item.name }}
+            </j-select-option>
+          </j-select>
         </j-col>
       </j-row>
     </j-form-item>
@@ -45,7 +67,11 @@
             <AIcon type="QuestionCircleOutlined" />
           </j-tooltip>
         </template>
-        <j-select placeholder="请选择" />
+        <j-select
+          v-model:value="target.componentProps.source.source"
+          placeholder="请选择"
+        >
+        </j-select>
       </j-form-item>
       <j-form-item
         :rules="[
@@ -60,7 +86,11 @@
             <AIcon type="QuestionCircleOutlined" />
           </j-tooltip>
         </template>
-        <j-select placeholder="请选择" />
+        <j-select
+          v-model:value="target.componentProps.source.label"
+          placeholder="请选择"
+        >
+        </j-select>
       </j-form-item>
       <j-form-item
         :rules="[
@@ -75,20 +105,28 @@
             <AIcon type="QuestionCircleOutlined" />
           </j-tooltip>
         </template>
-        <j-select placeholder="请选择" />
+        <j-select
+          v-model:value="target.componentProps.source.value"
+          placeholder="请选择"
+        >
+        </j-select>
       </j-form-item>
     </template>
   </div>
 </template>
     
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useTarget } from '../../../../hooks'
-import { queryDictionary } from '@/api/form'
+import { queryDictionary, queryEndCommands } from '@/api/form'
+import { useProduct } from '@/store'
+
+const product = useProduct()
 
 const { target } = useTarget()
 
 const dic = ref<any[]>([])
+const end = ref<any[]>([])
 
 const getDictionary = () => {
   queryDictionary().then((resp) => {
@@ -98,9 +136,15 @@ const getDictionary = () => {
   })
 }
 
-onMounted(() => {
-  getDictionary()
-})
+const getEnd = () => {
+  const id = product.info?.draftId
+  queryEndCommands(id).then((resp) => {
+    if (resp.success) {
+      console.log(resp.result)
+      end.value = resp.result || []
+    }
+  })
+}
 
 const onRadioChange = (e) => {
   if (e.target?.value === 'end') {
@@ -110,7 +154,7 @@ const onRadioChange = (e) => {
       name: undefined,
       functionId: undefined,
       commandId: undefined,
-      source: undefined
+      source: undefined,
     }
   } else {
     target.value.componentProps.source = {
@@ -119,4 +163,24 @@ const onRadioChange = (e) => {
     }
   }
 }
+
+const functionList = computed(() => {
+  return []
+})
+
+const commandList = computed(() => {
+  return []
+})
+
+watch(
+  () => target.value?.componentProps?.source?.type,
+  (newVal) => {
+    if (newVal === 'dic') {
+      getDictionary()
+    }
+    if (newVal === 'end') {
+      getEnd()
+    }
+  },
+)
 </script>

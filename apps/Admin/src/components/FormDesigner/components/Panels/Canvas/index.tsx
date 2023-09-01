@@ -49,7 +49,17 @@ export default defineComponent({
 
     const renderContent = () => {
       const typeProps = useProps(designer, true) // 根结点，也是form的props
-      const Layout = (<DraggableLayout path={[]} index={0} data-layout-type={'root'} style={_style} data={unref(designer.formData)?.children} parent={unref(designer.formData)} isRoot></DraggableLayout>)
+      const Layout = (
+        <DraggableLayout
+          path={[]}
+          index={0}
+          data-layout-type={'root'}
+          style={_style}
+          data={unref(designer.formData)?.children}
+          parent={unref(designer.formData)}
+          isRoot
+        ></DraggableLayout>
+      )
 
       return (
         <div style={{ height: '100%' }}>

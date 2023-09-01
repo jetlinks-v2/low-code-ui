@@ -148,7 +148,6 @@ const Selection = defineComponent({
     }
     // 删除
     const onDelete = () => {
-      console.log(props.data)
       handleAction('remove')
     }
 

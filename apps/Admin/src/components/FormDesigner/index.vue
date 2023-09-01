@@ -42,8 +42,8 @@ const props = defineProps({
   },
   mode: {
     // 是否为编辑
-    type: String as PropType<'add' | 'edit'>,
-    default: 'add',
+    type: String as PropType<'add' | 'edit' | undefined>,
+    default: undefined,
   },
   data: {
     type: Object,
@@ -51,7 +51,7 @@ const props = defineProps({
 })
 
 const model = ref<'preview' | 'edit'>('edit') // 预览；编辑
-const formData = ref<any>(props.data?.other?.formDesigner || initData) // 表单数据
+const formData = ref<any>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
 const selected = reactive<any>({ ...initData }) // 被选择数据
 const formState = reactive<any>({})
