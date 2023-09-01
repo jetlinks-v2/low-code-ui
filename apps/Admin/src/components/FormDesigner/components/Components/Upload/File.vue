@@ -23,9 +23,8 @@
 </template>
   
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue'
+import { ref } from 'vue'
 import type { UploadProps, UploadChangeParam } from 'jetlinks-ui-components'
-// import { notification as Notification } from 'jetlinks-ui-components';
 import { _fileUpload } from '@/api/comm'
 import { onlyMessage } from '@/utils/comm';
 import { TOKEN_KEY } from '@jetlinks/constants';
@@ -53,22 +52,23 @@ const props = defineProps({
     default: {
       'X-Access-Token': LocalStore.get(TOKEN_KEY)
     }
-  }
+  },
+  value:Array
 })
 
-const fileList = ref([])
+const emits = defineEmits(['change'])
+
+const fileList = ref<any>([])
 const dbRef = ref<boolean>(false)
 const dbId = ref<string>('')
 const nameRef =ref()
 
 
-
 const beforeUpload = (file: UploadProps['fileList'][number]) => {
-  console.log('props.accept----', props.accept, file)
+  // console.log('props.accept----', props.accept, file)
   const maxSize = props.unit === 'M' ? props.fileSize * 1024 * 1024 : props.fileSize * 1024
   const arr = file.name.split('.')
   const isType =props.accept?.length? props.accept?.join('').includes(arr[arr.length - 1]):true
-  console.log('isType',isType)
 
   return new Promise((resolve) => {
     if (maxSize < file.size) {
@@ -88,15 +88,14 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
 const handleChange = async (info: UploadChangeParam) => {
   if (!info.file.status) return
   if (info.file.status === 'done') {
-    console.log('---', info)
-    const result = info.file.response?.result;
-    // const f = `${paths || ''}/file/${result.id}?accessKey=${
-    //     result.others.accessKey
-    // }`;
+    // console.log(fileList.value)
+    const arr = fileList.value.map(item=>({
+      name:item.name,
+      url:item.response?.result?.accessUrl || item.url,
+      uid:item.uid
+    }))
+    emits('change',arr)
     onlyMessage('上传成功！', 'success');
-    // value.value = f;
-    // emit('update:modelValue', f);
-    // emit('change', f);
   }
 };
 
@@ -113,6 +112,17 @@ const onBlur = () => {
   dbRef.value = false
 }
 
+
+watch(
+  ()=>props.value,
+  (val)=>{
+    // console.log('val',val)
+    if(val){
+      fileList.value = val
+    }
+   
+  }
+)
 
 </script>
 
