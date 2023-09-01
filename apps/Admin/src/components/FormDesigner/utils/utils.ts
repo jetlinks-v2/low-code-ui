@@ -1,6 +1,7 @@
 import { uid } from "./uid"
 import componentMap from "./componentMap"
 import { ISchema } from "../typings"
+import { queryDictionaryData } from "@/api/form"
 
 export const checkIsField = (node: any) => node?.type && (componentMap?.[node?.type]) || ['table'].includes(node?.type)
 
@@ -143,4 +144,47 @@ export const insertCustomCssToHead = (cssCode, formId) => {
     }
 
     head.appendChild(newStyle)
+}
+
+// 查询数据
+export const getBrotherList = (value: string, arr: any[]) => {
+    if (Array.isArray(arr) && arr?.length) {
+        for (let index = 0; index < arr?.length; index++) {
+            const element = arr[index];
+            if (element.key === value) {
+                return arr
+            }
+            if (element?.children?.length) {
+                return getBrotherList(value, element?.children)
+            }
+        }
+    }
+    return []
+}
+
+// 获取options
+export const queryOptions = async (source: any) => {
+    if (source?.type === 'dic' && source?.dictionary) {
+        const resp = await queryDictionaryData(source?.dictionary)
+        if (resp.success) {
+            return resp.result.map(item => {
+                return {
+                    label: item.name,
+                    value: item.id
+                }
+            })
+        }
+    }
+    if (source?.type === 'end' && source?.dictionary) {
+        // const resp = await queryDictionaryData(source?.dictionary)
+        // if (resp.success) {
+        //     return resp.result.map(item => {
+        //         return {
+        //             label: item.name,
+        //             value: item.id
+        //         }
+        //     })
+        // }
+    }
+    return []
 }
