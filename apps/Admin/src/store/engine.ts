@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { useProduct } from './product'
-import {cloneDeep, omit} from 'lodash-es'
 import dayjs from "dayjs";
 import { cloneDeep } from "lodash-es";
 
