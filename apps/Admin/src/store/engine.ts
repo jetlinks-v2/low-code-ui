@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { useProduct } from './product'
-import {cloneDeep, omit} from 'lodash-es'
 import dayjs from "dayjs";
 import { cloneDeep } from "lodash-es";
 
@@ -60,7 +59,7 @@ export const useEngine = defineStore('engine', () => {
     files.value = arr.filter(item => item.id !== key)
   }
 
-  const getExpandsKeys = (id: string) => {
+  const getExpandsKeys = (id: string, type?: string) => {
     console.log(id)
     const arrSet: Set<string> = new Set([...expandedKeys.value])
     const map = product.getDataMap()
@@ -70,8 +69,8 @@ export const useEngine = defineStore('engine', () => {
     if (id !== activeFile.value) { // 不是当前选中项
       openFile.value = currentNode
     }
-    console.log(expandedKeys.value, arrSet, currentNode.parentId)
-    if (currentNode && !expandedKeys.value.includes(currentNode.parentId)) { // 当前节点的parentId不在expandedKeys中
+
+    if (currentNode && !expandedKeys.value.includes(currentNode.parentId) && type !== 'project') { // 当前节点的parentId不在expandedKeys中
       while (currentNode) {
         if (!arrSet.has(currentNode.id)) {
           arrSet.add(currentNode.id)
@@ -93,8 +92,8 @@ export const useEngine = defineStore('engine', () => {
     expandedKeys.value = []
   }
 
-  const selectFile = (key: string) => {
-    getExpandsKeys(key)
+  const selectFile = (key: string, type?: string) => {
+    getExpandsKeys(key, type)
   }
 
   /**
@@ -103,14 +102,16 @@ export const useEngine = defineStore('engine', () => {
    */
   const addFile = (record: FileItemType) => {
     activeFile.value = record.id
-
+    const type = record.type
     if (!files.value.some(item => item.id === record.id)) {
       const cloneRecord = cloneDeep(record)
-      delete cloneRecord.children
+      if (type === 'project') {
+        delete cloneRecord.children
+      }
       files.value.push(cloneRecord)
     }
 
-    selectFile(record.id)
+    selectFile(record.id, type)
   }
 
 
@@ -161,17 +162,16 @@ export const useEngine = defineStore('engine', () => {
    * @param record
    */
   const updateFile = (record: any, type: string) => {
-      const index = files.value.findIndex(item => item.id !== record.id)
+    const index = files.value.findIndex(item => item.id === record.id)
 
-      if (index !== -1) {
+    if (index !== -1) {
         files.value = files.value.map(item => {
           return product.getById(item.id)
         })
-      }
+    }
     if (['del', 'edit'].includes(type)) {
-      type === 'del' ? files.value.splice(index,1) : files.value.splice(index,0, record)
+      type === 'del' ? files.value.splice(index,1) : files.value[index] = record
     } else if (type === 'add') {
-      files.value.push(record)
       addFile(record)
     }
   }

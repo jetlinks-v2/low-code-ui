@@ -174,7 +174,7 @@ const props = defineProps({
     default: () => ({})
   }
 })
-const emit = defineEmits(['update:tree','update:asset','update:relation'])
+const emit = defineEmits(['update:tree','update:asset','update:relation', 'update'])
 
 const { data:options } = useRequest(getAssetType)
 
@@ -197,15 +197,18 @@ const myTree = ref(props.tree || false)
 const assetChange = (v) => {
   myAsset.correlatesAssets = v.target.value === 'true'
   emit('update:asset', myAsset)
+  emit('update')
 }
 
 const treeChange = () => {
   console.log(myTree.value)
   emit('update:tree', myTree.value)
+  emit('update')
 }
 
 const relationChange = () => {
   emit('update:relation', myRelation)
+  emit('update')
 }
 
 </script>

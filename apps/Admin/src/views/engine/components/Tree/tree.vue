@@ -62,10 +62,7 @@ const menuState = reactive({
 
 const select = (key, e) => {
   engine.addFile({
-    id: e.node.id,
-    title: e.node.title,
-    type: e.node.type,
-    children: e.node.children
+    ...e.node.dataRef
   })
 }
 
@@ -86,6 +83,7 @@ const save = ({ name }) => {
     id: randomString(16),
     title: name,
     type: menuState.provider,
+    provider: menuState.provider,
     parentId: parentId
   }, parentId)
   close()
@@ -100,8 +98,7 @@ const menuClick = (record) => {
 
 <style scoped lang="less">
 .tree-content-warp {
-  flex: 0 0 auto;
-  min-height: 0;
+  height: calc(100% - 44px);
 
   .tree-content-body {
     height: 100%;

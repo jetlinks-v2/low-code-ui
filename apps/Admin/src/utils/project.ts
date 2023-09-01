@@ -5,6 +5,7 @@ export const Integrate = (data: any[]) => {
   const { children, ...project } = cloneData[0]
 
   const arr = handleChildren(children)
+  // const arr = []
 
   return {
     ...project,
@@ -14,7 +15,8 @@ export const Integrate = (data: any[]) => {
 
 
 const handleChildren = (children: any[]) => {
-  const arr: any[] = children.filter(item => item.type === providerEnum.Module).map(item => {
+
+  const arr: any[] = children.filter(item => item.type === providerEnum.Module && item.title ).map(item => {
     if (item.children?.length) {
       item.children = handleChildren(item.children)
     }

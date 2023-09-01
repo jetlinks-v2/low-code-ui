@@ -21,10 +21,10 @@
       />
       <BtnsType v-else-if="steps == 'BtnsType'" v-model:steps="steps" />
       <template #footer v-if="steps == 'EditBtns'">
-        <a-button style="margin-right: 8px" @click="steps = 'BtnsList'"
-          >取消</a-button
+        <j-button style="margin-right: 8px" @click="steps = 'BtnsList'"
+          >取消</j-button
         >
-        <a-button type="primary" @click="save">确定</a-button>
+        <j-button type="primary" @click="save">确定</j-button>
       </template>
     </j-drawer>
   </div>
@@ -44,6 +44,7 @@ import {
   errorListKey,
 } from './keys'
 import { validOperationsBtn } from './index'
+import { PropType } from 'vue'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -60,7 +61,7 @@ const props = defineProps({
     default: '',
   },
   initData: {
-    type: Object,
+    type: Object as PropType<OperationConfigTreeItem[]>,
     default: () => {}
   }
 })
@@ -110,9 +111,9 @@ const valid = async () => {
   })
 }
 
-watch(() => props.initData, (val) => {
-  if(val) {
-    columnsTree.value = props.initData?.configurations?.code ? JSON.parse(props.initData?.configurations?.code) : []
+watchEffect(() => {
+  if(props.initData) {
+    columnsTree.value = props.initData
   }
 })
 

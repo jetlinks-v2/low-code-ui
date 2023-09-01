@@ -4,12 +4,11 @@
       <j-form-item
         label="请输入按钮名称"
         v-if="activeBtn!.type == 'customer'"
-        :validateStatus="errorMessage['title'] ? 'error' : 'success'"
+        name="title"
       >
-        <template #extra v-if="errorMessage['title']">
-          <span style="color: red">{{ errorMessage['title'] }}</span>
-        </template>
-        <j-input v-model:value="form.title" :maxlength="8"></j-input>
+        <ErrorItem :errorData="errorMessage['title']">
+          <j-input v-model:value="form.title" :maxlength="8"></j-input>
+        </ErrorItem>
       </j-form-item>
       <j-form-item label="图标">
         <AIcon
@@ -24,12 +23,9 @@
           <j-col :span="12">
             <j-form-item
               label="调用功能"
-              :validateStatus="errorMessage['functions'] ? 'error' : 'success'"
             >
-              <template #extra v-if="errorMessage['functions']">
-                <span style="color: red">{{ errorMessage['functions'] }}</span>
-              </template>
-              <j-select
+              <ErrorItem :errorData="errorMessage['functions']">
+                <j-select
                 v-model:value="form.functions"
                 placeholder="请选择调用功能"
               >
@@ -40,27 +36,26 @@
                   >{{ item.name }}</j-select-option
                 >
               </j-select>
+              </ErrorItem>
             </j-form-item>
           </j-col>
           <j-col :span="12">
             <j-form-item
               label=" "
-              :validateStatus="errorMessage['command'] ? 'error' : 'success'"
             >
-              <template #extra v-if="errorMessage['command']">
-                <span style="color: red">{{ errorMessage['command'] }}</span>
-              </template>
-              <j-select
-                v-model:value="form.command"
-                placeholder="请选择调用指令"
-              >
-                <j-select-option
-                  v-for="item in commands"
-                  :value="item.id"
-                  :key="item.id"
-                  >{{ item.name }}</j-select-option
+              <ErrorItem :errorData="errorMessage['command']">
+                <j-select
+                  v-model:value="form.command"
+                  placeholder="请选择调用指令"
                 >
-              </j-select>
+                  <j-select-option
+                    v-for="item in commands"
+                    :value="item.id"
+                    :key="item.id"
+                    >{{ item.name }}</j-select-option
+                  >
+                </j-select>
+              </ErrorItem>
             </j-form-item>
           </j-col>
         </j-row>
@@ -71,20 +66,18 @@
             activeBtn?.type === 'Update' ||
             activeBtn?.type === 'Detail'
           "
-          :validateStatus="errorMessage['pages'] ? 'error' : 'success'"
         >
-          <template #extra v-if="errorMessage['pages']">
-            <span style="color: red">{{ errorMessage['pages'] }}</span>
-          </template>
-          <j-select v-model:value="form.pages" placeholder="请选择调用页面">
-            <j-select-option
-              v-for="item in pages"
-              :value="item.id"
-              :key="item.id"
-            >
-              {{ item.name }}
-            </j-select-option>
-          </j-select>
+          <ErrorItem :errorData="errorMessage['pages']">
+            <j-select v-model:value="form.pages" placeholder="请选择调用页面">
+              <j-select-option
+                v-for="item in pages"
+                :value="item.id"
+                :key="item.id"
+              >
+                {{ item.name }}
+              </j-select-option>
+            </j-select>
+          </ErrorItem>
         </j-form-item>
       </template>
       <j-form-item label="脚本">
@@ -103,6 +96,7 @@ import { activeBtnKey, errorListKey, editTypeKey } from '../keys'
 import { queryCommand } from '@/api/project'
 import { providerEnum } from '@/components/ProJect'
 import { functionsKey, pagesKey } from '../../keys'
+import { ErrorItem } from '../..'
 interface Emit {
   (e: 'update:steps', value: string): void
 }
@@ -126,10 +120,9 @@ const errorMessage = computed(() => {
   let result = errorList!.value?.filter(
     (item) => item.key === activeBtn?.value.key,
   )
-  console.log(result)
   if (result) {
     result.forEach((item) => {
-      data[item.errorKey] = item.message
+      data[item.errorKey] = item
     })
   }
   return data
