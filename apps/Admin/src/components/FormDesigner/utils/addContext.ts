@@ -174,6 +174,16 @@ export const addContext = (node: any, parent: any, fn?: any) => {
             })
             arr.splice(index + 1, 0, newNode)
         },
+        paste(_data: any) {
+            const index = arr.indexOf(node)
+            const newNode = reactive(cloneDeep(toRaw(_data)))
+            delete newNode.context
+            newNode.key = `${newNode.type}_${uid()}-paste`
+            addContext(newNode, parent, (node) => {
+                node.key = `${node.type}_${uid()}-paste`
+            })
+            arr.splice(index + 1, 0, newNode)
+        },
         delete() {
             arr.splice(arr.indexOf(node), 1)
         },
@@ -235,30 +245,7 @@ export const addContext = (node: any, parent: any, fn?: any) => {
                 addContext(newNode, node)
                 node.children.splice(0, 0, newNode)
             }
-        },
-        del(type) {
-            const {
-                context: {
-                    root,
-                    col,
-                    row
-                }
-            } = node
-            switch (type) {
-                case 'column':
-                    root.rows.forEach(e => {
-                        e.columns.splice(col, node.options.colspan)
-                        addContext(e, root)
-                    })
-                    break
-                case 'row':
-                    root.rows.splice(row, node.options.rowspan)
-                    root.rows.forEach(e => {
-                        addContext(e, root)
-                    })
-                    break
-            }
-        },
+        }
     }
     Object.defineProperty(node, 'context', {
         value: context,
