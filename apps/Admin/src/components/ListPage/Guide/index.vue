@@ -12,7 +12,7 @@
       </j-space>
     </div>
     <div class="stop">
-      <j-button @click.stop="emits('update:open', false)">跳过向导</j-button>
+      <j-button @click.stop="handleJump">跳过向导</j-button>
     </div>
   </div>
 </template>
@@ -83,7 +83,6 @@ watch(
       props.stepList[val - 1].target?.()[0]?.el,
       props.stepList[val - 1]?.placement,
     )[0]
-    console.log(props.stepList[val - 1].target);
     props.stepList[val - 1].target?.().forEach((item) => {
       item.el.style.backgroundColor = <string>item.backgroundColor
       item.el.style.pointerEvents = 'none'
@@ -101,6 +100,11 @@ watch(
   },
 )
 
+/**跳过向导 */
+const handleJump = () => {
+  emits('update:open', false)
+  steps.value = 0;
+}
 function position(el: HTMLElement, position?: string) {
   let result: string[] = ['0px', '0px']
   switch (position) {
@@ -149,9 +153,6 @@ watch(
     nextTick(() => {
       if (val[0] && val[1]) {
         steps.value = 1
-      }
-      if (!val[1]) {
-        steps.value = 0
       }
     })
   },

@@ -104,10 +104,8 @@ import EditorModal from '@/components/EditorModal'
 import { activeBtnKey, errorListKey, editTypeKey } from '../keys'
 import { providerEnum } from '@/components/ProJect'
 import { ErrorItem } from '../..'
-import { useFunctions } from '@/components/hooks/useFunctions'
-interface Emit {
-  (e: 'update:steps', value: string): void
-}
+import { useFunctions } from '@/hooks/useFunctions'
+
 const props = defineProps({
   data: {
     type: Object as PropType<Record<string, any>>,

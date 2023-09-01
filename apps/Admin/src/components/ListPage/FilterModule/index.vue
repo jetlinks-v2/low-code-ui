@@ -24,6 +24,7 @@
         @handleAdd="handleAdd"
         @configuration="configuration"
         @handleOk="handleOk"
+        @bindData="bindData"
       />
       <div v-if="type !== ''">
         <a-page-header title="配置筛选项" sub-title="配置筛选项" @back="goBack">
@@ -236,7 +237,6 @@ const handleAdd = async (table: any) => {
     type: 'string',
     mark: 'add',
   })
-  // const data = await table?.getData();
 }
 
 const configRow = ref()
@@ -290,7 +290,10 @@ const handleOk = (value: any, data: any) => {
     props.id,
   )
 }
-
+//点击显示table的同步数据
+const bindData = (data: any) => {
+  configurationStore.setALLlistDataInfo('datasource', data, props.id)
+}
 //保存
 const submit = () => {
   configurationStore.setALLlistDataInfo(type.value, subValue.value, props.id)
@@ -316,11 +319,11 @@ const goBack = () => {
 /**
  * 校验筛选模块配置
  */
-const errorList:any = ref([])
+const errorList: any = ref([])
 const valid = () => {
   return new Promise((resolve, reject) => {
     errorList.value = validFilterModule(dataSource.value)
-    if(errorList.value.length) reject(errorList.value)
+    if (errorList.value.length) reject(errorList.value)
     else resolve([])
   })
 }

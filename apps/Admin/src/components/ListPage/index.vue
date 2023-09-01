@@ -1,9 +1,14 @@
 <template>
   <div class="list-page">
-    <Preview :show="showPreview" :id="props.data.id" @back="() => (showPreview = false)"/>
+    <Preview
+      :show="showPreview"
+      :id="props.data.id"
+      @back="() => (showPreview = false)"
+    />
     <DataBind
       ref="dataBindRef"
       v-model:open="visibles.GuideVisible"
+      :id="props.data.id"
       @valid="validate"
     />
     <ListSkeleton
@@ -18,23 +23,27 @@
     <OperationColumns
       v-model:open="visibles.OperationBtnsVisible"
       type="btns"
+      v-model:columnsTree="buttonsConfig"
       :initData="allListData?.addButton"
       ref="btnTreeRef"
     />
     <OperationColumns
       v-model:open="visibles.OperationColumnsVisible"
       :initData="allListData?.actionsButton"
+      v-model:columnsTree="actionsConfig"
       type="columns"
       ref="columnsRef"
     />
     <FilterModule
       v-model:open="visibles.FilterModuleVisible"
+      v-model:dataSource="searchData"
       :id="props.data.id"
       ref="filterModuleRef"
     />
     <ListData
       v-model:open="visibles.ListDataVisible"
       :id="props.data.id"
+      v-model:dataSource="dataSource"
       ref="listDataRef"
     />
     <ListForm
@@ -44,10 +53,16 @@
     />
     <PagingConfig
       v-model:open="visibles.PagingConfigVisible"
+      v-model:pagingData="pagingData"
       :id="props.data.id"
       ref="pagingConfigRef"
     />
-    <MenuConfig v-model:open="visibles.MenuConfigVisible" :data="props.data" />
+    <MenuConfig
+      v-model:open="visibles.MenuConfigVisible"
+      v-model:menuConfig="menuConfig"
+      :data="props.data"
+      ref="menuConfigRef"
+    />
   </div>
 </template>
 
@@ -62,9 +77,9 @@ import ListSkeleton from './ListSkeleton/index.vue'
 import OperationColumns from './Operation/index.vue'
 import Preview from './Preview/index.vue'
 import { useAllListDataStore } from '@/store/listForm'
-import { omit } from 'lodash-es'
-import { DATA_BIND, BASE_INFO } from './keys'
+import { DATA_BIND, BASE_INFO, MENU_CONFIG } from './keys'
 import { useProduct } from '@/store'
+import { debounce, throttle } from 'lodash-es'
 
 const props = defineProps({
   data: {
@@ -92,8 +107,6 @@ const visibles = reactive({
 const allListData = computed(() => {
   return configurationStore.getALLlistDataInfo(props.data.id)
 })
-
-
 const handleVisible = (key: string, value: boolean) => {
   visibles[key] = value
 }
@@ -101,6 +114,34 @@ const goPreview = () => {
   showPreview.value = true
 }
 
+const buttonsConfig = ref<any[]>([])
+const actionsConfig = ref<any[]>([])
+const dataSource = ref<any[]>([])
+const searchData = ref<any[]>([])
+const pagingData = ref<any[]>([
+  { pageSize: 12 },
+  { pageSize: 24 },
+  { pageSize: 48 },
+  { pageSize: 96 },
+])
+const menuConfig = reactive({
+  pageName: props.data.title,
+  main: true,
+  name: '',
+  icon: '',
+})
+
+const listPageData = computed(() => {
+  return {
+    buttonsConfig: buttonsConfig.value,
+    actionsConfig: actionsConfig.value,
+    dataSource: dataSource.value,
+    searchData: searchData.value,
+    pagingData: pagingData.value,
+    menu: menuConfig,
+    dataBind,
+  }
+})
 /**
  * 校验
  */
@@ -125,14 +166,14 @@ const validate = async () => {
   ]
   return new Promise((resolve) => {
     Promise.all(promiseArr)
-    .then((res) => {
-      console.log(res);
-      resolve(res)
-    })
-    .catch((err) => {
-      console.log(err);
-      throw err
-    })
+      .then((res) => {
+        console.log(res)
+        resolve(res)
+      })
+      .catch((err) => {
+        console.log(err)
+        throw err
+      })
   })
 }
 
@@ -144,43 +185,23 @@ const errorCount = computed(() => {
     listForm: listFormRef.value?.errorList.length,
     filterModule: filterModuleRef.value?.errorList.length,
     listData: listDataRef.value?.errorList.length,
-    menuConfig: menuConfigRef.value?.errorList.length
+    menuConfig: menuConfigRef.value?.errorList.length,
   }
 })
 
 const configDone = computed(() => {
   return {
-    btn: btnTreeRef.value?.columnsTree.length,
-    actions: columnsRef.value?.columnsTree.length,
-    filterModule: configurationStore.getALLlistDataInfo(props.data.id)?.searchData?.length,
-    listData: configurationStore.getALLlistDataInfo(props.data.id)?.datasource?.length,
-    pagination: configurationStore.getALLlistDataInfo(props.data.id)?.pagingData?.length,
+    btn: buttonsConfig.value?.length,
+    actions: actionsConfig.value?.length,
+    filterModule: configurationStore.getALLlistDataInfo(props.data.id)
+      ?.searchData?.length,
+    listData: configurationStore.getALLlistDataInfo(props.data.id)?.datasource
+      ?.length,
+    pagination: configurationStore.getALLlistDataInfo(props.data.id)?.pagingData
+      ?.length,
     ListForm: configurationStore.getALLlistDataInfo(props.data.id)?.showType,
   }
 })
-
-/**
- * 获取草稿下的所有功能和页面
- */
-const functions = ref<Draft.Function[]>([])
-const pages = ref<Partial<Draft.Module>[]>([])
-/**
- * 获取草稿下的所有功能和页面
- */
-const findFunctionsPages = (data: any[]) => {
-  data.forEach((item) => {
-    if (item.functions && item.functions.length) {
-      functions.value.push(...item.functions)
-    }
-    if (item.type == 'page-code') {
-      pages.value.push(omit(item, 'children'))
-    }
-    if (item.children) {
-      findFunctionsPages(item.children)
-    }
-  })
-}
-findFunctionsPages(productStore.data)
 
 const dataBind = reactive({
   data: {
@@ -190,42 +211,80 @@ const dataBind = reactive({
   functionInfo: undefined,
 })
 
-const filterModule = ref<any[]>([])
-const listData = ref<any[]>([])
 provide(DATA_BIND, dataBind)
 provide(BASE_INFO, props.data)
-provide('FILTER_MODULE', filterModule)
-provide('LIST_DATA', listData)
+provide(MENU_CONFIG, menuConfig)
+// watch(
+//   () => buttonsConfig.value,
+//   () => {
+//     configurationStore.setALLlistDataInfo(
+//       'addButton',
+//       buttonsConfig.value,
+//       props.data.id,
+//     )
+//   },
+// )
+// watch(
+//   () => columnsRef?.value?.columnsTree,
+//   () => {
+//     configurationStore.setALLlistDataInfo(
+//       'actionsButton',
+//       columnsRef?.value?.columnsTree,
+//       props.data.id,
+//     )
+//   },
+// )
+
+// watch(() => JSON.stringify(dataBind), () => {
+//   configurationStore.setALLlistDataInfo('dataBind', dataBind, props.data.id)
+// })
+
+onMounted(() => {
+  const editData = productStore.getById(props.data.id)?.configuration?.code
+  visibles.GuideVisible = !editData
+  const initData = JSON.parse(editData ? editData : '{}')
+  Object.assign(dataBind, initData?.dataBind)
+})
+
+// watch(() => JSON.stringify(allListData.value), () => {
+//   const record = {
+//     ...props.data,
+//     configuration: {
+//       type: 'list',
+//       code: JSON.stringify(configurationStore.getALLlistDataInfo(props.data.id))
+//     },
+//     others: {
+//       ...props.data.others,
+//       menu: {
+//         ...configurationStore.getALLlistDataInfo(props.data.id)?.menu
+//       },
+//     }
+//   }
+//   productStore.update(record)
+// })
+
+const onSave = throttle((record) => {
+  productStore.update(record)
+}, 1000)
 watch(
-  () => btnTreeRef?.value?.columnsTree,
+  () => JSON.stringify(listPageData.value),
   () => {
-    configurationStore.setALLlistDataInfo(
-      'addButton',
-      btnTreeRef?.value?.columnsTree,
-      props.data.id,
-    )
-  },
-)
-watch(
-  () => columnsRef?.value?.columnsTree,
-  () => {
-    configurationStore.setALLlistDataInfo(
-      'actionsButton',
-      columnsRef?.value?.columnsTree,
-      props.data.id,
-    )
+    const record = {
+      ...props.data,
+      configurationStore: {
+        type: 'list',
+        code: JSON.stringify(listPageData.value),
+      },
+      others: {
+        ...props?.data?.others,
+        menu: menuConfig.value
+      },
+    }
+    onSave(record)
   },
 )
 
-const showGuide = computed(() => {
-  return !props.data.configuration?.code
-})
 
-watchEffect(() => {
-  if(showGuide.value) {
-    visibles.GuideVisible = true
-  }
-})
 </script>
 
 <style scoped lang="less">

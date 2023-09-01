@@ -30,9 +30,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  data: {
-    type: Object,
-    default: () => {},
+  id: {
+    type: String,
+    default: '',
   },
 })
 const configurationStore = useAllListDataStore()
@@ -55,7 +55,6 @@ onMounted(() => {
 
 const errorList = ref<any[]>([])
 const valid = () => {
-  // console.log(menuRef.value?.form);
   return new Promise((resolve, reject) => {
     errorList.value = validMenu(menuRef.value?.form)
     if(errorList.value.length) reject(errorList.value)
@@ -75,7 +74,7 @@ watch(
 watch(
   () => subValue.value,
   (val) => {
-    configurationStore.setALLlistDataInfo('menu', val, props.data?.id)
+    configurationStore.setALLlistDataInfo('menu', val, props.id)
   },
 )
 </script>

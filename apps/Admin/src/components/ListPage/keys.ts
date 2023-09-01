@@ -1,4 +1,10 @@
-export const functionsKey: InjectionKey<Ref<Draft.Function[]>> = Symbol('')
-export const pagesKey: InjectionKey<Ref<Partial<Draft.Module>[]>> = Symbol('')
+type MENU_CONFIG = {
+  pageName: string;
+  main: boolean;
+  name: string;
+  icon: string;
+}
+
 export const DATA_BIND: InjectionKey<any> = Symbol('')
 export const BASE_INFO: InjectionKey<any> = Symbol('')
+export const MENU_CONFIG: InjectionKey<MENU_CONFIG> = Symbol('menu_config')

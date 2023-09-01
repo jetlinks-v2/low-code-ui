@@ -200,7 +200,7 @@ const emit = defineEmits([
   'handleAdd',
   'handleOk',
   'handleChange',
-  'update:data'
+  'update:data',
 ])
 
 const handleChange = (data) => {
@@ -316,7 +316,6 @@ const handleAdd = async () => {
 }
 //配置
 const configuration = async (data: any) => {
-  tableRef.value.cleanEditStatus()
   const dataSource = await tableRef.value.getData()
   emit('configuration', data, dataSource)
 }
@@ -336,10 +335,9 @@ const syncData = async () => {
     bindShow.value = false
     return onlyMessage('请先完成数据绑定', 'error')
   }
-  if (!asyncData.value) {
-    const bindData = await tableRef.value?.getData()
+  if (!asyncData.value) {    
+    emit('bindData', props.dataSource)
     bindShow.value = true
-    emit('update:data', bindData)
     asyncData.value = true
   } else {
     const data = await tableRef.value?.getData()
