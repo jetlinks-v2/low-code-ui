@@ -79,6 +79,9 @@ const onContextMenuClick = (node, menuKey) => {
         type: 'Rename'
       })
       break;
+    case actionMap.Delete.key:
+      product.remove(node)
+      break;
   }
 
 }

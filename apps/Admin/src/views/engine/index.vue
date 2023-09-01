@@ -24,8 +24,7 @@ import { Header, Tree, Content } from './components'
 
   .engine-warp {
     display: flex;
-    flex-grow: 1;
-    min-height: 0;
+    height: calc(100% - 56px);
   }
 }
 </style>

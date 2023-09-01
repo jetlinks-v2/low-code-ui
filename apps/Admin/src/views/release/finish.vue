@@ -20,6 +20,12 @@
 
 const width = ref('0%')
 
+const releaseStart = () => {
+
+}
+
+
+
 </script>
 
 <style scoped lang="less">
