@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
-import {editProject, queryProjectDraft} from "@/api/project";
+import { queryProjectDraft, updateDraft} from "@/api/project";
 import { useEngine } from './engine'
 import dayjs from 'dayjs';
-import { throttle, cloneDeep } from 'lodash-es'
+import { throttle, cloneDeep, omit } from 'lodash-es'
 import { Integrate } from '@/utils/project'
 
 type TreeData = {
@@ -14,57 +14,59 @@ type TreeData = {
   [key: string]: any
 }
 
-const handleChildren = (children: Draft.Module, parentId: string): TreeData[] => {
+const handleChildren = (children: any[], parentId: string): TreeData[] => {
   const treeData: TreeData[] = []
+  children.forEach(item => {
+    const hasChildren = item.children?.length
 
-  if (children.children) {
-    children.children.forEach(item => {
-      const hasChildren = item.children?.length || item.functions?.length || item.resources?.length
-
-      treeData.push({
-        ...item,
-        title: item.name,
-        type: 'module',
-        parentId: parentId,
-        children: hasChildren ? handleChildren(item, item.id) : []
+    if (item.functions) {
+      item.functions.forEach(a => {
+        treeData.push({
+          title: a.name,
+          type: a.provider,
+          parentId: parentId,
+          ...a
+        })
       })
-    })
-  }
+    }
 
-  if (children.functions) {
-    children.functions.forEach(item => {
-      treeData.push({
-        title: item.name,
-        type: item.provider,
-        parentId: parentId,
-        ...item
+    if (item.resources) {
+      item.resources.forEach(a => {
+        treeData.push({
+          title: a.name,
+          type: a.provider,
+          parentId: parentId,
+          ...a
+        })
       })
-    })
-  }
+    }
 
-  if (children.resources) {
-    children.resources.forEach(item => {
-      treeData.push({
-        title: item.name,
-        type: item.provider,
-        parentId: parentId,
-        ...item
-      })
+    treeData.push({
+      ...item,
+      title: item.name,
+      type: 'module',
+      parentId: parentId,
+      children: hasChildren ? handleChildren(item.children, item.id) : []
     })
-  }
+  })
+
   return treeData
 }
 
+/**
+ * 保存草稿
+ */
 const updateProductReq = throttle((data: any[]) => {
   const integrateData = Integrate(data)
-  editProject(integrateData)
+  updateDraft(integrateData.draftId, integrateData)
 }, 1000)
 
 export const useProduct = defineStore('product', () => {
   const data = ref<TreeData[]>([]) // 项目
   const dataMap: Map<string, any> = new Map()
-  const engine = useEngine()
   const dataById = ref()
+
+  const engine = useEngine()
 
   const handleDataMap = (data?: TreeData[]) => {
     data?.forEach?.(item => {
@@ -177,7 +179,7 @@ const findParent=(data, target, result) =>{
   }
 
   const update = (record: any) => {
-    dataMap.set(record.id, record)
+    dataMap.set(record.id, omit(record, ['children']))
     data.value = updateProduct(data.value, record)
     engine.updateFile(record, 'edit')
     updateProductReq(data.value)
@@ -209,7 +211,7 @@ const findParent=(data, target, result) =>{
     if (resp.success) {
       const result = resp.result
       const treeData: TreeData[] = []
-      const children: TreeData[] = result.modules ? handleChildren(result.modules[0], result.id) : []
+      const children: TreeData[] = result.modules ? handleChildren(result.modules, result.id) : []
       treeData.push({
         version: result.version,
         draftName: result.draftName,
@@ -225,6 +227,14 @@ const findParent=(data, target, result) =>{
     }
   }
 
+  const initProjectState = () => {
+    data.value = []
+    dataMap.clear()
+    dataById.value = null
+
+    engine.initEngineState()
+  }
+
   return {
     data,
     queryProduct,
@@ -233,7 +243,8 @@ const findParent=(data, target, result) =>{
     update,
     remove,
     getById,
-    getParent
+    getParent,
+    initProjectState
   }
 },{
   persist: false
