@@ -35,10 +35,10 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
   if (children.functions) {
     children.functions.forEach(item => {
       treeData.push({
+        ...item,
         title: item.name,
-        type: item.provider,
+        type: item.others?.type,
         parentId: parentId,
-        ...item
       })
     })
   }
@@ -46,10 +46,10 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
   if (children.resources) {
     children.resources.forEach(item => {
       treeData.push({
+        ...item,
         title: item.name,
-        type: item.provider,
+        type: item.others?.type,
         parentId: parentId,
-        ...item
       })
     })
   }
@@ -83,7 +83,7 @@ export const useProduct = defineStore('product', () => {
     })
   }
 
-  const getDataMap = () => {
+  const getDataMap = (): Map<string, any> => {
     return dataMap
   }
 
@@ -113,6 +113,7 @@ const findParent=(data, target, result) =>{
         const add = {
           ...record,
           others:{
+            ...record.others,
             createTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
             modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
             useList:[]

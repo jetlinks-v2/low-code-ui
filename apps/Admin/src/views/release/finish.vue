@@ -6,7 +6,7 @@
       </div>
       <div class="progress-warp">
         <div class="progress-inner">
-          <div class="progress-bg" :style="{ width: width }"></div>
+          <div class="progress-bg" :style="{ width: width + '%' }"></div>
         </div>
       </div>
     </div>
@@ -17,14 +17,80 @@
 </template>
 
 <script setup name="Finish">
+import { releaseDraft, validateDraft } from '@/api/project'
+import { saveMenu } from '@/api/menu'
+import { useIntervalFn } from '@vueuse/core'
 
-const width = ref('0%')
+const props = defineProps({
+  tree: {
+    type: Array,
+    default: () => []
+  }
+})
 
-const releaseStart = () => {
+const width = ref(0)
+const status = ref('success')
+const route = useRoute()
+let count = 0
 
+const { pause, resume } = useIntervalFn(() => {
+  /* your function */
+  if (width.value < count) {
+    width.value += 10
+  }
+}, 300)
+
+const releaseStart = async () => {
+  const { id } = route.params
+
+  if (id) {
+    //  发布校验
+    count = 33.333
+    const validateResp = await validateDraft(id)
+    if (!validateResp.success) {
+      status.value = 'error'
+      pause()
+      return
+    }
+    width.value = 33.33
+    //  发布接口
+    count = 66.66
+    const releaseResp = await releaseDraft(id)
+    if (!releaseResp.success) {
+      status.value = 'error'
+      pause()
+      return
+    }
+    width.value = 66.66
+    count = 99
+    // 修改菜单
+    const menuResp = await saveMenu(props.tree)
+
+    if (!menuResp.success) {
+      width.value = 99
+      status.value = 'error'
+      pause()
+      return
+    }
+    width.value = 100
+    count = 100
+    pause()
+  }
 }
 
+const reset = () => {
+  count = 0
+  width.value = 0
+  resume()
+}
 
+onBeforeMount(() => {
+  reset()
+})
+
+defineExpose({
+  releaseStart
+})
 
 </script>
 
