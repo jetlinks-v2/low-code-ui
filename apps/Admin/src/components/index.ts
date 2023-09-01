@@ -8,7 +8,7 @@ import {FormPreview} from './FormDesigner/index';
 import QuickEditTable from './QuickEditTable/index.vue'
 import Search from './Search'
 import Menu from './Menu/index.vue'
-import Project from './ProJect/index.vue'
+import Project from './ProJect'
 import DragBox, { DragContent } from "./DragBox";
 import Card from "./Card";
 import BadgeStatus from "./BadgeStatus";

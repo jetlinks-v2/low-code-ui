@@ -61,15 +61,12 @@ const menuState = reactive({
 })
 
 const select = (key, e) => {
-  console.log(e)
-  if (e.node?.type !== 'project') {
-    engine.addFile({
-      id: e.node.id,
-      title: e.node.title,
-      type: e.node.type,
-      children: e.node.children
-    })
-  }
+  engine.addFile({
+    id: e.node.id,
+    title: e.node.title,
+    type: e.node.type,
+    children: e.node.children
+  })
 }
 
 const close = () => {

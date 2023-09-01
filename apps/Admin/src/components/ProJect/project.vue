@@ -1,13 +1,12 @@
 
 <template>
     <div style="width: 100%;">
-        <List v-if="isShow" :data="list" /> 
-        <Empty v-else/>
+        <List :data="list" />
+<!--        <Empty v-else/>-->
     </div>
 </template>
 
 <script setup lang='ts' name="Project">
-import Empty from './Empty/index.vue'
 import List from './List/index.vue'
 
 

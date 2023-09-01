@@ -3,25 +3,6 @@ import { BasicLayoutPage } from '@/layout'
 
 export const BASIC_ROUTERS: RouteRecordItem[] = [
   {
-    path: '/customHTML',
-    name: 'CustomHTML',
-    redirect: '/customHTML/center',
-    component: BasicLayoutPage,
-    meta: {
-      title: 'DDD',
-    },
-    children: [
-      {
-        path: '/customHTML/center',
-        name: 'customHTML/center',
-        meta: {
-          title: '自定义HTML',
-        },
-        component: () => import('@/components/CustomHTML/index.vue'),
-      },
-    ],
-  },
-  {
     path: '/delivery',
     name: 'Delivery',
     redirect: '/delivery/center',
@@ -49,6 +30,14 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
     },
   },
   {
+    path: '/release/:id',
+    name: 'Release',
+    component: () => import('@/views/release/index.vue'),
+    meta: {
+      title: '项目发布',
+    },
+  },
+  {
     path: '/demo',
     name: 'Demo',
     component: () => import('@/views/demo/index.vue'),
@@ -61,26 +50,26 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
     name: 'Card',
     component: () => import('@/views/demo/Card.vue'),
     meta: {
-      title: '测试页'
-    }
+      title: '测试页',
+    },
   },
   {
     path: '/editor',
     name: 'Editor',
     component: () => import('@/views/demo/EditorModal.vue'),
     meta: {
-      title: '测试页'
-    }
+      title: '测试页',
+    },
   },
   {
     path: '/quick',
     name: 'Quick',
     component: () => import('@/views/demo/add.vue'),
     meta: {
-      title: '测试页'
-    }
+      title: '测试页',
+    },
   },
-    {
+  {
     path: '/preview/:id',
     name: 'Preview',
     meta: {

@@ -187,7 +187,7 @@ watch(
     (val: any) => {
         countMap.value.clear()
         newMap.value = {}
-      console.log(props.list)
+        console.log(props.list)
         treeData.value = [...treeData.value, ...val]
         handleTree(treeData.value)
     },

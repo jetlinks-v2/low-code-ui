@@ -116,6 +116,7 @@
         >
           <j-radio-group
             v-model:value="target.componentProps.listType"
+            @change="onChange"
             button-style="solid"
           >
             <j-radio-button :value="'text'">文件</j-radio-button>

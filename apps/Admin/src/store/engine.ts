@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { useProduct } from './product'
+import {cloneDeep, omit} from 'lodash-es'
 import dayjs from "dayjs";
+import { cloneDeep } from "lodash-es";
 
 type FileItemType = {
   id: string
@@ -8,6 +10,7 @@ type FileItemType = {
   type: string
   parentName: string
   parentId: string
+  [key: string]: any
 }
 
 export const useEngine = defineStore('engine', () => {
@@ -49,6 +52,7 @@ export const useEngine = defineStore('engine', () => {
   }
 
   const getExpandsKeys = (id: string) => {
+    console.log(id)
     const arrSet: Set<string> = new Set([...expandedKeys.value])
     const map = product.getDataMap()
 
@@ -92,7 +96,9 @@ export const useEngine = defineStore('engine', () => {
     activeFile.value = record.id
 
     if (!files.value.some(item => item.id === record.id)) {
-      files.value.push(record)
+      const cloneRecord = cloneDeep(record)
+      delete cloneRecord.children
+      files.value.push(cloneRecord)
     }
 
     selectFile(record.id)
@@ -100,13 +106,15 @@ export const useEngine = defineStore('engine', () => {
 
 
   const updateTree = (data: any[], record: any) => {
-    return data.map(item => {
+    const arr  = cloneDeep(data)
+    return arr.map(item => {
       if (item.id === record.id) {
         return { 
           ...item, 
           ...record,
           others:{
             ...item.others,
+            ...record.others,
             modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss')
           }
          }
@@ -197,4 +205,6 @@ export const useEngine = defineStore('engine', () => {
     setCopyFile,
     updateFile
   }
+},{
+  persist:false
 })

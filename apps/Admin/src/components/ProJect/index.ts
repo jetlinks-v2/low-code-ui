@@ -1,5 +1,6 @@
 import { randomString } from '@jetlinks/utils'
 import { cloneDeep } from "lodash-es";
+import Project from './project.vue'
 
 //key:前端菜单key,value:后端对应provider,
 export const providerEnum = {
@@ -72,3 +73,5 @@ export const restId = (arr: any[]) => {
       return item
     })
   }
+
+  export default Project
