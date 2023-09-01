@@ -68,7 +68,7 @@ const title = computed(() => {
 const save = async (callback: () => void) => {
   const valid = await EditRef.value?.submit()
   if(valid) {
-    if(editType!!.value == 'add'){
+    if(editType!.value == 'add'){
       if (parentKey.value) {
         columnsTree!.value.forEach((item, index) => {
           if (item.key === parentKey.value) {

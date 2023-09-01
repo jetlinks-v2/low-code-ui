@@ -1,5 +1,7 @@
 import { OperationConfigTreeItem, ErrorItemType } from './type'
 
+export { DATA_BIND } from '../keys'
+
 export const columnsTreeKey: InjectionKey<Ref<OperationConfigTreeItem[]>> = Symbol()
 export const activeBtnKey: InjectionKey<Ref<Partial<OperationConfigTreeItem>>> = Symbol()
 export const editTypeKey: InjectionKey<Ref<'add' | 'edit'>> = Symbol()
