@@ -93,6 +93,12 @@ const functionDisabled = computed(() => {
   return dataBind.data.function && dataBind.data.function !== ''
 })
 
+const showCommand = computed(() => {
+  return functions!.value.find(item => item.id === dataBind.data.function)?.provider === 'rdb-sql-query'
+})
+
+const functions = inject(functionsKey)
+
 const commandDisabled = computed(() => {
   return dataBind.data.command && dataBind.data.command !== ''
 })

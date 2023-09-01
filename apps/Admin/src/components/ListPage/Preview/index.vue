@@ -256,7 +256,7 @@ const actionsBtnFormat = (data: any) => {
           fn();
           console.log(data, 'datafdnh')
           importVisible.value = data?.command === 'Import'
-          exmportVisible.value = data?.command === 'Export'
+          exportVisible.value = data?.command === 'Export'
           addVisible.value = data?.command === 'Add'
           item?.script
           // handleView(data.id)

@@ -24,11 +24,7 @@
         @handleOk="handleOk"
       />
       <div v-else>
-        <a-page-header
-          title="表头配置"
-          sub-title=""
-          @back="configState.type = ''"
-        >
+        <a-page-header title="表头配置" sub-title="" @back="goBack">
           <template #backIcon>
             <AIcon type="LeftOutlined" />
             返回
@@ -42,7 +38,7 @@
             configState.type !== 'array'
           "
           :config="configRow"
-          @update:state="newValue => subValue = newValue"
+          @update:state="(newValue) => (subValue = newValue)"
         >
           <template #demonstrations v-if="configState.type !== 'geoPoint'">
             <div class="content">
@@ -391,7 +387,7 @@ const dataBinds:any = inject(DATA_BIND)
 const dataSource = ref()
 //新增一列table
 const handleAdd = async (table: any) => {
-  table.addItem({
+  table?.addItem({
     id: '',
     name: '',
     type: 'string',

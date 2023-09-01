@@ -19,10 +19,16 @@
             <j-col :span="8">
               <j-space>
                 <j-badge :count="errorCount?.filterModule">
+                <j-badge :count="errorCount?.filterModule">
                   <j-skeleton-button
                     size="large"
                     ref="ref1"
                     class="config-item filter"
+                    :class="{
+                      'config-done': configDone?.filterModule,
+                      animation:
+                        !configDone?.filterModule && !visibles.GuideVisible,
+                    }"
                     :class="{
                       'config-done': configDone?.filterModule,
                       animation:

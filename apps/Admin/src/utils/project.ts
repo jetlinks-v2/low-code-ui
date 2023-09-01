@@ -14,15 +14,21 @@ export const Integrate = (data: any[]) => {
 
 
 const handleChildren = (children: any[]) => {
-  const arr: any[] = children.filter(item => item.type === providerEnum.Module).map(item => {
+  const newChildren = children.map(item => {
+    if (item.type) {
+      item.provider = item.type
+    }
+    return item
+  })
+  const arr: any[] = newChildren.filter(item => item.type === providerEnum.Module).map(item => {
     if (item.children?.length) {
       item.children = handleChildren(item.children)
     }
     return item
   })
 
-  const resources = children.filter(item => [providerEnum.HtmlPage, providerEnum.ListPage, providerEnum.FormPage].includes(item.type))
-  const functions = children.filter(item => [providerEnum.CRUD, providerEnum.SQL, providerEnum.Function].includes(item.type))
+  const resources = newChildren.filter(item => [providerEnum.HtmlPage, providerEnum.ListPage, providerEnum.FormPage].includes(item.type))
+  const functions = newChildren.filter(item => [providerEnum.CRUD, providerEnum.SQL, providerEnum.Function].includes(item.type))
 
   if (resources.length) {
     arr.push({ resources })
@@ -34,4 +40,3 @@ const handleChildren = (children: any[]) => {
 
   return arr
 }
-
