@@ -4,7 +4,12 @@ export const Integrate = (data: any[]) => {
   const cloneData = cloneDeep(data)
   const { children, ...project } = cloneData[0]
 
-  const arr = handleChildren(children)
+  const arr = handleChildren([{
+    id: project.id,
+    name: project.title,
+    children: children,
+    type: providerEnum.Module,
+  }])
 
   return {
     ...project,
@@ -12,31 +17,44 @@ export const Integrate = (data: any[]) => {
   }
 }
 
+const handleModuleChildren = (data: any[]) => {
+  const resources: any[] = []
+  const functions: any[] = []
+  const children: any[] = []
 
-const handleChildren = (children: any[]) => {
-  const newChildren = children.map(item => {
-    if (item.type) {
-      item.provider = item.type
+  data?.forEach?.(item => {
+    if ([providerEnum.HtmlPage, providerEnum.ListPage, providerEnum.FormPage].includes(item.type)) {
+      resources.push(item)
     }
-    return item
-  })
-  const arr: any[] = newChildren.filter(item => item.type === providerEnum.Module).map(item => {
-    if (item.children?.length) {
-      item.children = handleChildren(item.children)
+    if ([providerEnum.CRUD, providerEnum.SQL, providerEnum.Function].includes(item.type)) {
+      functions.push(item)
     }
-    return item
+
+    if (item.type === providerEnum.Module) {
+      children.push(item)
+    }
   })
 
-  const resources = newChildren.filter(item => [providerEnum.HtmlPage, providerEnum.ListPage, providerEnum.FormPage].includes(item.type))
-  const functions = newChildren.filter(item => [providerEnum.CRUD, providerEnum.SQL, providerEnum.Function].includes(item.type))
-
-  if (resources.length) {
-    arr.push({ resources })
+  return {
+    resources, functions, children
   }
+}
 
-  if (functions.length) {
-    arr.push({ functions })
-  }
-
-  return arr
+const handleChildren = (data: any[]) => {
+  const modules: any[] = []
+  data.forEach(item => {
+    console.log(item)
+    if (item.type === providerEnum.Module) {
+      let extra = handleModuleChildren(item.children)
+      if (extra.children) {
+        extra.children = handleChildren(extra.children)
+      }
+      modules.push({
+        ...item,
+        ...extra
+      })
+    }
+  })
+  console.log(modules)
+  return modules
 }
