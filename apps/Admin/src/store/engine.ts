@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { useProduct } from './product'
-import {cloneDeep, omit} from 'lodash-es'
 import dayjs from "dayjs";
 import { cloneDeep } from "lodash-es";
 
@@ -159,6 +158,7 @@ export const useEngine = defineStore('engine', () => {
   /**
    * 更新文件
    * @param record
+   * @param type
    */
   const updateFile = (record: any, type: string) => {
       const index = files.value.findIndex(item => item.id !== record.id)
