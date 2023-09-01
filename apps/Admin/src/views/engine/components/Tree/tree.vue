@@ -15,23 +15,32 @@
             <j-dropdown :trigger="['contextmenu']">
               <span>{{ node.title }}</span>
               <template #overlay>
-                <RightMenu :node="node" />
+                <RightMenu :node="node" @click="menuClick" />
               </template>
             </j-dropdown>
           </template>
         </j-tree>
       </j-scrollbar>
     </div>
-
+    <InputModal
+      v-if="menuState.visible"
+      v-bind="menuState"
+      @save="save"
+      @close="close"
+    />
   </div>
 </template>
 
 <script setup name="EngineTreeContent">
-import { useEngine } from '@/store'
+import { useEngine, useProduct } from '@/store'
 import { storeToRefs } from 'pinia'
 import RightMenu from './rightMenu.vue'
+import InputModal from '@/components/ProJect/components/Action/InputModal.vue'
+import {providerEnum} from "@/components/ProJect/index";
+import { randomString } from '@jetlinks/utils'
 
 const engine = useEngine()
+const product = useProduct()
 
 const { activeFile, expandedKeys } = storeToRefs(engine)
 
@@ -40,6 +49,15 @@ const props = defineProps({
     type: Array,
     default: () => []
   }
+})
+
+const menuState = reactive({
+  visible: false,
+  provider: '',
+  cacheData: undefined,
+  data: undefined,
+  type: undefined,
+  nameList: []
 })
 
 const select = (key, e) => {
@@ -52,6 +70,32 @@ const select = (key, e) => {
       children: e.node.children
     })
   }
+}
+
+const close = () => {
+  menuState.visible = false
+  menuState.provider = ''
+  menuState.data = undefined
+  menuState.cacheData = undefined
+  menuState.type = undefined
+  menuState.nameList = []
+}
+
+const save = ({ name }) => {
+  const node = menuState.cacheData
+  const parentId = node.type === providerEnum.Module ? node.id : node.parentId
+  product.add({
+    id: randomString(16),
+    title: name,
+    type: menuState.provider,
+    parentId: parentId
+  }, parentId)
+  close()
+}
+
+const menuClick = (record) => {
+  Object.assign(menuState, record)
+  menuState.visible = true
 }
 
 </script>
