@@ -28,4 +28,16 @@ export const queryProjectDraft = (id: string) => request.post<Draft.Info>(`/low-
  */
 export const queryCommand = (data: any) => request.post(`/low-code/editor/support/commands`, data)
 
-export const updateDraft = (id, data: any) => request.post(`/low-code/editor/draft/${id}/_update`, data)
+export const updateDraft = (id: string, data: any) => request.post(`/low-code/editor/draft/${id}/_update`, data)
+
+/**
+ * 发布草稿
+ * @param id
+ */
+export const releaseDraft = (id: string) => request.put(`/low-code/editor/${id}/_deploy`)
+
+/**
+ * 校验草稿
+ * @param id
+ */
+export const validateDraft = (id: string) => request.post(`/low-code/editor/${id}/_validate`)

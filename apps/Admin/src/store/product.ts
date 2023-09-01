@@ -53,6 +53,9 @@ const handleChildren = (children: any[], parentId: string): TreeData[] => {
   return treeData
 }
 
+/**
+ * 保存草稿
+ */
 const updateProductReq = throttle((data: any[]) => {
   const integrateData = Integrate(data)
   updateDraft(integrateData.draftId, integrateData)
