@@ -13,7 +13,6 @@
         @update:form="(newValue) => (subValue = newValue)"
         :errorList="errorList"
       />
-      <j-button type="primary" @click="submit"> 确定 </j-button>
     </j-drawer>
   </div>
 </template>
@@ -31,9 +30,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  data: {
-    type: Object,
-    default: () => {},
+  id: {
+    type: String,
+    default: '',
   },
 })
 const configurationStore = useAllListDataStore()
@@ -48,15 +47,12 @@ const open = computed({
 const subValue = ref({})
 const menuRef = ref()
 const pageName = ref('')
-const formData = ref({})
 onMounted(() => {
-  pageName.value = props.data?.title || ''
-  formData.value =  configurationStore.getALLlistDataInfo( props.data?.id)?.menu || {}
+  configurationStore.setALLlistDataInfo('menu', menuRef.value?.form, props.id)
 })
 
 const errorList = ref<any[]>([])
 const valid = () => {
-  // console.log(menuRef.value?.form);
   return new Promise((resolve, reject) => {
     errorList.value = validMenu(menuRef.value?.form)
     if(errorList.value.length) reject(errorList.value)
@@ -67,16 +63,11 @@ defineExpose({
   errorList,
   valid
 })
-watch(
-  () => props.data,
-  (val) => {
-    pageName.value = val.title || ''
-  },
-)
+
 watch(
   () => subValue.value,
   (val) => {
-    configurationStore.setALLlistDataInfo('menu', val, props.data?.id)
+    configurationStore.setALLlistDataInfo('menu', val, props.id)
   },
 )
 </script>

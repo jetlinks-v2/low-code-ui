@@ -48,6 +48,7 @@ import { PropType } from 'vue'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
+  (e: 'update:columnsTree', value: OperationConfigTreeItem[]): void
 }
 
 const emits = defineEmits<Emit>()
@@ -62,11 +63,22 @@ const props = defineProps({
   },
   initData: {
     type: Object as PropType<OperationConfigTreeItem[]>,
-    default: () => {}
+    default: () => []
+  },
+  columnsTree: {
+    type: Object as PropType<OperationConfigTreeItem[]>,
+    default: () => []
   }
 })
 
-const columnsTree = ref<OperationConfigTreeItem[]>([])
+const columnsTree = computed({
+  get() {
+    return props.columnsTree
+  },
+  set(val: OperationConfigTreeItem[]) {
+    emits('update:columnsTree', val)
+  }
+})
 
 const steps = ref('BtnsList')
 const _visible = computed({

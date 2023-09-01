@@ -263,9 +263,9 @@ watchEffect(() => {
   console.log(props.dataBindRef)
 })
 
-watch(() => props.visibles, () => {
-  console.log(props.visibles);
-}, {immediate: true, deep: true})
+// watch(() => props.visibles, () => {
+//   console.log(props.visibles);
+// }, {immediate: true, deep: true})
 </script>
 
 <style scoped lang="less">
