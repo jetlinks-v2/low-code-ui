@@ -16,7 +16,7 @@ import File from './File.vue'
 import Picture from './Picture.vue'
 
 const props = defineProps({
-  size: {
+  fileSize: {
     type: Number,
     default: 2,
   },
@@ -25,7 +25,7 @@ const props = defineProps({
     default: 'M',
   },
   accept: {
-    type: String,
+    type: Array,
   },
   maxCount: {
     type: Number,

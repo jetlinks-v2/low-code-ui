@@ -159,34 +159,10 @@ export const addContext = (node: any, parent: any, fn?: any) => {
     }
     fn && fn(node)
     const context = {
-        updateProps(_props) {
-            node = { ..._props }
-        },
-        get root() {
-            let result = {}
-            switch (node.type) {
-                case 'grid':
-                    result = node
-                    break
-                default:
-                    result = parent.context.root
+        updateProps(_val, key) {
+            if (node?.componentProps && key) {
+                node.componentProps[key] = _val
             }
-            return result
-        },
-        state: node,
-        parent,
-        get parents() {
-            const result: any = []
-            let cursor = node
-            while (cursor) {
-                result.unshift(cursor)
-                if (cursor.context.parent && !Array.isArray(cursor.context.parent)) {
-                    cursor = cursor.context.parent
-                } else {
-                    cursor = ''
-                }
-            }
-            return result
         },
         copy() {
             const index = arr.indexOf(node)

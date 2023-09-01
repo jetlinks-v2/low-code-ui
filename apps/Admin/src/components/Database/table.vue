@@ -108,13 +108,14 @@
 </template>
 
 <script setup name="CRUDTable">
-import {onlyMessage, upperCase} from "@/utils/comm";
+import { upperCase } from "@/utils/comm";
 import { executeReq } from '@/api/basis'
 import { cloneDeep, debounce, omit } from 'lodash-es'
 import { TYPE_PROVIDE, CRUD_COLUMNS } from "@/components/Database/util";
 import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly } from './components'
 import { provide } from 'vue'
 import { defaultSetting, defaultTreeSetting } from './setting'
+import { onlyMessage } from '@jetlinks/utils'
 
 const props = defineProps({
   tree: {

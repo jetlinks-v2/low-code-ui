@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { useProduct } from './product'
+import {cloneDeep, omit} from 'lodash-es'
 import dayjs from "dayjs";
+import { cloneDeep } from "lodash-es";
 
 type FileItemType = {
   id: string
@@ -8,6 +10,7 @@ type FileItemType = {
   type: string
   parentName: string
   parentId: string
+  [key: string]: any
 }
 
 export const useEngine = defineStore('engine', () => {
@@ -19,6 +22,15 @@ export const useEngine = defineStore('engine', () => {
   const copyFile = ref<string>('')
 
   const product = useProduct()
+
+  const initEngineState = () => {
+    activeFile.value = null
+    copyFile.value = ''
+    openFile.value = null
+    expandedKeys.value = []
+    content.value = []
+    files.value = []
+  }
 
   /**
    * 当前选中的文件
@@ -49,6 +61,7 @@ export const useEngine = defineStore('engine', () => {
   }
 
   const getExpandsKeys = (id: string) => {
+    console.log(id)
     const arrSet: Set<string> = new Set([...expandedKeys.value])
     const map = product.getDataMap()
 
@@ -57,7 +70,7 @@ export const useEngine = defineStore('engine', () => {
     if (id !== activeFile.value) { // 不是当前选中项
       openFile.value = currentNode
     }
-
+    console.log(expandedKeys.value, arrSet, currentNode.parentId)
     if (currentNode && !expandedKeys.value.includes(currentNode.parentId)) { // 当前节点的parentId不在expandedKeys中
       while (currentNode) {
         if (!arrSet.has(currentNode.id)) {
@@ -92,7 +105,9 @@ export const useEngine = defineStore('engine', () => {
     activeFile.value = record.id
 
     if (!files.value.some(item => item.id === record.id)) {
-      files.value.push(record)
+      const cloneRecord = cloneDeep(record)
+      delete cloneRecord.children
+      files.value.push(cloneRecord)
     }
 
     selectFile(record.id)
@@ -100,13 +115,15 @@ export const useEngine = defineStore('engine', () => {
 
 
   const updateTree = (data: any[], record: any) => {
-    return data.map(item => {
+    const arr  = cloneDeep(data)
+    return arr.map(item => {
       if (item.id === record.id) {
         return { 
           ...item, 
           ...record,
           others:{
             ...item.others,
+            ...record.others,
             modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss')
           }
          }
@@ -139,34 +156,23 @@ export const useEngine = defineStore('engine', () => {
     })
   }
 
-  const delTree = (data: any[], record: any) => {
-    return data.filter(item => {
-      if (item.id === record.id) {
-        return false
-      }
-      if (item.children) {
-        item.children = delTree(item.children, record)
-      }
-      return true
-    })
-  }
-
   /**
    * 更新文件
    * @param record
    */
-  const updateFile = (record: FileItemType, type: string) => {
-    switch (type) {
-      case 'add':
-        files.value= addTree(files.value, record); 
-        addFile(record)
-        break
-      case 'edit':
-        files.value = updateTree(files.value, record);
-        break
-      case 'del':
-        files.value = delTree(files.value, record);
-        break
+  const updateFile = (record: any, type: string) => {
+      const index = files.value.findIndex(item => item.id !== record.id)
+
+      if (index !== -1) {
+        files.value = files.value.map(item => {
+          return product.getById(item.id)
+        })
+      }
+    if (['del', 'edit'].includes(type)) {
+      type === 'del' ? files.value.splice(index,1) : files.value.splice(index,0, record)
+    } else if (type === 'add') {
+      files.value.push(record)
+      addFile(record)
     }
   }
 
@@ -178,9 +184,9 @@ export const useEngine = defineStore('engine', () => {
     copyFile.value = record.id
   }
 
-  watch(() => activeFile.value, () => {
-    console.log(activeFile.value)
-  }, { immediate: true })
+  // watch(() => activeFile.value, () => {
+  //   console.log(activeFile.value)
+  // }, { immediate: true })
 
   return {
     files,
@@ -195,6 +201,9 @@ export const useEngine = defineStore('engine', () => {
     expandedAll,
     packUpAll,
     setCopyFile,
-    updateFile
+    updateFile,
+    initEngineState
   }
+},{
+  persist:false
 })

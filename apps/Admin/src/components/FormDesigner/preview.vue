@@ -38,7 +38,7 @@ const props = defineProps({
     type: String as PropType<'add' | 'edit'>,
     default: 'add',
   },
-  list: {
+  data: {
     type: Object
   },
 })
@@ -46,35 +46,10 @@ const formData = ref<ISchema>() // 表单数据
 const formState = reactive<any>({})
 const formRef = ref<any>()
 
-// const getFieldChildrenData = (data: ISchema[]) => {
-//   let obj: any = {}
-//   data.map((item: any) => {
-//     obj = {
-//       ...obj,
-//       ...getFieldData(item),
-//     }
-//   })
-//   return obj
-// }
-
-// const getFieldData = (data: ISchema) => {
-//   let obj: any = undefined
-//   if (data.children && data.children?.length) {
-//     obj = getFieldChildrenData(data?.children)
-//   }
-//   let _obj: any = {}
-//   if (data?.formItemProps?.name) {
-//     _obj[data?.formItemProps?.name] = obj
-//   } else {
-//     _obj = obj
-//   }
-//   return _obj
-// }
-
 watch(
-  () => props.list,
-  () => {
-    formData.value = (props?.list || initData) as ISchema
+  () => props.data?.other?.formDesigner,
+  (newVal) => {
+    formData.value = (newVal || initData) as ISchema
   },
   {
     deep: true,

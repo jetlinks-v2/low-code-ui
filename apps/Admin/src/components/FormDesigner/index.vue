@@ -17,10 +17,11 @@
 import Header from './components/Header/index.vue'
 import Canvas from './components/Panels/Canvas/index'
 import Config from './components/Panels/Config/index.vue'
-import Filed from './components/Panels/Filed/index'
-import { provide, ref, reactive, watch} from 'vue'
+import { provide, ref, reactive, watch, onUnmounted, unref } from 'vue'
+import Filed from './components/Panels/Filed/index.vue'
 import { ISchema } from './typings'
-// import { updateData } from './utils/utils'
+import { omit } from 'lodash-es'
+import { useProduct } from '@/store/product'
 
 const initData = {
   type: 'root',
@@ -28,32 +29,50 @@ const initData = {
   componentProps: {
     layout: 'horizontal',
     size: 'default',
+    cssCode: '',
+    eventCode: '',
   },
   children: [],
 }
 
 const props = defineProps({
-  // inlineMax: { // inline横排最多展示的组件个数
-  //   type: Number,
-  //   default: 4,
-  // },
-  // fileUploadURI: { // 上传组件的action
-  //   type: String,
-  // },
   value: {
     type: Object,
     default: () => {},
   },
+  mode: {
+    // 是否为编辑
+    type: String as PropType<'add' | 'edit'>,
+    default: 'add',
+  },
+  data: {
+    type: Object,
+  },
 })
 
 const model = ref<'preview' | 'edit'>('edit') // 预览；编辑
-const formData = ref<ISchema>(initData) // 表单数据
+const formData = ref<any>(props.data?.other?.formDesigner || initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
-const selected = reactive<any>({}) // 被选择数据
+const selected = reactive<any>({ ...initData }) // 被选择数据
 const formState = reactive<any>({})
 const errorKey = ref<string[]>([])
 const formRef = ref<any>()
 const configRef = ref<any>()
+const refList = ref<any>({})
+
+const product = useProduct()
+
+const onSaveData = () => {
+  const obj = {
+    ...props.data,
+    others: {
+      ...props?.data?.others,
+      formDesigner: unref(formData),
+    },
+  }
+  console.log('props.data',props.data)
+  product.update(obj)
+}
 
 // 设置数据被选中
 const setSelection = (node: any) => {
@@ -69,6 +88,7 @@ const setSelection = (node: any) => {
   }
   Object.assign(selected, result)
   isShowConfig.value = selected?.key === result?.key
+  onSaveData()
 }
 
 const setModel = (_type: 'preview' | 'edit') => {
@@ -93,15 +113,14 @@ const getFieldData = (data: ISchema) => {
   }
   let _obj: any = {}
   if (data?.formItemProps?.name) {
-    if(data.type === 'table') {
-      _obj[data?.formItemProps?.name] = [obj]
+    if (data.type === 'table') {
+      _obj[data?.formItemProps?.name] = [omit(obj, ['actions', 'index'])]
     } else {
       _obj[data?.formItemProps?.name] = obj
     }
   } else {
     _obj = obj
   }
-  console.log(obj)
   return _obj
 }
 
@@ -113,8 +132,11 @@ provide('FormDesigner', {
   formState,
   formRef,
   errorKey,
+  mode: props?.mode,
+  refList,
   setSelection,
-  setModel
+  setModel,
+  onSaveData
 })
 
 const onSave = () => {
@@ -123,7 +145,6 @@ const onSave = () => {
       .validateFields()
       .then((values) => {
         console.log('Received values of form: ', values)
-        // console.log('formState: ', toRaw(formState))
       })
       .catch((info) => {
         console.log('Validate Failed:', info)
@@ -135,8 +156,8 @@ watch(
   () => model.value,
   (newValue: 'preview' | 'edit') => {
     if (newValue === 'preview') {
-      const obj: any = getFieldData(formData.value)
       Object.assign(formState, {})
+      const obj: any = getFieldData(formData.value)
       Object.assign(formState, obj)
     }
   },
@@ -145,6 +166,21 @@ watch(
     immediate: true,
   },
 )
+
+watch(
+  () => props.data,
+  (newVal) => {
+    formData.value = newVal?.others?.formDesigner || initData
+  },
+  {
+    deep: true,
+    immediate: true,
+  },
+)
+
+onUnmounted(() => {
+  onSaveData()
+})
 
 defineExpose({ onSave })
 </script>

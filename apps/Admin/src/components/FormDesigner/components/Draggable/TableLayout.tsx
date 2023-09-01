@@ -2,7 +2,7 @@ import Selection from '../Selection/index'
 import './index.less'
 import { withModifiers } from 'vue'
 import { Table, AIcon, Input, Button, TableColumn, FormItem, Select } from 'jetlinks-ui-components'
-import { cloneDeep, get, omit } from 'lodash-es'
+import { cloneDeep, get, omit, set } from 'lodash-es'
 
 export default defineComponent({
     name: 'TableLayout',
@@ -28,7 +28,6 @@ export default defineComponent({
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
-        const _path = cloneDeep(props?.path || []) || '';
 
         const _data = computed(() => {
             return props.data
@@ -46,7 +45,16 @@ export default defineComponent({
             return props.data?.formItemProps
         })
 
-        const data = ref<any[]>(get(designer.formState, _path) || [{}])
+        const __path = computed(() => {
+            let _path: any[] = cloneDeep(props?.path || []);
+            const _index: any = props.index || 0;
+            if (unref(_formItemProps)?.name) {
+                _path[_index] = unref(_formItemProps)?.name
+            }
+            return _path
+        })
+
+        const data = ref<any[]>(get(designer.formState, __path.value) || [{}])
 
         const handleAdd = () => {
             props.data.context?.appendItem()
@@ -77,17 +85,27 @@ export default defineComponent({
             if (element?.formItemProps?.name === 'index') {
                 return (dt?.index || 0) + 1
             } else if (element?.formItemProps?.name === 'actions') {
-                return <Button on type="link" danger><AIcon type="DeleteOutlined" /></Button>
+                return <Button onClick={() => {
+                    data.value.splice(dt?.index, 1)
+                }} type="link" danger><AIcon type="DeleteOutlined" /></Button>
             } else {
-                const _value = ref<any>()
+                const _path1 = [...unref(__path), dt?.index, element.formItemProps.name]
+                const _value = ref<any>(get(designer.formState, _path1))
+                watch(
+                    () => _value.value, 
+                    (newValue) => {
+                        set(designer.formState, _path1, newValue)
+                    }, 
+                    {
+                        deep: true
+                    }
+                )
                 return <FormItem class="table-item" {...omit(element?.formItemProps, 'label')} name={[unref(_formItemProps)?.name, dt.index, element?.formItemProps?.name]}>
                     {
                         element?.componentProps.type === 'select' ? 
                         <Select v-model:value={_value.value}></Select> : 
                         <Input v-model:value={_value.value} />
                     }
-                    {/* name={[unref(_formItemProps)?.name, dt.index, element.formItemProps.name]} */}
-                    {/* v-model:value={dt.record[element.formItemProps.name]} */}
                 </FormItem>
             }
         }
@@ -129,8 +147,7 @@ export default defineComponent({
                                     })
                                 }
                             </Table>
-                            <Button onClick={() => {
-                                console.log(data.value)
+                            <Button disabled={isEditModel.value} onClick={() => {
                                 if (!isEditModel.value) {
                                     data.value.push({})
                                 }
