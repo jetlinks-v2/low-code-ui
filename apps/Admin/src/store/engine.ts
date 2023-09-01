@@ -163,17 +163,16 @@ export const useEngine = defineStore('engine', () => {
    * @param type
    */
   const updateFile = (record: any, type: string) => {
-      const index = files.value.findIndex(item => item.id !== record.id)
+    const index = files.value.findIndex(item => item.id === record.id)
 
-      if (index !== -1) {
+    if (index !== -1) {
         files.value = files.value.map(item => {
           return product.getById(item.id)
         })
-      }
+    }
     if (['del', 'edit'].includes(type)) {
-      type === 'del' ? files.value.splice(index,1) : files.value.splice(index,0, record)
+      type === 'del' ? files.value.splice(index,1) : files.value[index] = record
     } else if (type === 'add') {
-      files.value.push(record)
       addFile(record)
     }
   }

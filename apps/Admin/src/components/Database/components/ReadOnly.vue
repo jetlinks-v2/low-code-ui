@@ -10,13 +10,14 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value', 'change'])
 
 const myValue = ref(false)
 
 const change = (e) => {
   myValue.value = e.checked
   emit('update:value', !myValue.value)
+  emit('change', !myValue.value)
 }
 
 watch( () => props.value, () => {

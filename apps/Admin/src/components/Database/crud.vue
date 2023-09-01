@@ -6,18 +6,19 @@
           v-model:tableName="tableName"
           v-model:columns="columns"
           :tree="tree"
+          :ownerId="ownerId"
           @update="update"
         />
       </j-tab-pane>
       <j-tab-pane key="2" tab="数据">
-        <DataSetting
-        />
+        <DataSetting />
       </j-tab-pane>
       <j-tab-pane key="3" tab="高级配置">
         <Advanced
           v-model:tree="tree"
           v-model:asset="asset"
           v-model:relation="relation"
+          @update="update"
         />
       </j-tab-pane>
       <template #rightExtra>
@@ -32,11 +33,29 @@ import { CRUD_COLUMNS } from "@/components/Database/util";
 import DataTable from './table.vue'
 import DataSetting from './data.vue'
 import Advanced from './advanced.vue'
+import { useProduct } from '@/store'
+import { defaultSetting } from './setting'
 
 const props = defineProps({
   configuration: {
     type: Object,
     default: () => ({})
+  },
+  provider: {
+    type: String,
+    default: undefined
+  },
+  title: {
+    type: String,
+    default: undefined
+  },
+  type: {
+    type: String,
+    default: undefined
+  },
+  parentId: {
+    type: String,
+    default: undefined
   },
   id: {
     type: String,
@@ -45,17 +64,34 @@ const props = defineProps({
 })
 
 const tableColumns = ref([])
+const project = useProduct()
 
 provide(CRUD_COLUMNS, tableColumns)
 
+const ownerId = computed(() => {
+  return `${project.info?.projectId}.${props.parentId}.${props.id}`
+})
+
 const tableName = ref(props.configuration.tableName)
-const columns = ref(props.configuration.columns)
-const relation = ref(props.configuration.relation)
-const asset = ref(props.configuration.asset)
+const columns = ref(props.configuration.columns || defaultSetting)
+const relation = ref(props.configuration.relation || {})
+const asset = ref(props.configuration.asset || {})
 const tree = ref(props.configuration.tree || false)
 
 const update = () => {
-
+  project.update({
+    id: props.id,
+    title: props.title,
+    provider: props.provider,
+    type: props.type,
+    configuration: {
+      tableName: tableName.value,
+      relation: relation.value,
+      columns: columns.value,
+      asset: asset.value,
+      tree: tree.value,
+    }
+  })
 }
 </script>
 

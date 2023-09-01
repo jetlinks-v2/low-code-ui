@@ -4,6 +4,7 @@ import { useEngine } from './engine'
 import dayjs from 'dayjs';
 import { throttle, cloneDeep, omit } from 'lodash-es'
 import { Integrate } from '@/utils/project'
+import { providerEnum } from  '@/components/ProJect/index'
 
 type TreeData = {
   title: string
@@ -24,6 +25,7 @@ const handleChildren = (children: any[], parentId: string): TreeData[] => {
         treeData.push({
           title: a.name,
           type: a.provider,
+          provider: a.provider,
           parentId: parentId,
           ...a
         })
@@ -35,21 +37,21 @@ const handleChildren = (children: any[], parentId: string): TreeData[] => {
         treeData.push({
           title: a.name,
           type: a.provider,
+          provider: a.provider,
           parentId: parentId,
           ...a
         })
       })
     }
 
-    if (item.name) {
-      treeData.push({
-        ...item,
-        title: item.name,
-        type: 'module',
-        parentId: parentId,
-        children: hasChildren ? handleChildren(item.children, item.id) : []
-      })
-    }
+    treeData.push({
+      ...item,
+      title: item.name,
+      type: providerEnum.Module,
+      provider: providerEnum.Module,
+      parentId: parentId,
+      children: hasChildren ? handleChildren(item.children, item.id) : []
+    })
   })
 
   return treeData
@@ -67,6 +69,7 @@ export const useProduct = defineStore('product', () => {
   const data = ref<TreeData[]>([]) // 项目
   const dataMap: Map<string, any> = new Map()
   const dataById = ref()
+  const info = ref()
 
   const engine = useEngine()
 
@@ -225,6 +228,7 @@ const findParent=(data, target, result) =>{
       })
       handleDataMap(treeData);
       data.value = treeData
+      info.value = omit(result, ['modules'])
       cb?.()
     }
   }
@@ -239,6 +243,7 @@ const findParent=(data, target, result) =>{
 
   return {
     data,
+    info,
     queryProduct,
     getDataMap,
     add,

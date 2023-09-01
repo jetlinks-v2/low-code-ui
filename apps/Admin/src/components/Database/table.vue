@@ -1,7 +1,7 @@
 <template>
   <div class="crud-table crud-content">
     <div class="crud-query">
-      <j-input v-model:value="tableName" placeholder="表名" @change="tableNameChange" />
+      <j-input v-model:value="myTableName" placeholder="表名" @change="tableNameChange" />
     </div>
     <QuickEditTable
       serial
@@ -22,7 +22,7 @@
       </template>
       <template #comment="{record, index}">
         <span v-if="index <= maxLen">{{ record.comment }}</span>
-        <j-input v-else v-model:value="record.comment" :maxLength="16"/>
+        <j-input v-else v-model:value="record.comment" :maxLength="16" @change="emitUpdateDataSource"/>
       </template>
       <template #javaType="{record, index}">
         <span v-if="index <= maxLen">{{record.javaType}}</span>
@@ -30,18 +30,18 @@
       </template>
       <template #jdbcType="{record, index}">
         <span v-if="index <= maxLen">{{record.jdbcType}}</span>
-        <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" />
+        <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="emitUpdateDataSource" />
       </template>
       <template #length="{ record, index }">
         <span v-if="index <= maxLen">{{record.length}}</span>
-        <j-input-number v-else v-model:value="record.length" :precision="0" style="width: 100%;" />
+        <j-input-number v-else v-model:value="record.length" :precision="0" style="width: 100%;" @change="emitUpdateDataSource" />
       </template>
       <template #scale="{ record, index }">
         <span v-if="index <= maxLen">{{record.scale}}</span>
-        <j-input-number v-else v-model:value="record.scale" :precision="0" style="width: 100%;" />
+        <j-input-number v-else v-model:value="record.scale" :precision="0" style="width: 100%;" @change="emitUpdateDataSource" />
       </template>
       <template #updatable="{ record }">
-        <ReadOnly v-model:value="record.updatable" />
+        <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" />
       </template>
       <template #setting="{ record, index }">
         <span v-if="index <= maxLen"></span>
@@ -127,9 +127,16 @@ const props = defineProps({
     default: () => []
   },
   tableName: {
-
+    type: String,
+    default: undefined
+  },
+  ownerId: {
+    type: String,
+    default: undefined
   }
 })
+
+const emit = defineEmits(['update'])
 
 const myColumns = [
   {
@@ -186,7 +193,7 @@ const myColumns = [
   },
 ]
 
-const tableName = ref()
+const myTableName = ref()
 const maxLen = ref(defaultSetting.length)
 
 const dataSource = ref(props.columns ? props.columns : defaultSetting)
@@ -208,10 +215,16 @@ const dataSourceChange = () => {
   }))
 }
 
+const emitUpdateDataSource = () => {
+  emit('update:columns', dataSource.value)
+  emit('update')
+}
+
 const updateDataSource = (record, index) => {
   const _record = omit(record, ['index', '_quick_id', 'offsetTop'])
   dataSource.value.splice(index, 0, _record)
   dataSourceChange()
+  emitUpdateDataSource()
 }
 
 const add = (index) => {
@@ -226,6 +239,7 @@ const add = (index) => {
     updatable: true,
   }
   updateDataSource(record, index)
+
 }
 
 const copy = (record, index) => {
@@ -239,14 +253,17 @@ const copy = (record, index) => {
 const deleteFn = async (index) => {
   dataSource.value.splice(index, 1)
   dataSourceChange()
+  emitUpdateDataSource()
 }
 
 const JavaTypeChange = (record) => {
   record.jdbcType = undefined
+  emitUpdateDataSource()
 }
 
 const alias = (name, record) => {
   record.alias = upperCase(name)
+  emitUpdateDataSource()
 }
 
 const settingClick = (record) => {
@@ -262,14 +279,18 @@ const settingCancel = () => {
 const settingSave = (data) => {
   dataSource.value.splice(data.index - 1, 1, data)
   settingCancel()
+  emit('update:columns', dataSource.value)
+  emit('update')
 }
 
 const tableNameChange = debounce((e) => {
-  executeReq('rdb-crud', 'CheckTableName', { tableName: e.target.value }).then(res => {
-    console.log(res)
+  const _value = e.target.value
+  executeReq('rdb-crud', 'CheckTableName', { tableName: _value, ownerId: props.ownerId }).then(res => {
     if(res.success && res.result) {
-      onlyMessage('', "warning")
+      return onlyMessage('表名重复', "warning")
     }
+    emit('update:tableName', _value)
+    emit('update')
   })
 }, 300)
 
@@ -297,6 +318,10 @@ watch(() => props.tree, () => {
       maxLen.value = 5
     }
   }
+}, { immediate: true })
+
+watch(() => props.tableName, () => {
+  myTableName.value = props.tableName
 }, { immediate: true })
 
 getTypes()
