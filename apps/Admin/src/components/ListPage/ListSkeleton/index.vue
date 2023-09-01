@@ -16,11 +16,16 @@
           <j-row justify="space-between">
             <j-col :span="8">
               <j-space>
-                <j-badge :count="0">
+                <j-badge :count="errorCount?.filterModule">
                   <j-skeleton-button
                     size="large"
                     ref="ref1"
                     class="config-item filter"
+                    :class="{
+                      'config-done': configDone?.filterModule,
+                      animation:
+                        !configDone?.filterModule && !visibles.GuideVisible,
+                    }"
                     @click="handleVisible('FilterModuleVisible')"
                   />
                 </j-badge>
@@ -64,22 +69,28 @@
                   @click="handleVisible('ListFormVisible')"
                 >
                   <j-skeleton-input style="width: 32px" />
-                    <j-skeleton-input style="width: 32px" />
+                  <j-skeleton-input style="width: 32px" />
                 </j-space>
               </j-badge>
             </j-col>
           </j-row>
-          <j-row :gutter="20" style="height: 60%; overflow: hidden;padding: 20px;">
+          <j-row
+            :gutter="20"
+            style="height: 60%; overflow: hidden; padding: 20px"
+          >
             <j-col :span="20">
               <j-skeleton-input
-                style="width: 100%; margin: 8px 0"
                 size="large"
                 ref="ref3"
-                class="config-item column-data"
+                class="config-item column-data skeletion-input"
+                :class="{
+                  'config-done': configDone?.listData,
+                  animation: !configDone?.listData && !visibles.GuideVisible,
+                }"
                 @click="handleVisible('ListDataVisible')"
               />
               <j-skeleton-input
-                style="width: 100%; margin: 8px 0"
+                class="skeletion-input"
                 size="large"
                 v-for="item in 8"
               />
@@ -93,16 +104,18 @@
                 }"
               >
                 <j-skeleton-input
-                  style="width: 100%; margin: 8px 0"
                   size="large"
                   ref="ref4"
                   @click="handleVisible('OperationColumnsVisible')"
-                  class="config-item column-operation"
-                  :class="{ 'config-done': errorCount?.actions }"
+                  class="config-item column-operation skeletion-input"
+                  :class="{
+                    'config-done': configDone?.actions,
+                    animation: !configDone?.actions && !visibles.GuideVisible,
+                  }"
                 />
               </j-badge>
               <j-skeleton-input
-                style="width: 100%; margin: 8px 0"
+                class="skeletion-input"
                 size="large"
                 v-for="item in 8"
               />
@@ -122,6 +135,10 @@
                   size="large"
                   ref="ref5"
                   class="config-item pagination"
+                  :class="{
+                    'config-done': configDone?.pagination,
+                    animation: !configDone?.pagination && !visibles.GuideVisible,
+                  }"
                   @click="handleVisible('PagingConfigVisible')"
                 />
               </j-badge>
@@ -249,6 +266,9 @@ watchEffect(() => {
   height: 100%;
   width: 100%;
   display: flex;
+  .mb-50 {
+    margin-bottom: 50;
+  }
   .left-menu {
     background-color: #ffffff;
     writing-mode: vertical-lr;
@@ -268,7 +288,11 @@ watchEffect(() => {
   .right-skeleton {
     flex: 1;
     padding: 10px;
-    .skeleton-content{
+    .skeletion-input {
+      width: 100%;
+      margin: 8px 0
+    }
+    .skeleton-content {
       background-color: #f2f2f2;
       padding: 10px;
       height: 100%;

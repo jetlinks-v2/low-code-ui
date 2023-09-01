@@ -7,7 +7,6 @@
     :selectable="false"
     :defaultExpandAll="true"
     @drop="onDrop"
-    @dragover="onDragEnter"
   >
     <template #switcherIcon="{ switcherCls }">
       <AIcon type="DownOutlined" :class="switcherCls"></AIcon>
@@ -53,10 +52,6 @@ const btnTree = computed({
 const emits = defineEmits<Emit>();
 
 
-const onDragEnter = () => {
-  // console.log('111111');
-}
-
 const onDrop = (info: AntTreeNodeDropEvent) => {
   const dropKey = info.node.key;
   const dragKey = info.dragNode.key;
@@ -91,11 +86,7 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
     arr?.splice(index, 1);
     dragObj = item;
   });
-  if(dropPosition === 0) {
-    dragObj.level = 1;
-  } else {
-    dragObj.level = info.node.level;
-  }
+  dragObj.level = (dropPosition === 0) ? 1 : info.node.level;
   if (!info.dropToGap) {
     // Drop on the content
     loop(data, dropKey, (item: any) => {
@@ -121,11 +112,7 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
       ar = arr;
       i = index;
     });
-    if (dropPosition === -1) {
-      ar.splice(i, 0, dragObj);
-    } else {
-      ar.splice(i + 1, 0, dragObj);
-    }
+    ar.splice(dropPosition === -1 ? i : i + 1, 0, dragObj);
   }
   btnTree.value = data;
 };
