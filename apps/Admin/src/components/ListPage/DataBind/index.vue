@@ -8,7 +8,6 @@
             style="width: 200px"
             :disabled="functionDisabled"
             placeholder="请选择功能"
-            @change="handleChangeFunction"
           >
             <j-select-option
               v-for="item in functionOptions"
@@ -130,8 +129,16 @@ const valid = () => {
   })
 }
 
+onMounted(() => {
+  if(dataBind.data.function) {
+    handleFunction(dataBind.data.function)
+  }
+})
 watch(() => JSON.stringify(dataBind), () => {
   configurationStore.setALLlistDataInfo('dataBind', dataBind, props.id)
+  if(dataBind.data.function) {
+    handleChangeFunction(dataBind.data.function)
+  }
 })
 
 defineExpose({

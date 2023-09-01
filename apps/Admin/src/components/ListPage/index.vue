@@ -24,12 +24,10 @@
       v-model:open="visibles.OperationBtnsVisible"
       type="btns"
       v-model:columnsTree="buttonsConfig"
-      :initData="allListData?.addButton"
       ref="btnTreeRef"
     />
     <OperationColumns
       v-model:open="visibles.OperationColumnsVisible"
-      :initData="allListData?.actionsButton"
       v-model:columnsTree="actionsConfig"
       type="columns"
       ref="columnsRef"
@@ -48,6 +46,8 @@
     />
     <ListForm
       v-model:open="visibles.ListFormVisible"
+      v-model:listFormInfo="listFormInfo"
+      v-model:state="showType"
       :id="props.data.id"
       ref="listFormRef"
     />
@@ -77,9 +77,9 @@ import ListSkeleton from './ListSkeleton/index.vue'
 import OperationColumns from './Operation/index.vue'
 import Preview from './Preview/index.vue'
 import { useAllListDataStore } from '@/store/listForm'
-import { DATA_BIND, BASE_INFO, MENU_CONFIG } from './keys'
+import { DATA_BIND, BASE_INFO, MENU_CONFIG, SHOW_TYPE_KEY, LIST_PAGE_DATA_KEY } from './keys'
 import { useProduct } from '@/store'
-import { debounce, throttle } from 'lodash-es'
+import { debounce } from 'lodash-es'
 
 const props = defineProps({
   data: {
@@ -104,9 +104,6 @@ const visibles = reactive({
   MenuConfigVisible: false,
 })
 
-const allListData = computed(() => {
-  return configurationStore.getALLlistDataInfo(props.data.id)
-})
 const handleVisible = (key: string, value: boolean) => {
   visibles[key] = value
 }
@@ -130,16 +127,34 @@ const menuConfig = reactive({
   name: '',
   icon: '',
 })
-
+const listFormInfo = reactive({
+  customIcon: '',
+  dynamicIcon: '',
+  field2Title: '',
+  field3Title: '',
+  field1: '',
+  field2: '',
+  field3: '',
+  emphasisField: '',
+  specialStyle: ``,
+})
+const showType = reactive({
+  type: 'list',
+  configured: ['list'],
+  configurationShow: false,
+  defaultForm: 'list',
+})
 const listPageData = computed(() => {
   return {
-    buttonsConfig: buttonsConfig.value,
-    actionsConfig: actionsConfig.value,
+    addButton: buttonsConfig.value,
+    actionsButton: actionsConfig.value,
     dataSource: dataSource.value,
     searchData: searchData.value,
     pagingData: pagingData.value,
     menu: menuConfig,
     dataBind,
+    listFormInfo,
+    showType,
   }
 })
 /**
@@ -213,7 +228,9 @@ const dataBind = reactive({
 
 provide(DATA_BIND, dataBind)
 provide(BASE_INFO, props.data)
+provide(SHOW_TYPE_KEY, showType)
 provide(MENU_CONFIG, menuConfig)
+provide(LIST_PAGE_DATA_KEY, listPageData)
 // watch(
 //   () => buttonsConfig.value,
 //   () => {
@@ -240,10 +257,35 @@ provide(MENU_CONFIG, menuConfig)
 // })
 
 onMounted(() => {
-  const editData = productStore.getById(props.data.id)?.configuration?.code
-  visibles.GuideVisible = !editData
-  const initData = JSON.parse(editData ? editData : '{}')
+  visibles.GuideVisible = !props.data.configuration?.code
+  const initData = JSON.parse(props.data.configuration?.code || '{}')
   Object.assign(dataBind, initData?.dataBind)
+  Object.assign(showType, initData?.showType)
+  Object.assign(menuConfig, initData?.menu)
+  pagingData.value = initData?.pagingData
+  buttonsConfig.value = initData?.addButton
+  actionsConfig.value = initData?.actionsButton
+  console.log(initData?.addButton, initData?.actionsButton);
+  setTimeout(() => {
+    watch(
+      () => JSON.stringify(listPageData.value),
+      () => {
+        console.log(listPageData.value);
+        const record = {
+          ...props.data,
+          configuration: {
+            type: 'list',
+            code: JSON.stringify(listPageData.value),
+          },
+          others: {
+            ...props?.data?.others,
+            menu: menuConfig,
+          },
+        }
+        onSave(record)
+      },
+    )
+  })
 })
 
 // watch(() => JSON.stringify(allListData.value), () => {
@@ -263,26 +305,11 @@ onMounted(() => {
 //   productStore.update(record)
 // })
 
-const onSave = throttle((record) => {
+const onSave = debounce((record) => {
+  debugger
   productStore.update(record)
 }, 1000)
-watch(
-  () => JSON.stringify(listPageData.value),
-  () => {
-    const record = {
-      ...props.data,
-      configurationStore: {
-        type: 'list',
-        code: JSON.stringify(listPageData.value),
-      },
-      others: {
-        ...props?.data?.others,
-        menu: menuConfig.value
-      },
-    }
-    onSave(record)
-  },
-)
+
 
 
 </script>

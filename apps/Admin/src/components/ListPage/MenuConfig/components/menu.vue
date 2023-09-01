@@ -34,7 +34,9 @@
                 </j-tooltip>
               </span>
             </template>
-            <j-input v-model:value="form!.name" />
+            <ErrorItem :error-data="errorData('name')">
+              <j-input v-model:value="form!.name" />
+            </ErrorItem>
           </j-form-item>
           <j-form-item
             label="icon"
@@ -48,21 +50,23 @@
             ]"
             style="flex: 0 0 186px"
           >
-            <div class="icon-upload has-icon" v-if="form!.icon">
-              <AIcon :type="form!.icon" style="font-size: 50px" />
-              <span class="mark" @click="dialogVisible = true">点击修改</span>
-            </div>
+            <ErrorItem :error-data="errorData('icon')">
+              <div class="icon-upload has-icon" v-if="form!.icon">
+                <AIcon :type="form!.icon" style="font-size: 50px" />
+                <span class="mark" @click="dialogVisible = true">点击修改</span>
+              </div>
 
-            <div
-              v-else
-              @click="dialogVisible = true"
-              class="icon-upload no-icon"
-            >
-              <span>
-                <AIcon type="PlusOutlined" style="font-size: 20px" />
-                <p>点击选择图标</p>
-              </span>
-            </div>
+              <div
+                v-else
+                @click="dialogVisible = true"
+                class="icon-upload no-icon"
+              >
+                <span>
+                  <AIcon type="PlusOutlined" style="font-size: 20px" />
+                  <p>点击选择图标</p>
+                </span>
+              </div>
+            </ErrorItem>
           </j-form-item>
         </template>
       </j-form>
@@ -78,11 +82,27 @@
 import ChooseIconDialog from '@/components/ListPage/MenuConfig/components/icon.vue'
 import { BASE_INFO, MENU_CONFIG } from '../../keys'
 import { useAllListDataStore } from '@/store/listForm';
+import { ErrorItem } from '../..';
+
+const props = defineProps({
+  errorList: {
+    type: Array,
+    default: () => [],
+  },
+})
+
 const dialogVisible = ref<boolean>(false)
 const baseInfo = inject(BASE_INFO)
 const form = inject(MENU_CONFIG)
 const emits = defineEmits()
 const configurationStore = useAllListDataStore();
+
+const errorData = computed(() => {
+  return (val: string): any => {
+    return props.errorList?.find((item: any) => item.key === val)
+  }
+})
+
 watchEffect(() => {
   configurationStore.setALLlistDataInfo('menu', form, baseInfo.id)
 })

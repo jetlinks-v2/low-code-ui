@@ -20,6 +20,7 @@
 import Menu from '@/components/ListPage/MenuConfig/components/menu.vue'
 import { validMenu } from './utils/valid'
 import { useAllListDataStore } from '@/store/listForm'
+import { MENU_CONFIG } from '../keys';
 interface Emit {
   (e: 'update:open', value: boolean): void
 }
@@ -36,6 +37,7 @@ const props = defineProps({
   },
 })
 const configurationStore = useAllListDataStore()
+const menConfig = inject(MENU_CONFIG)
 const open = computed({
   get() {
     return props.open
@@ -54,7 +56,7 @@ onMounted(() => {
 const errorList = ref<any[]>([])
 const valid = () => {
   return new Promise((resolve, reject) => {
-    errorList.value = validMenu(menuRef.value?.form)
+    errorList.value = validMenu(menConfig)
     if(errorList.value.length) reject(errorList.value)
     else resolve([])
   })
