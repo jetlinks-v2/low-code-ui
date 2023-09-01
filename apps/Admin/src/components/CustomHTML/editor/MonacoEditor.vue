@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// import type _typescript from './codeHint/typscript'
  const props = defineProps<{
   value: string,
   filename: string
@@ -10,7 +9,6 @@ defineOptions({
   editorType: 'monaco',
 })
 
-// console.log(_typescript)
 const code = ref(props.value)
 const onChange = (code: string) => {
   emit('change', code)
@@ -18,5 +16,5 @@ const onChange = (code: string) => {
 </script>
 
 <template>
-  <j-monaco-editor v-model="code"  @change="onChange" language="vue"/>
+  <j-monaco-editor v-model="code"  @change="onChange" language="html"/>
 </template>

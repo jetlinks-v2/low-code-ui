@@ -4,6 +4,7 @@
     <FormDesigner v-else-if="props.data.type === providerEnum.FormPage" />
     <CRUD v-else-if="data.type === providerEnum.CRUD" />
     <CustomHTML v-else-if="data.type === providerEnum.HtmlPage" />
+    <ListPage v-else-if="data.type === providerEnum.ListPage" :data="props.data"/>
   </div>
 </template>
 
@@ -19,8 +20,4 @@ const props = defineProps({
 
 </script>
 
-<style scoped lang="less">
-.content-warp {
-  height: 100%;
-}
-</style>
+<style scoped lang="less"></style>

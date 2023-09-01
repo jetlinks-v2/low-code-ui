@@ -28,7 +28,7 @@ const Selection = defineComponent({
     },
     hasDrag: {
       type: Boolean,
-      default: false
+      default: true
     },
     hasDel: {
       type: Boolean,
@@ -49,7 +49,7 @@ const Selection = defineComponent({
     const isField = checkIsField(props.data)
 
     const Selected = computed(() => {
-      return props?.data?.key !== undefined && designer.selected?.value?.key === props?.data?.key
+      return props?.data?.key !== undefined && designer.selected?.key === props?.data?.key
     })
 
     const isEditModel = computed(() => {
@@ -88,25 +88,31 @@ const Selection = defineComponent({
     }
     const TagComponent = isHTMLTag(props?.tag) ? props.tag : resolveComponent(props?.tag)
 
-    const maskNode = (<div class={'mask'}></div>)
+    const maskNode = (<div class={['mask']}></div>) // 'handle', 
 
     const _hasDrag = computed(() => { return props.hasDrag })
+
+    const _error = computed(() => {
+      return designer.errorKey?.value.includes(props.data?.key)
+    })
 
     return () => {
       return (
         <TagComponent
           class={[
             'selectElement',
+            unref(isEditModel) && unref(_hasDrag) && 'handle',
             !isField && 'borderless',
             unref(isEditModel) && Selected.value && 'Selected',
-            unref(isEditModel) && 'edit-hover'
+            unref(isEditModel) && 'edit-hover',
+            unref(isEditModel) && unref(_error) && 'Warning'
           ]}
           {...useAttrs()}
           onClick={withModifiers(handleClick, ['stop'])}
         >
           {slots?.default()}
-          <span></span>
-          {
+          {/* <span></span> */}
+          {/* {
             // 拖拽按钮
             unref(isEditModel) && Selected.value && unref(_hasDrag) && (
               <div class={['topLeft']}>
@@ -116,7 +122,7 @@ const Selection = defineComponent({
                 />
               </div>
             )
-          }
+          } */}
           {
             unref(isEditModel) && Selected.value && (
               <div class="bottomRight">

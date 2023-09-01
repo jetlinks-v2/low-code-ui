@@ -1,7 +1,8 @@
 import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
-import { Card } from 'jetlinks-ui-components'
+import { Card, FormItem } from 'jetlinks-ui-components'
 import './index.less'
+import { cloneDeep } from 'lodash-es'
 
 export default defineComponent({
     name: 'CardLayout',
@@ -16,15 +17,46 @@ export default defineComponent({
             type: Array,
             default: () => []
         },
+        path: {
+            type: Array,
+            default: () => []
+        },
+        index: {
+            type: Number,
+            default: 0
+        }
     },
     setup(props) {
-        const list = computed(() => {
-            return props.data?.children || []
+        const _data = computed(() => {
+            return props.data
         })
+
+        const list = computed(() => {
+            return unref(_data)?.children || []
+        })
+
+        const _formItemProps = computed(() => {
+            return _data.value?.formItemProps
+        })
+
+        const _isLayout = computed(() => {
+            return props.data?.formItemProps.isLayout
+        })
+
         return () => {
-            return (
-                <Selection {...useAttrs()} style={{ padding: '16px' }} hasDrag={true} hasDel={true} hasCopy={true} data={props.data} parent={props.parent}>
-                    <Card data-layout-type={'card'} {...props.data.componentProps}>
+            const _path = cloneDeep(props?.path || []);
+            const _index = props?.index || 0;
+
+            if (unref(_data)?.formItemProps?.name) {
+                _path[_index] = unref(_data).formItemProps.name
+            }
+
+            const renderContent = () => {
+                return (
+                    <Card
+                        data-layout-type={'card'}
+                        {...unref(_data).componentProps}
+                    >
                         {
                             unref(list).map(element => {
                                 return (
@@ -39,12 +71,27 @@ export default defineComponent({
                                         <DraggableLayout
                                             data-layout-type={'card-item'}
                                             data={element.children}
-                                            parent={element} />
+                                            parent={element}
+                                            path={_path}
+                                            index={_index + 1}
+                                        />
                                     </Selection>
                                 )
                             })
                         }
                     </Card>
+                )
+            }
+            return (
+                <Selection {...useAttrs()} style={{ padding: '16px' }} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
+                    {
+                        unref(_isLayout) ?
+                            <FormItem {...unref(_formItemProps)}>
+                                {renderContent()}
+                            </FormItem>
+                            : renderContent()
+                    }
+
                 </Selection>
             )
         }

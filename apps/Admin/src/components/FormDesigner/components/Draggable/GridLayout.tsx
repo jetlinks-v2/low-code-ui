@@ -4,6 +4,7 @@ import Selection from '../Selection/index'
 import { Col } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
+import { cloneDeep } from 'lodash-es'
 
 export default defineComponent({
     name: 'GridLayout',
@@ -18,6 +19,14 @@ export default defineComponent({
             type: Array,
             default: () => []
         },
+        path: {
+            type: Array,
+            default: () => []
+        },
+        index: {
+            type: Number,
+            default: 0
+        }
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
@@ -35,6 +44,11 @@ export default defineComponent({
             return unref(designer?.model) === 'edit'
         })
         return () => {
+            const _path = cloneDeep(props?.path || []);
+            const _index = props?.index || 0;
+            if(props.data?.formItemProps?.name) {
+                _path[_index] = props.data.formItemProps.name || ''
+            }
             return (
                 <Selection {...useAttrs()} style={{ padding: '16px' }} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
                     <Row data-layout-type={'grid'} {...props.data.componentProps}>
@@ -54,6 +68,8 @@ export default defineComponent({
                                                 data={element?.children || []}
                                                 data-layout-type={'item'}
                                                 parent={element}
+                                                path={_path}
+                                                index={_index + 1}
                                             />
                                         </Selection>
                                     </Col>
@@ -64,7 +80,7 @@ export default defineComponent({
                     {
                         unref(isEditModel) &&
                         <div class="draggable-add">
-                            <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}>添加网格列</div>
+                            <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}><span>添加网格列</span></div>
                         </div>
                     }
                 </Selection>

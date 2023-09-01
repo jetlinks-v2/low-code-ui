@@ -13,7 +13,7 @@ const width = ref(0)
 
 provide(DRAG_PROVIDE, width)
 const resize = (e) => {
-  console.log(e)
+  // console.log(e)
   width.value = e.width
 }
 

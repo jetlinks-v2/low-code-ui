@@ -80,4 +80,12 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
       title: '测试页'
     }
   },
+    {
+    path: '/preview/:id',
+    name: 'Preview',
+    meta: {
+      title: '预览',
+    },
+    component: () => import('@/components/ListPage/Preview/index.vue'),
+  },
 ]

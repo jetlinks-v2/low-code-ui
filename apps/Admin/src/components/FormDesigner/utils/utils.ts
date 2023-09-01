@@ -1,145 +1,109 @@
-import { get, isArray } from "lodash-es"
 import { uid } from "./uid"
 import componentMap from "./componentMap"
+import { ISchema } from "../typings"
 
-export const checkIsField = (node: any) => componentMap?.[node?.type]
-
-export const checkIdExistInLogic = (fieldId, logic) => {
-    return new RegExp(`"${fieldId}"`).test(JSON.stringify(logic))
-}
-
-export const removeLogicDataById = (fieldId, logic) => {
-    for (const rules of Object.values(logic)) {
-        for (let i0 = 0; i0 < rules.length; i0++) {
-            const conditions = get(rules[i0], 'ifRules.filters[0].conditions', [])
-            for (let i1 = 0; i1 < conditions.length; i1++) {
-                if (conditions[i1].property === fieldId) {
-                    conditions.splice(i1--, 1)
-                }
-            }
-            if (!conditions.length) {
-                rules.splice(i0--, 1)
-            }
-        }
-    }
-    for (const key in logic) {
-        if (!logic[key].length) {
-            delete logic[key]
-        }
-    }
-
-    for (const rules of Object.values(logic)) {
-        for (let i0 = 0; i0 < rules.length; i0++) {
-            const conditions = get(rules[i0], 'thenRules.filters[0].conditions', [])
-            for (let i1 = 0; i1 < conditions.length; i1++) {
-                for (let i2 = 0; i2 < conditions[i1].value.length; i2++) {
-                    if (conditions[i1].value[i2] === fieldId) {
-                        conditions[i1].value.splice(i2--, 1)
-                    }
-                }
-                if (!conditions[i1].value.length) {
-                    conditions.splice(i1--, 1)
-                }
-            }
-            if (!conditions.length) {
-                rules.splice(i0--, 1)
-            }
-        }
-    }
-    for (const key in logic) {
-        if (!logic[key].length) {
-            delete logic[key]
-        }
-    }
-}
-
-export const deepTraversal = (node: any, fn: any) => {
-    fn(node)
-    const nodes = node.children || []
-    nodes.forEach(e => {
-        deepTraversal(e, fn)
-    })
-}
-
-export const renderFieldData = (type) => {
-    const result = {
-        id: uid(),
-        type,
-        label: '',
-        list: [],
-        style: {}
-    }
-    return result
-}
-
-export const wrapElement = (element: any, fn?: any) => {
-    const result = element
-    deepTraversal(result, (node) => {
-        if (!node.style) {
-            node.style = {}
-        }
-        if (!node.key) {
-            node.key = `${node.type}_${uid()}`
-        }
-
-        if (checkIsField(node)) {
-            node.style = {
-                width: '100%'
-            }
-        }
-
-        // fn && fn?.(node)
-    })
-    return result
-}
+export const checkIsField = (node: any) => node?.type && (componentMap?.[node?.type]) || ['table'].includes(node?.type)
 
 // 生成多个选项
 export const generateOptions = (len: number) => {
     const result: any[] = []
+    const length = len
     while (len--) {
         result.push({
-            label: 'Option',
+            label: '选项' + (length - len),
             value: uid()
         })
     }
     return result
 }
 
-const calculateAverage = (count, total = 100) => {
-    const base: number = Number((total / count).toFixed(2))
-    const result: number[] = []
-    for (let i = 0; i < count; i++) {
-        result.push(base)
+const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-number', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo']
+// 容器组件
+const layout = ['card', 'grid', 'tabs', 'collapse', 'space']
+
+const checkedConfigItem = (node: ISchema) => {
+    const _type = node.type || 'root'
+    // let flag: boolean = false // false: 没错误， true: 有错误
+    if (_type === 'root') {
+        return false
+    } else {
+        if (['text'].includes(_type) && !(node?.formItemProps?.name)) {
+            return node?.key
+        }
+        if (arr.includes(_type)) {
+            if (!(node?.formItemProps?.label && node?.formItemProps?.name)) {
+                return node?.key
+            } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
+                return node?.key
+            }
+        }
+        if ('upload' && !(node?.componentProps?.maxCount && node?.componentProps?.size)) {
+            // 个数和单位
+            return node?.key
+        }
+        if ('table') {
+            // 数据绑定
+        }
+        if (['card'].includes(_type) && !(node?.componentProps?.title)) {
+            return node?.key
+        }
     }
-    return result
+    return ''
 }
 
-export const syncWidthByPlatform = (node, _data) => {
-    const _isArray = isArray(node)
-    console.log(_isArray)
-    // if (!_isArray) {
-    //     if (isObject(node.style.width)) {
-    //         if (syncFullPlatform) {
-    //             node.style.width.pc = node.style.width.mobile = value + '%'
-    //         } else {
-    //             node.style.width[platform] = value + '%'
-    //         }
-    //     } else {
-    //         node.style.width = value + '%'
-    //     }
+// 校验配置项必填
+export const checkedConfig = (node: ISchema) => {
+    const _data: any = checkedConfigItem(node);
+    let _rules: any[] = []
+    if (_data) {
+        _rules = [..._rules, _data]
+    }
+    if (node.children && node.children?.length) {
+        node?.children.map(item => {
+            const _item = checkedConfig(item)
+            _rules = [..._rules, ..._item]
+        })
+    }
+
+    return _rules
+}
+
+export const updateData = (list: ISchema[], item: ISchema) => {
+    return (list || []).map(_item => {
+        if (_item.key === item.key) {
+            return {
+                ..._item,
+                ...item
+            }
+        }
+        return {
+            ..._item,
+            children: updateData(_item?.children || [], item)
+        }
+    })
+}
+
+export const insertCustomCssToHead = (cssCode, formId) => {
+    let head = document.getElementsByTagName('head')[0]
+    console.log(head, formId)
+    // let oldStyle = document.getElementById('vform-custom-css')
+    // if (!!oldStyle) {
+    //     head.removeChild(oldStyle)  //先清除后插入！！
     // }
-    // const otherNodes = _isArray ? node : node.context.parent.columns.filter(e => e !== node)
-    // const averageWidths = calculateAverage(otherNodes.length, _isArray ? 100 : 100 - value)
-    // otherNodes.forEach((node, index) => {
-    //     // const isFieldWidth = isObject(node.style.width)
-    //     // if (isFieldWidth) {
-    //     //     if (syncFullPlatform) {
-    //     //         node.style.width.pc = node.style.width.mobile = averageWidths[index] + '%'
-    //     //     } else {
-    //     //         node.style.width[platform] = averageWidths[index] + '%'
-    //     //     }
-    //     // } else {
-    //     //     node.style.width = averageWidths[index] + '%'
-    //     // }
-    // })
+    // if (!!formId) {
+    //     oldStyle = document.getElementById('vform-custom-css' + '-' + formId)
+    //     !!oldStyle && head.removeChild(oldStyle)  //先清除后插入！！
+    // }
+
+    // let newStyle = document.createElement('style')
+    // newStyle.type = 'text/css'
+    // newStyle.rel = 'stylesheet'
+    // newStyle.id = !!formId ? 'vform-custom-css' + '-' + formId : 'vform-custom-css'
+    // try {
+    //     newStyle.appendChild(document.createTextNode(cssCode))
+    // } catch (ex) {
+    //     newStyle.styleSheet.cssText = cssCode
+    // }
+
+    // head.appendChild(newStyle)
 }

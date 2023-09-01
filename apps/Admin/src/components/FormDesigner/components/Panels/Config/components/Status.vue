@@ -10,19 +10,15 @@
         },
       ]"
     >
-      <j-radio-group
-        v-model:value="_data.visible"
-        button-style="solid"
-        @change="onChange"
-      >
+      <j-radio-group v-model:value="target.visible" button-style="solid">
         <j-radio-button :value="true">展示</j-radio-button>
         <j-radio-button :value="false">隐藏</j-radio-button>
       </j-radio-group>
     </j-form-item>
     <j-form-item
       label="编辑状态是否支持修改"
-      v-if="!['text'].includes(type)"
-      :name="['componentProps', 'required']"
+      v-if="!['text', 'table'].includes(type)"
+      :name="['editable']"
       :rules="[
         {
           required: true,
@@ -30,11 +26,7 @@
         },
       ]"
     >
-      <j-radio-group
-        v-model:value="_data.componentProps.required"
-        button-style="solid"
-        @change="onChange"
-      >
+      <j-radio-group v-model:value="target.editable" button-style="solid">
         <j-radio-button :value="true">支持</j-radio-button>
         <j-radio-button :value="false">不支持</j-radio-button>
       </j-radio-group>
@@ -42,27 +34,12 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { reactive, watchEffect } from 'vue'
-const props = defineProps({
-  value: {
-    type: Object,
-    default: () => {},
-  },
-  type: {
-    type: String,
-    default: '',
-  },
+import { computed } from 'vue'
+import { useTarget } from '../../../../hooks'
+
+const { target } = useTarget()
+
+const type = computed(() => {
+  return target.value?.type
 })
-const emits = defineEmits(['update:value', 'change'])
-
-const _data = reactive({ ...props.value })
-
-watchEffect(() => {
-  Object.assign(_data, props.value)
-})
-
-const onChange = () => {
-  emits('update:value', _data)
-  emits('change', _data)
-}
 </script>

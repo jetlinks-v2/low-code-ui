@@ -12,4 +12,7 @@ export declare type ISchema = {
     context?: any;
     icon?: string;
     visible?: boolean; // 字段是否显示
+    editable?: boolean; // 编辑时是否可修改
+    dependence?: any[]; // 显示依赖
+    onChange?: string; 
 }

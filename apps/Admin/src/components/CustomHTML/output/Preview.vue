@@ -15,7 +15,7 @@ import { ReplStore } from '../store'
 
 const props = defineProps<{ code?: string }>()
 const useVueMode = <Ref<Boolean>>inject('useVueMode')
-let store: Store = <Store>inject('store')
+let store = inject('store') as Store
 if (props.code) {
   store = new ReplStore(props.code)
   store.init()
