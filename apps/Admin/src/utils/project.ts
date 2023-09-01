@@ -1,5 +1,5 @@
 import { providerEnum } from  '@/components/ProJect/index'
-import {cloneDeep} from "lodash-es";
+import { cloneDeep, omit } from "lodash-es";
 export const Integrate = (data: any[]) => {
   const cloneData = cloneDeep(data)
   const { children, ...project } = cloneData[0]
@@ -23,15 +23,18 @@ const handleModuleChildren = (data: any[]) => {
   const children: any[] = []
 
   data?.forEach?.(item => {
+    item.provider = item.type
+
     if ([providerEnum.HtmlPage, providerEnum.ListPage, providerEnum.FormPage].includes(item.type)) {
-      resources.push(item)
+      item.provider = 'page-code'
+      resources.push(omit(item, ['fullId']))
     }
     if ([providerEnum.CRUD, providerEnum.SQL, providerEnum.Function].includes(item.type)) {
-      functions.push(item)
+      functions.push(omit(item, ['fullId']))
     }
 
     if (item.type === providerEnum.Module) {
-      children.push(item)
+      children.push(omit(item, ['fullId']))
     }
   })
 

@@ -36,8 +36,9 @@ import { useEngine, useProduct } from '@/store'
 import { storeToRefs } from 'pinia'
 import RightMenu from './rightMenu.vue'
 import InputModal from '@/components/ProJect/components/Action/InputModal.vue'
-import {providerEnum} from "@/components/ProJect/index";
+import { providerEnum } from "@/components/ProJect/index";
 import { randomString } from '@jetlinks/utils'
+import { defaultSetting as CrudBaseData } from '@/components/Database/setting'
 
 const engine = useEngine()
 const product = useProduct()
@@ -75,16 +76,51 @@ const close = () => {
   menuState.nameList = []
 }
 
-const save = ({ name }) => {
+const getConfiguration = (type) => {
+  switch (type) {
+    case providerEnum.SQL:
+      return {
+        sql: undefined
+      };
+    case providerEnum.CRUD:
+      return {
+        columns: CrudBaseData
+      };
+    case providerEnum.Function:
+      return {
+        lang: undefined,
+        script: ''
+      };
+    case providerEnum.FormPage:
+      return {
+        type: 'form',
+        code: ''
+      };
+    case providerEnum.ListPage:
+      return {
+        type: 'list',
+        code: ''
+      };
+    case providerEnum.HtmlPage:
+      return {
+        type: 'html',
+        code: ''
+      };
+  }
+}
+
+const save = ({ name, others }) => {
   const node = menuState.cacheData
+
   const parentId = node.type === providerEnum.Module ? node.id : node.parentId
   product.add({
     name,
+    others,
     id: randomString(16),
     title: name,
-    type: menuState.provider,
-    provider: menuState.provider,
-    parentId: parentId
+    type: others.type,
+    configuration: getConfiguration(others.type),
+    parentId: parentId,
   }, parentId)
   close()
 }

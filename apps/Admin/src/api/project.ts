@@ -40,4 +40,4 @@ export const releaseDraft = (id: string) => request.put(`/low-code/editor/${id}/
  * 校验草稿
  * @param id
  */
-export const validateDraft = (id: string) => request.post(`/low-code/editor/${id}/_validate`)
+export const validateDraft = (id: string) => request.post(`/low-code/editor/${id}/_validate`, [])
