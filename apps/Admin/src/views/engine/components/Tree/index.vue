@@ -69,13 +69,10 @@ product.queryProduct(route.params.id)
   min-width: 0;
   user-select: none;
   border-right: 1px solid #d1d1d1;
+  height: 100%;
 
   .engine-tree-content {
-    display: flex;
-    flex-direction: column;
     height: 100%;
-    min-width: 180px;
-    overflow: hidden;
   }
 
   .product {
