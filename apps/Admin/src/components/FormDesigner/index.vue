@@ -42,8 +42,8 @@ const props = defineProps({
   },
   mode: {
     // 是否为编辑
-    type: String as PropType<'add' | 'edit'>,
-    default: 'add',
+    type: String as PropType<'add' | 'edit' | undefined>,
+    default: undefined,
   },
   data: {
     type: Object,
@@ -51,7 +51,7 @@ const props = defineProps({
 })
 
 const model = ref<'preview' | 'edit'>('edit') // 预览；编辑
-const formData = ref<any>(props.data?.other?.formDesigner || initData) // 表单数据
+const formData = ref<any>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
 const selected = reactive<any>({ ...initData }) // 被选择数据
 const formState = reactive<any>({})
@@ -60,14 +60,17 @@ const formRef = ref<any>()
 const configRef = ref<any>()
 const refList = ref<any>({})
 
+const collectVisible = ref<boolean>(false)
+const collectData = ref<any>()
+
 const product = useProduct()
 
 const onSaveData = () => {
   const obj = {
     ...props.data,
-    others: {
-      ...props?.data?.others,
-      formDesigner: unref(formData),
+    configuration: {
+      type: 'form',
+      code: JSON.stringify(unref(formData)),
     },
   }
   console.log('props.data',props.data)
@@ -134,9 +137,11 @@ provide('FormDesigner', {
   errorKey,
   mode: props?.mode,
   refList,
+  collectVisible,
+  collectData,
   setSelection,
   setModel,
-  onSaveData
+  onSaveData,
 })
 
 const onSave = () => {
@@ -170,7 +175,9 @@ watch(
 watch(
   () => props.data,
   (newVal) => {
-    formData.value = newVal?.others?.formDesigner || initData
+    try {
+      formData.value = JSON.parse(newVal?.configuration?.code) || initData
+    } catch (error) {}
   },
   {
     deep: true,

@@ -25,8 +25,8 @@
         </div>
         <div class="release-step-content" v-if="loading">
           <Status v-show="step === 1" :theme="theme" />
-          <Tree v-show="step === 2" :tree="tree" />
-          <Finish v-show="step === 3" />
+          <Tree v-show="step === 2" @change="treeChange" />
+          <Finish ref="finishRef" v-show="step === 3" :tree="tree" />
         </div>
       </div>
     </div>
@@ -35,7 +35,7 @@
       <j-button v-if="step === 1" type="primary" @click="next">下一步</j-button>
 
       <j-button v-if="step === 2" @click="prev">上一步</j-button>
-      <j-button v-if="step === 2" type="primary" @click="next">发布</j-button>
+      <j-button v-if="step === 2" type="primary" @click="release">发布</j-button>
 
       <j-button v-if="step === 3" type="primary" @click="finish">完成</j-button>
     </div>
@@ -57,6 +57,8 @@ const loading = ref(false)
 const theme = ref('')
 const tree = ref([])
 
+const finishRef = ref()
+
 const router = useRouter()
 
 const prev = () => {
@@ -65,6 +67,10 @@ const prev = () => {
 
 const next = () => {
   step.value += 1
+}
+
+const treeChange = (data) => {
+  tree.value = data
 }
 
 const cancel = () => {
@@ -76,8 +82,13 @@ const cancel = () => {
   })
 }
 
-const finish = () => {
+const release = () => {
+  step.value += 1
+  finishRef.value?.releaseStart()
+}
 
+const finish = () => {
+  // finishRef.value?.releaseStart()
 }
 
 product.queryProduct(route.params.id, () => {
