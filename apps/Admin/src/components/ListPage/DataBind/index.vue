@@ -8,7 +8,6 @@
             style="width: 200px"
             :disabled="functionDisabled"
             placeholder="请选择功能"
-            @change="handleChangeFunction"
           >
             <j-select-option
               v-for="item in functionOptions"
@@ -55,14 +54,14 @@
 
 <script setup lang="ts" name="DataBind">
 import { ErrorItem } from '../index'
-import { DATA_BIND } from '../keys'
+import { useProduct } from '@/store'
+import { storeToRefs } from 'pinia'
+import { queryCommand } from '@/api/project'
+import { functionsKey, DATA_BIND } from '../keys'
 import { validDataBind } from './utils/valid'
-import { useFunctions } from '@/hooks/useFunctions'
-import { useAllListDataStore } from '@/store/listForm'
+import { useFunctions } from '../../hooks/useFunctions'
 
 const { functionOptions, commandOptions, handleFunction } = useFunctions()
-
-const configurationStore = useAllListDataStore();
 
 const visible = ref(false)
 const handleValid = () => {
@@ -86,16 +85,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  id: {
-    type: String,
-    default: ''
-  }
 })
 
-const handleChangeFunction = (val: string) => {
-  dataBind.functionInfo = functionOptions!.value.find(item => item.id === val)
-  handleFunction(val)
-}
+const { data } = storeToRefs(useProduct())
+
 const functionDisabled = computed(() => {
   return dataBind.data.function && dataBind.data.function !== ''
 })
@@ -120,6 +113,12 @@ const handleOk = () => {
 }
 
 
+watchEffect(() => {
+  if(dataBind?.data?.function) {
+    dataBind.functionInfo = functionOptions!.value.find(item => item.id === dataBind.data.function)
+    handleFunction(dataBind?.data?.function)
+  }
+})
 
 const errorList = ref<any[]>([])
 const valid = () => {
@@ -129,10 +128,6 @@ const valid = () => {
     else resolve([])
   })
 }
-
-watch(() => JSON.stringify(dataBind), () => {
-  configurationStore.setALLlistDataInfo('dataBind', dataBind, props.id)
-})
 
 defineExpose({
   valid,
