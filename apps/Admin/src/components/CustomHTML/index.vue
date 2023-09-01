@@ -8,6 +8,14 @@ import { debounce } from './utils'
 import MonacoEditor from './editor/MonacoEditor.vue'
 import { ReplStore } from './store'
 import 'splitpanes/dist/splitpanes.css'
+import { useAllListDataStore } from '@/store/listForm'
+
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => {},
+  },
+})
 
 const store = new ReplStore()
 const vueMode = ref(true)
@@ -21,6 +29,9 @@ enum OperType {
   View = 'view',
   Menu = 'menu',
 }
+
+const allListDataStore = useAllListDataStore()
+
 const onChange = debounce((code: string) => {
   store.state.activeFile.code = code
 }, 250)
@@ -35,10 +46,11 @@ const handleDbClickViewName = () => {
 
 const activeOper = ref('')
 const menuListRef = ref()
+const menuFormData = ref({ pageName: '', main: true, name: '', icon: '' })
 const handleOperClick = (type: OperType) => {
   if (type === OperType.Menu && drawerVisible.value) {
-    const vaild = menuListRef.value?.vaildate();
-    console.log(vaild);
+    const vaild = menuListRef.value?.vaildate()
+    console.log(vaild)
   }
   if (type === activeOper.value) {
     drawerVisible.value = !drawerVisible.value
@@ -67,6 +79,12 @@ const runCode = () => {
     }
   })
 }
+
+onMounted(() => {
+  menuFormData.value =
+    allListDataStore.getALLlistDataInfo(props.data?.id)?.menu || {}
+  menuFormData.value.pageName = props.data?.title || ''
+})
 </script>
 
 <template>
@@ -122,7 +140,11 @@ const runCode = () => {
       </div>
       <div class="drawer-body">
         <Preview v-if="activeOper === OperType.View" ref="previewRef" />
-        <MenuList v-else-if="activeOper === OperType.Menu" ref="menuListRef" />
+        <MenuList
+          v-else-if="activeOper === OperType.Menu"
+          ref="menuListRef"
+          :form-data="menuFormData"
+        />
       </div>
     </div>
   </div>
