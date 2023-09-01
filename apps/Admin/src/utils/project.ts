@@ -40,4 +40,3 @@ const handleChildren = (children: any[]) => {
 
   return arr
 }
-
