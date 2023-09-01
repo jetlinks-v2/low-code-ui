@@ -5,6 +5,7 @@ import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import { checkIsField, extractCssClass, insertCustomCssToHead } from '../../utils/utils'
 import { cloneDeep, set } from 'lodash-es'
 import { useFormDesigner } from '@/store/designer'
+import { addContext } from '../../utils/addContext'
 
 const Selection = defineComponent({
   name: 'Selection',
@@ -147,11 +148,14 @@ const Selection = defineComponent({
     }
     // 删除
     const onDelete = () => {
+      console.log(props.data)
       handleAction('remove')
     }
+
     // 收藏为模板
     const onCollect = () => {
-      designer.collectData.value = props.data
+      const newNode = cloneDeep(toRaw(props.data))
+      designer.collectData.value = {...newNode}
       designer.collectVisible.value = true
     }
 

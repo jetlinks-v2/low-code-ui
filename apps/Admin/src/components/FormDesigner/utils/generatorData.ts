@@ -22,19 +22,21 @@ const handleProps = (node: any) => {
             width: '100%'
         }
     }
-    if (!result?.placeholder) {
-        if (/^(select|select-card|tree-select)$/.test(node.type)) {
-            result.placeholder = '请选择'
+    if (/^(select|select-card|tree-select)$/.test(node.type)) {
+        result.placeholder = '请选择'
+        result.source = {
+            dictionary: undefined,
+            type: 'dic', // 
         }
-        if (/^(input|textarea|input-password)$/.test(node.type)) {
-            result.placeholder = '请输入'
-        }
-        if (/^(date-picker)$/.test(node.type)) {
-            result.placeholder = '请选择日期'
-        }
-        if (/^(time-picker)$/.test(node.type)) {
-            result.placeholder = '请选择时间'
-        }
+    }
+    if (/^(input|textarea|input-password|input-number)$/.test(node.type)) {
+        result.placeholder = '请输入'
+    }
+    if (/^(date-picker)$/.test(node.type)) {
+        result.placeholder = '请选择日期'
+    }
+    if (/^(time-picker)$/.test(node.type)) {
+        result.placeholder = '请选择时间'
     }
 
     switch (node.type) {

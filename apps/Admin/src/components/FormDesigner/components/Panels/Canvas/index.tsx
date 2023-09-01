@@ -3,10 +3,10 @@ import { Form, Scrollbar, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-c
 import DraggableLayout from "../../Draggable/DraggableLayout"
 import './index.less'
 import { cloneDeep, omit } from "lodash-es"
-import { useFormDesigner } from "@/store/designer"
 import { addContext } from "@/components/FormDesigner/utils/addContext"
 import { uid } from "@/components/FormDesigner/utils/uid"
 import CollectModal from '../../CollectModal/index.vue'
+import { useProduct, useFormDesigner } from "@/store"
 
 export default defineComponent({
   name: 'Canvas',
@@ -15,6 +15,7 @@ export default defineComponent({
   setup() {
     const designer: any = inject('FormDesigner')
     const formDesigner = useFormDesigner()
+    const product = useProduct()
 
     const handleClick = () => {
       designer.setSelection('root')
@@ -96,18 +97,25 @@ export default defineComponent({
               </div>
             )
             : renderContent()}
-          {unref(designer.collectVisible) && <CollectModal
+          {unref(designer.collectVisible) && unref(isEditModel) && <CollectModal
             onSave={(name: string) => {
               const obj = {
                 key: uid(8),
                 name: name,
-                template: unref(designer.collectData)
+                template: cloneDeep(unref(designer.collectData))
               }
-              console.log(obj)
               // 保存为模板
-
-              // designer.collectData.value = undefined
-              // designer.collectVisible.value = false
+              const arr = product.data?.[0]?.others?.formTemplate || []
+              const _data = {
+                ...product.data?.[0],
+                others: {
+                  ...product.data?.[0]?.others,
+                  formTemplate: [...arr, obj]
+                }
+              }
+              product.update(_data)
+              designer.collectData.value = undefined
+              designer.collectVisible.value = false
             }}
             onClose={() => { designer.collectVisible.value = false }}
           />}

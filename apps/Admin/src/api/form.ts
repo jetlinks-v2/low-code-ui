@@ -22,3 +22,8 @@ export const  getTissue = (data:any) => request.post('/organization/_all/tree',d
   * 查询设备列表(分页)
   */
  export const queryDeviceList = (data:any) => request.post('/device-instance/_query', data)
+
+ /**
+  * 查询字典列表
+  */
+ export const queryDictionary = () => request.post('/dictionary/_query/no-paging', {paging: false})

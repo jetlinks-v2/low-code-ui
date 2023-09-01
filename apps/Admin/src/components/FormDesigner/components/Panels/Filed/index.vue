@@ -11,6 +11,7 @@
 import Library from "./library";
 import Template from "./template";
 import { Scrollbar } from 'jetlinks-ui-components'
+import { ref } from "vue";
 const activeKey = ref('module')
 </script>
 <style lang="less" scoped>

@@ -144,3 +144,19 @@ export const insertCustomCssToHead = (cssCode, formId) => {
 
     head.appendChild(newStyle)
 }
+
+// 查询数据
+export const getBrotherList = (value: string, arr: any[]) => {
+    if(Array.isArray(arr) && arr?.length){
+        for (let index = 0; index < arr?.length; index++) {
+            const element = arr[index];
+            if(element.key === value) {
+                return arr
+            }
+            if(element?.children?.length){
+                return getBrotherList(value, element?.children)
+            }
+        }
+    }
+    return []
+}
