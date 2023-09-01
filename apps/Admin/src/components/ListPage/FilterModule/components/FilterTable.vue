@@ -23,6 +23,7 @@
           (_record, index) => (_record?.mark === 'add' ? 'table-striped' : null)
         "
         @change="(data) => handleChange(data)"
+        @editStatus="editStatus"
       >
         <template #headerCell="{ column }">
           <template v-if="column.tips">
@@ -204,6 +205,8 @@ const emit = defineEmits([
 ])
 
 const handleChange = (data) => {
+  console.log(data,'hjasjhghg');
+  
   emit('handleChange', data)
 }
 

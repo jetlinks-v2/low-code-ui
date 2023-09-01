@@ -273,7 +273,7 @@ const handleOk = (value: any, data: any) => {
       source = data
       break
     case '3':
-      source = dataBinds?.functionInfo?.configuration?.columns?.map((item) => {
+      source = dataSource.value?.map((item) => {
         return {
           id: item.name,
           name: item.name,
@@ -315,6 +315,7 @@ const goBack = () => {
   show.value = true
   dataBind.value = true
   asyncData.value = true
+  configChange.value = false
 }
 /**
  * 校验筛选模块配置

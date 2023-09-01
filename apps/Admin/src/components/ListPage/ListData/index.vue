@@ -527,6 +527,7 @@ const goBack = () => {
   show.value = true
   dataBind.value = true
   asyncData.value = true
+  configChange.value = false
 }
 const errorList = ref([])
 watch(
