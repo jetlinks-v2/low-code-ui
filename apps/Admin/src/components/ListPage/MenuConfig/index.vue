@@ -8,10 +8,10 @@
       @close="emits('update:open', false)"
     >
       <Menu
-        :pageName="pageName"
         ref="menuRef"
         @update:form="(newValue) => (subValue = newValue)"
         :errorList="errorList"
+        :formData="formData"
       />
     </j-drawer>
   </div>
@@ -48,9 +48,11 @@ const open = computed({
 })
 const subValue = ref({})
 const menuRef = ref()
-const pageName = ref('')
+const formData = ref({ pageName: '', main: true, name: '', icon: '' })
 onMounted(() => {
-  configurationStore.setALLlistDataInfo('menu', menuRef.value?.form, props.id)
+  formData.value =
+    configurationStore.getALLlistDataInfo(props.data?.id)?.menu || {}
+  formData.value.pageName = props.data?.title || ''
 })
 
 const errorList = ref<any[]>([])
@@ -65,7 +67,12 @@ defineExpose({
   errorList,
   valid
 })
-
+watch(
+  () => props.data,
+  (val) => {
+    formData.value.pageName = val.title || ''
+  },
+)
 watch(
   () => subValue.value,
   (val) => {

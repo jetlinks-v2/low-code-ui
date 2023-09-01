@@ -60,7 +60,7 @@
     <MenuConfig
       v-model:open="visibles.MenuConfigVisible"
       v-model:menuConfig="menuConfig"
-      :id="props.data.id"
+      :data="props.data"
       ref="menuConfigRef"
     />
   </div>

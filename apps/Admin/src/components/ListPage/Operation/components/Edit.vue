@@ -99,12 +99,12 @@
 <script setup lang="ts" name="Edit">
 import UploadIcon from './UploadIcon.vue'
 import { FormInstance } from 'jetlinks-ui-components'
+import { useProduct } from '@/store'
 import EditorModal from '@/components/EditorModal'
 import { activeBtnKey, errorListKey, editTypeKey } from '../keys'
 import { providerEnum } from '@/components/ProJect'
 import { ErrorItem } from '../..'
 import { useFunctions } from '@/hooks/useFunctions'
-import { useProduct } from '@/store'
 
 const props = defineProps({
   data: {
@@ -120,18 +120,7 @@ const activeBtn = inject(activeBtnKey)
 const editType = inject(editTypeKey)
 const errorList = inject(errorListKey)
 
-const productStore = useProduct();
-const pages = computed(() => {
-  let arr: Draft.Module[] = [];
-  productStore.getDataMap()?.forEach(item => {
-    if(item.type === providerEnum.Page) {
-      arr.push(item)
-    }
-  })
-  return arr;
-})
-
-const { functionOptions, commandOptions, handleFunction } = useFunctions()
+const { functionOptions, commandOptions, pages, handleFunction } = useFunctions()
 const errorMessage = computed(() => {
   let data = {}
   let result = errorList!.value?.filter(

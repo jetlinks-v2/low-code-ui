@@ -23,6 +23,7 @@
           (_record, index) => (_record?.mark === 'add' ? 'table-striped' : null)
         "
         @change="(data) => handleChange(data)"
+        @editStatus="editStatus"
       >
         <template #headerCell="{ column }">
           <template v-if="column.tips">
@@ -200,9 +201,12 @@ const emit = defineEmits([
   'handleAdd',
   'handleOk',
   'handleChange',
+  'update:data',
 ])
 
 const handleChange = (data) => {
+  console.log(data,'hjasjhghg');
+  
   emit('handleChange', data)
 }
 
@@ -315,7 +319,6 @@ const handleAdd = async () => {
 }
 //配置
 const configuration = async (data: any) => {
-  tableRef.value.cleanEditStatus()
   const dataSource = await tableRef.value.getData()
   emit('configuration', data, dataSource)
 }
@@ -335,7 +338,8 @@ const syncData = async () => {
     bindShow.value = false
     return onlyMessage('请先完成数据绑定', 'error')
   }
-  if (!asyncData.value) {
+  if (!asyncData.value) {    
+    emit('bindData', props.dataSource)
     bindShow.value = true
     asyncData.value = true
   } else {

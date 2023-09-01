@@ -124,6 +124,7 @@ watch(
 )
 defineExpose({
   vaildate: onCheck,
+  form:form
 })
 </script>
 <style lang="less" scoped>

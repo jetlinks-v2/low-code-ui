@@ -49,7 +49,7 @@ export const useAllListDataStore = defineStore('allListData', () => {
       date: {},
     },
     menu: {
-      pageName: '',
+      pageName:'',
       main: true,
       name: '',
       icon: '',

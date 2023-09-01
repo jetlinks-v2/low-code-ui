@@ -87,7 +87,7 @@ const props = defineProps({
   },
   id: {
     type: String,
-    default: ''
+    default: '',
   }
 })
 
