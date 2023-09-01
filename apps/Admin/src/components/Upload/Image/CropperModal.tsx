@@ -91,7 +91,7 @@ const CropperModal = defineComponent({
     }
 
     return () => {
-      console.log('cropper', cropper, loading.value)
+      // console.log('cropper', cropper, loading.value)
       return (
         <Modal
           visible

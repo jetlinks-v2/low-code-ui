@@ -172,7 +172,11 @@ const configuredChange = (value: string) => {
 
 const errorList = ref<any[]>([])
 const valid = () => {
-  errorList.value = validListForm(state, configurationStore.getALLlistDataInfo(props.id)?.listFormInfo)
+  return new Promise((resolve, reject) => {
+    errorList.value = validListForm(state, configurationStore.getALLlistDataInfo(props.id)?.listFormInfo)
+    if(errorList.value.length) reject(errorList.value)
+    else resolve([])
+  })
 }
 
 defineExpose({

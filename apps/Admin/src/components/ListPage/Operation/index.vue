@@ -99,15 +99,9 @@ const save = async () => {
 
 const valid = async () => {
   return new Promise((resolve, reject) => {
-    validOperationsBtn(columnsTree.value)
-    .then(() => {
-      errorList.value = []
-      resolve(errorList.value)
-    })
-    .catch((err: ErrorItemType[]) => {
-      errorList.value = err
-      resolve(errorList.value)
-    })
+    errorList.value = validOperationsBtn(columnsTree.value)
+    if(errorList.value.length) reject(errorList.value)
+    else resolve([])
   })
 }
 

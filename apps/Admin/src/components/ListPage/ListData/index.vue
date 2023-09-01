@@ -12,21 +12,24 @@
         v-if="configState.type === ''"
         :columns="columns"
         :dataBind="dataBind"
+        :asynData="asynData"
         :dataChange="dataChange"
         :title="title"
         :addBtnName="addBtnName"
         :dataSource="dataSource"
         :modelActiveKey="activeKey"
-        :show="show"
-        :asyncData="asyncData"
-        :configChange="configChange"
+        :errorList="errorList"
         @handleAdd="handleAdd"
         @configuration="configuration"
+        @confirm="confirm"
         @handleOk="handleOk"
-        @update:data="(value) => (dataSource = value)"
       />
       <div v-else>
-        <a-page-header title="表头配置" sub-title="" @back="goBack">
+        <a-page-header
+          title="表头配置"
+          sub-title=""
+          @back="configState.type = ''"
+        >
           <template #backIcon>
             <AIcon type="LeftOutlined" />
             返回
@@ -40,7 +43,7 @@
             configState.type !== 'array'
           "
           :config="configRow"
-          @update:state="(newValue) => (subValue = newValue)"
+          @update:state="newValue => subValue = newValue"
         >
           <template #demonstrations v-if="configState.type !== 'geoPoint'">
             <div class="content">
@@ -172,6 +175,7 @@ import Table from '@/components/ListPage/FilterModule/components/FilterTable.vue
 import Config from '@/components/ListPage/ListData/components/Configuration.vue'
 import { useAllListDataStore } from '@/store/listForm'
 import { DATA_BIND } from '../keys'
+import { validListData } from './utils/valid'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -384,11 +388,11 @@ const columns: any = [
   },
 ]
 //数据
-const dataBinds: any = inject(DATA_BIND)
-const dataSource = ref([])
+const dataBinds:any = inject(DATA_BIND)
+const dataSource = ref()
 //新增一列table
 const handleAdd = async (table: any) => {
-  table?.addItem({
+  table.addItem({
     id: '',
     name: '',
     type: 'string',
@@ -548,6 +552,7 @@ watch(
 
 defineExpose({
   errorList,
+  valid
 })
 </script>
 

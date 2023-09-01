@@ -2,28 +2,31 @@
   <div class="data-bind">
     <j-form :model="dataBind" layout="inline">
       <j-form-item label="数据绑定">
-        <j-select
-          v-model:value="dataBind.data.function"
-          style="width: 200px"
-          :disabled="functionDisabled"
-          placeholder="请选择功能"
-        >
-          <j-select-option
-            v-for="item in functions"
-            :value="item.id"
-            :key="item.id"
+        <ErrorItem :errorData="errorData('function')">
+          <j-select
+            v-model:value="dataBind.data.function"
+            style="width: 200px"
+            :disabled="functionDisabled"
+            placeholder="请选择功能"
           >
-            {{ item.name }}
-          </j-select-option>
-        </j-select>
+            <j-select-option
+              v-for="item in functionOptions"
+              :value="item.id"
+              :key="item.id"
+            >
+              {{ item.name }}
+            </j-select-option>
+          </j-select>
+        </ErrorItem>
       </j-form-item>
       <j-form-item v-if="showCommand">
         <j-select
           v-model:value="dataBind.data.command"
+          :disabled="commandDisabled"
           style="width: 200px"
         >
         <j-select-option
-          v-for="item in commands"
+          v-for="item in commandOptions"
           :value="item.id"
           :key="item.id"
         >
@@ -50,10 +53,15 @@
 </template>
 
 <script setup lang="ts" name="DataBind">
+import { ErrorItem } from '../index'
 import { useProduct } from '@/store'
 import { storeToRefs } from 'pinia'
 import { queryCommand } from '@/api/project'
-import { functionsKey, DATA_BIND } from '../keys';
+import { functionsKey, DATA_BIND } from '../keys'
+import { validDataBind } from './utils/valid'
+import { useFunctions } from '../../hooks/useFunctions'
+
+const { functionOptions, commandOptions, handleFunction } = useFunctions()
 
 const visible = ref(false)
 const handleValid = () => {
@@ -63,11 +71,15 @@ const handleValid = () => {
 interface Emit {
   (e: 'update:open', value: boolean): void
   (e: 'valid'): void
-  (e: 'modify'): void
 }
 
+const errorData = computed(() => {
+  return (key: string): any => {
+    return errorList.value.find((item) => item.key === key)
+  }
+})
 const emits = defineEmits<Emit>()
-const dataBind: any = inject(DATA_BIND)
+const dataBind = inject(DATA_BIND)
 const props = defineProps({
   open: {
     type: Boolean,
@@ -81,56 +93,45 @@ const functionDisabled = computed(() => {
   return dataBind.data.function && dataBind.data.function !== ''
 })
 
-const showCommand = computed(() => {
-  return functions!.value.find(item => item.id === dataBind.data.function)?.provider === 'rdb-sql-query'
+const commandDisabled = computed(() => {
+  return dataBind.data.command && dataBind.data.command !== ''
 })
 
-const functions = inject(functionsKey)
-
-const commands = ref([
-  { name: '新增数据', id: 'Add' },
-  { name: '导入数据', id: 'Import' },
-  { name: '导出数据', id: 'Export' },
-  { name: '删除数据', id: 'Delete' },
-  { name: '更新数据', id: 'Update' },
-])
-
-/**查询功能下的指令 */
-const findCommand = async () => {
-  const params = {
-    modules: [
-        {
-        id: data.value?.[0].id,
-        name: data.value?.[0].name,
-        functions: functions!.value?.filter(item => item.id === dataBind.data.function)
-      }
-    ]
-  }
-  const res = await queryCommand(params)
-  if(res.success) {
-    commands.value = res.result?.[0]?.command
-  }
-}
+const showCommand = computed(() => {
+  return ['rdb-sql-query', 'rdb-crud'].includes(functionOptions!.value.find(item => item.id === dataBind.data.function)?.provider || '')
+})
 
 const handleModify = () => {
-  if(dataBind?.data?.function !== ''){
-    visible.value = true
-  }
+  visible.value = dataBind.data && dataBind.data.function
 }
 
 const handleOk = () => {
-  emits('modify')
+  dataBind.data.function = undefined
+  dataBind.data.command = undefined
+  dataBind.functionInfo = undefined
   visible.value = false
 }
 
 
 watchEffect(() => {
   if(dataBind?.data?.function) {
-    dataBind.functionInfo = functions!.value.find(item => item.id === dataBind.data.function)
-    findCommand();
+    dataBind.functionInfo = functionOptions!.value.find(item => item.id === dataBind.data.function)
+    handleFunction(dataBind?.data?.function)
   }
 })
 
+const errorList = ref<any[]>([])
+const valid = () => {
+  return new Promise((resolve, reject) => {
+    errorList.value = validDataBind(dataBind.data)
+    if(errorList.value.length) reject(errorList.value)
+    else resolve([])
+  })
+}
+
+defineExpose({
+  valid,
+})
 /**树形结构转一维数组 */
 </script>
 

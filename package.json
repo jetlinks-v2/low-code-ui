@@ -34,9 +34,10 @@
     "dependencies": {
         "@changesets/cli": "^2.26.2",
         "@jetlinks/utils": "workspace:^",
-        "jetlinks-ui-components": "^1.0.31",
+        "jetlinks-ui-components": "^1.0.29",
         "latest": "^0.2.0",
         "lodash-es": "^4.17.21",
+        "pinia-plugin-persistedstate": "^3.2.0",
         "pubsub-js": "^1.9.4"
     }
 }
