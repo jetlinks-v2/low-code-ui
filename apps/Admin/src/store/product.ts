@@ -41,13 +41,15 @@ const handleChildren = (children: any[], parentId: string): TreeData[] => {
       })
     }
 
-    treeData.push({
-      ...item,
-      title: item.name,
-      type: 'module',
-      parentId: parentId,
-      children: hasChildren ? handleChildren(item.children, item.id) : []
-    })
+    if (item.name) {
+      treeData.push({
+        ...item,
+        title: item.name,
+        type: 'module',
+        parentId: parentId,
+        children: hasChildren ? handleChildren(item.children, item.id) : []
+      })
+    }
   })
 
   return treeData
