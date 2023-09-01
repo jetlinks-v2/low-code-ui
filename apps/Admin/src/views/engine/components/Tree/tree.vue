@@ -82,6 +82,7 @@ const save = ({ name }) => {
   const node = menuState.cacheData
   const parentId = node.type === providerEnum.Module ? node.id : node.parentId
   product.add({
+    name,
     id: randomString(16),
     title: name,
     type: menuState.provider,
