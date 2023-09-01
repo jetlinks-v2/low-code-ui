@@ -12,7 +12,7 @@
         v-if="configState.type === ''"
         :columns="columns"
         :dataBind="dataBind"
-        :asynData="asynData"
+        :asyncData="asyncData"
         :dataChange="dataChange"
         :title="title"
         :addBtnName="addBtnName"
@@ -21,7 +21,6 @@
         :errorList="errorList"
         @handleAdd="handleAdd"
         @configuration="configuration"
-        @confirm="confirm"
         @handleOk="handleOk"
       />
       <div v-else>
