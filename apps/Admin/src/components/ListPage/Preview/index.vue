@@ -106,7 +106,70 @@ const typeChangeShow = ref(false)
 //操作按钮
 const actions = ref([])
 //table头部按钮
-const headerActions = ref([])
+const headerActions = ref([
+  {
+    key: 'view',
+    text: '查看',
+    icon: 'EyeOutlined',
+    type: 'primary',
+    permissionProps: (data) => ({
+      tooltip: {
+        title: '查看',
+      },
+      hasPermission: false,
+
+      onClick: (e) => {
+        console.log(data, 'data')
+        // handleView(data.id)
+      },
+    }),
+  },
+  {
+    key: 'view1',
+    text: '查看1',
+    icon: 'FormOutlined',
+    type: 'primary',
+    permissionProps: (data) => ({
+      tooltip: {
+        title: '查看',
+      },
+      hasPermission: false,
+
+      onClick: (e) => {
+        console.log(data)
+        // handleView(data.id)
+      },
+    }),
+  },
+  {
+    key: 'view2',
+    text: '查看2',
+    type: 'dashed',
+    icon: 'HeatMapOutlined',
+  },
+
+  {
+    key: 'delete',
+    text: '删除',
+    icon: 'DeleteOutlined',
+    type: 'primary',
+    permissionProps: (data) => ({
+      tooltip: {
+        title: '删除',
+      },
+      popConfirm: {
+        title: data?.status === 'error' ? '禁用' : '确认删除？',
+        onConfirm: () => {
+          console.log(data, 'onConfirm')
+        },
+      },
+      hasPermission: true,
+      // onClick: () => {
+      //   handleView(data.id)
+      // },
+    }),
+  },
+])
 //卡片样式
 const cardConfig = ref({
   customIcon: '',

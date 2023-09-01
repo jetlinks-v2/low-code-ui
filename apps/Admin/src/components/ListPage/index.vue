@@ -107,7 +107,6 @@ const visibles = reactive({
 const allListData = computed(() => {
   return configurationStore.getALLlistDataInfo(props.data.id)
 })
-
 const handleVisible = (key: string, value: boolean) => {
   visibles[key] = value
 }
@@ -125,7 +124,7 @@ const pagingData = ref<any[]>([
   { pageSize: 48 },
   { pageSize: 96 },
 ])
-const menuConfig = ref({
+const menuConfig = reactive({
   pageName: props.data.title,
   main: true,
   name: '',
@@ -139,7 +138,8 @@ const listPageData = computed(() => {
     dataSource: dataSource.value,
     searchData: searchData.value,
     pagingData: pagingData.value,
-    menu: menuConfig.value,
+    menu: menuConfig,
+    dataBind,
   }
 })
 /**
@@ -264,10 +264,10 @@ onMounted(() => {
 // })
 
 const onSave = throttle((record) => {
-  // productStore.update(record)
+  productStore.update(record)
 }, 1000)
 watch(
-  () => JSON.stringify(visibles),
+  () => JSON.stringify(listPageData.value),
   () => {
     const record = {
       ...props.data,
@@ -280,7 +280,6 @@ watch(
         menu: menuConfig.value
       },
     }
-    console.log(record);
     onSave(record)
   },
 )

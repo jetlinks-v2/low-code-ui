@@ -81,12 +81,29 @@ import { useAllListDataStore } from '@/store/listForm';
 const dialogVisible = ref<boolean>(false)
 const baseInfo = inject(BASE_INFO)
 const form = inject(MENU_CONFIG)
+const emits = defineEmits()
 const configurationStore = useAllListDataStore();
 watchEffect(() => {
   configurationStore.setALLlistDataInfo('menu', form, baseInfo.id)
 })
+const basicFormRef = ref()
+
+const onCheck = async () => {
+  try {
+    const values = await basicFormRef.value.validateFields()
+    return values
+  } catch (errorInfo) {
+    return errorInfo
+  }
+}
+watch(
+  () => [form!.pageName, form!.main, form!.name, form!.icon],
+  () => {
+    emits('update:form',form)
+  },
+)
 defineExpose({
-  form: form,
+  vaildate: onCheck,
 })
 </script>
 <style lang="less" scoped>
