@@ -1,6 +1,6 @@
 import {onUnmounted, ref} from 'vue'
 import type { Ref } from 'vue'
-import { isFunction, get } from 'lodash-es'
+import {isFunction, get, isArray} from 'lodash-es'
 import type { AxiosResponseRewrite } from '@jetlinks/types'
 
 interface RequestOptions<T, S> {
@@ -17,6 +17,8 @@ interface RequestOptions<T, S> {
      */
     formatName: string | [string]
     onError: (e: any) => void
+
+    defaultParams: S | any | any[]
 }
 
 const defaultOptions: any = {
@@ -27,8 +29,8 @@ const defaultOptions: any = {
 type Run = (...args: any[]) => void
 
 export const useRequest = <T = any, S = any>(
-  request: () => Promise<AxiosResponseRewrite<T>>,
-  options: Partial<RequestOptions<T, S>> = defaultOptions
+  request: (...args: any[]) => Promise<AxiosResponseRewrite<T>>,
+  options: Partial<RequestOptions<T, S>> = defaultOptions,
 ): {
   data: Ref<S | undefined>,
   loading: Ref<boolean>,
@@ -41,8 +43,7 @@ export const useRequest = <T = any, S = any>(
         ...options
     }
    
-    async function run(...arg: any) {
-      console.log(request, isFunction(request))
+    async function run(...arg: any[]) {
         if (request && isFunction(request)) {
             loading.value = true
             try {
@@ -54,6 +55,7 @@ export const useRequest = <T = any, S = any>(
               if (resp?.success) {
                 const successData = await _options.onSuccess?.(resp)
                 data.value = successData || get(resp, _options.formatName!)
+                console.log(data.value)
               } else {
                 _options.onError?.(resp)
               }
@@ -61,16 +63,22 @@ export const useRequest = <T = any, S = any>(
               loading.value = false
               _options.onError?.(e)
             }
-
         }
     }
 
-
     if (_options.immediate) { // 主动触发
+      if (_options.defaultParams) {
+        isArray(_options.defaultParams) ? run(..._options.defaultParams) : run(_options.defaultParams)
+      } else {
         run()
+      }
     }
 
     onUnmounted(() => {
+      // 销毁时，撤销该请求
+      if (request && isFunction(request)) {
+
+      }
       // request()
     })
 

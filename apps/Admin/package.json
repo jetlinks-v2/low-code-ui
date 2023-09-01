@@ -19,6 +19,7 @@
     "@jetlinks/types": "workspace:^",
     "@jetlinks/utils": "workspace:^",
     "@jetlinks/vite": "workspace:^",
+    "@vue/compiler-sfc": "^3.3.4",
     "@vue/shared": "^3.3.4",
     "@vuemap/vue-amap": "^2.0.13",
     "dayjs": "^1.11.8",

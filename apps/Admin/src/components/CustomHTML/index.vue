@@ -3,7 +3,7 @@ import SplitPane from './SplitPane.vue'
 import Console from './Console.vue'
 import EditorContainer from './editor/EditorContainer.vue'
 import Preview from './output/Preview.vue'
-// import Menu from '@/components/ListPage/MenuConfig/components/menu.vue'
+import MenuList from '@/components/ListPage/MenuConfig/components/menu.vue'
 import { debounce } from './utils'
 import MonacoEditor from './editor/MonacoEditor.vue'
 import { ReplStore } from './store'
@@ -34,7 +34,12 @@ const handleDbClickViewName = () => {
 }
 
 const activeOper = ref('')
+const menuListRef = ref()
 const handleOperClick = (type: OperType) => {
+  if (type === OperType.Menu && drawerVisible.value) {
+    const vaild = menuListRef.value?.vaildate();
+    console.log(vaild);
+  }
   if (type === activeOper.value) {
     drawerVisible.value = !drawerVisible.value
   } else {
@@ -117,7 +122,7 @@ const runCode = () => {
       </div>
       <div class="drawer-body">
         <Preview v-if="activeOper === OperType.View" ref="previewRef" />
-        <Menu v-else-if="activeOper === OperType.Menu" />
+        <MenuList v-else-if="activeOper === OperType.Menu" ref="menuListRef" />
       </div>
     </div>
   </div>

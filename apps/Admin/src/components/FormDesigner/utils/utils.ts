@@ -23,7 +23,6 @@ const layout = ['card', 'grid', 'tabs', 'collapse', 'space']
 
 const checkedConfigItem = (node: ISchema) => {
     const _type = node.type || 'root'
-    // let flag: boolean = false // false: 没错误， true: 有错误
     if (_type === 'root') {
         return false
     } else {
@@ -83,27 +82,65 @@ export const updateData = (list: ISchema[], item: ISchema) => {
     })
 }
 
+// 处理css 获取名称
+export const extractCssClass = (formCssCode: string) => {
+    if (!formCssCode) return []
+    const regExp = /\..*{/g
+    const result = formCssCode.match(regExp)
+    const cssNameArray: string[] = []
+
+    if (!!result && result.length) {
+        result.forEach((rItem) => {
+            let classArray = rItem.split(',')  //切分逗号分割的多个class
+            if (classArray.length) {
+                classArray.forEach((cItem) => {
+                    let caItem = cItem.trim()
+                    if (caItem.indexOf('.', 1) !== -1) {  //查找第二个.位置
+                        let newClass = caItem.substring(caItem.indexOf('.') + 1, caItem.indexOf('.', 1))  //仅截取第一、二个.号之间的class
+                        if (!!newClass) {
+                            cssNameArray.push(newClass.trim())
+                        }
+                    } else if (caItem.indexOf(' ') !== -1) {  //查找第一个空格位置
+                        let newClass = caItem.substring(caItem.indexOf('.') + 1, caItem.indexOf(' '))  //仅截取第一、二个.号之间的class
+                        if (!!newClass) {
+                            cssNameArray.push(newClass.trim())
+                        }
+                    } else {
+                        if (caItem.indexOf('{') !== -1) {  //查找第一个{位置
+                            let newClass = caItem.substring(caItem.indexOf('.') + 1, caItem.indexOf('{'))
+                            cssNameArray.push(newClass.trim())
+                        } else {
+                            let newClass = caItem.substring(caItem.indexOf('.') + 1)
+                            cssNameArray.push(newClass.trim())
+                        }
+                    }
+                })
+            }
+        })
+    }
+    return Array.from(new Set(cssNameArray))  //数组去重
+}
+
 export const insertCustomCssToHead = (cssCode, formId) => {
     let head = document.getElementsByTagName('head')[0]
-    console.log(head, formId)
-    // let oldStyle = document.getElementById('vform-custom-css')
-    // if (!!oldStyle) {
-    //     head.removeChild(oldStyle)  //先清除后插入！！
-    // }
-    // if (!!formId) {
-    //     oldStyle = document.getElementById('vform-custom-css' + '-' + formId)
-    //     !!oldStyle && head.removeChild(oldStyle)  //先清除后插入！！
-    // }
+    let oldStyle = document.getElementById(formId)
+    if (!!oldStyle) {
+        head.removeChild(oldStyle)  //先清除后插入！！
+    }
+    if (!!formId) {
+        oldStyle = document.getElementById(formId)
+        !!oldStyle && head.removeChild(oldStyle)  //先清除后插入！！
+    }
 
-    // let newStyle = document.createElement('style')
-    // newStyle.type = 'text/css'
-    // newStyle.rel = 'stylesheet'
-    // newStyle.id = !!formId ? 'vform-custom-css' + '-' + formId : 'vform-custom-css'
-    // try {
-    //     newStyle.appendChild(document.createTextNode(cssCode))
-    // } catch (ex) {
-    //     newStyle.styleSheet.cssText = cssCode
-    // }
+    let newStyle: HTMLStyleElement = document.createElement('style')
+    newStyle.type = 'text/css'
+    newStyle.rel = 'stylesheet'
+    newStyle.id = formId
+    try {
+        newStyle.appendChild(document.createTextNode(cssCode))
+    } catch (ex) {
+        newStyle.styleSheet.cssText = cssCode
+    }
 
-    // head.appendChild(newStyle)
+    head.appendChild(newStyle)
 }

@@ -6,6 +6,16 @@ const handleProps = (node: any) => {
     if (!result?.style) {
         result.style = {}
     }
+    if (!result?.cssCode) {
+        result.cssCode = ''
+    }
+    if (!result?.onChange) {
+        result.onChange = ''
+    }
+    if (!result?.disabled) {
+        result.disabled = false
+    }
+
     result.description = result?.description || ''
     if (checkIsField(node) && node.type !== 'switch') {
         result.style = {
@@ -62,6 +72,9 @@ const handleProps = (node: any) => {
             result.size = 2
             result.unit = 'M'
             break
+        case 'grid':
+            result.inlineMax = 4
+            break
     }
 
     return result
@@ -78,7 +91,7 @@ const handleFormItemProps = (node: any) => {
 }
 
 const generatorData = (node: any) => {
-    const result: any = { ...node, visible: true, editable: true }
+    const result: any = { ...node }
     if (!result.key) {
         result.key = `${result.type}_${uid()}`
     }
@@ -86,7 +99,11 @@ const generatorData = (node: any) => {
         result.formItemProps = handleFormItemProps(node)
     }
 
-    result.componentProps = handleProps(node)
+    result.componentProps = {
+        ...handleProps(node),
+        visible: true,
+        editable: true
+    }
 
     if (Array.isArray(node?.children) && node?.children?.length > 0) {
         result.children = (node?.children || [])?.map(i => {

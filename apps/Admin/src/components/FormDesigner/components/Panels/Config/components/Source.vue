@@ -8,6 +8,33 @@
     <j-form-item>
       <j-select placeholder="请选择" />
     </j-form-item>
+    <j-form-item label="数据层级"  
+        :rules="[
+          {
+            required: true,
+            message: '请输入',
+          },
+        ]">
+      <j-select placeholder="请选择" />
+    </j-form-item>
+    <j-form-item label="展示字段" 
+        :rules="[
+          {
+            required: true,
+            message: '请输入',
+          },
+        ]">
+      <j-select placeholder="请选择"  />
+    </j-form-item>
+    <j-form-item label="存入后端字段" 
+        :rules="[
+          {
+            required: true,
+            message: '请输入',
+          },
+        ]">
+      <j-select placeholder="请选择" />
+    </j-form-item>
   </div>
 </template>
     
