@@ -14,3 +14,5 @@ export const getDetails_api = (data: any) => request.post<any>(`/system/config/s
 export const executeReq = (provider: Draft.Provider, command: Draft.Command, data: any = {}) => request.post(`/low-code/editor/function-provider/${provider}/${command}/execute`, data)
 
 export const getAssetType = () => request.get('/asset/types')
+
+export const getResource = (projectId: string, moduleId: string, resourceId: string) => request.get(`/low-code/runtime/${projectId}/${moduleId}/resources/${resourceId}`, {}, { headers: { 'Content-Type': 'text/plain'}})
