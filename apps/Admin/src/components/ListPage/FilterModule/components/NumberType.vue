@@ -21,7 +21,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useAllListDataStore } from '@/store/listForm'
 interface Emit {
   (e: 'update:state', value: any): void
 }
@@ -29,11 +28,13 @@ const props = defineProps({
   id: {
     type: null,
   },
+  data: {
+    type: Object,
+    default: () => {},
+  },
 })
 const emits = defineEmits<Emit>()
-const configurationStore = useAllListDataStore()
-const data = configurationStore.getALLlistDataInfo(props.id).configurationInfo
-  ?.number
+const data = props.data?.config || null
 
 const state = reactive({
   max: data?.max || null,

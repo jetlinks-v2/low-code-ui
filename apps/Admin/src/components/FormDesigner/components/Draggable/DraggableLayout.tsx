@@ -1,7 +1,6 @@
 
-import { cloneDeep, get, isEmpty, set } from 'lodash-es';
+import { cloneDeep, get, isEmpty, omit, set } from 'lodash-es';
 import { useProps } from '../../hooks';
-import { PropType } from 'vue';
 import { onEnd, onMove } from './ControlInsertionPlugin';
 import DraggableWrap from './DragGableWrap'
 import Selection from '../Selection'
@@ -13,7 +12,8 @@ import CardLayout from './CardLayout';
 import SpaceLayout from './SpaceLayout';
 import CollapseLayout from './CollapseLayout';
 import TableLayout from './TableLayout'
-import { watch } from 'vue';
+import { watch, PropType } from 'vue';
+import { queryOptions } from '../../utils/utils';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -65,9 +65,20 @@ const DraggableLayout = defineComponent({
         }
 
         const slots = {
+            getWidgetRef: (path) => {
+                let foundRef = unref(designer.refList)?.[path]
+                return foundRef
+            },
             item: ({ element }) => {
                 const _path: string[] = cloneDeep(props?.path || []);
                 const _index: number = props?.index || 0;
+
+                const _hidden = computed(() => {
+                    return !unref(isEditModel) && !element.componentProps?.visible && unref(designer.mode) === 'add'
+                })
+
+                if(unref(_hidden)) return ''
+
                 switch (element.type) {
                     case 'text':
                         if (unref(isEditModel)) {
@@ -100,6 +111,9 @@ const DraggableLayout = defineComponent({
                             const typeProps = useProps(element)
                             const TypeComponent = componentMap?.[element?.type] || 'div'
 
+                            const selectRef = ref<any>(null)
+                            const options = ref<any[]>(element?.componentProps?.options || [])
+
                             const params = {
                                 data: element,
                                 parent: props.data
@@ -115,6 +129,7 @@ const DraggableLayout = defineComponent({
 
                             const value = ref<any>(get(designer.formState, _path))
                             const checked = ref<any>(get(designer.formState, _path))
+                            
 
                             watch(
                                 () => value.value, 
@@ -136,35 +151,63 @@ const DraggableLayout = defineComponent({
                             )
 
                             const onChange = (...arg) => {
-                                if(!element?.onChange) return 
-                                if(['input', 'input-number'].includes(element.type)){
-                                    let customFn = new Function('e', element?.onChange)
-                                    customFn.call(arg?.[0])
+                                if(!element?.componentProps?.eventCode && !unref(isEditModel)) return 
+                                if(['input', 'input-number', 'textarea', 'input-password'].includes(element.type)){
+                                    let customFn = new Function('e', element?.componentProps?.eventCode)
+                                    customFn.call(slots, arg?.[0])
                                 }
-                                if(['select', 'switch'].includes(element.type)){
-                                    let customFn = new Function('value', 'option', element?.onChange)
-                                    customFn.call(arg?.[0], arg?.[1])
+                                if(['select', 'switch', 'select-card', 'tree-select'].includes(element.type)){
+                                    let customFn = new Function('value', 'option', element?.componentProps?.eventCode)
+                                    customFn.call(slots, arg?.[0], arg?.[1])
+                                }
+                                if(['time-picker'].includes(element.type)){
+                                    let customFn = new Function('time', 'timeString', element?.componentProps?.eventCode)
+                                    customFn.call(slots, arg?.[0], arg?.[1])
+                                }
+                                if(['date-picker'].includes(element.type)){
+                                    let customFn = new Function('date', 'timeString', element?.componentProps?.eventCode)
+                                    customFn.call(slots, arg?.[0], arg?.[1])
                                 }
                             }
 
+                            const registerToRefList = (path: string[], _ref: any) => {
+                                if(!unref(isEditModel) && Array.isArray(path) && path?.length && element?.formItemProps?.name){
+                                    const __path = path.join('.')
+                                    designer.refList.value[__path] = _ref
+                                }
+                            }
+
+                            watchEffect(() => {
+                                registerToRefList(_path, selectRef.value)
+                            })
+
+                            if(!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
+                                queryOptions(element.componentProps.source).then(resp => {
+                                    options.value = resp
+                                })
+                            }
+
                             return (
-                                <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
+                                <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                                     <FormItem {...unref(formItemProps)} name={_path}>
                                         {
-                                            unref(isEditModel) ? <TypeComponent
+                                            unref(isEditModel) ? 
+                                            <TypeComponent
                                                 {...unref(typeProps)}
                                                 data={element}
-                                                {...element.componentProps}
-                                                size={designer.formData.value?.componentProps.size}
-                                            ></TypeComponent> : <TypeComponent
+                                                {...omit(element.componentProps, ['description'])}
+                                                size={unref(designer.formData)?.componentProps.size}
+                                            ></TypeComponent> : 
+                                            <TypeComponent
                                                 {...unref(typeProps)}
                                                 data={element}
-                                                {...element.componentProps}
-                                                size={designer.formData.value?.componentProps.size}
-                                                // v-model={[designer.formState[_path[0]], 'value']}
+                                                {...omit(element.componentProps, ['description'])}
+                                                size={unref(designer.formData)?.componentProps.size}
                                                 v-model:value={value.value}
                                                 v-model:checked={checked.value}
                                                 onChange={onChange}
+                                                disabled={element?.componentProps?.disabled || (unref(designer.mode) === 'edit' && !element?.componentProps?.editable)}
+                                                options={unref(options)}
                                             ></TypeComponent>
                                         }
                                         <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{element.componentProps?.description}</div>

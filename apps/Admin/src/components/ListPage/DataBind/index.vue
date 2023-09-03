@@ -5,7 +5,7 @@
         <j-select
           v-model:value="dataBind.data.function"
           style="width: 200px"
-          :disabled="dataBind.data.function && dataBind.data.function !== ''"
+          :disabled="functionDisabled"
           placeholder="请选择功能"
         >
           <j-select-option
@@ -17,7 +17,7 @@
           </j-select-option>
         </j-select>
       </j-form-item>
-      <j-form-item v-if="functions!.find(item => item.id === dataBind.data.function)?.provider === 'rdb-sql-query'">
+      <j-form-item v-if="showCommand">
         <j-select
           v-model:value="dataBind.data.command"
           style="width: 200px"
@@ -53,7 +53,7 @@
 import { useProduct } from '@/store'
 import { storeToRefs } from 'pinia'
 import { queryCommand } from '@/api/project'
-import { functionsKey } from '../keys';
+import { functionsKey, DATA_BIND } from '../keys';
 
 const visible = ref(false)
 const handleValid = () => {
@@ -67,7 +67,7 @@ interface Emit {
 }
 
 const emits = defineEmits<Emit>()
-const dataBind: any = inject('dataBind')
+const dataBind: any = inject(DATA_BIND)
 const props = defineProps({
   open: {
     type: Boolean,
@@ -76,6 +76,14 @@ const props = defineProps({
 })
 
 const { data } = storeToRefs(useProduct())
+
+const functionDisabled = computed(() => {
+  return dataBind.data.function && dataBind.data.function !== ''
+})
+
+const showCommand = computed(() => {
+  return functions!.value.find(item => item.id === dataBind.data.function)?.provider === 'rdb-sql-query'
+})
 
 const functions = inject(functionsKey)
 
@@ -94,20 +102,18 @@ const findCommand = async () => {
         {
         id: data.value?.[0].id,
         name: data.value?.[0].name,
-        functions: [
-          functions!.value?.find(item => item.id === dataBind.data.function)
-        ]
+        functions: functions!.value?.filter(item => item.id === dataBind.data.function)
       }
     ]
   }
   const res = await queryCommand(params)
   if(res.success) {
-    commands.value = res.result?.[0].command
+    commands.value = res.result?.[0]?.command
   }
 }
 
 const handleModify = () => {
-  if(dataBind.data.function && dataBind.data.function !== ''){
+  if(dataBind?.data?.function !== ''){
     visible.value = true
   }
 }
@@ -118,12 +124,13 @@ const handleOk = () => {
 }
 
 
-watch(() => dataBind.data.function, () => {
-  if(dataBind.data?.function) {
+watchEffect(() => {
+  if(dataBind?.data?.function) {
     dataBind.functionInfo = functions!.value.find(item => item.id === dataBind.data.function)
     findCommand();
   }
-}, {immediate: true, deep: true})
+})
+
 /**树形结构转一维数组 */
 </script>
 

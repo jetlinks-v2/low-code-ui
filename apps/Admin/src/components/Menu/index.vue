@@ -35,21 +35,28 @@
 </template>
 
 <script setup lang='ts' name="Menu">
-
-import { cloneDeep } from 'lodash-es';
 import TreeDrag from './TreeDrag/index.vue'
 import { randomString } from '@jetlinks/utils';
+import { providerEnum } from  '@/components/ProJect/index'
+
+// import { cloneDeep } from 'lodash-es';
+// import TreeDrag from './TreeDrag/index.vue'
+// import { randomString } from '@jetlinks/utils';
 
 const props = defineProps({
     projectData: {
         type: Object,
         default: {}
     },
+    projectId: {
+      type: String,
+      default: ''
+    }
 })
 
 const emit = defineEmits(['change'])
 
-const leftList = ref<any>([])
+const leftList = ref<any>(props.projectData || [])
 const addTree = ref<any>([])
 const treeData = ref<any>([])
 
@@ -84,13 +91,22 @@ const onCheck = (e) => {
 
 const toRight = () => {
     // const arr = menuState.checkedKey
-    const arr = leftList.value.filter(item => menuState.checkedKey.includes(item.id)).map(it => ({
+    const arr = leftList.value.filter(item => menuState.checkedKey.includes(item.id)).map(it => {
+      console.log(it)
+      const id = randomString(16)
+      const code = randomString(8)
+      const type = it.others.type === providerEnum.HtmlPage ? 'html' : 'list'
+      const url = `/preview/${props.projectId}/${it.parentId}/${type}/${code}`
+      return {
         ...it,
-        id: randomString(16),
+        url,
+        id,
+        name: 'code',
         options: {
-            pageId: it.id
-        }
-    }))
+        pageId: it.id
+      }
+      }
+    })
 
     addTree.value = [...arr]
 }
@@ -104,34 +120,6 @@ const onTree = (data) => {
     treeData.value = data
     emit('change', data)
 }
-
-
-onMounted(() => {
-    const test = [
-        {
-            id: 'html1',
-            name: 'html-1',
-            icon: 'EyeOutlined',
-            url:"/html1",
-            owner:'iot',
-            // code:'html1'
-        },
-        {
-            id: 'html2',
-            name: 'html-2',
-            icon: 'EyeOutlined',
-            url:"/html2",
-            owner:'iot',
-        },
-        {
-            id: 'html3',
-            name: 'html-3',
-            icon: 'EyeOutlined'
-        }
-    ]
-    leftList.value = test
-})
-
 
 </script>
 

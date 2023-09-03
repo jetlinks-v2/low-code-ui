@@ -33,9 +33,11 @@
             class="card-field"
             @click="cardState.type = 'field1'"
           >
-            <h3>
-              {{ formState.field1 || '字段1' }}
-            </h3>
+            <ErrorItem :errorData="errorData('field1')">
+              <h3>
+                {{ formState.field1 || '字段1' }}
+              </h3>
+            </ErrorItem>
           </j-col>
           <j-col
             :span="12"
@@ -52,7 +54,7 @@
             class="card-field"
             @click="cardState.type = 'field2'"
           >
-            <div>{{ formState.field2Titel || '展示字段2' }}</div>
+            <div>{{ formState.field2Title || '展示字段2' }}</div>
             <div>
               {{ formState.field2 || '字段2' }}
             </div>
@@ -62,7 +64,7 @@
             class="card-field"
             @click="cardState.type = 'field3'"
           >
-            <div>{{ formState.field3Titel || '展示字段3' }}</div>
+            <div>{{ formState.field3Title || '展示字段3' }}</div>
             <div>
               {{ formState.field3 || '字段3' }}
             </div>
@@ -90,12 +92,7 @@
         style="padding: 10px"
       >
         <div v-if="cardState.type === 'customIcon'">
-          <j-form-item
-            label="自定义图标"
-            name="customIcon"
-            :rules="[{ required: true, message: '请上传图标!' }]"
-            class="upload-icon"
-          >
+          <j-form-item label="自定义图标" name="customIcon" class="upload-icon">
             <Upload v-model:value="formState.customIcon" :accept="accept" />
           </j-form-item>
 
@@ -111,37 +108,30 @@
           </j-form-item>
         </div>
         <div v-if="cardState.type === 'field1'">
-          <j-form-item
-            label="字段1"
-            name="field1"
-            :rules="[
-              {
-                required: true,
-                message: '请选择字段1!',
-              },
-            ]"
-          >
-            <j-select
-              width="200px"
-              placeholder="请先配置列表数据"
-              v-model:value="formState.field1"
-              showSearch
-              :options="titleOptions"
-              :field-names="{ label: 'name', value: 'id' }"
-            />
-          </j-form-item>
+          <ErrorItem :errorData="errorList?.[0]">
+            <j-form-item
+              label="字段1"
+              name="field1"
+              :rules="[
+                {
+                  required: true,
+                  message: '请选择字段1!',
+                },
+              ]"
+            >
+              <j-select
+                width="200px"
+                placeholder="请先配置列表数据"
+                v-model:value="formState.field1"
+                showSearch
+                :options="titleOptions"
+                :field-names="{ label: 'name', value: 'id' }"
+              />
+            </j-form-item>
+          </ErrorItem>
         </div>
         <div v-if="cardState.type === 'field2'">
-          <j-form-item
-            label="字段2"
-            name="field2"
-            :rules="[
-              {
-                required: true,
-                message: '请选择字段2!',
-              },
-            ]"
-          >
+          <j-form-item label="字段2" name="field2">
             <j-select
               width="200px"
               placeholder="请先配置列表数据"
@@ -154,16 +144,7 @@
           </j-form-item>
         </div>
         <div v-if="cardState.type === 'field3'">
-          <j-form-item
-            label="字段3"
-            name="field3"
-            :rules="[
-              {
-                required: true,
-                message: '请选择字段3!',
-              },
-            ]"
-          >
+          <j-form-item label="字段3" name="field3">
             <j-select
               width="200px"
               placeholder="请先配置列表数据"
@@ -176,16 +157,18 @@
           </j-form-item>
         </div>
         <div v-if="cardState.type === 'emphasisField'">
-          <j-form-item label="强调字段" name="emphasisField">
-            <j-select
-              width="200px"
-              placeholder="请先配置列表数据"
-              v-model:value="formState.emphasisField"
-              showSearch
-              :options="titleOptions"
-              :field-names="{ label: 'name', value: 'id' }"
-            />
-          </j-form-item>
+          <ErrorItem :errorData="errorData('emphasisField')">
+            <j-form-item label="强调字段" name="emphasisField">
+              <j-select
+                width="200px"
+                placeholder="请先配置列表数据"
+                v-model:value="formState.emphasisField"
+                showSearch
+                :options="titleOptions"
+                :field-names="{ label: 'name', value: 'id' }"
+              />
+            </j-form-item>
+          </ErrorItem>
           <j-form-item label="特殊样式" name="specialStyle">
             <EditorModal
               v-model:value="formState.specialStyle"
@@ -204,12 +187,16 @@
 <script lang="ts" setup>
 import Upload from '@/components/Upload/Image/ImageUpload.vue'
 import { useAllListDataStore } from '@/store/listForm'
-
+import { ErrorItem } from '../..';
 import EditorModal from '@/components/EditorModal'
 const props = defineProps({
   id: {
     type: null,
   },
+  errorList: {
+    type: Array,
+    default: () => []
+  }
 })
 const configurationStore = useAllListDataStore()
 const titleOptions = ref([])
@@ -222,8 +209,8 @@ const cardState = reactive({
 const formState = reactive({
   customIcon: '',
   dynamicIcon: '',
-  field2Titel: '',
-  field3Titel: '',
+  field2Title: '',
+  field3Title: '',
   field1: '',
   field2: '',
   field3: '',
@@ -231,6 +218,11 @@ const formState = reactive({
   specialStyle: '',
 })
 
+const errorData = computed(() => {
+  return (val: string) => {
+    return props.errorList?.find((item: any) => item.key == val)
+  }
+})
 //上传icon格式
 const accept = '.jpg,.jpeg,.png'
 //悬浮提示自动调整位置
@@ -248,10 +240,7 @@ const actions = [
       },
       hasPermission: false,
       icon: 'EyeOutlined',
-      onClick: (e) => {
-        console.log(data, 'data')
-        handleView(data.id)
-      },
+      onClick: (e) => {},
     }),
   },
   {
@@ -285,15 +274,13 @@ const actions = [
       },
       hasPermission: true,
       icon: 'EyeOutlined',
-      onClick: () => {
-        handleView(data.id)
-      },
+      onClick: () => {},
     }),
   },
 ]
 
 const validateValue = () => {
-  const value = ['customIcon', 'field3', 'field2', 'field1']
+  const value = ['field1']
   value.map((item: any) => {
     if (formState[item] === '') {
       cardState.type = item
@@ -306,12 +293,7 @@ const onCheck = async () => {
   try {
     await formRef.value.validateFields()
     validateValue()
-    if (
-      formState.customIcon !== '' &&
-      formState.field1 !== '' &&
-      formState.field2 !== '' &&
-      formState.field3 !== ''
-    ) {
+    if (formState.field1 !== '') {
       configurationStore.setALLlistDataInfo('listFormInfo', formState, props.id)
       return true
     }
@@ -320,10 +302,10 @@ const onCheck = async () => {
   }
 }
 const field2Change = (value: any, options: any) => {
-  formState.field2Titel = options.name
+  formState.field2Title = options.name
 }
 const field3Change = (value: any, options: any) => {
-  formState.field3Titel = options.name
+  formState.field3Title = options.name
 }
 const statusColor = ref({
   error: '',
@@ -338,7 +320,7 @@ const init = () => {
 
   Object.assign(formState, data)
   statusColor.value = JSON.parse(formState.specialStyle || '{}')
-  console.log(statusColor.value, 'statusColor');
+  console.log(statusColor.value, 'statusColor')
 }
 
 onMounted(() => {

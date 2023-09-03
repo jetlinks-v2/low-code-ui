@@ -10,7 +10,7 @@
                 <template #label>
                     {{ `${titleType} ${props.provider ? providerMap[props.provider] : ''}` }}
                 </template>
-                <j-input v-model:value="modelRef.title" placeholder="请输入" />
+                <j-input v-model:value="modelRef.title" placeholder="请输入" ref="inputRef"/>
             </j-form-item>
         </j-form>
     </j-modal>
@@ -40,7 +40,7 @@ const props = defineProps({
     },
     data: {
         type: Object,
-        default: ''
+        default: () => ({})
     },
     type: {
         type: String,
@@ -60,6 +60,7 @@ const modelRef = reactive({
     children:props.data.children || []
 })
 const formRef = ref()
+const inputRef = ref()
 
 const titleType = computed(() => props.type === 'Add' ? '新增' : '重命名')
 
@@ -77,9 +78,16 @@ onKeyStroke('Enter', async () => {
     if (res && modelRef.title) {
         emit('save', {
             ...modelRef,
-            name:modelRef.title
+            name: modelRef.title,
+            others: {
+              type: modelRef.type
+            }
         })
     }
+})
+
+onMounted(()=>{
+    inputRef.value?.focus()
 })
 
 

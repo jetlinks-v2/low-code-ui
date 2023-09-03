@@ -159,34 +159,10 @@ export const addContext = (node: any, parent: any, fn?: any) => {
     }
     fn && fn(node)
     const context = {
-        updateProps(_props) {
-            node = { ..._props }
-        },
-        get root() {
-            let result = {}
-            switch (node.type) {
-                case 'grid':
-                    result = node
-                    break
-                default:
-                    result = parent.context.root
+        updateProps(_val, key) {
+            if (node?.componentProps && key) {
+                node.componentProps[key] = _val
             }
-            return result
-        },
-        state: node,
-        parent,
-        get parents() {
-            const result: any = []
-            let cursor = node
-            while (cursor) {
-                result.unshift(cursor)
-                if (cursor.context.parent && !Array.isArray(cursor.context.parent)) {
-                    cursor = cursor.context.parent
-                } else {
-                    cursor = ''
-                }
-            }
-            return result
         },
         copy() {
             const index = arr.indexOf(node)
@@ -195,6 +171,16 @@ export const addContext = (node: any, parent: any, fn?: any) => {
             newNode.key = `${newNode.type}_${uid()}`
             addContext(newNode, parent, (node) => {
                 node.key = `${node.type}_${uid()}-copy`
+            })
+            arr.splice(index + 1, 0, newNode)
+        },
+        paste(_data: any) {
+            const index = arr.indexOf(node)
+            const newNode = reactive(cloneDeep(toRaw(_data)))
+            delete newNode.context
+            newNode.key = `${newNode.type}_${uid()}-paste`
+            addContext(newNode, parent, (node) => {
+                node.key = `${node.type}_${uid()}-paste`
             })
             arr.splice(index + 1, 0, newNode)
         },
@@ -259,30 +245,7 @@ export const addContext = (node: any, parent: any, fn?: any) => {
                 addContext(newNode, node)
                 node.children.splice(0, 0, newNode)
             }
-        },
-        del(type) {
-            const {
-                context: {
-                    root,
-                    col,
-                    row
-                }
-            } = node
-            switch (type) {
-                case 'column':
-                    root.rows.forEach(e => {
-                        e.columns.splice(col, node.options.colspan)
-                        addContext(e, root)
-                    })
-                    break
-                case 'row':
-                    root.rows.splice(row, node.options.rowspan)
-                    root.rows.forEach(e => {
-                        addContext(e, root)
-                    })
-                    break
-            }
-        },
+        }
     }
     Object.defineProperty(node, 'context', {
         value: context,
