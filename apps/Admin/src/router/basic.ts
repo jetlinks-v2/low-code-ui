@@ -69,12 +69,12 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
       title: '测试页'
     }
   },
-    {
-    path: '/preview/:id',
+  {
+    path: '/preview/:project/:module/:id/:type/:sid',
     name: 'Preview',
     meta: {
       title: '预览',
     },
-    component: () => import('@/components/ListPage/Preview/index.vue'),
+    component: () => import('@/views/preview/index.vue'),
   },
 ]

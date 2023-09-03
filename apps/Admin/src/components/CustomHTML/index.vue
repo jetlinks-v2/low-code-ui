@@ -8,7 +8,10 @@ import { debounce } from './utils'
 import MonacoEditor from './editor/MonacoEditor.vue'
 import { ReplStore } from './store'
 import 'splitpanes/dist/splitpanes.css'
-import { useAllListDataStore } from '@/store/listForm'
+import { useProduct } from '@/store/product'
+import { storeToRefs } from 'pinia'
+import { useEngine } from '@/store/engine'
+import { onlyMessage } from '@jetlinks/utils'
 
 const props = defineProps({
   data: {
@@ -17,7 +20,10 @@ const props = defineProps({
   },
 })
 
-const store = new ReplStore()
+const engineStore = useEngine()
+const productStore = useProduct()
+const { files, activeFile } = storeToRefs(engineStore)
+const store = new ReplStore(files.value[activeFile.value]?.configuration?.code)
 const vueMode = ref(true)
 store.init()
 
@@ -29,8 +35,6 @@ enum OperType {
   View = 'view',
   Menu = 'menu',
 }
-
-const allListDataStore = useAllListDataStore()
 
 const onChange = debounce((code: string) => {
   store.state.activeFile.code = code
@@ -47,24 +51,28 @@ const handleDbClickViewName = () => {
 const activeOper = ref('')
 const menuListRef = ref()
 const menuFormData = ref({ pageName: '', main: true, name: '', icon: '' })
-const handleOperClick = (type: OperType) => {
-  if (type === OperType.Menu && drawerVisible.value) {
-    const vaild = menuListRef.value?.vaildate()
-    console.log(vaild)
-  }
-  if (type === activeOper.value) {
-    drawerVisible.value = !drawerVisible.value
-  } else {
-    drawerVisible.value = true
-  }
-  activeOper.value = type
-  $drawerWidth.value = '50%'
-  if (type === OperType.View) {
-    drawerTitle.value = '预览'
-  } else if (type === OperType.Menu) {
-    drawerTitle.value = '菜单配置'
-  }
-  !drawerVisible.value && (activeOper.value = '')
+const menuChangeValue = ref()
+const errors = ref([] as any)
+const handleOperClick = async (type: OperType) => {
+  await nextTick(async () => {
+    const vaild = await menuListRef.value?.vaildate()
+    if (vaild?.errorFields?.length > 0) {
+      errors.value = vaild.errorFields ?? []
+    }
+    if (type === activeOper.value) {
+      drawerVisible.value = !drawerVisible.value
+    } else {
+      drawerVisible.value = true
+    }
+    activeOper.value = type
+    $drawerWidth.value = '50%'
+    if (type === OperType.View) {
+      drawerTitle.value = '预览'
+    } else if (type === OperType.Menu) {
+      drawerTitle.value = '菜单配置'
+    }
+    !drawerVisible.value && (activeOper.value = '')
+  })
 }
 
 const previewRef = ref()
@@ -80,9 +88,30 @@ const runCode = () => {
   })
 }
 
+const handleVaild = () => {
+  if (errors.value.length > 0) {
+    onlyMessage(errors.value[0].errors[0], 'error')
+  }
+  productStore.update({
+    ...props.data,
+    configuration: {
+      type: 'html',
+      code: store.state.activeFile.code,
+    },
+  })
+}
+
+watch(menuChangeValue, (val) => {
+  productStore.update({
+    ...props.data,
+    others: {
+      ...props.data.others,
+      menu: val,
+    },
+  })
+})
+
 onMounted(() => {
-  menuFormData.value =
-    allListDataStore.getALLlistDataInfo(props.data?.id)?.menu || {}
   menuFormData.value.pageName = props.data?.title || ''
 })
 </script>
@@ -91,12 +120,22 @@ onMounted(() => {
   <div class="jetlinks-repl">
     <SplitPane class="split-pane">
       <template #editor>
-        <EditorContainer title="代码编辑">
+        <EditorContainer>
           <MonacoEditor
             @change="onChange"
             :filename="store.state.activeFile.filename"
             :value="store.state.activeFile.code"
           />
+          <template #title>
+            <div style="margin-right: 10px">代码编辑</div>
+            <j-button
+              type="primary"
+              size="small"
+              @click.stop="handleVaild"
+              @dblclick.stop
+              >校验</j-button
+            >
+          </template>
         </EditorContainer>
       </template>
       <template #console>
@@ -129,6 +168,7 @@ onMounted(() => {
         <div class="drawer-title" @dblclick="handleDbClickViewName">
           {{ drawerTitle }}
           <j-button
+            v-if="activeOper === OperType.View"
             type="primary"
             size="small"
             @click.stop="runCode"
@@ -144,6 +184,7 @@ onMounted(() => {
           v-else-if="activeOper === OperType.Menu"
           ref="menuListRef"
           :form-data="menuFormData"
+          @update:form="(newValue) => (menuChangeValue = newValue)"
         />
       </div>
     </div>

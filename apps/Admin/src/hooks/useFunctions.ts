@@ -1,6 +1,6 @@
-import { useProduct } from "@/store";
-import { queryCommand } from "@/api/project";
-import { providerEnum } from "@/components/ProJect";
+import { useProduct } from '@/store'
+import { queryCommand } from '@/api/project'
+import { providerEnum } from '@/components/ProJect'
 
 type CommandType = {
   id: string
@@ -13,11 +13,18 @@ export const useFunctions = () => {
   const functionOptions = ref<Draft.Function[]>([])
   const commandOptions = ref<CommandType[]>([])
   const pages = ref<Draft.Resource[]>([])
-  const productStore = useProduct();
+  const productStore = useProduct()
   const { data } = productStore
-  
+
   productStore.getDataMap()?.forEach((value) => {
-    if([providerEnum.Function, providerEnum.CRUD, providerEnum.SQL].includes(value.type)) {
+    if (
+      [
+        providerEnum.Function,
+        providerEnum.HtmlPage,
+        providerEnum.CRUD,
+        providerEnum.SQL,
+      ].includes(value.type)
+    ) {
       functionOptions.value.push(value)
     }
   })
@@ -27,18 +34,18 @@ export const useFunctions = () => {
    * @param functionId 功能id
    */
   const handleFunction = async (functionId: string) => {
-    commandOptions.value = [];
+    commandOptions.value = []
     const params = {
       modules: [
-          {
+        {
           id: data?.[0].id,
           name: data?.[0].name,
-          functions: [productStore.getById(functionId)]
-        }
-      ]
+          functions: [productStore.getById(functionId)],
+        },
+      ],
     }
     const res = await queryCommand(params)
-    if(res.success) {
+    if (res.success) {
       commandOptions.value = res.result?.[0]?.command
     }
   }
