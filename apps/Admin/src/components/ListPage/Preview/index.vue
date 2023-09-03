@@ -70,8 +70,7 @@
     />
   </div>
 </template>
-<script setup lang="ts">
-import { useAllListDataStore } from '@/store/listForm'
+<script setup lang="ts" name="Preview">
 import ProTable from '@/components/ListPage/Preview/components/TableModel.vue'
 import dayjs from 'dayjs'
 import Import from './components/Import.vue'
@@ -87,15 +86,19 @@ const props = defineProps({
   id: {
     type: null,
   },
+  data: {
+    type: String,
+    default: '{}'
+  }
 })
 const emits = defineEmits()
 const importVisible = ref<boolean>(false)
 const exportVisible = ref<boolean>(false)
 const addVisible = ref<boolean>(false)
 
-const id = props.id
-const listDataStore = useAllListDataStore()
-const allData = ref<any>({})
+const allData = computed(() => {
+  return JSON.parse(props.data || '{}')
+})
 const jsonData = ref<any>({
   previewVisible: false,
   value: {},
@@ -106,70 +109,7 @@ const typeChangeShow = ref(false)
 //操作按钮
 const actions = ref([])
 //table头部按钮
-const headerActions = ref([
-  {
-    key: 'view',
-    text: '查看',
-    icon: 'EyeOutlined',
-    type: 'primary',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '查看',
-      },
-      hasPermission: false,
-
-      onClick: (e) => {
-        console.log(data, 'data')
-        // handleView(data.id)
-      },
-    }),
-  },
-  {
-    key: 'view1',
-    text: '查看1',
-    icon: 'FormOutlined',
-    type: 'primary',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '查看',
-      },
-      hasPermission: false,
-
-      onClick: (e) => {
-        console.log(data)
-        // handleView(data.id)
-      },
-    }),
-  },
-  {
-    key: 'view2',
-    text: '查看2',
-    type: 'dashed',
-    icon: 'HeatMapOutlined',
-  },
-
-  {
-    key: 'delete',
-    text: '删除',
-    icon: 'DeleteOutlined',
-    type: 'primary',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '删除',
-      },
-      popConfirm: {
-        title: data?.status === 'error' ? '禁用' : '确认删除？',
-        onConfirm: () => {
-          console.log(data, 'onConfirm')
-        },
-      },
-      hasPermission: true,
-      // onClick: () => {
-      //   handleView(data.id)
-      // },
-    }),
-  },
-])
+const headerActions = ref([])
 //卡片样式
 const cardConfig = ref({
   customIcon: '',
@@ -202,7 +142,7 @@ const pagingData = () => {
 }
 //table头部
 const tableHeader = () => {
-  const cloumn = allData.value?.datasource || []
+  const cloumn = allData.value?.dataSource || []
   dataColumns.value = cloumn?.map((item: any, index: number) => {
     return {
       title: item.name,
@@ -259,6 +199,7 @@ const componentPropsSwitch = (item: any) => {
 //筛选search
 const searchData = () => {
   const cloumnS = allData.value?.searchData || []
+  console.log(`output->cloumnS`,cloumnS)
   searchColumns.value = cloumnS?.map((item: any) => {
     const placeholder = item.type === 'date' ? '请选择' : '请输入'
     const componentProps = componentPropsSwitch(item) || {}
@@ -284,7 +225,7 @@ const typeData = () => {
   model.value =
     showType.configured?.length === 2
       ? showType.defaultForm
-      : showType.configured[0]
+      : showType.configured?.[0]
 }
 
 const typeChange = (e: any) => {
@@ -332,12 +273,13 @@ const actionsBtnFormat = (data: any) => {
 }
 //表头按钮
 const handleHeaderActions = () => {
-  const btnData = listDataStore.getALLlistDataInfo(id)?.addButton || []
+  const btnData = allData.value?.addButton || []
+  console.log(`output->btnData`,btnData)
   headerActions.value = actionsBtnFormat(btnData)
 }
 //table操作按钮
 const handleRowActions = () => {
-  const btnData = listDataStore.getALLlistDataInfo(id)?.actionsButton || []
+  const btnData = allData.value?.actionsButton || []
   actions.value = actionsBtnFormat(btnData)
 }
 //table数据
@@ -391,7 +333,24 @@ const back = () => {
 }
 
 onMounted(() => {
-  allData.value = listDataStore.getALLlistDataInfo(id)
+  // allData.value = listDataStore.getALLlistDataInfo(id)
+  // //分页
+  // pagingData()
+  // //卡片样式
+  // cardConfig.value = allData.value?.listFormInfo || {}
+  // //列表头部
+  // tableHeader()
+  // //筛选search
+  // searchData()
+  // //table形态选择
+  // typeData()
+  // //table头部按钮
+  // handleHeaderActions()
+  // //table操作按钮
+  // handleRowActions()
+})
+watch(() => JSON.stringify(allData.value), () => {
+  console.log(`output->allData.value`,allData.value)
   //分页
   pagingData()
   //卡片样式
@@ -406,7 +365,7 @@ onMounted(() => {
   handleHeaderActions()
   //table操作按钮
   handleRowActions()
-})
+}, { immediate: true })
 </script>
 <style lang="less" scoped>
 .list-form-preview {
@@ -414,7 +373,7 @@ onMounted(() => {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 9999;
+  z-index: 999;
   height: 100vh;
   width: 100vw;
 }

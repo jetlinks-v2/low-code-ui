@@ -74,7 +74,7 @@
           <ErrorItem :errorData="errorMessage['pages']">
             <j-select v-model:value="form.pages" placeholder="请选择调用页面">
               <j-select-option
-                v-for="item in pages"
+                v-for="item in pagesOptions"
                 :value="item.id"
                 :key="item.id"
               >
@@ -120,7 +120,8 @@ const activeBtn = inject(activeBtnKey)
 const editType = inject(editTypeKey)
 const errorList = inject(errorListKey)
 
-const { functionOptions, commandOptions, pages, handleFunction } = useFunctions()
+const productStore = useProduct();
+const { functionOptions, commandOptions, handleFunction } = useFunctions()
 const errorMessage = computed(() => {
   let data = {}
   let result = errorList!.value?.filter(
@@ -132,6 +133,16 @@ const errorMessage = computed(() => {
     })
   }
   return data
+})
+
+const pagesOptions = computed(() => {
+  let arr: any[] = [];
+  productStore.getDataMap()?.forEach((value) => {
+    if(value.type === providerEnum.HtmlPage || value.type === providerEnum.FormPage) {
+      arr.push(value)
+    }
+  })
+  return arr;
 })
 
 const iconType = computed(() => {

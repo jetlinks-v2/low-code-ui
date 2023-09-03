@@ -9,7 +9,7 @@
         :popConfirm="handleFunction(item.permissionProps)?.popConfirm"
         v-if="item?.children?.length === 0"
       >
-        <!-- <AIcon v-if="item.icon" :type="item?.icon" /> -->
+        <AIcon v-if="item.icon" :type="item?.icon" />
         {{ item?.text }}
       </PermissionButton>
 
@@ -35,7 +35,7 @@
                 
                 "
               >
-                <!-- <AIcon v-if="item.icon" :type="item?.icon" /> -->
+                <AIcon v-if="child.icon" :type="child?.icon" />
                 {{ child?.text }}
               </PermissionButton>
             </j-menu-item>

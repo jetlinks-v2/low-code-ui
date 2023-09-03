@@ -112,6 +112,7 @@
 import { onlyMessage } from '@/utils/comm'
 import { ErrorItem } from '../..'
 import type { PropType } from 'vue'
+import { DATA_BIND } from '../../keys';
 const props = defineProps({
   title: {
     type: String,
@@ -165,7 +166,7 @@ const props = defineProps({
       {
         value: '1',
         label: '覆盖',
-        subLabel: '以功能下的数据覆盖页面已有内容',
+        subLabel: '以下功能的数据覆盖页面已有内容',
       },
       {
         value: '2',
@@ -192,7 +193,7 @@ const props = defineProps({
 })
 const tableRef = ref()
 const visible = ref<boolean>(false)
-
+const dataBinds: any = inject(DATA_BIND)
 const loading = ref<boolean>(false)
 const emit = defineEmits([
   'configuration',
@@ -338,13 +339,22 @@ const syncData = async () => {
     bindShow.value = false
     return onlyMessage('请先完成数据绑定', 'error')
   }
-  if (!asyncData.value) {    
-    emit('bindData', props.dataSource)
+  if (!asyncData.value) {  
+    emit('bindData', props.dataSource.length ? props.dataSource : dataBinds.functionInfo?.configuration?.columns?.map(
+      (item) => {
+        return {
+          id: item.name,
+          name: item.name,
+          type: 'string',
+        }
+      },
+    ))
     bindShow.value = true
     asyncData.value = true
   } else {
     const data = await tableRef.value?.getData()
-    if (data?.length !== props.dataSource?.length || props.configChange) {
+    // if (data?.length !== props.dataSource?.length || props.configChange) {
+    if (JSON.stringify(data) !== JSON.stringify(props.dataSource)) {
       openModel(props.modelActiveKey)
     } else {
       onlyMessage('已是最新数据', 'success')

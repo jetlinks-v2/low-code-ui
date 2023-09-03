@@ -1,7 +1,7 @@
 export const validMenu = (data: any) => {
   if(!data) return []
   let errorList: any = [];
-  if(data.systemMenu) {
+  if(data.main) {
     if(data?.name === '') {
       errorList.push({
         key: 'name',

@@ -19,7 +19,6 @@
 <script setup lang="ts">
 import Menu from '@/components/ListPage/MenuConfig/components/menu.vue'
 import { validMenu } from './utils/valid'
-import { useAllListDataStore } from '@/store/listForm'
 import { MENU_CONFIG } from '../keys';
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -36,7 +35,6 @@ const props = defineProps({
     default: '',
   },
 })
-const configurationStore = useAllListDataStore()
 const menConfig = inject(MENU_CONFIG)
 const open = computed({
   get() {
@@ -49,11 +47,6 @@ const open = computed({
 const subValue = ref({})
 const menuRef = ref()
 const formData = ref({ pageName: '', main: true, name: '', icon: '' })
-onMounted(() => {
-  formData.value =
-    configurationStore.getALLlistDataInfo(props.data?.id)?.menu || {}
-  formData.value.pageName = props.data?.title || ''
-})
 
 const errorList = ref<any[]>([])
 const valid = () => {
@@ -67,16 +60,4 @@ defineExpose({
   errorList,
   valid
 })
-watch(
-  () => props.data,
-  (val) => {
-    formData.value.pageName = val.title || ''
-  },
-)
-watch(
-  () => subValue.value,
-  (val) => {
-    configurationStore.setALLlistDataInfo('menu', val, props.id)
-  },
-)
 </script>

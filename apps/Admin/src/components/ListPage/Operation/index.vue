@@ -61,10 +61,6 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  initData: {
-    type: Object as PropType<OperationConfigTreeItem[]>,
-    default: () => []
-  },
   columnsTree: {
     type: Object as PropType<OperationConfigTreeItem[]>,
     default: () => []
@@ -117,11 +113,6 @@ const valid = async () => {
   })
 }
 
-watchEffect(() => {
-  if(props.initData) {
-    columnsTree.value = props.initData
-  }
-})
 
 provide(activeBtnKey, activeBtn)
 provide(columnsTreeKey, columnsTree)

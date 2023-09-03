@@ -3,6 +3,7 @@
     <Preview
       :show="showPreview"
       :id="props.data.id"
+      :data="props.data?.configuration?.code"
       @back="() => (showPreview = false)"
     />
     <DataBind
@@ -76,8 +77,7 @@ import MenuConfig from './MenuConfig/index.vue'
 import ListSkeleton from './ListSkeleton/index.vue'
 import OperationColumns from './Operation/index.vue'
 import Preview from './Preview/index.vue'
-import { useAllListDataStore } from '@/store/listForm'
-import { DATA_BIND, BASE_INFO, MENU_CONFIG, SHOW_TYPE_KEY, LIST_PAGE_DATA_KEY } from './keys'
+import { DATA_BIND, BASE_INFO, MENU_CONFIG, SHOW_TYPE_KEY, LIST_PAGE_DATA_KEY, LIST_FORM_INFO, DATA_SOURCE } from './keys'
 import { useProduct } from '@/store'
 import { debounce } from 'lodash-es'
 
@@ -87,7 +87,6 @@ const props = defineProps({
     default: () => {},
   },
 })
-const configurationStore = useAllListDataStore()
 const productStore = useProduct()
 
 const showPreview = ref(false)
@@ -208,13 +207,10 @@ const configDone = computed(() => {
   return {
     btn: buttonsConfig.value?.length,
     actions: actionsConfig.value?.length,
-    filterModule: configurationStore.getALLlistDataInfo(props.data.id)
-      ?.searchData?.length,
-    listData: configurationStore.getALLlistDataInfo(props.data.id)?.datasource
-      ?.length,
-    pagination: configurationStore.getALLlistDataInfo(props.data.id)?.pagingData
-      ?.length,
-    ListForm: configurationStore.getALLlistDataInfo(props.data.id)?.showType,
+    filterModule: searchData.value?.length,
+    listData: dataSource.value?.length,
+    pagination: pagingData.value?.length,
+    ListForm: listFormInfo
   }
 })
 
@@ -231,6 +227,8 @@ provide(BASE_INFO, props.data)
 provide(SHOW_TYPE_KEY, showType)
 provide(MENU_CONFIG, menuConfig)
 provide(LIST_PAGE_DATA_KEY, listPageData)
+provide(LIST_FORM_INFO, listFormInfo)
+provide(DATA_SOURCE, dataSource)
 // watch(
 //   () => buttonsConfig.value,
 //   () => {
@@ -259,13 +257,17 @@ provide(LIST_PAGE_DATA_KEY, listPageData)
 onMounted(() => {
   visibles.GuideVisible = !props.data.configuration?.code
   const initData = JSON.parse(props.data.configuration?.code || '{}')
-  Object.assign(dataBind, initData?.dataBind)
-  Object.assign(showType, initData?.showType)
-  Object.assign(menuConfig, initData?.menu)
-  pagingData.value = initData?.pagingData
-  buttonsConfig.value = initData?.addButton
-  actionsConfig.value = initData?.actionsButton
-  console.log(initData?.addButton, initData?.actionsButton);
+  if(initData) {
+    Object.assign(dataBind, initData?.dataBind)
+    Object.assign(showType, initData?.showType)
+    Object.assign(menuConfig, initData?.menu)
+    Object.assign(listFormInfo, initData?.listFormInfo)
+    pagingData.value = initData?.pagingData || []
+    buttonsConfig.value = initData?.addButton || []
+    actionsConfig.value = initData?.actionsButton || []
+    searchData.value = initData?.searchData || []
+    dataSource.value = initData?.dataSource || []
+  }
   setTimeout(() => {
     watch(
       () => JSON.stringify(listPageData.value),
@@ -280,6 +282,7 @@ onMounted(() => {
           others: {
             ...props?.data?.others,
             menu: menuConfig,
+            userList: [...actionsConfig.value.filter(item => item.pages && item.pages !== '')?.map(item => item.pages)]
           },
         }
         onSave(record)

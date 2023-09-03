@@ -62,15 +62,16 @@
 </template>
 
 <script lang="ts" setup>
-import { useAllListDataStore } from '@/store/listForm'
 import Card from '@/components/ListPage/ListForm/components/card.vue'
 import { cloneDeep } from 'lodash-es'
 import { validListForm } from './utils/valid'
+import { LIST_FORM_INFO, SHOW_TYPE_KEY } from '../keys';
+import { PropType } from 'vue';
 
 interface Emit {
   (e: 'update:open', value: boolean): void
+  (e: 'update:listFormInfo', value: any): void
 }
-const configurationStore = useAllListDataStore()
 
 const emits = defineEmits<Emit>()
 const props = defineProps({
@@ -81,14 +82,24 @@ const props = defineProps({
   id: {
     type: null,
   },
+  listFormInfo: {
+    type: Object as PropType<Record<string, any>>,
+    default: () => {}
+  }
 })
 
+const listFormInfo = computed({
+  get() {
+    return props.listFormInfo
+  },
+  set(val) {
+    emits('update:listFormInfo', val)
+  }
+})
 const open = computed({
   get() {
     if (props.open) {
-      const data = cloneDeep(
-        configurationStore.getALLlistDataInfo(props.id)?.showType,
-      )
+      const data = showType!
       state.type = data.type
       state.configured = data.configured
       state.defaultForm = data.defaultForm
@@ -120,6 +131,8 @@ const state = reactive({
   configurationShow: false,
   defaultForm: 'list',
 })
+
+const showType = inject(SHOW_TYPE_KEY)
 //卡片配置返回
 const back = () => {
   state.configurationShow = false
@@ -130,9 +143,7 @@ const cancel = () => {
     back()
   } else {
     if (props.open) {
-      const data = cloneDeep(
-        configurationStore.getALLlistDataInfo(props.id)?.showType,
-      )
+      const data = cloneDeep(showType!)
       state.configurationShow = false
       state.type = data.type
       state.configured = data.configured
@@ -146,13 +157,12 @@ const submit = async () => {
   let data: any = {}
   const vaildate = await cardRef.value?.vaildate()
   if (vaildate && state.configurationShow) {
-    data = { ...configurationStore.getALLlistDataInfo(props.id)?.listFormInfo }
-
     state.configurationShow = false
   } else if (!state.configurationShow) {
     open.value = false
-    delete state.configurationShow
-    configurationStore.setALLlistDataInfo('showType', state, props.id)
+    delete showType.configurationShow
+    Object.assign(showType!, state)
+    Object.assign(listFormInfo.value, vaildate)
   }
   data.type = state.type
 }
@@ -173,7 +183,7 @@ const configuredChange = (value: string) => {
 const errorList = ref<any[]>([])
 const valid = () => {
   return new Promise((resolve, reject) => {
-    errorList.value = validListForm(state, configurationStore.getALLlistDataInfo(props.id)?.listFormInfo)
+    errorList.value = validListForm(state,listFormInfo.value)
     if(errorList.value.length) reject(errorList.value)
     else resolve([])
   })

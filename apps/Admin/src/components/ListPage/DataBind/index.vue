@@ -57,11 +57,9 @@ import { ErrorItem } from '../index'
 import { DATA_BIND } from '../keys'
 import { validDataBind } from './utils/valid'
 import { useFunctions } from '@/hooks/useFunctions'
-import { useAllListDataStore } from '@/store/listForm'
 
 const { functionOptions, commandOptions, handleFunction } = useFunctions()
 
-const configurationStore = useAllListDataStore();
 
 const visible = ref(false)
 const handleValid = () => {
@@ -135,7 +133,6 @@ onMounted(() => {
   }
 })
 watch(() => JSON.stringify(dataBind), () => {
-  configurationStore.setALLlistDataInfo('dataBind', dataBind, props.id)
   if(dataBind.data.function) {
     handleChangeFunction(dataBind.data.function)
   }

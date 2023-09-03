@@ -171,11 +171,13 @@
 <script lang="ts" setup>
 import Table from '@/components/ListPage/FilterModule/components/FilterTable.vue'
 import Config from '@/components/ListPage/ListData/components/Configuration.vue'
-import { useAllListDataStore } from '@/store/listForm'
 import { DATA_BIND } from '../keys'
+import { validListData } from './utils/valid'
+import { PropType } from 'vue'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
+  (e: 'update:dataSource', value: any): void
 }
 
 const emits = defineEmits<Emit>()
@@ -187,6 +189,10 @@ const props = defineProps({
   id: {
     type: null,
   },
+  dataSource: {
+    type: Array as PropType<Record<string, any>[]>,
+    default: () => {}
+  }
 })
 
 const open = computed({
@@ -200,7 +206,6 @@ const open = computed({
 const show = ref(false)
 const title = ref('请配置数据列表需要展示的表头')
 const addBtnName = ref('新增表头')
-const configurationStore = useAllListDataStore()
 const subValue = ref({})
 const configState = reactive({
   type: '',
@@ -386,7 +391,14 @@ const columns: any = [
 ]
 //数据
 const dataBinds: any = inject(DATA_BIND)
-const dataSource = ref([])
+const dataSource = computed({
+  get() {
+    return props.dataSource
+  },
+  set(val) {
+    emits('update:dataSource', val)
+  }
+})
 //新增一列table
 const handleAdd = async (table: any) => {
   table?.addItem({
@@ -416,6 +428,9 @@ const handleOk = (value: any, data: any) => {
   let source: any = []
   switch (value) {
     case '1':
+      source = data
+      break
+    case '2':
       if (configChange.value) {
         data?.map((item: any) => {
           const dataFind = dataSource.value?.find(
@@ -432,10 +447,6 @@ const handleOk = (value: any, data: any) => {
           }
         })
       }
-
-      break
-    case '2':
-      source = data
       break
     case '3':
       source = dataSource.value?.map((item) => {
@@ -450,15 +461,10 @@ const handleOk = (value: any, data: any) => {
 
   dataSource.value = source
   configChange.value = false
-  configurationStore.setALLlistDataInfo(
-    'datasource',
-    dataSource.value,
-    props.id,
-  )
 }
 //点击显示table的同步数据
 const bindData = (data: any) => {
-  configurationStore.setALLlistDataInfo('datasource', data, props.id)
+  dataSource.value = data
 }
 const typeDataFilter = (value: string) => {
   let data = {}
@@ -537,22 +543,37 @@ watch(
       dataBind.value = true
     } else {
       dataBind.value = false
+      dataSource.value = [];
     }
-    dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(
-      (item) => {
-        return {
-          id: item.name,
-          name: item.name,
-          type: 'string',
-        }
-      },
-    )
   },
   { immediate: true, deep: true },
 )
 
+// watch(() => [JSON.stringify(props.dataSource), JSON.stringify(dataBinds)], () => {
+//   if(!props.dataSource.length && dataBinds?.functionInfo?.configuration?.columns) {
+//     dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(
+//       (item) => {
+//         console.log(`output->item`,item)
+//         return {
+//           id: item.name,
+//           name: item.name,
+//           type: 'string',
+//         }
+//       },
+//     ) || []
+//   }
+// }, {immediate: true})
+
+const valid = () => {
+  return new Promise((resolve) => {
+    errorList.value = validListData(dataSource.value);
+    if(errorList.value.length) throw errorList.value
+    else resolve(errorList.value)
+  })
+}
 defineExpose({
   errorList,
+  valid
 })
 </script>
 
