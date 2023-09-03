@@ -12,7 +12,6 @@ type CommandType = {
 export const useFunctions = () => {
   const functionOptions = ref<Draft.Function[]>([])
   const commandOptions = ref<CommandType[]>([])
-  const pages = ref<Draft.Resource[]>([])
   const productStore = useProduct();
   const { data } = productStore
   
@@ -32,7 +31,7 @@ export const useFunctions = () => {
       modules: [
           {
           id: data?.[0].id,
-          name: data?.[0].name,
+          name: data?.[0].title,
           functions: [productStore.getById(functionId)]
         }
       ]
@@ -45,7 +44,6 @@ export const useFunctions = () => {
   return {
     functionOptions,
     commandOptions,
-    pages,
     handleFunction,
   }
 }
