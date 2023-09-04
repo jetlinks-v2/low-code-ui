@@ -74,15 +74,15 @@
                   }"
                   @click="handleVisible('ListFormVisible')"
                 >
-                  <j-skeleton-input style="width: 32px" />
-                  <j-skeleton-input style="width: 32px" />
+                  <j-skeleton-input class="width-32" />
+                  <j-skeleton-input class="width-32" />
                 </j-space>
               </j-badge>
             </j-col>
           </j-row>
           <j-row
             :gutter="20"
-            style="height: 60%; overflow: hidden; padding: 20px"
+            class="table-skeleton-row"
           >
             <j-col :span="20">
               <j-badge :count="errorCount?.listData" style="width: 100%" :numberStyle="{
@@ -282,6 +282,14 @@ watchEffect(() => {
   display: flex;
   .mb-50 {
     margin-bottom: 50;
+  }
+  .width-32 {
+    width: 32px;
+  }
+  .table-skeleton-row {
+    height: 60%; 
+    overflow: hidden; 
+    padding: 20px
   }
   .left-menu {
     background-color: #ffffff;
