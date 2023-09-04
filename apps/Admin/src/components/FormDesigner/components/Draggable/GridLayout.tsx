@@ -5,6 +5,7 @@ import { Col } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
 import { cloneDeep } from 'lodash-es'
+import { addContext } from '../../utils/addContext'
 
 export default defineComponent({
     name: 'GridLayout',
@@ -33,20 +34,23 @@ export default defineComponent({
         const list = computed(() => {
             return props.data?.children || []
         })
-        
+
         const handleAdd = () => {
+            if (!props.data?.context) {
+                addContext(props.data, props.parent)
+            }
             props.data.context?.appendItem()
-            const addData = unref(list).slice(-1)
-            designer.setSelection(addData)
+            designer.setSelection(props.data)
         }
 
         const isEditModel = computed(() => {
             return unref(designer?.model) === 'edit'
         })
+
         return () => {
             const _path = cloneDeep(props?.path || []);
             const _index = props?.index || 0;
-            if(props.data?.formItemProps?.name) {
+            if (props.data?.formItemProps?.name) {
                 _path[_index] = props.data.formItemProps.name || ''
             }
             return (
@@ -55,7 +59,7 @@ export default defineComponent({
                         {
                             unref(list).map((element) => {
                                 return (
-                                    <Col key={element.key} {...element.componentProps}>
+                                    <Col key={element.key} {...element.componentProps} span={24 / (props.data.componentProps?.inlineMax || 1)}>
                                         <Selection
                                             class={'drag-area'}
                                             hasDel={unref(list).length > 1}

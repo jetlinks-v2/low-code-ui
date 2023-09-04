@@ -34,7 +34,7 @@ const props = defineProps({
   }
 })
 
-const emits = defineEmits(['update:value'])
+const emits = defineEmits(['update:value', 'change'])
 const visible = ref<boolean>(false)
 const _value = ref<string>()
 
@@ -48,6 +48,7 @@ const onBtn = () => {
 
 const handleOk = () => {
   emits('update:value', _value.value)
+  emits('change', _value.value)
   visible.value = false
 }
 </script>
