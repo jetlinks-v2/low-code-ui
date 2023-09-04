@@ -41,5 +41,5 @@ export const queryEndCommands = (id: string) => request.post(`/low-code/editor/$
 /**
  * 执行功能命令
  */
-export const queryRuntime = (projectId: string, functionId: string, commandId: string, data: any) => request.post(`/low-code/runtime/${projectId}/${functionId}/${commandId}`, data)
+export const queryRuntime = (projectId: string, functionId: string, commandId: string, data?: any, ) => request.post(`/low-code/runtime/${projectId}/${functionId}/${commandId}`, data)
 
