@@ -2,10 +2,7 @@ import { uid } from "./uid"
 import componentMap from "./componentMap"
 import { ISchema } from "../typings"
 import { queryDictionaryData, queryRuntime } from "@/api/form"
-import { useProduct } from "@/store/product"
 import { isObject } from "lodash-es"
-
-const product = useProduct()
 
 export const checkIsField = (node: any) => node?.type && (componentMap?.[node?.type]) || ['table'].includes(node?.type)
 
@@ -31,7 +28,7 @@ const checkedConfigItem = (node: ISchema) => {
     if (_type === 'root') {
         return false
     } else {
-        if (['text'].includes(_type) && !(node?.formItemProps?.name)) {
+        if (['text'].includes(_type) && !(node?.componentProps?.value && node?.formItemProps?.name)) {
             return node?.key
         }
         if (arr.includes(_type)) {
@@ -40,6 +37,13 @@ const checkedConfigItem = (node: ISchema) => {
             } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
                 return node?.key
             }
+        }
+        if('input-number' && !(node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined && node?.componentProps?.precision !== undefined)) {
+            return node?.key
+        }
+        if (['select', 'tree-select', 'select-card'].includes(_type)) {
+            // 数据源
+            // return node?.key
         }
         if ('upload' && !(node?.componentProps?.maxCount && node?.componentProps?.size)) {
             // 个数和单位
@@ -182,7 +186,7 @@ const getData = (key: string, obj: any) => {
 }
 
 // 获取options
-export const queryOptions = async (source: any) => {
+export const queryOptions = async (source: any, id: string) => {
     if (source?.type === 'dic' && source?.dictionary) {
         const resp = await queryDictionaryData(source?.dictionary)
         if (resp.success) {
@@ -194,8 +198,8 @@ export const queryOptions = async (source: any) => {
             })
         }
     }
-    if (product.info?.id && source?.type === 'end' && source?.functionId && source?.commandId && source?.label && source?.value) {
-        const resp = await queryRuntime(product.info?.id, source?.functionId, source?.commandId)
+    if (id && source?.type === 'end' && source?.functionId && source?.commandId && source?.label && source?.value) {
+        const resp = await queryRuntime(id, source?.functionId, source?.commandId)
         if (resp.success) {
             const arr = getData(source?.source, resp?.result || {})
             if (Array.isArray(arr) && arr?.length) {
