@@ -315,6 +315,9 @@ const onResize = debounce((e) => {
         border: 1px solid #e6e6e6;
         color: #2f54eb;
       }
+      :deep(.ant-tooltip-disabled-compatible-wrapper){
+        width: 100%;
+      }
 
       &.delete {
         width: 60px;

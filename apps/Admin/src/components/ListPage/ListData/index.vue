@@ -20,9 +20,11 @@
         :show="show"
         :asyncData="asyncData"
         :configChange="configChange"
+        :errorList="errorList"
         @handleAdd="handleAdd"
         @configuration="configuration"
         @handleOk="handleOk"
+        @bindData="bindData"
       />
       <div v-else>
         <a-page-header title="表头配置" sub-title="" @back="goBack">
@@ -78,9 +80,9 @@
               <!--object类型-->
 
               <j-radio-group
+                v-if="configState.type === 'object'"
                 v-model:value="configState.demonstrations"
                 button-style="solid"
-                v-if="configState.type === 'object'"
               >
                 <j-space size="large">
                   <j-radio-button value="json" class="check-btn">
@@ -169,11 +171,13 @@
 <script lang="ts" setup>
 import Table from '@/components/ListPage/FilterModule/components/FilterTable.vue'
 import Config from '@/components/ListPage/ListData/components/Configuration.vue'
-import { useAllListDataStore } from '@/store/listForm'
 import { DATA_BIND } from '../keys'
+import { validListData } from './utils/valid'
+import { PropType } from 'vue'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
+  (e: 'update:dataSource', value: any): void
 }
 
 const emits = defineEmits<Emit>()
@@ -185,6 +189,10 @@ const props = defineProps({
   id: {
     type: null,
   },
+  dataSource: {
+    type: Array as PropType<Record<string, any>[]>,
+    default: () => {}
+  }
 })
 
 const open = computed({
@@ -198,11 +206,9 @@ const open = computed({
 const show = ref(false)
 const title = ref('请配置数据列表需要展示的表头')
 const addBtnName = ref('新增表头')
-const configurationStore = useAllListDataStore()
 const subValue = ref({})
 const configState = reactive({
   type: '',
-
   demonstrations: 'json', //object类型
   dateValue: '', //date类型
   inputValue: '', //int/long/text/float/double类型
@@ -385,7 +391,14 @@ const columns: any = [
 ]
 //数据
 const dataBinds: any = inject(DATA_BIND)
-const dataSource = ref()
+const dataSource = computed({
+  get() {
+    return props.dataSource
+  },
+  set(val) {
+    emits('update:dataSource', val)
+  }
+})
 //新增一列table
 const handleAdd = async (table: any) => {
   table?.addItem({
@@ -415,6 +428,9 @@ const handleOk = (value: any, data: any) => {
   let source: any = []
   switch (value) {
     case '1':
+      source = data
+      break
+    case '2':
       if (configChange.value) {
         data?.map((item: any) => {
           const dataFind = dataSource.value?.find(
@@ -431,30 +447,24 @@ const handleOk = (value: any, data: any) => {
           }
         })
       }
-
-      break
-    case '2':
-      source = data
       break
     case '3':
       source = dataSource.value?.map((item) => {
         return {
-          id: item.name,
-          name: item.name,
-          type: item.type,
+          id: item?.id,
+          name: item?.name,
+          type: item?.type,
         }
       })
       break
   }
-  console.log(source, dataSource.value)
 
   dataSource.value = source
   configChange.value = false
-  configurationStore.setALLlistDataInfo(
-    'datasource',
-    dataSource.value,
-    props.id,
-  )
+}
+//点击显示table的同步数据
+const bindData = (data: any) => {
+  dataSource.value = data
 }
 const typeDataFilter = (value: string) => {
   let data = {}
@@ -523,6 +533,7 @@ const goBack = () => {
   show.value = true
   dataBind.value = true
   asyncData.value = true
+  configChange.value = false
 }
 const errorList = ref([])
 watch(
@@ -532,22 +543,37 @@ watch(
       dataBind.value = true
     } else {
       dataBind.value = false
+      dataSource.value = [];
     }
-    dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(
-      (item) => {
-        return {
-          id: item.name,
-          name: item.name,
-          type: 'string',
-        }
-      },
-    )
   },
   { immediate: true, deep: true },
 )
 
+// watch(() => [JSON.stringify(props.dataSource), JSON.stringify(dataBinds)], () => {
+//   if(!props.dataSource.length && dataBinds?.functionInfo?.configuration?.columns) {
+//     dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(
+//       (item) => {
+//         console.log(`output->item`,item)
+//         return {
+//           id: item.name,
+//           name: item.name,
+//           type: 'string',
+//         }
+//       },
+//     ) || []
+//   }
+// }, {immediate: true})
+
+const valid = () => {
+  return new Promise((resolve) => {
+    errorList.value = validListData(dataSource.value);
+    if(errorList.value.length) throw errorList.value
+    else resolve(errorList.value)
+  })
+}
 defineExpose({
   errorList,
+  valid
 })
 </script>
 

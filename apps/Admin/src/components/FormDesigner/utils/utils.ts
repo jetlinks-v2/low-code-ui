@@ -1,6 +1,11 @@
 import { uid } from "./uid"
 import componentMap from "./componentMap"
 import { ISchema } from "../typings"
+import { queryDictionaryData, queryRuntime } from "@/api/form"
+import { useProduct } from "@/store/product"
+import { isObject } from "lodash-es"
+
+const product = useProduct()
 
 export const checkIsField = (node: any) => node?.type && (componentMap?.[node?.type]) || ['table'].includes(node?.type)
 
@@ -143,4 +148,67 @@ export const insertCustomCssToHead = (cssCode, formId) => {
     }
 
     head.appendChild(newStyle)
+}
+
+// 查询数据
+export const getBrotherList = (value: string, arr: any[]) => {
+    if (Array.isArray(arr) && arr?.length) {
+        for (let index = 0; index < arr?.length; index++) {
+            const element = arr[index];
+            if (element.key === value) {
+                return arr
+            }
+            if (element?.children?.length) {
+                return getBrotherList(value, element?.children)
+            }
+        }
+    }
+    return []
+}
+
+const getData = (key: string, obj: any) => {
+    if (key) {
+        const arr = Object.keys(obj) || []
+        return arr.find(item => {
+            if (item === key) {
+                return obj?.[key]
+            }
+            if (isObject(obj[item])) {
+                return getData(key, obj[item])
+            }
+        })
+    }
+    return obj
+}
+
+// 获取options
+export const queryOptions = async (source: any) => {
+    if (source?.type === 'dic' && source?.dictionary) {
+        const resp = await queryDictionaryData(source?.dictionary)
+        if (resp.success) {
+            return resp.result.map(item => {
+                return {
+                    label: item.name,
+                    value: item.id
+                }
+            })
+        }
+    }
+    if (product.info?.id && source?.type === 'end' && source?.functionId && source?.commandId && source?.label && source?.value) {
+        const resp = await queryRuntime(product.info?.id, source?.functionId, source?.commandId)
+        if (resp.success) {
+            const arr = getData(source?.source, resp?.result || {})
+            if (Array.isArray(arr) && arr?.length) {
+                return arr.map(item => {
+                    return {
+                        label: item[source?.label],
+                        value: item[source?.value]
+                    }
+                })
+            } else {
+                return []
+            }
+        }
+    }
+    return []
 }

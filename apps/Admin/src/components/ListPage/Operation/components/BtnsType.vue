@@ -51,7 +51,7 @@
   </div>
 </template>
 
-<script setup lang="ts" name="EditBtn">
+<script setup lang="ts" name="BtnsType">
 import {
   activeBtnKey,
   editTypeKey,

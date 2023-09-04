@@ -14,8 +14,8 @@
                         'active': menuState.checkedKey.includes(item.id)
                     }">
                         <div style="display: flex; align-items: center;">
-                            <AIcon :type="item.icon" />
-                            <div style="margin-left: 10px;">{{ item.name }}</div>
+                            <AIcon :type="item.icon || item.others?.menu?.icon" />
+                            <div style="margin-left: 10px;">{{ item.others?.menu?.name }}</div>
                         </div>
                         <j-badge :count="countMap.get(item.id)" :number-style="{ backgroundColor: '#315efb' }" />
                     </div>
@@ -37,6 +37,7 @@
 <script setup lang='ts' name="Menu">
 import TreeDrag from './TreeDrag/index.vue'
 import { randomString } from '@jetlinks/utils';
+import { providerEnum } from '@/components/ProJect/index'
 
 // import { cloneDeep } from 'lodash-es';
 // import TreeDrag from './TreeDrag/index.vue'
@@ -47,11 +48,15 @@ const props = defineProps({
         type: Object,
         default: {}
     },
+    projectId: {
+        type: String,
+        default: ''
+    }
 })
 
 const emit = defineEmits(['change'])
 
-const leftList = ref<any>([])
+const leftList = ref<any>(props.projectData || [])
 const addTree = ref<any>([])
 const treeData = ref<any>([])
 
@@ -86,13 +91,26 @@ const onCheck = (e) => {
 
 const toRight = () => {
     // const arr = menuState.checkedKey
-    const arr = leftList.value.filter(item => menuState.checkedKey.includes(item.id)).map(it => ({
-        ...it,
-        id: randomString(16),
-        options: {
-            pageId: it.id
+    const arr = leftList.value.filter(item => menuState.checkedKey.includes(item.id)).map(it => {
+        console.log('-----it', it)
+        const id = randomString(16)
+        const code = randomString(8)
+        const type = it.others.type === providerEnum.HtmlPage ? 'html' : 'list'
+        const url = `/preview/${props.projectId}/${it.parentFullId}/${it.id}/${type}/${code}`
+        return {
+            ...it,
+            url,
+            id,
+            name: it.others.menu?.name,
+            owner: 'iot',
+            code,
+            icon: it.others.menu?.icon,
+            parentId: undefined,
+            options: {
+                pageId: it.id
+            }
         }
-    }))
+    })
 
     addTree.value = [...arr]
 }
@@ -107,33 +125,9 @@ const onTree = (data) => {
     emit('change', data)
 }
 
-
-onMounted(() => {
-    const test = [
-        {
-            id: 'html1',
-            name: 'html-1',
-            icon: 'EyeOutlined',
-            url:"/html1",
-            owner:'iot',
-            // code:'html1'
-        },
-        {
-            id: 'html2',
-            name: 'html-2',
-            icon: 'EyeOutlined',
-            url:"/html2",
-            owner:'iot',
-        },
-        {
-            id: 'html3',
-            name: 'html-3',
-            icon: 'EyeOutlined'
-        }
-    ]
-    leftList.value = test
+watchEffect(()=>{
+    leftList.value = props.projectData
 })
-
 
 </script>
 

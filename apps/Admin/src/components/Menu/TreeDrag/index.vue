@@ -14,7 +14,7 @@
                             'tree-content-title': true,
                             'project': item.options?.pageId
                         }">
-                            <AIcon :type="item.icon" />
+                            <AIcon :type="item.icon || item.others?.menu?.icon" />
                             <div style="margin-left: 10px;">{{ item.name }}</div>
                         </div>
                         <div v-if="selectedKeys.includes(item.id)" @click="(e) => e.stopPropagation()"
@@ -71,7 +71,6 @@ const visibleDel = ref<boolean>(false)
 
 
 const countMap = ref(new Map())
-const newMap = ref<any>({})
 
 const handleTree = (tree) => {
     const arr = cloneDeep(tree)
@@ -186,8 +185,7 @@ watch(
     () => props.list,
     (val: any) => {
         countMap.value.clear()
-        newMap.value = {}
-        console.log(props.list)
+        console.log('val',val)
         treeData.value = [...treeData.value, ...val]
         handleTree(treeData.value)
     },
@@ -197,25 +195,14 @@ watch(
 watch(
     () => countMap.value,
     (val) => {
-        console.log('changeCount', val)
         emit('changeCount', val)
     },
     { deep: true, immediate: true }
 )
 
-// watch(
-//     () => newMap.value,
-//     (val) => {
-//         console.log('changeCount', val)
-//         // emit('changeCount', val)
-//     },
-//     { deep: true, immediate: true }
-// )
-
 watch(
     () => treeData.value,
     (val) => {
-        // console.log('changeTree', val)
         emit('changeTree', val)
     },
     { deep: true, immediate: true }

@@ -15,45 +15,51 @@ type TreeData = {
   [key: string]: any
 }
 
-const handleChildren = (children: any[], parentId: string): TreeData[] => {
+const handleChildren = (children: any, parentId: string): TreeData[] => {
   const treeData: TreeData[] = []
-  children.forEach(item => {
-    const hasChildren = item.children?.length
 
-    if (item.functions) {
-      item.functions.forEach(a => {
-        treeData.push({
-          title: a.name,
-          type: a.provider,
-          provider: a.provider,
-          parentId: parentId,
-          ...a
-        })
+  if (children.children) {
+    children.children.forEach(item => {
+      const hasChildren = item.children?.length || item.functions?.length || item.resources?.length
+      const others = Object.assign(item.others || {}, { type: item.provider })
+      treeData.push({
+        ...item,
+        others,
+        title: item.name,
+        type: providerEnum.Module,
+        parentId: parentId,
+        children: hasChildren ? handleChildren(item, item.id) : []
       })
-    }
-
-    if (item.resources) {
-      item.resources.forEach(a => {
-        treeData.push({
-          title: a.name,
-          type: a.provider,
-          provider: a.provider,
-          parentId: parentId,
-          ...a
-        })
-      })
-    }
-
-    treeData.push({
-      ...item,
-      title: item.name,
-      type: providerEnum.Module,
-      provider: providerEnum.Module,
-      parentId: parentId,
-      children: hasChildren ? handleChildren(item.children, item.id) : []
     })
-  })
+  }
 
+  if (children.functions) {
+    children.functions.forEach(item => {
+      const type = item.others?.type || item.provider
+      const others = Object.assign(item.others || {}, { type })
+      treeData.push({
+        ...item,
+        others,
+        type,
+        title: item.name,
+        parentId: parentId,
+      })
+    })
+  }
+
+  if (children.resources) {
+    children.resources.forEach(item => {
+      const type = item.others?.type || item.provider
+      const others = Object.assign(item.others || {}, { type })
+      treeData.push({
+        ...item,
+        others,
+        type,
+        title: item.name,
+        parentId: parentId,
+      })
+    })
+  }
   return treeData
 }
 
@@ -84,8 +90,12 @@ export const useProduct = defineStore('product', () => {
     })
   }
 
-  const getDataMap = () => {
+  const getDataMap = (): Map<string, any> => {
     return dataMap
+  }
+
+  const getDataMapByType = (type: string) => {
+    return [...dataMap.values()].filter(item => item.others?.type === type)
   }
 
 const findParent=(data, target, result) =>{
@@ -114,6 +124,7 @@ const findParent=(data, target, result) =>{
         const add = {
           ...record,
           others:{
+            ...record.others,
             createTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
             modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
             useList:[]
@@ -209,6 +220,11 @@ const findParent=(data, target, result) =>{
     return arr;
   }
 
+  const getServerModulesData = async () => {
+    const integrateData = Integrate(data.value)
+    return integrateData?.modules || []
+  }
+
   const queryProduct = async (id?: string, cb?: () => void) => {
     if (!id) return
     dataMap.clear()
@@ -216,7 +232,7 @@ const findParent=(data, target, result) =>{
     if (resp.success) {
       const result = resp.result
       const treeData: TreeData[] = []
-      const children: TreeData[] = result.modules ? handleChildren(result.modules, result.id) : []
+      const children: TreeData[] = result.modules?.[0] ? handleChildren(result.modules[0], result.id) : []
       treeData.push({
         version: result.version,
         draftName: result.draftName,
@@ -246,12 +262,14 @@ const findParent=(data, target, result) =>{
     info,
     queryProduct,
     getDataMap,
+    getDataMapByType,
     add,
     update,
     remove,
     getById,
     getParent,
-    initProjectState
+    initProjectState,
+    getServerModulesData
   }
 },{
   persist: false
