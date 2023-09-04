@@ -98,10 +98,14 @@ const onChange = debounce((v) => {
   project.update({
     ...extra,
     configuration: {
-      code: v
+      sql: v
     }
   })
 }, 1000)
+
+watch(() => props.configuration.code, () => {
+  code.value = props.configuration.sql
+},{ immediate: true })
 
 getAllCrud()
 
