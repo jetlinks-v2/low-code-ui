@@ -72,6 +72,9 @@ const Selection = defineComponent({
       const index = (props?.parent || [])?.findIndex(item => item?.key === props.data?.key)
       switch (_type) {
         case 'remove':
+          if(!props.data?.context) {
+            addContext(props.data, props.parent)
+          } 
           props.data.context?.delete()
           const arr: any = cloneDeep(props.parent) || []
           if (arr?.length > 0) {
@@ -85,6 +88,9 @@ const Selection = defineComponent({
           }
           break
         case 'copy':
+          if(!props.data?.context) {
+            addContext(props.data, props.parent)
+          }
           props.data.context?.copy()
           const copyData = props.parent?.[index + 1]
           designer.setSelection(copyData)
