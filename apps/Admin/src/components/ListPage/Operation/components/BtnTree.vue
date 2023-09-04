@@ -17,7 +17,7 @@
     </template>
   </j-tree>
 </template>
-<script setup lang="ts">
+<script setup lang="ts" name="BtnTree">
 import type { PropType } from 'vue';
 import type {
   AntTreeNodeDropEvent,

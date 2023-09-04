@@ -9,7 +9,7 @@ export const commonUseBtn = [
   { title: '删除', type: 'Delete', icon: 'DeleteOutlined' },
 ]
 
-export const validOperationsBtn = async (tree: OperationConfigTreeItem[]) => {
+export const validOperationsBtn = (tree: OperationConfigTreeItem[]) => {
   const errorItems: any[] = [];
   const commonUseBtnNames = commonUseBtn.map((item) => item.title);
 
@@ -59,12 +59,7 @@ export const validOperationsBtn = async (tree: OperationConfigTreeItem[]) => {
       }
     });
   }
-
   validate(tree);
 
-  if (errorItems.length > 0) {
-    throw errorItems;
-  } else {
-    return [];
-  }
+  return errorItems
 };

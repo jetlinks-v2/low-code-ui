@@ -3,15 +3,16 @@
     <div v-for="item in props.headerActions" :key="item.key">
       <PermissionButton
         :type="item.type"
-        v-bind:="handleFunction(item.permissionProps, item)"
-        style="width: 134px; margin-right: 10px"
+        v-bind:="handleFunction(item.permissionProps, item, item)"
+        style="width: 134px; width: 134px; margin-right: 10px"
         :danger="item.command === 'Delete'"
         :popConfirm="handleFunction(item.permissionProps)?.popConfirm"
         v-if="item?.children?.length === 0"
       >
-        <!-- <AIcon v-if="item.icon" :type="item?.icon" /> -->
+        <AIcon v-if="item.icon" :type="item?.icon" />
         {{ item?.text }}
       </PermissionButton>
+
 
       <j-dropdown
         :trigger="['click']"
@@ -29,10 +30,12 @@
                 :danger="child.command === 'Delete'"
                 style="width: 100%"
                 :popConfirm="
-                  handleFunction(child.permissionProps, child)?.popConfirm
+                  
+                  handleFunction(child.permissionProps, child, child)?.popConfirm
+                
                 "
               >
-                <!-- <AIcon v-if="item.icon" :type="item?.icon" /> -->
+                <AIcon v-if="child.icon" :type="child?.icon" />
                 {{ child?.text }}
               </PermissionButton>
             </j-menu-item>
@@ -50,7 +53,6 @@ const props = defineProps({
     default: () => [],
   },
 })
-
 const handleFunction = (item: any, data?: any) => {
   if (isFunction(item)) {
     return item(data)
