@@ -14,6 +14,7 @@ import CollapseLayout from './CollapseLayout';
 import TableLayout from './TableLayout'
 import { watch, PropType } from 'vue';
 import { queryOptions } from '../../utils/utils';
+import { useProduct } from '@/store';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -48,6 +49,8 @@ const DraggableLayout = defineComponent({
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
+
+        const product = useProduct()
 
         const dragOptions = {
             swapThreshold: 1,
@@ -182,7 +185,7 @@ const DraggableLayout = defineComponent({
                             })
 
                             if(!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
-                                queryOptions(element.componentProps.source).then(resp => {
+                                queryOptions(element.componentProps.source, product.info?.id).then(resp => {
                                     options.value = resp
                                 })
                             }
