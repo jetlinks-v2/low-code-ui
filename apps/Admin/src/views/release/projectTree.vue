@@ -19,7 +19,10 @@ const getAllTree = () => {
 const getTree = () => {
   const maps = product.getDataMap()
   const copyData = JSON.parse(JSON.stringify([...maps.values()]))
-  list.value = copyData.filter(item => item.others && item.others?.menu).map(item => {
+  list.value = copyData.filter(item => {
+    console.log(item)
+    return item.others && item.others?.menu
+  }).map(item => {
     item.parentFullId = maps.get(item.parentId).fullId
     return item
   })
