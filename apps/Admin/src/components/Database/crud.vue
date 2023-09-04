@@ -11,13 +11,18 @@
         />
       </j-tab-pane>
       <j-tab-pane key="2" tab="数据">
-        <DataSetting />
+        <DataSetting
+          :id="props.id"
+          :parentId="props.parentId"
+        />
       </j-tab-pane>
       <j-tab-pane key="3" tab="高级配置">
         <Advanced
           v-model:tree="tree"
           v-model:asset="asset"
           v-model:relation="relation"
+          :id="props.id"
+          :parentId="props.parentId"
           @update="update"
         />
       </j-tab-pane>
