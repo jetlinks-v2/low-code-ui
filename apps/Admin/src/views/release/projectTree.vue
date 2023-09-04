@@ -1,13 +1,11 @@
 <template>
   <div class="tree-warp">
-    <Menu :projectData="list" @change="change" />
+    <Menu :projectData="list" @change="change" :projectId="product.info.id" />
   </div>
 </template>
 
 <script setup name="projectTree">
 import { useProduct } from '@/store'
-
-
 
 const emit = defineEmits(['change'])
 const product = useProduct()
