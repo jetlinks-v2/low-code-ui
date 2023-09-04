@@ -95,6 +95,10 @@ export const useProduct = defineStore('product', () => {
     return dataMap
   }
 
+  const getDataMapByType = (type: string) => {
+    return [...dataMap.values()].filter(item => item.others?.type === type)
+  }
+
 const findParent=(data, target, result) =>{
   for (let item of data) {
     if (item.id === target.id) {
@@ -217,6 +221,11 @@ const findParent=(data, target, result) =>{
     return arr;
   }
 
+  const getServerModulesData = async () => {
+    const integrateData = Integrate(data.value)
+    return integrateData?.modules || []
+  }
+
   const queryProduct = async (id?: string, cb?: () => void) => {
     if (!id) return
     dataMap.clear()
@@ -254,12 +263,14 @@ const findParent=(data, target, result) =>{
     info,
     queryProduct,
     getDataMap,
+    getDataMapByType,
     add,
     update,
     remove,
     getById,
     getParent,
-    initProjectState
+    initProjectState,
+    getServerModulesData
   }
 },{
   persist: false

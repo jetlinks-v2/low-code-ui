@@ -60,6 +60,10 @@ const props = defineProps({
   id: {
     type: String,
     default: undefined
+  },
+  others: {
+    type: Object,
+    default: () => ({})
   }
 })
 
@@ -79,18 +83,16 @@ const asset = ref(props.configuration.asset || {})
 const tree = ref(props.configuration.tree || false)
 
 const update = () => {
+  const { configuration, ...extra} = props
   project.update({
-    id: props.id,
-    title: props.title,
-    provider: props.provider,
-    type: props.type,
+    ...extra,
     configuration: {
       tableName: tableName.value,
       relation: relation.value,
       columns: columns.value,
       asset: asset.value,
       tree: tree.value,
-    }
+    },
   })
 }
 </script>
