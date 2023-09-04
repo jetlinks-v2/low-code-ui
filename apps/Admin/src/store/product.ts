@@ -68,8 +68,7 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
  */
 const updateProductReq = throttle((data: any[]) => {
   const integrateData = Integrate(data)
-  console.log(integrateData)
-  // updateDraft(integrateData.draftId, integrateData)
+  updateDraft(integrateData.draftId, integrateData)
 }, 1000)
 
 export const useProduct = defineStore('product', () => {
@@ -93,6 +92,10 @@ export const useProduct = defineStore('product', () => {
 
   const getDataMap = (): Map<string, any> => {
     return dataMap
+  }
+
+  const getDataMapByType = (type: string) => {
+    return [...dataMap.values()].filter(item => item.others?.type === type)
   }
 
 const findParent=(data, target, result) =>{
@@ -254,6 +257,7 @@ const findParent=(data, target, result) =>{
     info,
     queryProduct,
     getDataMap,
+    getDataMapByType,
     add,
     update,
     remove,
