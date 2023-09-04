@@ -39,7 +39,7 @@
 
     </JProTable>
     <Save v-if="visible" @close="handleClose" :data="current" :type="modelType" />
-    <Menu v-if="visibleMenu" @close="visibleMenu = false" :draftId="draftId"/>
+    <Menu v-if="visibleMenu" @close="visibleMenu = false" :data="current"/>
   </page-container>
 </template>
 
@@ -57,7 +57,6 @@ const current = ref({})
 const modelType = ref<string>('add')
 const visible = ref<boolean>(false)
 const visibleMenu = ref<boolean>(false)
-const draftId = ref<string>('')
 
 const columns = [
   {
@@ -188,9 +187,9 @@ const getActions = (record) => {
         icon: 'EyeOutlined',
         disabled:record.state.value!=='published',
         onClick: () => {
-          console.log(record)
+          // console.log(record)
           visibleMenu.value = true
-          draftId.value = record.draftId
+          current.value = record
         }
       },
     },

@@ -2,7 +2,7 @@
 <template>
     <j-modal title="菜单管理" visible :maskClosable="false" :width="1000" @ok="handleSave" @cancel="emits('close')"
         :confirmLoading="loading">
-        <Menu @change="onChange" :projectData="list" :projectId="product.info.id"></Menu>
+        <Menu @change="onChange" :projectData="list" :projectId="data?.id"></Menu>
     </j-modal>
 </template>
 
@@ -14,7 +14,7 @@ import { useProduct } from '@/store/product';
 const emits = defineEmits(['close'])
 
 const props = defineProps({
-    draftId:String
+    data: Object
 })
 
 const product = useProduct()
@@ -35,13 +35,14 @@ const onChange = (item) => {
 
 
 const getTree = () => {
-    product.queryProduct(props.draftId)
-    const maps = product.getDataMap()
-    list.value = [...maps.values()].filter(item => item.others && item.others?.menu)
-    console.log(list.value)
+    product.queryProduct(props.data?.draftId, () => {
+        const maps = product.getDataMap()
+        list.value = [...maps.values()].filter(item => item.others && item.others?.menu)
+        console.log('list',list.value)
+    })
 }
 
-onMounted(()=>{
+onMounted(() => {
     getTree()
 })
 </script>
