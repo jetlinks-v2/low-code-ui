@@ -50,7 +50,7 @@ const props = defineProps({
   headers: {
     type: Object,
     default: {
-      'X-Access-Token': LocalStore.get(TOKEN_KEY)
+      [TOKEN_KEY]: LocalStore.get(TOKEN_KEY)
     }
   },
   value:Array

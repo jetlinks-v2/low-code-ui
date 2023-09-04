@@ -1,6 +1,6 @@
 <template>
   <a-upload dragger name="file" v-model:file-list="fileList" list-type="picture-card" :max-count="maxCount" :headers="{
-    'X-Access-Token': LocalStore.get(TOKEN_KEY)
+    [TOKEN_KEY]: LocalStore.get(TOKEN_KEY)
   }" :before-upload="beforeUpload" :accept="accept" :disabled="fileList.length >= maxCount" >
 
     <div v-if="maxCount > 1 || fileList.length < maxCount ">
