@@ -1,10 +1,10 @@
 <template>
   <div>
-    <p>表单样式</p>
-    <j-form-item label="标签对齐方式" name="layout">
+    <j-form-item label="组件布局" name="layout">
       <j-radio-group
         v-model:value="target.componentProps.layout"
         button-style="solid"
+        @change="onDataChange"
       >
         <j-radio-button value="horizontal">水平</j-radio-button>
         <j-radio-button value="vertical">垂直</j-radio-button>
@@ -15,6 +15,7 @@
       <j-radio-group
         v-model:value="target.componentProps.size"
         button-style="solid"
+        @change="onDataChange"
       >
         <j-radio-button value="small">小</j-radio-button>
         <j-radio-button value="default">中</j-radio-button>
@@ -28,4 +29,10 @@
 import { useTarget } from '../../../../hooks'
 
 const { target } = useTarget()
+
+const emits = defineEmits(['refresh'])
+
+const onDataChange = () => {
+  emits('refresh', target.value)
+}
 </script>

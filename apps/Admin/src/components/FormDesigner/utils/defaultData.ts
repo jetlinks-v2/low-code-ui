@@ -105,11 +105,6 @@ export const basic: ISchema[] = [
         componentProps: {},
         children: []
     },
-    {
-        type: 'geo',
-        name: '地区',
-        icon: 'FundOutlined',
-    },
 ]
 
 export const layout: ISchema[] = [
@@ -236,7 +231,12 @@ export const pro: ISchema[] = [
         type: 'role',
         name: '角色选择',
         icon: 'ForkOutlined',
-    }
+    },
+    {
+        type: 'geo',
+        name: '地区',
+        icon: 'FundOutlined',
+    },
 ]
 
 const iot: ISchema[] = [
