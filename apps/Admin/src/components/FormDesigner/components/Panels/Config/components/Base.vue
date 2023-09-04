@@ -214,7 +214,7 @@
           />
         </j-form-item>
       </template>
-      <template v-if="['table-item'].includes(type)">
+      <!-- <template v-if="['table-item'].includes(type)">
         <j-form-item label="名称" :name="['componentProps', 'title']" required>
           <j-input
             placeholder="请输入"
@@ -236,7 +236,7 @@
             v-model:value="target.formItemProps.name"
           />
         </j-form-item>
-      </template>
+      </template> -->
       <template v-if="['grid', 'space'].includes(type)">
         <j-form-item
           label="标识"

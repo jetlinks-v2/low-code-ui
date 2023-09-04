@@ -5,6 +5,7 @@ import { Collapse, CollapsePanel, FormItem } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
 import { cloneDeep } from 'lodash-es'
+import { addContext } from '../../utils/addContext'
 
 export default defineComponent({
   name: 'CollapseLayout',
@@ -36,6 +37,9 @@ export default defineComponent({
     })
 
     const handleAdd = () => {
+      if (!props.data?.context) {
+        addContext(props.data, props.parent)
+      }
       props.data.context?.appendItem()
       const addData = unref(list).slice(-1)
       designer?.setSelection(addData)

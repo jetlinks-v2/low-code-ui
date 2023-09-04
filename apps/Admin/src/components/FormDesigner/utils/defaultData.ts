@@ -131,17 +131,14 @@ export const layout: ISchema[] = [
         name: '网格布局',
         icon: 'AppstoreOutlined',
         componentProps: {
-            gutter: 16,
-            justify: 'space-around',
-            align: 'top'
+            gutter: [24, 24],
+            // justify: 'space-around',
+            // align: 'top'
         },
         children: [
             {
                 componentProps: {
                     span: 6,
-                    offset: 0,
-                    pull: 0,
-                    push: 0
                 },
                 type: 'grid-item',
                 children: []
@@ -149,9 +146,6 @@ export const layout: ISchema[] = [
             {
                 componentProps: {
                     span: 6,
-                    offset: 0,
-                    pull: 0,
-                    push: 0
                 },
                 type: 'grid-item',
                 children: []
@@ -159,9 +153,6 @@ export const layout: ISchema[] = [
             {
                 componentProps: {
                     span: 6,
-                    offset: 0,
-                    pull: 0,
-                    push: 0
                 },
                 type: 'grid-item',
                 children: []
@@ -169,9 +160,6 @@ export const layout: ISchema[] = [
             {
                 componentProps: {
                     span: 6,
-                    offset: 0,
-                    pull: 0,
-                    push: 0
                 },
                 type: 'grid-item',
                 children: []

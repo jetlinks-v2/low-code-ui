@@ -78,6 +78,7 @@ const onSaveData = () => {
 
 // 设置数据被选中
 const setSelection = (node: any) => {
+  if(['card-item', 'grid-item'].includes(node.type)) return
   let result: any = {}
   if (node === 'root') {
     result = formData.value

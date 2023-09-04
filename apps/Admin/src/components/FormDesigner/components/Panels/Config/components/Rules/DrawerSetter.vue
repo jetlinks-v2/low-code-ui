@@ -69,24 +69,6 @@
               v-model:value="ruleModel.max"
             />
           </j-form-item>
-          <j-form-item
-            label="约束"
-            name="required"
-            :rules="[
-              {
-                required: true,
-                message: '请选择',
-              },
-            ]"
-          >
-            <j-radio-group
-              button-style="solid"
-              v-model:value="ruleModel.required"
-            >
-              <j-radio-button :value="true">必填</j-radio-button>
-              <j-radio-button :value="false">非必填</j-radio-button>
-            </j-radio-group>
-          </j-form-item>
         </j-form>
       </div>
     </Teleport>
