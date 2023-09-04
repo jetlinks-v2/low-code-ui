@@ -23,6 +23,7 @@
           (_record, index) => (_record?.mark === 'add' ? 'table-striped' : null)
         "
         @change="(data) => handleChange(data)"
+        @editStatus="editStatus"
       >
         <template #headerCell="{ column }">
           <template v-if="column.tips">
@@ -46,8 +47,13 @@
           </template>
         </template>
         <template #name="{ data }">
-          <ErrorItem :errorData="errorData(data.record.id)">
+          <ErrorItem :border="false" :errorData="errorData(data.record.id)">
             <span>{{ data.record?.name }}</span>
+          </ErrorItem>
+        </template>
+        <template #id="{ data }">
+          <ErrorItem :border="false" :errorData="errorData(data.record.name)">
+            <span>{{ data.record?.id }}</span>
           </ErrorItem>
         </template>
         <template #action="{ data }">
@@ -106,6 +112,7 @@
 import { onlyMessage } from '@/utils/comm'
 import { ErrorItem } from '../..'
 import type { PropType } from 'vue'
+import { DATA_BIND } from '../../keys';
 const props = defineProps({
   title: {
     type: String,
@@ -159,7 +166,7 @@ const props = defineProps({
       {
         value: '1',
         label: '覆盖',
-        subLabel: '以功能下的数据覆盖页面已有内容',
+        subLabel: '以下功能的数据覆盖页面已有内容',
       },
       {
         value: '2',
@@ -186,7 +193,7 @@ const props = defineProps({
 })
 const tableRef = ref()
 const visible = ref<boolean>(false)
-
+const dataBinds: any = inject(DATA_BIND)
 const loading = ref<boolean>(false)
 const emit = defineEmits([
   'configuration',
@@ -195,16 +202,19 @@ const emit = defineEmits([
   'handleAdd',
   'handleOk',
   'handleChange',
+  'update:data',
 ])
 
 const handleChange = (data) => {
+  console.log(data,'hjasjhghg');
+  
   emit('handleChange', data)
 }
 
 const activeKey = ref('1')
 
 const errorData = computed(() => {
-  return (val: string) => {
+  return (val: string): any => {
     return props.errorList?.find((item: any) => item.key === val)
   }
 })
@@ -310,7 +320,6 @@ const handleAdd = async () => {
 }
 //配置
 const configuration = async (data: any) => {
-  tableRef.value.cleanEditStatus()
   const dataSource = await tableRef.value.getData()
   emit('configuration', data, dataSource)
 }
@@ -330,12 +339,22 @@ const syncData = async () => {
     bindShow.value = false
     return onlyMessage('请先完成数据绑定', 'error')
   }
-  if (!asyncData.value) {
+  if (!asyncData.value) {  
+    emit('bindData', props.dataSource.length ? props.dataSource : dataBinds.functionInfo?.configuration?.columns?.map(
+      (item) => {
+        return {
+          id: item.name,
+          name: item.name,
+          type: 'string',
+        }
+      },
+    ))
     bindShow.value = true
     asyncData.value = true
   } else {
     const data = await tableRef.value?.getData()
-    if (data?.length !== props.dataSource?.length || props.configChange) {
+    // if (data?.length !== props.dataSource?.length || props.configChange) {
+    if (JSON.stringify(data) !== JSON.stringify(props.dataSource)) {
       openModel(props.modelActiveKey)
     } else {
       onlyMessage('已是最新数据', 'success')

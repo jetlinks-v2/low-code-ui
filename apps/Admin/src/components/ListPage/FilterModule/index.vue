@@ -24,6 +24,7 @@
         @handleAdd="handleAdd"
         @configuration="configuration"
         @handleOk="handleOk"
+        @bindData="bindData"
       />
       <div v-if="type !== ''">
         <a-page-header title="配置筛选项" sub-title="配置筛选项" @back="goBack">
@@ -79,12 +80,12 @@ import {
   DateType,
 } from '@/components/ListPage/FilterModule/components/index'
 
-import { useAllListDataStore } from '@/store/listForm'
 import { validFilterModule } from './utils/valid'
 import { DATA_BIND } from '../keys'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
+  (e: 'update:dataSource', value: any): void
 }
 
 const emits = defineEmits<Emit>()
@@ -96,6 +97,10 @@ const props = defineProps({
   id: {
     type: null,
   },
+  dataSource: {
+    type: Array,
+    default: () => []
+  }
 })
 
 const open = computed({
@@ -109,7 +114,6 @@ const open = computed({
 const type = ref('')
 const title = ref('请选择页面支持的筛选项')
 const addBtnName = ref('新增筛选项')
-const configurationStore = useAllListDataStore()
 const subValue = ref({})
 const show = ref(false)
 //是否完成数据绑定
@@ -227,7 +231,14 @@ const columns: any = [
 
 const dataBinds: any = inject(DATA_BIND)
 //数据
-const dataSource = ref([])
+const dataSource = computed({
+  get() {
+    return props.dataSource
+  },
+  set(val) {
+    emits('update:dataSource', val)
+  }
+})
 //新增一列table
 const handleAdd = async (table: any) => {
   table?.addItem({
@@ -236,7 +247,6 @@ const handleAdd = async (table: any) => {
     type: 'string',
     mark: 'add',
   })
-  // const data = await table?.getData();
 }
 
 const configRow = ref()
@@ -252,6 +262,9 @@ const handleOk = (value: any, data: any) => {
   let source: any = []
   switch (value) {
     case '1':
+      source = data
+      break
+    case '2':
       if (configChange.value) {
         data?.map((item: any) => {
           const dataFind = dataSource.value?.find(
@@ -269,11 +282,8 @@ const handleOk = (value: any, data: any) => {
         })
       }
       break
-    case '2':
-      source = data
-      break
     case '3':
-      source = dataBinds?.functionInfo?.configuration?.columns?.map((item) => {
+      source = dataSource.value?.map((item) => {
         return {
           id: item.name,
           name: item.name,
@@ -284,16 +294,13 @@ const handleOk = (value: any, data: any) => {
   }
   dataSource.value = source
   configChange.value = false
-  configurationStore.setALLlistDataInfo(
-    'searchData',
-    dataSource.value,
-    props.id,
-  )
 }
-
+//点击显示table的同步数据
+const bindData = (data: any) => {
+  dataSource.value = data;
+}
 //保存
 const submit = () => {
-  configurationStore.setALLlistDataInfo(type.value, subValue.value, props.id)
   const dataRow = dataSource.value?.find(
     (item: any) => item?.id === configRow.value?.id,
   )
@@ -312,13 +319,18 @@ const goBack = () => {
   show.value = true
   dataBind.value = true
   asyncData.value = true
+  configChange.value = false
 }
 /**
  * 校验筛选模块配置
  */
 const errorList: any = ref([])
-const valid = async () => {
-  errorList.value = await validFilterModule(dataSource.value)
+const valid = () => {
+  return new Promise((resolve, reject) => {
+    errorList.value = validFilterModule(dataSource.value)
+    if (errorList.value.length) reject(errorList.value)
+    else resolve([])
+  })
 }
 
 defineExpose({
@@ -333,19 +345,26 @@ watch(
       dataBind.value = true
     } else {
       dataBind.value = false
+      dataSource.value = [];
     }
-    dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(
-      (item) => {
-        return {
-          id: item.name,
-          name: item.name,
-          type: 'string',
-        }
-      },
-    )
   },
   { immediate: true, deep: true },
 )
+
+// watch(() => [JSON.stringify(props.dataSource), JSON.stringify(dataBinds)], () => {
+//   if(!props.dataSource.length && dataBinds?.functionInfo?.configuration?.columns) {
+//     dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(
+//       (item) => {
+//         console.log(`output->item`,item)
+//         return {
+//           id: item.name,
+//           name: item.name,
+//           type: 'string',
+//         }
+//       },
+//     ) || []
+//   }
+// }, {immediate: true})
 </script>
 
 <style scoped lang="less"></style>

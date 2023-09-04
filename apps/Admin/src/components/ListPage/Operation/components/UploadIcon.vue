@@ -30,7 +30,7 @@
   />
 </template>
 
-<script lang="ts" setup name="JProUpload">
+<script lang="ts" setup name="UploadIcon">
 import { UploadChangeParam, UploadProps } from 'ant-design-vue'
 import { onlyMessage } from '@/utils/comm'
 import { CSSProperties } from 'vue'

@@ -48,6 +48,7 @@ import { PropType } from 'vue'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
+  (e: 'update:columnsTree', value: OperationConfigTreeItem[]): void
 }
 
 const emits = defineEmits<Emit>()
@@ -60,13 +61,20 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  initData: {
+  columnsTree: {
     type: Object as PropType<OperationConfigTreeItem[]>,
-    default: () => {}
+    default: () => []
   }
 })
 
-const columnsTree = ref<OperationConfigTreeItem[]>([])
+const columnsTree = computed({
+  get() {
+    return props.columnsTree
+  },
+  set(val: OperationConfigTreeItem[]) {
+    emits('update:columnsTree', val)
+  }
+})
 
 const steps = ref('BtnsList')
 const _visible = computed({
@@ -99,23 +107,12 @@ const save = async () => {
 
 const valid = async () => {
   return new Promise((resolve, reject) => {
-    validOperationsBtn(columnsTree.value)
-    .then(() => {
-      errorList.value = []
-      resolve(errorList.value)
-    })
-    .catch((err: ErrorItemType[]) => {
-      errorList.value = err
-      resolve(errorList.value)
-    })
+    errorList.value = validOperationsBtn(columnsTree.value)
+    if(errorList.value.length) reject(errorList.value)
+    else resolve([])
   })
 }
 
-watchEffect(() => {
-  if(props.initData) {
-    columnsTree.value = props.initData
-  }
-})
 
 provide(activeBtnKey, activeBtn)
 provide(columnsTreeKey, columnsTree)

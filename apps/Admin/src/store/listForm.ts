@@ -36,8 +36,10 @@ export const useAllListDataStore = defineStore('allListData', () => {
     datasource: [],
     searchData: [],
     dataBind: {
-      function: undefined,
-      command: undefined,
+      data: {
+        function: undefined,
+        command: undefined,
+      },
       functionInfo: [],
     },
     configurationInfo: {
@@ -47,7 +49,8 @@ export const useAllListDataStore = defineStore('allListData', () => {
       date: {},
     },
     menu: {
-      systemMenu: true,
+      pageName:'',
+      main: true,
       name: '',
       icon: '',
     },

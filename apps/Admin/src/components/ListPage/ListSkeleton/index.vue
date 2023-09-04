@@ -1,13 +1,15 @@
 <template>
   <div class="list-skeleton">
     <div class="left-menu">
-      <div
-        class="menus"
-        ref="menuRef"
-        @click="handleVisible('MenuConfigVisible')"
-      >
-        菜单配置
-      </div>
+      <j-badge :count="errorCount?.menuConfig">
+        <div
+          class="menus"
+          ref="menuRef"
+          @click="handleVisible('MenuConfigVisible')"
+        >
+          菜单配置
+        </div>
+      </j-badge>
       <div class="menus" ref="previewRef" @click="emits('goPreview')">预览</div>
     </div>
     <div class="right-skeleton">
@@ -66,6 +68,10 @@
                 <j-space
                   ref="ref6"
                   class="config-item type"
+                  :class="{
+                    'config-done': configDone?.ListForm,
+                    animation: !configDone?.ListForm && !visibles.GuideVisible,
+                  }"
                   @click="handleVisible('ListFormVisible')"
                 >
                   <j-skeleton-input style="width: 32px" />
@@ -79,16 +85,20 @@
             style="height: 60%; overflow: hidden; padding: 20px"
           >
             <j-col :span="20">
-              <j-skeleton-input
-                size="large"
-                ref="ref3"
-                class="config-item column-data skeletion-input"
-                :class="{
-                  'config-done': configDone?.listData,
-                  animation: !configDone?.listData && !visibles.GuideVisible,
-                }"
-                @click="handleVisible('ListDataVisible')"
-              />
+              <j-badge :count="errorCount?.listData" style="width: 100%" :numberStyle="{
+                  width: 'auto',
+                }">
+                <j-skeleton-input
+                  size="large"
+                  ref="ref3"
+                  class="config-item column-data skeletion-input"
+                  :class="{
+                    'config-done': configDone?.listData,
+                    animation: !configDone?.listData && !visibles.GuideVisible,
+                  }"
+                  @click="handleVisible('ListDataVisible')"
+                />
+              </j-badge>
               <j-skeleton-input
                 class="skeletion-input"
                 size="large"
@@ -147,11 +157,11 @@
         </div>
       </div>
     </div>
+    <Guide :stepList="steps" v-model:open="visibles.GuideVisible" />
   </div>
-  <Guide :stepList="steps" v-model:open="visibles.GuideVisible" />
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="listSkeleton">
 import Guide from '../Guide/index.vue'
 import type { GuideProps } from '../Guide/type'
 
@@ -252,6 +262,10 @@ watchEffect(() => {
   ]
   console.log(props.dataBindRef)
 })
+
+// watch(() => props.visibles, () => {
+//   console.log(props.visibles);
+// }, {immediate: true, deep: true})
 </script>
 
 <style scoped lang="less">
@@ -271,17 +285,19 @@ watchEffect(() => {
   }
   .left-menu {
     background-color: #ffffff;
-    writing-mode: vertical-lr;
     display: flex;
+    flex-direction: column;
+    padding: 10px 0 0 10px;
     .menus {
       height: 120px;
+      writing-mode: vertical-lr;
       width: 50px;
       background-color: #f2f2f2;
       text-align: center;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 10px;
+      margin-bottom: 10px;
       cursor: pointer;
     }
   }
