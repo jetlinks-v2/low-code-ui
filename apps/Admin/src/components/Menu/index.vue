@@ -96,7 +96,7 @@ const toRight = () => {
         const id = randomString(16)
         const code = randomString(8)
         const type = it.others.type === providerEnum.HtmlPage ? 'html' : 'list'
-        const url = `/preview/${props.projectId}/${it.parentId}/${it.id}/${type}/${code}`
+        const url = `/preview/${props.projectId}/${it.parentFullId}/${it.id}/${type}/${code}`
         return {
             ...it,
             url,
