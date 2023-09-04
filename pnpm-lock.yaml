@@ -784,6 +784,7 @@ packages:
   /@babel/highlight@7.22.10:
     resolution: {integrity: sha512-78aUtVcT7MUscr0K5mIEnkwxPE0MaxkR5RxRwuHaQ+JuU5AmTPhY+do2mdzVTnIJJpyBglql2pehuBIWHug+WQ==}
     engines: {node: '>=6.9.0'}
+    requiresBuild: true
     dependencies:
       '@babel/helper-validator-identifier': 7.22.5
       chalk: 2.4.2
@@ -4831,6 +4832,11 @@ packages:
       colorpicker-v3: 2.10.2
       lodash-es: 4.17.21
       monaco-editor: 0.40.0
+      monaco-editor-core: 0.41.0
+      monaco-editor-textmate: 4.0.0(monaco-editor@0.40.0)(monaco-textmate@3.0.1)
+      monaco-textmate: 3.0.1(onigasm@2.2.5)
+      monaco-volar: 0.4.0
+      onigasm: 2.2.5
       sortablejs: 1.15.0
       vuedraggable: 4.1.0(vue@3.3.4)
     transitivePeerDependencies:

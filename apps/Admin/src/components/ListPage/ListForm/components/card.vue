@@ -186,9 +186,9 @@
 
 <script lang="ts" setup>
 import Upload from '@/components/Upload/Image/ImageUpload.vue'
-import { useAllListDataStore } from '@/store/listForm'
 import { ErrorItem } from '../..';
 import EditorModal from '@/components/EditorModal'
+import { LIST_FORM_INFO, DATA_SOURCE } from '../../keys';
 const props = defineProps({
   id: {
     type: null,
@@ -198,7 +198,6 @@ const props = defineProps({
     default: () => []
   }
 })
-const configurationStore = useAllListDataStore()
 const titleOptions = ref([])
 const formRef = ref()
 //卡片样式点击类型
@@ -215,8 +214,10 @@ const formState = reactive({
   field2: '',
   field3: '',
   emphasisField: '',
-  specialStyle: '',
+  specialStyle: ``,
 })
+const listFormInfo = inject(LIST_FORM_INFO)
+const dataSource = inject(DATA_SOURCE)
 
 const errorData = computed(() => {
   return (val: string) => {
@@ -287,17 +288,17 @@ const validateValue = () => {
       onCheck()
     }
   })
-  statusColor.value = JSON.parse(formState.specialStyle)
+  statusColor.value = JSON.parse(formState.specialStyle || '{}')
 }
 const onCheck = async () => {
-  try {
-    await formRef.value.validateFields()
+  const valid = await formRef.value.validate()
+  if(valid) {
     validateValue()
     if (formState.field1 !== '') {
-      configurationStore.setALLlistDataInfo('listFormInfo', formState, props.id)
+      Object.assign(listFormInfo, formState)
       return true
     }
-  } catch (errorInfo) {
+  } else {
     return false
   }
 }
@@ -313,14 +314,9 @@ const statusColor = ref({
   warning: '#13c2c2',
 })
 const init = () => {
-  titleOptions.value =
-    configurationStore.getALLlistDataInfo(props.id).datasource || []
-  const data = configurationStore.getALLlistDataInfo(props.id).listFormInfo
-  console.log(data, 'titleOptions.value')
-
-  Object.assign(formState, data)
+  titleOptions.value = dataSource.value || []
+  Object.assign(formState, listFormInfo)
   statusColor.value = JSON.parse(formState.specialStyle || '{}')
-  console.log(statusColor.value, 'statusColor')
 }
 
 onMounted(() => {

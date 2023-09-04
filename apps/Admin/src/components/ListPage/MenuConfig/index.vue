@@ -10,6 +10,7 @@
       <Menu
         ref="menuRef"
         @update:form="(newValue) => (subValue = newValue)"
+        :errorList="errorList"
         :formData="formData"
       />
     </j-drawer>
@@ -17,7 +18,8 @@
 </template>
 <script setup lang="ts">
 import Menu from '@/components/ListPage/MenuConfig/components/menu.vue'
-import { useAllListDataStore } from '@/store/listForm'
+import { validMenu } from './utils/valid'
+import { MENU_CONFIG } from '../keys';
 interface Emit {
   (e: 'update:open', value: boolean): void
 }
@@ -28,12 +30,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  data: {
-    type: Object,
-    default: () => {},
+  id: {
+    type: String,
+    default: '',
   },
 })
-const configurationStore = useAllListDataStore()
+const menConfig = inject(MENU_CONFIG)
 const open = computed({
   get() {
     return props.open
@@ -45,22 +47,17 @@ const open = computed({
 const subValue = ref({})
 const menuRef = ref()
 const formData = ref({ pageName: '', main: true, name: '', icon: '' })
-onMounted(() => {
-  formData.value =
-    configurationStore.getALLlistDataInfo(props.data?.id)?.menu || {}
-  formData.value.pageName = props.data?.title || ''
-})
 
-watch(
-  () => props.data,
-  (val) => {
-    formData.value.pageName = val.title || ''
-  },
-)
-watch(
-  () => subValue.value,
-  (val) => {
-    configurationStore.setALLlistDataInfo('menu', val, props.data?.id)
-  },
-)
+const errorList = ref<any[]>([])
+const valid = () => {
+  return new Promise((resolve, reject) => {
+    errorList.value = validMenu(menConfig)
+    if(errorList.value.length) reject(errorList.value)
+    else resolve([])
+  })
+}
+defineExpose({
+  errorList,
+  valid
+})
 </script>

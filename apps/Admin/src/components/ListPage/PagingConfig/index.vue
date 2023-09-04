@@ -35,18 +35,20 @@
   </div>
 </template>
 <script setup lang="ts">
-import { useAllListDataStore } from '@/store/listForm'
 import { ErrorItem } from '../index'
-const pagingConfigStore = useAllListDataStore()
-const pagingData = ref([
-  { pageSize: 12 },
-  { pageSize: 24 },
-  { pageSize: 48 },
-  { pageSize: 96 },
-])
+import { PropType } from 'vue';
+const pagingData = computed({
+  get() {
+    return props.pagingData
+  },
+  set(val) {
+    emits('update:pagingData', val)
+  }
+})
 
 interface Emit {
   (e: 'update:open', value: boolean): void
+  (e: 'update:pagingData', value: any): void
 }
 
 const emits = defineEmits<Emit>()
@@ -58,6 +60,11 @@ const props = defineProps({
   id: {
     type: null,
   },
+
+  pagingData: {
+    type: Array as PropType<Record<string, any>[]>,
+    default: () => []
+  }
 })
 
 const errorData = computed(() => {
@@ -67,11 +74,6 @@ const errorData = computed(() => {
 })
 const open = computed({
   get() {
-    if (props.open) {
-      pagingData.value = pagingConfigStore.getALLlistDataInfo(props.id).pagingData
-      console.log(pagingConfigStore.getALLlistDataInfo(props.id));
-      
-    }
     return props.open
   },
   set(val: boolean) {
@@ -103,7 +105,6 @@ const blur = () => {
   pagingData.value?.sort((a, b) => {
     return a.pageSize - b.pageSize
   })
-  pagingConfigStore.setALLlistDataInfo('pagingData',pagingData.value,props.id)
 }
 
 /**
@@ -111,7 +112,11 @@ const blur = () => {
  */
 const errorList = ref<any[]>([])
 const valid = () => {
-  errorList.value = pagingData.value.length ? [] : [{key: 'pageList', message: '请配置分页器支持的单页数据量'}]
+  return new Promise((resolve, reject) => {
+    errorList.value = pagingData.value.length ? [] : [{key: 'pageList', message: '请配置分页器支持的单页数据量'}]
+    if(errorList.value.length) reject(errorList.value)
+    else resolve([])
+  })
 }
 
 defineExpose({
