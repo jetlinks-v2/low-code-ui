@@ -23,13 +23,14 @@ const handleModuleChildren = (data: any[]) => {
   const children: any[] = []
 
   data?.forEach?.(item => {
-    item.provider = item.type
+    const type = item.others.type
+    item.provider = item.others.type
 
-    if ([providerEnum.HtmlPage, providerEnum.ListPage, providerEnum.FormPage].includes(item.type)) {
+    if ([providerEnum.HtmlPage, providerEnum.ListPage, providerEnum.FormPage].includes(type)) {
       item.provider = 'page-code'
       resources.push(omit(item, ['fullId']))
     }
-    if ([providerEnum.CRUD, providerEnum.SQL, providerEnum.Function].includes(item.type)) {
+    if ([providerEnum.CRUD, providerEnum.SQL, providerEnum.Function].includes(type)) {
       functions.push(omit(item, ['fullId']))
     }
 
