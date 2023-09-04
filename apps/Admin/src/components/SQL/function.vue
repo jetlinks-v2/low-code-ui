@@ -72,10 +72,14 @@ const onChange = debounce((v) => {
   project.update({
     ...extra,
     configuration: {
-      code: v
+      script: v
     }
   })
 }, 1000)
+
+watch(() => props.configuration.code, () => {
+  code.value = props.configuration.script
+}, { immediate: true })
 
 getTSTips()
 

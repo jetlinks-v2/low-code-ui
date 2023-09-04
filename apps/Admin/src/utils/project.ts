@@ -25,7 +25,7 @@ const handleModuleChildren = (data: any[]) => {
   data?.forEach?.(item => {
     const type = item.others.type
     item.provider = item.others.type
-
+    console.log(item)
     if ([providerEnum.HtmlPage, providerEnum.ListPage, providerEnum.FormPage].includes(type)) {
       item.provider = 'page-code'
       resources.push(omit(item, ['fullId']))

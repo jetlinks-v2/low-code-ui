@@ -35,7 +35,7 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
 
   if (children.functions) {
     children.functions.forEach(item => {
-      const type = item.provider
+      const type = item.others?.type || item.provider
       const others = Object.assign(item.others || {}, { type })
       treeData.push({
         ...item,
@@ -49,7 +49,7 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
 
   if (children.resources) {
     children.resources.forEach(item => {
-      const type = item.provider
+      const type = item.others?.type || item.provider
       const others = Object.assign(item.others || {}, { type })
       treeData.push({
         ...item,
