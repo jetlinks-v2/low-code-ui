@@ -1,10 +1,10 @@
 <template>
   <div>
     <template v-if="listType === 'text'">
-      <File v-bind="_componentProps" />
+      <File v-bind="_componentProps" :value="_value" @change="onChange"/>
     </template>
     <template v-else>
-      <Picture v-bind="_componentProps" />
+      <Picture v-bind="_componentProps" :value="_value" @change="onChange"/>
     </template>
   </div>
 </template>
@@ -35,7 +35,26 @@ const props = defineProps({
     type: String,
     default: 'text',
   },
+  value:Array
 })
+const _value:any = ref([])
+const emit = defineEmits(['update:value'])
+
+// const updateValue = (value:any) =>{
+//   emit('update:value',value)
+// }
+
+watch(
+  ()=>props.value,
+  (val)=>{
+    _value.value = val
+  }
+)
+
+const onChange = (item:any)=>{
+  // console.log('item---',item)
+  emit('update:value',item)
+}
 
 const _componentProps = computed(() => {
   return omit(props, 'listType')
