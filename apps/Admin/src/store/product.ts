@@ -220,6 +220,11 @@ const findParent=(data, target, result) =>{
     return arr;
   }
 
+  const getServerModulesData = async () => {
+    const integrateData = Integrate(data.value)
+    return integrateData?.modules || []
+  }
+
   const queryProduct = async (id?: string, cb?: () => void) => {
     if (!id) return
     dataMap.clear()
@@ -263,7 +268,8 @@ const findParent=(data, target, result) =>{
     remove,
     getById,
     getParent,
-    initProjectState
+    initProjectState,
+    getServerModulesData
   }
 },{
   persist: false

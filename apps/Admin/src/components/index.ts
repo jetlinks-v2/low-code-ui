@@ -16,7 +16,7 @@ import ProImage from './Image/index.vue'
 import EditorModal from './EditorModal'
 import CRUD from './Database'
 import {BooleanSelect, EmptySelect} from './Select'
-import { SQLCode } from './SQL'
+import { SQLCode, FunctionCode } from './SQL'
 
 export default  {
     install(app: App) {
@@ -38,5 +38,6 @@ export default  {
           .component('EmptySelect',EmptySelect)
           .component('BooleanSelect',BooleanSelect)
           .component('SQLCode', SQLCode)
+          .component('FunctionCode', FunctionCode)
     }
 }
