@@ -36,7 +36,7 @@ import { useEngine, useProduct } from '@/store'
 import { storeToRefs } from 'pinia'
 import RightMenu from './rightMenu.vue'
 import InputModal from '@/components/ProJect/components/Action/InputModal.vue'
-import {providerEnum} from "@/components/ProJect/index";
+import { providerEnum } from "@/components/ProJect/index";
 import { randomString } from '@jetlinks/utils'
 
 const engine = useEngine()

@@ -74,8 +74,8 @@ const ownerId = computed(() => {
 
 const tableName = ref(props.configuration.tableName)
 const columns = ref(props.configuration.columns || defaultSetting)
-const relation = ref(props.configuration.relation || {})
-const asset = ref(props.configuration.asset || {})
+const relation = ref(props.configuration.relation || { relationType: 'id' })
+const asset = ref(props.configuration.asset || { assetIdColumn: 'id' })
 const tree = ref(props.configuration.tree || false)
 
 const update = () => {

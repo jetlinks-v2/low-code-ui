@@ -16,7 +16,7 @@
                 关系标识
               </div>
               <div class="descriptions-content">
-                <j-select v-model:value="myRelation.relationType" style="width: 100%" @change="relationChange" />
+                <j-select :options="columnOptions" v-model:value="myRelation.relationType" style="width: 100%" @change="relationChange" />
               </div>
             </div>
             <div class="descriptions-item">
@@ -109,7 +109,7 @@
                 列名称
               </div>
               <div class="descriptions-content">
-                <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" @change="assetChange" />
+                <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" :options="columnOptions" @change="assetChange" />
               </div>
             </div>
             <div class="descriptions-item">
@@ -135,7 +135,7 @@
                 当前表字段
               </div>
               <div class="descriptions-content">
-                <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" @change="assetChange" />
+                <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" :options="columnOptions" @change="assetChange" />
               </div>
             </div>
             <div class="descriptions-item">
@@ -159,6 +159,7 @@
 <script setup name="CRUDAdvanced">
 import { getAssetType } from '@/api/basis'
 import { useRequest } from '@jetlinks/hooks'
+import {CRUD_COLUMNS} from "@/components/Database/util";
 
 const props = defineProps({
   tree: {
@@ -174,9 +175,16 @@ const props = defineProps({
     default: () => ({})
   }
 })
+
+const CrudColumns = inject(CRUD_COLUMNS)
+
 const emit = defineEmits(['update:tree','update:asset','update:relation', 'update'])
 
 const { data:options } = useRequest(getAssetType)
+
+const columnOptions = computed(() => {
+  return CrudColumns.value.map(item => ({ label: item.name, value: item.name}))
+})
 
 const myRelation = reactive(props.relation || {
   enabled: true,
