@@ -21,9 +21,10 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
   if (children.children) {
     children.children.forEach(item => {
       const hasChildren = item.children?.length || item.functions?.length || item.resources?.length
-
+      const others = Object.assign(item.others || {}, { type: item.provider })
       treeData.push({
         ...item,
+        others,
         title: item.name,
         type: providerEnum.Module,
         parentId: parentId,
@@ -34,10 +35,13 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
 
   if (children.functions) {
     children.functions.forEach(item => {
+      const type = item.provider
+      const others = Object.assign(item.others || {}, { type })
       treeData.push({
         ...item,
+        others,
+        type,
         title: item.name,
-        type: item.others?.type,
         parentId: parentId,
       })
     })
@@ -45,10 +49,13 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
 
   if (children.resources) {
     children.resources.forEach(item => {
+      const type = item.provider
+      const others = Object.assign(item.others || {}, { type })
       treeData.push({
         ...item,
+        others,
+        type,
         title: item.name,
-        type: item.others?.type,
         parentId: parentId,
       })
     })
@@ -61,7 +68,8 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
  */
 const updateProductReq = throttle((data: any[]) => {
   const integrateData = Integrate(data)
-  updateDraft(integrateData.draftId, integrateData)
+  console.log(integrateData)
+  // updateDraft(integrateData.draftId, integrateData)
 }, 1000)
 
 export const useProduct = defineStore('product', () => {
