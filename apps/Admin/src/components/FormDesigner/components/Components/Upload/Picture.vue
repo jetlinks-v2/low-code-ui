@@ -1,7 +1,7 @@
 <template>
   <a-upload dragger name="file" v-model:file-list="fileList" list-type="picture-card" :max-count="maxCount" :headers="{
-    'X-Access-Token': LocalStore.get(TOKEN_KEY)
-  }" :before-upload="beforeUpload" :accept="accept" :disabled="fileList.length >= maxCount">
+    [TOKEN_KEY]: LocalStore.get(TOKEN_KEY)
+  }" :before-upload="beforeUpload" :accept="accept" :disabled="fileList.length >= maxCount" >
 
     <div v-if="maxCount > 1 || fileList.length < maxCount ">
       <p class="icon">
@@ -64,7 +64,10 @@ const props = defineProps({
     type: String,
     default: 'picture',
   },
+  value:Array
 })
+
+const emits = defineEmits(['change'])
 
 const cropper = reactive({
   visible: false,
@@ -99,6 +102,7 @@ const saveImage = async (url: string) => {
         uid: randomString(16)
       })
     })
+    emits('change',fileList.value)
   }
 }
 
@@ -106,7 +110,8 @@ const saveImage = async (url: string) => {
 const beforeUpload = (file: UploadProps['fileList'][number]) => {
   const maxSize = props.unit === 'M' ? props.fileSize * 1024 * 1024 : props.fileSize * 1024
   const arr = file.name.split('.')
-  const isType = props.accept?.length ? props.accept?.join('').includes(arr[arr.length - 1]) : true
+  const imgType =['image/jpeg', 'image/png','image/jpg']
+  const isType = props.accept?.length ? props.accept?.join('').includes(arr[arr.length - 1]) : imgType.includes(file.type);
 
 
 
@@ -142,11 +147,19 @@ const onDbClick = (file) => {
 const onBlur = () => {
   dbId.value = ''
   dbRef.value = false
-  console.log(fileList.value)
+  // console.log(fileList.value)
 }
 
-
-
+watch(
+  ()=>props.value,
+  (val)=>{
+    // console.log('val',val)
+    if(val){
+      fileList.value = val
+    }
+   
+  }
+)
 
 </script>
 

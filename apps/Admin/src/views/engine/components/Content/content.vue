@@ -6,6 +6,8 @@
     <CustomHTML v-else-if="data.type === providerEnum.HtmlPage" :data="props.data"/>
     <CRUD v-else-if="data.type === providerEnum.CRUD" v-bind="data"/>
     <ListPage v-else-if="data.type === providerEnum.ListPage" :data="props.data"/>
+    <SQLCode v-else-if="data.type === providerEnum.SQL"  v-bind="data"/>
+    <FunctionCode v-else-if="data.type === providerEnum.Function"  v-bind="data"/>
   </div>
 </template>
 
@@ -16,10 +18,14 @@ import ProjectEmpty from '@/components/ProJect/Empty/index.vue'
 const props = defineProps({
   data: {
     type: Object,
-    default: {}
+    default: () => ({})
   },
 })
 
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.content-warp {
+  height: 100%;
+}
+</style>
