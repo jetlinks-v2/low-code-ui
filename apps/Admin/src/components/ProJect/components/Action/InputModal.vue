@@ -78,7 +78,10 @@ onKeyStroke('Enter', async () => {
     if (res && modelRef.title) {
         emit('save', {
             ...modelRef,
-            name:modelRef.title
+            name: modelRef.title,
+            others: {
+              type: modelRef.type
+            }
         })
     }
 })

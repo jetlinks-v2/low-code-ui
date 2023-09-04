@@ -57,7 +57,7 @@ const onContextMenuClick = (node, menuKey) => {
     case providerEnum.CRUD:
     case providerEnum.SQL:
     case providerEnum.Function:
-      const isModule = node.type === providerEnum.Module
+      const isModule = node.provider === providerEnum.Module
       let _arr = node.data.children || []
       if (!isModule) {
         _arr = product.getById(node.parentId)?.children || []
