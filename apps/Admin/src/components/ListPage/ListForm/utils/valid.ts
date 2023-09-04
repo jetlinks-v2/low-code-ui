@@ -1,5 +1,4 @@
 export const validListForm = (data1, data2) => {
-  console.log(data1, data2);
   let errorList: any = []
   if(data1.configured.includes('card')) {
     if(!data2.field1) errorList.push({
@@ -13,6 +12,5 @@ export const validListForm = (data1, data2) => {
       })
     }
   }
-  console.log(errorList);
   return errorList
 }

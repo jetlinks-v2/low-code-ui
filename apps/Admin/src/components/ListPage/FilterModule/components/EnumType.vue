@@ -28,7 +28,8 @@
           style="width: 200px"
           v-model:value="state.abilityValue"
           showSearch
-          :options="abilityOptions"
+          :options="functionOptions"
+          :field-names="{label: 'name', value: 'id'}"
         />
         <!--选中功能类型为SQL/函数时，下拉框后方展示指令下拉框-->
         <j-select
@@ -38,7 +39,7 @@
           style="width: 200px"
           v-model:value="state.instructValue"
           showSearch
-          :options="instructOptions"
+          :options="commandOptions"
         />
       </j-space>
     </div>
@@ -46,6 +47,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useFunctions } from '@/hooks/useFunctions';
 interface Emit {
   (e: 'update:state', value: any): void
 }
@@ -58,6 +60,8 @@ const props = defineProps({
     default: () => {},
   },
 })
+
+const { functionOptions, commandOptions, handleFunction } = useFunctions()
 const emits = defineEmits<Emit>()
 const data = props.data?.config || null
 
