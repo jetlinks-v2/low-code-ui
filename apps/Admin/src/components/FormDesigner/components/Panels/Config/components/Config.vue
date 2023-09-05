@@ -193,7 +193,8 @@
           'user',
           'product',
           'device',
-          'geo'
+          'geo',
+          'form'
         ].includes(type)
       "
     >

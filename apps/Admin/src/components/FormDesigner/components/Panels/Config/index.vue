@@ -26,6 +26,7 @@ import { Scrollbar } from 'jetlinks-ui-components'
 import Base from './components/Base.vue'
 import Status from './components/Status.vue'
 import Source from './components/Source.vue'
+import SourceForm from './components/SourceForm.vue'
 import Form from './components/Form.vue'
 import Grid from './components/Grid.vue'
 import Config from './components/Config.vue'
@@ -51,6 +52,7 @@ const Panels = {
   Status,
   Source,
   Grid,
+  SourceForm
 }
 
 const panelsList = computed(() => {

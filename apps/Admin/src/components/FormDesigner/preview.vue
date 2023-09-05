@@ -42,6 +42,9 @@ const props = defineProps({
     type: Object
   },
 })
+
+const emit = defineEmits(['valueChange'])
+
 const formData = ref<ISchema>() // 表单数据
 const formState = reactive<any>({})
 const formRef = ref<any>()
@@ -86,6 +89,10 @@ const onSave = () => {
       console.log('Validate Failed:', info)
     })
 }
+
+watch(() => JSON.stringify(formData.value), () => {
+  emit("valueChange", formData.value)
+})
 
 defineExpose({ onSave })
 </script>
