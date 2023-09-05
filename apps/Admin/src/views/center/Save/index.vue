@@ -7,8 +7,9 @@
                 { required: true, message: '请输入项目标识' },
                 { max: 256, message: '最多输入256个字符' },
                 { pattern: regular.inputReg, message: '要求以小写字母开头，由字母+数字构成' },
+                { validator: vailId, trigger: 'blur' },
             ]">
-                <j-input v-model:value="modelRef.id" placeholder="请输入项目标识" />
+                <j-input v-model:value="modelRef.id" placeholder="请输入项目标识" :disabled="!!data.id"/>
             </j-form-item>
             <j-form-item label="项目名称" name="name" validateFirst :rules="[
                 { required: true, message: '请输入项目名称' },
@@ -27,7 +28,7 @@
 
 <script setup lang='ts' name="Save">
 import { regular } from '@jetlinks/utils';
-import { addProject, editProject } from '@/api/project'
+import { _validateProject, addProject, editProject } from '@/api/project'
 import { onlyMessage } from '@/utils/comm';
 import { useRequest } from '@jetlinks/hooks'
 
@@ -59,10 +60,10 @@ const title = computed(() => {
     }
 })
 
-const { loading, run } = useRequest(props.data.id ? editProject : addProject,{
-    immediate:false,
-    onSuccess:(res)=>{
-        if(res.success){
+const { loading, run } = useRequest(props.data.id ? editProject : addProject, {
+    immediate: false,
+    onSuccess: (res) => {
+        if (res.success) {
             onlyMessage('操作成功')
             emit('close')
         }
@@ -75,6 +76,28 @@ const handleSave = async () => {
         run(data)
     }
 }
+
+const vailId = async (_: Record<string, any>, value: string) => {
+    if (!props?.data?.id && value) {
+        const resp = await _validateProject({
+            "terms": [
+                {
+                    "type": "or",
+                    "value": value,
+                    "termType": "eq",
+                    "column": "id"
+                }
+            ]
+        });
+        if (resp.status === 200 && resp.result) {
+            return Promise.reject('标识需唯一');
+        } else {
+            return Promise.resolve();
+        }
+    } else {
+        return Promise.resolve();
+    }
+};
 
 const handleCancel = () => {
     emit('close')

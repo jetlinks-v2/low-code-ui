@@ -17,11 +17,16 @@
           <template #content>
             <div class="card-item">
               <div class="title">
-                <div>{{ record.id }}</div>
+                <j-ellipsis style="max-width: 200px;">{{ record.id }}</j-ellipsis>
                 <div class="title-tag"><j-tag :color="record.runningState.value === 'enabled' ? 'blue' : 'red'">{{
                   record.runningState.text }}</j-tag></div>
               </div>
-              <div>项目名称：{{ record.name }}</div>
+              <div style="display: flex;">
+                <span>项目名称：</span>
+                <j-ellipsis style="width: 200px;">
+                  {{ record.name }}
+                </j-ellipsis>
+              </div>
               <div>创建时间：{{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}</div>
               <div class="bottom">
                 <div>最近发布：{{ record.deployTime ? dayjs(record.deployTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}</div>
@@ -39,7 +44,7 @@
 
     </JProTable>
     <Save v-if="visible" @close="handleClose" :data="current" :type="modelType" />
-    <Menu v-if="visibleMenu" @close="visibleMenu = false" :data="current"/>
+    <Menu v-if="visibleMenu" @close="visibleMenu = false" :data="current" />
   </page-container>
 </template>
 
@@ -162,8 +167,8 @@ const getActions = (record) => {
       text: record.runningState.value === 'enabled' ? '禁用' : '启用',
       permissionProps: {
         tooltip: {
-          title: record.runningState.value === 'enabled' ? '禁用' : 
-          record.state.value==='published'?'启用':'请先发布项目',
+          title: record.runningState.value === 'enabled' ? '禁用' :
+            record.state.value === 'published' ? '启用' : '请先发布项目',
         },
         popConfirm: {
           title: record.runningState.value === 'enabled' ? '确认禁用？' : '确认启用？',
@@ -172,7 +177,7 @@ const getActions = (record) => {
           }
         },
         hasPermission: true,
-        disabled:record.state.value!=='published' && record.runningState.value !== 'enabled',
+        disabled: record.state.value !== 'published' && record.runningState.value !== 'enabled',
         // icon: 'EyeOutlined',
       },
     },
@@ -181,11 +186,11 @@ const getActions = (record) => {
       text: '菜单管理',
       permissionProps: {
         tooltip: {
-          title: record.state.value==='published'?'菜单管理':'请先发布项目',
+          title: record.state.value === 'published' ? '菜单管理' : '请先发布项目',
         },
         hasPermission: true,
         icon: 'EyeOutlined',
-        disabled:record.state.value!=='published',
+        disabled: record.state.value !== 'published',
         onClick: () => {
           // console.log(record)
           visibleMenu.value = true
@@ -207,7 +212,7 @@ const getActions = (record) => {
           }
         },
         hasPermission: true,
-        disabled:data?.runningState.value === 'enabled',
+        disabled: data?.runningState.value === 'enabled',
       }),
     }
   ]
@@ -275,4 +280,5 @@ const _action = async (id: string, type: string) => {
       margin-left: 5px;
     }
   }
-}</style>
+}
+</style>
