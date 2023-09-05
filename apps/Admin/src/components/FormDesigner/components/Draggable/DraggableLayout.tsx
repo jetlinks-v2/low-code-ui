@@ -187,7 +187,7 @@ const DraggableLayout = defineComponent({
                             }
 
                             const registerToRefList = (path: string[], _ref: any) => {
-                                if(!unref(isEditModel) && Array.isArray(path) && path?.length && element?.formItemProps?.name){
+                                if(!unref(isEditModel) && Array.isArray(path) && path?.length && element?.formItemProps?.name && designer.refList){
                                     const __path = path.join('.')
                                     designer.refList.value[__path] = _ref
                                 }
