@@ -15,7 +15,9 @@
                     }">
                         <div style="display: flex; align-items: center;">
                             <AIcon :type="item.icon || item.others?.menu?.icon" />
-                            <div style="margin-left: 10px;">{{ item.others?.menu?.name }}</div>
+                            <div style="margin-left: 10px;">
+                                <j-ellipsis style="max-width: 250px;">{{ item.others?.menu?.name }}</j-ellipsis>
+                            </div>
                         </div>
                         <j-badge :count="countMap.get(item.id)" :number-style="{ backgroundColor: '#315efb' }" />
                     </div>
