@@ -1,4 +1,8 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 importers:
 
@@ -113,6 +117,9 @@ importers:
       '@vuemap/vue-amap':
         specifier: ^2.0.13
         version: 2.0.13(vue@3.3.4)
+      '@vueuse/core':
+        specifier: ^10.1.2
+        version: 10.1.2(vue@3.3.4)
       dayjs:
         specifier: ^1.11.8
         version: 1.11.8
@@ -185,7 +192,7 @@ importers:
         version: 0.52.7(postcss@8.4.29)(rollup@3.23.1)(vite@4.3.9)
       unplugin-auto-import:
         specifier: ^0.16.4
-        version: 0.16.4(rollup@3.23.1)
+        version: 0.16.4(@vueuse/core@10.1.2)(rollup@3.23.1)
       unplugin-vue-components:
         specifier: ^0.24.1
         version: 0.24.1(rollup@3.23.1)(vue@3.3.4)
@@ -312,7 +319,7 @@ importers:
         version: 0.52.7(postcss@8.4.29)(rollup@3.23.1)(vite@4.3.9)
       unplugin-auto-import:
         specifier: ^0.16.4
-        version: 0.16.4(rollup@3.23.1)
+        version: 0.16.4(@vueuse/core@10.1.2)(rollup@3.23.1)
       unplugin-vue-components:
         specifier: ^0.24.1
         version: 0.24.1(rollup@3.23.1)(vue@3.3.4)
@@ -2021,7 +2028,6 @@ packages:
 
   /@types/web-bluetooth@0.0.17:
     resolution: {integrity: sha512-4p9vcSmxAayx72yn70joFoL44c9MO/0+iVEBIQXe3v2h2SiAsEIo/G5v6ObFWvNKRFjbrVadNf9LqEEZeQPzdA==}
-    dev: false
 
   /@unocss/astro@0.52.7(rollup@3.23.1)(vite@4.3.9):
     resolution: {integrity: sha512-jGm3sVB6AU3A1vXJskCdG2kUw1aRdg2fV60nILCBiRmj7SIlbMTXEHrz864AaleGVnxTiV7oGL4P1DfDJ3tQSA==}
@@ -2554,7 +2560,6 @@ packages:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
-    dev: false
 
   /@vueuse/core@7.7.1(vue@3.3.4):
     resolution: {integrity: sha512-PRRgbATMpoeUmkCEBtUeJgOwtew8s+4UsEd+Pm7MhkjL2ihCNrSqxNVtM6NFE4uP2sWnkGcZpCjPuNSxowJ1Ow==}
@@ -2586,7 +2591,6 @@ packages:
 
   /@vueuse/metadata@10.1.2:
     resolution: {integrity: sha512-3mc5BqN9aU2SqBeBuWE7ne4OtXHoHKggNgxZR2K+zIW4YLsy6xoZ4/9vErQs6tvoKDX6QAqm3lvsrv0mczAwIQ==}
-    dev: false
 
   /@vueuse/metadata@9.13.0:
     resolution: {integrity: sha512-gdU7TKNAUVlXXLbaF+ZCfte8BjRJQWPCa2J55+7/h+yDtzw3vOoGQDRXzI6pyKyo6bXFT5/QoPE4hAknExjRLQ==}
@@ -2612,7 +2616,6 @@ packages:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
-    dev: false
 
   /@vueuse/shared@7.7.1(vue@3.3.4):
     resolution: {integrity: sha512-rN2qd22AUl7VdBxihagWyhUNHCyVk9IpvBTTfHoLH9G7rGE552X1f+zeCfehuno0zXif13jPw+icW/wn2a0rnQ==}
@@ -7095,7 +7098,7 @@ packages:
       - vite
     dev: true
 
-  /unplugin-auto-import@0.16.4(rollup@3.23.1):
+  /unplugin-auto-import@0.16.4(@vueuse/core@10.1.2)(rollup@3.23.1):
     resolution: {integrity: sha512-xdgBa9NAS3JG8HjkAZHSbGSMlrjKpaWKXGUzaF6RzEtr980RCl1t0Zsu0skUInNYrEQfqaHc7aGWPv41DLTK/w==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -7109,6 +7112,7 @@ packages:
     dependencies:
       '@antfu/utils': 0.7.6
       '@rollup/pluginutils': 5.0.4(rollup@3.23.1)
+      '@vueuse/core': 10.1.2(vue@3.3.4)
       local-pkg: 0.4.3
       magic-string: 0.30.3
       minimatch: 9.0.3
@@ -7521,7 +7525,6 @@ packages:
         optional: true
     dependencies:
       vue: 3.3.4
-    dev: false
 
   /vue-router@4.2.2(vue@3.3.4):
     resolution: {integrity: sha512-cChBPPmAflgBGmy3tBsjeoe3f3VOSG6naKyY5pjtrqLGbNEXdzCigFUHgBvp9e3ysAtFtEx7OLqcSDh/1Cq2TQ==}
@@ -7756,7 +7759,3 @@ packages:
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
