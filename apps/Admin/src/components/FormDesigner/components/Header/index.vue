@@ -3,7 +3,7 @@
     <div class="left">
       <j-space :size="24">
         <span>提供多种方式帮助你快速添加表单页内容</span>
-        <QuickAdd />
+        <QuickAdd :data="data" />
       </j-space>
     </div>
     <div class="right">
@@ -29,6 +29,13 @@ import { checkedConfig } from '../../utils/utils'
 import QuickAdd from '../QuickAdd/index.vue'
 
 const designer: any = inject('FormDesigner')
+
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => {}
+  },
+})
 
 const emits = defineEmits(['save'])
 
