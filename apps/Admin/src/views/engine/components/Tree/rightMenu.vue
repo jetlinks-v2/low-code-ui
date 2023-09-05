@@ -82,6 +82,9 @@ const onContextMenuClick = (node, menuKey) => {
     case actionMap.Delete.key:
       product.remove(node)
       break;
+    case actionMap.Copy.key:
+      console.log('-------')
+      break;
   }
 
 }

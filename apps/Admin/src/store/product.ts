@@ -253,7 +253,7 @@ const findParent=(data, target, result) =>{
     data.value = []
     dataMap.clear()
     dataById.value = null
-
+    info.value = null
     engine.initEngineState()
   }
 

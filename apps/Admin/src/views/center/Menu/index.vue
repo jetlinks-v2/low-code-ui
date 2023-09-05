@@ -37,13 +37,23 @@ const onChange = (item) => {
 const getTree = () => {
     product.queryProduct(props.data?.draftId, () => {
         const maps = product.getDataMap()
-        list.value = [...maps.values()].filter(item => item.others && item.others?.menu)
-        console.log('list',list.value)
+        const copyData = JSON.parse(JSON.stringify([...maps.values()]))
+        list.value = copyData.filter(item => {
+            // console.log(item)
+            return item.others && item.others?.menu
+        }).map(item => {
+            item.parentFullId = maps.get(item.parentId).fullId
+            return item
+        })
     })
 }
 
 onMounted(() => {
     getTree()
+})
+
+onUnmounted(()=>{
+    product.initProjectState()
 })
 </script>
 
