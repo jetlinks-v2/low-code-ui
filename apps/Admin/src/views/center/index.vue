@@ -9,11 +9,17 @@
         <j-button type="primary" @click="handleSave('add')">新增</j-button>
       </template>
       <template #card="record">
-        <Card :actions="getActions(record)" :record="record" :status="record.state.value" @click="_view(record.draftId)"
-          :statusText="record.state.text" :statusNames="{
+        <Card
+          :actions="getActions(record)"
+          :record="record"
+          :status="record.state.value"
+          :statusText="record.state.text"
+          :statusNames="{
             unpublished: 'error',
             published: 'success',
-          }">
+          }"
+          @click="_view(record.draftId)"
+        >
           <template #content>
             <div class="card-item">
               <div class="title">
@@ -147,6 +153,7 @@ const columns = [
 ]
 
 const getActions = (record) => {
+  console.log(record)
   return [
     {
       key: 'edit',

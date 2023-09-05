@@ -46,7 +46,7 @@
     </div>
     <ResizeObserver :onResize="onResize">
       <div class="card-footer" v-if="showTool && actions?.length">
-        <div :class="['card-button', item.key === 'delete' ? 'delete' : 'default']" v-for="item in myActions">
+        <div :class="['card-button', item.key === 'delete' ? 'delete' : 'default']" v-for="item in actionsList">
           <OtherActions
             v-if="item.key === 'others'"
             :actions="item.actions"
@@ -123,6 +123,9 @@ const props = defineProps({
 const slots = useSlots();
 
 const emit = defineEmits(['click'])
+const myActions = ref([])
+const widthCount = ref(0)
+const max = ref(0)
 
 const bodyClass = computed(() => {
   return {
@@ -131,6 +134,23 @@ const bodyClass = computed(() => {
     'disabled': props.disabled
   }
 })
+
+const actionsList = computed(() => {
+  const maxLength = parseInt(String(max.value / 100))
+  console.log(maxLength)
+  if (widthCount.value && widthCount.value > max.value && maxLength > 1) {
+    const cloneActions = cloneDeep(props.actions)
+    const newActions = cloneActions.splice(0, maxLength - 1)
+    newActions.push({
+      key: 'others',
+      actions: cloneActions
+    })
+    return newActions
+  } else {
+    return props.actions
+  }
+})
+
 
 const stateColor = computed(() => {
   const badgeColor = props.statusColor || BadgeColors
@@ -144,7 +164,7 @@ const cardClick = () => {
   emit('click')
 }
 
-const myActions = ref([])
+
 
 const handleFunction = (item) => {
   if (isFunction(item)) {
@@ -155,25 +175,14 @@ const handleFunction = (item) => {
   return undefined
 }
 
+
+
 const onResize = debounce((e) => {
   const len = props.actions?.length || 0
   const hasDelete = props.actions.some(item => item.key === 'delete')
   const deleteWidth = hasDelete ? 60 : 0
-  const max = e.width
-  const maxLength = parseInt(String(max / 100))
-  const widthCount = 100 * len + deleteWidth
-
-  if (widthCount > max ) {
-    const cloneActions = cloneDeep(props.actions)
-    const newActions = cloneActions.splice(0, maxLength - 1)
-    newActions.push({
-      key: 'others',
-      actions: cloneActions
-    })
-    myActions.value = newActions
-  } else {
-    myActions.value = props.actions
-  }
+  max.value = e.width
+  widthCount.value = 100 * len + deleteWidth
 }, 100)
 
 </script>
@@ -315,8 +324,15 @@ const onResize = debounce((e) => {
         border: 1px solid #e6e6e6;
         color: #2f54eb;
       }
+
       :deep(.ant-tooltip-disabled-compatible-wrapper){
         width: 100%;
+      }
+
+      :deep(.ant-btn[disabled]) {
+        background: #f5f5f5;
+        border-color: #00000040;
+        color: #00000040!important;
       }
 
       &.delete {

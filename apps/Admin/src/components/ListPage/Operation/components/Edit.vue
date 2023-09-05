@@ -72,7 +72,7 @@
           name="pages"
         >
           <ErrorItem :errorData="errorMessage['pages']">
-            <j-select v-model:value="form.pages" placeholder="请选择调用页面">
+            <j-select v-model:value="form.pages" placeholder="请选择调用页面" @change="handlePages">
               <j-select-option
                 v-for="item in pagesOptions"
                 :value="item.id"
@@ -105,6 +105,7 @@ import { activeBtnKey, errorListKey, editTypeKey } from '../keys'
 import { providerEnum } from '@/components/ProJect'
 import { ErrorItem } from '../..'
 import { useFunctions } from '@/hooks/useFunctions'
+import { pick } from 'lodash-es'
 
 const props = defineProps({
   data: {
@@ -121,6 +122,7 @@ const editType = inject(editTypeKey)
 const errorList = inject(errorListKey)
 
 const productStore = useProduct();
+const { info } = productStore
 const { functionOptions, commandOptions, handleFunction } = useFunctions()
 const errorMessage = computed(() => {
   let data = {}
@@ -165,6 +167,7 @@ const form = reactive({
   pages: props.data.pages,
   command: props.data.command,
   style: props.data.style,
+  resource: props.data.resource
 })
 
 const rules = {
@@ -183,6 +186,11 @@ const rules = {
   pages: [{ required: true, message: '请选择调用页面', trigger: 'blur' }],
 }
 
+const handlePages = (val: string) => {
+  const data = pagesOptions.value.find(item => item.id === val)
+  form.resource = {...pick(data, ['id', 'parentId', 'type']), projectId: info.id}
+  form.resource.parentId = `${form.resource.projectId}.${form.resource.parentId}`
+}
 const submit = async () => {
   const valid = await formRef.value?.validate()
   return valid
