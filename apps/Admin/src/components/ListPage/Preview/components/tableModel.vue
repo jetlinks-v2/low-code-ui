@@ -1,12 +1,12 @@
 <template>
   <div>
     <JProTable
-      v-if="props.model === 'list'"
       ref="tableRef"
       :columns="props?.dataColumns"
       :request="props?.query"
       :pagination="props?.pagination"
-      model="TABLE"
+      :model="model"
+      :modelValue="defaultFormType"
     >
       <template #headerTitle>
         <HeaderButton :headerActions="props.headerActions" />
@@ -42,7 +42,7 @@
         </div>
         <div v-if="item?.key === 'action'">
           <PermissionButton
-            v-for="item in slotProps?.actions"
+            v-for="item in tableActions"
             :key="item.key"
             type="link"
             v-bind:="handleFunction(item.permissionProps, slotProps)"
@@ -59,18 +59,6 @@
             <j-divider type="vertical" />
           </PermissionButton>
         </div>
-      </template>
-    </JProTable>
-    <JProTable
-      v-if="props.model === 'card'"
-      ref="tableRef"
-      :columns="props?.dataColumns"
-      :request="props?.query"
-      :pagination="props?.pagination"
-      model="CARD"
-    >
-      <template #headerTitle>
-        <HeaderButton :headerActions="props.headerActions" />
       </template>
       <template #card="slotProps">
         <Card
@@ -247,7 +235,6 @@
           </template>
         </Card>
       </template>
-      <template #action="slotProps"> </template>
     </JProTable>
   </div>
 </template>
@@ -256,6 +243,7 @@ import Card from '@/components/Card'
 import HeaderButton from '@/components/ListPage/Preview/components/HederActions.vue'
 import { isFunction, isObject } from 'lodash-es'
 import dayjs from 'dayjs'
+import { PropType } from 'vue'
 const props = defineProps({
   model: {
     type: String,
@@ -289,6 +277,14 @@ const props = defineProps({
   },
   headerActions: {
     type: Array,
+    default: () => [],
+  },
+  defaultFormType: {
+    type: String,
+    default: 'CARD',
+  },
+  tableActions: {
+    type: Array as PropType<Record<string, any>>,
     default: () => [],
   },
 })
@@ -381,6 +377,25 @@ const dataFormat = (data: any, value: any) => {
   }
   return format
 }
+
+const getActions = (
+  data: Partial<Record<string, any>>,
+  type: 'card' | 'table',
+) => {
+  if (!data) return []
+  const actions = [
+    {
+      key: 'view',
+      text: '查看',
+      tooltip: {
+        title: '查看',
+      },
+      icon: 'EyeOutlined',
+    },
+  ]
+  return actions
+}
+
 const jsonOpen = (value: any) => {
   emit('openJson', { previewVisible: true, value: value })
 }
