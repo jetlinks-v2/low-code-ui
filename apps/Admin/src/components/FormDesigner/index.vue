@@ -129,6 +129,7 @@ const getFieldData = (data: ISchema) => {
 }
 
 provide('FormDesigner', {
+  tabsId: props.data?.id,
   model,
   formData,
   isShowConfig,
