@@ -26,7 +26,7 @@ const layout = ['card', 'grid', 'tabs', 'collapse', 'space']
 const checkedConfigItem = (node: ISchema) => {
     const _type = node.type || 'root'
     if (_type === 'root') {
-        return false
+        return ''
     } else {
         if (['text'].includes(_type) && !(node?.componentProps?.value && node?.formItemProps?.name)) {
             return node?.key
@@ -38,19 +38,24 @@ const checkedConfigItem = (node: ISchema) => {
                 return node?.key
             }
         }
-        if('input-number' && !(node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined && node?.componentProps?.precision !== undefined)) {
+        if('input-number' === _type && !(node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined && node?.componentProps?.precision !== undefined)) {
             return node?.key
         }
         if (['select', 'tree-select', 'select-card'].includes(_type)) {
             // 数据源
-            // return node?.key
+            if(node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
+                return node?.key
+            }
+            if(node?.componentProps?.source?.type === 'end' && !(node?.componentProps.source?.commandId && node?.componentProps.source?.functionId && node?.componentProps.source?.label && node?.componentProps.source?.value)) {
+                return node?.key
+            }
         }
-        if ('upload' && !(node?.componentProps?.maxCount && node?.componentProps?.size)) {
+        if ('upload' === _type && !(node?.componentProps?.accept && node?.componentProps?.maxCount && node?.componentProps?.fileSize)) {
             // 个数和单位
             return node?.key
         }
-        if ('table') {
-            // 数据绑定
+        if ('space' === _type && !node?.componentProps?.size) {
+            return node?.key
         }
         if (['card'].includes(_type) && !(node?.componentProps?.title)) {
             return node?.key

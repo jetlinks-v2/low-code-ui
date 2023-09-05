@@ -47,8 +47,9 @@ const formState = reactive<any>({})
 const formRef = ref<any>()
 
 watch(
-  () => props.data?.other?.formDesigner,
+  () => props.data,
   (newVal) => {
+    console.log(newVal, 'hhhhh')
     formData.value = (newVal || initData) as ISchema
   },
   {

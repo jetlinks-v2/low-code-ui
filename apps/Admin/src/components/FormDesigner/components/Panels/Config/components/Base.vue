@@ -7,6 +7,7 @@
           'tabs-item',
           'card',
           'card-item',
+          'table-item',
           'grid',
           'tabs',
           'collapse',
@@ -214,7 +215,7 @@
           />
         </j-form-item>
       </template>
-      <!-- <template v-if="['table-item'].includes(type)">
+      <template v-if="['table-item'].includes(type)">
         <j-form-item label="名称" :name="['componentProps', 'title']" required>
           <j-input
             placeholder="请输入"
@@ -236,7 +237,7 @@
             v-model:value="target.formItemProps.name"
           />
         </j-form-item>
-      </template> -->
+      </template>
       <template v-if="['grid', 'space'].includes(type)">
         <j-form-item
           label="标识"
@@ -333,7 +334,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, unref, watchEffect } from 'vue'
+import { computed, inject, unref } from 'vue'
 import { useTarget } from '../../../../hooks'
 import Rule from './Rules/Rule.vue'
 import { basic } from '@/components/FormDesigner/utils/defaultData'

@@ -34,7 +34,7 @@ const props = defineProps({
     default: () => [],
   },
 })
-const emits = defineEmits(['update:value'])
+const emits = defineEmits(['update:value', 'change'])
 const list = ref<any[]>([])
 
 watchEffect(() => {
@@ -44,16 +44,19 @@ watchEffect(() => {
 const onClick = () => {
   list.value.push({})
   emits('update:value', unref(list))
+  emits('change', unref(list))
 }
 
 const onDelete = (index: number) => {
   list.value.splice(index, 1)
   emits('update:value', unref(list))
+  emits('change', unref(list))
 }
 
 const onChange = (item: any, index: number) => {
   list.value[index] = item
   emits('update:value', unref(list))
+  emits('change', unref(list))
 }
 </script>
 
