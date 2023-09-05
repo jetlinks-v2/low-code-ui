@@ -53,7 +53,7 @@ export const onMove = (e: any, _data: any) => {
 
 export const onEnd = (e: any, _data: any) => {
     resetStates() 
-    if(e.to?.dataset?.layoutType !== 'filed-item') {
+    if(e.to?.dataset?.layoutType !== 'filed-item' && e.item?._underlying_vm_ && e?.to?.__draggable_component__?.list) {
         // field的数据
         // _data.addFieldData(e.item?._underlying_vm_)
         addContext(e.item?._underlying_vm_, e?.to?.__draggable_component__?.list)
