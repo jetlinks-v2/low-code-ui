@@ -1,9 +1,8 @@
 import { Scrollbar, Empty } from 'jetlinks-ui-components'
 import DragGableWrap from '../../Draggable/DragGableWrap'
-import { cloneDeep, omit } from 'lodash-es';
+import { cloneDeep } from 'lodash-es';
 import './index.less';
 import { onMove, onEnd } from '../../Draggable/ControlInsertionPlugin';
-import generatorData from '@/components/FormDesigner/utils/generatorData';
 import { Card, AIcon } from 'jetlinks-ui-components';
 import { useProduct } from '@/store';
 import { uid } from '@/components/FormDesigner/utils/uid';
@@ -20,21 +19,17 @@ const Template = defineComponent({
         })
 
         const handleClone = (element) => {
-            const item = {
-                ...element.template,
-                key: `${element.template?.type}_${uid()}_template`
-            }
-            return cloneDeep(item)
-        }
+            // const arr = element.template.map(item => {
+            //     return {
+            //         ...item,
+            //         key: `${item?.type}_${uid()}_template`
+            //     }
+            // })
+            return cloneDeep({
+                ...element.template?.[0],
+                key: `${element.template?.[0]?.type}_${uid()}_template`
+            })
 
-        const handleMove = () => {
-            return true
-        }
-
-        const dragOptions = {
-            dataSource: 'block',
-            direction: 'horizontal',
-            scroll: false,
         }
 
         const slots = {
@@ -63,8 +58,9 @@ const Template = defineComponent({
                                     clone={handleClone}
                                     class="filed-item-children"
                                     sort={false}
-                                    move={handleMove}
-                                    {...dragOptions}
+                                    dataSource={'block'}
+                                    direction={'horizontal'}
+                                    scroll={false}
                                     group={
                                         { name: 'j-canvas', pull: 'clone', put: false }
                                     }

@@ -17,11 +17,19 @@
 import Header from './components/Header/index.vue'
 import Canvas from './components/Panels/Canvas/index'
 import Config from './components/Panels/Config/index.vue'
-import { provide, ref, reactive, watch, onUnmounted, unref } from 'vue'
+import {
+  provide,
+  ref,
+  reactive,
+  watch,
+  onUnmounted,
+  unref
+} from 'vue'
 import Filed from './components/Panels/Filed/index.vue'
 import { ISchema } from './typings'
 import { omit } from 'lodash-es'
 import { useProduct } from '@/store/product'
+import { useMagicKeys } from '@vueuse/core'
 
 const initData = {
   type: 'root',
@@ -53,15 +61,17 @@ const props = defineProps({
 const model = ref<'preview' | 'edit'>(props.mode ? 'preview' : 'edit') // 预览；编辑
 const formData = ref<any>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
-const selected = reactive<any>({ ...initData }) // 被选择数据
+const selected = ref<any[]>([]) // 被选择数据,需要多选
 const formState = reactive<any>({})
 const errorKey = ref<string[]>([])
 const formRef = ref<any>()
 const configRef = ref<any>()
 const refList = ref<any>({})
 
+const {shift, space, ctrl, Delete} = useMagicKeys()
+
 const collectVisible = ref<boolean>(false)
-const collectData = ref<any>()
+const collectData = ref<any[]>([])
 
 const product = useProduct()
 
@@ -73,25 +83,24 @@ const onSaveData = () => {
       code: JSON.stringify(unref(formData)),
     },
   }
-  // console.log('props.data',props.data)
   product.update(obj)
 }
 
 // 设置数据被选中
 const setSelection = (node: any) => {
-  if(['card-item', 'grid-item'].includes(node.type)) return
-  let result: any = {}
-  if (node === 'root') {
-    result = formData.value
+  if (['card-item', 'grid-item'].includes(node.type)) return
+  if (shift.value || ctrl.value) {
+    if (node === 'root') return
+    selected.value.push(node)
   } else {
-    if (Array.isArray(node)) {
-      result = node?.[0]
+    selected.value = []
+    if (node === 'root') {
+      selected.value.push(formData.value)
     } else {
-      result = node
+      selected.value.push(node)
     }
   }
-  Object.assign(selected, result)
-  isShowConfig.value = selected?.key === result?.key
+  isShowConfig.value = !(selected.value?.length > 1)
   onSaveData()
 }
 
@@ -218,3 +227,4 @@ defineExpose({ onSave })
   }
 }
 </style>
+

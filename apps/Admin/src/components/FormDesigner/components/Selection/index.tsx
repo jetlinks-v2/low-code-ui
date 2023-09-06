@@ -1,7 +1,7 @@
 import { isHTMLTag } from '@vue/shared'
 import { withModifiers } from 'vue'
 import './index.less'
-import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
+import { AIcon, Dropdown, Menu, MenuItem, Button, Modal } from 'jetlinks-ui-components'
 import { checkIsField, extractCssClass, insertCustomCssToHead } from '../../utils/utils'
 import { cloneDeep, set } from 'lodash-es'
 import { useFormDesigner } from '@/store/designer'
@@ -45,9 +45,8 @@ const Selection = defineComponent({
       default: () => []
     },
   },
-  setup(props, { expose }) {
+  setup(props, { slots, expose }) {
     const designer: any = inject('FormDesigner')
-    const slots = useSlots()
     const isField = checkIsField(props.data)
     const cssClassList = ref<string[]>([])
     const visible = ref<boolean>(true)
@@ -55,7 +54,12 @@ const Selection = defineComponent({
     const formDesigner = useFormDesigner()
 
     const Selected = computed(() => {
-      return props?.data?.key !== undefined && designer.selected?.key === props?.data?.key
+      const flag = designer.selected.value.find(item => props?.data?.key === item.key)
+      return props?.data?.key !== undefined && flag
+    })
+
+    const isMultiple = computed(() => {
+      return designer.selected.value?.length > 1
     })
 
     const isEditModel = computed(() => {
@@ -72,23 +76,30 @@ const Selection = defineComponent({
       const index = (props?.parent || [])?.findIndex(item => item?.key === props.data?.key)
       switch (_type) {
         case 'remove':
-          if(!props.data?.context) {
-            addContext(props.data, props.parent)
-          } 
-          props.data.context?.delete()
-          const arr: any = cloneDeep(props.parent) || []
-          if (arr?.length > 0) {
-            if (index === arr?.length) {
-              designer.setSelection(arr?.[index - 1])
-            } else {
-              designer.setSelection(arr?.[index])
-            }
-          } else {
-            designer.setSelection('root')
-          }
+          Modal.confirm({
+            title: '确定删除组件及其配置？',
+            okText: '确认',
+            cancelText: '取消',
+            onOk() {
+              if (!props.data?.context) {
+                addContext(props.data, props.parent)
+              }
+              props.data.context?.delete()
+              const arr: any = cloneDeep(props.parent) || []
+              if (arr?.length > 0) {
+                if (index === arr?.length) {
+                  designer.setSelection(arr?.[index - 1])
+                } else {
+                  designer.setSelection(arr?.[index])
+                }
+              } else {
+                designer.setSelection('root')
+              }
+            },
+          });
           break
         case 'copy':
-          if(!props.data?.context) {
+          if (!props.data?.context) {
             addContext(props.data, props.parent)
           }
           props.data.context?.copy()
@@ -98,9 +109,7 @@ const Selection = defineComponent({
         default: break
       }
     }
-    const TagComponent = isHTMLTag(props?.tag) ? props.tag : resolveComponent(props?.tag)
-
-    const maskNode = (<div class={['mask']}></div>)
+    const TagComponent = isHTMLTag(props.tag as string) ? props.tag : resolveComponent(props.tag as string)
 
     const _hasDrag = computed(() => { return props.hasDrag })
 
@@ -134,37 +143,61 @@ const Selection = defineComponent({
 
     // 复制
     const onCopy = () => {
-      formDesigner.setCopyData(props.data)
+      formDesigner.setCopyData(designer.selected.value || [])
     }
     // 粘贴
     const onPaste = () => {
       const _data = formDesigner.getCopyData()
-      if (_data) {
-        const index = (props?.parent || [])?.findIndex(item => item?.key === props.data?.key)
-        props.data.context?.paste(_data)
-        const copyData = props.parent?.[index + 1]
-        designer.setSelection(copyData)
+      if (_data.length) {
+        _data.map(item => {
+          const index = (props?.parent || [])?.findIndex(item => item?.key === props.data?.key)
+          props.data.context?.paste(item)
+          const copyData = props.parent?.[index + 1]
+          designer.setSelection(copyData)
+        })
         formDesigner.deleteData()
       }
     }
     // 剪切
     const onShear = () => {
-      formDesigner.setCopyData(props.data)
+      formDesigner.setCopyData(designer.selected.value || [])
       handleAction('remove')
     }
     // 删除
     const onDelete = () => {
+      console.log(designer.selected.value)
       handleAction('remove')
     }
 
     // 收藏为模板
     const onCollect = () => {
-      const newNode = cloneDeep(toRaw(props.data))
-      designer.collectData.value = {...newNode}
+      designer.collectData.value = designer.selected.value || []
       designer.collectVisible.value = true
     }
 
     expose({ setVisible, setOptions, setValue, setDisabled })
+
+    const maskNode = () => {
+      return <Dropdown
+        trigger={['contextmenu']}
+        onContextmenu={withModifiers(() => { }, ['stop'])}
+        v-slots={{
+          overlay: () => {
+            return (
+              <Menu>
+                <MenuItem key="copy"><Button type="link" onClick={onCopy}>复制</Button></MenuItem>
+                <MenuItem key="paste"><Button type="link" onClick={onPaste}>粘贴</Button></MenuItem>
+                <MenuItem key="shear"><Button type="link" onClick={onShear}>剪切</Button></MenuItem>
+                <MenuItem key="delete"><Button danger type="link" onClick={onDelete}>删除</Button></MenuItem>
+                <MenuItem key="collect"><Button type="link" onClick={onCollect}>收藏为模版</Button></MenuItem>
+              </Menu>
+            )
+          }
+        }}
+      >
+        <div class={['mask']}></div>
+      </Dropdown>
+    }
 
     const renderSelected = () => {
       return <TagComponent
@@ -182,7 +215,7 @@ const Selection = defineComponent({
       >
         {slots?.default()}
         {
-          unref(isEditModel) && Selected.value && (
+          unref(isEditModel) && Selected.value && !isMultiple.value && (
             <div class="bottomRight">
               {
                 props.hasCopy && (
@@ -207,43 +240,11 @@ const Selection = defineComponent({
             </div>
           )
         }
-        {
-          unref(isEditModel) && props.hasMask && maskNode
-        }
+        {unref(isEditModel) && props.hasMask && maskNode()}
       </TagComponent>
     }
 
-    const renderContent = () => {
-      if (unref(isEditModel)) {
-        return <Dropdown
-          trigger={['contextmenu']}
-          onContextmenu={withModifiers(() => { }, ['stop'])}
-          v-slots={{
-            overlay: () => {
-              return (
-                <Menu>
-                  <MenuItem key="copy"><Button type="link" onClick={onCopy}>复制</Button></MenuItem>
-                  <MenuItem key="paste"><Button type="link" onClick={onPaste}>粘贴</Button></MenuItem>
-                  <MenuItem key="shear"><Button type="link" onClick={onShear}>剪切</Button></MenuItem>
-                  <MenuItem key="delete"><Button danger type="link" onClick={onDelete}>删除</Button></MenuItem>
-                  <MenuItem key="collect"><Button type="link" onClick={onCollect}>收藏为模版</Button></MenuItem>
-                </Menu>
-              )
-            }
-          }}
-        >
-          {renderSelected()}
-        </Dropdown>
-      } else {
-        if (unref(visible)) {
-          return renderSelected()
-        } else {
-          return <div></div>
-        }
-      }
-    }
-
-    return () => renderContent()
+    return () => renderSelected()
   }
 })
 

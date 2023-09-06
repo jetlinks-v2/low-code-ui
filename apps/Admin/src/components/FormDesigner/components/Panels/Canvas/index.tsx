@@ -1,4 +1,4 @@
-import { useProps } from "@/components/FormDesigner/hooks"
+// import { useProps } from "@/components/FormDesigner/hooks"
 import { Form, Scrollbar, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import DraggableLayout from "../../Draggable/DraggableLayout"
 import './index.less'
@@ -42,15 +42,17 @@ const Canvas = defineComponent({
 
     const onPaste = () => {
       const _data = formDesigner.getCopyData()
-      if (_data) {
-        const newNode = reactive(cloneDeep(toRaw(_data)))
-        delete newNode.context
-        newNode.key = `${newNode.type}_${uid()}-paste`
-        addContext(newNode, unref(designer.formData), (node) => {
-          node.key = `${node.type}_${uid()}-paste`
+      if (_data.length) {
+        _data.map(item => {
+          const newNode = reactive(cloneDeep(toRaw(item)))
+          delete newNode.context
+          newNode.key = `${newNode.type}_${uid()}-paste`
+          addContext(newNode, unref(designer.formData), (node) => {
+            node.key = `${node.type}_${uid()}-paste`
+          })
+          designer.formData?.value?.children?.push(newNode)
+          designer.setSelection(newNode)
         })
-        designer.formData?.value?.children?.push(newNode)
-        designer.setSelection(newNode)
         formDesigner.deleteData()
       }
     }
@@ -62,7 +64,7 @@ const Canvas = defineComponent({
     })
 
     const renderContent = () => {
-      const typeProps = useProps(designer, true) // 根结点，也是form的props
+      // const typeProps = useProps(designer, true) // 根结点，也是form的props
 
       const Layout = (
         <DraggableLayout
@@ -83,7 +85,7 @@ const Canvas = defineComponent({
             model={designer.formState}
             {...omit(unref(designer.formData)?.componentProps, ['size'])}
             onClick={unref(isEditModel) && handleClick}
-            {...unref(typeProps)}
+            // {...unref(typeProps)}
             class={[...unref(cssClassList)]}
             onValidate={(name, status, errorMsgs) => {
               if (unref(designer.formData)?.componentProps?.eventCode) {

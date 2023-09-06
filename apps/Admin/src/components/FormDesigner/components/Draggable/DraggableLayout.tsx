@@ -1,6 +1,5 @@
 
 import { cloneDeep, get, isEmpty, omit, set } from 'lodash-es';
-import { useProps } from '../../hooks';
 import { onEnd, onMove } from './ControlInsertionPlugin';
 import DraggableWrap from './DragGableWrap'
 import Selection from '../Selection'
@@ -52,13 +51,6 @@ const DraggableLayout = defineComponent({
 
         const product = useProduct()
 
-        const dragOptions = {
-            swapThreshold: 1,
-            group: {
-                name: 'j-canvas'
-            },
-        }
-
         const isEditModel = computed(() => {
             return unref(designer.model) === 'edit'
         })
@@ -68,10 +60,6 @@ const DraggableLayout = defineComponent({
         }
 
         const slots = {
-            getWidgetRef: (path) => {
-                let foundRef = unref(designer.refList)?.[path]
-                return foundRef
-            },
             item: ({ element }) => {
                 const _path: string[] = cloneDeep(props?.path || []);
                 const _index: number = props?.index || 0;
@@ -111,7 +99,6 @@ const DraggableLayout = defineComponent({
                         return (<TableLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></TableLayout>)
                     default:
                         if (unref(isEditModel) || componentMap?.[element?.type]) {
-                            const typeProps = useProps(element)
                             const TypeComponent = componentMap?.[element?.type] || 'div'
 
                             const selectRef = ref<any>(null)
@@ -167,22 +154,28 @@ const DraggableLayout = defineComponent({
                             )
 
                             const onChange = (...arg) => {
+                                const _this = {
+                                    getWidgetRef: (path) => {
+                                        let foundRef = unref(designer.refList)?.[path]
+                                        return foundRef
+                                    }
+                                }
                                 if(!element?.componentProps?.eventCode && !unref(isEditModel)) return 
                                 if(['input', 'input-number', 'textarea', 'input-password'].includes(element.type)){
                                     let customFn = new Function('e', element?.componentProps?.eventCode)
-                                    customFn.call(slots, arg?.[0])
+                                    customFn.call(_this, arg?.[0])
                                 }
                                 if(['select', 'switch', 'select-card', 'tree-select'].includes(element.type)){
                                     let customFn = new Function('value', 'option', element?.componentProps?.eventCode)
-                                    customFn.call(slots, arg?.[0], arg?.[1])
+                                    customFn.call(_this, arg?.[0], arg?.[1])
                                 }
                                 if(['time-picker'].includes(element.type)){
                                     let customFn = new Function('time', 'timeString', element?.componentProps?.eventCode)
-                                    customFn.call(slots, arg?.[0], arg?.[1])
+                                    customFn.call(_this, arg?.[0], arg?.[1])
                                 }
                                 if(['date-picker'].includes(element.type)){
                                     let customFn = new Function('date', 'timeString', element?.componentProps?.eventCode)
-                                    customFn.call(slots, arg?.[0], arg?.[1])
+                                    customFn.call(_this, arg?.[0], arg?.[1])
                                 }
                             }
 
@@ -209,13 +202,11 @@ const DraggableLayout = defineComponent({
                                         {
                                             unref(isEditModel) ? 
                                             <TypeComponent
-                                                {...unref(typeProps)}
                                                 data={element}
                                                 {...omit(element.componentProps, ['description'])}
                                                 size={unref(designer.formData)?.componentProps.size}
                                             ></TypeComponent> : 
                                             <TypeComponent
-                                                {...unref(typeProps)}
                                                 data={element}
                                                 {...omit(element.componentProps, ['description'])}
                                                 size={unref(designer.formData)?.componentProps.size}
@@ -265,9 +256,16 @@ const DraggableLayout = defineComponent({
                     tag={props.tag}
                     item-key="key"
                     move={handleMove}
-                    {...dragOptions}
+                    ghostClass={'ghost'}
+                    animation={200}
+                    group={{
+                        name: 'j-canvas'
+                    }}
                     v-slots={slots}
-                    componentData={useAttrs()} // tag的props和event
+                    componentData={{
+                        ...useAttrs(),
+                        type: 'transition-group',
+                    }} // tag的props和event
                     onMove={(e) => {
                         onMove(e, designer)
                     }}

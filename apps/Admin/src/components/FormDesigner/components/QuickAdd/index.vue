@@ -66,17 +66,28 @@
         </j-space>
       </div>
     </j-drawer>
+    <j-modal
+      v-model:visible="modalVisible"
+      @ok="onOk"
+      @cancel="modalVisible = false"
+    >
+      <p>组件类型冲突，请选择处理方式</p>
+      <j-radio-group v-model:value="value" name="radioGroup">
+        <j-radio :value="true">覆盖当前组件样式</j-radio>
+        <j-radio :value="false">忽略保留当前组件样式</j-radio>
+      </j-radio-group>
+    </j-modal>
   </div>
 </template>
   <script lang="ts" setup>
-import { ref, reactive, onMounted, computed, inject } from 'vue'
+import { ref, reactive, onMounted, computed, inject, unref } from 'vue'
 import Editor from '@/components/EditorModal'
 import { queryEndCommands } from '@/api/form'
 import { useProduct } from '@/store'
 import { onlyMessage } from '@jetlinks/utils'
 import { providerEnum } from '@/components/ProJect'
 import generatorData from '../../utils/generatorData'
-import { uniqBy } from 'lodash-es'
+import { map, uniqBy } from 'lodash-es'
 
 const product = useProduct()
 const designer: any = inject('FormDesigner')
@@ -89,8 +100,12 @@ const props = defineProps({
 })
 
 const visible = ref<boolean>(false)
+const modalVisible = ref<boolean>(false)
 
 const formRef = ref()
+const value = ref<boolean>(true)
+
+const dataList = ref<any[]>([])
 
 const modelRef = reactive({
   json: undefined,
@@ -266,8 +281,8 @@ const generatorSource = (_item: any) => {
         ..._data,
         componentProps: {
           ..._data.componentProps,
-          name: i.name
-        }
+          name: i.name,
+        },
       }
     })
   }
@@ -313,7 +328,7 @@ const onSave = () => {
     .map((i) => {
       return JSON.parse(i.configuration?.code || '{}')
     })
-  const arr: any[] = [...designer.formData.value.children]
+  const arr: any[] = []
   ;[
     ...(obj?.sourceData || []),
     ...(obj?.json || []),
@@ -327,11 +342,34 @@ const onSave = () => {
       arr.push(item)
     }
   })
+  dataList.value = uniqBy(arr, 'formItemProps.name')
+  const names = map(dataList.value, 'formItemProps.name')
+  const difference = designer.formData.value?.children.find((i) =>
+    names.includes(i?.formItemProps?.name),
+  )
+  if (difference) {
+    modalVisible.value = true
+  } else {
+    designer.formData.value = {
+      ...designer.formData.value,
+      children: [...designer.formData.value.children, ...dataList.value],
+    }
+    visible.value = false
+  }
+}
 
+const onOk = () => {
+  let arr: any[] = []
+  if (unref(value)) {
+    arr = [...dataList.value, ...designer.formData.value.children]
+  } else {
+    arr = [...designer.formData.value.children, ...dataList.value]
+  }
   designer.formData.value = {
     ...designer.formData.value,
     children: uniqBy(arr, 'formItemProps.name'),
   }
+  modalVisible.value = false
   visible.value = false
 }
 </script>
