@@ -16,7 +16,7 @@
                 关系标识
               </div>
               <div class="descriptions-content">
-                <j-select v-model:value="myRelation.relationType" style="width: 100%" @change="relationChange" />
+                <j-select :options="columnOptions" v-model:value="myRelation.relationType" style="width: 100%" @change="relationChange" />
               </div>
             </div>
             <div class="descriptions-item">
@@ -109,7 +109,7 @@
                 列名称
               </div>
               <div class="descriptions-content">
-                <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" @change="assetChange" />
+                <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" :options="columnOptions" @change="assetChange" />
               </div>
             </div>
             <div class="descriptions-item">
@@ -135,7 +135,7 @@
                 当前表字段
               </div>
               <div class="descriptions-content">
-                <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" @change="assetChange" />
+                <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" :options="columnOptions" @change="assetChange" />
               </div>
             </div>
             <div class="descriptions-item">
@@ -151,7 +151,32 @@
       </div>
     </div>
     <div class="api">
-
+        <j-popover placement="leftBottom" trigger="click" >
+          <template #content>
+            <div style="width: 750px">
+              <j-table
+                :columns="apiColumns"
+                :dataSource="apiDataSource"
+                size="small"
+                :pagination="false"
+              >
+                <template #bodyCell="{ column, text }">
+                  <template v-if="column.dataIndex === 'api'">
+                    <j-ellipsis>
+                      {{ text }}
+                    </j-ellipsis>
+                  </template>
+                  <template v-if="column.dataIndex === 'description'">
+                    <j-ellipsis>
+                      {{ text }}
+                    </j-ellipsis>
+                  </template>
+                </template>
+              </j-table>
+            </div>
+          </template>
+          <j-button>查看接口能力</j-button>
+        </j-popover>
     </div>
   </div>
 </template>
@@ -159,6 +184,9 @@
 <script setup name="CRUDAdvanced">
 import { getAssetType } from '@/api/basis'
 import { useRequest } from '@jetlinks/hooks'
+import {CRUD_COLUMNS} from "@/components/Database/util";
+import { queryEndCommands } from '@/api/form'
+import { useProduct } from '@/store'
 
 const props = defineProps({
   tree: {
@@ -172,11 +200,68 @@ const props = defineProps({
   relation: {
     type: Object,
     default: () => ({})
+  },
+  id: {
+    type: String,
+    default: undefined
+  },
+  parentId: {
+    type: String,
+    default: undefined
   }
 })
+
 const emit = defineEmits(['update:tree','update:asset','update:relation', 'update'])
 
+const CrudColumns = inject(CRUD_COLUMNS)
+const route = useRoute()
+const project = useProduct()
+
 const { data:options } = useRequest(getAssetType)
+const { data: apiDataSource, run: apiRun } = useRequest(queryEndCommands,
+  {
+    immediate: false,
+    onSuccess(res) {
+      const item = res.result.find(a => a.id === props.id)
+      const arr = item?.command?.map(a => {
+        return {
+          ability: a.name,
+          api: `/low-code/runtime/${project.info.id}/${props.parentId}/${props.id}`,
+          instruction: a.id,
+          description: a.description
+        }
+      })
+      return arr || []
+    }
+  }
+)
+
+const columnOptions = computed(() => {
+  return CrudColumns.value.map(item => ({ label: item.dataIndex, value: item.dataIndex }))
+})
+
+const apiColumns = [
+  {
+    dataIndex: 'ability',
+    title: '能力',
+    width: 100
+  },
+  {
+    dataIndex: 'api',
+    title: 'API'
+  },
+  {
+    dataIndex: 'instruction',
+    title: '指令',
+    width: 100
+  },
+  {
+    dataIndex: 'description',
+    title: '说明',
+    width: 120
+  },
+]
+
 
 const myRelation = reactive(props.relation || {
   enabled: true,
@@ -195,7 +280,10 @@ const myAsset = reactive(props.asset || {
 const myTree = ref(props.tree || false)
 
 const assetChange = (v) => {
-  myAsset.correlatesAssets = v.target.value === 'true'
+  if (v.target) {
+    myAsset.correlatesAssets = v.target.value === 'true'
+  }
+
   emit('update:asset', myAsset)
   emit('update')
 }
@@ -210,6 +298,9 @@ const relationChange = () => {
   emit('update:relation', myRelation)
   emit('update')
 }
+onMounted(() => {
+  apiRun(route.params.id)
+})
 
 </script>
 
@@ -237,7 +328,7 @@ const relationChange = () => {
   }
 
   .api {
-    flex-basis: 320px;
+    flex-basis: 112px;
   }
 
 

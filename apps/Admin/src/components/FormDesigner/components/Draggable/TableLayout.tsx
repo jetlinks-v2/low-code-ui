@@ -3,6 +3,7 @@ import './index.less'
 import { withModifiers } from 'vue'
 import { Table, AIcon, Input, Button, TableColumn, FormItem, Select } from 'jetlinks-ui-components'
 import { cloneDeep, get, omit, set } from 'lodash-es'
+import { addContext } from '../../utils/addContext'
 
 export default defineComponent({
     name: 'TableLayout',
@@ -57,6 +58,9 @@ export default defineComponent({
         const data = ref<any[]>(get(designer.formState, __path.value) || [{}])
 
         const handleAdd = () => {
+            if (!props.data?.context) {
+                addContext(props.data, props.parent)
+            }
             props.data.context?.appendItem()
             const addData = unref(list).slice(-1)
             designer.setSelection(addData)
@@ -65,6 +69,9 @@ export default defineComponent({
         const onAddIndex = () => {
             const _index = unref(list).findIndex(item => item?.formItemProps?.name === 'index')
             if (_index === -1) {
+                if (!props.data?.context) {
+                    addContext(props.data, props.parent)
+                }
                 props.data.context?.appendTableIndex()
                 // const addData = unref(list).slice(-1)
                 // designer.setSelection(addData)
@@ -75,6 +82,9 @@ export default defineComponent({
         const onAddAction = () => {
             const _index = unref(list).findIndex(item => item?.formItemProps?.name === 'actions')
             if (_index === -1) {
+                if (!props.data?.context) {
+                    addContext(props.data, props.parent)
+                }
                 props.data.context?.appendTableAction()
                 // const addData = unref(list).slice(-1)
                 designer.setSelection(props.data)

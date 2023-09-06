@@ -35,7 +35,8 @@ export const getConfigList = (_type: string) => {
             'user',
             'product',
             'device',
-            'geo'
+            'geo',
+            'form'
         ].includes(unref(_type))) {
         arr.push({
             key: 'Config',
@@ -49,6 +50,13 @@ export const getConfigList = (_type: string) => {
             header: '数据来源',
         })
     }
+
+  if (unref(_type) === 'form') {
+    arr.push({
+      key: 'SourceForm',
+      header: '数据来源',
+    })
+  }
 
     if (unref(_type) === 'grid') {
         arr.push({
@@ -82,6 +90,7 @@ export const getConfigList = (_type: string) => {
             'product',
             'device',
             'geo',
+            'form'
         ].includes(unref(_type))
     ) {
         arr.push({
