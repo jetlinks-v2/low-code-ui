@@ -3,12 +3,12 @@
     <div class="card">
       <h3>基本信息</h3>
       <p>页面名称</p>
-      <j-input v-model:value="baseInfo.title" disabled />
+      <j-input v-model:value="baseInfo.title" disabled/>
 
       <h3 class="title">设置该页面为系统主菜单</h3>
       <j-form ref="basicFormRef" :model="form" class="basic-form">
         <j-form-item name="main">
-          <j-switch v-model:checked="form!.main" />
+          <j-switch v-model:checked="form!.main"/>
         </j-form-item>
         <template v-if="form!.main">
           <j-form-item
@@ -30,12 +30,12 @@
                       中文名将应用于系统菜单名称、面包屑等位置，建议设置2-8个字符
                     </p>
                   </template>
-                  <AIcon type="InfoCircleOutlined" />
+                  <AIcon type="InfoCircleOutlined"/>
                 </j-tooltip>
               </span>
             </template>
             <ErrorItem :error-data="errorData('name')">
-              <j-input v-model:value="form!.name" />
+              <j-input v-model:value="form!.name"/>
             </ErrorItem>
           </j-form-item>
           <j-form-item
@@ -52,7 +52,7 @@
           >
             <ErrorItem :error-data="errorData('icon')">
               <div class="icon-upload has-icon" v-if="form!.icon">
-                <AIcon :type="form!.icon" style="font-size: 50px" />
+                <AIcon :type="form!.icon" style="font-size: 50px"/>
                 <span class="mark" @click="dialogVisible = true">点击修改</span>
               </div>
 
@@ -62,7 +62,7 @@
                 class="icon-upload no-icon"
               >
                 <span>
-                  <AIcon type="PlusOutlined" style="font-size: 20px" />
+                  <AIcon type="PlusOutlined" style="font-size: 20px"/>
                   <p>点击选择图标</p>
                 </span>
               </div>
@@ -94,7 +94,7 @@ const props = defineProps({
 const dialogVisible = ref<boolean>(false)
 const baseInfo = inject(BASE_INFO)
 const form = inject(MENU_CONFIG)
-const emits = defineEmits()
+const emits = defineEmits(['change', 'update:open', 'confirm'])
 const configurationStore = useAllListDataStore();
 
 const errorData = computed(() => {
@@ -116,15 +116,17 @@ const onCheck = async () => {
     return errorInfo
   }
 }
+
 watch(
-  () => [form!.pageName, form!.main, form!.name, form!.icon],
-  () => {
-    emits('update:form',form)
-  },
+  () => form,
+  (value) => {
+    emits('change', value)
+    emits('update:form', form)
+  }, {deep: true}
 )
 defineExpose({
   vaildate: onCheck,
-  form:form
+  form: form
 })
 </script>
 <style lang="less" scoped>
@@ -153,24 +155,31 @@ defineExpose({
       content: ' ';
     }
   }
+
   .title {
     margin-top: 20px;
   }
+
   .basic-form {
     .ant-form-item {
       display: block;
+
       :deep(.ant-form-item-label) {
         overflow: inherit;
+
         .img-style {
           cursor: help;
         }
+
         label::after {
           display: none;
         }
       }
+
       .tips {
         margin-left: 10px;
       }
+
       :deep(.ant-form-item-control-input-content) {
         .icon-upload {
           width: 100px;
@@ -183,10 +192,12 @@ defineExpose({
           text-align: center;
           cursor: pointer;
           transition: 0.5s;
+
           &:hover {
             border-color: #415ed1;
           }
         }
+
         .has-icon {
           position: relative;
           text-align: center;
@@ -204,10 +215,12 @@ defineExpose({
             align-items: center;
             justify-content: center;
           }
+
           &:hover .mark {
             display: flex;
           }
         }
+
         .no-icon {
           background-color: rgba(0, 0, 0, 0.06);
         }

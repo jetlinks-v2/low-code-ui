@@ -66,11 +66,7 @@
         </j-space>
       </div>
     </j-drawer>
-    <j-modal
-      v-model:visible="modalVisible"
-      @ok="onOk"
-      @cancel="modalVisible = false"
-    >
+    <j-modal v-model:visible="modalVisible" @ok="onOk" @cancel="modalVisible = false">
       <p>组件类型冲突，请选择处理方式</p>
       <j-radio-group v-model:value="value" name="radioGroup">
         <j-radio :value="true">覆盖当前组件样式</j-radio>
@@ -360,15 +356,15 @@ const onSave = () => {
 
 const onOk = () => {
   let arr: any[] = []
-  if (unref(value)) {
-    arr = [...dataList.value, ...designer.formData.value.children]
+  if(unref(value)) {
+    const arr = [...dataList.value, ...designer.formData.value.children]
   } else {
-    arr = [...designer.formData.value.children, ...dataList.value]
+    const arr = [...designer.formData.value.children, ...dataList.value]
   }
   designer.formData.value = {
-    ...designer.formData.value,
-    children: uniqBy(arr, 'formItemProps.name'),
-  }
+      ...designer.formData.value,
+      children: uniqBy(arr, 'formItemProps.name')
+    }
   modalVisible.value = false
   visible.value = false
 }
