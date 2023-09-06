@@ -242,7 +242,7 @@ function getJetlinksPluginCode(version: string | 'latest' | 'preview') {
   }
 
   return `\
-import JetlinksUI from '@jetlinks/ui'
+// import JetlinksUI from '@jetlinks/ui'
 import { getCurrentInstance } from 'vue'
 
 const jetlinksCss = '${jetlinksCss}'
@@ -250,8 +250,8 @@ const jetlinksCss = '${jetlinksCss}'
 await appendStyle()
 
 export function installJetlinksPlugin() {
-  const instance = getCurrentInstance()
-  instance.appContext.app.use(JetlinksUI)
+  // const instance = getCurrentInstance()
+  // instance.appContext.app.use(JetlinksUI)
 }
 
 export function appendStyle() {
