@@ -7,7 +7,7 @@
           <j-button
             type="link"
             style="padding: 0; margin: 0"
-            @click="visible = false"
+            @click="onBack"
           >
             <AIcon type="ArrowLeftOutlined" style="font-size: 15px" />返回
           </j-button>
@@ -98,7 +98,7 @@ const ruleModel = reactive<any>({
   message: undefined,
   max: undefined,
   min: undefined,
-  required: false,
+  // required: false,
   trigger: ['change'],
   pattern: undefined,
   validator: undefined,
@@ -136,6 +136,11 @@ const onClickItem = () => {
   // console.log('ruleModel',ruleModel)
   emits('change', unref(ruleModel), props.index)
   visible.value = true
+}
+
+const onBack = () => {
+  emits('change', unref(ruleModel), props.index)
+  visible.value = false
 }
 </script>
 

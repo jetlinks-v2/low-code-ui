@@ -81,6 +81,12 @@ const handleProps = (node: any) => {
         case 'grid':
             result.inlineMax = 4
             break
+        case 'form':
+            result.source = {
+              value: undefined,
+              code: ''
+            }
+          break
     }
 
     return result

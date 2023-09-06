@@ -45,19 +45,13 @@
       <j-form-item
         label="类型"
         :name="['componentProps', 'mode']"
-        :rules="[
-          {
-            required: true,
-            message: '请选择',
-          },
-        ]"
       >
         <j-radio-group
           v-model:value="target.componentProps.mode"
           button-style="solid"
           @change="onDataChange"
         >
-          <j-radio-button :value="''">单选项</j-radio-button>
+          <j-radio-button :value="undefined">单选项</j-radio-button>
           <j-radio-button :value="'multiple'">多选项</j-radio-button>
         </j-radio-group>
       </j-form-item>
@@ -208,7 +202,8 @@
           'user',
           'product',
           'device',
-          'geo'
+          'geo',
+          'form'
         ].includes(type)
       "
     >

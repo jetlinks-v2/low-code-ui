@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Header @save="onSave" />
+    <Header @save="onSave" :data="data" />
     <div class="box">
       <div class="left"><Filed /></div>
       <div class="right">
@@ -73,7 +73,7 @@ const onSaveData = () => {
       code: JSON.stringify(unref(formData)),
     },
   }
-  console.log('props.data',props.data)
+  // console.log('props.data',props.data)
   product.update(obj)
 }
 
@@ -129,6 +129,7 @@ const getFieldData = (data: ISchema) => {
 }
 
 provide('FormDesigner', {
+  tabsId: props.data?.id,
   model,
   formData,
   isShowConfig,

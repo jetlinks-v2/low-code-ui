@@ -123,19 +123,32 @@ const DraggableLayout = defineComponent({
                             }
 
                             const formItemProps = computed(() => {
-                                return { ...element?.formItemProps }
+                                const rules = (element.formItemProps?.rules || []).map(item => {
+                                    if(item?.validator) { // 处理自定义校验函数
+                                        return {
+                                            ...omit(item, 'validator'),
+                                            validator(rule, value, callback){
+                                                let customFn = new Function('rule', 'value', 'callback', item?.validator)
+                                                return customFn(rule, value, callback)
+                                            }
+                                        }
+                                    }
+                                    return item
+                                })
+                                
+                                return { ...element?.formItemProps, rules }
                             })
 
                             if (element?.formItemProps?.name) {
                                 _path[_index] = element?.formItemProps?.name
                             }
 
-                            const value = ref<any>(get(designer.formState, _path))
+                            const myValue = ref<any>(get(designer.formState, _path))
                             const checked = ref<any>(get(designer.formState, _path))
                             
 
                             watch(
-                                () => value.value, 
+                                () => myValue.value, 
                                 (newValue) => {
                                     set(designer.formState, _path, newValue)
                                 }, 
@@ -174,7 +187,7 @@ const DraggableLayout = defineComponent({
                             }
 
                             const registerToRefList = (path: string[], _ref: any) => {
-                                if(!unref(isEditModel) && Array.isArray(path) && path?.length && element?.formItemProps?.name){
+                                if(!unref(isEditModel) && Array.isArray(path) && path?.length && element?.formItemProps?.name && designer.refList){
                                     const __path = path.join('.')
                                     designer.refList.value[__path] = _ref
                                 }
@@ -206,7 +219,7 @@ const DraggableLayout = defineComponent({
                                                 data={element}
                                                 {...omit(element.componentProps, ['description'])}
                                                 size={unref(designer.formData)?.componentProps.size}
-                                                v-model:value={value.value}
+                                                v-model:value={myValue.value}
                                                 v-model:checked={checked.value}
                                                 onChange={onChange}
                                                 disabled={element?.componentProps?.disabled || (unref(designer.mode) === 'edit' && !element?.componentProps?.editable)}
