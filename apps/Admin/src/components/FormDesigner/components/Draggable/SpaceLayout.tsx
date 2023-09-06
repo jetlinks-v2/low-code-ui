@@ -4,6 +4,7 @@ import { Space } from 'jetlinks-ui-components'
 import './index.less'
 import { cloneDeep } from 'lodash-es'
 import { withModifiers } from 'vue'
+import { addContext } from '../../utils/addContext'
 
 export default defineComponent({
     name: 'SpaceLayout',
@@ -47,9 +48,11 @@ export default defineComponent({
             }
 
             const handleAdd = () => {
+                if (!props.data?.context) {
+                    addContext(props.data, props.parent)
+                }
                 props.data.context?.appendItem()
-                const addData = unref(list).slice(-1)
-                designer.setSelection(addData)
+                designer.setSelection(props.data)
             }
             return (
                 <Selection {...useAttrs()} style={{ padding: '16px' }} hasDrag={true} hasDel={true} hasCopy={true} data={props.data} parent={props.parent}>

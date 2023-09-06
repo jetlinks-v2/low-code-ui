@@ -3,87 +3,108 @@
     <div class="card">
       <h3>基本信息</h3>
       <p>页面名称</p>
-      <j-input v-model:value="form.pageName" disabled />
+      <j-input v-model:value="baseInfo.title" disabled />
 
       <h3 class="title">设置该页面为系统主菜单</h3>
       <j-form ref="basicFormRef" :model="form" class="basic-form">
         <j-form-item name="main">
-          <j-switch v-model:checked="form.main" />
+          <j-switch v-model:checked="form!.main" />
         </j-form-item>
-        <j-form-item
-          name="name"
-          :rules="[
-            {
-              required: true,
-              message: '建议设置2-16个字符',
-            },
-          ]"
-        >
-          <template #label>
-            <span>菜单名称</span>
-            <span class="tips">
-              <j-tooltip placement="top">
-                <template #title>
-                  <p>
-                    中文名将应用于系统菜单名称、面包屑等位置，建议设置2-8个字符
-                  </p>
-                </template>
-                <AIcon type="InfoCircleOutlined" />
-              </j-tooltip>
-            </span>
-          </template>
-          <j-input v-model:value="form.name" maxlength="16" />
-        </j-form-item>
-        <j-form-item
-          label="icon"
-          name="icon"
-          :rules="[
-            {
-              required: true,
-              message: '请上传图标',
-            },
-          ]"
-          style="flex: 0 0 186px"
-        >
-          <div class="icon-upload has-icon" v-if="form.icon">
-            <AIcon :type="form.icon" style="font-size: 50px" />
-            <span class="mark" @click="dialogVisible = true">点击修改</span>
-          </div>
+        <template v-if="form!.main">
+          <j-form-item
+            name="name"
+            :rules="[
+              {
+                required: true,
+                message: '建议设置2-16个字符',
+                trigger: 'change',
+              },
+            ]"
+          >
+            <template #label>
+              <span>菜单名称</span>
+              <span class="tips">
+                <j-tooltip placement="top">
+                  <template #title>
+                    <p>
+                      中文名将应用于系统菜单名称、面包屑等位置，建议设置2-8个字符
+                    </p>
+                  </template>
+                  <AIcon type="InfoCircleOutlined" />
+                </j-tooltip>
+              </span>
+            </template>
+            <ErrorItem :error-data="errorData('name')">
+              <j-input v-model:value="form!.name" />
+            </ErrorItem>
+          </j-form-item>
+          <j-form-item
+            label="icon"
+            name="icon"
+            :rules="[
+              {
+                required: true,
+                message: '请上传图标',
+                trigger: 'change',
+              },
+            ]"
+            style="flex: 0 0 186px"
+          >
+            <ErrorItem :error-data="errorData('icon')">
+              <div class="icon-upload has-icon" v-if="form!.icon">
+                <AIcon :type="form!.icon" style="font-size: 50px" />
+                <span class="mark" @click="dialogVisible = true">点击修改</span>
+              </div>
 
-          <div v-else @click="dialogVisible = true" class="icon-upload no-icon">
-            <span>
-              <AIcon type="PlusOutlined" style="font-size: 20px" />
-              <p>点击选择图标</p>
-            </span>
-          </div>
-        </j-form-item>
-        <j-form-item v-show="false">
-          <j-button type="primary" html-type="submit" @click="onCheck" />
-        </j-form-item>
+              <div
+                v-else
+                @click="dialogVisible = true"
+                class="icon-upload no-icon"
+              >
+                <span>
+                  <AIcon type="PlusOutlined" style="font-size: 20px" />
+                  <p>点击选择图标</p>
+                </span>
+              </div>
+            </ErrorItem>
+          </j-form-item>
+        </template>
       </j-form>
     </div>
   </div>
   <!-- 弹窗 -->
   <ChooseIconDialog
     v-model:visible="dialogVisible"
-    @confirm="(typeStr:string)=>form.icon = typeStr"
+    @confirm="(typeStr:string)=>form!.icon = typeStr"
   />
 </template>
 <script setup lang="ts">
 import ChooseIconDialog from '@/components/ListPage/MenuConfig/components/icon.vue'
-const emits = defineEmits()
+import { BASE_INFO, MENU_CONFIG } from '../../keys'
+import { useAllListDataStore } from '@/store/listForm';
+import { ErrorItem } from '../..';
+
 const props = defineProps({
-  formData: {
-    type: Object,
-    default: () => {},
+  errorList: {
+    type: Array,
+    default: () => [],
   },
 })
+
 const dialogVisible = ref<boolean>(false)
-const form = reactive({
-  pageName: props.formData?.pageName || '',
-  main: props.formData?.main || true,
-  name: props.formData?.name || '',
-  icon: props.formData?.icon || '',
+const baseInfo = inject(BASE_INFO)
+const form = inject(MENU_CONFIG)
+const emits = defineEmits()
+const configurationStore = useAllListDataStore();
+
+const errorData = computed(() => {
+  return (val: string): any => {
+    return props.errorList?.find((item: any) => item.key === val)
+  }
+})
+
+watchEffect(() => {
+  configurationStore.setALLlistDataInfo('menu', form, baseInfo.id)
 })
 const basicFormRef = ref()
 
@@ -96,13 +117,14 @@ const onCheck = async () => {
   }
 }
 watch(
-  () => [form.pageName, form.main, form.name, form.icon],
+  () => [form!.pageName, form!.main, form!.name, form!.icon],
   () => {
     emits('update:form',form)
   },
 )
 defineExpose({
   vaildate: onCheck,
+  form:form
 })
 </script>
 <style lang="less" scoped>

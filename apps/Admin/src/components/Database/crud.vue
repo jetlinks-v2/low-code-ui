@@ -11,13 +11,18 @@
         />
       </j-tab-pane>
       <j-tab-pane key="2" tab="数据">
-        <DataSetting />
+        <DataSetting
+          :id="props.id"
+          :parentId="props.parentId"
+        />
       </j-tab-pane>
       <j-tab-pane key="3" tab="高级配置">
         <Advanced
           v-model:tree="tree"
           v-model:asset="asset"
           v-model:relation="relation"
+          :id="props.id"
+          :parentId="props.parentId"
           @update="update"
         />
       </j-tab-pane>
@@ -60,6 +65,10 @@ const props = defineProps({
   id: {
     type: String,
     default: undefined
+  },
+  others: {
+    type: Object,
+    default: () => ({})
   }
 })
 
@@ -79,18 +88,16 @@ const asset = ref(props.configuration.asset || {})
 const tree = ref(props.configuration.tree || false)
 
 const update = () => {
+  const { configuration, ...extra} = props
   project.update({
-    id: props.id,
-    title: props.title,
-    provider: props.provider,
-    type: props.type,
+    ...extra,
     configuration: {
       tableName: tableName.value,
       relation: relation.value,
       columns: columns.value,
       asset: asset.value,
       tree: tree.value,
-    }
+    },
   })
 }
 </script>

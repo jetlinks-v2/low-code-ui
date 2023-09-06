@@ -12,7 +12,7 @@
             :key="item.key"
             :header="item.header"
           >
-            <component :is="Panels[item.key]" />
+            <component :is="Panels[item.key]" @refresh="onRefresh" />
           </j-collapse-panel>
         </j-collapse>
       </j-form>
@@ -24,17 +24,16 @@
 import { ref, computed, watchEffect, inject, watch, unref } from 'vue'
 import { Scrollbar } from 'jetlinks-ui-components'
 import Base from './components/Base.vue'
-import InputLimit from './components/InputLimit.vue'
 import Status from './components/Status.vue'
 import Source from './components/Source.vue'
+import SourceForm from './components/SourceForm.vue'
 import Form from './components/Form.vue'
 import Grid from './components/Grid.vue'
-import UploadLimit from './components/UploadLimit.vue'
-import TabsConfig from './components/TabsConfig.vue'
-import Space from './components/Space.vue'
+import Config from './components/Config.vue'
 import { map } from 'lodash-es'
 import { getConfigList } from './utils'
 import { useTarget } from '../../../hooks'
+import { updateData } from '../../../utils/utils'
 
 const formRef = ref<any>()
 
@@ -47,15 +46,13 @@ const _type = computed(() => {
 })
 
 const Panels = {
+  Form,
   Base,
-  InputLimit,
+  Config,
   Status,
   Source,
-  Form,
   Grid,
-  UploadLimit,
-  TabsConfig,
-  Space,
+  SourceForm
 }
 
 const panelsList = computed(() => {
@@ -69,7 +66,8 @@ watchEffect(() => {
 })
 
 const onSave = () => {
-  formRef.value?.validateFields()
+  formRef.value
+    ?.validateFields()
     .then((values) => {
       console.log('Received values of form: ', values)
     })
@@ -78,16 +76,34 @@ const onSave = () => {
     })
 }
 
+const onRefresh = (obj: any) => {
+  if (obj?.key) {
+    if (obj.key === 'root') {
+      designer.formData.value = {
+        ...obj,
+        children: designer.formData.value?.children || []
+      }
+    } else {
+      const arr = updateData(unref(designer.formData)?.children, obj)
+      designer.formData.value = {
+        ...designer.formData.value,
+        children: arr,
+      }
+      designer.setSelection(obj)
+    }
+  }
+}
+
 watch(
   () => designer.errorKey?.value,
   (newValue) => {
-    if(unref(newValue)?.length) {
+    if (unref(newValue)?.length) {
       onSave()
     }
   },
   {
     immediate: true,
-    deep: true
+    deep: true,
   },
 )
 </script>

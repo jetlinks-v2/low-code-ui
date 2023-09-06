@@ -10,10 +10,10 @@
           <j-input v-model:value="form.title" :maxlength="8"></j-input>
         </ErrorItem>
       </j-form-item>
-      <j-form-item label="图标">
+      <j-form-item :label="iconType ? '图标' : '自定义图标'">
         <AIcon
           :type="activeBtn?.icon"
-          v-if="activeBtn?.icon && activeBtn?.type !== 'customer'"
+          v-if="iconType"
           style="border: 1px solid #d9d9d9; padding: 5px"
         />
         <UploadIcon v-model:modelValue="form.icon" v-else />
@@ -23,6 +23,7 @@
           <j-col :span="12">
             <j-form-item
               label="调用功能"
+              name="functions"
             >
               <ErrorItem :errorData="errorMessage['functions']">
                 <j-select
@@ -30,7 +31,7 @@
                 placeholder="请选择调用功能"
               >
                 <j-select-option
-                  v-for="item in functions"
+                  v-for="item in functionOptions"
                   :value="item.id"
                   :key="item.id"
                   >{{ item.name }}</j-select-option
@@ -42,14 +43,16 @@
           <j-col :span="12">
             <j-form-item
               label=" "
+              name="command"
             >
               <ErrorItem :errorData="errorMessage['command']">
                 <j-select
                   v-model:value="form.command"
-                  placeholder="请选择调用指令"
+                  placeholder="当前功能下无可用接口"
+                  disabled
                 >
                   <j-select-option
-                    v-for="item in commands"
+                    v-for="item in commandOptions"
                     :value="item.id"
                     :key="item.id"
                     >{{ item.name }}</j-select-option
@@ -66,11 +69,12 @@
             activeBtn?.type === 'Update' ||
             activeBtn?.type === 'Detail'
           "
+          name="pages"
         >
           <ErrorItem :errorData="errorMessage['pages']">
-            <j-select v-model:value="form.pages" placeholder="请选择调用页面">
+            <j-select v-model:value="form.pages" placeholder="请选择调用页面" @change="handlePages">
               <j-select-option
-                v-for="item in pages"
+                v-for="item in pagesOptions"
                 :value="item.id"
                 :key="item.id"
               >
@@ -80,8 +84,13 @@
           </ErrorItem>
         </j-form-item>
       </template>
-      <j-form-item label="脚本">
-        <EditorModal v-model:value="form.script" />
+      <j-form-item label="自定义脚本">
+        <j-select style="width: 100%;" v-model:value="language">
+            <j-select-option value="javascript">JS</j-select-option>
+            <j-select-option value="css">CSS</j-select-option>
+        </j-select>
+        <EditorModal v-if="language==='javascript'" v-model:value="form.script" language="javascript"/>
+        <EditorModal v-else v-model:value="form.style" language="css"/>
       </j-form-item>
     </j-form>
   </div>
@@ -93,13 +102,11 @@ import { FormInstance } from 'jetlinks-ui-components'
 import { useProduct } from '@/store'
 import EditorModal from '@/components/EditorModal'
 import { activeBtnKey, errorListKey, editTypeKey } from '../keys'
-import { queryCommand } from '@/api/project'
 import { providerEnum } from '@/components/ProJect'
-import { functionsKey, pagesKey } from '../../keys'
 import { ErrorItem } from '../..'
-interface Emit {
-  (e: 'update:steps', value: string): void
-}
+import { useFunctions } from '@/hooks/useFunctions'
+import { pick } from 'lodash-es'
+
 const props = defineProps({
   data: {
     type: Object as PropType<Record<string, any>>,
@@ -113,8 +120,10 @@ const props = defineProps({
 const activeBtn = inject(activeBtnKey)
 const editType = inject(editTypeKey)
 const errorList = inject(errorListKey)
-const functions = inject(functionsKey)
-const pages = inject(pagesKey)
+
+const productStore = useProduct();
+const { info } = productStore
+const { functionOptions, commandOptions, handleFunction } = useFunctions()
 const errorMessage = computed(() => {
   let data = {}
   let result = errorList!.value?.filter(
@@ -127,28 +136,20 @@ const errorMessage = computed(() => {
   }
   return data
 })
-const productStore = useProduct()
 
-const commands = ref()
+const pagesOptions = computed(() => {
+  let arr: any[] = [];
+  productStore.getDataMap()?.forEach((value) => {
+    if(value.type === providerEnum.HtmlPage || value.type === providerEnum.FormPage) {
+      arr.push(value)
+    }
+  })
+  return arr;
+})
 
-/**查询功能下的指令 */
-const findCommand = async () => {
-  const params = {
-    modules: [
-      {
-        id: productStore.data?.[0].id,
-        name: productStore.data?.[0].name,
-        functions: [
-          functions!.value?.find((item) => item.id === form.functions),
-        ],
-      },
-    ],
-  }
-  const res = await queryCommand(params)
-  if (res.success) {
-    commands.value = res.result?.[0].command
-  }
-}
+const iconType = computed(() => {
+  return activeBtn?.value.icon && activeBtn?.value.type !== 'customer'
+})
 
 const formRef = ref<FormInstance>()
 const form = reactive({
@@ -159,17 +160,36 @@ const form = reactive({
   key: props.data.key,
   functions:
     editType!.value === 'add' &&
-    functions!.value.find((item) => item.id === props.data.functions)
-      ?.provider === providerEnum.SQL
+    functionOptions!.value.find((item) => item.id === props.data.functions)
+      ?.provider === providerEnum.Function
       ? ''
       : props.data.functions,
   pages: props.data.pages,
   command: props.data.command,
+  style: props.data.style,
+  resource: props.data.resource
 })
 
 const rules = {
-  title: [{ required: true, message: '请输入按钮名称', trigger: 'blur' }],
+  title: [{ required: true, trigger: 'blur',validator: (_rule, value: string) => {
+    if(!value || !value.length) {
+      return Promise.reject('请输入按钮名称')
+    }
+    if(value.length > 8 || value.length < 2) {
+      return Promise.reject('请输入2-8个字符')
+    }
+    return Promise.resolve()
+  }}],
   icon: [{ required: true, message: '请选择图标', trigger: 'blur' }],
+  functions: [{ required: true, message: '请选择功能', trigger: 'blur' }],
+  command: [{ required: true, message: '请选择调用指令', trigger: 'blur' }],
+  pages: [{ required: true, message: '请选择调用页面', trigger: 'blur' }],
+}
+
+const handlePages = (val: string) => {
+  const data = pagesOptions.value.find(item => item.id === val)
+  form.resource = {...pick(data, ['id', 'parentId', 'type']), projectId: info.id}
+  form.resource.parentId = `${form.resource.projectId}.${form.resource.parentId}`
 }
 const submit = async () => {
   const valid = await formRef.value?.validate()
@@ -178,15 +198,20 @@ const submit = async () => {
     : undefined
 }
 
+const language = ref('javascript')
 watch(
   () => form.functions,
   () => {
     if (form.functions && form.functions !== '') {
-      findCommand()
+      handleFunction(form.functions)
     }
   },
   { immediate: true },
 )
+
+watch(() => commandOptions.value, () => {
+  form.command = commandOptions.value.find(item => item.id === form.type)?.id
+})
 defineExpose({
   submit,
 })

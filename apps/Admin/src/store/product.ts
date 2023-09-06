@@ -21,9 +21,10 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
   if (children.children) {
     children.children.forEach(item => {
       const hasChildren = item.children?.length || item.functions?.length || item.resources?.length
-
+      const others = Object.assign(item.others || {}, { type: item.provider })
       treeData.push({
         ...item,
+        others,
         title: item.name,
         type: providerEnum.Module,
         parentId: parentId,
@@ -34,10 +35,13 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
 
   if (children.functions) {
     children.functions.forEach(item => {
+      const type = item.others?.type || item.provider
+      const others = Object.assign(item.others || {}, { type })
       treeData.push({
         ...item,
+        others,
+        type,
         title: item.name,
-        type: item.others?.type,
         parentId: parentId,
       })
     })
@@ -45,10 +49,13 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
 
   if (children.resources) {
     children.resources.forEach(item => {
+      const type = item.others?.type || item.provider
+      const others = Object.assign(item.others || {}, { type })
       treeData.push({
         ...item,
+        others,
+        type,
         title: item.name,
-        type: item.others?.type,
         parentId: parentId,
       })
     })
@@ -85,6 +92,10 @@ export const useProduct = defineStore('product', () => {
 
   const getDataMap = (): Map<string, any> => {
     return dataMap
+  }
+
+  const getDataMapByType = (type: string) => {
+    return [...dataMap.values()].filter(item => item.others?.type === type)
   }
 
 const findParent=(data, target, result) =>{
@@ -209,6 +220,11 @@ const findParent=(data, target, result) =>{
     return arr;
   }
 
+  const getServerModulesData = async () => {
+    const integrateData = Integrate(data.value)
+    return integrateData?.modules || []
+  }
+
   const queryProduct = async (id?: string, cb?: () => void) => {
     if (!id) return
     dataMap.clear()
@@ -237,7 +253,7 @@ const findParent=(data, target, result) =>{
     data.value = []
     dataMap.clear()
     dataById.value = null
-
+    info.value = null
     engine.initEngineState()
   }
 
@@ -246,12 +262,14 @@ const findParent=(data, target, result) =>{
     info,
     queryProduct,
     getDataMap,
+    getDataMapByType,
     add,
     update,
     remove,
     getById,
     getParent,
-    initProjectState
+    initProjectState,
+    getServerModulesData
   }
 },{
   persist: false

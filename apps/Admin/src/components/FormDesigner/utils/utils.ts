@@ -1,7 +1,8 @@
 import { uid } from "./uid"
 import componentMap from "./componentMap"
 import { ISchema } from "../typings"
-import { queryDictionaryData } from "@/api/form"
+import { queryDictionaryData, queryRuntime } from "@/api/form"
+import { isObject } from "lodash-es"
 
 export const checkIsField = (node: any) => node?.type && (componentMap?.[node?.type]) || ['table'].includes(node?.type)
 
@@ -25,9 +26,9 @@ const layout = ['card', 'grid', 'tabs', 'collapse', 'space']
 const checkedConfigItem = (node: ISchema) => {
     const _type = node.type || 'root'
     if (_type === 'root') {
-        return false
+        return ''
     } else {
-        if (['text'].includes(_type) && !(node?.formItemProps?.name)) {
+        if (['text'].includes(_type) && !(node?.componentProps?.value && node?.formItemProps?.name)) {
             return node?.key
         }
         if (arr.includes(_type)) {
@@ -37,12 +38,24 @@ const checkedConfigItem = (node: ISchema) => {
                 return node?.key
             }
         }
-        if ('upload' && !(node?.componentProps?.maxCount && node?.componentProps?.size)) {
+        if('input-number' === _type && !(node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined && node?.componentProps?.precision !== undefined)) {
+            return node?.key
+        }
+        if (['select', 'tree-select', 'select-card'].includes(_type)) {
+            // 数据源
+            if(node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
+                return node?.key
+            }
+            if(node?.componentProps?.source?.type === 'end' && !(node?.componentProps.source?.commandId && node?.componentProps.source?.functionId && node?.componentProps.source?.label && node?.componentProps.source?.value)) {
+                return node?.key
+            }
+        }
+        if ('upload' === _type && !(node?.componentProps?.accept && node?.componentProps?.maxCount && node?.componentProps?.fileSize)) {
             // 个数和单位
             return node?.key
         }
-        if ('table') {
-            // 数据绑定
+        if ('space' === _type && !node?.componentProps?.size) {
+            return node?.key
         }
         if (['card'].includes(_type) && !(node?.componentProps?.title)) {
             return node?.key
@@ -162,8 +175,23 @@ export const getBrotherList = (value: string, arr: any[]) => {
     return []
 }
 
+const getData = (key: string, obj: any) => {
+    if (key) {
+        const arr = Object.keys(obj) || []
+        return arr.find(item => {
+            if (item === key) {
+                return obj?.[key]
+            }
+            if (isObject(obj[item])) {
+                return getData(key, obj[item])
+            }
+        })
+    }
+    return obj
+}
+
 // 获取options
-export const queryOptions = async (source: any) => {
+export const queryOptions = async (source: any, id: string) => {
     if (source?.type === 'dic' && source?.dictionary) {
         const resp = await queryDictionaryData(source?.dictionary)
         if (resp.success) {
@@ -175,16 +203,21 @@ export const queryOptions = async (source: any) => {
             })
         }
     }
-    if (source?.type === 'end' && source?.dictionary) {
-        // const resp = await queryDictionaryData(source?.dictionary)
-        // if (resp.success) {
-        //     return resp.result.map(item => {
-        //         return {
-        //             label: item.name,
-        //             value: item.id
-        //         }
-        //     })
-        // }
+    if (id && source?.type === 'end' && source?.functionId && source?.commandId && source?.label && source?.value) {
+        const resp = await queryRuntime(id, source?.functionId, source?.commandId)
+        if (resp.success) {
+            const arr = getData(source?.source, resp?.result || {})
+            if (Array.isArray(arr) && arr?.length) {
+                return arr.map(item => {
+                    return {
+                        label: item[source?.label],
+                        value: item[source?.value]
+                    }
+                })
+            } else {
+                return []
+            }
+        }
     }
     return []
 }

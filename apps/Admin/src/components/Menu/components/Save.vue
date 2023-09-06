@@ -57,7 +57,7 @@ const formRef = ref()
 
 const modelRef = reactive({
    //  title: props.data.title || '',
-   id: props.data.id || '',
+   // id: props.data.id || '',
    name: props.data.name || '',
    icon: props.data.icon || ''
 })
@@ -72,13 +72,24 @@ const choseIcon = (typeStr: string) => {
 const onSave = async()=>{
    const res = await formRef.value?.validate()
    if(res){
+      const code =props.data.code ||  randomString(8)
+      const id = props.data.id || randomString(16)
       emit('ok',{
+         ...props.data,
          ...res,
-         id:props.data.id || randomString(16)
+         id,
+         owner:'iot',
+         code,
+         url:`/preview/${id}`,
+         children: props.data.children || []
       })
    }
 }
 
+
+onMounted(()=>{
+   console.log('props',props.data)
+})
 </script>
    
 <style scoped lang='less'>

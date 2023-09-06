@@ -7,52 +7,67 @@
           <j-button
             type="link"
             style="padding: 0; margin: 0"
-            @click="visible = false"
+            @click="onBack"
           >
             <AIcon type="ArrowLeftOutlined" style="font-size: 15px" />返回
           </j-button>
         </div>
         <j-form ref="formRef" :model="ruleModel" layout="vertical">
           <j-form-item label="触发类型" name="trigger">
-            <j-select placeholder="请选择" v-model:value="ruleModel.trigger" mode="multiple">
+            <j-select
+              placeholder="请选择"
+              v-model:value="ruleModel.trigger"
+              mode="multiple"
+            >
               <j-select-option value="blur">失焦时</j-select-option>
               <j-select-option value="change">输入时</j-select-option>
             </j-select>
           </j-form-item>
-          <j-form-item label="自定义校验器" name="validator">
-            <j-textarea placeholder="请输入" v-model:value="ruleModel.validator" />
+          <j-form-item name="validator">
+            <template #label>
+              自定义校验器<j-tooltip title="格式：">
+                <AIcon type="QuestionCircleOutlined" />
+              </j-tooltip>
+            </template>
+            <EditorBtn
+              v-model:value="ruleModel.validator"
+              text="编写代码"
+              language="javascript"
+            />
           </j-form-item>
           <j-form-item label="错误信息" name="message">
-            <j-textarea placeholder="请输入" v-model:value="ruleModel.message" />
+            <j-textarea
+              placeholder="请输入"
+              v-model:value="ruleModel.message"
+            />
           </j-form-item>
           <j-form-item label="格式校验" name="pattern">
-            <j-select placeholder="请选择" v-model:value="regRef" @change="handleChange">
-              <j-select-option v-for="item in patternList" :value="item.value">{{ item.text }} </j-select-option>
+            <j-select
+              placeholder="请选择"
+              v-model:value="regRef"
+              @change="handleChange"
+            >
+              <j-select-option :key="item.value" v-for="item in patternList" :value="item.value"
+                >{{ item.text }}
+              </j-select-option>
             </j-select>
           </j-form-item>
-          <j-form-item label="正则表达式" name="pattern" >
+          <j-form-item label="正则表达式" name="pattern">
             <j-textarea placeholder="请输入" v-model:value="inputRef" />
           </j-form-item>
           <j-form-item label="最小长度限制" name="min">
-            <j-input-number placeholder="请输入" style="width: 100%;" v-model:value="ruleModel.min" />
+            <j-input-number
+              placeholder="请输入"
+              style="width: 100%"
+              v-model:value="ruleModel.min"
+            />
           </j-form-item>
           <j-form-item label="最大长度限制" name="max">
-            <j-input-number placeholder="请输入" style="width: 100%;" v-model:value="ruleModel.max" />
-          </j-form-item>
-          <j-form-item
-            label="约束"
-            name="required"
-            :rules="[
-              {
-                required: true,
-                message: '请选择',
-              },
-            ]"
-          >
-            <j-radio-group button-style="solid" v-model:value="ruleModel.required">
-              <j-radio-button :value="true">必填</j-radio-button>
-              <j-radio-button :value="false">非必填</j-radio-button>
-            </j-radio-group>
+            <j-input-number
+              placeholder="请输入"
+              style="width: 100%"
+              v-model:value="ruleModel.max"
+            />
           </j-form-item>
         </j-form>
       </div>
@@ -61,8 +76,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, unref, watchEffect } from 'vue'
-import {patternList} from './index'
+import { ref, reactive, unref, watchEffect, watch } from 'vue'
+import { patternList } from './index'
+import EditorBtn from '../EditorBtn.vue'
+
 const props = defineProps({
   value: {
     type: Object,
@@ -70,8 +87,8 @@ const props = defineProps({
   },
   index: {
     type: Number,
-    default: 0
-  }
+    default: 0,
+  },
 })
 const emits = defineEmits(['change'])
 
@@ -81,7 +98,7 @@ const ruleModel = reactive<any>({
   message: undefined,
   max: undefined,
   min: undefined,
-  required: false,
+  // required: false,
   trigger: ['change'],
   pattern: undefined,
   validator: undefined,
@@ -89,31 +106,29 @@ const ruleModel = reactive<any>({
 const regRef = ref<any>(undefined)
 const inputRef = ref<any>('')
 
-
-
-const handleChange = (e:any)=>{
-    const reg = new RegExp(e)
-    ruleModel.pattern = reg
+const handleChange = (e: any) => {
+  const reg = new RegExp(e)
+  ruleModel.pattern = reg
 }
 
 watch(
-  ()=>inputRef.value,
-  (val)=>{
-    const params = patternList.find(item=>item.value === val)
-    if(params){
+  () => inputRef.value,
+  (val) => {
+    const params = patternList.find((item) => item.value === val)
+    if (params) {
       regRef.value = val
-    }else{
+    } else {
       regRef.value = undefined
     }
-  }
+  },
 )
 
 watchEffect(() => {
   // console.log('props.value',props.value)
   Object.assign(ruleModel, props.value)
-  if(props.value.pattern){
-    const reg = `${props.value.pattern}` 
-    inputRef.value = reg.slice(1,reg.length-1)
+  if (props.value.pattern) {
+    const reg = `${props.value.pattern}`
+    inputRef.value = reg.slice(1, reg.length - 1)
   }
 })
 
@@ -121,6 +136,11 @@ const onClickItem = () => {
   // console.log('ruleModel',ruleModel)
   emits('change', unref(ruleModel), props.index)
   visible.value = true
+}
+
+const onBack = () => {
+  emits('change', unref(ruleModel), props.index)
+  visible.value = false
 }
 </script>
 

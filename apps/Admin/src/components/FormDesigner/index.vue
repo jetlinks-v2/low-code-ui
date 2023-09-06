@@ -50,7 +50,7 @@ const props = defineProps({
   },
 })
 
-const model = ref<'preview' | 'edit'>('edit') // 预览；编辑
+const model = ref<'preview' | 'edit'>(props.mode ? 'preview' : 'edit') // 预览；编辑
 const formData = ref<any>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
 const selected = reactive<any>({ ...initData }) // 被选择数据
@@ -73,11 +73,13 @@ const onSaveData = () => {
       code: JSON.stringify(unref(formData)),
     },
   }
+  console.log('props.data',props.data)
   product.update(obj)
 }
 
 // 设置数据被选中
 const setSelection = (node: any) => {
+  if(['card-item', 'grid-item'].includes(node.type)) return
   let result: any = {}
   if (node === 'root') {
     result = formData.value
@@ -127,6 +129,7 @@ const getFieldData = (data: ISchema) => {
 }
 
 provide('FormDesigner', {
+  tabsId: props.data?.id,
   model,
   formData,
   isShowConfig,

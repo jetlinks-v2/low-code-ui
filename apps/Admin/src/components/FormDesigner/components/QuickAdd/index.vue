@@ -3,7 +3,9 @@
     <j-button type="primary" @click="visible = true">快速添加</j-button>
     <j-drawer v-model:visible="visible" title="快速添加" placement="right">
       <p>自由组合快速添加表单页内容</p>
-      <div>123</div>
+      <div class="content">
+        
+      </div>
       <div class="btn">
         <j-space>
           <j-button @click="visible = false">取消</j-button>

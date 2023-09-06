@@ -203,7 +203,7 @@ const handleSort = (sort) => {
   const listLength = indexMap.size
   // const colNumber = listLength / 8
   const currentIndex = selectSort.value + sort
-  if (currentIndex > 0 && currentIndex < listLength) {
+  if (currentIndex >= 0 && currentIndex < listLength) {
     selectSort.value = selectSort.value + sort
     selectKey.value = list.value[currentIndex]?.id
   }
