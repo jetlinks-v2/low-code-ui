@@ -20,7 +20,7 @@
     </j-sub-menu>
     <j-menu-item :key="actionMap['Profile'].key">{{actionMap['Profile'].value}}</j-menu-item>
     <j-menu-item :key="actionMap['Copy'].key">{{actionMap['Copy'].value  }}</j-menu-item>
-    <j-menu-item :key="actionMap['Paste'].key" :disabled="!!copyFile">{{actionMap['Paste'].value  }}</j-menu-item>
+    <j-menu-item :key="actionMap['Paste'].key" :disabled="!copyFile">{{actionMap['Paste'].value  }}</j-menu-item>
     <j-menu-item :key="actionMap['Rename'].key">{{actionMap['Rename'].value  }}</j-menu-item>
     <j-menu-item :key="actionMap['Delete'].key">{{actionMap['Delete'].value  }}</j-menu-item>
   </j-menu>
@@ -30,7 +30,7 @@
 <script setup name="RightClickMenu">
 import { useProduct, useEngine } from "@/store";
 
-import {providerMap, providerEnum,actionMap} from  '@/components/ProJect/index'
+import {providerMap, providerEnum,actionMap,restId} from  '@/components/ProJect/index'
 import { storeToRefs } from 'pinia'
 
 const product = useProduct()
@@ -47,6 +47,29 @@ const emit = defineEmits(['click'])
 
 const { copyFile } = storeToRefs(engine)
 
+const onPaste = (node) => {
+  const copyItem = product.getById(engine.copyFile)
+  const isModule = node.type === providerEnum.Module
+      let _arr = node.data.children || []
+      if (!isModule) {
+        _arr = product.getById(node.parentId)?.children || []
+      }
+  const copyData = {
+    data:{
+      title: `copy_${copyItem.name}`,
+      children: copyItem.children ? restId(copyItem.children) : undefined,
+      parentId: isModule ? node.id : node.parentId
+    },
+    provider:copyItem.type,
+    type:'Add',
+    nameList:_arr.map(item => item.name),
+    cacheData:node.data
+  }
+  console.log('is',isModule)
+  console.log('copyData',copyData)
+  emit('click',copyData)
+}
+
 const onContextMenuClick = (node, menuKey) => {
 
   switch(menuKey) {
@@ -57,7 +80,7 @@ const onContextMenuClick = (node, menuKey) => {
     case providerEnum.CRUD:
     case providerEnum.SQL:
     case providerEnum.Function:
-      const isModule = node.provider === providerEnum.Module
+      const isModule = node.type === providerEnum.Module
       let _arr = node.data.children || []
       if (!isModule) {
         _arr = product.getById(node.parentId)?.children || []
@@ -83,7 +106,14 @@ const onContextMenuClick = (node, menuKey) => {
       product.remove(node)
       break;
     case actionMap.Copy.key:
-      console.log('-------')
+      emit('click',{
+        data: node.data,
+        menuKey:menuKey
+      })
+      break;
+    case actionMap.Paste.key:
+      console.log('-------',node)
+      onPaste(node)
       break;
   }
 

@@ -166,16 +166,25 @@
       </j-form-item>
     </template>
     <template v-if="['geo'].includes(type)">
-      <j-form-item label="存储层级" :name="['componentProps', 'align']">
+      <j-form-item label="存储层级" :name="['componentProps', 'level']">
         <j-select
-          v-model:value="target.componentProps.treeCheckStrictly"
+          v-model:value="target.componentProps.level"
           placeholder="请选择"
           required
           @change="onDataChange"
         >
-          <j-select-option :value="'left'">左</j-select-option>
-          <j-select-option :value="'right'">中</j-select-option>
-          <j-select-option :value="'center'">右</j-select-option>
+          <j-select-option :value="'all'">全部层级</j-select-option>
+          <j-select-option :value="'min'">最小级</j-select-option>
+        </j-select>
+      </j-form-item>
+      <j-form-item label="可选项" :name="['componentProps', 'geoType']">
+        <j-select
+          v-model:value="target.componentProps.geoType"
+          placeholder="请选择"
+          required
+          @change="onDataChange"
+        >
+          <j-select-option v-for="item in options" :value="item.id">{{ item.name }}</j-select-option>
         </j-select>
       </j-form-item>
     </template>
@@ -229,6 +238,8 @@
 <script lang="ts" setup>
 import { useTarget } from '../../../../hooks'
 import { computed } from 'vue'
+import { useRequest } from '@jetlinks/hooks'
+import { getGeoType } from '@/api/form';
 
 const { target } = useTarget()
 
@@ -249,6 +260,8 @@ const imgType = ['.jpg', '.png', '.jpeg']
 const list = computed(() =>
   target.value.componentProps?.listType === 'text' ? textType : imgType,
 )
+
+const { data: options } = useRequest(getGeoType)
 
 const onDataChange = () => {
   emits('refresh', target.value)
