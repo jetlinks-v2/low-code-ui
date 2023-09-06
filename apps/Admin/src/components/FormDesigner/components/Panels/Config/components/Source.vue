@@ -139,7 +139,7 @@ const getDictionary = () => {
 
 const getEnd = () => {
   const id = product.info?.draftId
-  queryEndCommands(id).then((resp) => {
+  queryEndCommands(id, ["rdb-crud"]).then((resp) => {
     if (resp.success) {
       end.value = resp.result || []
     }
