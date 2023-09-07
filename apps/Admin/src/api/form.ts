@@ -43,3 +43,21 @@ export const queryEndCommands = (id: string, data?: any) => request.post(`/low-c
  */
 export const queryRuntime = (projectId: string, functionId: string, commandId: string, data?: any, ) => request.post(`/low-code/runtime/${projectId}/${functionId}/${commandId}`, data)
 
+
+/**
+ * 获取地区类型
+ */
+export const getGeoType = () => request.post(`/district/category/_query/no-paging`,{})
+
+/**
+ * 获取地区
+ * categoryId：类型id
+ */
+export const getGeoTree = (categoryId:string,data:any) => request.post(`/district/byCategory/${categoryId}/_query`,data)
+
+/**
+ * 根据类别条件查询地区（树结构）
+ * categoryId：类型id
+ */
+export const GeoTreeByName = (categoryId:string,data:any) => request.post(`/district/byCategory/${categoryId}/_tree`,data)
+
