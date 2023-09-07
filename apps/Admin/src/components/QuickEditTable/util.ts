@@ -38,7 +38,6 @@ export const useValidate = (dataSource) => {
 
   const createValidate = (columns) => {
     handleColumns(columns)
-    console.log(ruleObj)
     validateRef.value = new Schema(ruleObj)
   }
 
@@ -52,7 +51,6 @@ export const useValidate = (dataSource) => {
             const hasName = err?.find(item => item.field === name)
 
             const path = createPath(name, record._quick_id)
-            console.log(err, path, hasName)
             if (err && hasName) { // 有错误
               errorMap.value[path] = hasName.message
               reject({ [path]:[hasName] })
@@ -73,10 +71,7 @@ export const useValidate = (dataSource) => {
       let errorMsg = {}
       for (const item of dataSource) {
         for (const key in ruleObj) {
-          await validate(key, item[key], item)?.then(res => {
-            console.log(res)
-          })?.catch(e => {
-            console.log(e)
+          await validate(key, item[key], item)?.catch(e => {
             errorMsg = {
               ...e,
               ...errorMsg
@@ -84,7 +79,6 @@ export const useValidate = (dataSource) => {
           })
         }
       }
-      console.log('validates', errorMsg)
       if (Object.keys(errorMsg).length) {
         reject(errorMsg)
       } else {
