@@ -36,10 +36,10 @@ export const queryDictionaryData = (id: string) => request.get(`/dictionary/${id
 /**
  * 获取功能预支持的指令
  */
-export const queryEndCommands = (id: string) => request.post(`/low-code/editor/${id}/support/commands`, ["rdb-crud"])
+export const queryEndCommands = (id: string, data?: any) => request.post(`/low-code/editor/${id}/support/commands`, data)
 
 /**
  * 执行功能命令
  */
-export const queryRuntime = (projectId: string, functionId: string, commandId: string, data: any) => request.post(`/low-code/runtime/${projectId}/${functionId}/${commandId}`, data)
+export const queryRuntime = (projectId: string, functionId: string, commandId: string, data?: any, ) => request.post(`/low-code/runtime/${projectId}/${functionId}/${commandId}`, data)
 

@@ -7,8 +7,9 @@ import { addContext } from "@/components/FormDesigner/utils/addContext"
 import { uid } from "@/components/FormDesigner/utils/uid"
 import CollectModal from '../../CollectModal/index.vue'
 import { useProduct, useFormDesigner } from "@/store"
+import { extractCssClass, insertCustomCssToHead } from "@/components/FormDesigner/utils/utils"
 
-export default defineComponent({
+const Canvas = defineComponent({
   name: 'Canvas',
   inheritAttrs: false,
   customOptions: {},
@@ -17,6 +18,8 @@ export default defineComponent({
     const formDesigner = useFormDesigner()
     const product = useProduct()
 
+    const cssClassList = ref<string[]>([])
+
     const handleClick = () => {
       designer.setSelection('root')
     }
@@ -24,6 +27,11 @@ export default defineComponent({
     const isEditModel = computed(() => {
       return unref(designer?.model) === 'edit'
     })
+
+    const getWidgetRef = (path) => {
+      let foundRef = unref(designer.refList)?.[path]
+      return foundRef
+    }
 
     const _style = {
       margin: '10px 10px 0 10px',
@@ -47,8 +55,15 @@ export default defineComponent({
       }
     }
 
+    watchEffect(() => {
+      const arr = extractCssClass(unref(designer.formData)?.componentProps?.cssCode)
+      cssClassList.value = arr
+      insertCustomCssToHead(unref(designer.formData)?.componentProps?.cssCode, 'root')
+    })
+
     const renderContent = () => {
       const typeProps = useProps(designer, true) // 根结点，也是form的props
+
       const Layout = (
         <DraggableLayout
           path={[]}
@@ -69,6 +84,13 @@ export default defineComponent({
             {...omit(unref(designer.formData)?.componentProps, ['size'])}
             onClick={unref(isEditModel) && handleClick}
             {...unref(typeProps)}
+            class={[...unref(cssClassList)]}
+            onValidate={(name, status, errorMsgs) => {
+              if (unref(designer.formData)?.componentProps?.eventCode) {
+                let customFn = new Function('e', unref(designer.formData)?.componentProps?.eventCode)
+                customFn.call({ getWidgetRef: getWidgetRef }, name, status, errorMsgs)
+              }
+            }}
           >
             {Layout}
           </Form>
@@ -134,3 +156,5 @@ export default defineComponent({
     }
   }
 })
+
+export default Canvas

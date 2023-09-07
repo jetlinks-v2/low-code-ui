@@ -1,0 +1,251 @@
+<!-- 组件属性 -->
+<template>
+  <div>
+    <template v-if="['input-number'].includes(type)">
+      <j-form-item label="最大值" :name="['componentProps', 'max']">
+        <j-input-number
+          style="width: 100%"
+          v-model:value="target.componentProps.max"
+          placeholder="请输入"
+          @change="onDataChange"
+        />
+      </j-form-item>
+      <j-form-item label="最小值" :name="['componentProps', 'min']">
+        <j-input-number
+          style="width: 100%"
+          v-model:value="target.componentProps.min"
+          placeholder="请输入"
+          @change="onDataChange"
+        />
+      </j-form-item>
+      <j-form-item label="精度" :name="['componentProps', 'precision']">
+        <j-input-number
+          style="width: 100%"
+          v-model:value="target.componentProps.precision"
+          placeholder="请输入"
+          :precision="0"
+          @change="onDataChange"
+        />
+      </j-form-item>
+    </template>
+    <template
+      v-if="
+        [
+          'select-card',
+          'tree-select',
+          'select',
+          'org',
+          'role',
+          'user',
+          'product',
+          'device',
+        ].includes(type)
+      "
+    >
+      <j-form-item
+        label="类型"
+        :name="['componentProps', 'mode']"
+      >
+        <j-radio-group
+          v-model:value="target.componentProps.mode"
+          button-style="solid"
+          @change="onDataChange"
+        >
+          <j-radio-button :value="undefined">单选项</j-radio-button>
+          <j-radio-button :value="'multiple'">多选项</j-radio-button>
+        </j-radio-group>
+      </j-form-item>
+    </template>
+    <template v-if="['upload'].includes(type)">
+      <j-form-item
+        label="上传内容"
+        :name="['componentProps', 'listType']"
+        required
+      >
+        <j-radio-group
+          v-model:value="target.componentProps.listType"
+          @change="onChange"
+          button-style="solid"
+        >
+          <j-radio-button :value="'text'">文件</j-radio-button>
+          <j-radio-button :value="'picture'">图片</j-radio-button>
+        </j-radio-group>
+      </j-form-item>
+      <j-form-item
+        label="上传个数"
+        :name="['componentProps', 'maxCount']"
+        required
+      >
+        <j-input-number
+          style="width: 100%"
+          v-model:value="target.componentProps.maxCount"
+          placeholder="请输入"
+          :precision="0"
+          :min="1"
+          @change="onDataChange"
+        />
+      </j-form-item>
+      <j-form-item required :name="['componentProps', 'accept']" label="格式">
+        <j-select
+          mode="multiple"
+          placeholder="请选择"
+          v-model:value="target.componentProps.accept"
+          @change="onDataChange"
+        >
+          <j-select-option :key="item" v-for="item in list" :value="item">{{
+            item
+          }}</j-select-option>
+        </j-select>
+      </j-form-item>
+      <j-form-item
+        required
+        :name="['componentProps', 'fileSize']"
+        label="单个大小"
+      >
+        <j-input-group compact>
+          <j-input-number
+            style="width: 60%"
+            v-model:value="target.componentProps.fileSize"
+            :min="0"
+            @change="onDataChange"
+          />
+          <j-select
+            :defaultValue="'M'"
+            style="width: 40%"
+            @change="onDataChange"
+            v-model:value="target.componentProps.unit"
+          >
+            <j-select-option value="M">M</j-select-option>
+            <j-select-option value="KB">KB</j-select-option>
+          </j-select>
+        </j-input-group>
+      </j-form-item>
+    </template>
+    <template v-if="['tree-select'].includes(type)">
+      <j-form-item
+        label="可选节点"
+        :name="['componentProps', 'treeCheckStrictly']"
+        required
+      >
+        <j-select
+          v-model:value="target.componentProps.treeCheckStrictly"
+          placeholder="请选择"
+          @change="onDataChange"
+        >
+          <j-select-option :value="false">联动选择</j-select-option>
+          <j-select-option :value="true">仅选子节点</j-select-option>
+        </j-select>
+      </j-form-item>
+    </template>
+    <template v-if="['tree-select', 'select'].includes(type)">
+      <j-form-item
+        label="支持模糊搜索"
+        :name="['componentProps', 'showSearch']"
+        required
+      >
+        <j-switch @change="onDataChange" v-model:checked="target.componentProps.showSearch" />
+      </j-form-item>
+    </template>
+    <template v-if="['table'].includes(type)">
+      <j-form-item label="内容对齐" :name="['componentProps', 'align']">
+        <j-select
+          v-model:value="target.componentProps.align"
+          placeholder="请选择"
+          @change="onDataChange"
+        >
+          <j-select-option :value="'left'">左</j-select-option>
+          <j-select-option :value="'right'">中</j-select-option>
+          <j-select-option :value="'center'">右</j-select-option>
+        </j-select>
+      </j-form-item>
+    </template>
+    <template v-if="['geo'].includes(type)">
+      <j-form-item label="存储层级" :name="['componentProps', 'align']">
+        <j-select
+          v-model:value="target.componentProps.treeCheckStrictly"
+          placeholder="请选择"
+          required
+          @change="onDataChange"
+        >
+          <j-select-option :value="'left'">左</j-select-option>
+          <j-select-option :value="'right'">中</j-select-option>
+          <j-select-option :value="'center'">右</j-select-option>
+        </j-select>
+      </j-form-item>
+    </template>
+    <template
+      v-if="
+        [
+          'input',
+          'textarea',
+          'input-number',
+          'input-password',
+          'select-card',
+          'upload',
+          'switch',
+          'tree-select',
+          'select',
+          'date-picker',
+          'time-picker',
+          'table',
+          'org',
+          'role',
+          'user',
+          'product',
+          'device',
+          'geo',
+          'form'
+        ].includes(type)
+      "
+    >
+      <j-form-item
+        label="约束"
+        :name="['formItemProps', 'required']"
+        :rules="[
+          {
+            required: true,
+            message: '请选择',
+          },
+        ]"
+      >
+        <j-radio-group
+          v-model:value="target.formItemProps.required"
+          button-style="solid"
+          @change="onDataChange"
+        >
+          <j-radio-button :value="true">必填</j-radio-button>
+          <j-radio-button :value="false">非必填</j-radio-button>
+        </j-radio-group>
+      </j-form-item>
+    </template>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import { useTarget } from '../../../../hooks'
+import { computed } from 'vue'
+
+const { target } = useTarget()
+
+const emits = defineEmits(['refresh'])
+
+const type = computed(() => {
+  return target.value?.type
+})
+
+const onChange = () => {
+  target.value.componentProps.accept = undefined
+  emits('refresh', target.value)
+}
+
+const textType = ['.xlsx', '.xls', '.csv', '.zip', '.json']
+const imgType = ['.jpg', '.png', '.jpeg']
+
+const list = computed(() =>
+  target.value.componentProps?.listType === 'text' ? textType : imgType,
+)
+
+const onDataChange = () => {
+  emits('refresh', target.value)
+}
+</script>
