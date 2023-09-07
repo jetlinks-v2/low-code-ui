@@ -1,6 +1,5 @@
 
 import { cloneDeep, get, isEmpty, omit, set } from 'lodash-es';
-import { onEnd, onMove } from './ControlInsertionPlugin';
 import DraggableWrap from './DragGableWrap'
 import Selection from '../Selection'
 import { FormItem } from 'jetlinks-ui-components'
@@ -54,10 +53,6 @@ const DraggableLayout = defineComponent({
         const isEditModel = computed(() => {
             return unref(designer.model) === 'edit'
         })
-
-        const handleMove = () => {
-            return true
-        }
 
         const slots = {
             item: ({ element }) => {
@@ -248,31 +243,28 @@ const DraggableLayout = defineComponent({
             }
         }
 
+        const options = {
+            animation: 150,
+            multiDrag: true,
+            itemKey: 'key',
+            selectedClass: "sortable-selected",
+            multiDragKey: "SHIFT",
+            group: { name: "j-canvas" },
+            //拖动结束
+            // onEnd: function (evt) {
+            //   console.log(evt);
+            // }
+        }
+
         return () => {
             return (
                 <DraggableWrap
                     list={props.data || []}
-                    handle=".handle"
                     tag={props.tag}
-                    item-key="key"
-                    move={handleMove}
-                    ghostClass={'ghost'}
-                    animation={200}
-                    group={{
-                        name: 'j-canvas'
-                    }}
                     v-slots={slots}
-                    componentData={{
-                        ...useAttrs(),
-                        type: 'transition-group',
-                    }} // tag的props和event
-                    onMove={(e) => {
-                        onMove(e, designer)
-                    }}
+                    componentData={useAttrs()} // tag的props和event
                     model={unref(designer.model)}
-                    onEnd={(e) => {
-                        onEnd(e, designer)
-                    }}
+                    {...options}
                 />
             )
         };

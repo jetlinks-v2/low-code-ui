@@ -25,7 +25,7 @@
 
 <script lang="ts" setup>
 import { ref, watchEffect, unref } from 'vue'
-import Draggable from 'vuedraggable'
+import Draggable from '../../../../JSortable/index'
 import DrawerSetter from './DrawerSetter.vue'
 
 const props = defineProps({
