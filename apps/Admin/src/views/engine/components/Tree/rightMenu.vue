@@ -65,8 +65,8 @@ const onPaste = (node) => {
     nameList:_arr.map(item => item.name),
     cacheData:node.data
   }
-  console.log('is',isModule)
-  console.log('copyData',copyData)
+  // console.log('is',isModule)
+  // console.log('copyData',copyData)
   emit('click',copyData)
 }
 
@@ -112,7 +112,7 @@ const onContextMenuClick = (node, menuKey) => {
       })
       break;
     case actionMap.Paste.key:
-      console.log('-------',node)
+      // console.log('-------',node)
       onPaste(node)
       break;
   }

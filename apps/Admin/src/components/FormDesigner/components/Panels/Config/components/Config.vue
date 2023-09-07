@@ -160,7 +160,7 @@
       </j-form-item>
     </template>
     <template v-if="['geo'].includes(type)">
-      <j-form-item label="存储层级" :name="['componentProps', 'level']">
+      <!-- <j-form-item label="存储层级" :name="['componentProps', 'level']">
         <j-select
           v-model:value="target.componentProps.level"
           placeholder="请选择"
@@ -170,7 +170,7 @@
           <j-select-option :value="'all'">全部层级</j-select-option>
           <j-select-option :value="'min'">最小级</j-select-option>
         </j-select>
-      </j-form-item>
+      </j-form-item> -->
       <j-form-item label="可选项" :name="['componentProps', 'geoType']">
         <j-select
           v-model:value="target.componentProps.geoType"

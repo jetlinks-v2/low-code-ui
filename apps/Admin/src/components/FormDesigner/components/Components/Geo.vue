@@ -1,7 +1,7 @@
 <template>
     <div>
-        <a-select :options="geoList" :open="selectRef.open" showSearch allowClear v-model:value="_value" placeholder="请选择"
-            @search="onSearch" @change="onChange" @dropdownVisibleChange="onDrop">
+        <a-select :options="geoList" :open="selectRef.open" showSearch allowClear v-model:value="_value" placeholder="请选择" :disabled="disabled"
+            @search="onSearch" @change="onChange" @dropdownVisibleChange="onDrop" @blur="onBlur">
             <template #dropdownRender="{ menuNode: menu }">
                 <j-spin :spinning="selectRef.loading">
                     <v-nodes :vnodes="menu" />
@@ -13,7 +13,7 @@
 
 <script  setup>
 import { getGeoTree, GeoTreeByName } from '@/api/form'
-import { debounce } from '@/components/CustomHTML/utils';
+import { debounce } from "lodash-es";
 
 
 const props = defineProps({
@@ -25,10 +25,10 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    level: {
-        type: String,
-        default: 'all'
-    },
+    // level: {
+    //     type: String,
+    //     default: 'all'
+    // },
     geoType: {
         type: String,
         default: 'country'
@@ -48,9 +48,21 @@ const selectRef = reactive({
     loading: false,
 })
 
+const TreeMap = new Map()
 
-const handleTree = (tree)=>{
-    
+//处理tree的name
+const handleTree = (tree, name) => {
+    if (tree.length === 0) return []
+    return tree.map(item => {
+        if (name) {
+            item.name = `${name}/${item.name}`
+        }
+        if (item.children) {
+            item.children = handleTree(item.children, item.name)
+        }
+        TreeMap.set(item.id, item)
+        return item
+    })
 }
 
 const getTree = async (option) => {
@@ -59,9 +71,9 @@ const getTree = async (option) => {
         paging: false,
         "terms": [
             {
-                "value": option ? option.key : geoType.value,
+                "value": option ? option.key : 1,
                 "termType": "eq",
-                "column": "parentId"
+                "column": option ? "parentId" : 'level'
             }
         ]
     }).finally(() => selectRef.loading = false)
@@ -81,21 +93,30 @@ const getTree = async (option) => {
 
 
 const onSearch = debounce(async (inputValue) => {
-    console.log('----e', inputValue)
-    selectRef.loading = true
-    const res = await GeoTreeByName(geoType.value, {
-        "paging": false,
-        terms: [
-            {
-                "value": `%${inputValue}%`,
-                "termType": "like",
-                "column": "name"
-            }
-        ]
-    }).finally(()=> selectRef.loading = false)
-    if (res.status === 200) {
-        console.log(res.result)
-        geoList.value = []
+    // console.log('----e', inputValue)
+    if (inputValue) {
+        selectRef.loading = true
+        const res = await GeoTreeByName(geoType.value, {
+            "paging": false,
+            terms: [
+                {
+                    "value": `%${inputValue}%`,
+                    "termType": "like",
+                    "column": "name"
+                }
+            ]
+        }).finally(() => selectRef.loading = false)
+        if (res.status === 200) {
+            handleTree(res.result)
+            const arr = [...TreeMap.values()].filter(item => item.name.includes(inputValue))
+
+            // console.log(arr, [...TreeMap.values()])
+            geoList.value = arr.map(item => ({
+                key: item.id,
+                label: item.name,
+                value: item.name
+            }))
+        }
     }
 }, 300)
 
@@ -104,7 +125,7 @@ const onSearch = debounce(async (inputValue) => {
 const onChange = (value, options) => {
     // console.log('value', value, options)
     if (value) {
-        getTree(props.level==='all'? options:'')
+        getTree(options)
     } else {
         selectRef.open = false
         getTree()
@@ -119,6 +140,10 @@ const onDrop = (value) => {
     if (!value && !_value.value) {
         selectRef.open = value
     }
+}
+
+const onBlur = ()=>{
+    selectRef.open = false
 }
 
 
