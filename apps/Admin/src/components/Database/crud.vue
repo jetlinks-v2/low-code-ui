@@ -167,6 +167,10 @@ const validate = async () => {
   await tableValidates()
 }
 
+defineExpose({
+  validate
+})
+
 </script>
 
 <style scoped lang="less">
