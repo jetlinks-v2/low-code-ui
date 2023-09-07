@@ -18,12 +18,9 @@
         size="small"
         :columns="props.columns"
         :data-source="props.dataSource"
+        :showTool="false"
         :height="200"
-        :row-class-name="
-          (_record, index) => (_record?.mark === 'add' ? 'table-striped' : null)
-        "
         @change="(data) => handleChange(data)"
-        @editStatus="editStatus"
       >
         <template #headerCell="{ column }">
           <template v-if="column.tips">
@@ -203,6 +200,7 @@ const emit = defineEmits([
   'handleOk',
   'handleChange',
   'update:data',
+  'bindData'
 ])
 
 const handleChange = (data) => {
@@ -340,21 +338,13 @@ const syncData = async () => {
     return onlyMessage('请先完成数据绑定', 'error')
   }
   if (!asyncData.value) {  
-    emit('bindData', props.dataSource.length ? props.dataSource : dataBinds.functionInfo?.configuration?.columns?.map(
-      (item) => {
-        return {
-          id: item.name,
-          name: item.name,
-          type: 'string',
-        }
-      },
-    ))
+    emit('bindData', tempData.value)
     bindShow.value = true
     asyncData.value = true
   } else {
-    const data = await tableRef.value?.getData()
+    tempData.value = await tableRef.value?.getData()
     // if (data?.length !== props.dataSource?.length || props.configChange) {
-    if (JSON.stringify(data) !== JSON.stringify(props.dataSource)) {
+    if (JSON.stringify(tempData.value) !== JSON.stringify(props.dataSource)) {
       openModel(props.modelActiveKey)
     } else {
       onlyMessage('已是最新数据', 'success')
@@ -379,6 +369,23 @@ const handleCancel = () => {
 const handleSelect = (key: string) => {
   activeKey.value = key
 }
+
+const tempData = ref([])
+
+watch(() => JSON.stringify(dataBinds), () => {
+  if(!dataBinds.function) asyncData.value = false;
+  bindShow.value = true
+  tempData.value = props.dataSource.length ? props.dataSource : dataBinds.functionInfo?.configuration?.columns?.map(
+    (item) => {
+      return {
+        id: item.name,
+        name: item.name,
+        type: item.javaType?.toLowerCase(),
+      }
+    },
+  )
+}, { immediate: true })
+
 </script>
 
 <style scoped lang="less">
