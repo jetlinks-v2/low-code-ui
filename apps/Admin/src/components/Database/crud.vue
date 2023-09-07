@@ -168,7 +168,12 @@ const validate = async () => {
 }
 
 defineExpose({
-  validate
+  validate: () => {
+    return new Promise(async (resolve, reject) => {
+      await validate()
+      !Object.keys(errorTips.dataTable).length && !(errorTips.relation + errorTips.asset) ? resolve() : reject(errorTips)
+    })
+  }
 })
 
 </script>
