@@ -74,6 +74,10 @@ const handleProps = (node: any) => {
             result.fileSize = 2
             result.unit = 'M'
             break
+        case 'geo':
+            result.level = 'all'
+            result.geoType = 'country'
+            break
         case 'grid':
             result.inlineMax = 4
             break
