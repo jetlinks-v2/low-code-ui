@@ -33,13 +33,11 @@
         />
         <!--选中功能类型为SQL/函数时，下拉框后方展示指令下拉框-->
         <j-select
-          v-if="
-            state.abilityValue === 'SQL' || state.abilityValue === 'function'
-          "
           style="width: 200px"
           v-model:value="state.instructValue"
           showSearch
           :options="commandOptions"
+          :field-names="{label: 'name', value: 'id'}"
         />
       </j-space>
     </div>
@@ -72,8 +70,10 @@ const state = reactive({
   instructValue: data?.instructValue || '',
 })
 const dataOptions = ref([])
-const abilityOptions = ref([])
-const instructOptions = ref([])
+
+watch(() => state.abilityValue, () => {
+  handleFunction(state.abilityValue)
+})
 
 watch(
   () => state,

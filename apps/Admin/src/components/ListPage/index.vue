@@ -262,7 +262,7 @@ onMounted(() => {
     Object.assign(showType, initData?.showType)
     Object.assign(menuConfig, initData?.menu)
     Object.assign(listFormInfo, initData?.listFormInfo)
-    pagingData.value = initData?.pagingData || []
+    pagingData.value = initData?.pagingData || pagingData.value
     buttonsConfig.value = initData?.addButton || []
     actionsConfig.value = initData?.actionsButton || []
     searchData.value = initData?.searchData || []
@@ -272,7 +272,6 @@ onMounted(() => {
     watch(
       () => JSON.stringify(listPageData.value),
       () => {
-        console.log(listPageData.value);
         const record = {
           ...props.data,
           configuration: {
@@ -309,11 +308,12 @@ onMounted(() => {
 // })
 
 const onSave = debounce((record) => {
-  debugger
   productStore.update(record)
 }, 1000)
 
-
+defineExpose({
+  validate
+})
 
 </script>
 
