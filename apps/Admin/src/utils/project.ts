@@ -26,7 +26,6 @@ const handleModuleChildren = (data: any[]) => {
   data?.forEach?.(item => {
     const type = item.others.type
     item.provider = item.others.type
-    console.log(item)
     if ([providerEnum.HtmlPage, providerEnum.ListPage, providerEnum.FormPage].includes(type)) {
       item.provider = 'page-code'
       resources.push(omit(item, ['fullId']))
@@ -48,7 +47,6 @@ const handleModuleChildren = (data: any[]) => {
 const handleChildren = (data: any[]) => {
   const modules: any[] = []
   data.forEach(item => {
-    console.log(item)
     if (item.type === providerEnum.Module) {
       let extra = handleModuleChildren(item.children)
       if (extra.children) {
@@ -60,6 +58,5 @@ const handleChildren = (data: any[]) => {
       })
     }
   })
-  console.log(modules)
   return modules
 }

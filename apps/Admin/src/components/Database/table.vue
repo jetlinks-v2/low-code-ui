@@ -5,6 +5,8 @@
     </div>
     <QuickEditTable
       serial
+      validate
+      ref="tableRef"
       :data="dataSource"
       :columns="myColumns"
       :height="500"
@@ -16,29 +18,29 @@
           <span>{{ index }}</span>
         </div>
       </template>
-      <template #name="{record, index}">
+      <template #name="{record, index, valueChange}" >
         <span v-if="index <= maxLen">{{ record.name }}</span>
-        <j-input v-else v-model:value="record.name" @change="() => { alias(record.name, record) }" />
+        <j-input v-else v-model:value="record.name" @change="() => { valueChange(record.name); alias(record.name, record) }" />
       </template>
       <template #comment="{record, index}">
         <span v-if="index <= maxLen">{{ record.comment }}</span>
         <j-input v-else v-model:value="record.comment" :maxLength="16" @change="emitUpdateDataSource"/>
       </template>
-      <template #javaType="{record, index}">
+      <template #javaType="{record, index, valueChange}">
         <span v-if="index <= maxLen">{{record.javaType}}</span>
-        <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => JavaTypeChange(record)" />
+        <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => { valueChange(record.javaType); JavaTypeChange(record)}" />
       </template>
-      <template #jdbcType="{record, index}">
+      <template #jdbcType="{record, index, valueChange}">
         <span v-if="index <= maxLen">{{record.jdbcType}}</span>
-        <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="emitUpdateDataSource" />
+        <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="() => { valueChange(record.jdbcType);emitUpdateDataSource()}" />
       </template>
       <template #length="{ record, index }">
         <span v-if="index <= maxLen">{{record.length}}</span>
-        <j-input-number v-else v-model:value="record.length" :precision="0" style="width: 100%;" @change="emitUpdateDataSource" />
+        <j-input-number v-else v-model:value="record.length" :precision="0" :maxLength="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
       </template>
       <template #scale="{ record, index }">
-        <span v-if="index <= maxLen">{{record.scale}}</span>
-        <j-input-number v-else v-model:value="record.scale" :precision="0" style="width: 100%;" @change="emitUpdateDataSource" />
+        <span v-if="index <= maxLen || !['Double','BigDecimal','Float'].includes(record.javaType)">{{record.scale}}</span>
+        <j-input-number v-else v-model:value="record.scale" :precision="0" :maxLength="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
       </template>
       <template #updatable="{ record }">
         <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" />
@@ -115,7 +117,7 @@ import { TYPE_PROVIDE, CRUD_COLUMNS } from "@/components/Database/util";
 import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly } from './components'
 import { provide } from 'vue'
 import { defaultSetting, defaultTreeSetting } from './setting'
-import { onlyMessage } from '@jetlinks/utils'
+import { onlyMessage, regular } from '@jetlinks/utils'
 
 const props = defineProps({
   tree: {
@@ -143,7 +145,29 @@ const myColumns = [
     title: '列',
     dataIndex: 'name',
     width: 200,
-    tooltip: '蛇形命名'
+    tooltip: '蛇形命名',
+    form: {
+      rules: {
+        asyncValidator: (rule, value, callback, source) => {
+          if (source.record.index > maxLen.value) {
+            if (!value) {
+              return Promise.reject('请输入列名')
+            }
+
+            if (!regular.isModalReg(value)) {
+              return Promise.reject('请以小写字母开头，使用字母、数字和下划线完成命名')
+            }
+
+            const someName = dataSource.value.filter(item => item.index !== source.record.index).some(item => item.name === value)
+            if (someName) {
+              return Promise.reject('有重复列名')
+            }
+            return Promise.resolve()
+          }
+          return Promise.resolve()
+        }
+      }
+    }
   },
   {
     title: '别名',
@@ -159,12 +183,32 @@ const myColumns = [
   {
     title: 'javaType',
     dataIndex: 'javaType',
-    width: 150
+    width: 150,
+    form: {
+      rules: {
+        asyncValidator: (rule, value) => {
+          if (!value) {
+            return Promise.reject('请选择javaType')
+          }
+          return Promise.resolve()
+        }
+      }
+    }
   },
   {
     title: 'jdbcType',
     dataIndex: 'jdbcType',
-    width: 150
+    width: 150,
+    form: {
+      rules: {
+        asyncValidator: (rule, value) => {
+          if (!value) {
+            return Promise.reject('请选择jdbcType')
+          }
+          return Promise.resolve()
+        }
+      }
+    }
   },
   {
     title: '长度',
@@ -193,18 +237,21 @@ const myColumns = [
   },
 ]
 
+const tableRef = ref()
 const myTableName = ref()
 const maxLen = ref(defaultSetting.length)
 
 const dataSource = ref(props.columns ? props.columns : defaultSetting)
 
 const typesOptions = ref([])
+
 const setting = reactive({
   visible: false,
   data: undefined
 })
 
 const CrudColumns = inject(CRUD_COLUMNS)
+
 
 provide(TYPE_PROVIDE, typesOptions)
 
@@ -229,7 +276,7 @@ const updateDataSource = (record, index) => {
 
 const add = (index) => {
   const record = {
-    column: undefined,
+    name: undefined,
     alias: undefined,
     description: undefined,
     javaType: undefined,
@@ -244,20 +291,24 @@ const add = (index) => {
 
 const copy = (record, index) => {
   const cloneRecord = cloneDeep(record)
-  if (cloneRecord.column) {
-    cloneRecord.column = `${cloneRecord.column}_copy`
+  if (cloneRecord.name) {
+    cloneRecord.name = `copy_${cloneRecord.name}`
   }
+
   updateDataSource(cloneRecord, index)
 }
 
 const deleteFn = async (index) => {
-  dataSource.value.splice(index, 1)
+  dataSource.value.splice(index-1, 1)
   dataSourceChange()
   emitUpdateDataSource()
 }
 
 const JavaTypeChange = (record) => {
   record.jdbcType = undefined
+  if (!['Double','BigDecimal','Float'].includes(record.javaType)) {
+    record.scale = undefined
+  }
   emitUpdateDataSource()
 }
 
@@ -323,6 +374,19 @@ watch(() => props.tree, () => {
 watch(() => props.tableName, () => {
   myTableName.value = props.tableName
 }, { immediate: true })
+
+defineExpose({
+  validates: () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const v = await tableRef.value?.validates()
+        resolve(v)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+})
 
 getTypes()
 dataSourceChange()

@@ -1,6 +1,5 @@
 import { useProduct } from "@/store";
 import { queryCommand } from "@/api/project";
-import { providerEnum } from "@/components/ProJect";
 
 type CommandType = {
   id: string
@@ -10,36 +9,29 @@ type CommandType = {
   output: Record<string, any>
 }
 export const useFunctions = () => {
-  const functionOptions = ref<Draft.Function[]>([])
-  const commandOptions = ref<CommandType[]>([])
-  const productStore = useProduct();
-  const { data } = productStore
-  
-  productStore.getDataMap()?.forEach((value) => {
-    if([providerEnum.Function, providerEnum.CRUD, providerEnum.SQL].includes(value.type)) {
-      functionOptions.value.push(value)
-    }
+  const functionOptions = ref<any[]>([])
+  const functionId = ref<string>('')
+  const commandOptions = computed<CommandType[]>(() => {
+    return functionOptions.value.find(item => item.id === functionId.value)?.command || []
   })
-
+  const productStore = useProduct();
+  const { info } = productStore
+  queryCommand(info.draftId, []).then(res => {
+    res.result?.forEach(item => {
+      const other = productStore.getById(item.id);
+      functionOptions.value.push({
+        ...item,
+        ...other
+      })
+    })
+  })
+  
   /***
    * 查询功能下的的指令
    * @param functionId 功能id
    */
-  const handleFunction = async (functionId: string) => {
-    commandOptions.value = [];
-    const params = {
-      modules: [
-          {
-          id: data?.[0].id,
-          name: data?.[0].title,
-          functions: [productStore.getById(functionId)]
-        }
-      ]
-    }
-    const res = await queryCommand(params)
-    if(res.success) {
-      commandOptions.value = res.result?.[0]?.command
-    }
+  const handleFunction = (functionId_: string) => {
+    functionId.value = functionId_;
   }
   return {
     functionOptions,

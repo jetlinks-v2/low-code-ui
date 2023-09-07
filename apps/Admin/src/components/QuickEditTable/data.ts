@@ -26,6 +26,10 @@ export const BodyProps = () => ({
   slots: {
     type: Object,
     default: () => ({})
+  },
+  validate: {
+    type: Boolean,
+    default: false
   }
 })
 
