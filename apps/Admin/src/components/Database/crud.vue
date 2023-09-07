@@ -1,8 +1,13 @@
 <template>
   <div class="crud-warp">
     <j-tabs >
-      <j-tab-pane key="1" tab="表结构">
+      <j-tab-pane key="1">
+        <template #tab>
+          表结构
+          <j-badge v-if="errorDataTableLength" :count="errorDataTableLength" />
+        </template>
         <DataTable
+          ref="dataTableRef"
           v-model:tableName="tableName"
           v-model:columns="columns"
           :tree="tree"
@@ -16,7 +21,11 @@
           :parentId="props.parentId"
         />
       </j-tab-pane>
-      <j-tab-pane key="3" tab="高级配置">
+      <j-tab-pane key="3" >
+        <template #tab>
+          高级配置
+          <j-badge v-if="errorTips.relation || errorTips.asset" :count="errorTips.asset + errorTips.relation" />
+        </template>
         <Advanced
           v-model:tree="tree"
           v-model:asset="asset"
@@ -27,7 +36,7 @@
         />
       </j-tab-pane>
       <template #rightExtra>
-        <j-button class="extra-check">校验</j-button>
+        <j-button class="extra-check" @click="validate">校验</j-button>
       </template>
     </j-tabs>
   </div>
@@ -73,6 +82,8 @@ const props = defineProps({
 })
 
 const tableColumns = ref([])
+const dataTableRef = ref()
+
 const project = useProduct()
 
 provide(CRUD_COLUMNS, tableColumns)
@@ -89,6 +100,14 @@ const tree = ref(props.configuration.tree || false)
 
 const update = () => {
   const { configuration, ...extra} = props
+  if (errorTips.relation && (!relation.value.enabled || relation.value.assetIdColumn)) {
+    errorTips.relation = 0
+  }
+
+  if (errorTips.asset && (!asset.value.enabled || asset.value.assetIdColumn)) {
+    errorTips.asset = 0
+  }
+
   project.update({
     ...extra,
     configuration: {
@@ -100,6 +119,40 @@ const update = () => {
     },
   })
 }
+
+const errorTips = reactive({
+  dataTable: {}
+})
+
+const errorDataTableLength = computed(() => {
+  return Object.keys(errorTips.dataTable).length
+})
+
+const tableValidates = async () => {
+  try {
+    const resp = await dataTableRef.value.validates()
+    console.log(resp)
+    errorTips.dataTable = {}
+  } catch (e) {
+    errorTips.dataTable = e
+  }
+}
+
+const validate = async () => {
+  errorTips.relation = 0
+  errorTips.asset = 0
+
+  if (relation.value.enabled && !relation.value.relationType) {
+    errorTips.relation = 1
+  }
+
+  if (asset.value.enabled && !asset.value.assetIdColumn) {
+    errorTips.asset += 1
+  }
+
+  tableValidates()
+}
+
 </script>
 
 <style scoped lang="less">

@@ -7,10 +7,12 @@
           :serial="serial"
         />
         <Body
+          ref="bodyRef"
           :columns="myColumns"
           :serial="serial"
           :data="data"
           :scroll="scroll"
+          :validate="validate"
         >
           <template v-for="(_, name) in $slots" #[name]="slotData">
             <slot :name="name" v-bind="slotData || {}" />
@@ -23,7 +25,7 @@
 </template>
 
 <script setup name="QuickEditTable">
-import { ref, provide } from 'vue'
+import { ref, provide, defineExpose } from 'vue'
 import ResizeObserver from 'ant-design-vue/lib/vc-resize-observer';
 import { Header, Body } from './components'
 import {HeaderProps, BodyProps, SCROLL_LEFT} from './data'
@@ -39,8 +41,22 @@ const props = defineProps({
 
 const myColumns = ref([])
 const left = ref(0)
+const bodyRef = ref()
 
 provide(SCROLL_LEFT, left)
+
+defineExpose({
+  validates: () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const v = await bodyRef.value?.validates()
+        resolve(v)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+})
 
 const onResize = debounce((e) => {
   const { width } = e
@@ -76,6 +92,7 @@ const onResize = debounce((e) => {
 
   myColumns.value = array
 }, 100)
+
 </script>
 
 <style scoped lang="less">
