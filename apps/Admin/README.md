@@ -60,3 +60,10 @@ tsconfig相关配置
 
 通用工具函数
 
+## 规范
+
+* 尽量使用useRequest来调用api下的接口
+* 正则表达式使用@jetlinks/utils下的 regular
+* 先看packages和components中有哪些公用函数或组件，避免重复造轮子
+* 需要熟悉vueuse
+* 代码书写要符合规范，否则pr不予合并

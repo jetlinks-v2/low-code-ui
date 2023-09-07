@@ -12,21 +12,18 @@ import { useProduct } from '@/store/product'
 import { storeToRefs } from 'pinia'
 import { useEngine } from '@/store/engine'
 import { onlyMessage } from '@jetlinks/utils'
+import { BASE_INFO, MENU_CONFIG } from "@/components/ListPage/keys";
 
 const props = defineProps({
-  data: {
-    type: Object,
-    default: () => {},
-  },
+  data: Object
 })
 
 const engineStore = useEngine()
 const productStore = useProduct()
-const { files, activeFile } = storeToRefs(engineStore)
+const {files, activeFile} = storeToRefs(engineStore)
 const store = new ReplStore(files.value[activeFile.value]?.configuration?.code)
 const vueMode = ref(true)
 store.init()
-
 provide('store', store)
 provide('theme', 'dark')
 provide('useVueMode', vueMode)
@@ -50,29 +47,23 @@ const handleDbClickViewName = () => {
 
 const activeOper = ref('')
 const menuListRef = ref()
-const menuFormData = ref({ pageName: '', main: true, name: '', icon: '' })
+const menuFormData = ref({pageName: '', main: true, name: '', icon: ''})
 const menuChangeValue = ref()
 const errors = ref([] as any)
-const handleOperClick = async (type: OperType) => {
-  await nextTick(async () => {
-    const vaild = await menuListRef.value?.vaildate()
-    if (vaild?.errorFields?.length > 0) {
-      errors.value = vaild.errorFields ?? []
-    }
-    if (type === activeOper.value) {
-      drawerVisible.value = !drawerVisible.value
-    } else {
-      drawerVisible.value = true
-    }
-    activeOper.value = type
-    $drawerWidth.value = '50%'
-    if (type === OperType.View) {
-      drawerTitle.value = '预览'
-    } else if (type === OperType.Menu) {
-      drawerTitle.value = '菜单配置'
-    }
-    !drawerVisible.value && (activeOper.value = '')
-  })
+const handleOperClick = (type: OperType) => {
+  if (type === activeOper.value) {
+    drawerVisible.value = !drawerVisible.value
+  } else {
+    drawerVisible.value = true
+  }
+  activeOper.value = type
+  $drawerWidth.value = '50%'
+  if (type === OperType.View) {
+    drawerTitle.value = '预览'
+  } else if (type === OperType.Menu) {
+    drawerTitle.value = '菜单配置'
+  }
+  !drawerVisible.value && (activeOper.value = '')
 }
 
 const previewRef = ref()
@@ -91,6 +82,8 @@ const runCode = () => {
 const handleVaild = () => {
   if (errors.value.length > 0) {
     onlyMessage(errors.value[0].errors[0], 'error')
+  } else {
+    onlyMessage('校验成功', 'success')
   }
   productStore.update({
     ...props.data,
@@ -101,7 +94,18 @@ const handleVaild = () => {
   })
 }
 
-watch(menuChangeValue, (val) => {
+provide(BASE_INFO, props.data)
+provide(MENU_CONFIG, menuFormData)
+
+const updateMenuFormData = (val) => {
+  nextTick(() => {
+    menuListRef.value?.vaildate().then(vaild => {
+      if (vaild?.errorFields?.length > 0) {
+        errors.value = vaild.errorFields ?? []
+      }
+    })
+  })
+
   productStore.update({
     ...props.data,
     others: {
@@ -109,10 +113,13 @@ watch(menuChangeValue, (val) => {
       menu: val,
     },
   })
-})
+}
 
 onMounted(() => {
-  menuFormData.value.pageName = props.data?.title || ''
+  menuFormData.value = {
+    ...props.data.others.menu,
+    pageName: props.data.pageName || props.data?.title || '',
+  }
 })
 </script>
 
@@ -133,14 +140,15 @@ onMounted(() => {
               size="small"
               @click.stop="handleVaild"
               @dblclick.stop
-              >校验</j-button
+            >校验
+            </j-button
             >
           </template>
         </EditorContainer>
       </template>
       <template #console>
         <EditorContainer title="运行日志">
-          <Console :error="store.state.errors[0]" />
+          <Console :error="store.state.errors[0]"/>
         </EditorContainer>
       </template>
     </SplitPane>
@@ -163,28 +171,29 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="drawer-content" v-show="drawerVisible">
+    <div class="drawer-content" v-if="drawerVisible">
       <div class="drawer-header">
         <div class="drawer-title" @dblclick="handleDbClickViewName">
           {{ drawerTitle }}
           <j-button
-            v-if="activeOper === OperType.View"
+            v-show="activeOper === OperType.View"
             type="primary"
             size="small"
             @click.stop="runCode"
             @dblclick.stop
             :loading="runLoading"
-            >运行</j-button
+          >运行
+          </j-button
           >
         </div>
       </div>
       <div class="drawer-body">
-        <Preview v-if="activeOper === OperType.View" ref="previewRef" />
+        <Preview v-if="activeOper === OperType.View" ref="previewRef"/>
         <MenuList
-          v-else-if="activeOper === OperType.Menu"
+          v-if="activeOper === OperType.Menu"
           ref="menuListRef"
           :form-data="menuFormData"
-          @update:form="(newValue) => (menuChangeValue = newValue)"
+          @update:form="updateMenuFormData"
         />
       </div>
     </div>
@@ -196,9 +205,11 @@ onMounted(() => {
   height: calc(100vh - 48px);
   display: flex;
   position: relative;
+
   .split-pane {
     width: 98%;
   }
+
   .right-oper {
     width: 2%;
 
@@ -216,9 +227,11 @@ onMounted(() => {
         padding-bottom: 18px;
         font-size: 17px;
         user-select: none;
+
         &:hover {
           color: var(--ant-primary-color);
         }
+
         &.active {
           color: var(--ant-primary-color);
         }
@@ -226,6 +239,7 @@ onMounted(() => {
     }
   }
 }
+
 .drawer-content {
   position: absolute;
   right: 2%;
@@ -235,6 +249,7 @@ onMounted(() => {
   margin: 0;
   background-color: #fff;
   overflow-y: auto;
+
   .drawer-header {
     position: relative;
     padding: 16px 24px;
@@ -242,6 +257,7 @@ onMounted(() => {
     background: #fff;
     border-bottom: 1px solid #f0f0f0;
     border-radius: 2px 2px 0 0;
+
     .drawer-title {
       cursor: pointer;
       margin: 0;
@@ -252,6 +268,7 @@ onMounted(() => {
       user-select: none;
     }
   }
+
   .drawer-body {
     padding: 24px;
     font-size: 14px;
