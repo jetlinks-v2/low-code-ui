@@ -44,5 +44,6 @@ export const regular = {
   textReg: /^[\u4e00-\u9fa5]{0,}$/,
   isTextReg: (value: string) => regular.textReg.test(value),
   colorReg: /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
-  isColorReg: (value: string) => regular.colorReg.test(value)
+  isColorReg: (value: string) => regular.colorReg.test(value),
+
 }

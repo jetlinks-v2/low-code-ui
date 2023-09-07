@@ -10,7 +10,7 @@
         </div>
         <div>
           <j-switch v-model:checked="myRelation.enabled" />
-          <div class="descriptions-warp" style="margin-top: 24px;width: 500px;">
+          <div class="descriptions-warp" style="margin-top: 24px;width: 500px;" v-if="myRelation.enabled">
             <div class="descriptions-item">
               <div class="descriptions-title">
                 关系标识
@@ -24,7 +24,7 @@
                 关系名称
               </div>
               <div class="descriptions-content">
-                <j-input v-model:value="myRelation.relationTypeName" placeholder="请为关系命名" @change="relationChange" />
+                <j-input v-model:value="myRelation.relationTypeName" placeholder="请为关系命名" @change="relationChange" :maxLength="16" />
               </div>
             </div>
           </div>
@@ -95,58 +95,58 @@
           <div>
             <j-switch v-model:checked="myAsset.enabled" style="margin-bottom: 24px" />
           </div>
-
-          <div style="margin-bottom: 24px">
-            <j-radio-group :value="myAsset.correlatesAssets ? 'true' : 'false'" button-style="solid" @change="assetChange">
-              <j-radio-button value="false">设为资产</j-radio-button>
-              <j-radio-button value="true">间接资产</j-radio-button>
-            </j-radio-group>
-          </div>
-
-          <div v-if="!myAsset.correlatesAssets" class="descriptions-warp" style="width: 600px;">
-            <div class="descriptions-item">
-              <div class="descriptions-title" style="padding: 4px;text-align: left">
-                列名称
+          <template v-if="myAsset.enabled">
+            <div style="margin-bottom: 24px">
+              <j-radio-group :value="myAsset.correlatesAssets ? 'true' : 'false'" button-style="solid" @change="assetChange">
+                <j-radio-button value="false">设为资产</j-radio-button>
+                <j-radio-button value="true">间接资产</j-radio-button>
+              </j-radio-group>
+            </div>
+            <div v-if="!myAsset.correlatesAssets" class="descriptions-warp" style="width: 600px;">
+              <div class="descriptions-item">
+                <div class="descriptions-title" style="padding: 4px;text-align: left">
+                  列名称
+                </div>
+                <div class="descriptions-content">
+                  <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" :options="columnOptions" @change="assetChange" />
+                </div>
               </div>
-              <div class="descriptions-content">
-                <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" :options="columnOptions" @change="assetChange" />
+              <div class="descriptions-item">
+                <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
+                  资产标识
+                </div>
+                <div class="descriptions-content">
+                  <j-input v-model:value="myAsset.assetType" @change="assetChange" :maxLength="64" />
+                </div>
+              </div>
+              <div class="descriptions-item">
+                <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
+                  资产名称
+                </div>
+                <div class="descriptions-content">
+                  <j-input v-model:value="myAsset.assetTypeName" @change="assetChange" :maxLength="16" />
+                </div>
               </div>
             </div>
-            <div class="descriptions-item">
-              <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
-                资产标识
+            <div v-else class="descriptions-warp" style="width: 600px;">
+              <div class="descriptions-item">
+                <div class="descriptions-title" style="padding: 4px;text-align: left">
+                  当前表字段
+                </div>
+                <div class="descriptions-content">
+                  <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" :options="columnOptions" @change="assetChange" />
+                </div>
               </div>
-              <div class="descriptions-content">
-                <j-input v-model:value="myAsset.assetType" @change="assetChange" />
-              </div>
-            </div>
-            <div class="descriptions-item">
-              <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
-                资产名称
-              </div>
-              <div class="descriptions-content">
-                <j-input v-model:value="myAsset.assetTypeName" @change="assetChange" />
-              </div>
-            </div>
-          </div>
-          <div v-else class="descriptions-warp" style="width: 600px;">
-            <div class="descriptions-item">
-              <div class="descriptions-title" style="padding: 4px;text-align: left">
-                当前表字段
-              </div>
-              <div class="descriptions-content">
-                <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" :options="columnOptions" @change="assetChange" />
+              <div class="descriptions-item">
+                <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
+                  资产标识
+                </div>
+                <div class="descriptions-content">
+                  <j-select style="width: 100%;" v-model:value="myAsset.assetTypeName" :options="options" :fieldNames="{ label: 'name', value: 'id'}" @change="assetChange" />
+                </div>
               </div>
             </div>
-            <div class="descriptions-item">
-              <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
-                资产标识
-              </div>
-              <div class="descriptions-content">
-                <j-select style="width: 100%;" v-model:value="myAsset.assetTypeName" :options="options" :fieldNames="{ label: 'name', value: 'id'}" @change="assetChange" />
-              </div>
-            </div>
-          </div>
+          </template>
         </div>
       </div>
     </div>
@@ -226,7 +226,7 @@ const { data: apiDataSource, run: apiRun } = useRequest(queryEndCommands,
       const arr = item?.command?.map(a => {
         return {
           ability: a.name,
-          api: `/low-code/runtime/${project.info.id}/${props.parentId}/${props.id}`,
+          api: `/low-code/runtime/${project.info.id}/${props.parentId}/${a.id}`,
           instruction: a.id,
           description: a.description
         }
@@ -298,6 +298,7 @@ const relationChange = () => {
   emit('update:relation', myRelation)
   emit('update')
 }
+
 onMounted(() => {
   apiRun(route.params.id)
 })
