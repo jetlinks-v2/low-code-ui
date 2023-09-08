@@ -4,7 +4,7 @@
       <span>展示</span>
       <j-switch v-model:checked="showColumns"></j-switch>
     </j-space>
-    <template v-if="showColumns">
+    <template v-if="showColumns || type !== 'columns'">
       <div v-if="!columnsTree?.length">
         <p>
           {{
