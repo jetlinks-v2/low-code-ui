@@ -15,34 +15,45 @@
         <Content :data="item" />
       </j-tab-pane>
     </j-tabs>
-<!--    <Tabs-->
-<!--      v-model:activeKey="activeFile"-->
-<!--      :options="files"-->
-<!--      @edit="onEdit"-->
-<!--      @select="select"-->
-<!--    />-->
-<!--    <Content/>-->
+
+    <div class="content-module" v-if="activeData?.type==='project' || activeData?.type==='module'" :key="activeData.id">
+      <ProjectEmpty v-if="activeData?.type === 'project'" :data="activeData"/>
+      <Project v-else :data="activeData.children" />
+    </div>
   </div>
 </template>
 
 <script setup name="ContentTabs">
 import { storeToRefs } from 'pinia'
-import { useEngine } from '@/store'
+import { useEngine,useProduct } from '@/store'
 import Tabs from '../Tabs/tabs.vue'
 import Content from './content.vue'
+import ProjectEmpty from '@/components/ProJect/Empty/index.vue'
+
 
 const engine = useEngine()
+const product = useProduct()
 
 const { files, activeFile } = storeToRefs(engine)
+const activeData = ref()
 
 const onEdit = (targetKey) => {
   engine.removeFile(targetKey)
 }
 
 const select = (key) => {
-  // console.log(key)
   engine.selectFile(key)
 }
+
+watch(
+  ()=>activeFile.value,
+  (val)=>{
+    if(val){
+      activeData.value = product.getById(val)
+    }
+  },
+  {deep:true,immediate:true}
+)
 
 </script>
 
@@ -55,6 +66,7 @@ const select = (key) => {
 
   .content-tabs {
     height: 100%;
+    z-index: 1;
 
     &>:deep(.ant-tabs) {
       height: 100%;
@@ -104,6 +116,14 @@ const select = (key) => {
 
   }
 
+  .content-module{
+    height: calc(100% - 56px);
+    background-color: rgb(255, 255, 255);
+    position: absolute;
+    top: 56px;
+    width: calc(100% - 320px);
+    z-index: 2;
+  }
 
 }
 </style>

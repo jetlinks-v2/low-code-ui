@@ -1,31 +1,32 @@
 
 <template>
-    <div>
+    <div class="content">
         <div class="top">
             <j-button type="primary" @click="onAction({}, 'save')">新增菜单</j-button>
             <AIcon type="QuestionCircleOutlined" style="font-size: 18px;" />
         </div>
         <j-scrollbar style="height: 330px;">
-            <j-tree v-model:selectedKeys="selectedKeys" draggable :tree-data="treeData" blockNode
-                :fieldNames="{ title: 'name', key: 'id' }" @drop="onDrop">
+            <j-tree v-model:selectedKeys="selectedKeys" draggable :tree-data="treeData" blockNode autoExpandParent
+                v-model:expandedKeys="expandedKeys" :fieldNames="{ title: 'name', key: 'id' }" @drop="onDrop">
                 <template #title="item">
-                    <div class="tree-content">
-                        <div :class="{
-                            'tree-content-title': true,
-                            'project': item.options?.pageId
-                        }">
+                    <div :class="{
+                        'tree-content': true,
+                        'project': props.checkedKey?.includes(item.options?.pageId)
+                    }">
+                        <div class="tree-content-title">
                             <AIcon :type="item.icon || item.others?.menu?.icon" />
-                            <div style="margin-left: 10px;">{{ item.name }}</div>
+                            <div style="margin-left: 10px">{{ item.name }}</div>
+                            <j-badge v-if="item.options?.projectId === projectId" color="blue"
+                                style="margin-left: 10px;"></j-badge>
                         </div>
-                        <div v-if="selectedKeys.includes(item.id)" @click="(e) => e.stopPropagation()"
-                            style="display: flex;">
+                        <div @click="(e) => e.stopPropagation()" style="display: flex;">
                             <j-tooltip title="编辑">
                                 <j-button type="link" style="padding: 0;" @click="onAction(item, 'save')">
                                     <AIcon type="FormOutlined" />
                                 </j-button>
                             </j-tooltip>
                             <j-tooltip title="删除">
-                                <j-button type="link" style="padding: 0;margin-left: 10px;" danger
+                                <j-button type="link" style="padding: 0;margin-left: 10px;margin-right: 10px;" danger
                                     @click="onAction(item, 'del')">
                                     <AIcon type="DeleteOutlined" />
                                 </j-button>
@@ -55,7 +56,9 @@ type TreeDataItem = TreeProps['treeData'][];
 
 const props = defineProps({
     list: Array,
-    treeData: Array
+    treeData: Array,
+    projectId: String,
+    checkedKey: Array
 })
 type Emits = {
     (e: 'changeCount', data: any): void;
@@ -66,30 +69,33 @@ const emit = defineEmits<Emits>();
 const treeData = ref<any>([])
 const treeItem = ref<any>({})
 const selectedKeys = ref<any>([])
+const expandedKeys = ref<any>([])
 const visible = ref<boolean>(false)
 const visibleDel = ref<boolean>(false)
 
 
 const countMap = ref(new Map())
+const expandMap = new Map()
 
 const handleTree = (tree) => {
     const arr = cloneDeep(tree)
     arr.forEach(item => {
-      if (item.options) {
-        if (item.options?.pageId) {
-          if(countMap.value.has(item.options.pageId)){
-            // debugger;
-            const sum = countMap.value.get(item.options.pageId) + 1
-            countMap.value.set(item.options.pageId,sum)
-          }else{
-            countMap.value.set(item.options.pageId,1)
-          }
+        if (item.options) {
+            if (item.options?.pageId) {
+                expandMap.set(item.id, item.options?.pageId)
+                if (countMap.value.has(item.options.pageId)) {
+                    // debugger;
+                    const sum = countMap.value.get(item.options.pageId) + 1
+                    countMap.value.set(item.options.pageId, sum)
+                } else {
+                    countMap.value.set(item.options.pageId, 1)
+                }
+            }
+            if (item.children) {
+                handleTree(item.children)
+            }
         }
-        if (item.children) {
-          handleTree(item.children)
-        }
-      }
-      return;
+        return;
     });
 }
 
@@ -181,11 +187,20 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
     }
 }
 
+const getKeyByValue = (arr) => {
+    const keys: any = []
+    for (const [key, value] of expandMap.entries()) {
+        if (arr.includes(value)) {
+            keys.push(key);
+        }
+    }
+    return keys
+}
+
 watch(
     () => props.list,
     (val: any) => {
         countMap.value.clear()
-        console.log('val',val)
         treeData.value = [...treeData.value, ...val]
         handleTree(treeData.value)
     },
@@ -206,6 +221,15 @@ watch(
         emit('changeTree', val)
     },
     { deep: true, immediate: true }
+)
+
+//左边控制右边展开
+watch(
+    () => props.checkedKey,
+    (val) => {
+        const arr = getKeyByValue(val)
+        expandedKeys.value = arr
+    }
 )
 
 const getTree = async () => {
@@ -239,27 +263,34 @@ onMounted(() => {
 </script>
 
 <style scoped lang='less'>
-.top {
-    margin-bottom: 10px;
-    // margin-left: 10px;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.tree-content {
-    display: flex;
-    min-height: 32px;
-
-    .tree-content-title {
+.content {
+    .top {
+        margin-bottom: 10px;
+        // margin-left: 10px;
+        width: 100%;
         display: flex;
         align-items: center;
-        // min-width: 250px;
-        width: 100%;
+        justify-content: space-between;
+    }
+
+    :deep(.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected) {
+        background-color: #FFF;
+    }
+
+    .tree-content {
+        display: flex;
+        min-height: 32px;
 
         &.project {
-            background-color: #d6e4ff;
+            background-color: #d6e4ff8a;
+        }
+
+        .tree-content-title {
+            display: flex;
+            align-items: center;
+            // min-width: 250px;
+            width: 100%;
+
         }
     }
 }

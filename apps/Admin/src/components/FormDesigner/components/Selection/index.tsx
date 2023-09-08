@@ -3,7 +3,7 @@ import { withModifiers } from 'vue'
 import './index.less'
 import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import { checkIsField, extractCssClass, insertCustomCssToHead } from '../../utils/utils'
-import { set } from 'lodash-es'
+import { map, set } from 'lodash-es'
 
 const Selection = defineComponent({
   name: 'Selection',
@@ -73,7 +73,7 @@ const Selection = defineComponent({
     const _hasDrag = computed(() => { return props.hasDrag })
 
     const _error = computed(() => {
-      return designer.errorKey?.value.includes(props.data?.key)
+      return map(designer.errorKey?.value, 'key').includes(props.data?.key)
     })
 
     watchEffect(() => {

@@ -19,7 +19,7 @@ export const generateOptions = (len: number) => {
     return result
 }
 
-const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-number', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo']
+const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo']
 
 const checkedConfigItem = (node: ISchema) => {
     const _type = node.type || 'root'
@@ -27,36 +27,60 @@ const checkedConfigItem = (node: ISchema) => {
         return false
     } else {
         if (['text'].includes(_type) && !(node?.componentProps?.value && node?.formItemProps?.name)) {
-            return node?.key
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.label || node.name) + '配置错误'
+            }
         }
         if (arr.includes(_type)) {
-            if (!(node?.formItemProps?.name && node?.formItemProps?.label)) {
-                return node?.key
+            if (!node?.formItemProps?.name || !node?.formItemProps?.label) {
+                return {
+                    key: node?.key,
+                    message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
             } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
-                return node?.key
+                return {
+                    key: node?.key,
+                    message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
             }
         }
         if ('input-number' === _type && !(node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined && node?.componentProps?.precision !== undefined)) {
-            return node?.key
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.label || node.name) + '配置错误'
+            }
         }
-        // if (['select', 'tree-select', 'select-card'].includes(_type)) {
-        //     // 数据源
-        //     if (node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
-        //         return node?.key
-        //     }
-        //     if (node?.componentProps?.source?.type === 'end' && !(node?.componentProps.source?.commandId && node?.componentProps.source?.functionId && node?.componentProps.source?.label && node?.componentProps.source?.value)) {
-        //         return node?.key
-        //     }
-        // }
-        if ('upload' === _type && !(node?.componentProps?.accept && node?.componentProps?.maxCount && node?.componentProps?.fileSize)) {
+        if (['select', 'tree-select', 'select-card'].includes(_type)) {
+            // 数据源
+            // if (node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
+            //     return node?.key
+            // }
+            if (node?.componentProps?.source?.type === 'end' && (!node?.componentProps.source?.commandId || !node?.componentProps.source?.functionId || !node?.componentProps.source?.label || !node?.componentProps.source?.value)) {
+                return {
+                    key: node?.key,
+                    message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
+            }
+        }
+        if ('upload' === _type && (!node?.componentProps?.accept || !node?.componentProps?.maxCount || !node?.componentProps?.fileSize)) {
             // 个数和单位
-            return node?.key
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.label || node.name) + '配置错误'
+            }
         }
         if ('space' === _type && !node?.componentProps?.size) {
-            return node?.key
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.label || node.name) + '配置错误'
+            }
         }
         if (['card'].includes(_type) && !(node?.componentProps?.title)) {
-            return node?.key
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.label || node.name) + '配置错误'
+            }
         }
     }
     return false

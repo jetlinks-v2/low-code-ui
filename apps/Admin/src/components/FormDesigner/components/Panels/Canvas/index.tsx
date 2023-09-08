@@ -2,10 +2,9 @@ import { Form, Scrollbar, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-c
 import DraggableLayout from "../../Draggable/DraggableLayout"
 import './index.less'
 import { cloneDeep, omit } from "lodash-es"
-import { addContext } from "@/components/FormDesigner/utils/addContext"
 import { uid } from "@/components/FormDesigner/utils/uid"
 import CollectModal from '../../CollectModal/index.vue'
-import { useProduct, useFormDesigner } from "@/store"
+import { useProduct } from "@/store"
 import { extractCssClass, insertCustomCssToHead } from "@/components/FormDesigner/utils/utils"
 
 const Canvas = defineComponent({
@@ -14,7 +13,6 @@ const Canvas = defineComponent({
   customOptions: {},
   setup() {
     const designer: any = inject('FormDesigner')
-    const formDesigner = useFormDesigner()
     const product = useProduct()
 
     const cssClassList = ref<string[]>([])
@@ -110,17 +108,13 @@ const Canvas = defineComponent({
     return () => {
       return (
         <div class={['canvas-box', unref(isEditModel) && 'editModel']}>
-          {unref(isEditModel)
-            ? (
-              <div class="container">
-                <Scrollbar height={'100%'}>
-                  <div class="subject">
-                    {renderChildren()}
-                  </div>
-                </Scrollbar>
+          <div class="container">
+            <Scrollbar height={'100%'}>
+              <div class="subject">
+                {unref(isEditModel) ? renderChildren() : renderContent()}
               </div>
-            )
-            : renderContent()}
+            </Scrollbar>
+          </div>
           {unref(designer.collectVisible) && unref(isEditModel) && <CollectModal
             onSave={(name: string) => {
               const obj = {

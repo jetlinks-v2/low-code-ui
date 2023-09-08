@@ -3,7 +3,7 @@
     <div class="container">
       <Header @save="onSave" :data="data" @validate="onValidate" />
       <div class="box">
-        <div class="left"><Filed /></div>
+        <div class="left" v-if="model !== 'preview'"><Filed /></div>
         <div class="right">
           <Canvas :data="formData"></Canvas>
         </div>
@@ -11,6 +11,32 @@
           <Config ref="configRef" />
         </div>
       </div>
+    </div>
+    <div class="check" v-if="model === 'preview' && !mode">
+      <div style="margin-bottom: 5px">
+        <j-button
+          v-if="!checkVisible"
+          type="primary"
+          @click="checkVisible = true"
+          >数据校验</j-button
+        >
+        <j-space v-else>
+          <j-button @click="checkVisible = false">取消</j-button>
+          <j-button type="primary" @click="onInput('get')"
+            >获取数据<j-tooltip title="将表单中填写的所有数据获取到代码框中">
+              <AIcon type="QuestionCircleOutlined" /> </j-tooltip
+          ></j-button>
+          <j-button type="primary" @click="onInput('set')"
+            >加载数据<j-tooltip title="将代码框输入的模拟数据显示到代码框中">
+              <AIcon type="QuestionCircleOutlined" /> </j-tooltip
+          ></j-button>
+        </j-space>
+      </div>
+      <template v-if="checkVisible">
+        <div>
+          <j-monaco-editor v-model="editData" :language="'json'" />
+        </div>
+      </template>
     </div>
   </j-spin>
 </template>
@@ -35,6 +61,7 @@ import { useProduct, useFormDesigner } from '@/store'
 import { useMagicKeys } from '@vueuse/core'
 import { Modal } from 'jetlinks-ui-components'
 import { deleteDataByKey, copyDataByKey, checkedConfig } from './utils/utils'
+import { resolve } from 'dns'
 
 const initData = {
   type: 'root',
@@ -81,6 +108,8 @@ const collectVisible = ref<boolean>(false)
 const collectData = ref<any[]>([])
 const delVisible = ref<boolean>(false)
 const spinning = ref<boolean>(false)
+const checkVisible = ref<boolean>(false)
+const editData = ref<string>()
 
 const product = useProduct()
 const formDesigner = useFormDesigner()
@@ -146,7 +175,6 @@ const onCopy = () => {
 const onShear = debounce(() => {
   if (unref(isSelectedRoot)) return
   formDesigner.setCopyData(selected.value || [])
-  console.log('shear')
   const _data: any = selected.value
     .map((item) => {
       return deleteDataByKey(formData.value.children, item)
@@ -346,6 +374,26 @@ const onValidate = () => {
   spinning.value = true
   errorKey.value = checkedConfig(unref(formData))
   spinning.value = false
+  return new Promise((resolve, reject) => {
+    if (errorKey.value?.length) {
+      reject(errorKey.value)
+    } else {
+      resolve(true)
+    }
+  })
+}
+
+// 获取数据
+const onInput = async (type: 'get' | 'set') => {
+  if (type === 'set') {
+    const obj = JSON.parse(editData?.value || '{}')
+    Object.assign(formState, obj)
+  } else {
+    const obj = await onSave().catch(() => {})
+    if (obj) {
+      editData.value = JSON.stringify(obj)
+    }
+  }
 }
 
 defineExpose({ onSave, validate: onValidate })
@@ -373,6 +421,14 @@ defineExpose({ onSave, validate: onValidate })
       width: 300px;
     }
   }
+}
+
+.check {
+  position: fixed;
+  background-color: lightgray;
+  padding: 10px 20px;
+  width: 100%;
+  bottom: 0;
 }
 </style>
 

@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <div class="left">
+    <div class="left" v-if="isEditModel">
       <j-space :size="24">
         <span>提供多种方式帮助你快速添加表单页内容</span>
         <QuickAdd :data="data" />
@@ -8,16 +8,17 @@
     </div>
     <div class="right">
       <j-space>
-        <j-button type="link" v-if="!isEditModel"  @click="emits('save')">提交</j-button>
-        <!-- <j-button type="link" @click="onInput">打印json</j-button> -->
-        <j-button type="link" @click="onCheck">校验</j-button>
-        <j-button
-          type="link"
-          v-if="isEditModel"
-          @click="onPreview('preview')"
+        <!-- <j-button type="link" v-if="!isEditModel"  @click="emits('save')">提交</j-button> -->
+        <j-button v-if="isEditModel" type="link" @click="onCheck"
+          >校验</j-button
+        >
+        <j-button type="link" v-if="isEditModel" @click="onPreview('preview')"
           >预览</j-button
         >
-        <j-button type="link" v-else @click="onPreview('edit')">取消</j-button>
+        <template v-else>
+          <j-button type="link" @click="onPreview('edit')"><AIcon type="LeftOutlined" />结束预览</j-button>
+          <div>正在预览</div>
+        </template>
       </j-space>
     </div>
   </div>
@@ -32,7 +33,7 @@ const designer: any = inject('FormDesigner')
 const props = defineProps({
   data: {
     type: Object,
-    default: () => {}
+    default: () => {},
   },
 })
 
@@ -49,10 +50,6 @@ const onPreview = (_type: 'preview' | 'edit') => {
 
 const onCheck = () => {
   emits('validate')
-}
-
-const onInput = () => {
-  console.log(unref(designer.formData))
 }
 </script>
 
