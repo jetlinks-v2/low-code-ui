@@ -82,6 +82,10 @@ const runCode = () => {
 const handleVaild = () => {
   if (errors.value.length > 0) {
     onlyMessage(errors.value[0].errors[0], 'error')
+  } else if(!store.state.activeFile.code){
+    onlyMessage('页面代码为空', 'error')
+  } else if(store.state.errors?.length > 0) {
+    onlyMessage('运行日志报错', 'error');
   } else {
     onlyMessage('校验成功', 'success')
   }
