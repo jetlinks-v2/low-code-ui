@@ -2,7 +2,7 @@
 <template>
   <div>
     <template v-if="['input-number'].includes(type)">
-      <j-form-item label="最大值" :name="['componentProps', 'max']">
+      <j-form-item label="最大值" :name="['componentProps', 'max']" required>
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.max"
@@ -10,7 +10,7 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item label="最小值" :name="['componentProps', 'min']">
+      <j-form-item label="最小值" :name="['componentProps', 'min']" required>
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.min"
@@ -18,7 +18,7 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item label="精度" :name="['componentProps', 'precision']">
+      <j-form-item label="精度" :name="['componentProps', 'precision']" required>
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.precision"
@@ -60,7 +60,12 @@
       <j-form-item
         label="上传内容"
         :name="['componentProps', 'listType']"
-        required
+        :rules="[
+          {
+            required: true,
+            message: '请选择',
+          },
+        ]"
       >
         <j-radio-group
           v-model:value="target.componentProps.listType"
@@ -85,7 +90,12 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item required :name="['componentProps', 'accept']" label="格式">
+      <j-form-item :rules="[
+          {
+            required: true,
+            message: '请选择',
+          },
+        ]" :name="['componentProps', 'accept']" label="格式">
         <j-select
           mode="multiple"
           placeholder="请选择"
@@ -125,7 +135,12 @@
       <j-form-item
         label="可选节点"
         :name="['componentProps', 'treeCheckStrictly']"
-        required
+        :rules="[
+          {
+            required: true,
+            message: '请选择',
+          },
+        ]"
       >
         <j-select
           v-model:value="target.componentProps.treeCheckStrictly"
@@ -171,11 +186,15 @@
           <j-select-option :value="'min'">最小级</j-select-option>
         </j-select>
       </j-form-item> -->
-      <j-form-item label="可选项" :name="['componentProps', 'geoType']">
+      <j-form-item label="可选项" :name="['componentProps', 'geoType']" :rules="[
+          {
+            required: true,
+            message: '请选择',
+          },
+        ]">
         <j-select
           v-model:value="target.componentProps.geoType"
           placeholder="请选择"
-          required
           @change="onDataChange"
         >
           <j-select-option v-for="item in options" :value="item.id">{{ item.name }}</j-select-option>

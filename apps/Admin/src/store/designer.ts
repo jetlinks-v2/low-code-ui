@@ -8,7 +8,7 @@ export const useFormDesigner = defineStore('form-designer', () => {
     }
 
     const getCopyData = () => {
-        return copyData.value
+        return copyData.value || []
     }
 
     const deleteData = () => {

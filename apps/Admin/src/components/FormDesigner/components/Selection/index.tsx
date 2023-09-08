@@ -1,11 +1,9 @@
 import { isHTMLTag } from '@vue/shared'
 import { withModifiers } from 'vue'
 import './index.less'
-import { AIcon, Dropdown, Menu, MenuItem, Button, Modal } from 'jetlinks-ui-components'
+import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import { checkIsField, extractCssClass, insertCustomCssToHead } from '../../utils/utils'
-import { cloneDeep, set } from 'lodash-es'
-import { useFormDesigner } from '@/store/designer'
-import { addContext } from '../../utils/addContext'
+import { set } from 'lodash-es'
 
 const Selection = defineComponent({
   name: 'Selection',
@@ -51,8 +49,6 @@ const Selection = defineComponent({
     const cssClassList = ref<string[]>([])
     const visible = ref<boolean>(true)
 
-    const formDesigner = useFormDesigner()
-
     const Selected = computed(() => {
       const flag = designer.selected.value.find(item => props?.data?.key === item.key)
       return props?.data?.key !== undefined && flag
@@ -72,43 +68,6 @@ const Selection = defineComponent({
       }
     }
 
-    const handleAction = (_type: string) => {
-      const index = (props?.parent || [])?.findIndex(item => item?.key === props.data?.key)
-      switch (_type) {
-        case 'remove':
-          Modal.confirm({
-            title: '确定删除组件及其配置？',
-            okText: '确认',
-            cancelText: '取消',
-            onOk() {
-              if (!props.data?.context) {
-                addContext(props.data, props.parent)
-              }
-              props.data.context?.delete()
-              const arr: any = cloneDeep(props.parent) || []
-              if (arr?.length > 0) {
-                if (index === arr?.length) {
-                  designer.setSelection(arr?.[index - 1])
-                } else {
-                  designer.setSelection(arr?.[index])
-                }
-              } else {
-                designer.setSelection('root')
-              }
-            },
-          });
-          break
-        case 'copy':
-          if (!props.data?.context) {
-            addContext(props.data, props.parent)
-          }
-          props.data.context?.copy()
-          const copyData = props.parent?.[index + 1]
-          designer.setSelection(copyData)
-          break
-        default: break
-      }
-    }
     const TagComponent = isHTMLTag(props.tag as string) ? props.tag : resolveComponent(props.tag as string)
 
     const _hasDrag = computed(() => { return props.hasDrag })
@@ -143,36 +102,24 @@ const Selection = defineComponent({
 
     // 复制
     const onCopy = () => {
-      formDesigner.setCopyData(designer.selected.value || [])
+      designer.onCopy()
     }
     // 粘贴
     const onPaste = () => {
-      const _data = formDesigner.getCopyData()
-      if (_data.length) {
-        _data.map(item => {
-          const index = (props?.parent || [])?.findIndex(item => item?.key === props.data?.key)
-          props.data.context?.paste(item)
-          const copyData = props.parent?.[index + 1]
-          designer.setSelection(copyData)
-        })
-        formDesigner.deleteData()
-      }
+      designer.onPaste()
     }
     // 剪切
     const onShear = () => {
-      formDesigner.setCopyData(designer.selected.value || [])
-      handleAction('remove')
+      designer.onShear()
     }
     // 删除
     const onDelete = () => {
-      console.log(designer.selected.value)
-      handleAction('remove')
+      designer.onDelete()
     }
 
     // 收藏为模板
     const onCollect = () => {
-      designer.collectData.value = designer.selected.value || []
-      designer.collectVisible.value = true
+      designer.onCollect()
     }
 
     expose({ setVisible, setOptions, setValue, setDisabled })
@@ -180,7 +127,12 @@ const Selection = defineComponent({
     const maskNode = () => {
       return <Dropdown
         trigger={['contextmenu']}
-        onContextmenu={withModifiers(() => { }, ['stop'])}
+        onContextmenu={withModifiers(() => {
+          const flag = designer.selected.value.find(item => item.key === props.data.key)
+          if(!flag) {
+            designer.setSelection(props.data)
+          }
+        }, ['stop'])}
         v-slots={{
           overlay: () => {
             return (
@@ -221,7 +173,7 @@ const Selection = defineComponent({
                 props.hasCopy && (
                   <div
                     class="action"
-                    onClick={withModifiers(() => { handleAction('copy') }, ['stop'])}
+                    onClick={withModifiers(() => onCopy(), ['stop'])}
                   >
                     <AIcon type="CopyOutlined" />
                   </div>
@@ -231,7 +183,7 @@ const Selection = defineComponent({
                 props.hasDel && (
                   <div
                     class="action"
-                    onClick={withModifiers(() => { handleAction('remove') }, ['stop'])}
+                    onClick={withModifiers(() => onDelete(), ['stop'])}
                   >
                     <AIcon type="DeleteOutlined" />
                   </div>

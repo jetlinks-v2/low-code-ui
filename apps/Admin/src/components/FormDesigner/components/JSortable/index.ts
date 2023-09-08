@@ -93,7 +93,7 @@ const draggable = defineComponent({
             return;
         }
         const { $attrs, $el, componentStructure } = this;
-        console.log($attrs, $el)
+        // console.log($attrs, $el)
         componentStructure?.updated();
 
         const sortableOptions = createSortableOption({
