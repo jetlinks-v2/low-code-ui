@@ -77,7 +77,7 @@ const onChange = debounce((v) => {
   })
 }, 1000)
 
-watch(() => props.configuration.code, () => {
+watch(() => props.configuration.script, () => {
   code.value = props.configuration.script
 }, { immediate: true })
 

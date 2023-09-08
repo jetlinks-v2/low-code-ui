@@ -9,7 +9,7 @@
     <div class="right">
       <j-space>
         <j-button type="link" v-if="!isEditModel"  @click="emits('save')">提交</j-button>
-        <j-button type="link" @click="onInput">打印json</j-button>
+        <!-- <j-button type="link" @click="onInput">打印json</j-button> -->
         <j-button type="link" @click="onCheck">校验</j-button>
         <j-button
           type="link"
@@ -25,7 +25,6 @@
   
 <script lang="ts" setup>
 import { inject, computed, unref } from 'vue'
-import { checkedConfig } from '../../utils/utils'
 import QuickAdd from '../QuickAdd/index.vue'
 
 const designer: any = inject('FormDesigner')
@@ -37,7 +36,7 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['save'])
+const emits = defineEmits(['save', 'validate'])
 
 const isEditModel = computed(() => {
   return unref(designer?.model) === 'edit'
@@ -49,8 +48,7 @@ const onPreview = (_type: 'preview' | 'edit') => {
 }
 
 const onCheck = () => {
-  designer.errorKey.value = checkedConfig(unref(designer.formData))
-  console.log(designer.errorKey.value)
+  emits('validate')
 }
 
 const onInput = () => {

@@ -133,23 +133,6 @@ const errorDataTableLength = computed(() => {
   return Object.keys(errorTips.dataTable).length
 })
 
-const tableValidates = async () => {
-  try {
-    const resp = await dataTableRef.value.validates()
-    errorTips.dataTable = {}
-  } catch (e) {
-    errorTips.dataTable = e
-  }
-
-
-  const res = await executeReq('rdb-crud', 'CheckTableName', { tableName: tableName.value, ownerId: ownerId.value }).finally(() => loading.value = false)
-  if (res.success && res.result) {
-    errorTips.dataTable['tableName'] = 1
-  } else {
-    delete errorTips.dataTable['tableName']
-  }
-  loading.value = false
-}
 
 const validate = async () => {
   loading.value = ref(true)
@@ -164,11 +147,48 @@ const validate = async () => {
     errorTips.asset += 1
   }
 
-  await tableValidates()
+  try {
+    const resp = await dataTableRef.value.validates()
+    errorTips.dataTable = {}
+  } catch (e) {
+
+    errorTips.dataTable = e
+  }
+
+
+  const res = await executeReq('rdb-crud', 'CheckTableName', { tableName: tableName.value, ownerId: ownerId.value }).finally(() => loading.value = false)
+  if (res.success && res.result) {
+    errorTips.dataTable['tableName'] = 1
+  } else {
+    delete errorTips.dataTable['tableName']
+  }
+  loading.value = false
 }
 
 defineExpose({
-  validate
+  validate: () => {
+    return new Promise(async (resolve, reject) => {
+      await validate()
+      const err = []
+      if (errorTips.relation) {
+        err.push({
+          message: '请配置关系标识'
+        })
+      }
+
+      if (errorTips.asset) {
+        err.push({
+          message: '请配置资产列名称'
+        })
+      }
+      if(Object.keys(errorTips.dataTable).length) {
+        Object.values(errorTips.dataTable).forEach(a => {
+          err.push(a[0])
+        })
+      }
+      !err.length ? resolve() : reject(err)
+    })
+  }
 })
 
 </script>
