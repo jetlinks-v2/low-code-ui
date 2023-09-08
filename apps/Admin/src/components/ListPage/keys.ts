@@ -19,3 +19,4 @@ export const SHOW_TYPE_KEY: InjectionKey<SHOW_TYPE> = Symbol('show_type')
 export const LIST_PAGE_DATA_KEY: InjectionKey<any> = Symbol('list_page_data')
 export const LIST_FORM_INFO: InjectionKey<any> = Symbol('list_form_info')
 export const DATA_SOURCE: InjectionKey<any> = Symbol('data_source')
+export { showColumnsKey } from './Operation/keys'

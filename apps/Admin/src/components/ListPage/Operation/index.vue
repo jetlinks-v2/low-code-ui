@@ -38,7 +38,6 @@ import {
   activeBtnKey,
   columnsTreeKey,
   typeKey,
-  showColumnsKey,
   editTypeKey,
   parentKeyKey,
   errorListKey,
@@ -96,7 +95,6 @@ const activeBtn = ref<Partial<OperationConfigTreeItem>>({})
 const editType = ref<'add' | 'edit'>('add')
 const parentKey = ref('')
 const EditBtnsRef = ref()
-const showColumns = ref(true)
 const errorList = ref<ErrorItemType[]>([])
 
 const save = async () => {
@@ -119,7 +117,6 @@ provide(columnsTreeKey, columnsTree)
 provide(editTypeKey, editType)
 provide(parentKeyKey, parentKey)
 provide(typeKey, props.type)
-provide(showColumnsKey, showColumns)
 provide(errorListKey, errorList)
 
 defineExpose({
