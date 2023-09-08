@@ -39,6 +39,7 @@ import InputModal from '@/components/ProJect/components/Action/InputModal.vue'
 import { providerEnum } from "@/components/ProJect/index";
 import { randomString } from '@jetlinks/utils'
 import { defaultSetting as CrudBaseData } from '@/components/Database/setting'
+import { onlyMessage } from '@jetlinks/utils';
 
 const engine = useEngine()
 const product = useProduct()
@@ -109,7 +110,7 @@ const getConfiguration = (type) => {
   }
 }
 
-const save = ({ name, others }) => {
+const save = ({ name, others,children }) => {
   const node = menuState.cacheData
 
   const parentId = node.type === providerEnum.Module ? node.id : node.parentId
@@ -121,13 +122,19 @@ const save = ({ name, others }) => {
     type: others.type,
     configuration: getConfiguration(others.type),
     parentId: parentId,
+    children:children
   }, parentId)
   close()
 }
 
 const menuClick = (record) => {
-  Object.assign(menuState, record)
-  menuState.visible = true
+  if(record.menuKey  === 'Copy'){
+    engine.setCopyFile(record.data)
+    onlyMessage('复制成功')
+  }else{
+    Object.assign(menuState, record)
+    menuState.visible = true
+  }
 }
 
 </script>

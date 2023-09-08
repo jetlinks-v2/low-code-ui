@@ -35,7 +35,7 @@ const columns = inject(CRUD_COLUMNS)
 const project = useProduct()
 const total = ref(0)
 const getData = async (params) => {
-  const resp = await queryRuntime(project.info.if, props.parentId, 'QueryPager', params)
+  const resp = await queryRuntime(project.info.id, props.parentId, 'QueryPager', params)
   total.value = resp.result?.total || 0
   console.log(resp)
   return {

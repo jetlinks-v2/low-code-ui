@@ -133,7 +133,7 @@ export default defineComponent({
                                     unref(list).map(element => {
                                         return <TableColumn
                                             key={element.key}
-                                            {...omit(element.componentProps, 'title')}
+                                            {...omit(element.componentProps, 'name')}
                                             v-slots={{
                                                 title: () => {
                                                     return <Selection
@@ -146,7 +146,7 @@ export default defineComponent({
                                                         hasDel={true}
                                                         parent={unref(list)}
                                                     >
-                                                        {element.componentProps?.title}
+                                                        {element.componentProps?.name}
                                                     </Selection>
                                                 },
                                                 default: (dt: any) => {

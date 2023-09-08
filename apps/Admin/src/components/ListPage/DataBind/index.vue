@@ -90,7 +90,7 @@ const props = defineProps({
 })
 
 const handleChangeFunction = (val: string) => {
-  dataBind.functionInfo = functionOptions!.value.find(item => item.id === val)
+  dataBind.functionInfo = functionOptions!.value.find(item => item.id === val) || dataBind.functionInfo
   handleFunction(val)
 }
 const functionDisabled = computed(() => {
@@ -127,11 +127,6 @@ const valid = () => {
   })
 }
 
-onMounted(() => {
-  if(dataBind.data.function) {
-    handleFunction(dataBind.data.function)
-  }
-})
 watch(() => JSON.stringify(dataBind), () => {
   if(dataBind.data.function) {
     handleChangeFunction(dataBind.data.function)
