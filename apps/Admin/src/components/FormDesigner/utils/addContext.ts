@@ -174,19 +174,19 @@ export const addContext = (node: any, parent: any, fn?: any) => {
             })
             arr.splice(index + 1, 0, newNode)
         },
-        paste(_data: any) {
-            const index = arr.indexOf(node)
-            const newNode = reactive(cloneDeep(toRaw(_data)))
-            delete newNode.context
-            newNode.key = `${newNode.type}_${uid()}-paste`
-            addContext(newNode, parent, (node) => {
-                node.key = `${node.type}_${uid()}-paste`
-            })
-            arr.splice(index + 1, 0, newNode)
-        },
-        delete() {
-            arr.splice(arr.indexOf(node), 1)
-        },
+        // paste(_data: any) {
+        //     const index = arr.indexOf(node)
+        //     const newNode = reactive(cloneDeep(toRaw(_data)))
+        //     delete newNode.context
+        //     newNode.key = `${newNode.type}_${uid()}-paste`
+        //     addContext(newNode, parent, (node) => {
+        //         node.key = `${node.type}_${uid()}-paste`
+        //     })
+        //     arr.splice(index + 1, 0, newNode)
+        // },
+        // delete() {
+        //     arr.splice(arr.indexOf(node), 1)
+        // },
         appendItem() {
             let _props = onAppendItem(node)
             if (_props) {
