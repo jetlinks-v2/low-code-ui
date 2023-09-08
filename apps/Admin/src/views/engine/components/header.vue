@@ -17,7 +17,7 @@ const product = useProduct()
 const router = useRouter()
 const route = useRoute()
 const onRelease = () => {
-  router.push({
+  router.replace({
     name: 'Release',
     params: {
       id: route.params.id

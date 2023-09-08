@@ -24,20 +24,20 @@
           </j-steps>
         </div>
         <div class="release-step-content" v-if="loading">
-          <Status v-show="step === 1" :theme="theme" />
-          <Tree v-show="step === 2" @change="treeChange" />
-          <Finish ref="finishRef" v-show="step === 3" :tree="tree" />
+          <Status v-show="step === 1" v-model:status="status" />
+          <Tree v-show="step === 2" ref="treeRef" @change="treeChange" />
+          <Finish ref="finishRef" v-show="step === 3" v-model:value="finishStatus" :tree="tree" />
         </div>
       </div>
     </div>
     <div class="release-footer">
       <j-button v-if="step === 1" @click="cancel">取消</j-button>
-      <j-button v-if="step === 1" type="primary" @click="next">下一步</j-button>
+      <j-button v-if="step === 1" type="primary" @click="next" :disabled="status">下一步</j-button>
 
       <j-button v-if="step === 2" @click="prev">上一步</j-button>
       <j-button v-if="step === 2" type="primary" @click="release">发布</j-button>
 
-      <j-button v-if="step === 3" type="primary" @click="finish">完成</j-button>
+      <j-button v-if="step === 3" type="primary" @click="cancel" :disabled="finishStatus !== 100">完成</j-button>
     </div>
   </div>
 </template>
@@ -46,20 +46,24 @@
 import Status from './status.vue'
 import Tree from './projectTree.vue'
 import Finish from './finish.vue'
-import { useProduct } from "@/store";
+import { useProduct, useEngine } from "@/store";
 
 const route = useRoute()
 const product = useProduct()
+const engine = useEngine()
 
 const step = ref(1)
 
 const loading = ref(false)
-const theme = ref('')
 const tree = ref([])
+const treeRef = ref()
 
 const finishRef = ref()
 
 const router = useRouter()
+
+const status = ref(true)
+const finishStatus = ref(0)
 
 const prev = () => {
   step.value -= 1
@@ -67,6 +71,9 @@ const prev = () => {
 
 const next = () => {
   step.value += 1
+  if (step.value === 2) {
+    treeRef.value.init()
+  }
 }
 
 const treeChange = (data) => {
@@ -74,7 +81,10 @@ const treeChange = (data) => {
 }
 
 const cancel = () => {
-  router.push({
+  // 清空engine中的状态
+  engine.initEngineState()
+
+  router.replace({
     name: 'Engine',
     params: {
       id: route.params.id
@@ -85,10 +95,6 @@ const cancel = () => {
 const release = () => {
   step.value += 1
   finishRef.value?.releaseStart()
-}
-
-const finish = () => {
-  // finishRef.value?.releaseStart()
 }
 
 product.queryProduct(route.params.id, () => {

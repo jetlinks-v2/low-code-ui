@@ -178,15 +178,13 @@ const validate = async () => {
     menuConfigRef.value?.valid(),
     dataBindRef.value?.valid(),
   ]
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     Promise.all(promiseArr)
       .then((res) => {
-        console.log(res)
         resolve(res)
       })
       .catch((err) => {
-        console.log(err)
-        throw err
+        reject(err)
       })
   })
 }
