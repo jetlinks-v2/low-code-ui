@@ -44,39 +44,71 @@
     }
 }
 
+// .filed-template {
+//     .filed-item-children {
+//         display: flex;
+//         flex-wrap: wrap;
+
+//         .filed-item-card {
+//             width: 49%;
+//             padding: 5px;
+//             text-align: center;
+//             cursor: grab;
+//             color: #333333;
+
+//             &[draggable="true"] {
+//                 cursor: grabbing;
+//             }
+
+//             .ant-card {
+//                 background-color: #fafafa;
+//             }
+
+//             .ant-card-body {
+//                 padding: 10px;
+//             }
+
+//             .filed-item-card-item {
+//                 display: flex;
+//                 flex-direction: column;
+//                 justify-content: center;
+//                 align-items: center;
+
+//                 span {
+//                     font-size: 16px;
+//                 }
+//             }
+//         }
+//     }
+// }
+
 .filed-template {
+    display: flex;
+    flex-wrap: wrap;
+
     .filed-item-children {
-        display: flex;
-        flex-wrap: wrap;
+        width: 50%;
+        padding: 5px;
+        text-align: center;
+        cursor: grab;
+        color: #333333;
 
-        .filed-item-card {
-            width: 50%;
-            padding: 5px;
-            text-align: center;
-            cursor: grab;
-            color: #333333;
+        .ant-card {
+            background-color: #fafafa;
+        }
 
-            &[draggable="true"] {
-                cursor: grabbing;
-            }
+        .ant-card-body {
+            padding: 10px;
+        }
 
-            .ant-card {
-                background-color: #fafafa;
-            }
+        .filed-item-card-item {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
 
-            .ant-card-body {
-                padding: 10px;
-            }
-
-            .filed-item-card-item {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-
-                span {
-                    font-size: 16px;
-                }
+            span {
+                font-size: 16px;
             }
         }
     }

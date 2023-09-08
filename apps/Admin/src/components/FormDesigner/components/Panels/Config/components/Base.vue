@@ -8,6 +8,7 @@
           'card',
           'card-item',
           'table-item',
+          'grid-item',
           'grid',
           'tabs',
           'collapse',
@@ -39,6 +40,7 @@
           'collapse-item',
           'tabs-item',
           'table-item',
+          'grid-item',
         ].includes(type)
       "
     >
@@ -46,7 +48,7 @@
         label="名称"
         :name="['formItemProps', 'label']"
         v-if="
-          !['text', 'org', 'role', 'user', 'product', 'device'].includes(type)
+          !['text'].includes(type)
         "
         :rules="[
           {

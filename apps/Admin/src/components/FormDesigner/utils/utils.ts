@@ -269,21 +269,15 @@ export const deleteDataByKey = (arr: any[], _item: any) => {
 
 // 插入数据，主要是为了粘贴
 export const copyDataByKey = (arr: any[], newData: any[], _item: any) => {
-    const list = newData.map(item => {
-        return {
-            ...item,
-            key: item.key + '_copy'
-        }
-    })
     const _index = arr.findIndex(item => item.key === _item.key)
-    if (_index !== -1) {
+    if (_index === -1) {
         return arr.map(item => {
             return {
                 ...item,
-                children: item?.children?.length ? copyDataByKey(item.children, list, _item) : []
+                children: item?.children?.length ? copyDataByKey(item.children, newData, _item) : []
             }
         })
     } else {
-        return [...arr.slice(0, _index), ...list, ...arr.slice(_index, arr?.length)]
+        return [...arr.slice(0, _index + 1), ...newData, ...arr.slice(_index + 1, arr?.length)]
     }
 }
