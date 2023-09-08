@@ -246,8 +246,9 @@ onMounted(() => {
 })
 
 onBeforeMount(() => {
-  if (product.info?.others?.theme) {
-    theme.value = product.info.others.theme
+  const item = product.getById(product.info.id)
+  if (item?.others?.theme) {
+    theme.value = item.others.theme
   }
 })
 
