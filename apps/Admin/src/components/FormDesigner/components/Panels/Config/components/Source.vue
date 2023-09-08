@@ -162,6 +162,7 @@ const onRadioChange = (e) => {
       type: 'dic',
     }
   }
+  emits('refresh', target.value)
 }
 
 const functionList = computed(() => {
