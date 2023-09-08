@@ -110,18 +110,18 @@ const handleModify = () => {
 }
 
 const handleOk = () => {
-  dataBind.data.function = undefined
-  dataBind.data.command = undefined
-  dataBind.functionInfo = undefined
+  dataBind.data.function = null
+  dataBind.data.command = null
+  dataBind.functionInfo = null
   visible.value = false
 }
 
 
-
 const errorList = ref<any[]>([])
 const valid = () => {
+  console.log(`output->dataBind.data`,dataBind)
   return new Promise((resolve, reject) => {
-    errorList.value = validDataBind(dataBind.data)
+    errorList.value = validDataBind(dataBind.data, functionOptions.value)
     if(errorList.value.length) reject(errorList.value)
     else resolve([])
   })
@@ -145,6 +145,7 @@ defineExpose({
   background-color: #ffffff;
   box-shadow: 0 1px 4px #0015291f;
   margin-bottom: 5px;
+  height: 8vh;
 }
 .text {
   text-align: center;
