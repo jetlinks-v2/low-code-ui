@@ -114,9 +114,11 @@ const toRight = () => {
             code,
             icon: it.others.menu?.icon,
             parentId: undefined,
+            buttons:it.others.menu?.buttons || [],
             options: {
                 pageId: it.id,
-                projectId: props.projectId
+                projectId: props.projectId,
+                LowCode:true,
             }
         }
     })
