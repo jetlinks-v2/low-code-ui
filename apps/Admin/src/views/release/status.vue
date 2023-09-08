@@ -4,10 +4,10 @@
       <div class="status-result">
         总共 {{ Object.keys(status).length }} 条
         <span v-if="check.type === 'loading'">
-         ，已校验 {{ check.progress }} 条，未校验 {{ check.wait }} 条
+         ，已校验 {{ check.fail + check.success }} 条，未校验 {{ Object.keys(status).length - (check.fail + check.success)  }} 条
         </span>
         <span v-if="check.type === 'end'">
-         ，已校验 {{ check.progress }} 条，正常 {{ check.success }} 条，失败 {{ check.fail }} 条
+         ，已校验 {{ check.fail + check.success }} 条，正常 {{ check.success }} 条，失败 {{ check.fail }} 条
         </span>
       </div>
       <div class="status-source">
@@ -26,7 +26,7 @@
                   <AIcon type="LoadingOutlined" />
                   正在校验...
                 </div>
-                <div v-else-if="status[node.id] === 1">
+                <div v-else-if="status[node.id] === 1" @click="() => showModal(node.id)">
                   <j-badge color="#f50" :text="statusMsg[node.id]" />
                 </div>
                 <div v-else-if="status[node.id] === 2">
@@ -47,6 +47,7 @@
         option-label-prop="label"
         :options="options"
         style="width: 100%"
+        @change="themeChange"
       >
         <template #option="{ value, label }">
           <div style="display: flex;gap: 24px;" >
@@ -58,17 +59,28 @@
       </a-select>
     </div>
     <div class="release-validate-box">
-      {{validateContent.type}}
-      <FormDesigner v-if="validateContent.type === providerEnum.FormPage" :data="validateContent.data" ref="validateRef"/>
-      <CustomHTML v-else-if="validateContent.type === providerEnum.HtmlPage" :data="validateContent.data" ref="validateRef"/>
-      <CRUD v-else-if="validateContent.type === providerEnum.CRUD" v-bind="validateContent.data" ref="validateRef"/>
-      <ListPage v-else-if="validateContent.type === providerEnum.ListPage" :data="validateContent.data" ref="validateRef"/>
+      <FormDesigner v-if="validateContent.type === providerEnum.FormPage" :key="validateContent.data.id" :data="validateContent.data" ref="validateRef"/>
+      <CustomHTML v-else-if="validateContent.type === providerEnum.HtmlPage" :key="validateContent.data.id" :data="validateContent.data" ref="validateRef"/>
+      <CRUD v-else-if="validateContent.type === providerEnum.CRUD" :key="validateContent.data.id" v-bind="validateContent.data" ref="validateRef"/>
+      <ListPage v-else-if="validateContent.type === providerEnum.ListPage" :key="validateContent.data.id" :data="validateContent.data" ref="validateRef"/>
     </div>
-    <j-modal
 
-    >
-
-    </j-modal>
+    <div class="update-modal" v-show="visible">
+      <div class="update-modal-header">
+        <span>快速修改</span>
+        <div class="update-modal-header-close" @click="cancel">
+          <AIcon type="CloseOutlined" />
+        </div>
+      </div>
+      <div class="update-modal-body">
+        <FormDesigner v-if="modelData.type === providerEnum.FormPage" :data="modelData.data" ref="modelRef"/>
+        <CustomHTML v-else-if="modelData.type === providerEnum.HtmlPage" :data="modelData.data" ref="modelRef"/>
+        <CRUD v-else-if="modelData.type === providerEnum.CRUD" v-bind="modelData.data" ref="modelRef"/>
+        <ListPage v-else-if="modelData.type === providerEnum.ListPage" :data="modelData.data" ref="modelRef"/>
+        <SQLCode v-else-if="modelData.type === providerEnum.SQL"  v-bind="modelData.data" ref="modelRef"/>
+        <FunctionCode v-else-if="modelData.type === providerEnum.Function"  v-bind="modelData.data" ref="modelRef"/>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -76,12 +88,8 @@
 import { useEngine, useProduct } from '@/store'
 import { providerEnum } from '@/components/ProJect/index'
 
-const props = defineProps({
-  theme: {
-    type: String,
-    default: '#1677ff'
-  }
-})
+
+const emit = defineEmits(['update:status'])
 
 const engine = useEngine()
 const product = useProduct()
@@ -105,7 +113,7 @@ const options = [
   { label: '海棠', value: '#eb2f96' },
 ]
 
-const theme = ref(props.theme || '#1677ff')
+const theme = ref('#1677ff')
 
 const check = reactive({
   success: 0,
@@ -117,8 +125,15 @@ const check = reactive({
 
 const status = reactive({})
 const statusMsg = reactive({})
+const visible = ref(false)
 
 const validateRef = ref()
+const modelRef = ref()
+
+const modelData = reactive({
+  type: undefined,
+  data: {},
+})
 
 const validateContent = reactive({
   type: undefined,
@@ -128,46 +143,21 @@ const validateContent = reactive({
 
 const nextCheck = async () => {
   const _id = Object.keys(status)[validateContent.step]
-  const item = product.getById(_id)
 
-  if (!item) return
+  if (validateContent.step > Object.keys(status).length) {
+    emit('update:status', Object.keys(statusMsg).length)
+    check.type = 'end'
+  } else {
+    check.type = 'loading'
+    emit('update:status', true)
+  }
 
-  if (providerEnum.SQL === item.type) {
-    if (!item.configuration.code) {
-      statusMsg[item.id] = '请输入sql'
-    }
-    status[item.id] = !item.configuration.script ? 1 : 2
+  if (!_id) return
+
+  await validateAll(_id, () => {
     validateContent.step += 1
-    await nextCheck()
-    return
-  }
-
-  if (providerEnum.Function === item.type) {
-    if (!item.configuration.script) {
-      statusMsg[item.id] = '请输入函数'
-    }
-    status[item.id] = !item.configuration.script ? 1 : 2
-    validateContent.step += 1
-    await nextCheck()
-    return
-  }
-
-  if (item) {
-    validateContent.type = item.type
-    validateContent.data = item
-    console.log(item)
-    await nextTick(async () => {
-      validateRef.value.validate().then(ref => {
-        status[item.id] = 2
-      }).catch(e => {
-        status[item.id] = 1
-        console.log(e)
-      }).finally(() => {
-        validateContent.step += 1
-        nextCheck()
-      })
-    })
-  }
+    nextCheck()
+  })
 }
 
 /**
@@ -181,8 +171,101 @@ const startCheck = () => {
   nextCheck()
 }
 
+const validateAll = async (id, cb) => {
+  const item = product.getById(id)
+
+  if (providerEnum.SQL === item.type) {
+    if (!item.configuration.sql) {
+      statusMsg[item.id] = '请输入sql'
+    }
+    status[item.id] = !item.configuration.sql ? 1 : 2
+    cb?.()
+    return
+  }
+
+  if (providerEnum.Function === item.type) {
+    if (!item.configuration.script) {
+      statusMsg[item.id] = '请输入函数'
+    }
+    status[item.id] = !item.configuration.script ? 1 : 2
+    cb?.()
+    return
+  }
+
+  if (item) {
+    validateContent.type = item.type
+    validateContent.data = item
+
+    nextTick(async () => {
+      setTimeout(() => {
+        validateRef.value.validate().then(ref => {
+          status[item.id] = 2
+          delete statusMsg[item.id]
+          cb?.()
+          nextCheck()
+        }).catch(e => {
+          status[item.id] = 1
+          statusMsg[item.id] = e.map(a => a.message).join(',')
+          cb?.()
+        })
+      }, 2000)
+    })
+  }
+}
+
+const themeChange = (e) =>{
+  const item = product.getById(product.info.id)
+
+  item.others = {
+    ...(item.others || {}),
+    theme: e
+  }
+
+  product.update(item)
+}
+
+const cancel = () => {
+  visible.value = false
+  status[modelData.id] = 0
+  validateAll(modelData.id)
+}
+
+const showModal = (id) => {
+  const item = product.getById(id)
+  modelData.type = item.type
+  modelData.data = item
+  modelData.id = id
+  visible.value = true
+  setTimeout(() => {
+    modelRef.value?.validate?.()
+  }, 1000)
+}
+
 onMounted(() => {
   startCheck()
+})
+
+onBeforeMount(() => {
+  if (product.info?.others?.theme) {
+    theme.value = product.info.others.theme
+  }
+})
+
+watch( () => JSON.stringify(status), () => {
+  check.progress = 0
+  check.fail = 0
+  check.success = 0
+  Object.values(status).forEach(a => {
+    if(a === 0) {
+      check.progress += 1
+    }
+    if (a === 1) {
+      check.fail += 1
+    }
+    if (a === 2) {
+      check.success += 1
+    }
+  })
 })
 
 </script>
@@ -230,7 +313,38 @@ onMounted(() => {
     width: 300px;
   }
 }
-</style>
-<style>
+
+.update-modal {
+  background-color: #fff;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 99;
+
+  .update-modal-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e3e3e3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    >span {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .update-modal-header-close {
+      font-size: 18px;
+    }
+  }
+
+  .update-modal-body {
+    padding: 12px 16px;
+    overflow-y: auto;
+    height: calc(100% - 54px);
+  }
+}
 
 </style>
