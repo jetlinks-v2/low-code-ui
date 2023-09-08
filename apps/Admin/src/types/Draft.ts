@@ -174,6 +174,13 @@ namespace Draft {
      * 菜单icon
      */
     icon?: string
+
+    buttons?: Array<Button>
+  }
+
+  export type Button = {
+    id: string,
+    name: string
   }
 
   export type AssetType = {
