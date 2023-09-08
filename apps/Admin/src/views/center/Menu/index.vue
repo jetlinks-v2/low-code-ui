@@ -38,6 +38,7 @@ const getTree = () => {
     product.queryProduct(props.data?.draftId, () => {
         const maps = product.getDataMap()
         const copyData = JSON.parse(JSON.stringify([...maps.values()]))
+        console.log('copyData',copyData)
         list.value = copyData.filter(item => {
             // console.log(item)
             return item.others && item.others?.menu
