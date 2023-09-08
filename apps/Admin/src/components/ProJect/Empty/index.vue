@@ -1,7 +1,7 @@
 
 <template>
    <div style="margin-left: 10px;">
-      <div>自由选配为 {{ props.data?.name }} 项目添加能力，快速完成项目搭建</div>
+      <div>自由选配为 {{ props.data?.title }} 项目添加能力，快速完成项目搭建</div>
       <div class="module">
          <div>通用能力</div>
          <div class="module-card" @click="onClick(providerEnum.Module)">

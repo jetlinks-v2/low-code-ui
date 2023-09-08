@@ -1,8 +1,24 @@
 
 <template>
+  <div class="title">
+    <a-radio-group v-model:value="viewType">
+      <a-radio-button value="table">
+        <AIcon type="UnorderedListOutlined" />
+      </a-radio-button>
+      <a-radio-button value="card">
+        <AIcon type="AppstoreOutlined" />
+      </a-radio-button>
+    </a-radio-group>
+    <j-select v-model:value="sorts" class="title-sorts" placeholder="排序方式" @change="handleSorts">
+      <j-select-option value="type">种类</j-select-option>
+      <j-select-option value="name">名字</j-select-option>
+      <j-select-option value="createTime">添加日期</j-select-option>
+      <j-select-option value="modifyTime">修改日期</j-select-option>
+    </j-select>
+  </div>
   <div class="content" v-if="viewType === 'card'">
     <ContextMenu type="empty" @select="handleChange">
-      <a-row :gutter="[8, 8]">
+      <a-row>
         <a-col :span="3" v-for="item in list" class="content-col">
           <div @click="onClick(item.id)" @dblclick="onDbClick(item)" :class="{
             'content-item': true,
@@ -17,7 +33,7 @@
       </a-row>
     </ContextMenu>
   </div>
-  <div v-else style="width: 1200px;">
+  <div v-else>
     <j-pro-table :columns="columns" :dataSource="list" model="TABLE" :noPagination="true" :childrenColumnName="'list'"
       :customRow="(record) => ({ onContextmenu: (e) => onContextmenu(e, record) })">
       <template #type="{ type }">
@@ -36,7 +52,8 @@
     </div>
   </div>
   <FileDrawer v-if="visibleFile" @close="visibleFile = false" :data="current" />
-  <InputModal v-if="visible" @close="visible = false" @save="onSave" :provider="provider" :data="current" :type="type" :name-list="nameList"/>
+  <InputModal v-if="visible" @close="visible = false" @save="onSave" :provider="provider" :data="current" :type="type"
+    :name-list="nameList" />
   <ToastModal v-if="visibleToast" @close="visibleToast = false" @save="onSave" :data="current" />
   <DelModal v-if="visibleDel" @close="visibleDel = false" @save="onDel" :data="current" />
 </template>
@@ -48,7 +65,7 @@ import FileDrawer from '../components/Action/FileDrawer.vue'
 import ToastModal from '../components/Action/ToastModal.vue'
 import DelModal from '../components/Action/DelModal.vue'
 import { onlyMessage } from '@jetlinks/utils';
-import { providerMap, restId,actionMap } from '../index'
+import { providerMap, restId, actionMap } from '../index'
 import { onKeyStroke, useMagicKeys } from '@vueuse/core'
 import { useProduct, useEngine } from '@/store'
 
@@ -75,6 +92,7 @@ const selectKey = ref<string>('')
 const selectSort = ref<number>(0)
 const list = ref<any>([])
 const nameList = ref<any>([])
+const sorts = ref<any>(undefined)
 
 const viewType = ref<string>('card')
 const menuData = reactive({
@@ -137,11 +155,12 @@ const onPaste = (parentId?: string) => {
 //table 右键菜单
 const onContextmenu = (e, record) => {
   e.preventDefault()
+  // console.log('e',e.clientX, e.clientY)
   visibleMenu.value = true
   menuData.style = {
     position: 'absolute',
-    left: e.clientX + "px",
-    top: e.clientY + "px",
+    left: e.clientX - 340 + "px",
+    top: e.clientY - 30 + "px",
   }
   menuData.data = record
   //点击取消菜单
@@ -199,7 +218,21 @@ const onDbClick = (data: any) => {
   engine.addFile(data)
 }
 
-const handleSort = (sort) => {
+//排序方式
+const handleSorts = ()=>{
+ const data =  product.getById(engine.activeFile)
+//  console.log('data---------',data)
+ product.update({
+  ...data,
+  others:{
+      ...data.others,
+      sorts:sorts.value
+    }
+ })
+}
+
+//键盘移动
+const handleMove = (sort) => {
   const listLength = indexMap.size
   // const colNumber = listLength / 8
   const currentIndex = selectSort.value + sort
@@ -211,13 +244,13 @@ const handleSort = (sort) => {
 
 onKeyStroke(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'], (e) => {
   if (e.key === 'ArrowUp') {
-    handleSort(-8)
+    handleMove(-8)
   } else if (e.key === 'ArrowDown') {
-    handleSort(8)
+    handleMove(8)
   } else if (e.key === 'ArrowLeft') {
-    handleSort(-1)
+    handleMove(-1)
   } else {
-    handleSort(1)
+    handleMove(1)
   }
 })
 
@@ -241,7 +274,7 @@ watchEffect(() => {
 
 watchEffect(() => {
   if (props.data.length !== 0) {
-    console.log(props.data)
+    // console.log(props.data)
     selectKey.value = props.data[0].id
     selectSort.value = 0
     nameList.value = props.data.map(item => item.name)
@@ -250,15 +283,30 @@ watchEffect(() => {
       return item
     })
   }
+  sorts.value = product.getById(engine.activeFile)?.others?.sorts
 })
+
 
 
 </script>
 
 <style scoped lang='less'>
+.title {
+  height: 40px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  border-bottom: 1px solid #EEE;
+  .title-sorts{
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 130px;
+  }
+}
+
 .content {
-  background-color: #dddddd;
-  height: calc(100vh - 80px);
+  background-color: #f5f5f5;
+  height: calc(100vh - 100px);
 
   .content-col {
     display: flex;
@@ -288,6 +336,7 @@ watchEffect(() => {
 }
 
 .tableMenu {
-  background-color: #e0e0e063;
+  // background-color: #ececec;
+  border: 1px solid #d4d4d4;
 }
 </style>

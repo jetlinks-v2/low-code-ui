@@ -19,7 +19,6 @@ export const useEngine = defineStore('engine', () => {
   const expandedKeys = ref<string[]>([])
   const openFile = ref<any>()
   const copyFile = ref<string>('')
-
   const product = useProduct()
 
   const initEngineState = () => {
@@ -108,9 +107,11 @@ export const useEngine = defineStore('engine', () => {
       if (type === 'project') {
         delete cloneRecord.children
       }
-      files.value.push(cloneRecord)
+      if(type!=='module'){
+        files.value.push(cloneRecord)
+      }
+      // files.value.push(cloneRecord)
     }
-
     selectFile(record.id, type)
   }
 
@@ -204,6 +205,4 @@ export const useEngine = defineStore('engine', () => {
     updateFile,
     initEngineState
   }
-},{
-  persist:false
 })

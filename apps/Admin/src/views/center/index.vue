@@ -125,7 +125,7 @@ const columns = [
     },
   },
   {
-    title: '状态',
+    title: '运行状态',
     dataIndex: 'runningState',
     key: 'runningState',
     ellipsis: true,

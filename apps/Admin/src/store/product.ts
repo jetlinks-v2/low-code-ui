@@ -195,6 +195,7 @@ const findParent=(data, target, result) =>{
   }
 
   const update = (record: any) => {
+    // console.log('item---',record)
     dataMap.set(record.id, omit(record, ['children']))
     data.value = updateProduct(data.value, record)
     engine.updateFile(record, 'edit')
@@ -271,6 +272,4 @@ const findParent=(data, target, result) =>{
     initProjectState,
     getServerModulesData
   }
-},{
-  persist: false
 })
