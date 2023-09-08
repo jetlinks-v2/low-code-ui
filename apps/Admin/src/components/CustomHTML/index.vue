@@ -37,6 +37,8 @@ const onChange = debounce((code: string) => {
   store.state.activeFile.code = code
 }, 250)
 
+const onBlur = debounce(() => updateStoreCode(), 250)
+
 const drawerVisible = ref(false)
 const $drawerWidth = ref('50%')
 const drawerTitle = ref('预览')
@@ -66,6 +68,15 @@ const handleOperClick = (type: OperType) => {
   !drawerVisible.value && (activeOper.value = '')
 }
 
+const updateStoreCode = () => {
+  productStore.update({
+    ...props.data,
+    configuration: {
+      type: 'html',
+      code: store.state.activeFile.code,
+    },
+  })
+}
 const previewRef = ref()
 const runLoading = ref(false)
 const runCode = () => {
@@ -79,7 +90,7 @@ const runCode = () => {
   })
 }
 
-const handleVaild = () => {
+const handleValidate = () => {
   if (errors.value.length > 0) {
     onlyMessage(errors.value[0].errors[0], 'error')
   } else if(!store.state.activeFile.code){
@@ -89,13 +100,7 @@ const handleVaild = () => {
   } else {
     onlyMessage('校验成功', 'success')
   }
-  productStore.update({
-    ...props.data,
-    configuration: {
-      type: 'html',
-      code: store.state.activeFile.code,
-    },
-  })
+  updateStoreCode()
 }
 
 provide(BASE_INFO, props.data)
@@ -134,7 +139,14 @@ const errorValidate = async () => {
   if (!store.state.activeFile.code) {
     err.push({massage: '页面代码为空'})
   }
-  return err;
+
+  return new Promise((resolve, reject) => {
+    if (err.length) {
+      reject(err)
+    } else {
+      resolve(true)
+    }
+  });
 }
 
 onMounted(() => {
@@ -145,7 +157,7 @@ onMounted(() => {
 })
 
 defineExpose({
-  vaildate: errorValidate
+  validate: errorValidate
 })
 </script>
 
@@ -156,6 +168,7 @@ defineExpose({
         <EditorContainer>
           <MonacoEditor
             @change="onChange"
+            @blur="onBlur"
             :filename="store.state.activeFile.filename"
             :value="store.state.activeFile.code"
           />
@@ -164,7 +177,7 @@ defineExpose({
             <j-button
               type="primary"
               size="small"
-              @click.stop="handleVaild"
+              @click.stop="handleValidate"
               @dblclick.stop
             >校验
             </j-button

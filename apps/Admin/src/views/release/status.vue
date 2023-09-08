@@ -73,12 +73,12 @@
         </div>
       </div>
       <div class="update-modal-body">
-        <FormDesigner v-if="modelData.type === providerEnum.FormPage" :data="modelData.data" ref="modelRef"/>
-        <CustomHTML v-else-if="modelData.type === providerEnum.HtmlPage" :data="modelData.data" ref="modelRef"/>
-        <CRUD v-else-if="modelData.type === providerEnum.CRUD" v-bind="modelData.data" ref="modelRef"/>
-        <ListPage v-else-if="modelData.type === providerEnum.ListPage" :data="modelData.data" ref="modelRef"/>
-        <SQLCode v-else-if="modelData.type === providerEnum.SQL"  v-bind="modelData.data" ref="modelRef"/>
-        <FunctionCode v-else-if="modelData.type === providerEnum.Function"  v-bind="modelData.data" ref="modelRef"/>
+        <FormDesigner v-if="modelData.type === providerEnum.FormPage" :key="modelData.data.id" :data="modelData.data" ref="modelRef"/>
+        <CustomHTML v-else-if="modelData.type === providerEnum.HtmlPage" :key="modelData.data.id" :data="modelData.data" ref="modelRef"/>
+        <CRUD v-else-if="modelData.type === providerEnum.CRUD" v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
+        <ListPage v-else-if="modelData.type === providerEnum.ListPage" :data="modelData.data" :key="modelData.data.id" ref="modelRef"/>
+        <SQLCode v-else-if="modelData.type === providerEnum.SQL"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
+        <FunctionCode v-else-if="modelData.type === providerEnum.Function"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
       </div>
     </div>
   </div>
@@ -143,8 +143,7 @@ const validateContent = reactive({
 
 const nextCheck = async () => {
   const _id = Object.keys(status)[validateContent.step]
-
-  if (validateContent.step > Object.keys(status).length) {
+  if (validateContent.step >= Object.keys(status).length) {
     emit('update:status', Object.keys(statusMsg).length)
     check.type = 'end'
   } else {
@@ -183,6 +182,15 @@ const validateAll = async (id, cb) => {
     return
   }
 
+  if (providerEnum.HtmlPage === item.type) {
+    if (!item.configuration.code) {
+      statusMsg[item.id] = '页面代码为空'
+    }
+    status[item.id] = !item.configuration.code ? 1 : 2
+    cb?.()
+    return
+  }
+
   if (providerEnum.Function === item.type) {
     if (!item.configuration.script) {
       statusMsg[item.id] = '请输入函数'
@@ -195,20 +203,27 @@ const validateAll = async (id, cb) => {
   if (item) {
     validateContent.type = item.type
     validateContent.data = item
-
     nextTick(async () => {
       setTimeout(() => {
         validateRef.value.validate().then(ref => {
           status[item.id] = 2
           delete statusMsg[item.id]
-          cb?.()
-          nextCheck()
+          if (cb) {
+            cb()
+          } else {
+            emit('update:status', Object.keys(statusMsg).length)
+          }
+
         }).catch(e => {
           status[item.id] = 1
           statusMsg[item.id] = e.map(a => a.message).join(',')
-          cb?.()
+          if (cb) {
+            cb()
+          } else {
+            emit('update:status', Object.keys(statusMsg).length)
+          }
         })
-      }, 2000)
+      }, 1000)
     })
   }
 }
