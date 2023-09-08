@@ -183,6 +183,15 @@ const validateAll = async (id, cb) => {
     return
   }
 
+  if (providerEnum.HtmlPage === item.type) {
+    if (!item.configuration.code) {
+      statusMsg[item.id] = '页面代码为空'
+    }
+    status[item.id] = !item.configuration.code ? 1 : 2
+    cb?.()
+    return
+  }
+
   if (providerEnum.Function === item.type) {
     if (!item.configuration.script) {
       statusMsg[item.id] = '请输入函数'
@@ -195,21 +204,27 @@ const validateAll = async (id, cb) => {
   if (item) {
     validateContent.type = item.type
     validateContent.data = item
-
     nextTick(async () => {
       setTimeout(() => {
-      console.log('validateRef',item, validateRef.value.validate)
         validateRef.value.validate().then(ref => {
           status[item.id] = 2
           delete statusMsg[item.id]
-          cb?.()
-          nextCheck()
+          if (cb) {
+            cb()
+          } else {
+            emit('update:status', Object.keys(statusMsg).length)
+          }
+
         }).catch(e => {
           status[item.id] = 1
           statusMsg[item.id] = e.map(a => a.message).join(',')
-          cb?.()
+          if (cb) {
+            cb()
+          } else {
+            emit('update:status', Object.keys(statusMsg).length)
+          }
         })
-      }, 2000)
+      }, 1000)
     })
   }
 }
