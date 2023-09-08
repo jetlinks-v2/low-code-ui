@@ -20,19 +20,21 @@
         </ErrorItem>
       </j-form-item>
       <j-form-item v-if="showCommand">
-        <j-select
-          v-model:value="dataBind.data.command"
-          :disabled="commandDisabled"
-          style="width: 200px"
-        >
-        <j-select-option
-          v-for="item in commandOptions"
-          :value="item.id"
-          :key="item.id"
-        >
-          {{ item.name }}
-        </j-select-option>
-      </j-select>
+        <ErrorItem :errorData="errorData('command')">
+          <j-select
+            v-model:value="dataBind.data.command"
+            :disabled="commandDisabled"
+            style="width: 200px"
+          >
+            <j-select-option
+              v-for="item in commandOptions"
+              :value="item.id"
+              :key="item.id"
+            >
+              {{ item.name }}
+            </j-select-option>
+          </j-select>
+        </ErrorItem>
       </j-form-item>
       <j-form-item>
         <j-button type="link" @click="handleModify">变更</j-button>
@@ -60,7 +62,6 @@ import { useFunctions } from '@/hooks/useFunctions'
 
 const { functionOptions, commandOptions, handleFunction } = useFunctions()
 
-
 const visible = ref(false)
 const handleValid = () => {
   emits('valid')
@@ -86,11 +87,13 @@ const props = defineProps({
   id: {
     type: String,
     default: '',
-  }
+  },
 })
 
 const handleChangeFunction = (val: string) => {
-  dataBind.functionInfo = functionOptions!.value.find(item => item.id === val) || dataBind.functionInfo
+  dataBind.functionInfo =
+    functionOptions!.value.find((item) => item.id === val) ||
+    dataBind.functionInfo
   handleFunction(val)
 }
 const functionDisabled = computed(() => {
@@ -102,7 +105,10 @@ const commandDisabled = computed(() => {
 })
 
 const showCommand = computed(() => {
-  return ['rdb-sql-query', 'rdb-crud'].includes(functionOptions!.value.find(item => item.id === dataBind.data.function)?.provider || '')
+  return ['rdb-sql-query', 'rdb-crud'].includes(
+    functionOptions!.value.find((item) => item.id === dataBind.data.function)
+      ?.provider || '',
+  )
 })
 
 const handleModify = () => {
@@ -116,22 +122,24 @@ const handleOk = () => {
   visible.value = false
 }
 
-
 const errorList = ref<any[]>([])
 const valid = () => {
-  console.log(`output->dataBind.data`,dataBind)
+  console.log(`output->dataBind.data`, dataBind)
   return new Promise((resolve, reject) => {
     errorList.value = validDataBind(dataBind.data, functionOptions.value)
-    if(errorList.value.length) reject(errorList.value)
+    if (errorList.value.length) reject(errorList.value)
     else resolve([])
   })
 }
 
-watch(() => JSON.stringify(dataBind), () => {
-  if(dataBind.data.function) {
-    handleChangeFunction(dataBind.data.function)
-  }
-})
+watch(
+  () => JSON.stringify(dataBind),
+  () => {
+    if (dataBind.data.function) {
+      handleChangeFunction(dataBind.data.function)
+    }
+  },
+)
 
 defineExpose({
   valid,

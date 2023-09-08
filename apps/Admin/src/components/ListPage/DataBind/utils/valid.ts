@@ -1,13 +1,15 @@
+import { providerEnum } from "@/components/ProJect";
+
 export const validDataBind = (data: any, functionOptions: any) => {
   const errorList: any = [];
+  const isExist = functionOptions.find(item => item.id === data.function)
   for(let key in data) {
-    if(!data[key]) {
+    if(!data[key] && isExist?.provider !== providerEnum.Function) {
       errorList.push({
         key,
         message: '请配置'
       })
     } else if(key === 'function') {
-      const isExist = functionOptions.find(item => item.id === data.function)
       if(!isExist) {
         errorList.push({
           key: 'function',

@@ -90,7 +90,7 @@ import {
   showColumnsKey,
 } from './keys'
 import { useProduct } from '@/store'
-import { debounce } from 'lodash-es'
+import { omit, debounce } from 'lodash-es'
 
 const spinning = ref(false)
 const props = defineProps({
@@ -271,14 +271,28 @@ provide(showColumnsKey, showColumns)
 //   configurationStore.setALLlistDataInfo('dataBind', dataBind, props.data.id)
 // })
 
+//树形结构转换成数组
+const arrFlat = (arr: any[]) => {
+  const arr_: any[] = []
+  function flat(arr: any[]) {
+    arr.forEach((item) => {
+      arr_.push({ id: item.key, name: item.title })
+      if (item.children) {
+        flat(item.children)
+      }
+    })
+  }
+  flat(arr)
+  return arr_
+}
+
 onMounted(() => {
   visibles.GuideVisible = !props.data.configuration?.code
   const initData = JSON.parse(props.data.configuration?.code || '{}')
-  console.log(initData?.dataBind);
   if (initData) {
     Object.assign(dataBind, initData?.dataBind)
     Object.assign(showType, initData?.showType)
-    Object.assign(menuConfig, initData?.menu)
+    Object.assign(menuConfig, omit(initData?.menu, 'buttons'))
     Object.assign(listFormInfo, initData?.listFormInfo)
     pagingData.value = initData?.pagingData || pagingData.value
     buttonsConfig.value = initData?.addButton || []
@@ -299,7 +313,7 @@ onMounted(() => {
           },
           others: {
             ...props?.data?.others,
-            menu: menuConfig,
+            menu: { ...menuConfig, buttons: [...arrFlat(buttonsConfig.value), ...arrFlat(actionsConfig.value)] },
             userList: [
               ...actionsConfig.value
                 .filter((item) => item.pages && item.pages !== '')
@@ -335,9 +349,8 @@ const onSave = debounce((record) => {
 }, 1000)
 
 defineExpose({
-  validate
+  validate,
 })
-
 </script>
 
 <style scoped lang="less">

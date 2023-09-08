@@ -379,7 +379,7 @@ watch(() => JSON.stringify(dataBinds), () => {
     (item) => {
       return {
         id: item.name,
-        name: item.name,
+        name: item.comment,
         type: item.javaType?.toLowerCase(),
       }
     },
