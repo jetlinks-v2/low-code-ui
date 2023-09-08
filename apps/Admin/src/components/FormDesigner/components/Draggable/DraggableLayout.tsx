@@ -13,6 +13,7 @@ import TableLayout from './TableLayout'
 import { watch, PropType } from 'vue';
 import { queryOptions } from '../../utils/utils';
 import { useProduct } from '@/store';
+import { onEnd } from './ControlInsertionPlugin';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -251,9 +252,9 @@ const DraggableLayout = defineComponent({
             multiDragKey: "SHIFT",
             group: { name: "j-canvas" },
             //拖动结束
-            // onEnd: function (evt) {
-            //   console.log(evt);
-            // }
+            onEnd: (e) => {
+                onEnd(e, designer)
+            }
         }
 
         return () => {

@@ -7,6 +7,7 @@
           v-model:value="target.componentProps.inlineMax"
           @change="onDataChange"
           :min="1"
+          :max="15"
           style="width: 100%"
         />
       </j-form-item>

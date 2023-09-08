@@ -45,7 +45,7 @@ const checkedConfigItem = (node: ISchema) => {
                 }
             }
         }
-        if ('input-number' === _type && !(node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined && node?.componentProps?.precision !== undefined)) {
+        if ('input-number' === _type && (node?.componentProps?.max === undefined || node?.componentProps?.min === undefined || node?.componentProps?.precision === undefined)) {
             return {
                 key: node?.key,
                 message: (node.formItemProps?.label || node.name) + '配置错误'
