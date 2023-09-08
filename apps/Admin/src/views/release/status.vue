@@ -73,12 +73,12 @@
         </div>
       </div>
       <div class="update-modal-body">
-        <FormDesigner v-if="modelData.type === providerEnum.FormPage" :data="modelData.data" ref="modelRef"/>
-        <CustomHTML v-else-if="modelData.type === providerEnum.HtmlPage" :data="modelData.data" ref="modelRef"/>
-        <CRUD v-else-if="modelData.type === providerEnum.CRUD" v-bind="modelData.data" ref="modelRef"/>
-        <ListPage v-else-if="modelData.type === providerEnum.ListPage" :data="modelData.data" ref="modelRef"/>
-        <SQLCode v-else-if="modelData.type === providerEnum.SQL"  v-bind="modelData.data" ref="modelRef"/>
-        <FunctionCode v-else-if="modelData.type === providerEnum.Function"  v-bind="modelData.data" ref="modelRef"/>
+        <FormDesigner v-if="modelData.type === providerEnum.FormPage" :key="modelData.data.id" :data="modelData.data" ref="modelRef"/>
+        <CustomHTML v-else-if="modelData.type === providerEnum.HtmlPage" :key="modelData.data.id" :data="modelData.data" ref="modelRef"/>
+        <CRUD v-else-if="modelData.type === providerEnum.CRUD" v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
+        <ListPage v-else-if="modelData.type === providerEnum.ListPage" :data="modelData.data" :key="modelData.data.id" ref="modelRef"/>
+        <SQLCode v-else-if="modelData.type === providerEnum.SQL"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
+        <FunctionCode v-else-if="modelData.type === providerEnum.Function"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
       </div>
     </div>
   </div>
@@ -198,6 +198,7 @@ const validateAll = async (id, cb) => {
 
     nextTick(async () => {
       setTimeout(() => {
+      console.log('validateRef',item, validateRef.value.validate)
         validateRef.value.validate().then(ref => {
           status[item.id] = 2
           delete statusMsg[item.id]

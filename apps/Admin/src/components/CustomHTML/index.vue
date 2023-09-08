@@ -134,7 +134,14 @@ const errorValidate = async () => {
   if (!store.state.activeFile.code) {
     err.push({massage: '页面代码为空'})
   }
-  return err;
+
+  return new Promise((resolve, reject) => {
+    if (err.length) {
+      reject(err)
+    } else {
+      resolve(true)
+    }
+  });
 }
 
 onMounted(() => {
@@ -145,7 +152,7 @@ onMounted(() => {
 })
 
 defineExpose({
-  vaildate: errorValidate
+  validate: errorValidate
 })
 </script>
 
