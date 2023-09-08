@@ -32,6 +32,7 @@ enum OperType {
   View = 'view',
   Menu = 'menu',
 }
+const storeErrors = computed(()=> store.state.errors)
 
 const onChange = debounce((code: string) => {
   store.state.activeFile.code = code
@@ -48,7 +49,6 @@ const handleDbClickViewName = () => {
 const activeOper = ref('')
 const menuListRef = ref()
 const menuFormData = ref({pageName: '', main: true, name: '', icon: ''})
-const menuChangeValue = ref()
 const errors = ref([] as any)
 const handleOperClick = (type: OperType) => {
   if (type === activeOper.value) {
@@ -92,6 +92,8 @@ const handleVaild = () => {
       code: store.state.activeFile.code,
     },
   })
+
+  console.log(errorValidate())
 }
 
 provide(BASE_INFO, props.data)
@@ -115,11 +117,32 @@ const updateMenuFormData = (val) => {
   })
 }
 
+const errorValidate = () => {
+  return new Promise((resolve, reject) => {
+    const err = [];
+    storeErrors.value.forEach((error: any) => {
+      err.push({
+        massage: error.message ?? error
+      })
+    })
+    errors.value.forEach((error: any) => {
+      err.push({
+        massage: error.errors[0]
+      })
+    })
+    resolve(err)
+  })
+}
+
 onMounted(() => {
   menuFormData.value = {
     ...props.data.others.menu,
     pageName: props.data.pageName || props.data?.title || '',
   }
+})
+
+defineExpose({
+  vaildate: errorValidate
 })
 </script>
 
@@ -148,7 +171,7 @@ onMounted(() => {
       </template>
       <template #console>
         <EditorContainer title="运行日志">
-          <Console :error="store.state.errors[0]"/>
+          <Console :error="storeErrors[0]"/>
         </EditorContainer>
       </template>
     </SplitPane>
