@@ -193,13 +193,13 @@ const validate = async () => {
     menuConfigRef.value?.valid(),
     dataBindRef.value?.valid(),
   ]
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     Promise.all(promiseArr)
       .then((res) => {
         resolve(res)
       })
       .catch((err) => {
-        throw err
+        reject(err)
       })
       .finally(() => {
         spinning.value = false
@@ -335,8 +335,9 @@ const onSave = debounce((record) => {
 }, 1000)
 
 defineExpose({
-  validate,
+  validate
 })
+
 </script>
 
 <style scoped lang="less">

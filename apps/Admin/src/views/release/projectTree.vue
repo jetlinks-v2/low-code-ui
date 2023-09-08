@@ -12,15 +12,10 @@ const product = useProduct()
 
 const list = ref([])
 
-const getAllTree = () => {
-
-}
-
 const getTree = () => {
   const maps = product.getDataMap()
   const copyData = JSON.parse(JSON.stringify([...maps.values()]))
   list.value = copyData.filter(item => {
-    console.log(item)
     return item.others && item.others?.menu
   }).map(item => {
     item.parentFullId = maps.get(item.parentId).fullId
@@ -32,8 +27,11 @@ const change = (data) => {
   emit('change', data)
 }
 
-getTree()
-getAllTree()
+defineExpose({
+  init: () => {
+    getTree()
+  }
+})
 
 </script>
 

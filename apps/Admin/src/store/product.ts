@@ -230,21 +230,19 @@ const findParent=(data, target, result) =>{
     dataMap.clear()
     const resp = await queryProjectDraft(id)
     if (resp.success) {
-      const result = resp.result
+      const {modules, ...extra } = resp.result
       const treeData: TreeData[] = []
-      const children: TreeData[] = result.modules?.[0] ? handleChildren(result.modules[0], result.id) : []
+      const children: TreeData[] = modules?.[0] ? handleChildren(modules[0], extra.id) : []
       treeData.push({
-        version: result.version,
-        draftName: result.draftName,
-        draftId: result.draftId,
-        id: result.id,
-        title: result.name,
+        ...extra,
+        title: extra.name,
         type: 'project',
-        children: children
+        children: children,
+        others: modules ? modules[0]?.others : {}
       })
       handleDataMap(treeData);
       data.value = treeData
-      info.value = omit(result, ['modules'])
+      info.value = extra
       cb?.()
     }
   }

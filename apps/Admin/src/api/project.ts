@@ -6,8 +6,6 @@ export const addProject = (data: any) => request.post(`/low-code/info/_add`, dat
 //编辑项目
 export const editProject = (data: any) => request.post(`/low-code/info/_update`, data)
 
-//项目标识唯一性
-export const _validateProject = (data: any) => request.post(`/low-code/info/_exists`, data)
 
 //删除项目
 export const delProject = (id: any) => request.remove(`/low-code/info/${id}/_delete`)

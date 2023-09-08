@@ -6,12 +6,22 @@
       </div>
       <div class="progress-warp">
         <div class="progress-inner">
-          <div class="progress-bg" :style="{ width: width + '%' }"></div>
+          <div :class="{'progress-bg': true, 'error': status === 'error'}" :style="{ width: width + '%' }"></div>
         </div>
       </div>
+      <div>{{ width }}%</div>
     </div>
-    <div>
-
+    <div v-if="loading">
+      {{ status === 'success' ? '发布成功' : '发布失败'}}
+      <template v-if="status === 'error'">
+        <span >
+          {{ errorMsg }}
+        </span>
+        <j-button type="link" @click="restart">
+          <template #icon><AIcon type="RedoOutlined" /></template>
+           重试
+        </j-button>
+      </template>
     </div>
   </div>
 </template>
@@ -28,61 +38,96 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['update:value'])
+
 const width = ref(0)
 const status = ref('success')
+const loading = ref(false)
+const errorMsg = ref('')
 const route = useRoute()
 let count = 0
 
 const { pause, resume } = useIntervalFn(() => {
   /* your function */
   if (width.value < count) {
-    width.value += 10
+    width.value += 0.5
   }
-}, 300)
+}, 100)
+
+const validateDraftFn = (id) => {
+  count = 33.333
+  validateDraft(id).then(resp => {
+    width.value = 33.33
+    releaseDraftFn(id)
+  }).catch((e) => {
+    width.value = 33.33
+    status.value = 'error'
+    loading.value = true
+    errorMsg.value = e?.response?.data?.message
+    console.log(e)
+    pause()
+  })
+}
+
+const releaseDraftFn = (id) => {
+  count = 66.66
+  releaseDraft(id).then(resp => {
+    width.value = 66.66
+    saveMenuFn()
+  }).catch((e) => {
+    width.value = 66.66
+    status.value = 'error'
+    loading.value = true
+    errorMsg.value = e?.response?.data?.message
+    console.log(e)
+    pause()
+  })
+}
+const saveMenuFn = (id) => {
+  count = 99.99
+  saveMenu(id).then(resp => {
+    width.value = 100
+    count = 100
+    loading.value = true
+    pause()
+  }).catch((e) => {
+    width.value = 99.99
+    status.value = 'error'
+    loading.value = true
+    errorMsg.value = e?.response?.data?.message
+    pause()
+  })
+}
+
+
 
 const releaseStart = async () => {
   const { id } = route.params
 
   if (id) {
-    //  发布校验
-    count = 33.333
-    const validateResp = await validateDraft(id)
-    if (!validateResp.success) {
-      status.value = 'error'
-      pause()
-      return
-    }
-    width.value = 33.33
-    //  发布接口
-    count = 66.66
-    const releaseResp = await releaseDraft(id)
-    if (!releaseResp.success) {
-      status.value = 'error'
-      pause()
-      return
-    }
-    width.value = 66.66
-    count = 99
-    // 修改菜单
-    const menuResp = await saveMenu(props.tree)
-
-    if (!menuResp.success) {
-      width.value = 99
-      status.value = 'error'
-      pause()
-      return
-    }
-    width.value = 100
-    count = 100
-    pause()
+    validateDraftFn(id)
   }
+}
+
+const restart = () => {
+  reset()
+  setTimeout(() => {
+    releaseStart()
+  }, 1000)
 }
 
 const reset = () => {
   count = 0
   width.value = 0
+  status.value = 'success'
+  errorMsg.value = ''
+  loading.value = false
   resume()
 }
+
+watch(() => width.value, () => {
+  emit('update:value', count)
+})
 
 onBeforeMount(() => {
   reset()
@@ -123,6 +168,10 @@ defineExpose({
     width: 80%;
     transition: all .3s ease;
     background-color: #315efb;
+  }
+
+  .error {
+    background-color: #ff4d4f;
   }
 }
 </style>

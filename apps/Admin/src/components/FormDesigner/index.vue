@@ -1,27 +1,40 @@
 <template>
-  <div class="container">
-    <Header @save="onSave" :data="data" />
-    <div class="box">
-      <div class="left"><Filed /></div>
-      <div class="right">
-        <Canvas :data="formData"></Canvas>
-      </div>
-      <div class="config" v-if="isShowConfig && model !== 'preview'">
-        <Config ref="configRef" />
+  <j-spin :spinning="spinning">
+    <div class="container">
+      <Header @save="onSave" :data="data" @validate="onValidate" />
+      <div class="box">
+        <div class="left"><Filed /></div>
+        <div class="right">
+          <Canvas :data="formData"></Canvas>
+        </div>
+        <div class="config" v-if="isShowConfig && model !== 'preview'">
+          <Config ref="configRef" />
+        </div>
       </div>
     </div>
-  </div>
+  </j-spin>
 </template>
 
 <script lang="ts" setup>
 import Header from './components/Header/index.vue'
 import Canvas from './components/Panels/Canvas/index'
 import Config from './components/Panels/Config/index.vue'
-import { provide, ref, reactive, watch, onUnmounted, unref } from 'vue'
 import Filed from './components/Panels/Filed/index.vue'
+import {
+  provide,
+  ref,
+  reactive,
+  watch,
+  onUnmounted,
+  unref,
+  computed,
+} from 'vue'
 import { ISchema } from './typings'
-import { omit } from 'lodash-es'
-import { useProduct } from '@/store/product'
+import { omit, debounce } from 'lodash-es'
+import { useProduct, useFormDesigner } from '@/store'
+import { useMagicKeys } from '@vueuse/core'
+import { Modal } from 'jetlinks-ui-components'
+import { deleteDataByKey, copyDataByKey, checkedConfig } from './utils/utils'
 
 const initData = {
   type: 'root',
@@ -53,18 +66,170 @@ const props = defineProps({
 const model = ref<'preview' | 'edit'>(props.mode ? 'preview' : 'edit') // 预览；编辑
 const formData = ref<any>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
-const selected = reactive<any>({ ...initData }) // 被选择数据
+const selected = ref<any[]>([]) // 被选择数据,需要多选
 const formState = reactive<any>({})
 const errorKey = ref<string[]>([])
 const formRef = ref<any>()
 const configRef = ref<any>()
 const refList = ref<any>({})
 
+const keys = useMagicKeys()
+const _shift = keys['Shift']
+const _ctrl = keys['Ctrl']
+
 const collectVisible = ref<boolean>(false)
-const collectData = ref<any>()
+const collectData = ref<any[]>([])
+const delVisible = ref<boolean>(false)
+const spinning = ref<boolean>(false)
 
 const product = useProduct()
+const formDesigner = useFormDesigner()
 
+const isSelectedRoot = computed(() => {
+  return !!selected.value.find((item) => item.key === 'root')
+})
+
+// 设置数据被选中
+const setSelection = (node: any) => {
+  if (['card-item', 'grid-item'].includes(node.type)) return
+  if (_shift.value || _ctrl.value) {
+    if (node === 'root') return
+    selected.value.push(node)
+  } else {
+    selected.value = []
+    if (node === 'root') {
+      selected.value.push(formData.value)
+    } else {
+      selected.value.push(node)
+    }
+  }
+  isShowConfig.value = !(selected.value?.length > 1)
+  onSaveData()
+}
+
+// 删除
+const onDelete = debounce(() => {
+  const arr = selected.value || []
+  if (unref(isSelectedRoot) || !arr?.length) return
+  delVisible.value = true
+  Modal.confirm({
+    title: '确定删除组件及其配置？',
+    okText: '确认',
+    cancelText: '取消',
+    onOk() {
+      delVisible.value = false
+      // 删除数据
+      const _data: any = selected.value
+        .map((item) => {
+          return deleteDataByKey(formData.value.children, item)
+        })
+        .pop()
+      formData.value = {
+        ...formData.value,
+        children: _data?.arr || [],
+      }
+      setSelection(_data?.data || 'root')
+    },
+    onCancel() {
+      delVisible.value = false
+    },
+  })
+}, 200)
+
+// 复制
+const onCopy = () => {
+  if (unref(isSelectedRoot)) return
+  formDesigner.setCopyData(selected.value || [])
+}
+
+// 剪切
+const onShear = debounce(() => {
+  if (unref(isSelectedRoot)) return
+  formDesigner.setCopyData(selected.value || [])
+  console.log('shear')
+  const _data: any = selected.value
+    .map((item) => {
+      return deleteDataByKey(formData.value.children, item)
+    })
+    .pop()
+  formData.value = {
+    ...formData.value,
+    children: _data?.arr || [],
+  }
+  setSelection(_data?.data || 'root')
+}, 200)
+
+// 粘贴
+const onPaste = () => {
+  if (!selected.value?.length) return
+  const _data = formDesigner.getCopyData()
+  if (_data.length && selected.value?.length) {
+    const dt = selected.value?.[selected.value.length - 1]
+    if (dt?.key === 'root') {
+      formData.value = {
+        ...formData.value,
+        children: [...formData.value?.children, ..._data],
+      }
+    } else {
+      formData.value = {
+        ...formData.value,
+        children: copyDataByKey(formData.value?.children, _data, dt),
+      }
+    }
+    setSelection(_data?.[_data.length - 1] || 'root')
+    formDesigner.deleteData()
+  }
+}
+
+// 收藏为模板
+const onCollect = () => {
+  if (unref(isSelectedRoot)) return
+  collectData.value = selected.value || []
+  collectVisible.value = true
+}
+
+watch(
+  () => [keys['Ctrl+C'].value, keys['Meta+C'].value],
+  (v1, v2) => {
+    if (v1 || v2) {
+      onCopy()
+    }
+  },
+)
+
+watch(
+  () => [keys['Ctrl+X'].value, keys['Meta+X'].value],
+  (v1, v2) => {
+    if (v1 || v2) {
+      onShear()
+    }
+  },
+)
+
+watch(
+  () => [keys['Ctrl+V'].value, keys['Meta+V'].value],
+  (v1, v2) => {
+    if (v1 || v2) {
+      onPaste()
+    }
+  },
+)
+
+// 删除
+watch(
+  () => [keys['Space'].value, keys['Delete'].value],
+  (v1, v2) => {
+    if (v1 || v2) {
+      if (!delVisible.value) {
+        onDelete()
+      }
+    }
+  },
+)
+
+/**
+ * 保存数据
+ */
 const onSaveData = () => {
   const obj = {
     ...props.data,
@@ -73,26 +238,7 @@ const onSaveData = () => {
       code: JSON.stringify(unref(formData)),
     },
   }
-  // console.log('props.data',props.data)
   product.update(obj)
-}
-
-// 设置数据被选中
-const setSelection = (node: any) => {
-  if(['card-item', 'grid-item'].includes(node.type)) return
-  let result: any = {}
-  if (node === 'root') {
-    result = formData.value
-  } else {
-    if (Array.isArray(node)) {
-      result = node?.[0]
-    } else {
-      result = node
-    }
-  }
-  Object.assign(selected, result)
-  isShowConfig.value = selected?.key === result?.key
-  onSaveData()
 }
 
 const setModel = (_type: 'preview' | 'edit') => {
@@ -144,18 +290,22 @@ provide('FormDesigner', {
   setSelection,
   setModel,
   onSaveData,
+  onDelete,
+  onPaste,
+  onCopy,
+  onShear,
+  onCollect,
 })
 
 const onSave = () => {
   if (model.value !== 'edit') {
-    formRef?.value
-      .validateFields()
-      .then((values) => {
-        console.log('Received values of form: ', values)
+    return new Promise(async (resolve, inject) => {
+      const values = await formRef?.value.validateFields().catch((info) => {
+        inject(info)
       })
-      .catch((info) => {
-        console.log('Validate Failed:', info)
-      })
+      // console.log('Received values of form: ', values)
+      resolve(values)
+    })
   }
 }
 
@@ -191,7 +341,14 @@ onUnmounted(() => {
   onSaveData()
 })
 
-defineExpose({ onSave })
+// 校验
+const onValidate = () => {
+  spinning.value = true
+  errorKey.value = checkedConfig(unref(formData))
+  spinning.value = false
+}
+
+defineExpose({ onSave, validate: onValidate })
 </script>
 
 <style lang="less" scoped>
@@ -218,3 +375,4 @@ defineExpose({ onSave })
   }
 }
 </style>
+

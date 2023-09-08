@@ -1,6 +1,6 @@
 <template>
   <div>
-    <j-button size="small" @click="onClickItem">配置规则</j-button>
+    <j-button size="small" @click="onClickItem">配置规则{{ uid() }}</j-button>
     <Teleport to="#config-container">
       <div v-if="visible" class="box">
         <div class="header">
@@ -79,6 +79,7 @@
 import { ref, reactive, unref, watchEffect, watch } from 'vue'
 import { patternList } from './index'
 import EditorBtn from '../EditorBtn.vue'
+import { uid } from '@/components/FormDesigner/utils/uid';
 
 const props = defineProps({
   value: {
