@@ -89,5 +89,6 @@ const handleClick = (item: any) => {
 .menu {
    // width: 150px;
    position: absolute;
+   z-index: 999;
 }
 </style>

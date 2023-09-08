@@ -30,7 +30,13 @@
                 </j-button>
             </div>
             <div class="right">
-                <TreeDrag :list="addTree" @change-count="onCount" @change-tree="onTree" />
+                <TreeDrag 
+                    :list="addTree" 
+                    @change-count="onCount" 
+                    @change-tree="onTree" 
+                    :project-id="projectId"
+                    :checkedKey="menuState.checkedKey" 
+                />
             </div>
         </div>
     </div>
@@ -94,7 +100,7 @@ const onCheck = (e) => {
 const toRight = () => {
     // const arr = menuState.checkedKey
     const arr = leftList.value.filter(item => menuState.checkedKey.includes(item.id)).map(it => {
-        console.log('-----it', it)
+        // console.log('-----it', it)
         const id = randomString(16)
         const code = randomString(8)
         const type = it.others.type === providerEnum.HtmlPage ? 'html' : 'list'
@@ -109,7 +115,8 @@ const toRight = () => {
             icon: it.others.menu?.icon,
             parentId: undefined,
             options: {
-                pageId: it.id
+                pageId: it.id,
+                projectId: props.projectId
             }
         }
     })
@@ -127,7 +134,7 @@ const onTree = (data) => {
     emit('change', data)
 }
 
-watchEffect(()=>{
+watchEffect(() => {
     leftList.value = props.projectData
 })
 
