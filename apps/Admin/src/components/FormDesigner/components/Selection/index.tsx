@@ -73,7 +73,8 @@ const Selection = defineComponent({
     const _hasDrag = computed(() => { return props.hasDrag })
 
     const _error = computed(() => {
-      return map(designer.errorKey?.value, 'key').includes(props.data?.key)
+      const arr = map(designer.errorKey?.value, 'key')
+      return arr.includes(props.data?.key)
     })
 
     watchEffect(() => {

@@ -120,7 +120,7 @@ const isSelectedRoot = computed(() => {
 
 // 设置数据被选中
 const setSelection = (node: any) => {
-  if (['card-item', 'grid-item'].includes(node.type)) return
+  if (['card-item'].includes(node.type)) return
   if (_shift.value || _ctrl.value) {
     if (node === 'root') return
     selected.value.push(node)
@@ -191,17 +191,23 @@ const onShear = debounce(() => {
 const onPaste = () => {
   if (!selected.value?.length) return
   const _data = formDesigner.getCopyData()
+  const list = (_data || []).map((item) => {
+    return {
+      ...item,
+      key: item.key + '_copy',
+    }
+  })
   if (_data.length && selected.value?.length) {
     const dt = selected.value?.[selected.value.length - 1]
     if (dt?.key === 'root') {
       formData.value = {
         ...formData.value,
-        children: [...formData.value?.children, ..._data],
+        children: [...formData.value?.children, ...list],
       }
     } else {
       formData.value = {
         ...formData.value,
-        children: copyDataByKey(formData.value?.children, _data, dt),
+        children: copyDataByKey(formData.value?.children, list, dt),
       }
     }
     setSelection(_data?.[_data.length - 1] || 'root')

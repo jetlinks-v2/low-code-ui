@@ -1,5 +1,3 @@
-import { updateData } from "@/components/FormDesigner/utils/utils"
-
 export const getConfigList = (_type: string) => {
     const arr: any[] = []
     if (['root'].includes(unref(_type))) {
@@ -9,7 +7,7 @@ export const getConfigList = (_type: string) => {
         })
     }
 
-    if (!['root'].includes(unref(_type))) {
+    if (!['root', 'grid-item'].includes(unref(_type))) {
         arr.push({
             key: 'Base',
             header: '基础信息',
@@ -58,7 +56,7 @@ export const getConfigList = (_type: string) => {
     })
   }
 
-    if (unref(_type) === 'grid') {
+    if (unref(_type) === 'grid' || unref(_type) === 'grid-item') {
         arr.push({
             key: 'Grid',
             header: '网格配置',
