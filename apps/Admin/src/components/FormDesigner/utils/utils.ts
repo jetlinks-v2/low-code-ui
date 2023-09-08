@@ -20,36 +20,34 @@ export const generateOptions = (len: number) => {
 }
 
 const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-number', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo']
-// 容器组件
-const layout = ['card', 'grid', 'tabs', 'collapse', 'space']
 
 const checkedConfigItem = (node: ISchema) => {
     const _type = node.type || 'root'
     if (_type === 'root') {
-        return ''
+        return false
     } else {
         if (['text'].includes(_type) && !(node?.componentProps?.value && node?.formItemProps?.name)) {
             return node?.key
         }
         if (arr.includes(_type)) {
-            if (!(node?.formItemProps?.label && node?.formItemProps?.name)) {
+            if (!(node?.formItemProps?.name && node?.formItemProps?.label)) {
                 return node?.key
             } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
                 return node?.key
             }
         }
-        if('input-number' === _type && !(node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined && node?.componentProps?.precision !== undefined)) {
+        if ('input-number' === _type && !(node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined && node?.componentProps?.precision !== undefined)) {
             return node?.key
         }
-        if (['select', 'tree-select', 'select-card'].includes(_type)) {
-            // 数据源
-            if(node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
-                return node?.key
-            }
-            if(node?.componentProps?.source?.type === 'end' && !(node?.componentProps.source?.commandId && node?.componentProps.source?.functionId && node?.componentProps.source?.label && node?.componentProps.source?.value)) {
-                return node?.key
-            }
-        }
+        // if (['select', 'tree-select', 'select-card'].includes(_type)) {
+        //     // 数据源
+        //     if (node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
+        //         return node?.key
+        //     }
+        //     if (node?.componentProps?.source?.type === 'end' && !(node?.componentProps.source?.commandId && node?.componentProps.source?.functionId && node?.componentProps.source?.label && node?.componentProps.source?.value)) {
+        //         return node?.key
+        //     }
+        // }
         if ('upload' === _type && !(node?.componentProps?.accept && node?.componentProps?.maxCount && node?.componentProps?.fileSize)) {
             // 个数和单位
             return node?.key
@@ -61,7 +59,7 @@ const checkedConfigItem = (node: ISchema) => {
             return node?.key
         }
     }
-    return ''
+    return false
 }
 
 // 校验配置项必填
@@ -69,15 +67,14 @@ export const checkedConfig = (node: ISchema) => {
     const _data: any = checkedConfigItem(node);
     let _rules: any[] = []
     if (_data) {
-        _rules = [..._rules, _data]
+        _rules.push(_data)
     }
     if (node.children && node.children?.length) {
         node?.children.map(item => {
-            const _item = checkedConfig(item)
-            _rules = [..._rules, ..._item]
+            const arr = checkedConfig(item)
+            _rules = [..._rules, ...arr]
         })
     }
-
     return _rules
 }
 
@@ -220,4 +217,49 @@ export const queryOptions = async (source: any, id: string) => {
         }
     }
     return []
+}
+
+// 删除数据并返回数据的后一个数据
+export const deleteDataByKey = (arr: any[], _item: any) => {
+    let _data: any = undefined
+    const _arr = arr.filter((item, index) => {
+        if (item?.key === _item?.key) {
+            if (arr?.[index - 1]) {
+                _data = arr[index - 1]
+            }
+            return false
+        } else {
+            if (item.children && item.children?.length) {
+                const obj = deleteDataByKey(item.children, _item)
+                item.children = obj?.arr
+                _data = obj?.data
+            }
+        }
+        return true
+    })
+    return {
+        arr: _arr,
+        data: _data
+    }
+}
+
+// 插入数据，主要是为了粘贴
+export const copyDataByKey = (arr: any[], newData: any[], _item: any) => {
+    const list = newData.map(item => {
+        return {
+            ...item,
+            key: item.key + '_copy'
+        }
+    })
+    const _index = arr.findIndex(item => item.key === _item.key)
+    if (_index !== -1) {
+        return arr.map(item => {
+            return {
+                ...item,
+                children: item?.children?.length ? copyDataByKey(item.children, list, _item) : []
+            }
+        })
+    } else {
+        return [...arr.slice(0, _index), ...list, ...arr.slice(_index, arr?.length)]
+    }
 }

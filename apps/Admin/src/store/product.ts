@@ -237,7 +237,8 @@ const findParent=(data, target, result) =>{
         ...extra,
         title: extra.name,
         type: 'project',
-        children: children
+        children: children,
+        others: result?.modules?.[0]?.others
       })
       handleDataMap(treeData);
       data.value = treeData
