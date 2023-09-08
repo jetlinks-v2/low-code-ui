@@ -20,7 +20,7 @@ const props = defineProps({
 
 const engineStore = useEngine()
 const productStore = useProduct()
-const {files, activeFile} = storeToRefs(engineStore)
+const { files, activeFile } = storeToRefs(engineStore)
 const store = new ReplStore(files.value[activeFile.value]?.configuration?.code)
 const vueMode = ref(true)
 store.init()
@@ -47,7 +47,7 @@ const handleDbClickViewName = () => {
 
 const activeOper = ref('')
 const menuListRef = ref()
-const menuFormData = ref({pageName: '', main: true, name: '', icon: ''})
+const menuFormData = ref({ pageName: '', main: true, name: '', icon: '' })
 const menuChangeValue = ref()
 const errors = ref([] as any)
 const handleOperClick = (type: OperType) => {
@@ -115,11 +115,32 @@ const updateMenuFormData = (val) => {
   })
 }
 
+const errorValidate = () => {
+  return new Promise((resolve, reject) => {
+    const err = [];
+    store.state.errors.forEach((error: any) => {
+      err.push({
+        massage: error.message ?? error
+      })
+    })
+    errors.value.forEach((error: any) => {
+      err.push({
+        massage: error.errors[0]
+      })
+    })
+    resolve(err)
+  })
+}
+
 onMounted(() => {
   menuFormData.value = {
     ...props.data.others.menu,
     pageName: props.data.pageName || props.data?.title || '',
   }
+})
+
+defineExpose({
+  vaildate: errorValidate
 })
 </script>
 
@@ -148,7 +169,7 @@ onMounted(() => {
       </template>
       <template #console>
         <EditorContainer title="运行日志">
-          <Console :error="store.state.errors[0]"/>
+          <Console :error="store.state.errors[0]" />
         </EditorContainer>
       </template>
     </SplitPane>
@@ -171,12 +192,12 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="drawer-content" v-if="drawerVisible">
+    <div class="drawer-content" v-show="drawerVisible">
       <div class="drawer-header">
         <div class="drawer-title" @dblclick="handleDbClickViewName">
           {{ drawerTitle }}
           <j-button
-            v-show="activeOper === OperType.View"
+            v-if="activeOper === OperType.View"
             type="primary"
             size="small"
             @click.stop="runCode"
@@ -188,9 +209,9 @@ onMounted(() => {
         </div>
       </div>
       <div class="drawer-body">
-        <Preview v-if="activeOper === OperType.View" ref="previewRef"/>
+        <Preview v-if="activeOper === OperType.View" ref="previewRef" />
         <MenuList
-          v-if="activeOper === OperType.Menu"
+          v-else-if="activeOper === OperType.Menu"
           ref="menuListRef"
           :form-data="menuFormData"
           @update:form="updateMenuFormData"
@@ -205,11 +226,9 @@ onMounted(() => {
   height: calc(100vh - 48px);
   display: flex;
   position: relative;
-
   .split-pane {
     width: 98%;
   }
-
   .right-oper {
     width: 2%;
 
@@ -227,11 +246,9 @@ onMounted(() => {
         padding-bottom: 18px;
         font-size: 17px;
         user-select: none;
-
         &:hover {
           color: var(--ant-primary-color);
         }
-
         &.active {
           color: var(--ant-primary-color);
         }
@@ -239,7 +256,6 @@ onMounted(() => {
     }
   }
 }
-
 .drawer-content {
   position: absolute;
   right: 2%;
@@ -249,7 +265,6 @@ onMounted(() => {
   margin: 0;
   background-color: #fff;
   overflow-y: auto;
-
   .drawer-header {
     position: relative;
     padding: 16px 24px;
@@ -257,7 +272,6 @@ onMounted(() => {
     background: #fff;
     border-bottom: 1px solid #f0f0f0;
     border-radius: 2px 2px 0 0;
-
     .drawer-title {
       cursor: pointer;
       margin: 0;
@@ -268,7 +282,6 @@ onMounted(() => {
       user-select: none;
     }
   }
-
   .drawer-body {
     padding: 24px;
     font-size: 14px;
