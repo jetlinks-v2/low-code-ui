@@ -78,7 +78,7 @@ function createSandBox() {
   }
   const sandBoxSrc = srcdoc.replace(
     /<!--IMPORT_MAP-->/,
-    JSON.stringify(importMap),
+    JSON.stringify(importMap)
   )
   sandBox.srcdoc = sandBoxSrc
   preview.value.appendChild(sandBox)
