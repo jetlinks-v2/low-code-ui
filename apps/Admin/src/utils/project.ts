@@ -2,13 +2,14 @@ import { providerEnum } from  '@/components/ProJect/index'
 import { cloneDeep, omit } from "lodash-es";
 export const Integrate = (data: any[]) => {
   const cloneData = cloneDeep(data)
-  const { children, ...project } = cloneData[0]
+  const { children, others, ...project } = cloneData[0]
 
   const arr = handleChildren([{
     id: project.id,
     name: project.title,
     children: children,
     type: providerEnum.Module,
+    others
   }])
 
   return {
