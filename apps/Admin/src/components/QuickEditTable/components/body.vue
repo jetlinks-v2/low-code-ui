@@ -27,7 +27,16 @@
 
             <div v-else class="body-cell-box">
               <template v-if="slots[b.dataIndex]">
-                <slot :name="b.dataIndex" :record="a" :index="a.index" :column="b">
+                <j-popover
+                  v-if="errorMap?.[`${b.dataIndex}__${a._quick_id}`]"
+                  visible
+                  :content="errorMap?.[`${b.dataIndex}__${a._quick_id}`]"
+                  :getPopupContainer="getPopupContainer"
+                >
+                  <div :class="{'form-error': errorMap?.[`${b.dataIndex}__${a._quick_id}`] }">
+                  </div>
+                </j-popover>
+                <slot :name="b.dataIndex" :record="a" :index="a.index" :column="b" :valueChange="(v) => { valueChange(v, b.dataIndex, a) }">
                   {{ a[b.dataIndex] }}
                 </slot>
               </template>
@@ -36,8 +45,8 @@
                   {{ a[b.dataIndex] }}
                 </j-ellipsis>
                 <span v-else>
-                  {{ a[b.dataIndex] }}
-                </span>
+                    {{ a[b.dataIndex] }}
+                  </span>
               </template>
             </div>
           </div>
@@ -49,8 +58,8 @@
 
 <script setup name="QuickTableBody">
 import { BodyProps, SCROLL_LEFT } from "../data";
-import { dataAddID } from "../util";
-import { useSlots } from 'vue'
+import { dataAddID, useValidate } from "../util";
+import { useSlots, defineExpose } from 'vue'
 
 const props = defineProps({
   ...BodyProps()
@@ -65,7 +74,13 @@ const maxLen = ref(10)
 const updateList = ref([])
 const left = inject(SCROLL_LEFT)
 
+const { errorMap, validate, createValidate, validates } = useValidate(props.data)
+
 const slots = useSlots()
+
+const isValidate = computed(() => {
+  return props.validate !== false
+})
 
 const bodyHeight = computed(() => {
   const len = myData.value.length
@@ -103,12 +118,45 @@ const maxLength = () => {
   }
 }
 
+const valueChange = (e, dataIndex, record) => {
+
+  if (isValidate.value) {
+    validate(dataIndex, e, record)
+  }
+}
+
+const getPopupContainer = (e) => {
+  return bodyRef.value || e.parentNode
+}
+
+watch(() => JSON.stringify(props.columns),  () => {
+  createValidate(props.columns)
+}, { immediate: true })
+
 maxLength()
 
-watch(() => JSON.stringify(props.data), () => {
+watch(() => JSON.stringify(props.data), (newValue, oldValue) => {
   myData.value = dataAddID(props.data, cellHeight)
   update()
+  // console.log(newValue)
+  // console.log(oldValue)
+  // console.log(isValidate.value)
+  // console.log(JSON.parse(newValue || '[]').length)
+  // console.log(JSON.parse(oldValue || '[]').length)
 }, { immediate: true })
+
+defineExpose({
+  validates: () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const v = await validates()
+        resolve(v)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+})
 
 </script>
 
@@ -148,6 +196,12 @@ watch(() => JSON.stringify(props.data), () => {
         }
       }
     }
+  }
+
+  .form-error {
+    width: 100%;
+    position: absolute;
+    height: 100%;
   }
 }
 </style>

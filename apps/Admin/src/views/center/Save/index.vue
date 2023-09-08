@@ -28,7 +28,7 @@
 
 <script setup lang='ts' name="Save">
 import { regular } from '@jetlinks/utils';
-import { _validateProject, addProject, editProject } from '@/api/project'
+import { queryProject, addProject, editProject } from '@/api/project'
 import { onlyMessage } from '@/utils/comm';
 import { useRequest } from '@jetlinks/hooks'
 
@@ -79,7 +79,7 @@ const handleSave = async () => {
 
 const vailId = async (_: Record<string, any>, value: string) => {
     if (!props?.data?.id && value) {
-        const resp = await _validateProject({
+        const resp = await queryProject({
             "terms": [
                 {
                     "type": "or",
@@ -89,7 +89,7 @@ const vailId = async (_: Record<string, any>, value: string) => {
                 }
             ]
         });
-        if (resp.status === 200 && resp.result) {
+        if (resp.status === 200 && resp.result.data.length!==0) {
             return Promise.reject('标识需唯一');
         } else {
             return Promise.resolve();

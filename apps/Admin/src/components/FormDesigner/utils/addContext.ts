@@ -211,7 +211,7 @@ export const addContext = (node: any, parent: any, fn?: any) => {
                 type: node.type + '-item',
                 children: [],
                 componentProps: {
-                    title: '操作',
+                    name: '操作',
                     width: 60,
                 },
                 formItemProps: {
