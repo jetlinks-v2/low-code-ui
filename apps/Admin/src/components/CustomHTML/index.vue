@@ -82,6 +82,10 @@ const runCode = () => {
 const handleVaild = () => {
   if (errors.value.length > 0) {
     onlyMessage(errors.value[0].errors[0], 'error')
+  } else if(!store.state.activeFile.code){
+    onlyMessage('页面代码为空', 'error')
+  } else if(store.state.errors?.length > 0) {
+    onlyMessage('运行日志报错', 'error');
   } else {
     onlyMessage('校验成功', 'success')
   }
@@ -115,21 +119,22 @@ const updateMenuFormData = (val) => {
   })
 }
 
-const errorValidate = () => {
-  return new Promise((resolve, reject) => {
-    const err = [];
-    store.state.errors.forEach((error: any) => {
-      err.push({
-        massage: error.message ?? error
-      })
+const errorValidate = async () => {
+  const err = [];
+  store.state.errors.forEach((error: any) => {
+    err.push({
+      massage: error.message ?? error
     })
-    errors.value.forEach((error: any) => {
-      err.push({
-        massage: error.errors[0]
-      })
-    })
-    resolve(err)
   })
+  errors.value.forEach((error: any) => {
+    err.push({
+      massage: error.errors[0]
+    })
+  })
+  if (!store.state.activeFile.code) {
+    err.push({massage: '页面代码为空'})
+  }
+  return err;
 }
 
 onMounted(() => {
