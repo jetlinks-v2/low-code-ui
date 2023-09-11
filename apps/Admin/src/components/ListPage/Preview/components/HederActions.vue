@@ -4,6 +4,7 @@
       <div v-for="item in props.headerActions" :key="item.key">
         <PermissionButton
           type="primary"
+          :class="className(item.style)"
           v-bind:="handleFunction(item.permissionProps, item, item)"
           :danger="item.command === 'Delete'"
           :popConfirm="handleFunction(item.permissionProps)?.popConfirm"
@@ -49,11 +50,20 @@
 </template>
 <script setup lang="ts">
 import { isFunction, isObject } from 'lodash-es'
+import { PropType } from 'vue';
+import { extractCssClass, insertCustomCssToHead } from '@/components/FormDesigner/utils/utils';
+
 const props = defineProps({
   headerActions: {
-    type: Array,
+    type: Array as PropType<Record<string, any>[]>,
     default: () => [],
   },
+})
+
+const className = computed(() => {
+  return (val: string) => {
+    return extractCssClass(val)
+  }
 })
 const handleFunction = (item: any, data?: any) => {
   if (isFunction(item)) {
@@ -63,6 +73,13 @@ const handleFunction = (item: any, data?: any) => {
   }
   return undefined
 }
+
+
+watchEffect(() => {
+  props.headerActions.forEach((item) => {
+    insertCustomCssToHead(item.style, item.key)
+  })
+})
 </script>
 <style lang="less" scoped>
 .headerBtn {

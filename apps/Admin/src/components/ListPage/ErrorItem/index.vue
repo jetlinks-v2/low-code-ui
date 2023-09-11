@@ -31,6 +31,7 @@ onMounted(() => {
 <style scoped lang="less">
   .error-item {
     width: 100%;
+    height: 100%;
     .error-border {
       border: 1px solid red;
     }

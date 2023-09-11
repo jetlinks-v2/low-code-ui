@@ -1,70 +1,72 @@
 <template>
-  <div class="list-page">
-    <Preview
-      :show="showPreview"
-      :id="props.data.id"
-      :data="props.data?.configuration?.code"
-      @back="() => (showPreview = false)"
-    />
-    <DataBind
-      ref="dataBindRef"
-      v-model:open="visibles.GuideVisible"
-      :id="props.data.id"
-      @valid="validate"
-    />
-    <ListSkeleton
-      :visibles="visibles"
-      @visibles="handleVisible"
-      @goPreview="goPreview"
-      :dataBindRef="dataBindRef"
-      :menuRef="menuRef"
-      :errorCount="errorCount"
-      :configDone="configDone"
-    />
-    <OperationColumns
-      v-model:open="visibles.OperationBtnsVisible"
-      type="btns"
-      v-model:columnsTree="buttonsConfig"
-      ref="btnTreeRef"
-    />
-    <OperationColumns
-      v-model:open="visibles.OperationColumnsVisible"
-      v-model:columnsTree="actionsConfig"
-      type="columns"
-      ref="columnsRef"
-    />
-    <FilterModule
-      v-model:open="visibles.FilterModuleVisible"
-      v-model:dataSource="searchData"
-      :id="props.data.id"
-      ref="filterModuleRef"
-    />
-    <ListData
-      v-model:open="visibles.ListDataVisible"
-      :id="props.data.id"
-      v-model:dataSource="dataSource"
-      ref="listDataRef"
-    />
-    <ListForm
-      v-model:open="visibles.ListFormVisible"
-      v-model:listFormInfo="listFormInfo"
-      v-model:state="showType"
-      :id="props.data.id"
-      ref="listFormRef"
-    />
-    <PagingConfig
-      v-model:open="visibles.PagingConfigVisible"
-      v-model:pagingData="pagingData"
-      :id="props.data.id"
-      ref="pagingConfigRef"
-    />
-    <MenuConfig
-      v-model:open="visibles.MenuConfigVisible"
-      v-model:menuConfig="menuConfig"
-      :data="props.data"
-      ref="menuConfigRef"
-    />
-  </div>
+  <j-spin :spinning="spinning">
+    <div class="list-page">
+      <Preview
+        :show="showPreview"
+        :id="props.data.id"
+        :data="props.data?.configuration?.code"
+        @back="() => (showPreview = false)"
+      />
+      <DataBind
+        ref="dataBindRef"
+        v-model:open="visibles.GuideVisible"
+        :id="props.data.id"
+        @valid="validate"
+      />
+      <ListSkeleton
+        :visibles="visibles"
+        @visibles="handleVisible"
+        @goPreview="goPreview"
+        :dataBindRef="dataBindRef"
+        :menuRef="menuRef"
+        :errorCount="errorCount"
+        :configDone="configDone"
+      />
+      <OperationColumns
+        v-model:open="visibles.OperationBtnsVisible"
+        type="btns"
+        v-model:columnsTree="buttonsConfig"
+        ref="btnTreeRef"
+      />
+      <OperationColumns
+        v-model:open="visibles.OperationColumnsVisible"
+        v-model:columnsTree="actionsConfig"
+        type="columns"
+        ref="columnsRef"
+      />
+      <FilterModule
+        v-model:open="visibles.FilterModuleVisible"
+        v-model:dataSource="searchData"
+        :id="props.data.id"
+        ref="filterModuleRef"
+      />
+      <ListData
+        v-model:open="visibles.ListDataVisible"
+        :id="props.data.id"
+        v-model:dataSource="dataSource"
+        ref="listDataRef"
+      />
+      <ListForm
+        v-model:open="visibles.ListFormVisible"
+        v-model:listFormInfo="listFormInfo"
+        v-model:state="showType"
+        :id="props.data.id"
+        ref="listFormRef"
+      />
+      <PagingConfig
+        v-model:open="visibles.PagingConfigVisible"
+        v-model:pagingData="pagingData"
+        :id="props.data.id"
+        ref="pagingConfigRef"
+      />
+      <MenuConfig
+        v-model:open="visibles.MenuConfigVisible"
+        v-model:menuConfig="menuConfig"
+        :data="props.data"
+        ref="menuConfigRef"
+      />
+    </div>
+  </j-spin>
 </template>
 
 <script setup lang="ts" name="ListPage">
@@ -77,10 +79,20 @@ import MenuConfig from './MenuConfig/index.vue'
 import ListSkeleton from './ListSkeleton/index.vue'
 import OperationColumns from './Operation/index.vue'
 import Preview from './Preview/index.vue'
-import { DATA_BIND, BASE_INFO, MENU_CONFIG, SHOW_TYPE_KEY, LIST_PAGE_DATA_KEY, LIST_FORM_INFO, DATA_SOURCE } from './keys'
+import {
+  DATA_BIND,
+  BASE_INFO,
+  MENU_CONFIG,
+  SHOW_TYPE_KEY,
+  LIST_PAGE_DATA_KEY,
+  LIST_FORM_INFO,
+  DATA_SOURCE,
+  showColumnsKey,
+} from './keys'
 import { useProduct } from '@/store'
-import { debounce } from 'lodash-es'
+import { omit, debounce } from 'lodash-es'
 
+const spinning = ref(false)
 const props = defineProps({
   data: {
     type: Object,
@@ -110,6 +122,7 @@ const goPreview = () => {
   showPreview.value = true
 }
 
+const showColumns = ref(true)
 const buttonsConfig = ref<any[]>([])
 const actionsConfig = ref<any[]>([])
 const dataSource = ref<any[]>([])
@@ -154,6 +167,7 @@ const listPageData = computed(() => {
     dataBind,
     listFormInfo,
     showType,
+    showColumns: showColumns.value,
   }
 })
 /**
@@ -168,6 +182,7 @@ const listFormRef = ref()
 const listDataRef = ref()
 const menuConfigRef = ref()
 const validate = async () => {
+  spinning.value = true
   const promiseArr = [
     btnTreeRef.value?.valid(),
     columnsRef.value?.valid(),
@@ -185,6 +200,9 @@ const validate = async () => {
       })
       .catch((err) => {
         reject(err)
+      })
+      .finally(() => {
+        spinning.value = false
       })
   })
 }
@@ -208,16 +226,16 @@ const configDone = computed(() => {
     filterModule: searchData.value?.length,
     listData: dataSource.value?.length,
     pagination: pagingData.value?.length,
-    ListForm: listFormInfo
+    ListForm: listFormInfo,
   }
 })
 
 const dataBind = reactive({
   data: {
-    function: undefined,
-    command: undefined,
+    function: null,
+    command: null,
   },
-  functionInfo: undefined,
+  functionInfo: null,
 })
 
 provide(DATA_BIND, dataBind)
@@ -227,6 +245,7 @@ provide(MENU_CONFIG, menuConfig)
 provide(LIST_PAGE_DATA_KEY, listPageData)
 provide(LIST_FORM_INFO, listFormInfo)
 provide(DATA_SOURCE, dataSource)
+provide(showColumnsKey, showColumns)
 // watch(
 //   () => buttonsConfig.value,
 //   () => {
@@ -252,19 +271,35 @@ provide(DATA_SOURCE, dataSource)
 //   configurationStore.setALLlistDataInfo('dataBind', dataBind, props.data.id)
 // })
 
+//树形结构转换成数组
+const arrFlat = (arr: any[]) => {
+  const arr_: any[] = []
+  function flat(arr: any[]) {
+    arr.forEach((item) => {
+      arr_.push({ id: item.key, name: item.title })
+      if (item.children) {
+        flat(item.children)
+      }
+    })
+  }
+  flat(arr)
+  return arr_
+}
+
 onMounted(() => {
   visibles.GuideVisible = !props.data.configuration?.code
   const initData = JSON.parse(props.data.configuration?.code || '{}')
-  if(initData) {
+  if (initData) {
     Object.assign(dataBind, initData?.dataBind)
     Object.assign(showType, initData?.showType)
-    Object.assign(menuConfig, initData?.menu)
+    Object.assign(menuConfig, omit(initData?.menu, 'buttons'))
     Object.assign(listFormInfo, initData?.listFormInfo)
     pagingData.value = initData?.pagingData || pagingData.value
     buttonsConfig.value = initData?.addButton || []
     actionsConfig.value = initData?.actionsButton || []
     searchData.value = initData?.searchData || []
     dataSource.value = initData?.dataSource || []
+    showColumns.value = initData?.showColumns
   }
   setTimeout(() => {
     watch(
@@ -278,8 +313,12 @@ onMounted(() => {
           },
           others: {
             ...props?.data?.others,
-            menu: menuConfig,
-            userList: [...actionsConfig.value.filter(item => item.pages && item.pages !== '')?.map(item => item.pages)]
+            menu: { ...menuConfig, buttons: [...arrFlat(buttonsConfig.value), ...arrFlat(actionsConfig.value)] },
+            userList: [
+              ...actionsConfig.value
+                .filter((item) => item.pages && item.pages !== '')
+                ?.map((item) => item.pages),
+            ],
           },
         }
         onSave(record)
@@ -310,9 +349,8 @@ const onSave = debounce((record) => {
 }, 1000)
 
 defineExpose({
-  validate
+  validate,
 })
-
 </script>
 
 <style scoped lang="less">
