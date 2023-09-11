@@ -17,8 +17,6 @@ const Canvas = defineComponent({
     const product = useProduct()
 
     const keys = useMagicKeys()
-    const _shift = keys['Shift']
-    const _ctrl = keys['Ctrl']
 
     const cssClassList = ref<string[]>([])
 
@@ -30,22 +28,15 @@ const Canvas = defineComponent({
       return unref(designer?.model) === 'edit'
     })
 
-    watch(
-      () => _shift.value,
+    watch( // keys['Ctrl']?.value, keys['Meta']?.value, 
+      () => keys['Shift']?.value,
       (v1) => {
-        designer._shift = v1
+        designer._ctrl.value = v1
       },
     )
 
     watch(
-      () => _ctrl.value,
-      (v1) => {
-        designer._ctrl = v1
-      },
-    )
-
-    watch(
-      () => [keys['Ctrl+C'].value, keys['Meta+C'].value],
+      () => [keys['Ctrl+C']?.value, keys['Meta+C']?.value],
       ([v1, v2]) => {
         if ((v1 || v2) && isEditModel.value) {
           designer.onCopy()
@@ -54,7 +45,7 @@ const Canvas = defineComponent({
     )
 
     watch(
-      () => [keys['Ctrl+X'].value, keys['Meta+X'].value],
+      () => [keys['Ctrl+X']?.value, keys['Meta+X']?.value],
       ([v1, v2]) => {
         if ((v1 || v2) && isEditModel.value) {
           designer.onShear()
@@ -63,7 +54,7 @@ const Canvas = defineComponent({
     )
 
     watch(
-      () => [keys['Ctrl+V'].value, keys['Meta+V'].value],
+      () => [keys['Ctrl+V']?.value, keys['Meta+V']?.value],
       ([v1, v2]) => {
         if ((v1 || v2) && isEditModel.value) {
           designer.onPaste()
@@ -167,11 +158,11 @@ const Canvas = defineComponent({
       return (
         <div class={['canvas-box', unref(isEditModel) && 'editModel']}>
           <div class="container">
-            <Scrollbar height={'100%'}>
+            {/* <Scrollbar height={'100%'}> */}
               <div class="subject">
                 {unref(isEditModel) ? renderChildren() : renderContent()}
               </div>
-            </Scrollbar>
+            {/* </Scrollbar> */}
           </div>
           {unref(designer.collectVisible) && unref(isEditModel) && <CollectModal
             onSave={(name: string) => {

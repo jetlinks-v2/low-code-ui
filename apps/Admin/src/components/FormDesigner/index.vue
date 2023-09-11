@@ -104,7 +104,6 @@ const delVisible = ref<boolean>(false)
 const spinning = ref<boolean>(false)
 const checkVisible = ref<boolean>(false)
 const editData = ref<string>()
-const _shift = ref<boolean>(false)
 const _ctrl = ref<boolean>(false)
 const focus = ref<boolean>(false)
 
@@ -118,7 +117,7 @@ const isSelectedRoot = computed(() => {
 // 设置数据被选中
 const setSelection = (node: any) => {
   if (['card-item'].includes(node.type)) return
-  if ((_shift.value || _ctrl.value) && model.value === 'edit') {
+  if (_ctrl.value && model.value === 'edit') {
     if (node === 'root') return
     selected.value.push(node)
   } else {
@@ -145,11 +144,7 @@ const onDelete = debounce(() => {
     onOk() {
       delVisible.value = false
       // 删除数据
-      const _data: any = selected.value
-        .map((item) => {
-          return deleteDataByKey(formData.value.children, item)
-        })
-        .pop()
+      const _data = deleteDataByKey(formData.value.children, selected.value)
       formData.value = {
         ...formData.value,
         children: _data?.arr || [],
@@ -172,11 +167,7 @@ const onCopy = () => {
 const onShear = debounce(() => {
   if (unref(isSelectedRoot)) return
   formDesigner.setCopyData(selected.value || [])
-  const _data: any = selected.value
-    .map((item) => {
-      return deleteDataByKey(formData.value.children, item)
-    })
-    .pop()
+  const _data: any = deleteDataByKey(formData.value.children, selected.value)
   formData.value = {
     ...formData.value,
     children: _data?.arr || [],
@@ -194,7 +185,7 @@ const onPaste = () => {
       key: item.key + '_copy',
     }
   })
-  if (_data.length && selected.value?.length) {
+  if (list.length && selected.value?.length) {
     const dt = selected.value?.[selected.value.length - 1]
     if (dt?.key === 'root') {
       formData.value = {
@@ -207,7 +198,7 @@ const onPaste = () => {
         children: copyDataByKey(formData.value?.children, list, dt),
       }
     }
-    setSelection(_data?.[_data.length - 1] || 'root')
+    setSelection(list?.[list.length - 1] || 'root')
     formDesigner.deleteData()
   }
 }
@@ -280,7 +271,6 @@ provide('FormDesigner', {
   collectVisible,
   collectData,
   delVisible,
-  _shift,
   _ctrl,
   focus,
   setSelection,
