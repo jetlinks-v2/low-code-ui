@@ -88,7 +88,7 @@ onKeyStroke('Enter', async () => {
 
 onMounted(()=>{
     inputRef.value?.focus()
-    // console.log('inputRef',inputRef.value)
+    // console.log('inputRef',props)
     window.navigator.clipboard.writeText('')
 })
 

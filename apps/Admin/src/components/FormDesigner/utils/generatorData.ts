@@ -56,16 +56,16 @@ const handleProps = (node: any) => {
             break
         case 'select-card':
             result.options = generateOptions(3)
-            result.mode = ''
+            result.mode = undefined
             break
         case 'select':
             result.options = generateOptions(3)
-            result.mode = ''
+            result.mode = undefined
             break
         case 'tree-select':
             result.treeData = generateOptions(3)
             result.showSearch = false
-            result.mode = ''
+            result.mode = undefined
             result.treeCheckStrictly = false
             break
         case 'upload':

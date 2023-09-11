@@ -2,7 +2,7 @@ import { uid } from "./uid"
 import componentMap from "./componentMap"
 import { ISchema } from "../typings"
 import { queryDictionaryData, queryRuntime } from "@/api/form"
-import { isObject } from "lodash-es"
+import { isObject, map } from "lodash-es"
 
 export const checkIsField = (node: any) => node?.type && (componentMap?.[node?.type]) || ['table'].includes(node?.type)
 
@@ -244,17 +244,18 @@ export const queryOptions = async (source: any, id: string) => {
 }
 
 // 删除数据并返回数据的后一个数据
-export const deleteDataByKey = (arr: any[], _item: any) => {
+export const deleteDataByKey = (arr: any[], _items: any[]) => {
+    const _keys = map(_items, 'key')
     let _data: any = undefined
     const _arr = arr.filter((item, index) => {
-        if (item?.key === _item?.key) {
+        if (_keys.includes(item?.key)) {
             if (arr?.[index - 1]) {
                 _data = arr[index - 1]
             }
             return false
         } else {
             if (item.children && item.children?.length) {
-                const obj = deleteDataByKey(item.children, _item)
+                const obj = deleteDataByKey(item.children, _items)
                 item.children = obj?.arr
                 _data = obj?.data
             }

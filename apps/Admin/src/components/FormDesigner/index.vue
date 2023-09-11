@@ -58,10 +58,8 @@ import {
 import { ISchema } from './typings'
 import { omit, debounce } from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
-import { useMagicKeys } from '@vueuse/core'
 import { Modal } from 'jetlinks-ui-components'
 import { deleteDataByKey, copyDataByKey, checkedConfig } from './utils/utils'
-import { resolve } from 'dns'
 
 const initData = {
   type: 'root',
@@ -100,16 +98,14 @@ const formRef = ref<any>()
 const configRef = ref<any>()
 const refList = ref<any>({})
 
-const keys = useMagicKeys()
-const _shift = keys['Shift']
-const _ctrl = keys['Ctrl']
-
 const collectVisible = ref<boolean>(false)
 const collectData = ref<any[]>([])
 const delVisible = ref<boolean>(false)
 const spinning = ref<boolean>(false)
 const checkVisible = ref<boolean>(false)
 const editData = ref<string>()
+const _ctrl = ref<boolean>(false)
+const focus = ref<boolean>(false)
 
 const product = useProduct()
 const formDesigner = useFormDesigner()
@@ -121,7 +117,7 @@ const isSelectedRoot = computed(() => {
 // 设置数据被选中
 const setSelection = (node: any) => {
   if (['card-item'].includes(node.type)) return
-  if (_shift.value || _ctrl.value) {
+  if (_ctrl.value && model.value === 'edit') {
     if (node === 'root') return
     selected.value.push(node)
   } else {
@@ -148,11 +144,7 @@ const onDelete = debounce(() => {
     onOk() {
       delVisible.value = false
       // 删除数据
-      const _data: any = selected.value
-        .map((item) => {
-          return deleteDataByKey(formData.value.children, item)
-        })
-        .pop()
+      const _data = deleteDataByKey(formData.value.children, selected.value)
       formData.value = {
         ...formData.value,
         children: _data?.arr || [],
@@ -175,11 +167,7 @@ const onCopy = () => {
 const onShear = debounce(() => {
   if (unref(isSelectedRoot)) return
   formDesigner.setCopyData(selected.value || [])
-  const _data: any = selected.value
-    .map((item) => {
-      return deleteDataByKey(formData.value.children, item)
-    })
-    .pop()
+  const _data: any = deleteDataByKey(formData.value.children, selected.value)
   formData.value = {
     ...formData.value,
     children: _data?.arr || [],
@@ -197,7 +185,7 @@ const onPaste = () => {
       key: item.key + '_copy',
     }
   })
-  if (_data.length && selected.value?.length) {
+  if (list.length && selected.value?.length) {
     const dt = selected.value?.[selected.value.length - 1]
     if (dt?.key === 'root') {
       formData.value = {
@@ -210,7 +198,7 @@ const onPaste = () => {
         children: copyDataByKey(formData.value?.children, list, dt),
       }
     }
-    setSelection(_data?.[_data.length - 1] || 'root')
+    setSelection(list?.[list.length - 1] || 'root')
     formDesigner.deleteData()
   }
 }
@@ -221,45 +209,6 @@ const onCollect = () => {
   collectData.value = selected.value || []
   collectVisible.value = true
 }
-
-watch(
-  () => [keys['Ctrl+C'].value, keys['Meta+C'].value],
-  (v1, v2) => {
-    if (v1 || v2) {
-      onCopy()
-    }
-  },
-)
-
-watch(
-  () => [keys['Ctrl+X'].value, keys['Meta+X'].value],
-  (v1, v2) => {
-    if (v1 || v2) {
-      onShear()
-    }
-  },
-)
-
-watch(
-  () => [keys['Ctrl+V'].value, keys['Meta+V'].value],
-  (v1, v2) => {
-    if (v1 || v2) {
-      onPaste()
-    }
-  },
-)
-
-// 删除
-watch(
-  () => [keys['Space'].value, keys['Delete'].value],
-  (v1, v2) => {
-    if (v1 || v2) {
-      if (!delVisible.value) {
-        onDelete()
-      }
-    }
-  },
-)
 
 /**
  * 保存数据
@@ -321,6 +270,9 @@ provide('FormDesigner', {
   refList,
   collectVisible,
   collectData,
+  delVisible,
+  _ctrl,
+  focus,
   setSelection,
   setModel,
   onSaveData,
@@ -434,7 +386,7 @@ defineExpose({ onSave, validate: onValidate })
   background-color: lightgray;
   padding: 10px 20px;
   width: 100%;
-  bottom: 0;
+  bottom: 25px;
 }
 </style>
 
