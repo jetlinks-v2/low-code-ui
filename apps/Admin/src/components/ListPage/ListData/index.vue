@@ -219,16 +219,16 @@ const configState = reactive({
 
 const dateOptions = [
   {
-    value: 'yyyy-MM-dd HH:mm:ss',
-    label: 'yyyy-MM-dd HH:mm:ss',
+    value: 'YYYY-MM-DD HH:mm:ss',
+    label: 'YYYY-MM-DD HH:mm:ss',
   },
   {
     value: 'HH:mm:ss',
     label: 'HH:mm:ss',
   },
   {
-    value: 'yyyy-MM-dd',
-    label: 'yyyy-MM-dd',
+    value: 'YYYY-MM-DD',
+    label: 'YYYY-MM-DD',
   },
 ]
 const fileOptions = [

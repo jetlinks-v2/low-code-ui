@@ -58,8 +58,11 @@ export default defineComponent({
                     <Row data-layout-type={'grid'} {...props.data.componentProps}>
                         {
                             unref(list).map((element) => {
+                                const a = (element.componentProps?.span || 1)
+                                const b = (props.data.componentProps?.inlineMax || 1)
+                                const _span = a >= b ? b : a
                                 return (
-                                    <Col key={element.key} {...element.componentProps} span={24 / (props.data.componentProps?.inlineMax || 1)}>
+                                    <Col key={element.key} {...element.componentProps} span={24 / (props.data.componentProps?.inlineMax || 1) * _span}>
                                         <Selection
                                             class={'drag-area'}
                                             hasDel={unref(list).length > 1}

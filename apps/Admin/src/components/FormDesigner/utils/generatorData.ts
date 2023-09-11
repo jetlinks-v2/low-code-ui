@@ -81,12 +81,15 @@ const handleProps = (node: any) => {
         case 'grid':
             result.inlineMax = 4
             break
+        case 'grid-item':
+            result.span = 1
+            break
         case 'form':
             result.source = {
-              value: undefined,
-              code: ''
+                value: undefined,
+                code: ''
             }
-          break
+            break
     }
 
     return result
@@ -109,6 +112,12 @@ const generatorData = (node: any) => {
     }
     if (checkIsField(result) || result.type === 'table') {
         result.formItemProps = handleFormItemProps(result)
+    }
+
+    if (result.type === 'grid' || result.type === 'space') {
+        result.formItemProps = {
+            name: result?.key
+        }
     }
 
     result.componentProps = {

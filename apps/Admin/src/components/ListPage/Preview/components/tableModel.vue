@@ -17,21 +17,21 @@
         #[item.key]="slotProps"
       >
         <div v-if="item.key !== 'action'">
-          <div v-if="slotProps[item.key]?.config">
+          <div v-if="item?.config">
             <span v-if="item?.config?.type === 'object' && isShowIcon">
               <AIcon
                 type="SearchOutlined"
-                @click="jsonOpen(slotProps[item.key]?.value)"
+                @click="jsonOpen(slotProps[item.key])"
               />
             </span>
             <span v-else-if="item?.config?.type === 'file' && isShowFileIcon">
               <img
                 style="width: 30px; height: 30px"
-                :src="dataFormat(item?.config, slotProps[item.key]?.value)"
+                :src="dataFormat(item?.config, slotProps[item.key])"
               />
             </span>
             <span v-else>
-              {{ dataFormat(item?.config, slotProps[item.key]?.value) }}
+              {{ dataFormat(item?.config, slotProps[item.key]) }}
             </span>
           </div>
           <div v-else>
@@ -51,6 +51,7 @@
             :popConfirm="
               handleFunction(item.permissionProps, slotProps)?.popConfirm
             "
+            :class="extractCssClass(item.style)"
           >
             <AIcon v-if="item.icon" :type="item?.icon" />
             <img v-else-if="item?.icon?.includes('http')" :src="item.icon" />
@@ -244,13 +245,14 @@ import HeaderButton from '@/components/ListPage/Preview/components/HederActions.
 import { isFunction, isObject } from 'lodash-es'
 import dayjs from 'dayjs'
 import { PropType } from 'vue'
+import { extractCssClass, insertCustomCssToHead } from '@/components/FormDesigner/utils/utils';
 const props = defineProps({
   model: {
     type: String,
     default: 'card',
   },
   dataColumns: {
-    type: Array,
+    type: Array as PropType<Record<string, any>[]>,
     default: () => [],
   },
   query: {
@@ -276,7 +278,7 @@ const props = defineProps({
     },
   },
   headerActions: {
-    type: Array,
+    type: Array as PropType<Record<string, any>[]>,
     default: () => [],
   },
   defaultFormType: {
@@ -407,4 +409,12 @@ const handleFunction = (item: any, data?: any) => {
   }
   return undefined
 }
+
+
+watchEffect(() => {
+  props.tableActions.forEach((item) => {
+    insertCustomCssToHead(item.style, item.key)
+    
+  })
+})
 </script>

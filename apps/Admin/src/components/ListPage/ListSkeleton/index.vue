@@ -277,7 +277,7 @@ watchEffect(() => {
 @paginationBg: #f8cfd4;
 
 .list-skeleton {
-  height: 100%;
+  height: calc(100% - 8vh);
   width: 100%;
   display: flex;
   .mb-50 {

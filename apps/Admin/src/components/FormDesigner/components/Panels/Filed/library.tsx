@@ -3,7 +3,7 @@ import { filedData } from '../../../utils/defaultData'
 import DragGableWrap from '../../Draggable/DragGableWrap'
 import './index.less';
 import { Card, AIcon } from 'jetlinks-ui-components';
-// import { onEnd, onMove } from '@/components/FormDesigner/components/Draggable/ControlInsertionPlugin';
+import { onEnd } from '@/components/FormDesigner/components/Draggable/ControlInsertionPlugin';
 import generatorData from '@/components/FormDesigner/utils/generatorData';
 import { cloneDeep, omit } from 'lodash-es';
 
@@ -11,7 +11,7 @@ const Library = defineComponent({
     name: 'Library',
     inheritAttrs: false,
     setup() {
-        // const designer: any = inject('FormDesigner')
+        const designer: any = inject('FormDesigner')
 
         const handleClone = (element) => {
             const item = { ...generatorData(omit(element, ['icon'])) }
@@ -60,6 +60,9 @@ const Library = defineComponent({
                                             v-slots={slots}
                                             item-key="type"
                                             data-layout-type={'filed-item'}
+                                            onEnd={(e) => {
+                                                onEnd(e, designer)
+                                            }}
                                         ></DragGableWrap>
                                     )
                                 }
