@@ -12,7 +12,7 @@ export const useFunctions = () => {
   const functionOptions = ref<any[]>([])
   const functionId = ref<string>('')
   const commandOptions = computed<CommandType[]>(() => {
-    return functionOptions.value.find(item => item.id === functionId.value)?.command || []
+    return functionOptions.value.find(item => item.fullId === functionId.value)?.command || []
   })
   const productStore = useProduct();
   const { info } = productStore
@@ -31,6 +31,7 @@ export const useFunctions = () => {
    * @param functionId 功能id
    */
   const handleFunction = (functionId_: string) => {
+    console.log(`output->functionId.value`,functionId.value, functionId_)
     functionId.value = functionId_;
   }
   return {

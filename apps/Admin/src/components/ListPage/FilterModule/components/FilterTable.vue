@@ -378,7 +378,7 @@ watch(() => JSON.stringify(dataBinds), () => {
   tempData.value = props.dataSource.length ? props.dataSource : dataBinds.functionInfo?.configuration?.columns?.map(
     (item) => {
       return {
-        id: item.name,
+        id: item.alias,
         name: item.comment,
         type: item.javaType?.toLowerCase(),
       }
@@ -418,7 +418,7 @@ watch(() => JSON.stringify(dataBinds), () => {
   }
 }
 
-.ant-table-striped :deep(.table-striped) td {
+:deep(.ant-table-cell) {
   text-align: left !important;
 }
 </style>
