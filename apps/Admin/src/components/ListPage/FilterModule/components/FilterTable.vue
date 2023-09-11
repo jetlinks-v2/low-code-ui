@@ -11,7 +11,7 @@
     </j-button>
     <div class="table" v-if="bindShow || props.show">
       <j-data-table
-        class="ant-table-striped"
+        class="ant-table-striped table-striped"
         rowKey="code"
         bordered
         ref="tableRef"
@@ -379,7 +379,7 @@ watch(() => JSON.stringify(dataBinds), () => {
     (item) => {
       return {
         id: item.name,
-        name: item.name,
+        name: item.comment,
         type: item.javaType?.toLowerCase(),
       }
     },
@@ -419,6 +419,6 @@ watch(() => JSON.stringify(dataBinds), () => {
 }
 
 .ant-table-striped :deep(.table-striped) td {
-  background-color: #f2fcfe;
+  text-align: left !important;
 }
 </style>

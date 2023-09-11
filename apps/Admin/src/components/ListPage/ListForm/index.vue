@@ -8,7 +8,7 @@
       @close="emits('update:open', false)"
       :footer-style="{ textAlign: 'right' }"
     >
-      <div v-if="!state.configurationShow">
+      <div v-if="!showType!.configurationShow">
         <p>数据展示方式</p>
         <div class="j-check-btn">
           <div :class="classList" @click="configuredChange('list')">
@@ -19,18 +19,18 @@
             卡片列表
           </div>
         </div>
-        <div v-if="state.configured.includes('card')">
+        <div v-if="showType!.configured.includes('card')">
           <p class="title">卡片配置</p>
           <j-badge :count="errorList.length">
-            <j-button :style="{width: '300px', border: errorList.length ? '1px solid red' : ''}" @click="state.configurationShow = true" :class="{ 'error-boder': errorList.length }"
+            <j-button :style="{width: '300px', border: errorList.length ? '1px solid red' : ''}" @click="showType!.configurationShow = true" :class="{ 'error-boder': errorList.length }"
               >配置</j-button
             >
           </j-badge>
         </div>
 
-        <div v-if="state.configured?.length === 2">
+        <div v-if="showType!.configured?.length === 2">
           <p class="title">默认形态</p>
-          <j-radio-group v-model:value="state.defaultForm" button-style="solid">
+          <j-radio-group v-model:value="showType!.defaultForm" button-style="solid">
             <j-radio-button value="list" class="check-btn">
               数据列表
             </j-radio-button>
@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      <div v-if="state.configurationShow" class="card-type">
+      <div v-if="showType!.configurationShow" class="card-type">
         <a-page-header @back="back" title=" ">
           <template #backIcon>
             <AIcon type="LeftOutlined" />
@@ -100,9 +100,9 @@ const open = computed({
   get() {
     if (props.open) {
       const data = showType!
-      state.type = data.type
-      state.configured = data.configured
-      state.defaultForm = data.defaultForm
+      showType!.type = data.type
+      showType!.configured = data.configured
+      showType!.defaultForm = data.defaultForm
     }
     return props.open
   },
@@ -113,41 +113,35 @@ const open = computed({
 const classCard = computed(() => {
   return {
     'j-check-btn-item': true,
-    selected: state.configured.includes('card'),
+    selected: showType!.configured.includes('card'),
   }
 })
 const classList = computed(() => {
   return {
     'j-check-btn-item': true,
-    selected: state.configured.includes('list'),
+    selected: showType!.configured.includes('list'),
   }
 })
 
 const cardRef = ref()
 //数组展示方式，卡片配置显示隐藏
-const state = reactive({
-  type: 'list',
-  configured: ['list'],
-  configurationShow: false,
-  defaultForm: 'list',
-})
 
 const showType = inject(SHOW_TYPE_KEY)
 //卡片配置返回
 const back = () => {
-  state.configurationShow = false
+  showType!.configurationShow = false
 }
 //取消
 const cancel = () => {
-  if (state.configurationShow) {
+  if (showType!.configurationShow) {
     back()
   } else {
     if (props.open) {
       const data = cloneDeep(showType!)
-      state.configurationShow = false
-      state.type = data.type
-      state.configured = data.configured
-      state.defaultForm = data.defaultForm
+      showType!.configurationShow = false
+      showType!.type = data.type
+      showType!.configured = data.configured
+      showType!.defaultForm = data.defaultForm
     }
     open.value = false
   }
@@ -156,34 +150,32 @@ const cancel = () => {
 const submit = async () => {
   let data: any = {}
   const vaildate = await cardRef.value?.vaildate()
-  if (vaildate && state.configurationShow) {
-    state.configurationShow = false
-  } else if (!state.configurationShow) {
+  if (vaildate && showType!.configurationShow) {
+    showType!.configurationShow = false
+  } else if (!showType!.configurationShow) {
     open.value = false
-    delete showType.configurationShow
-    Object.assign(showType!, state)
+    Object.assign(showType!, showType!)
     Object.assign(listFormInfo.value, vaildate)
   }
-  data.type = state.type
 }
 //已配置数据展示方式，默认数据列表
 const configuredChange = (value: string) => {
-  if (state.configured?.length === 1 && state.configured[0] === value) {
-    state.configured[0] = 'list'
+  if (showType!.configured?.length === 1 && showType!.configured[0] === value) {
+    showType!.configured[0] = 'list'
   } else {
-    const index = state.configured.findIndex((item: any) => item === value)
-    state.configured.includes(value)
-      ? state.configured.splice(index, 1)
-      : state.configured.push(value)
+    const index = showType!.configured.findIndex((item: any) => item === value)
+    showType!.configured.includes(value)
+      ? showType!.configured.splice(index, 1)
+      : showType!.configured.push(value)
   }
-  state.defaultForm =
-    state.configured?.length === 1 ? state.configured[0] : 'list'
+  showType!.defaultForm =
+    showType!.configured?.length === 1 ? showType!.configured[0] : 'list'
 }
 
 const errorList = ref<any[]>([])
 const valid = () => {
   return new Promise((resolve, reject) => {
-    errorList.value = validListForm(state,listFormInfo.value)
+    errorList.value = validListForm(showType!,listFormInfo.value)
     if(errorList.value.length) reject(errorList.value)
     else resolve([])
   })

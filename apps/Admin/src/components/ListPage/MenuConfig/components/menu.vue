@@ -50,23 +50,25 @@
             ]"
             style="flex: 0 0 186px"
           >
-            <ErrorItem :error-data="errorData('icon')">
               <div class="icon-upload has-icon" v-if="form!.icon">
                 <AIcon :type="form!.icon" style="font-size: 50px"/>
                 <span class="mark" @click="dialogVisible = true">点击修改</span>
               </div>
 
-              <div
-                v-else
-                @click="dialogVisible = true"
-                class="icon-upload no-icon"
-              >
-                <span>
-                  <AIcon type="PlusOutlined" style="font-size: 20px"/>
-                  <p>点击选择图标</p>
-                </span>
-              </div>
+              <div class="icon-upload no-icon" v-else>
+            <ErrorItem :error-data="errorData('icon')">
+                <div
+                  @click="dialogVisible = true"
+                  style="width: 100px; height: 100px;display: flex; align-items: center;justify-content: center;"
+                >
+                  <span>
+                    <AIcon type="PlusOutlined" style="font-size: 20px"/>
+                    <p>点击选择图标</p>
+                  </span>
+                </div>
             </ErrorItem>
+
+              </div>
           </j-form-item>
         </template>
       </j-form>
