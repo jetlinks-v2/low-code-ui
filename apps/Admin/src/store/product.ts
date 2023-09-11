@@ -98,25 +98,25 @@ export const useProduct = defineStore('product', () => {
     return [...dataMap.values()].filter(item => item.others?.type === type)
   }
 
-const findParent=(data, target, result) =>{
-  for (let item of data) {
-    if (item.id === target.id) {
-      //将查找到的目标数据加入结果数组中
-      result.unshift(item)
-      return true
-    }
-    if (item.children && item.children.length > 0) {
-      //根据查找到的结果往上找父级节点
-      let isFind = findParent(item.children, target, result)
-      if (isFind) {
+  const findParent=(data, target, result) =>{
+    for (let item of data) {
+      if (item.id === target.id) {
+        //将查找到的目标数据加入结果数组中
         result.unshift(item)
         return true
       }
+      if (item.children && item.children.length > 0) {
+        //根据查找到的结果往上找父级节点
+        let isFind = findParent(item.children, target, result)
+        if (isFind) {
+          result.unshift(item)
+          return true
+        }
+      }
     }
+    //走到这说明没找到目标
+    return false
   }
-  //走到这说明没找到目标
-  return false
-}
 
   const addProduct = (data: any[], record: any, parentId: string) => {
     return data.map(item => {
@@ -219,6 +219,11 @@ const findParent=(data, target, result) =>{
     const arr = []
     findParent(data.value,record,arr)
     return arr;
+  }
+  
+  //通过名称搜索
+  const filterTree = ()=>{
+    
   }
 
   const getServerModulesData = async () => {

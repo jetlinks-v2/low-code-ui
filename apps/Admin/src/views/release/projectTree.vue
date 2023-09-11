@@ -16,7 +16,7 @@ const getTree = () => {
   const maps = product.getDataMap()
   const copyData = JSON.parse(JSON.stringify([...maps.values()]))
   list.value = copyData.filter(item => {
-    return item.others && item.others?.menu
+    return item.others && item.others?.menu && item.others?.menu.main
   }).map(item => {
     item.parentFullId = maps.get(item.parentId).fullId
     return item
