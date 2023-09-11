@@ -37,7 +37,7 @@ import { updateData } from '../../../utils/utils'
 import { useFocusWithin } from '@vueuse/core'
 
 const formRef = ref<any>()
-const { focused: _focused } = useFocusWithin(formRef)
+const { focused } = useFocusWithin(formRef)
 
 const { target } = useTarget()
 
@@ -109,8 +109,8 @@ watch(
   },
 )
 
-watch(_focused, _focused => {
-  designer.focused = _focused
+watch(focused, focused => {
+  designer.focus = focused
 })
 </script>
 

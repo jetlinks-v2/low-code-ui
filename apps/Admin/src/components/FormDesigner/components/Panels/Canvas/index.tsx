@@ -75,7 +75,7 @@ const Canvas = defineComponent({
     watch(
       () => [keys['Backspace'].value, keys['Delete'].value],
       (v1, v2) => {
-        if ((v1 || v2) && isEditModel.value && !designer.focused) {
+        if ((v1 || v2) && isEditModel.value && !designer.focus) {
           if (!designer.delVisible.value) {
             designer.onDelete()
           }

@@ -106,7 +106,7 @@ const checkVisible = ref<boolean>(false)
 const editData = ref<string>()
 const _shift = ref<boolean>(false)
 const _ctrl = ref<boolean>(false)
-const focused = ref<boolean>(false)
+const focus = ref<boolean>(false)
 
 const product = useProduct()
 const formDesigner = useFormDesigner()
@@ -282,7 +282,7 @@ provide('FormDesigner', {
   delVisible,
   _shift,
   _ctrl,
-  focused,
+  focus,
   setSelection,
   setModel,
   onSaveData,
