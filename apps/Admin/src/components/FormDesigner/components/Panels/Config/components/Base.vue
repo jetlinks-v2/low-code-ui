@@ -9,6 +9,7 @@
           'card-item',
           'table-item',
           'grid-item',
+          'space-item',
           'grid',
           'tabs',
           'collapse',
@@ -41,6 +42,7 @@
           'tabs-item',
           'table-item',
           'grid-item',
+          'space-item'
         ].includes(type)
       "
     >
