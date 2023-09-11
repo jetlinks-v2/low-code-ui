@@ -10,7 +10,7 @@
         <template #item="{ element, index }">
           <div class="list-group-item">
             <AIcon class="handle" type="AlignLeftOutlined"></AIcon>
-            <DrawerSetter :value="element" @change="onChange" :index="index" />
+            <DrawerSetter :type="type" :value="element" @change="onChange" :index="index" />
             <AIcon type="CloseOutlined" @click="onDelete(index)" />
           </div>
         </template>
@@ -34,6 +34,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  type: {
+    type: String,
+    default: 'root'
+  },
 })
 const emits = defineEmits(['update:value', 'change'])
 const list = ref<any[]>([])
@@ -43,7 +47,7 @@ watchEffect(() => {
 })
 
 const onClick = () => {
-  list.value.push({key: uid()})
+  list.value.push({ key: uid() })
   emits('update:value', unref(list))
   emits('change', unref(list))
 }

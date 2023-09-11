@@ -50,7 +50,7 @@ export const basic: ISchema[] = [
     },
     {
         type: 'upload',
-        name: '上传(未)',
+        name: '上传',
         icon: 'DownloadOutlined',
     },
     {
@@ -60,7 +60,7 @@ export const basic: ISchema[] = [
     },
     {
         type: 'form',
-        name: '内嵌表单(未)',
+        name: '内嵌表单',
         icon: 'CalendarOutlined',
     },
     {
@@ -100,7 +100,7 @@ export const basic: ISchema[] = [
     // },
     {
         type: 'table',
-        name: '表格(ing)',
+        name: '表格',
         icon: 'AuditOutlined',
         componentProps: {},
         children: []

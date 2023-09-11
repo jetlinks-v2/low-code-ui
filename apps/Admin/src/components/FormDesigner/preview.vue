@@ -4,7 +4,7 @@
   </div>
 </template>
   
-  <script lang="ts" setup>
+<script lang="ts" setup>
 import Canvas from './components/Panels/Canvas/index'
 import { provide, ref, reactive, PropType, watch } from 'vue'
 import { ISchema } from './typings'
