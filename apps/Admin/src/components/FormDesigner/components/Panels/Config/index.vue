@@ -34,8 +34,10 @@ import { map } from 'lodash-es'
 import { getConfigList } from './utils'
 import { useTarget } from '../../../hooks'
 import { updateData } from '../../../utils/utils'
+import { useFocusWithin } from '@vueuse/core'
 
 const formRef = ref<any>()
+const { focused: _focused } = useFocusWithin(formRef)
 
 const { target } = useTarget()
 
@@ -106,6 +108,10 @@ watch(
     deep: true,
   },
 )
+
+watch(_focused, _focused => {
+  designer.focused = _focused
+})
 </script>
 
 <style lang="less" scoped>

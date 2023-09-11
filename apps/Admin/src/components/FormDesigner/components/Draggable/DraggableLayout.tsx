@@ -68,12 +68,12 @@ const DraggableLayout = defineComponent({
 
                 switch (element.type) {
                     case 'text':
-                        if (unref(isEditModel)) {
+                        if (unref(isEditModel) || componentMap?.[element?.type]) {
+                            const TypeComponent = componentMap?.[element?.type] || 'div'
                             const params = {
                                 data: element,
                                 parent: props.data
                             }
-                            const TypeComponent = componentMap?.[element?.type] || 'div'
                             return (
                                 <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                                     <TypeComponent data={element} {...element.componentProps} />
