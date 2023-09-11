@@ -158,11 +158,11 @@ const Canvas = defineComponent({
       return (
         <div class={['canvas-box', unref(isEditModel) && 'editModel']}>
           <div class="container">
-            {/* <Scrollbar height={'100%'}> */}
+            <Scrollbar height={'100%'}>
               <div class="subject">
                 {unref(isEditModel) ? renderChildren() : renderContent()}
               </div>
-            {/* </Scrollbar> */}
+            </Scrollbar>
           </div>
           {unref(designer.collectVisible) && unref(isEditModel) && <CollectModal
             onSave={(name: string) => {

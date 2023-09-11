@@ -39,7 +39,7 @@ export default defineComponent({
                 addContext(props.data, props.parent)
             }
             props.data.context?.appendItem()
-            const addData = unref(list).slice(-1)
+            const addData = unref(list)?.[unref(list).length - 1] ||'root'
             designer.setSelection(addData)
         }
 

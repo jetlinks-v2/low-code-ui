@@ -129,10 +129,16 @@ const onAppendItem = (node: any) => {
             _props.componentProps = {
                 tab: 'Tab' + uid(6)
             }
+            _props.formItemProps = {
+                name: ''
+            }
             break
         case 'collapse':
             _props.componentProps = {
                 header: 'Collapse' + uid(6)
+            }
+            _props.formItemProps = {
+                name: ''
             }
             break
         case 'table':
