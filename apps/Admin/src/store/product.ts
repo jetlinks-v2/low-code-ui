@@ -243,6 +243,7 @@ const findParent=(data, target, result) =>{
       })
       handleDataMap(treeData);
       data.value = treeData
+      engine.activeFile = treeData[0]?.id
       info.value = extra
       cb?.()
     }

@@ -197,7 +197,7 @@
           placeholder="请选择"
           @change="onDataChange"
         >
-          <j-select-option v-for="item in options" :value="item.id">{{ item.name }}</j-select-option>
+          <!-- <j-select-option v-for="item in options" :value="item?.id">{{ item?.name }}</j-select-option> -->
         </j-select>
       </j-form-item>
     </template>
@@ -275,9 +275,20 @@ const list = computed(() =>
   target.value.componentProps?.listType === 'text' ? textType : imgType,
 )
 
-const { data: options } = useRequest(getGeoType)
+const { data: options,run } = useRequest(getGeoType,{
+  immediate:false
+})
+
+
 
 const onDataChange = () => {
   emits('refresh', target.value)
 }
+
+watchEffect(()=>{
+  if(target.value?.type === 'geo'){
+    run()
+  }
+})
+
 </script>
