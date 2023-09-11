@@ -11,7 +11,7 @@
           >
             <j-select-option
               v-for="item in functionOptions"
-              :value="item.id"
+              :value="item.fullId"
               :key="item.id"
             >
               {{ item.name }}
@@ -92,7 +92,7 @@ const props = defineProps({
 
 const handleChangeFunction = (val: string) => {
   dataBind.functionInfo =
-    functionOptions!.value.find((item) => item.id === val) ||
+    functionOptions!.value.find((item) => item.fullId === val) ||
     dataBind.functionInfo
   handleFunction(val)
 }
@@ -106,7 +106,7 @@ const commandDisabled = computed(() => {
 
 const showCommand = computed(() => {
   return ['rdb-sql-query', 'rdb-crud'].includes(
-    functionOptions!.value.find((item) => item.id === dataBind.data.function)
+    functionOptions!.value.find((item) => item.fullId === dataBind.data.function)
       ?.provider || '',
   )
 })
