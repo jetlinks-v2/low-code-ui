@@ -32,7 +32,7 @@
               >
                 <j-select-option
                   v-for="item in functionOptions"
-                  :value="item.id"
+                  :value="item.fullId"
                   :key="item.id"
                   >{{ item.name }}</j-select-option
                 >
@@ -188,6 +188,7 @@ const rules = {
 
 const handlePages = (val: string) => {
   const data = pagesOptions.value.find(item => item.id === val)
+  console.log(data);
   form.resource = {...pick(data, ['id', 'parentId', 'type']), projectId: info.id}
   form.resource.parentId = `${form.resource.projectId}.${form.resource.parentId}`
 }
