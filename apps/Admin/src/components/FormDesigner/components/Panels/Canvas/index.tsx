@@ -46,7 +46,7 @@ const Canvas = defineComponent({
 
     watch(
       () => [keys['Ctrl+C'].value, keys['Meta+C'].value],
-      (v1, v2) => {
+      ([v1, v2]) => {
         if ((v1 || v2) && isEditModel.value) {
           designer.onCopy()
         }
@@ -55,7 +55,7 @@ const Canvas = defineComponent({
 
     watch(
       () => [keys['Ctrl+X'].value, keys['Meta+X'].value],
-      (v1, v2) => {
+      ([v1, v2]) => {
         if ((v1 || v2) && isEditModel.value) {
           designer.onShear()
         }
@@ -64,7 +64,7 @@ const Canvas = defineComponent({
 
     watch(
       () => [keys['Ctrl+V'].value, keys['Meta+V'].value],
-      (v1, v2) => {
+      ([v1, v2]) => {
         if ((v1 || v2) && isEditModel.value) {
           designer.onPaste()
         }
@@ -74,7 +74,7 @@ const Canvas = defineComponent({
     // 删除
     watch(
       () => [keys['Backspace'].value, keys['Delete'].value],
-      (v1, v2) => {
+      ([v1, v2]) => {
         if ((v1 || v2) && isEditModel.value && !designer.focus) {
           if (!designer.delVisible.value) {
             designer.onDelete()
