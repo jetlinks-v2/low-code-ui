@@ -11,8 +11,8 @@
     @cancel="emit('close', true)"
     @ok="emit('close', true)"
   >
-    <FormPreview :data="data" v-if="props.resource.callPage?.type === providerEnum.FormPage" mode="add"/>
-    <CustomHtml :code="JSON.stringify(data)" v-else-if="props.resource.callPage?.type === providerEnum.HtmlPage"/>
+    <FormPreview :data="data" v-if="props.resource.type === providerEnum.FormPage" mode="add"/>
+    <CustomHtml :code="JSON.stringify(data)" v-else-if="props.resource.type === providerEnum.HtmlPage"/>
   </j-modal>
 </template>
 <script setup lang="ts">
@@ -46,14 +46,14 @@ const visible = ref(false)
 const confirmLoading = ref(false)
 
 const getInfo = async () => {
-  const { projectId, parentId, id } = props.resource?.callPage
+  const { projectId, parentId, id } = props.resource
   // const res = await getResource(projectId, parentId, id)
   // data.value = res
   const res = productStore.getById(id)
   data.value = JSON.parse(res?.configuration?.code || '{}');
 }
 
-watch(() => JSON.stringify(props.resource?.callPage), () => {
+watch(() => JSON.stringify(props.resource), () => {
   console.log(data);
   getInfo()
 })
