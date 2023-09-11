@@ -97,7 +97,7 @@ const onContextMenuClick = (node, menuKey) => {
       emit('click', {
         data: node.data,
         cacheData: node.data,
-        provider: menuKey,
+        provider: node.data.type,
         nameList: (product.getById(node.parentId)?.children || []).map(item => item.name),
         type: 'Rename'
       })
