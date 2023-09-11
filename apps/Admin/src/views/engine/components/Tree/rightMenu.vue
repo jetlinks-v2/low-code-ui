@@ -102,6 +102,13 @@ const onContextMenuClick = (node, menuKey) => {
         type: 'Rename'
       })
       break;
+    case actionMap.Profile.key:
+    emit('click', {
+        data: node.data,
+        cacheData: node.data,
+        menuKey:'Profile',
+      })
+      break;
     case actionMap.Delete.key:
       product.remove(node)
       break;
