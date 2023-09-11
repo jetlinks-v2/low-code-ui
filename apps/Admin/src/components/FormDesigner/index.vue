@@ -58,10 +58,8 @@ import {
 import { ISchema } from './typings'
 import { omit, debounce } from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
-import { useMagicKeys } from '@vueuse/core'
 import { Modal } from 'jetlinks-ui-components'
 import { deleteDataByKey, copyDataByKey, checkedConfig } from './utils/utils'
-import { resolve } from 'dns'
 
 const initData = {
   type: 'root',
@@ -100,16 +98,15 @@ const formRef = ref<any>()
 const configRef = ref<any>()
 const refList = ref<any>({})
 
-const keys = useMagicKeys()
-const _shift = keys['Shift']
-const _ctrl = keys['Ctrl']
-
 const collectVisible = ref<boolean>(false)
 const collectData = ref<any[]>([])
 const delVisible = ref<boolean>(false)
 const spinning = ref<boolean>(false)
 const checkVisible = ref<boolean>(false)
 const editData = ref<string>()
+const _shift = ref<boolean>(false)
+const _ctrl = ref<boolean>(false)
+const focus = ref<boolean>(false)
 
 const product = useProduct()
 const formDesigner = useFormDesigner()
@@ -121,7 +118,7 @@ const isSelectedRoot = computed(() => {
 // 设置数据被选中
 const setSelection = (node: any) => {
   if (['card-item'].includes(node.type)) return
-  if (_shift.value || _ctrl.value) {
+  if ((_shift.value || _ctrl.value) && model.value === 'edit') {
     if (node === 'root') return
     selected.value.push(node)
   } else {
@@ -222,45 +219,6 @@ const onCollect = () => {
   collectVisible.value = true
 }
 
-watch(
-  () => [keys['Ctrl+C'].value, keys['Meta+C'].value],
-  (v1, v2) => {
-    if (v1 || v2) {
-      onCopy()
-    }
-  },
-)
-
-watch(
-  () => [keys['Ctrl+X'].value, keys['Meta+X'].value],
-  (v1, v2) => {
-    if (v1 || v2) {
-      onShear()
-    }
-  },
-)
-
-watch(
-  () => [keys['Ctrl+V'].value, keys['Meta+V'].value],
-  (v1, v2) => {
-    if (v1 || v2) {
-      onPaste()
-    }
-  },
-)
-
-// 删除
-watch(
-  () => [keys['Space'].value, keys['Delete'].value],
-  (v1, v2) => {
-    if (v1 || v2) {
-      if (!delVisible.value) {
-        onDelete()
-      }
-    }
-  },
-)
-
 /**
  * 保存数据
  */
@@ -321,6 +279,10 @@ provide('FormDesigner', {
   refList,
   collectVisible,
   collectData,
+  delVisible,
+  _shift,
+  _ctrl,
+  focus,
   setSelection,
   setModel,
   onSaveData,
@@ -434,7 +396,7 @@ defineExpose({ onSave, validate: onValidate })
   background-color: lightgray;
   padding: 10px 20px;
   width: 100%;
-  bottom: 0;
+  bottom: 25px;
 }
 </style>
 

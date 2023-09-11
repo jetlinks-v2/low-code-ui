@@ -5,7 +5,7 @@
         :list="list"
         class="list-group"
         handle=".handle"
-        item-key="name"
+        item-key="key"
       >
         <template #item="{ element, index }">
           <div class="list-group-item">
@@ -25,6 +25,7 @@
 
 <script lang="ts" setup>
 import { ref, watchEffect, unref } from 'vue'
+import { uid } from '../../../../../utils/uid'
 import Draggable from '../../../../JSortable/index'
 import DrawerSetter from './DrawerSetter.vue'
 
@@ -42,7 +43,7 @@ watchEffect(() => {
 })
 
 const onClick = () => {
-  list.value.push({})
+  list.value.push({key: uid()})
   emits('update:value', unref(list))
   emits('change', unref(list))
 }

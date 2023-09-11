@@ -6,6 +6,7 @@ import { uid } from "@/components/FormDesigner/utils/uid"
 import CollectModal from '../../CollectModal/index.vue'
 import { useProduct } from "@/store"
 import { extractCssClass, insertCustomCssToHead } from "@/components/FormDesigner/utils/utils"
+import { useMagicKeys } from '@vueuse/core'
 
 const Canvas = defineComponent({
   name: 'Canvas',
@@ -14,6 +15,10 @@ const Canvas = defineComponent({
   setup() {
     const designer: any = inject('FormDesigner')
     const product = useProduct()
+
+    const keys = useMagicKeys()
+    const _shift = keys['Shift']
+    const _ctrl = keys['Ctrl']
 
     const cssClassList = ref<string[]>([])
 
@@ -24,6 +29,59 @@ const Canvas = defineComponent({
     const isEditModel = computed(() => {
       return unref(designer?.model) === 'edit'
     })
+
+    watch(
+      () => _shift.value,
+      (v1) => {
+        designer._shift = v1
+      },
+    )
+
+    watch(
+      () => _ctrl.value,
+      (v1) => {
+        designer._ctrl = v1
+      },
+    )
+
+    watch(
+      () => [keys['Ctrl+C'].value, keys['Meta+C'].value],
+      (v1, v2) => {
+        if ((v1 || v2) && isEditModel.value) {
+          designer.onCopy()
+        }
+      },
+    )
+
+    watch(
+      () => [keys['Ctrl+X'].value, keys['Meta+X'].value],
+      (v1, v2) => {
+        if ((v1 || v2) && isEditModel.value) {
+          designer.onShear()
+        }
+      },
+    )
+
+    watch(
+      () => [keys['Ctrl+V'].value, keys['Meta+V'].value],
+      (v1, v2) => {
+        if ((v1 || v2) && isEditModel.value) {
+          designer.onPaste()
+        }
+      },
+    )
+
+    // 删除
+    watch(
+      () => [keys['Backspace'].value, keys['Delete'].value],
+      (v1, v2) => {
+        if ((v1 || v2) && isEditModel.value && !designer.focus) {
+          if (!designer.delVisible.value) {
+            designer.onDelete()
+          }
+        }
+      },
+    )
 
     const getWidgetRef = (path) => {
       let foundRef = unref(designer.refList)?.[path]
