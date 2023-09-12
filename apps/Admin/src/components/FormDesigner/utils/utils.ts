@@ -2,7 +2,7 @@ import { uid } from "./uid"
 import componentMap from "./componentMap"
 import { ISchema } from "../typings"
 import { queryDictionaryData, queryRuntime } from "@/api/form"
-import { isObject, map } from "lodash-es"
+import { isObject, map, omit } from "lodash-es"
 
 export const checkIsField = (node: any) => node?.type && (componentMap?.[node?.type]) || ['table'].includes(node?.type)
 
@@ -281,4 +281,45 @@ export const copyDataByKey = (arr: any[], newData: any[], _item: any) => {
     } else {
         return [...arr.slice(0, _index + 1), ...newData, ...arr.slice(_index + 1, arr?.length)]
     }
+}
+
+const getFieldChildrenData = (data: ISchema[]) => {
+    let obj: any = {}
+    data.map((item: any) => {
+        obj = {
+            ...obj,
+            ...getFieldData(item),
+        }
+    })
+    return obj
+}
+
+export const getFieldData = (data: ISchema) => {
+    let obj: any = undefined
+    if (data.children && data.children?.length) {
+        obj = getFieldChildrenData(data?.children)
+    }
+    let _obj: any = {}
+    if (data?.formItemProps?.name) {
+        if (data.type === 'table') {
+            _obj[data?.formItemProps?.name] = [omit(obj, ['actions', 'index'])]
+        } else {
+            _obj[data?.formItemProps?.name] = obj
+        }
+    } else {
+        _obj = obj
+    }
+    return _obj
+}
+
+export const initData = {
+    type: 'root',
+    key: 'root',
+    componentProps: {
+        layout: 'horizontal',
+        size: 'default',
+        cssCode: '',
+        eventCode: '',
+    },
+    children: [],
 }

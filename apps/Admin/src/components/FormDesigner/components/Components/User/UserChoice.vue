@@ -289,7 +289,7 @@ onMounted(() => {
     _selectedRowKeys.value = props.selected
 })
 watch(() => selectId.value, () => {
-    tableRef.value.reload()
+    tableRef.value?.reload()
 },{
     deep:true,
     immediate:true
