@@ -87,7 +87,7 @@ const componentName = computed(() => {
         validator: {
           provider: undefined,
           configuration: {
-            message: undefined,
+            message: '数据格式错误',
             group: undefined,
             classType: javaType,
             regexp: undefined,

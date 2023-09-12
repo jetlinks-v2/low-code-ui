@@ -122,7 +122,7 @@ export default defineComponent({
 
         return () => {
             return (
-                <Selection {...useAttrs()} style={{ padding: '16px' }} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
+                <Selection {...useAttrs()} style={{ padding: isEditModel.value ? '16px' : '0px' }} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <div class={'table'}>
                         <FormItem {...unref(_formItemProps)}>
                             <Table
