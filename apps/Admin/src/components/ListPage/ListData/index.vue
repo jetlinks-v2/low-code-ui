@@ -553,7 +553,7 @@ watch(
 const valid = () => {
   return new Promise((resolve) => {
     errorList.value = validListData(dataSource.value);
-    if(errorList.value.length) throw errorList.value
+    if(errorList.value.length) throw [{message: '列表数据配置错误'}]
     else resolve(errorList.value)
   })
 }

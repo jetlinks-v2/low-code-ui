@@ -330,7 +330,7 @@ const errorList: any = ref([])
 const valid = () => {
   return new Promise((resolve, reject) => {
     errorList.value = validFilterModule(dataSource.value)
-    if (errorList.value.length) reject(errorList.value)
+    if (errorList.value.length) reject([{message: '数据绑定配置错误'}])
     else resolve([])
   })
 }

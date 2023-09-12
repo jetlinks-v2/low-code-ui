@@ -44,12 +44,12 @@
           </template>
         </template>
         <template #name="{ data }">
-          <ErrorItem :border="false" :errorData="errorData(data.record.id)">
+          <ErrorItem :border="false" :errorData="errorData(data.record.name)">
             <span>{{ data.record?.name }}</span>
           </ErrorItem>
         </template>
         <template #id="{ data }">
-          <ErrorItem :border="false" :errorData="errorData(data.record.name)">
+          <ErrorItem :border="false" :errorData="errorData(data.record.id)">
             <span>{{ data.record?.id }}</span>
           </ErrorItem>
         </template>

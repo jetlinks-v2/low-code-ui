@@ -140,6 +140,7 @@
               showSearch
               :options="titleOptions"
               :field-names="{ label: 'name', value: 'id' }"
+              @change="field2Change"
             />
           </j-form-item>
         </div>
@@ -152,6 +153,7 @@
               showSearch
               :options="titleOptions"
               :field-names="{ label: 'name', value: 'id' }"
+              @change="field3Change"
             />
           </j-form-item>
         </div>
@@ -187,7 +189,7 @@
 import Upload from '@/components/Upload/Image/ImageUpload.vue'
 import { ErrorItem } from '../..';
 import EditorModal from '@/components/EditorModal'
-import { LIST_FORM_INFO, DATA_SOURCE, ACTION_CONFIG_KEY } from '../../keys';
+import { LIST_FORM_INFO, ACTION_CONFIG_KEY, DATA_BIND } from '../../keys';
 const props = defineProps({
   id: {
     type: null,
@@ -197,26 +199,14 @@ const props = defineProps({
     default: () => []
   }
 })
-
 const formRef = ref()
 //卡片样式点击类型
 const cardState = reactive({
   type: 'customIcon', //customIcon,field1,field2,field3,emphasisField
 })
 //卡片展示内容form
-const formState = reactive({
-  customIcon: '',
-  dynamicIcon: '',
-  field2Title: '',
-  field3Title: '',
-  field1: '',
-  field2: '',
-  field3: '',
-  emphasisField: '',
-  specialStyle: ``,
-})
-const listFormInfo = inject(LIST_FORM_INFO)
-const dataSource = inject(DATA_SOURCE)
+const formState = inject(LIST_FORM_INFO)
+const dataBind = inject(DATA_BIND)
 
 const errorData = computed(() => {
   return (val: string) => {
@@ -317,6 +307,12 @@ const onCheck = async () => {
     return false
   }
 }
+const field2Change = (value: any, options: any) => {
+  formState.field2Title = options.name
+}
+const field3Change = (value: any, options: any) => {
+  formState.field3Title = options.name
+}
 const statusColor = ref({
   error: '',
   offline: '',
@@ -324,7 +320,13 @@ const statusColor = ref({
 })
 
 const titleOptions = computed(() => {
-  return dataSource.value
+  return dataBind.functionInfo?.configuration?.columns?.map((item) => {
+    console.log(item);
+    return {
+      id: item.alias,
+      name: item.comment
+    }
+  })
 })
 defineExpose({
   vaildate: onCheck,
