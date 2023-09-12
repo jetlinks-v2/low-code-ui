@@ -517,6 +517,30 @@ const FlowDesigner = defineComponent({
     }
 
     // 鼠标拖动事件
+    const isDragging = ref(false)
+    const initialX = ref(0)
+    const initialY = ref(0)
+    const offsetX = ref(0)
+    const offsetY = ref(0)
+
+    const startDrag = (event) => {
+      isDragging.value = true
+      initialX.value = initialX.value || event.clientX
+      initialY.value = initialY.value || event.clientY
+    }
+    const dragging = (event) => {
+      if (isDragging.value) {
+        const deltaX = event.clientX - initialX.value
+        const deltaY = event.clientY - initialY.value
+        offsetX.value = deltaX
+        offsetY.value = deltaY
+      }
+    }
+    const endDrag = (event) => {
+      isDragging.value = false
+      initialX.value = event.clientX
+      initialY.value = event.clientY
+    }
 
     // 渲染组件
     return () => {
@@ -543,9 +567,15 @@ const FlowDesigner = defineComponent({
           ref: '_root',
           class: { _root: true },
           style: {
-            transform: `scale(${_scale.value})`,
+            // width: '200%',
+            // height: '200%',
+            // background: '#eee',
+            // transform: `scale(${_scale.value}) translate(${offsetX.value}px, ${offsetY.value}px)`,
           },
           //   onMousewheel: (e) => onMousewheel(e),
+          //   onMousedown: (e) => startDrag(e),
+          //   onMousemove: (e) => dragging(e),
+          //   onMouseup: (e) => endDrag(e),
         },
         processTrees,
       )
