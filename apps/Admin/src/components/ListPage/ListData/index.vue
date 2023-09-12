@@ -525,10 +525,9 @@ const errorList = ref([])
 watch(
   () => dataBinds,
   () => {
-    if (dataBinds.functionInfo) {
+    if (dataBinds.data.function) {
       dataBind.value = true
     } else {
-      dataBind.value = false
       dataSource.value = [];
     }
   },

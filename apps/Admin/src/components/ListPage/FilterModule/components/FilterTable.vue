@@ -9,7 +9,7 @@
     >
       同步数据绑定
     </j-button>
-    <div class="table" v-if="bindShow || props.show">
+    <div class="table">
       <j-data-table
         class="ant-table-striped table-striped"
         rowKey="code"
