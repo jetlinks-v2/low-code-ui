@@ -14,7 +14,7 @@
   />
 </template>
 
-<script setup lang="ts" name="CcNode">
+<script setup lang="ts" name="DealNode">
 import Node from './Node.vue'
 
 const emits = defineEmits(['selected', 'delNode', 'insertNode'])

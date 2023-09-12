@@ -20,8 +20,8 @@
           <span>审批节点</span>
         </div>
         <div
-          class="node-select-item cc"
-          @click="handleAddCc"
+          class="node-select-item deal"
+          @click="handleAddDeal"
           v-if="!isConditionNode"
         >
           <AIcon type="SendOutlined" />
@@ -67,9 +67,9 @@ const handleAddApproval = () => {
   visible.value = false
   emits('addBranchNode', 'APPROVAL')
 }
-const handleAddCc = () => {
+const handleAddDeal = () => {
   visible.value = false
-  emits('addBranchNode', 'CC')
+  emits('addBranchNode', 'DEAL')
 }
 const handleOpenConfig = () => {
   visible.value = false
@@ -97,7 +97,7 @@ const handleOpenConfig = () => {
     &.approval {
       background: #facd91;
     }
-    &.cc {
+    &.deal {
       background: #caf982;
     }
     &.conditions {

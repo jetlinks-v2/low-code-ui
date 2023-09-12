@@ -12,7 +12,7 @@ import './index.less'
 import Root from './components/nodes/RootNode.vue'
 import Node from './components/nodes/Node.vue'
 import Approval from './components/nodes/ApprovalNode.vue'
-import Cc from './components/nodes/CcNode.vue'
+import Deal from './components/nodes/DealNode.vue'
 import Condition from './components/nodes/ConditionNode.vue'
 import Empty from './components/nodes/EmptyNode.vue'
 
@@ -24,7 +24,7 @@ const componentsMap = {
   NODE: Node,
   ROOT: Root,
   APPROVAL: Approval,
-  CC: Cc,
+  DEAL: Deal,
   CONDITION: Condition,
   EMPTY: Empty,
 }
@@ -168,7 +168,7 @@ const FlowDesigner = defineComponent({
         node &&
         (node.type === 'ROOT' ||
           node.type === 'APPROVAL' ||
-          node.type === 'CC' ||
+          node.type === 'DEAL' ||
           node.type === 'DELAY' ||
           node.type === 'TRIGGER')
       )
@@ -216,8 +216,8 @@ const FlowDesigner = defineComponent({
         case 'APPROVAL':
           insertApprovalNode(parentNode)
           break
-        case 'CC':
-          insertCcNode(parentNode)
+        case 'DEAL':
+          insertDealNode(parentNode)
           break
         case 'CONDITIONS':
           insertConditionsNode(parentNode)
@@ -247,9 +247,9 @@ const FlowDesigner = defineComponent({
       parentNode.children.name = '审批人'
       parentNode.children.props = cloneDeep(DefaultProps.APPROVAL_PROPS)
     }
-    const insertCcNode = (parentNode) => {
+    const insertDealNode = (parentNode) => {
       parentNode.children.name = '办理人'
-      parentNode.children.props = cloneDeep(DefaultProps.CC_PROPS)
+      parentNode.children.props = cloneDeep(DefaultProps.DEAL_PROPS)
     }
     const insertConditionsNode = (parentNode) => {
       parentNode.children.name = '条件分支'
@@ -304,9 +304,9 @@ const FlowDesigner = defineComponent({
           id: getRandomId(),
           name: '办理节点',
           parentId: parentNode.children.id,
-          type: 'CC',
+          type: 'DEAL',
           props: {
-            ...cloneDeep(DefaultProps.CC_PROPS),
+            ...cloneDeep(DefaultProps.DEAL_PROPS),
             style: {
               margin: '30px',
             },
@@ -327,7 +327,7 @@ const FlowDesigner = defineComponent({
     /**
      * 添加分支节点
      * @param node
-     * @param type (CONDITIONS: 条件分支  APPROVAL:审批节点 CC:办理节点)
+     * @param type (CONDITIONS: 条件分支  APPROVAL:审批节点 DEAL:办理节点)
      */
     const addBranchNode = (node, type) => {
       if (node.branchs.length < 8) {
@@ -358,19 +358,19 @@ const FlowDesigner = defineComponent({
               children: {},
             })
             break
-          case 'CC':
+          case 'DEAL':
             node.branchs.push({
               id: getRandomId(),
               parentId: node.id,
               name: '办理人' + (node.branchs.length + 1),
               props: {
-                ...cloneDeep(DefaultProps.CC_PROPS),
+                ...cloneDeep(DefaultProps.DEAL_PROPS),
                 style: {
                   margin: '30px',
                 },
                 isBranchNode: true,
               },
-              type: 'CC',
+              type: 'DEAL',
               children: {},
             })
             break

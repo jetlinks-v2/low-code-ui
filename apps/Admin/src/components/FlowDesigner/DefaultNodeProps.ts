@@ -60,7 +60,7 @@ export const CONDITION_PROPS = {
 }
 
 //抄送节点默认属性
-export const CC_PROPS = {
+export const DEAL_PROPS = {
     shouldAdd: false,
     assignedUser: [],
     formPerms: []
@@ -108,5 +108,5 @@ export const DELAY_PROPS = {
 }
 
 export default {
-    APPROVAL_PROPS, CC_PROPS, DELAY_PROPS, CONDITION_PROPS, ROOT_PROPS, TRIGGER_PROPS
+    APPROVAL_PROPS, DEAL_PROPS, DELAY_PROPS, CONDITION_PROPS, ROOT_PROPS, TRIGGER_PROPS
 }

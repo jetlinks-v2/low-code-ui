@@ -7,7 +7,7 @@
           <AIcon type="ShareAltOutlined" />
           <span>审批节点</span>
         </div>
-        <div class="node-select-item cc" @click="handleAddCc">
+        <div class="node-select-item deal" @click="handleAddDeal">
           <AIcon type="SendOutlined" />
           <span>办理节点</span>
         </div>
@@ -43,9 +43,9 @@ const handleAddApproval = () => {
   visible.value = false
   emits('insertNode', 'APPROVAL')
 }
-const handleAddCc = () => {
+const handleAddDeal = () => {
   visible.value = false
-  emits('insertNode', 'CC')
+  emits('insertNode', 'DEAL')
 }
 const handleAddConditions = () => {
   visible.value = false
@@ -77,7 +77,7 @@ const handleAddConcurrents = () => {
     &.approval {
       background: #facd91;
     }
-    &.cc {
+    &.deal {
       background: #caf982;
     }
     &.conditions {
