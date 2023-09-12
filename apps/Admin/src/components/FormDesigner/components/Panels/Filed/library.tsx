@@ -22,12 +22,10 @@ const Library = defineComponent({
             item: ({ element }) => {
                 return (
                     <div class="filed-item-card">
-                        <Card hoverable>
-                            <div class="filed-item-card-item">
-                                <AIcon type={element.icon} style={{ fontSize: '25px' }} />
-                                <span>{element.name}</span>
-                            </div>
-                        </Card>
+                        <div class="filed-item-card-icon">
+                            <AIcon type={element.icon} style={{ fontSize: '25px' }} />
+                        </div>
+                        <div class="filed-item-card-text">{element.name}</div>
                     </div>
                 )
             }

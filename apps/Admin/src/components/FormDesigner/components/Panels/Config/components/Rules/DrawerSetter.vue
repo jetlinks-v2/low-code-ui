@@ -25,7 +25,7 @@
           </j-form-item>
           <j-form-item name="validator">
             <template #label>
-              自定义校验器<j-tooltip title="格式：">
+              自定义校验器<j-tooltip title="格式：return '错误信息'">
                 <AIcon type="QuestionCircleOutlined" />
               </j-tooltip>
             </template>

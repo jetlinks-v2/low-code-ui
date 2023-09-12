@@ -1,5 +1,5 @@
 <template>
-  <j-select v-model:value="selectData" :open="false" :showArrow="false" @focus="showModal" :options="selectOptions"   :mode="mode" :disabled="disabled">
+  <j-select placeholder="请选择" v-model:value="selectData" :open="false" :showArrow="false" @focus="showModal" :options="selectOptions"   :mode="mode" :disabled="disabled">
   </j-select>
   <UserChoice v-if="modalVisible" @closeModal="closeModal" @selectedUser="selectedUser" :selected="selectData" :mode="mode"></UserChoice>
 </template>
@@ -59,7 +59,7 @@ watch(()=>props.value,()=>{
   selectData.value = props.value
 },{
   deep:true,
-  immediate:true
+  // immediate:true
 })
 </script>
 <style lang="less" scoped>

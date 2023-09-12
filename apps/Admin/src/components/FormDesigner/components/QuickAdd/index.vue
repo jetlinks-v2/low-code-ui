@@ -1,11 +1,12 @@
 <template>
   <div class="quick">
-    <j-button type="primary" @click="visible = true">快速添加</j-button>
+    <j-button type="link" @click="visible = true">快速添加</j-button>
     <j-drawer
       :destroyOnClose="true"
       v-model:visible="visible"
       title="快速添加"
       placement="right"
+      :width="550" 
     >
       <p>自由组合快速添加表单页内容</p>
       <div class="content">
@@ -383,6 +384,11 @@ const onOk = () => {
 </script>
 
 <style lang="less" scoped>
+.content {
+  background-color: #F7F8F9;
+  border: 1px solid #F0F2F5;
+  padding: 16px;
+}
 .btn {
   position: absolute;
   bottom: 0;

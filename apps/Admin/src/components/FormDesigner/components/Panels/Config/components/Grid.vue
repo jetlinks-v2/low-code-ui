@@ -11,19 +11,19 @@
           style="width: 100%"
         />
       </j-form-item>
-      <j-form-item label="列间距" :name="['componentProps', 'gutter', 1]">
+      <j-form-item label="列间距" :name="['componentProps', 'colSpan']">
         <j-input-number
           placeholder="请输入"
-          v-model:value="target.componentProps.gutter[1]"
+          v-model:value="target.componentProps.colSpan"
           @change="onDataChange"
           :min="0"
           style="width: 100%"
         />
       </j-form-item>
-      <j-form-item label="行间距" :name="['componentProps', 'gutter', 0]">
+      <j-form-item label="行间距" :name="['componentProps', 'rowSpan']">
         <j-input-number
           placeholder="请输入"
-          v-model:value="target.componentProps.gutter[0]"
+          v-model:value="target.componentProps.rowSpan"
           @change="onDataChange"
           :min="0"
           style="width: 100%"

@@ -7,6 +7,7 @@ import CollectModal from '../../CollectModal/index.vue'
 import { useProduct } from "@/store"
 import { extractCssClass, insertCustomCssToHead } from "@/components/FormDesigner/utils/utils"
 import { useMagicKeys } from '@vueuse/core'
+import { useElementHover } from '@vueuse/core'
 
 const Canvas = defineComponent({
   name: 'Canvas',
@@ -15,8 +16,9 @@ const Canvas = defineComponent({
   setup() {
     const designer: any = inject('FormDesigner')
     const product = useProduct()
-
+    const canvasRef = ref<any>()
     const keys = useMagicKeys()
+    const focused = useElementHover(canvasRef)
 
     const cssClassList = ref<string[]>([])
 
@@ -66,7 +68,7 @@ const Canvas = defineComponent({
     watch(
       () => [keys['Backspace'].value, keys['Delete'].value],
       ([v1, v2]) => {
-        if ((v1 || v2) && isEditModel.value && !designer.focus) {
+        if ((v1 || v2) && isEditModel.value && designer.focus) {
           if (!designer.delVisible.value) {
             designer.onDelete()
           }
@@ -96,8 +98,14 @@ const Canvas = defineComponent({
       insertCustomCssToHead(unref(designer.formData)?.componentProps?.cssCode, 'root')
     })
 
-    const renderContent = () => {
+    watch(() => focused.value, (newValue) => {
+      designer.focus = newValue
+    }, {
+      immediate: true,
+      deep: true
+    })
 
+    const renderContent = () => {
       const Layout = (
         <DraggableLayout
           path={[]}
@@ -156,7 +164,7 @@ const Canvas = defineComponent({
 
     return () => {
       return (
-        <div class={['canvas-box', unref(isEditModel) && 'editModel']}>
+        <div ref={canvasRef} class={['canvas-box', unref(isEditModel) && 'editModel']}>
           <div class="container">
             <Scrollbar height={'100%'}>
               <div class="subject">
