@@ -17,6 +17,7 @@ import EditorModal from './EditorModal'
 import CRUD from './Database'
 import {BooleanSelect, EmptySelect} from './Select'
 import { SQLCode, FunctionCode } from './SQL'
+import OppositeSelect from './OppositeSelect/index.vue'
 
 export default  {
     install(app: App) {
@@ -39,5 +40,6 @@ export default  {
           .component('BooleanSelect',BooleanSelect)
           .component('SQLCode', SQLCode)
           .component('FunctionCode', FunctionCode)
+          .component('OppositeSelect',OppositeSelect)
     }
 }
