@@ -69,8 +69,9 @@
           :actions="tableActions"
           :record="slotProps"
           :statusText="
-            slotProps[props?.cardConfig?.emphasisField] || '强调字段'
+            slotProps[props?.cardConfig?.emphasisField] || ''
           "
+          :showStatus="props?.cardConfig?.emphasisField !== ''"
           :statusNames="{
             online: 'processing',
             offline: 'error',

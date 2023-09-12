@@ -2,11 +2,13 @@
   <div class="list-form-center">
     <j-drawer
       title="列表形态配置"
-      placement="left"
+      placement="right"
       :closable="true"
       :visible="open"
       @close="emits('update:open', false)"
-      :footer-style="{ textAlign: 'right' }"
+      getContainer=".list-page"
+      :wrap-style="{position: 'absolute'}"
+      width="608px"
     >
       <div v-if="!showType!.configurationShow">
         <p>数据展示方式</p>
@@ -52,10 +54,12 @@
         <Card ref="cardRef" :id="props.id" :errorList="errorList"/>
       </div>
       <template #footer>
-        <j-button style="margin-right: 8px" type="primary" @click="submit">
-          确定
-        </j-button>
-        <j-button @click="cancel"> 取消 </j-button>
+        <j-space size="large">
+          <j-button @click="cancel"> 取消 </j-button>
+          <j-button style="margin-right: 8px" type="primary" @click="submit">
+            确定
+          </j-button>
+        </j-space>
       </template>
     </j-drawer>
   </div>
@@ -151,6 +155,7 @@ const submit = async () => {
   let data: any = {}
   const vaildate = await cardRef.value?.vaildate()
   if (vaildate && showType!.configurationShow) {
+    valid()
     showType!.configurationShow = false
   } else if (!showType!.configurationShow) {
     open.value = false

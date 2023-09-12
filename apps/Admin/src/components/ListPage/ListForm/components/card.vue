@@ -11,6 +11,7 @@
         offline: 'error',
         notActive: 'warning',
       }"
+      :warpStyle="{width: '385px'}"
       :statusColor="statusColor"
     >
       <template #img>
@@ -139,7 +140,6 @@
               showSearch
               :options="titleOptions"
               :field-names="{ label: 'name', value: 'id' }"
-              @change="field2Change"
             />
           </j-form-item>
         </div>
@@ -152,7 +152,6 @@
               showSearch
               :options="titleOptions"
               :field-names="{ label: 'name', value: 'id' }"
-              @change="field3Change"
             />
           </j-form-item>
         </div>
@@ -188,7 +187,7 @@
 import Upload from '@/components/Upload/Image/ImageUpload.vue'
 import { ErrorItem } from '../..';
 import EditorModal from '@/components/EditorModal'
-import { LIST_FORM_INFO, DATA_SOURCE } from '../../keys';
+import { LIST_FORM_INFO, DATA_SOURCE, ACTION_CONFIG_KEY } from '../../keys';
 const props = defineProps({
   id: {
     type: null,
@@ -198,7 +197,7 @@ const props = defineProps({
     default: () => []
   }
 })
-const titleOptions = ref([])
+
 const formRef = ref()
 //卡片样式点击类型
 const cardState = reactive({
@@ -231,54 +230,70 @@ const getPopupContainer = (trigger: HTMLElement) => {
   return trigger.parentElement
 }
 //卡片
-const actions = [
-  {
-    key: 'view',
-    text: '查看',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '查看',
-      },
-      hasPermission: false,
-      icon: 'EyeOutlined',
-      onClick: (e) => {},
-    }),
-  },
-  {
-    key: 'view1',
-    text: '查看1',
-    permissionProps: {
-      tooltip: {
-        title: '查看1',
-      },
-      hasPermission: false,
-      icon: 'EyeOutlined',
-    },
-  },
-  {
-    key: 'view2',
-    text: '查看2',
-  },
-
-  {
-    key: 'delete',
-    text: '删除',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '删除',
-      },
-      popConfirm: {
-        title: data.status === 'error' ? '禁用' : '确认删除？',
-        onConfirm: () => {
-          console.log(data)
+const actionsConfig = inject(ACTION_CONFIG_KEY)
+const actions = computed(() => {
+  return actionsConfig.value.map((item) => {
+    return {
+      key: item?.key,
+      text: item?.title,
+      icon: item?.icon,
+      permissionProps: (data: any) => ({
+        tooltip: {
+          title: item?.title,
         },
-      },
-      hasPermission: true,
-      icon: 'EyeOutlined',
-      onClick: () => {},
-    }),
-  },
-]
+      }),
+    }
+  })
+})
+
+//  [
+//   {
+//     key: 'view',
+//     text: '查看',
+//     permissionProps: (data) => ({
+//       tooltip: {
+//         title: '查看',
+//       },
+//       hasPermission: false,
+//       icon: 'EyeOutlined',
+//       onClick: (e) => {},
+//     }),
+//   },
+//   {
+//     key: 'view1',
+//     text: '查看1',
+//     permissionProps: {
+//       tooltip: {
+//         title: '查看1',
+//       },
+//       hasPermission: false,
+//       icon: 'EyeOutlined',
+//     },
+//   },
+//   {
+//     key: 'view2',
+//     text: '查看2',
+//   },
+
+//   {
+//     key: 'delete',
+//     text: '删除',
+//     permissionProps: (data) => ({
+//       tooltip: {
+//         title: '删除',
+//       },
+//       popConfirm: {
+//         title: data.status === 'error' ? '禁用' : '确认删除？',
+//         onConfirm: () => {
+//           console.log(data)
+//         },
+//       },
+//       hasPermission: true,
+//       icon: 'EyeOutlined',
+//       onClick: () => {},
+//     }),
+//   },
+// ]
 
 const validateValue = () => {
   const value = ['field1']
@@ -302,25 +317,14 @@ const onCheck = async () => {
     return false
   }
 }
-const field2Change = (value: any, options: any) => {
-  formState.field2Title = options.name
-}
-const field3Change = (value: any, options: any) => {
-  formState.field3Title = options.name
-}
 const statusColor = ref({
   error: '',
   offline: '',
   warning: '#13c2c2',
 })
-const init = () => {
-  titleOptions.value = dataSource.value || []
-  Object.assign(formState, listFormInfo)
-  statusColor.value = JSON.parse(formState.specialStyle || '{}')
-}
 
-onMounted(() => {
-  init()
+const titleOptions = computed(() => {
+  return dataSource.value
 })
 defineExpose({
   vaildate: onCheck,

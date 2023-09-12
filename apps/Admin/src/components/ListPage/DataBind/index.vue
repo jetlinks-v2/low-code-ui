@@ -14,7 +14,7 @@
               :value="item.fullId"
               :key="item.id"
             >
-              {{ item.name }}
+              {{ item.title }}
             </j-select-option>
           </j-select>
         </ErrorItem>
@@ -133,9 +133,10 @@ const valid = () => {
 }
 
 watch(
-  () => JSON.stringify(dataBind),
+  () => dataBind.data.function,
   () => {
     if (dataBind.data.function) {
+      console.log(`output->dataBind.data.function`,dataBind.data.function)
       handleChangeFunction(dataBind.data.function)
     }
   },

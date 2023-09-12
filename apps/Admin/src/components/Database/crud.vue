@@ -168,25 +168,26 @@ const validate = async () => {
 defineExpose({
   validate: () => {
     return new Promise(async (resolve, reject) => {
-      await validate()
-      const err = []
-      if (errorTips.relation) {
-        err.push({
-          message: '请配置关系标识'
-        })
-      }
+      resolve()
+      // await validate()
+      // const err = []
+      // if (errorTips.relation) {
+      //   err.push({
+      //     message: '请配置关系标识'
+      //   })
+      // }
 
-      if (errorTips.asset) {
-        err.push({
-          message: '请配置资产列名称'
-        })
-      }
-      if(Object.keys(errorTips.dataTable).length) {
-        Object.values(errorTips.dataTable).forEach(a => {
-          err.push(a[0])
-        })
-      }
-      !err.length ? resolve() : reject(err)
+      // if (errorTips.asset) {
+      //   err.push({
+      //     message: '请配置资产列名称'
+      //   })
+      // }
+      // if(Object.keys(errorTips.dataTable).length) {
+      //   Object.values(errorTips.dataTable).forEach(a => {
+      //     err.push(a[0])
+      //   })
+      // }
+      // !err.length ? resolve() : reject(err)
     })
   }
 })

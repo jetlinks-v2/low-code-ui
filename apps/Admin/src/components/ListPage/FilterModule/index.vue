@@ -2,11 +2,13 @@
   <div className="filter-module-center">
     <j-drawer
       title="配置"
-      placement="bottom"
+      placement="right"
       :closable="true"
       :visible="open"
       @close="emits('update:open', false)"
-      height="520px"
+      getContainer=".list-page"
+      :wrap-style="{position: 'absolute'}"
+      width="560px"
     >
       <Table
         v-if="type === ''"
@@ -18,13 +20,14 @@
         :dataSource="dataSource"
         :modelActiveKey="activeKey"
         :show="show"
+        tableType="filter"
         :asyncData="asyncData"
-        :configChange="configChange"
         :errorList="errorList"
         @handleAdd="handleAdd"
         @configuration="configuration"
         @handleOk="handleOk"
         @bindData="bindData"
+        @handleChange="(data) => dataSource = data"
       />
       <div v-if="type !== ''">
         <a-page-header title="配置筛选项" sub-title="配置筛选项" @back="goBack">
@@ -152,7 +155,7 @@ const columns: any = [
     key: 'id',
     ellipsis: true,
     align: 'center',
-    width: 150,
+    width: 140,
     type: 'text',
     form: {
       isVerify: true,
@@ -191,7 +194,7 @@ const columns: any = [
     key: 'name',
     ellipsis: true,
     align: 'center',
-    width: 150,
+    width: 140,
     type: 'text',
     form: {
       isVerify: true,
@@ -216,7 +219,7 @@ const columns: any = [
     align: 'center',
     type: 'select',
     options: options,
-    width: 150,
+    width: 110,
     tips: true,
   },
   {
@@ -225,7 +228,7 @@ const columns: any = [
     dataIndex: 'action',
     ellipsis: true,
     align: 'center',
-    width: 140,
+    width: 100,
   },
 ]
 
@@ -259,40 +262,39 @@ const configuration = (data: any, value: any) => {
 //处理方式弹窗
 const handleOk = (value: any, data: any) => {
   activeKey.value = value
-  let source: any = []
   switch (value) {
     case '1':
-      source = data
+      dataSource.value = data
       break
     case '2':
-      if (configChange.value) {
-        data?.map((item: any) => {
-          const dataFind = dataSource.value?.find(
-            (i: any) => i?.id === item?.id,
-          )
-          if (dataFind?.config !== item?.config) {
-            source.push(item)
-          }
-        })
-      } else {
-        data?.map((item: any) => {
-          if (item?.mark === 'add') {
-            source.push(item)
-          }
-        })
-      }
-      break
-    case '3':
-      source = dataSource.value?.map((item) => {
-        return {
-          id: item.name,
-          name: item.name,
-          type: 'string',
+      data?.forEach((item: any) => {
+        const dataFind: any = dataSource.value?.find(
+          (i: any) => i?.id === item?.id,
+        )
+        if (dataFind?.id !== item?.id) {
+          dataSource.value.push(item)
         }
       })
+      // if (configChange.value) {
+      //   data?.map((item: any) => {
+      //     const dataFind = dataSource.value?.find(
+      //       (i: any) => i?.id === item?.id,
+      //     )
+      //     if (dataFind?.config !== item?.config) {
+      //       dataSource.value.push(item)
+      //     }
+      //   })
+      // } else {
+      //   data?.map((item: any) => {
+      //     if (item?.mark === 'add') {
+      //       dataSource.value.push(item)
+      //     }
+      //   })
+      // }
+      break
+    case '3':
       break
   }
-  dataSource.value = source
   configChange.value = false
 }
 //点击显示table的同步数据

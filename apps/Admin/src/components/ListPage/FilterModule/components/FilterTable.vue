@@ -19,7 +19,7 @@
         :columns="props.columns"
         :data-source="props.dataSource"
         :showTool="false"
-        :height="200"
+        :height="900"
         @change="(data) => handleChange(data)"
       >
         <template #headerCell="{ column }">
@@ -110,6 +110,7 @@ import { onlyMessage } from '@/utils/comm'
 import { ErrorItem } from '../..'
 import type { PropType } from 'vue'
 import { DATA_BIND } from '../../keys';
+import { useProduct } from '@/store';
 const props = defineProps({
   title: {
     type: String,
@@ -129,10 +130,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  //配置是否修改
-  configChange: {
-    type: Boolean,
-    default: false,
+  tableType: {
+    type: String,
+    default: ''
   },
   //数据是否有变动
   dataChange: {
@@ -188,6 +188,38 @@ const props = defineProps({
     default: () => [],
   },
 })
+
+enum javaType {
+  Enum = 'enum',
+  String = 'text',
+  Double = 'double',
+  Int = 'int',
+  BigDecimal = 'text',
+  DateTime = 'date',
+  Float = 'float',
+  Byte = 'int',
+  Long = 'long',
+  List = 'array',
+  Boolean = 'boolean',
+  Map = 'object',
+}
+
+enum filterType {
+  Enum = 'enum',
+  String = 'string',
+  Double = 'number',
+  Int = 'number',
+  BigDecimal = 'string',
+  DateTime = 'date',
+  Float = 'number',
+  Byte = 'number',
+  Long = 'string',
+  List = 'string',
+  Boolean = 'string',
+  Map = 'string',
+}
+
+
 const tableRef = ref()
 const visible = ref<boolean>(false)
 const dataBinds: any = inject(DATA_BIND)
@@ -204,8 +236,6 @@ const emit = defineEmits([
 ])
 
 const handleChange = (data) => {
-  console.log(data,'hjasjhghg');
-  
   emit('handleChange', data)
 }
 
@@ -337,19 +367,31 @@ const syncData = async () => {
     bindShow.value = false
     return onlyMessage('请先完成数据绑定', 'error')
   }
-  if (!asyncData.value) {  
-    emit('bindData', tempData.value)
-    bindShow.value = true
-    asyncData.value = true
-  } else {
-    tempData.value = await tableRef.value?.getData()
-    // if (data?.length !== props.dataSource?.length || props.configChange) {
-    if (JSON.stringify(tempData.value) !== JSON.stringify(props.dataSource)) {
-      openModel(props.modelActiveKey)
-    } else {
-      onlyMessage('已是最新数据', 'success')
-    }
+  asyncDataBind()
+  // tempData.value = await tableRef.value?.getData()
+  // if (data?.length !== props.dataSource?.length || props.configChange) {
+  if(!props.dataSource.length) {
+    handleChange(tempData.value)
+    return
   }
+  if (JSON.stringify(tempData.value) !== JSON.stringify(props.dataSource)) {
+    openModel(props.modelActiveKey)
+  } else {
+    onlyMessage('已是最新数据', 'success')
+  }
+}
+
+const productStore = useProduct()
+const asyncDataBind = async () => {
+  const functionId = dataBinds.data.function.split('.')
+  tempData.value = productStore.getById(functionId[functionId.length - 1])?.configuration?.columns?.map((item) => {
+      return {
+        id: item.alias,
+        name: item.comment,
+        type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
+      }
+    },
+  ) || []
 }
 //打开弹窗
 const openModel = (value: any) => {
@@ -358,7 +400,7 @@ const openModel = (value: any) => {
 }
 //处理方式弹窗
 const handleOk = async () => {
-  const dataSource = await tableRef.value.getData()
+  const dataSource = tempData.value
   tableRef.value.cleanEditStatus()
   emit('handleOk', activeKey.value, dataSource)
   visible.value = false
@@ -380,7 +422,7 @@ watch(() => JSON.stringify(dataBinds), () => {
       return {
         id: item.alias,
         name: item.comment,
-        type: item.javaType?.toLowerCase(),
+        type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
       }
     },
   )
