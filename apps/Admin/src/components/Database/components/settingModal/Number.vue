@@ -3,8 +3,7 @@
     <j-input v-model:value="model.defaultValueSpec.fixValue" placeholder="请输入默认值" :maxLength="256" />
   </j-form-item>
   <j-form-item label="校验规则" :name="['validator', 'provider']">
-    <j-select
-      allowClear
+    <SelectNull
       :options="rulesOptions"
       v-model:value="model.validator.provider"
       @change="providerChange"
@@ -37,14 +36,14 @@
     <j-input v-model:value="model.validator.configuration.message" />
   </j-form-item>
   <template v-if="model.validator.provider === 'range'">
-    <div style="padding-bottom: 8px;">范围</div>
+    <div style="padding-bottom: 8px;">范围 <span style="color: #ff4d4f">*</span></div>
     <div class="setting-range">
       <j-form-item style="flex: 1" :rules="rules.min" :name="['validator', 'configuration', 'min']">
-        <j-input-number v-model:value="model.validator.configuration.min" style="width: 100%;" />
+        <j-input-number v-model:value="model.validator.configuration.min" :stringMode="openStringMode" :precision="precision" style="width: 100%;" />
       </j-form-item>
       <div style="margin-top: 4px">-</div>
       <j-form-item style="flex: 1" :rules="rules.max" :name="['validator', 'configuration', 'max']">
-        <j-input-number v-model:value="model.validator.configuration.max" style="width: 100%;" />
+        <j-input-number v-model:value="model.validator.configuration.max" :stringMode="openStringMode" :precision="precision" style="width: 100%;" />
       </j-form-item>
     </div>
   </template>
@@ -54,7 +53,7 @@
     :name="['validator', 'configuration', 'value']"
     :rules="model.javaType === 'Int' ? [intMax] : undefined"
   >
-    <j-input-number v-model:value="model.validator.configuration.value" style="width: 100%;" />
+    <j-input-number v-model:value="model.validator.configuration.value" :stringMode="openStringMode" :precision="precision" style="width: 100%;" />
   </j-form-item>
   <j-form-item
     v-if="model.validator.provider === 'min'"
@@ -62,7 +61,7 @@
     :name="['validator', 'configuration', 'value']"
     :rules="model.javaType === 'Int' ? [intMin] : undefined"
   >
-    <j-input-number v-model:value="model.validator.configuration.value" style="width: 100%;" />
+    <j-input-number v-model:value="model.validator.configuration.value" :stringMode="openStringMode" :precision="precision" style="width: 100%;" />
   </j-form-item>
   <j-form-item label="数据操作" name="spec">
     <Spec v-model:value="model.spec" />
@@ -73,6 +72,7 @@
 import { SETTING_FORM_MODEL, SETTING_FORM_REF } from "@/components/Database/util";
 import {inject} from "vue";
 import Spec from './Spec.vue'
+import SelectNull from './SelectNull.vue'
 
 const model = inject(SETTING_FORM_MODEL)
 const formRef = inject(SETTING_FORM_REF)
@@ -96,10 +96,27 @@ const rulesOptions = [
   },
 ]
 
+const precision = computed(() => {
+  return model.value.javaType === 'Int' ? 0 : undefined
+})
+
+const openStringMode = computed(() => {
+  return ['Float','Double'].includes(model.value.javaType)
+})
+
+const InterValidatorFn = (value) => {
+  if (value > 2147483647) {
+    return Promise.reject('不能大于2147483647')
+  } else if (value < -2147483648) {
+    return Promise.reject('不能小于-2147483648')
+  }
+  return Promise.resolve()
+}
+
 const intMax = {
   validator(_, value) {
-    if (model.value.javaType === 'Int' && value > 2147483647) {
-      return Promise.reject('最大值不能大于2147483647')
+    if (model.value.javaType === 'Int') {
+      return InterValidatorFn(value)
     }
     return Promise.resolve()
   }
@@ -107,8 +124,8 @@ const intMax = {
 
 const intMin = {
   validator(_, value) {
-    if (model.value.javaType === 'Int' && value < -2147483647) {
-      return Promise.reject('最小值不能小于-2147483647')
+    if (model.value.javaType === 'Int') {
+      return InterValidatorFn(value)
     }
     return Promise.resolve()
   }
@@ -124,9 +141,11 @@ const rules = {
   min: [
     {
       async validator(_, value) {
-        console.log('min',value, model.value);
-        if (model.value.javaType === 'Int' && value < -2147483647) {
-          return Promise.reject('最小值不能小于-2147483647')
+        if (!value) {
+          return Promise.reject('请输入最小值')
+        }
+        if (model.value.javaType === 'Int') {
+          return InterValidatorFn(value)
         }
         if (value > model.value.validator.configuration.max) {
           return Promise.reject('最小值不能大于最大值')
@@ -138,10 +157,14 @@ const rules = {
   max: [
     {
       async validator(_, value) {
+        if (!value) {
+          return Promise.reject('请输入最大值')
+        }
+
         formRef.value.validateFields([['validator', 'configuration', 'min']])
 
-        if (model.value.javaType === 'Int' && value > 2147483647) {
-          return Promise.reject('最大值不能大于2147483647')
+        if (model.value.javaType === 'Int') {
+          return InterValidatorFn(value)
         }
         return Promise.resolve()
       }
@@ -176,6 +199,16 @@ const providerChange = (key) => {
         classType: model.value.javaType
       }
       break;
+    default:
+      model.value.validator.configuration = {
+        regexp: undefined,
+        min: undefined,
+        max: undefined,
+        message: '数据格式错误',
+        group: undefined,
+        classType: model.value.javaType
+      }
+      break
   }
 }
 
