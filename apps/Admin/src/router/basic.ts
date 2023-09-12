@@ -77,4 +77,12 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
     },
     component: () => import('@/views/preview/index.vue'),
   },
+  {
+    path: '/flow-designer',
+    name: 'FlowDesigner',
+    component: () => import('@/views/demo/flow.vue'),
+    meta: {
+      title: '测试页'
+    }
+  },
 ]
