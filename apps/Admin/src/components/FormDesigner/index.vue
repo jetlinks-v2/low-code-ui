@@ -116,7 +116,7 @@ const isSelectedRoot = computed(() => {
 
 // 设置数据被选中
 const setSelection = (node: any) => {
-  if (['card-item'].includes(node.type)) return
+  if (['card-item', 'space-item'].includes(node.type)) return
   if (_ctrl.value && model.value === 'edit') {
     if (node === 'root') return
     selected.value.push(node)

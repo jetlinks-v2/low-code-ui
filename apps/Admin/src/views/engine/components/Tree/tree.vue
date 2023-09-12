@@ -28,6 +28,7 @@
       @save="save"
       @close="close"
     />
+    <FileDrawer :data="menuState.data" v-if="menuState.fileVisible"  @close="close"/>
   </div>
 </template>
 
@@ -36,6 +37,7 @@ import { useEngine, useProduct } from '@/store'
 import { storeToRefs } from 'pinia'
 import RightMenu from './rightMenu.vue'
 import InputModal from '@/components/ProJect/components/Action/InputModal.vue'
+import FileDrawer from '@/components/ProJect/components/Action/FileDrawer.vue'
 import { providerEnum } from "@/components/ProJect/index";
 import { randomString } from '@jetlinks/utils'
 import { defaultSetting as CrudBaseData } from '@/components/Database/setting'
@@ -55,6 +57,7 @@ const props = defineProps({
 
 const menuState = reactive({
   visible: false,
+  fileVisible:false,
   provider: '',
   cacheData: undefined,
   data: undefined,
@@ -70,6 +73,7 @@ const select = (key, e) => {
 
 const close = () => {
   menuState.visible = false
+  menuState.fileVisible = false
   menuState.provider = ''
   menuState.data = undefined
   menuState.cacheData = undefined
@@ -128,9 +132,13 @@ const save = ({ name, others,children }) => {
 }
 
 const menuClick = (record) => {
+  console.log('record',record)
   if(record.menuKey  === 'Copy'){
     engine.setCopyFile(record.data)
     onlyMessage('复制成功')
+  }else if(record.menuKey === 'Profile'){
+    Object.assign(menuState, record)
+    menuState.fileVisible = true
   }else{
     Object.assign(menuState, record)
     menuState.visible = true

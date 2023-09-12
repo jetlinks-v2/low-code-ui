@@ -1,8 +1,8 @@
 <template>
-  <j-form-item label="数据字典ID" :name="['dictionary', 'dictionaryId']" required>
+  <j-form-item label="数据字典" :name="['dictionary', 'dictionaryId']" required>
     <j-select
       :options="options"
-      placeholder="请选择数据字典ID"
+      placeholder="请选择数据字典"
       v-model:value="model.dictionary.dictionaryId"
     />
   </j-form-item>
@@ -52,7 +52,8 @@ const { data: options } = useRequest(dictionaryList, {
 const model = inject(SETTING_FORM_MODEL, {})
 const visible = ref(false)
 const change = (key) => {
-  if (key && model.jdbcType !== 'BIGINT') {
+  console.log(model.value)
+  if (key && model.value.jdbcType !== 'BIGINT') {
     visible.value = true
   }
 }
