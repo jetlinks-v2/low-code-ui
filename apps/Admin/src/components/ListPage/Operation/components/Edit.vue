@@ -211,7 +211,7 @@ watch(
 )
 
 watch(() => commandOptions.value, () => {
-  form.command = commandOptions.value.find(item => item.id === form.type)?.id
+  form.command = commandOptions.value?.find(item => item.id === form.type)?.id
 })
 defineExpose({
   submit,
