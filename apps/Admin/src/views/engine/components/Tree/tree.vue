@@ -114,20 +114,24 @@ const getConfiguration = (type) => {
   }
 }
 
-const save = ({ name, others,children }) => {
+const save = (data) => {
   const node = menuState.cacheData
-
+  // console.log('---data',data,menuState.type)
   const parentId = node.type === providerEnum.Module ? node.id : node.parentId
-  product.add({
-    name,
-    others,
+  if(menuState.type !== 'Add'){
+    product.update(data)
+  }else{
+    product.add({
+    name:data.name,
+    others:data.others,
     id: randomString(16),
-    title: name,
-    type: others.type,
-    configuration: getConfiguration(others.type),
+    title: data.name,
+    type: data.others.type,
+    configuration: getConfiguration(data.others.type),
     parentId: parentId,
-    children:children
+    children:data.children
   }, parentId)
+  }
   close()
 }
 
