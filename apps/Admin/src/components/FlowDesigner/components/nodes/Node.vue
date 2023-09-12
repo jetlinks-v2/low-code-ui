@@ -4,6 +4,7 @@
       node: true,
       root: isRoot || !show,
       'node-error-state': showError,
+      active,
     }"
     :style="style"
   >
@@ -147,6 +148,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // 节点激活状态
+  active: {
+    type: Boolean,
+    default: false,
+  },
 })
 </script>
 
@@ -177,6 +183,17 @@ const props = defineProps({
     border-color: #cacaca transparent transparent;
     background: #f5f5f7;
   }
+  &.active {
+    &::before {
+      border-color: #3056df transparent transparent;
+    }
+    .node-body {
+      border: 2px solid #3056df;
+    }
+    .node-footer::before {
+      background-color: #3056df;
+    }
+  }
   .node-body {
     overflow: hidden;
     cursor: pointer;
@@ -186,6 +203,7 @@ const props = defineProps({
     border-radius: 5px;
     background-color: white;
     box-shadow: 0px 0px 5px 0px #d8d8d8;
+
     &:hover {
       box-shadow: 0px 0px 3px 0px #1890ff;
       .node-body-left,

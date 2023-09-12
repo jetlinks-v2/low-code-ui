@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ node: true, 'node-error-state': showError }">
+  <div :class="{ node: true, 'node-error-state': showError, active }">
     <div :class="{ 'node-body': true, error: showError }">
       <div
         class="node-body-left"
@@ -94,6 +94,11 @@ const props = defineProps({
   },
   // 只读模式
   readOnly: {
+    type: Boolean,
+    default: false,
+  },
+  // 节点激活状态
+  active: {
     type: Boolean,
     default: false,
   },
@@ -242,7 +247,17 @@ const validate = (err) => {
 .node {
   margin: 30px;
   width: 220px;
-
+  &.active {
+    &::before {
+      border-color: #3056df transparent transparent;
+    }
+    .node-body {
+      border: 2px solid #3056df;
+    }
+    .node-footer::before {
+      background-color: #3056df;
+    }
+  }
   .node-body {
     cursor: pointer;
     min-height: 80px;

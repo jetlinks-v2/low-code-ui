@@ -29,7 +29,7 @@
 .branch-node-item {
   position: relative;
   display: flex;
-  background: #f5f6f6;
+  background: #fff;
   flex-direction: column;
   align-items: center;
   border-top: 2px solid #cccccc;
@@ -44,6 +44,13 @@
     height: 100%;
     background-color: #cacaca;
   }
+  &.active {
+    border-top: 2px solid #3056df;
+    border-bottom: 2px solid #3056df;
+    &::before {
+      background-color: #3056df;
+    }
+  }
   .line-top-left,
   .line-top-right,
   .line-bot-left,
@@ -51,7 +58,7 @@
     position: absolute;
     width: 50%;
     height: 4px;
-    background-color: #f5f6f6;
+    background-color: #fff;
   }
   .line-top-left {
     top: -2px;

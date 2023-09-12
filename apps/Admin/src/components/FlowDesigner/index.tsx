@@ -40,7 +40,7 @@ const FlowDesigner = defineComponent({
     // 只读模式
     readOnly: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   setup(props, { slots, emit, expose }) {
@@ -55,6 +55,7 @@ const FlowDesigner = defineComponent({
     const dom = computed(() => flowStore.design?.process)
 
     const getDomTree = (h, node) => {
+      // console.log('node: ', node);
       toMapping(node)
       if (isPrimaryNode(node)) {
         //普通业务节点
@@ -76,7 +77,11 @@ const FlowDesigner = defineComponent({
           insertCoverLine(h, index, childDoms, node.branchs)
           //遍历子分支尾部分支
           index++
-          return h('div', { class: { 'branch-node-item': true } }, childDoms)
+          return h(
+            'div',
+            { class: { 'branch-node-item': true, active: false } },
+            childDoms,
+          )
         })
         //插入添加分支/条件的按钮
         branchItems.unshift(
@@ -518,6 +523,8 @@ const FlowDesigner = defineComponent({
       console.log('渲染流程树')
       nodeMap.value.clear()
       let processTrees = getDomTree(h, dom.value)
+      //   console.log('dom.value: ', dom.value);
+      //   console.log('nodeMap.value: ', nodeMap.value)
 
       //插入末端节点
       processTrees.push(
