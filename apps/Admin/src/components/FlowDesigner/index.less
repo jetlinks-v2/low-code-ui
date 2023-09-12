@@ -1,7 +1,7 @@
 ._root {
   margin: 0 auto;
   height: 100%;
-//   cursor: grab;
+  //   cursor: grab;
   overflow: auto;
 }
 .process-end {
@@ -73,6 +73,9 @@
 .add-branch-btn {
   position: absolute;
   width: 80px;
+  &.read-only {
+    display: none;
+  }
   .add-branch-btn-el {
     z-index: 999;
     position: absolute;

@@ -1,7 +1,12 @@
 <template>
   <div :class="{ node: true, 'node-error-state': showError }">
     <div :class="{ 'node-body': true, error: showError }">
-      <div class="node-body-left" @click="emits('leftMove')" v-if="level > 1">
+      <div
+        class="node-body-left"
+        :style="{ display: readOnly ? 'none' : '' }"
+        @click="emits('leftMove')"
+        v-if="level > 1"
+      >
         <AIcon type="LeftOutlined" />
       </div>
       <div class="node-body-main" @click="emits('selected')">
@@ -11,8 +16,16 @@
               {{ config.name ? config.name : '条件' + level }}
             </j-ellipsis>
           </span>
-          <span class="level">优先级{{ level }}</span>
-          <span class="option">
+          <span
+            class="level"
+            :style="{ display: readOnly ? 'inline-block !important' : '' }"
+          >
+            优先级{{ level }}
+          </span>
+          <span
+            class="option"
+            :style="{ display: readOnly ? 'none !important' : '' }"
+          >
             <j-space>
               <!-- <j-tooltip title="复制条件" placement="top">
                 <AIcon type="CopyOutlined" @click="emits('copy')" />
@@ -30,6 +43,7 @@
       </div>
       <div
         class="node-body-right"
+        :style="{ display: readOnly ? 'none' : '' }"
         @click="emits('rightMove')"
         v-if="level < size"
       >
@@ -43,7 +57,7 @@
       </div>
     </div>
     <div class="node-footer">
-      <div class="btn">
+      <div class="btn" :class="{ readonly: readOnly }">
         <InsertButton @insertNode="(type) => emits('insertNode', type)" />
       </div>
     </div>
@@ -77,6 +91,11 @@ const props = defineProps({
   size: {
     type: Number,
     default: 0,
+  },
+  // 只读模式
+  readOnly: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -355,6 +374,9 @@ const validate = (err) => {
       height: 70px;
       padding: 20px 0 32px;
       justify-content: center;
+      &.readonly:deep(.ant-btn) {
+        display: none;
+      }
     }
 
     &::before {

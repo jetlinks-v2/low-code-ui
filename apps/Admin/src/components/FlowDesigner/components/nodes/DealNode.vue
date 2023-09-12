@@ -19,10 +19,10 @@ import Node from './Node.vue'
 
 const emits = defineEmits(['selected', 'delNode', 'insertNode'])
 const props = defineProps({
-  config: {
-    type: Object,
-    default: () => ({}),
-  },
+    config: {
+        type: Object,
+        default: () => ({}),
+    },
 })
 
 const showError = ref(false)

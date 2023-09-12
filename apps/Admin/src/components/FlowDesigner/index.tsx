@@ -40,11 +40,12 @@ const FlowDesigner = defineComponent({
     // 只读模式
     readOnly: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   setup(props, { slots, emit, expose }) {
     console.log('props: ', props)
+    const { readOnly } = props
     const { proxy } = getCurrentInstance() as ComponentInternalInstance
 
     const flowStore = useFlowStore()
@@ -79,21 +80,25 @@ const FlowDesigner = defineComponent({
         })
         //插入添加分支/条件的按钮
         branchItems.unshift(
-          h('div', { class: { 'add-branch-btn': true } }, [
-            h(
-              BranchButton,
-              {
-                class: { 'add-branch-btn-el': true },
-                size: 'small',
-                round: true,
-                text: isConditionNode(node) ? '条件分支' : '并行分支',
-                isConditionNode: isConditionNode(node),
-                onAddBranchNode: (type) => addBranchNode(node, type),
-                onOpenConfig: () => openConfig(node),
-              },
-              [],
-            ),
-          ]),
+          h(
+            'div',
+            { class: { 'add-branch-btn': true, 'read-only': readOnly } },
+            [
+              h(
+                BranchButton,
+                {
+                  class: { 'add-branch-btn-el': true },
+                  size: 'small',
+                  round: true,
+                  text: isConditionNode(node) ? '条件分支' : '并行分支',
+                  isConditionNode: isConditionNode(node),
+                  onAddBranchNode: (type) => addBranchNode(node, type),
+                  onOpenConfig: () => openConfig(node),
+                },
+                [],
+              ),
+            ],
+          ),
         )
         let bchDom = [h('div', { class: { 'branch-node': true } }, branchItems)]
         //继续遍历分支后的节点
@@ -121,6 +126,7 @@ const FlowDesigner = defineComponent({
             ...props,
             ref: node.id,
             key: node.id,
+            readOnly,
             //定义事件，插入节点，删除节点，选中节点，复制/移动
             onInsertNode: (type) => insertNode(type, node),
             onDelNode: () => delNode(node),
