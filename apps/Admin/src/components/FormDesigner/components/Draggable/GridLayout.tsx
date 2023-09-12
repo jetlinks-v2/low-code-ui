@@ -54,7 +54,7 @@ export default defineComponent({
             }
             const _span = (props.data.componentProps?.inlineMax || 1)
             return (
-                <Selection {...useAttrs()} style={{ padding: '16px' }} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
+                <Selection {...useAttrs()} style={{ padding: isEditModel.value ? '16px' : '0px' }} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
                     <div
                         data-layout-type={'grid'}
                         {...omit(props.data.componentProps, ['rowSpan', 'colSpan', 'inlineMax'])}
@@ -70,7 +70,7 @@ export default defineComponent({
                                 return (
                                     <div key={element.key} {...omit(element.componentProps, 'span')} style={{ gridColumn: `span ${a} / auto` }}>
                                         <Selection
-                                            class={'drag-area'}
+                                            class={isEditModel.value && 'drag-area'}
                                             hasDel={unref(list).length > 1}
                                             data={element}
                                             tag="div"
