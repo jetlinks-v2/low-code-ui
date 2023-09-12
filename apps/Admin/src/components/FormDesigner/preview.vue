@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Canvas :data="formData" ref="formRef"></Canvas>
+    <Canvas></Canvas>
   </div>
 </template>
   
@@ -8,25 +8,7 @@
 import Canvas from './components/Panels/Canvas/index'
 import { provide, ref, reactive, PropType, watch } from 'vue'
 import { ISchema } from './typings'
-
-const initData = {
-  type: 'root',
-  key: 'root',
-  componentProps: {
-    layout: 'horizontal',
-    size: 'default',
-  },
-  children: [
-    {
-      type: 'input',
-      key: '123',
-      name: '123',
-      formItemProps: {
-        label: '123',
-      },
-    },
-  ],
-}
+import { initData } from './utils/utils'
 
 const props = defineProps({
   value: {
@@ -39,7 +21,7 @@ const props = defineProps({
     default: 'add',
   },
   data: {
-    type: Object
+    type: Object,
   },
 })
 
@@ -52,7 +34,6 @@ const formRef = ref<any>()
 watch(
   () => props.data,
   (newVal) => {
-    console.log(newVal, 'hhhhh')
     formData.value = (newVal || initData) as ISchema
   },
   {
@@ -76,28 +57,34 @@ provide('FormDesigner', {
   model: 'preview',
   formData,
   formState,
-  mode: props.mode
+  formRef,
+  mode: props.mode,
 })
 
 const onSave = () => {
-  formRef.value
-    .validateFields()
-    .then((values) => {
-      console.log('Received values of form: ', values)
-    })
-    .catch((info) => {
-      console.log('Validate Failed:', info)
-    })
+  return new Promise((resolve, inject) => {
+    formRef.value
+      .validate()
+      .then((_data: any) => {
+        resolve(_data)
+      })
+      .catch((err: any) => {
+        inject(err)
+      })
+  })
 }
 
-watch(() => JSON.stringify(formData.value), () => {
-  emit("valueChange", formData.value)
-})
+watch(
+  () => JSON.stringify(formData.value),
+  () => {
+    emit('valueChange', formData.value)
+  },
+)
 
 defineExpose({ onSave })
 </script>
   
-  <style lang="less" scoped>
+<style lang="less" scoped>
 .container {
   background-color: #fff;
 }

@@ -18,7 +18,8 @@
   </div>
   <div class="content" v-if="viewType === 'card'">
     <ContextMenu type="empty" @select="handleChange">
-      <a-row>
+      <j-scrollbar>
+        <a-row>
         <a-col :span="3" v-for="item in list" class="content-col">
           <div @click="onClick(item.id)" @dblclick="onDbClick(item)" :class="{
             'content-item': true,
@@ -31,11 +32,12 @@
           </div>
         </a-col>
       </a-row>
+      </j-scrollbar>
     </ContextMenu>
   </div>
   <div v-else>
     <j-pro-table :columns="columns" :dataSource="list" model="TABLE" :noPagination="true" :childrenColumnName="'list'"
-      :customRow="(record) => ({ onContextmenu: (e) => onContextmenu(e, record) })">
+      :scroll="{ y: 'calc(100vh - 300px)' }" :customRow="(record) => ({ onContextmenu: (e) => onContextmenu(e, record) })">
       <template #type="{ type }">
         {{ providerMap[type] }}
       </template>
@@ -45,7 +47,8 @@
       <j-menu @click="(e) => handleChange(e.key, menuData.data)" :style="menuData.style" class="tableMenu">
         <j-menu-item :key="actionMap['Profile'].key">{{ actionMap['Profile'].value }}</j-menu-item>
         <j-menu-item :key="actionMap['Copy'].key">{{ actionMap['Copy'].value }}</j-menu-item>
-        <j-menu-item :key="actionMap['Paste'].key" :disabled="engine.copyFile === ''">{{ actionMap['Paste'].value }}</j-menu-item>
+        <j-menu-item :key="actionMap['Paste'].key" :disabled="engine.copyFile === ''">{{ actionMap['Paste'].value
+        }}</j-menu-item>
         <j-menu-item :key="actionMap['Rename'].key">{{ actionMap['Rename'].value }}</j-menu-item>
         <j-menu-item :key="actionMap['Delete'].key">{{ actionMap['Delete'].value }}</j-menu-item>
       </j-menu>
@@ -130,7 +133,6 @@ const columns = [
 
 
 const onSave = (data?: any) => {
-  // console.log('save', data)
   if (data) {
     visible.value = false
     type.value === 'Add' ? product.add(data, data.parentId) : product.update(data)
@@ -219,16 +221,15 @@ const onDbClick = (data: any) => {
 }
 
 //排序方式
-const handleSorts = ()=>{
- const data =  product.getById(engine.activeFile)
-//  console.log('data---------',data)
- product.update({
-  ...data,
-  others:{
+const handleSorts = () => {
+  const data = product.getById(engine.activeFile)
+  product.update({
+    ...data,
+    others: {
       ...data.others,
-      sorts:sorts.value
+      sorts: sorts.value
     }
- })
+  })
 }
 
 //键盘移动
@@ -297,7 +298,8 @@ watchEffect(() => {
   justify-content: flex-end;
   align-items: center;
   border-bottom: 1px solid #EEE;
-  .title-sorts{
+
+  .title-sorts {
     margin-left: 10px;
     margin-right: 10px;
     width: 130px;

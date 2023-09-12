@@ -41,8 +41,10 @@
     v-model:open="addVisible"
     :resource="popResource"
     :type="commandType"
+    :popData="popData"
     @close="addVisible = false"
     @save="addVisible = false"
+    @reload="tableRef?.reload()"
   />
   <!-- 查看 -->
   <JsonPreview
@@ -245,9 +247,10 @@ const searchType = (type_: string) => {
   }
   return type;
 }
+const router = useRouter()
+
 const actionsBtnFormat = (data: any) => {
   const finalData = data?.map((item: any) => {
-    console.log(item);
     return {
       ...item,
       key: item?.key,
@@ -268,10 +271,8 @@ const actionsBtnFormat = (data: any) => {
                 onConfirm: async () => {
                   const res = await queryRuntime(info.id, item.functions, item.command, {terms: [{column: 'id', termType: 'eq', value: data.id}]})
                   if(res.success) {
-                    console.log(tableRef.value?.reload);
                     tableRef.value?.reload?.();
                   }
-                  item?.script
                 },
               }
             : false,
@@ -279,6 +280,7 @@ const actionsBtnFormat = (data: any) => {
           if(item.script) {
             eval(item.script)
           }
+          console.log(data, item);
           importVisible.value = data?.command === 'Import'
           exportVisible.value = data?.command === 'Export'
           addVisible.value = !!item.pages
@@ -287,7 +289,7 @@ const actionsBtnFormat = (data: any) => {
             function: item.functions,
             command: item.command
           }
-          popData.value = data
+          popData.value = item?.command === 'Update' ? data : undefined
           commandType.value = item.command
         },
       }),

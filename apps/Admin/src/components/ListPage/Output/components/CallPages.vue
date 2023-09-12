@@ -8,6 +8,7 @@
     okText="确定"
     cancelText="取消"
     width="630px"
+    :destroyOnClose="true"
     @cancel="emit('close', true)"
     @ok="handleSubmit"
   >
@@ -15,6 +16,7 @@
       :data="data"
       v-if="props.resource.callPage.type === providerEnum.FormPage"
       :mode="mode"
+      :value="editValue"
       ref="formPage"
     />
     <CustomHtml
@@ -32,6 +34,7 @@ import { providerEnum } from '@/components/ProJect'
 import { ReplStore } from '@/components/CustomHTML/store'
 import { useProduct } from '@/store'
 import { queryRuntime } from '@/api/form'
+import { values } from 'lodash-es'
 
 const data = ref<Record<string, any>>()
 
@@ -52,21 +55,26 @@ const props = defineProps({
   },
   type: {
     type: String,
-    default: ''
-  }
+    default: '',
+  },
+  popData: {
+    type: Object as PropType<Record<string, any>>,
+    default: () => {},
+  },
 })
 
 const mode = computed(() => {
-  if(props.type === 'Add') {
+  if (props.type === 'Add') {
     return 'add'
-  } else if(props.type === 'Update') {
+  } else if (props.type === 'Update') {
     return 'edit'
   }
 })
 
-const emit = defineEmits(['close', 'save'])
+const emit = defineEmits(['close', 'save', 'reload'])
 const visible = ref(false)
 const confirmLoading = ref(false)
+const editValue = ref()
 
 const getInfo = async () => {
   const { projectId, parentId, id } = props.resource.callPage
@@ -75,9 +83,27 @@ const getInfo = async () => {
 }
 
 const handleSubmit = async () => {
-  formPage.value.onSave()
-  const res = await queryRuntime(props.resource.callPage.projectId, props.resource.function, props.resource.command, data)
-  emit('close', true)
+  // formPage.value.onSave()
+  confirmLoading.value = true;
+  const data = {
+    data: { name: '123' },
+  }
+  if(mode.value == 'edit') {
+    data['terms'] = [
+      {
+        terms: [
+          { column: 'id', termType: 'eq', value: props.popData.id }
+        ]
+      }
+    ]
+  }
+  const res = await queryRuntime(
+    props.resource.callPage.projectId,
+    props.resource.function,
+    props.resource.command,
+    data,
+  ).finally(() => confirmLoading.value = false)
+  emit('reload')
 }
 
 watch(
@@ -93,10 +119,12 @@ watch(
     visible.value = val
   },
 )
-
-
-watch(() => props.type, () => {
-
-})
+watch(
+  () => props.popData,
+  (val) => {
+    editValue.value = val
+  },
+  { immediate: true }
+)
 </script>
 <style lang="less" scoped></style>

@@ -55,7 +55,7 @@ export default defineComponent({
                 designer.setSelection(props.data)
             }
             return (
-                <Selection {...useAttrs()} style={{ padding: '16px' }} hasDrag={true} hasDel={true} hasCopy={true} data={props.data} parent={props.parent}>
+                <Selection {...useAttrs()} style={{ padding: isEditModel.value ? '16px' : '0px' }} hasDrag={true} hasDel={true} hasCopy={true} data={props.data} parent={props.parent}>
                     {
                         unref(list).length ? <Space data-layout-type={'space'} {...props.data.componentProps}>
                             {
@@ -63,7 +63,7 @@ export default defineComponent({
                                     return (
                                         <div key={element.key} {...element.componentProps}>
                                             <Selection
-                                                class={'drag-area'}
+                                                class={isEditModel.value && 'drag-area'}
                                                 data={element}
                                                 tag="div"
                                                 hasCopy={true}
