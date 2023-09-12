@@ -314,11 +314,14 @@ onMounted(() => {
           others: {
             ...props?.data?.others,
             menu: { ...menuConfig, buttons: [...arrFlat(buttonsConfig.value), ...arrFlat(actionsConfig.value)] },
-            userList: [
+            useList: Array.from(new Set([
               ...actionsConfig.value
                 .filter((item) => item.pages && item.pages !== '')
                 ?.map((item) => item.pages),
-            ],
+              ...buttonsConfig.value
+                .filter((item) => item.pages && item.pages !== '')
+                ?.map((item) => item.pages),
+            ])) ,
           },
         }
         onSave(record)
