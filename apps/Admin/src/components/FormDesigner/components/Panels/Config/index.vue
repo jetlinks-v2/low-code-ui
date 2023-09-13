@@ -1,17 +1,17 @@
 <template>
   <Scrollbar>
-    <div class="header"><h3>页面搭建</h3></div>
+    <div class="header">组件配置</div>
     <div class="config-container" id="config-container">
       <j-form ref="formRef" :model="target" layout="vertical">
         <j-collapse
           v-model:activeKey="activeKey"
           :expand-icon-position="'right'"
+          :bordered="false"
         >
-          <j-collapse-panel
-            v-for="item in panelsList"
-            :key="item.key"
-            :header="item.header"
-          >
+          <j-collapse-panel v-for="item in panelsList" :key="item.key">
+            <template #header>
+              <TitleComponent :data="item.header" />
+            </template>
             <component :is="Panels[item.key]" @refresh="onRefresh" />
           </j-collapse-panel>
         </j-collapse>
@@ -34,10 +34,8 @@ import { map } from 'lodash-es'
 import { getConfigList } from './utils'
 import { useTarget } from '../../../hooks'
 import { updateData } from '../../../utils/utils'
-import { useFocusWithin } from '@vueuse/core'
 
 const formRef = ref<any>()
-const { focused } = useFocusWithin(formRef)
 
 const { target } = useTarget()
 
@@ -54,7 +52,7 @@ const Panels = {
   Status,
   Source,
   Grid,
-  SourceForm
+  SourceForm,
 }
 
 const panelsList = computed(() => {
@@ -83,7 +81,7 @@ const onRefresh = (obj: any) => {
     if (obj.key === 'root') {
       designer.formData.value = {
         ...obj,
-        children: designer.formData.value?.children || []
+        children: designer.formData.value?.children || [],
       }
     } else {
       const arr = updateData(unref(designer.formData)?.children, obj)
@@ -108,19 +106,39 @@ watch(
     deep: true,
   },
 )
-
-watch(focused, focused => {
-  designer.focus = focused
-})
 </script>
 
 <style lang="less" scoped>
 .header {
-  margin-top: 15px;
+  font-size: 18px;
+  font-weight: 500;
+  border-bottom: 1px solid #f0f0f0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
 }
 .config-container {
   height: 100%;
-  margin-top: 10px;
+  padding: 16px;
   position: relative;
+
+  :deep(.ant-collapse) {
+    background-color: #fff;
+    .ant-collapse-item {
+      border: none !important;
+      margin-bottom: 2px;
+      .ant-collapse-header {
+        background-color: #fafafa !important;
+        padding: 13px;
+        .title {
+          margin: 0;
+        }
+        span {
+          color: #333333;
+        }
+      }
+    }
+  }
 }
 </style>

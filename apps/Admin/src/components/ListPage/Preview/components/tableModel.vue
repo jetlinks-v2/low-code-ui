@@ -42,24 +42,25 @@
           </div>
         </div>
         <div v-if="item?.key === 'action'">
-          <PermissionButton
-            v-for="item in tableActions"
-            :key="item.key"
-            type="link"
-            v-bind:="handleFunction(item.permissionProps, slotProps)"
-            style="padding: 0"
-            :danger="item.command === 'Delete'"
-            :popConfirm="
-              handleFunction(item.permissionProps, slotProps)?.popConfirm
-            "
-            :class="extractCssClass(item.style)"
-          >
-            <AIcon v-if="item.icon" :type="item?.icon" />
-            <img v-else-if="item?.icon?.includes('http')" :src="item.icon" />
+          <j-space size="large">
+            <PermissionButton
+              v-for="item in tableActions"
+              :key="item.key"
+              type="link"
+              v-bind:="handleFunction(item.permissionProps, slotProps)"
+              style="padding: 0"
+              :danger="item.command === 'Delete'"
+              :popConfirm="
+                handleFunction(item.permissionProps, slotProps)?.popConfirm
+              "
+              :class="extractCssClass(item.style)"
+            >
+              <AIcon v-if="item.icon" :type="item?.icon" />
+              <img v-else-if="item?.icon?.includes('http')" :src="item.icon" />
 
-            <span v-else> {{ item.text }}</span>
-            <j-divider type="vertical" />
-          </PermissionButton>
+              <span v-else> {{ item.text }}</span>
+            </PermissionButton>
+          </j-space>
         </div>
       </template>
       <template #card="slotProps">
@@ -68,8 +69,9 @@
           :actions="tableActions"
           :record="slotProps"
           :statusText="
-            slotProps[props?.cardConfig?.emphasisField] || '强调字段'
+            slotProps[props?.cardConfig?.emphasisField] || ''
           "
+          :showStatus="props?.cardConfig?.emphasisField !== ''"
           :statusNames="{
             online: 'processing',
             offline: 'error',

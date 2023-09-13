@@ -1,13 +1,14 @@
 <template>
   <div class="operation-drawer">
     <j-drawer
-      width="25vw"
       :visible="_visible"
       :title="type == 'columns' ? '操作列' : '添加按钮'"
       @close="close"
       destroy-on-close
-      :z-index="1000"
-      :placement="type == 'columns' ? 'left' : 'right'"
+      placement="right"
+      getContainer=".list-page"
+      :wrap-style="{position: 'absolute'}"
+      width="560px"
     >
       <BtnsList
         v-model:data="columnsTree"
@@ -106,7 +107,7 @@ const save = async () => {
 const valid = async () => {
   return new Promise((resolve, reject) => {
     errorList.value = validOperationsBtn(columnsTree.value)
-    if(errorList.value.length) reject(errorList.value)
+    if(errorList.value.length) reject([{message: '操作按钮配置错误'}])
     else resolve([])
   })
 }

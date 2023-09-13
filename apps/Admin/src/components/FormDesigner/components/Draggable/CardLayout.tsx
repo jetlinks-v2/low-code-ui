@@ -27,6 +27,7 @@ export default defineComponent({
         }
     },
     setup(props) {
+        const designer: any = inject('FormDesigner')
         const _data = computed(() => {
             return props.data
         })
@@ -41,6 +42,10 @@ export default defineComponent({
 
         const _isLayout = computed(() => {
             return props.data?.formItemProps.isLayout
+        })
+
+        const isEditModel = computed(() => {
+            return unref(designer?.model) === 'edit'
         })
 
         return () => {
@@ -61,7 +66,7 @@ export default defineComponent({
                             unref(list).map(element => {
                                 return (
                                     <Selection
-                                        class={'drag-area'}
+                                        class={isEditModel.value && 'drag-area'}
                                         data={element}
                                         tag="div"
                                         hasCopy={true}
@@ -83,7 +88,7 @@ export default defineComponent({
                 )
             }
             return (
-                <Selection {...useAttrs()} style={{ padding: '16px' }} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
+                <Selection {...useAttrs()} style={{ padding: isEditModel.value ? '16px' : '0px' }} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     {
                         unref(_isLayout) ?
                             <FormItem {...unref(_formItemProps)}>

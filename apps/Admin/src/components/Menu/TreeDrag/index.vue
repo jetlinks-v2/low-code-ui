@@ -6,8 +6,8 @@
             <AIcon type="QuestionCircleOutlined" style="font-size: 18px;" />
         </div>
         <j-scrollbar style="height: 330px;">
-            <j-tree v-model:selectedKeys="selectedKeys" draggable :tree-data="treeData" blockNode autoExpandParent
-                v-model:expandedKeys="expandedKeys" :fieldNames="{ title: 'name', key: 'id' }" @drop="onDrop">
+            <j-tree v-model:selectedKeys="selectedKeys" draggable :tree-data="treeData" blockNode :autoExpandParent="autoExpandParent"
+                v-model:expandedKeys="expandedKeys" :fieldNames="{ title: 'name', key: 'id' }" @drop="onDrop" @expand="onExpand">
                 <template #title="item">
                     <div :class="{
                         'tree-content': true,
@@ -72,6 +72,7 @@ const selectedKeys = ref<any>([])
 const expandedKeys = ref<any>([])
 const visible = ref<boolean>(false)
 const visibleDel = ref<boolean>(false)
+const autoExpandParent = ref<boolean>(false)
 
 
 const countMap = ref(new Map())
@@ -187,6 +188,11 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
     }
 }
 
+const onExpand = (keys)=>{
+    console.log('keys',keys)
+    autoExpandParent.value = false
+}
+
 const getKeyByValue = (arr) => {
     const keys: any = []
     for (const [key, value] of expandMap.entries()) {
@@ -227,8 +233,10 @@ watch(
 watch(
     () => props.checkedKey,
     (val) => {
+        console.log('val',val)
         const arr = getKeyByValue(val)
-        expandedKeys.value = arr
+         expandedKeys.value = arr
+         autoExpandParent.value = true
     }
 )
 
@@ -254,6 +262,7 @@ const getTree = async () => {
         handleTree(res.result)
     }
 }
+
 
 onMounted(() => {
     getTree()
