@@ -1,17 +1,23 @@
 <template>
-  <a-tabs v-model:activeKey="activeKey" type="card">
-    <a-tab-pane key="basic" tab="基础配置">基础配置</a-tab-pane>
-    <a-tab-pane key="member" tab="成员配置">成员配置</a-tab-pane>
-  </a-tabs>
+  <component
+    :is="componentsMap[(selectedNode.type || '').toUpperCase()]"
+    :config="selectedNode.props"
+  />
 </template>
 
 <script setup lang="ts">
 import { useFlowStore } from '@/store/flow'
+import ApprovalNodeConfig from './ApprovalNodeConfig.vue'
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
+// console.log('selectedNode: ', selectedNode.value)
 
-const activeKey = ref('basic')
+const componentsMap = {
+  APPROVAL: ApprovalNodeConfig,
+  //   DEAL: Deal,
+  //   CONDITION: Condition,
+}
 </script>
 
 <style lang="less" scoped></style>
