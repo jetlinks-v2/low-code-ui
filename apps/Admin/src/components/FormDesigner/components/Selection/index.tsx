@@ -2,7 +2,7 @@ import { isHTMLTag } from '@vue/shared'
 import { withModifiers } from 'vue'
 import './index.less'
 import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
-import { checkIsField, extractCssClass, insertCustomCssToHead } from '../../utils/utils'
+import { checkIsField, extractCssClass, insertCustomCssToHead, updateData } from '../../utils/utils'
 import { map, set } from 'lodash-es'
 
 const Selection = defineComponent({
@@ -88,7 +88,18 @@ const Selection = defineComponent({
     }
 
     const setOptions = (arr: any[]) => {
-      props.data.context?.updateProps(arr, 'options')
+      const _list = updateData(unref(designer.formData)?.children, {
+        ...props.data,
+        componentProps: {
+          ...props.data.componentProps,
+          options: arr
+        }
+      })
+      designer.formData.value = {
+        ...designer.formData.value,
+        children: _list || [],
+      }
+      designer.setSelection(props.data || 'root')
     }
 
     const setValue = (_val: any) => {
@@ -98,7 +109,18 @@ const Selection = defineComponent({
     }
 
     const setDisabled = (bool: boolean) => {
-      props.data.context?.updateProps(bool, 'disabled')
+      const _list = updateData(unref(designer.formData)?.children, {
+        ...props.data,
+        componentProps: {
+          ...props.data.componentProps,
+          disabled: bool
+        }
+      })
+      designer.formData.value = {
+        ...designer.formData.value,
+        children: _list || [],
+      }
+      designer.setSelection(props.data || 'root')
     }
 
     // 复制
@@ -130,7 +152,7 @@ const Selection = defineComponent({
         trigger={['contextmenu']}
         onContextmenu={withModifiers(() => {
           const flag = designer.selected.value.find(item => item.key === props.data.key)
-          if(!flag) {
+          if (!flag) {
             designer.setSelection(props.data)
           }
         }, ['stop'])}

@@ -102,7 +102,7 @@ export const checkedConfig = (node: ISchema) => {
     return _rules
 }
 
-export const updateData = (list: ISchema[], item: ISchema) => {
+export const updateData = (list: ISchema[], item?: any) => {
     return (list || []).map(_item => {
         if (_item.key === item.key) {
             return {
