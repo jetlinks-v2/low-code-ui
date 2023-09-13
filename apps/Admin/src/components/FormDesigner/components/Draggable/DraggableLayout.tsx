@@ -1,5 +1,5 @@
 
-import { cloneDeep, get, isEmpty, omit, set } from 'lodash-es';
+import { cloneDeep, get, isEmpty, set } from 'lodash-es';
 import DraggableWrap from './DragGableWrap'
 import Selection from '../Selection'
 import { FormItem } from 'jetlinks-ui-components'
@@ -141,8 +141,12 @@ const DraggableLayout = defineComponent({
                                     }
                                 }
                                 if(!element?.componentProps?.eventCode && !unref(isEditModel)) return 
-                                if(['input', 'input-number', 'textarea', 'input-password'].includes(element.type)){
+                                if(['input', 'textarea', 'input-password'].includes(element.type)){
                                     let customFn = new Function('e', element?.componentProps?.eventCode)
+                                    customFn.call(_this, arg?.[0])
+                                }
+                                if(['input-number'].includes(element.type)){
+                                    let customFn = new Function('value', element?.componentProps?.eventCode)
                                     customFn.call(_this, arg?.[0])
                                 }
                                 if(['select', 'switch', 'select-card', 'tree-select'].includes(element.type)){
@@ -172,7 +176,7 @@ const DraggableLayout = defineComponent({
 
                             if(!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
                                 queryOptions(element.componentProps.source, product.info?.id).then(resp => {
-                                    options.value = resp
+                                    _props.componentProps.options = resp
                                 })
                             }
 

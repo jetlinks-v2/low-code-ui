@@ -169,8 +169,8 @@
           @change="onDataChange"
         >
           <j-select-option :value="'left'">左</j-select-option>
-          <j-select-option :value="'right'">中</j-select-option>
-          <j-select-option :value="'center'">右</j-select-option>
+          <j-select-option :value="'right'">右</j-select-option>
+          <j-select-option :value="'center'">中</j-select-option>
         </j-select>
       </j-form-item>
     </template>

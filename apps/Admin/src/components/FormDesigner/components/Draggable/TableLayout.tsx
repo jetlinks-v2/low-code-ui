@@ -150,12 +150,14 @@ export default defineComponent({
                             <Table
                                 pagination={false}
                                 dataSource={data.value}
+                                scroll={{ y: 300, x: 'max-content' }}
                             >
                                 {
                                     unref(list).map(element => {
                                         return <TableColumn
                                             key={element.key}
                                             {...omit(element.componentProps, 'name')}
+                                            align={props.data.componentProps?.align}
                                             v-slots={{
                                                 title: () => {
                                                     return <Selection

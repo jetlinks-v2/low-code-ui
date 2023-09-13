@@ -70,7 +70,7 @@ import {
   checkedConfig,
   getFieldData,
   initData,
-  appendChildItem
+  appendChildItem,
 } from './utils/utils'
 import { uid } from './utils/uid'
 
@@ -107,6 +107,7 @@ const checkVisible = ref<boolean>(false)
 const editData = ref<string>()
 const _ctrl = ref<boolean>(false)
 const focus = ref<boolean>(false)
+const focused = ref<boolean>(false)
 
 const product = useProduct()
 const formDesigner = useFormDesigner()
@@ -116,7 +117,11 @@ const isSelectedRoot = computed(() => {
 })
 
 const _width = computed(() => {
-  return model.value === 'preview' ? '100%' : (!unref(isShowConfig) ? 'calc(100% - 200px)' : 'calc(100% - 584px)')
+  return model.value === 'preview'
+    ? '100%'
+    : !unref(isShowConfig)
+    ? 'calc(100% - 200px)'
+    : 'calc(100% - 584px)'
 })
 
 // 设置数据被选中
@@ -140,7 +145,7 @@ const setSelection = (node: any) => {
 // 删除
 const onDelete = debounce(() => {
   const arr = selected.value || []
-  if (unref(isSelectedRoot) || !arr?.length) return
+  if (unref(isSelectedRoot) || !arr?.length || focused.value) return
   delVisible.value = true
   Modal.confirm({
     title: '确定删除组件及其配置？',
@@ -164,13 +169,13 @@ const onDelete = debounce(() => {
 
 // 复制
 const onCopy = () => {
-  if (unref(isSelectedRoot)) return
+  if (unref(isSelectedRoot) || focused.value) return
   formDesigner.setCopyData(selected.value || [])
 }
 
 // 剪切
 const onShear = debounce(() => {
-  if (unref(isSelectedRoot)) return
+  if (unref(isSelectedRoot) || focused.value) return
   formDesigner.setCopyData(selected.value || [])
   const _data: any = deleteDataByKey(formData.value.children, selected.value)
   formData.value = {
@@ -182,7 +187,7 @@ const onShear = debounce(() => {
 
 // 粘贴
 const onPaste = () => {
-  if (!selected.value?.length) return
+  if (!selected.value?.length || focused.value) return
   const _data = formDesigner.getCopyData()
   const list = (_data || []).map((item) => {
     return {
@@ -223,8 +228,8 @@ const onCollect = () => {
 const onAddChild = (newData: any, parent: any, flag?: boolean) => {
   const arr = appendChildItem(formData.value?.children, newData, parent, flag)
   formData.value = {
-      ...formData.value,
-      children: arr || [],
+    ...formData.value,
+    children: arr || [],
   }
   setSelection(newData || 'root')
 }
@@ -263,6 +268,7 @@ provide('FormDesigner', {
   delVisible,
   _ctrl,
   focus,
+  focused, // 其他组件
   setSelection,
   setModel,
   onSaveData,
@@ -271,7 +277,7 @@ provide('FormDesigner', {
   onCopy,
   onShear,
   onCollect,
-  onAddChild
+  onAddChild,
 })
 
 const onSave = () => {
