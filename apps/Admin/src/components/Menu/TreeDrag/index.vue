@@ -3,11 +3,12 @@
     <div class="content">
         <div class="top">
             <j-button type="primary" @click="onAction({}, 'save')">新增菜单</j-button>
-            <AIcon type="QuestionCircleOutlined" style="font-size: 18px;" />
+            <AIcon type="QuestionCircleOutlined" style="font-size: 18px;" @click="() => setVisible(true)" />
         </div>
         <j-scrollbar style="height: 330px;">
-            <j-tree v-model:selectedKeys="selectedKeys" draggable :tree-data="treeData" blockNode :autoExpandParent="autoExpandParent"
-                v-model:expandedKeys="expandedKeys" :fieldNames="{ title: 'name', key: 'id' }" @drop="onDrop" @expand="onExpand">
+            <j-tree v-model:selectedKeys="selectedKeys" draggable :tree-data="treeData" blockNode
+                :autoExpandParent="autoExpandParent" v-model:expandedKeys="expandedKeys"
+                :fieldNames="{ title: 'name', key: 'id' }" @drop="onDrop" @expand="onExpand">
                 <template #title="item">
                     <div :class="{
                         'tree-content': true,
@@ -36,9 +37,15 @@
                 </template>
             </j-tree>
         </j-scrollbar>
-
     </div>
-
+    <a-image 
+        style="display: none;"  
+        :preview="{
+            visible: visibleImg,
+            onVisibleChange: setVisible,
+        }" 
+        :src="getImage('/menu/menu.png')" 
+        />
     <Save v-if="visible" @close="visible = false" :data="treeItem" @ok="onOk" />
     <DelModal v-if="visibleDel" @close="visibleDel = false" @ok="onDel" :data="treeItem" />
 </template>
@@ -47,7 +54,7 @@
 import { cloneDeep } from 'lodash-es';
 import { DeleteTreeById, getTreeLevel, handleTreeModal } from '../index'
 import { AntTreeNodeDropEvent, TreeProps } from 'ant-design-vue/es/tree/Tree';
-import { onlyMessage } from '@jetlinks/utils';
+import { onlyMessage,getImage } from '@jetlinks/utils';
 import Save from '../components/Save.vue'
 import DelModal from '../components/DelModal.vue'
 import { getAllMenuTree } from '@/api/menu';
@@ -66,6 +73,7 @@ type Emits = {
 };
 const emit = defineEmits<Emits>();
 
+
 const treeData = ref<any>([])
 const treeItem = ref<any>({})
 const selectedKeys = ref<any>([])
@@ -73,6 +81,7 @@ const expandedKeys = ref<any>([])
 const visible = ref<boolean>(false)
 const visibleDel = ref<boolean>(false)
 const autoExpandParent = ref<boolean>(false)
+const visibleImg = ref<boolean>(false)
 
 
 const countMap = ref(new Map())
@@ -123,6 +132,9 @@ const onOk = (data: any) => {
     visible.value = false
 }
 
+const setVisible = (value) => {
+    visibleImg.value = value
+}
 
 //拖拽
 const onDrop = (info: AntTreeNodeDropEvent) => {
@@ -188,8 +200,8 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
     }
 }
 
-const onExpand = (keys)=>{
-    console.log('keys',keys)
+const onExpand = (keys) => {
+    console.log('keys', keys)
     autoExpandParent.value = false
 }
 
@@ -233,10 +245,10 @@ watch(
 watch(
     () => props.checkedKey,
     (val) => {
-        console.log('val',val)
+        console.log('val', val)
         const arr = getKeyByValue(val)
-         expandedKeys.value = arr
-         autoExpandParent.value = true
+        expandedKeys.value = arr
+        autoExpandParent.value = true
     }
 )
 
