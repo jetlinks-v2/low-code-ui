@@ -83,9 +83,6 @@ const handleProps = (node: any) => {
             result.rowSpan = 5
             result.colSpan = 10
             break
-        case 'grid-item':
-            result.span = 1
-            break
         case 'form':
             result.source = {
                 value: undefined,

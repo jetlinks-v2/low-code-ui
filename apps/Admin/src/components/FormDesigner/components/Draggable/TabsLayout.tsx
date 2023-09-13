@@ -4,7 +4,9 @@ import { Tabs, TabPane, FormItem } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
 import { cloneDeep } from 'lodash-es'
-import { addContext } from '../../utils/addContext'
+import { useTool } from '../../hooks'
+import generatorData from '../../utils/generatorData'
+import { uid } from '../../utils/uid'
 
 export default defineComponent({
     name: 'TabsLayout',
@@ -30,22 +32,25 @@ export default defineComponent({
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
+        const { isEditModel, isDragArea, layoutPadStyle } = useTool()
+
         const list = computed(() => {
             return props.data?.children || []
         })
 
         const handleAdd = () => {
-            if (!props.data?.context) {
-                addContext(props.data, props.parent)
-            }
-            props.data.context?.appendItem()
-            const addData = unref(list)?.[unref(list).length - 1] ||'root'
-            designer.setSelection(addData)
+            const _item = generatorData({
+                type: props.data?.type + '-item',
+                children: [],
+                componentProps: {
+                    tab: 'Tab' + uid(6)
+                },
+                formItemProps: {
+                    name: uid(6)
+                }
+            })
+            designer.onAddChild(_item, props.data)
         }
-
-        const isEditModel = computed(() => {
-            return unref(designer?.model) === 'edit'
-        })
 
         const _formItemProps = computed(() => {
             return props.data?.formItemProps
@@ -71,7 +76,7 @@ export default defineComponent({
                                     return (
                                         <TabPane key={element.key} {...element.componentProps}>
                                             <Selection
-                                                class={isEditModel.value && 'drag-area'}
+                                                class={unref(isDragArea) && 'drag-area'}
                                                 data={element}
                                                 tag="div"
                                                 hasCopy={true}
@@ -105,7 +110,7 @@ export default defineComponent({
             }
 
             return (
-                <Selection {...useAttrs()} style={{ padding: isEditModel.value ? '16px' : '0px' }} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
+                <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
                     {
                         unref(_isLayout) ?
                             <FormItem {...unref(_formItemProps)}>
