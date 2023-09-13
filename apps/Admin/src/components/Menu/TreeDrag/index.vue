@@ -2,8 +2,8 @@
 <template>
     <div class="content">
         <div class="top">
-            <j-button type="primary" @click="onAction({}, 'save')">新增菜单</j-button>
-            <AIcon type="QuestionCircleOutlined" style="font-size: 18px;" @click="() => setVisible(true)" />
+            <j-button type="link" class="btn" @click="onAction({}, 'save')">+ 新增菜单</j-button>
+            <AIcon type="QuestionCircleOutlined" class="icon" @click="() => setVisible(true)" />
         </div>
         <j-scrollbar style="height: 330px;">
             <j-tree v-model:selectedKeys="selectedKeys" draggable :tree-data="treeData" blockNode
@@ -17,13 +17,13 @@
                         <div class="tree-content-title">
                             <AIcon :type="item.icon || item.others?.menu?.icon" />
                             <div style="margin-left: 10px">{{ item.name }}</div>
-                            <j-badge v-if="item.options?.projectId === projectId" color="blue"
+                            <j-badge v-if="item.options?.projectId === projectId" color="#315EFB"
                                 style="margin-left: 10px;"></j-badge>
                         </div>
                         <div @click="(e) => e.stopPropagation()" style="display: flex;">
                             <j-tooltip title="编辑">
                                 <j-button type="link" style="padding: 0;" @click="onAction(item, 'save')">
-                                    <AIcon type="FormOutlined" />
+                                    <AIcon type="EditOutlined" />
                                 </j-button>
                             </j-tooltip>
                             <j-tooltip title="删除">
@@ -39,13 +39,12 @@
         </j-scrollbar>
     </div>
     <a-image 
-        style="display: none;"  
+        style="display: none;" 
         :preview="{
             visible: visibleImg,
             onVisibleChange: setVisible,
         }" 
-        :src="getImage('/menu/menu.png')" 
-        />
+        :src="getImage('/menu/menu.png')" />
     <Save v-if="visible" @close="visible = false" :data="treeItem" @ok="onOk" />
     <DelModal v-if="visibleDel" @close="visibleDel = false" @ok="onDel" :data="treeItem" />
 </template>
@@ -54,7 +53,7 @@
 import { cloneDeep } from 'lodash-es';
 import { DeleteTreeById, getTreeLevel, handleTreeModal } from '../index'
 import { AntTreeNodeDropEvent, TreeProps } from 'ant-design-vue/es/tree/Tree';
-import { onlyMessage,getImage } from '@jetlinks/utils';
+import { onlyMessage, getImage } from '@jetlinks/utils';
 import Save from '../components/Save.vue'
 import DelModal from '../components/DelModal.vue'
 import { getAllMenuTree } from '@/api/menu';
@@ -292,6 +291,19 @@ onMounted(() => {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        line-height: 40px;
+        height: 40px;
+        background-color: #F8F8F8;
+
+        .btn {
+            color: #333333;
+        }
+
+        .icon {
+            color: #00000050;
+            font-size: 16px;
+            margin-right: 20px;
+        }
     }
 
     :deep(.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected) {
@@ -303,7 +315,9 @@ onMounted(() => {
         min-height: 32px;
 
         &.project {
-            background-color: #d6e4ff8a;
+            background-color: #F6F7F9;
+            border-radius: 4px;
+            color: #315EFB;
         }
 
         .tree-content-title {
