@@ -300,7 +300,6 @@ const onCheck = async () => {
   if(valid) {
     validateValue()
     if (formState.field1 !== '') {
-      Object.assign(listFormInfo, formState)
       return true
     }
   } else {

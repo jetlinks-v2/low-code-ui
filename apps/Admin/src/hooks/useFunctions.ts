@@ -20,7 +20,12 @@ export const useFunctions = () => {
       return [providerEnum.CRUD, providerEnum.Function, providerEnum.SQL].includes(item.type)
     })
     if(JSON.stringify(newFunction) !== JSON.stringify(functionOptions.value)) {
-      functionOptions.value = newFunction
+      functionOptions.value = newFunction.map(item => {
+        return {
+          ...item,
+          ...productStore.getById(item.id)
+        }
+      })
     }
   }, { immediate: true })
   /***
