@@ -212,10 +212,10 @@ const FlowDesigner = defineComponent({
         Math.random() * 9000 + 1000,
       )}`
     }
-    //选中一个节点
+    // 选中一个节点
     const selectNode = (node) => {
       flowStore.setSelectedNode(node)
-      emit('selectedNode', node)
+      emit('selectNode', node)
     }
 
     //处理节点插入逻辑
@@ -400,9 +400,11 @@ const FlowDesigner = defineComponent({
       }
     }
 
-    // 打开配置抽屉
+    // 选中分支
     const openConfig = (node) => {
-      console.log('打开配置抽屉', node)
+      //   console.log('选中分支', node)
+      flowStore.setSelectedNode(node)
+      emit('selectNode', node)
     }
 
     //删除当前节点
