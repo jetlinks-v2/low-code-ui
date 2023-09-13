@@ -374,7 +374,7 @@ const syncData = async () => {
     handleChange(tempData.value)
     return
   }
-  if (tempData.value.length !== props.dataSource.length) {
+  if (dataBinds.functionInfo?.configuration?.columns?.length !== tempData.value.length) {
     openModel(props.modelActiveKey)
   } else {
     onlyMessage('已是最新数据', 'success')
@@ -392,6 +392,7 @@ const asyncDataBind = async () => {
       }
     },
   ) || []
+  
 }
 //打开弹窗
 const openModel = (value: any) => {
