@@ -19,6 +19,7 @@ import Empty from './components/nodes/EmptyNode.vue'
 import BranchButton from './components/BranchButton.vue'
 import DefaultProps from './DefaultNodeProps'
 import { onlyMessage } from '@jetlinks/utils'
+import { useMouseEvent } from './hooks/useMouseEvent'
 
 const componentsMap = {
   NODE: Node,
@@ -502,45 +503,16 @@ const FlowDesigner = defineComponent({
       }
     }
 
-    // 鼠标滚动事件
-    const _scale = ref(1)
-    const onMousewheel = ({ deltaY }) => {
-      if (deltaY < 0) {
-        _scale.value = parseFloat(
-          (_scale.value >= 1 ? 1 : _scale.value + 0.1).toFixed(1),
-        )
-      } else {
-        _scale.value = parseFloat(
-          (_scale.value <= 0.5 ? 0.5 : _scale.value - 0.1).toFixed(1),
-        )
-      }
-    }
-
-    // 鼠标拖动事件
-    const isDragging = ref(false)
-    const initialX = ref(0)
-    const initialY = ref(0)
-    const offsetX = ref(0)
-    const offsetY = ref(0)
-
-    const startDrag = (event) => {
-      isDragging.value = true
-      initialX.value = initialX.value || event.clientX
-      initialY.value = initialY.value || event.clientY
-    }
-    const dragging = (event) => {
-      if (isDragging.value) {
-        const deltaX = event.clientX - initialX.value
-        const deltaY = event.clientY - initialY.value
-        offsetX.value = deltaX
-        offsetY.value = deltaY
-      }
-    }
-    const endDrag = (event) => {
-      isDragging.value = false
-      initialX.value = event.clientX
-      initialY.value = event.clientY
-    }
+    // 鼠标事件
+    const {
+      scale,
+      offsetX,
+      offsetY,
+      onMousewheel,
+      startDrag,
+      dragging,
+      endDrag,
+    } = useMouseEvent()
 
     // 渲染组件
     return () => {
@@ -557,7 +529,6 @@ const FlowDesigner = defineComponent({
           }),
         ]),
       )
-
       //   console.log('dom.value: ', dom.value)
       //   console.log('nodeMap.value: ', nodeMap.value)
       //   console.log('processTrees: ', processTrees)
@@ -570,12 +541,12 @@ const FlowDesigner = defineComponent({
             // width: '200%',
             // height: '200%',
             // background: '#eee',
-            // transform: `scale(${_scale.value}) translate(${offsetX.value}px, ${offsetY.value}px)`,
+            // transform: `scale(${scale.value}) translate(${offsetX.value}px, ${offsetY.value}px)`,
           },
-          //   onMousewheel: (e) => onMousewheel(e),
-          //   onMousedown: (e) => startDrag(e),
-          //   onMousemove: (e) => dragging(e),
-          //   onMouseup: (e) => endDrag(e),
+          onMousewheel: (e) => onMousewheel(e),
+          onMousedown: (e) => startDrag(e),
+          onMousemove: (e) => dragging(e),
+          onMouseup: (e) => endDrag(e),
         },
         processTrees,
       )
