@@ -6,9 +6,7 @@
       :closable="true"
       :visible="open"
       @close="emits('update:open', false)"
-      getContainer=".list-page"
-      :wrap-style="{position: 'absolute'}"
-      width="608px"
+      width="560px"
     >
       <div v-if="!showType!.configurationShow">
         <p>数据展示方式</p>

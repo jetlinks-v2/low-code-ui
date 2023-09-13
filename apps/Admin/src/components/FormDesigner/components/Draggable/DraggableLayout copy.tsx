@@ -97,14 +97,34 @@ const DraggableLayout = defineComponent({
                     default:
                         if (unref(isEditModel) || componentMap?.[element?.type]) {
                             const TypeComponent = componentMap?.[element?.type] || 'div'
-                            const _props = useProps(element, unref(designer.formData), unref(isEditModel), unref(designer.mode))
+                            const _props = useProps(element, unref(designer.formData))
+
+                            console.log(_props)
 
                             const selectRef = ref<any>(null)
+                            const options = ref<any[]>(element?.componentProps?.options || [])
 
                             const params = {
                                 data: element,
                                 parent: props.data
                             }
+
+                            // const formItemProps = computed(() => {
+                            //     const rules = (element.formItemProps?.rules || []).map(item => {
+                            //         if(item?.validator) { // 处理自定义校验函数
+                            //             return {
+                            //                 ...omit(item, 'validator'),
+                            //                 validator(rule, value, callback){
+                            //                     let customFn = new Function('rule', 'value', 'callback', item?.validator)
+                            //                     return customFn(rule, value, callback)
+                            //                 }
+                            //             }
+                            //         }
+                            //         return item
+                            //     })
+                                
+                            //     return { ...element?.formItemProps, rules }
+                            // })
 
                             if (element?.formItemProps?.name) {
                                 _path[_index] = element?.formItemProps?.name
@@ -185,13 +205,17 @@ const DraggableLayout = defineComponent({
                                                 model={unref(designer.model)}
                                                 data={element}
                                                 {..._props.componentProps}
+                                                size={unref(designer.formData)?.componentProps.size}
                                             ></TypeComponent> : 
                                             <TypeComponent
                                                 data={element}
                                                 {..._props.componentProps}
+                                                size={unref(designer.formData)?.componentProps.size}
                                                 v-model:value={myValue.value}
                                                 v-model:checked={checked.value}
                                                 onChange={onChange}
+                                                disabled={element?.componentProps?.disabled || (unref(designer.mode) === 'edit' && !element?.componentProps?.editable)}
+                                                options={unref(options)}
                                             ></TypeComponent>
                                         }
                                         <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{element.componentProps?.description}</div>
