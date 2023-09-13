@@ -16,7 +16,19 @@
           v-if="iconType"
           style="border: 1px solid #d9d9d9; padding: 5px"
         />
-        <UploadIcon v-model:modelValue="form.icon" v-else />
+        <!-- <UploadIcon v-model:modelValue="form.icon" v-else /> -->
+        <div class="custom-upload" v-else>
+          <Upload v-model:value="form.icon" accept=".jpg,.jpeg,.png" :borderStyle="{border: 'none'}">
+            <template #content="{imageUrl}">
+              <template v-if="imageUrl">
+                <img :src="imageUrl" class="upload-image" />
+              </template>
+              <template v-else>
+                <AIcon type="PlusOutlined" style="font-size: 20px" />
+              </template>
+            </template>
+          </Upload>
+        </div>
       </j-form-item>
       <template v-if="activeBtn!.type !== 'customer'">
         <j-row :gutter="20" v-if="activeBtn?.type !== 'Detail'">
@@ -97,7 +109,8 @@
 </template>
 
 <script setup lang="ts" name="Edit">
-import UploadIcon from './UploadIcon.vue'
+import Upload from '@/components/Upload/Image/ImageUpload.vue'
+
 import { FormInstance } from 'jetlinks-ui-components'
 import { useProduct } from '@/store'
 import EditorModal from '@/components/EditorModal'
@@ -160,7 +173,7 @@ const form = reactive({
   key: props.data.key,
   functions:
     editType!.value === 'add' &&
-    functionOptions!.value.find((item) => item.id === props.data.functions)
+    functionOptions!.value.find((item) => item.fullId === props.data.functions)
       ?.provider === providerEnum.Function
       ? ''
       : props.data.functions,
@@ -220,5 +233,13 @@ defineExpose({
 <style scoped lang="less">
 form {
   padding: 20px;
+}
+.custom-upload {
+  width: 24px;
+  height: 24px;
+  .upload-image {
+    width: 24px;
+    height: 24px;
+  }
 }
 </style>

@@ -14,12 +14,13 @@
                         'active': menuState.checkedKey.includes(item.id)
                     }">
                         <div style="display: flex; align-items: center;">
-                            <AIcon :type="item.icon || item.others?.menu?.icon" />
+                            <AIcon :type="item.icon || item.others?.menu?.icon" style="margin-left: 10px;"/>
                             <div style="margin-left: 10px;">
                                 <j-ellipsis style="max-width: 250px;">{{ item.others?.menu?.name }}</j-ellipsis>
                             </div>
                         </div>
-                        <j-badge :count="countMap.get(item.id)" :number-style="{ backgroundColor: '#315efb' }" />
+                        <div style="color: #315EFB;margin-right: 20px;" v-if="countMap.get(item.id)!==0">{{ countMap.get(item.id) }}</div>
+                        <!-- <j-badge :count="countMap.get(item.id)" :number-style="{ backgroundColor: '#315efb' }" /> -->
                     </div>
                 </div>
             </div>
@@ -154,34 +155,41 @@ watchEffect(() => {
         .left {
             background-color: #ffffff;
             height: 400px;
-            border: 1px solid #dcdcdc;
+            border: 1px solid #E0E0E0;
             width: 49%;
+            border-radius: 5px;
 
             .left-top {
-                margin-left: 24px;
-                margin-top: 20px;
+                // margin-left: 24px;
+                // margin-top: 20px;
+                line-height: 40px;
+                height: 40px;
+                background-color: #F8F8F8;
+                padding-left: 20px;
             }
 
             .list {
-                padding: 0 24px 24px 24px;
+                padding:5px 10px;
 
                 .list-item {
-                    height: 30px;
-                    line-height: 30px;
+                    height: 32px;
+                    line-height: 32px;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    margin: 10px 0;
-                    border-bottom: 1px solid #e6e6e667;
+                    margin: 5px 0;
+                    color: #333333;
                     cursor: pointer;
 
                     &.active {
-                        background-color: #d6e4ff;
+                        background-color: #F6F7F9;
+                        border-radius: 4px;
+                        color: #315EFB;
                     }
 
-                    // &:hover {
-                    //     background-color: #d6e4ff;
-                    // }
+                    &:hover {
+                        background-color: #F6F7F9;
+                    }
                 }
             }
         }
@@ -194,8 +202,9 @@ watchEffect(() => {
             background-color: #ffffff;
             height: 400px;
             width: 49%;
-            border: 1px solid #dcdcdc;
-            padding: 12px;
+            border: 1px solid #E0E0E0;
+            width: 49%;
+            border-radius: 5px;
 
             .top {
                 margin-bottom: 10px;

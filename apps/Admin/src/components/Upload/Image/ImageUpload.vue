@@ -37,6 +37,7 @@
     :img="cropper.img"
     :title="cropperTitle"
     @cancel="cropper.visible = false"
+    output-type="jpg"
     @ok="saveImage"
   />
 </template>
@@ -130,9 +131,9 @@ const handleChange = (info: UploadChangeParam) => {
     loading.value = true;
   }
   if (info.file.status === 'done') {
-    imageUrl.value = info.file.response?.result;
+    imageUrl.value = info.file.response?.result?.accessUrl;
     loading.value = false;
-    emit('update:value', info.file.response?.result);
+    emit('update:value', info.file.response?.result?.accessUrl);
   }
   if (info.file.status === 'error') {
     loading.value = false;
@@ -140,10 +141,10 @@ const handleChange = (info: UploadChangeParam) => {
   }
 }
 
-const saveImage = (url: string) => {
+const saveImage = (url: any) => {
   cropper.visible = false
-  imageUrl.value = url
-  emit('update:value', url);
+  imageUrl.value = url?.accessUrl
+  emit('update:value', url?.accessUrl);
 }
 
 watch(() => props.value, (newValue) => {
