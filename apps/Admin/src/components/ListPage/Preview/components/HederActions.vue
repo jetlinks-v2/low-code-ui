@@ -10,8 +10,13 @@
           :popConfirm="handleFunction(item.permissionProps)?.popConfirm"
           v-if="item?.children?.length === 0"
         >
-          <AIcon v-if="item.icon" :type="item?.icon" />
-          {{ item?.text }}
+          <j-space>
+            <template v-if="item.icon">
+              <img :src="item.icon" alt="" v-if="item.icon.includes('http')" style="width: 14px;height: 14px;">
+              <AIcon v-else :type="item?.icon" />
+            </template>
+            {{ item?.text }}
+          </j-space>
         </PermissionButton>
 
 
