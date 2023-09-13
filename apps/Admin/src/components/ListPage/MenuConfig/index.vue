@@ -6,6 +6,9 @@
       :closable="false"
       :visible="open"
       @close="emits('update:open', false)"
+      getContainer=".list-page"
+      :wrap-style="{position: 'absolute'}"
+      width="560px"
     >
       <Menu
         ref="menuRef"
@@ -52,7 +55,7 @@ const errorList = ref<any[]>([])
 const valid = () => {
   return new Promise((resolve, reject) => {
     errorList.value = validMenu(menConfig)
-    if(errorList.value.length) reject(errorList.value)
+    if(errorList.value.length) reject([{message: '菜单配置错误'}])
     else resolve([])
   })
 }

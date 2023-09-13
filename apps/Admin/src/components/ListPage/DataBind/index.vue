@@ -14,7 +14,7 @@
               :value="item.fullId"
               :key="item.id"
             >
-              {{ item.name }}
+              {{ item.title }}
             </j-select-option>
           </j-select>
         </ErrorItem>
@@ -127,15 +127,16 @@ const valid = () => {
   console.log(`output->dataBind.data`, dataBind)
   return new Promise((resolve, reject) => {
     errorList.value = validDataBind(dataBind.data, functionOptions.value)
-    if (errorList.value.length) reject(errorList.value)
+    if (errorList.value.length) reject([{message: '数据绑定配置错误'}])
     else resolve([])
   })
 }
 
 watch(
-  () => JSON.stringify(dataBind),
+  () => dataBind.data.function,
   () => {
     if (dataBind.data.function) {
+      console.log(`output->dataBind.data.function`,dataBind.data.function)
       handleChangeFunction(dataBind.data.function)
     }
   },

@@ -108,7 +108,7 @@ export const useEngine = defineStore('engine', () => {
         delete cloneRecord.children
       }
       if(type!=='module'&& type!=='project'){
-        files.value.push(cloneRecord)
+        files.value.unshift(cloneRecord)
       }
       // files.value.push(cloneRecord)
     }

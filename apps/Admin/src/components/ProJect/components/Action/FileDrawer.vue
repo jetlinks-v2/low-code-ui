@@ -8,8 +8,6 @@
       <div>
          修改时间：{{ props.data.others.modifyTime }}
       </div>
-      <j-divider></j-divider>
-      <div class="title">通用：</div>
       <div>类型：{{ type }} - {{  providerMap[props.data.type] }}</div>
       <div>位置：{{ location }}</div>
       <j-divider></j-divider>
