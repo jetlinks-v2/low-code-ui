@@ -374,7 +374,7 @@ const syncData = async () => {
     handleChange(tempData.value)
     return
   }
-  if (JSON.stringify(tempData.value) !== JSON.stringify(props.dataSource)) {
+  if (tempData.value.length !== props.dataSource.length) {
     openModel(props.modelActiveKey)
   } else {
     onlyMessage('已是最新数据', 'success')
