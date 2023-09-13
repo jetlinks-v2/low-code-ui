@@ -547,8 +547,6 @@ const FlowDesigner = defineComponent({
       console.log('渲染流程树')
       nodeMap.value.clear()
       let processTrees = getDomTree(h, dom.value)
-      //   console.log('dom.value: ', dom.value);
-      //   console.log('nodeMap.value: ', nodeMap.value)
 
       //插入末端节点
       processTrees.push(
@@ -560,6 +558,8 @@ const FlowDesigner = defineComponent({
         ]),
       )
 
+      //   console.log('dom.value: ', dom.value)
+      //   console.log('nodeMap.value: ', nodeMap.value)
       //   console.log('processTrees: ', processTrees)
       return h(
         'div',
