@@ -18,7 +18,11 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item label="精度" :name="['componentProps', 'precision']" required>
+      <j-form-item
+        label="精度"
+        :name="['componentProps', 'precision']"
+        required
+      >
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.precision"
@@ -42,10 +46,7 @@
         ].includes(type)
       "
     >
-      <j-form-item
-        label="类型"
-        :name="['componentProps', 'mode']"
-      >
+      <j-form-item label="类型" :name="['componentProps', 'mode']">
         <j-radio-group
           v-model:value="target.componentProps.mode"
           button-style="solid"
@@ -90,12 +91,16 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item :rules="[
+      <j-form-item
+        :rules="[
           {
             required: true,
             message: '请选择',
           },
-        ]" :name="['componentProps', 'accept']" label="格式">
+        ]"
+        :name="['componentProps', 'accept']"
+        label="格式"
+      >
         <j-select
           mode="multiple"
           placeholder="请选择"
@@ -158,7 +163,10 @@
         :name="['componentProps', 'showSearch']"
         required
       >
-        <j-switch @change="onDataChange" v-model:checked="target.componentProps.showSearch" />
+        <j-switch
+          @change="onDataChange"
+          v-model:checked="target.componentProps.showSearch"
+        />
       </j-form-item>
     </template>
     <template v-if="['table'].includes(type)">
@@ -173,6 +181,15 @@
           <j-select-option :value="'center'">中</j-select-option>
         </j-select>
       </j-form-item>
+      <j-form-item label="表格高度" :name="['componentProps', 'height']">
+        <j-input-number
+          v-model:value="target.componentProps.height"
+          placeholder="请输入"
+          :min="1"
+          style="width: 100%;"
+          @change="onDataChange"
+        />
+      </j-form-item>
     </template>
     <template v-if="['geo'].includes(type)">
       <!-- <j-form-item label="存储层级" :name="['componentProps', 'level']">
@@ -186,12 +203,16 @@
           <j-select-option :value="'min'">最小级</j-select-option>
         </j-select>
       </j-form-item> -->
-      <j-form-item label="可选项" :name="['componentProps', 'geoType']" :rules="[
+      <j-form-item
+        label="可选项"
+        :name="['componentProps', 'geoType']"
+        :rules="[
           {
             required: true,
             message: '请选择',
           },
-        ]">
+        ]"
+      >
         <j-select
           v-model:value="target.componentProps.geoType"
           placeholder="请选择"
@@ -222,7 +243,7 @@
           'product',
           'device',
           'geo',
-          'form'
+          'form',
         ].includes(type)
       "
     >
@@ -253,7 +274,7 @@
 import { useTarget } from '../../../../hooks'
 import { computed } from 'vue'
 import { useRequest } from '@jetlinks/hooks'
-import { getGeoType } from '@/api/form';
+import { getGeoType } from '@/api/form'
 
 const { target } = useTarget()
 
@@ -275,20 +296,17 @@ const list = computed(() =>
   target.value.componentProps?.listType === 'text' ? textType : imgType,
 )
 
-const { data: options,run } = useRequest(getGeoType,{
-  immediate:false
+const { data: options, run } = useRequest(getGeoType, {
+  immediate: false,
 })
-
-
 
 const onDataChange = () => {
   emits('refresh', target.value)
 }
 
-watchEffect(()=>{
-  if(target.value?.type === 'geo'){
+watchEffect(() => {
+  if (target.value?.type === 'geo') {
     run()
   }
 })
-
 </script>
