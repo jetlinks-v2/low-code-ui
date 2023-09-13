@@ -1,4 +1,8 @@
 <template>
+
+  <div style="width: 200px;margin: 100px;">
+    <OppositeSelect :options="options" v-model:value="_value"/>
+  </div>
   <div style="width: 30%;">
     <Card
       status="offline"
@@ -185,6 +189,25 @@
 
 <script setup>
 
+const options = [
+  {
+    label:'选项1',
+    value:'key1'
+  },
+  {
+    label:'选项2',
+    value:'key2'
+  },
+  {
+    label:'选项3',
+    value:'key3'
+  }
+]
+
+const _value = ref()
+watchEffect(()=>{
+    console.log('=====',_value.value)
+})
 const record = {
   id: 'xxxxx',
   name: '测试card',

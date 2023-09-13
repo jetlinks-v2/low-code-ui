@@ -1,9 +1,6 @@
-// import DragGableWrap from '../../Draggable/DragGableWrap'
 import './index.less';
-import { Card, AIcon, Scrollbar, Empty, Dropdown, Menu, MenuItem, Button, Modal } from 'jetlinks-ui-components';
-// import { cloneDeep } from 'lodash-es';
+import { AIcon, Empty, Dropdown, Menu, MenuItem, Button, Modal } from 'jetlinks-ui-components';
 import { useProduct } from '@/store';
-// import { uid } from '@/components/FormDesigner/utils/uid';
 import { withModifiers } from 'vue';
 import { uid } from '@/components/FormDesigner/utils/uid';
 import { map } from 'lodash-es';
@@ -20,13 +17,30 @@ const Template = defineComponent({
             return product.data?.[0]?.others?.formTemplate || []
         })
 
-        // const handleClone = (element) => {
-        //     // TODO 多个数据拖拽
-        //     return cloneDeep({
-        //         ...element.template?.[0],
-        //         key: `${element.template?.[0]?.type}_${uid()}_template`
-        //     })
-        // }
+        const onClick = (item: any) => {
+            if (item?.template?.length) {
+                const arr = (item?.template || []).map(i => {
+                    return {
+                        ...i,
+                        key: `${i?.type}_${uid()}_template`
+                    }
+                })
+                if (!designer.selected.value?.length || map(designer.selected.value, 'key').includes('root')) {
+                    designer.formData.value = {
+                        ...designer.formData.value,
+                        children: [...designer.formData.value?.children, ...arr],
+                    }
+                } else {
+                    const dt = designer.selected.value[designer.selected.value.length - 1]
+                    const children = copyDataByKey(designer.formData.value?.children, arr, dt)
+                    designer.formData.value = {
+                        ...designer.formData.value,
+                        children
+                    }
+                }
+                designer.setSelection(arr?.[arr.length - 1] || 'root')
+            }
+        }
 
         const renderContent = (element) => {
             return <Dropdown
@@ -62,24 +76,44 @@ const Template = defineComponent({
                     }
                 }}
             >
-                <Card hoverable>
-                    <div class="filed-item-card-item">
-                        <AIcon type="AppstoreFilled" style={{ fontSize: '25px' }} />
-                        <span>{element?.name}</span>
-                    </div>
-                </Card>
+                <div class="filed-item-card-icon">
+                    <AIcon type="AppstoreFilled" style={{ fontSize: '25px' }} />
+                </div>
             </Dropdown>
         }
 
-        const slots = {
-            item: ({ element }) => {
-                return (
-                    <div class="filed-item-card">
-                        {renderContent(element)}
+        return () => {
+            return (
+                <div class="filed-container">
+                    <div class="filed-item">
+                        <div class="filed-item-children">
+                            {
+                                list.value.length ?
+                                    list.value.map(item => {
+                                        return <div class={"filed-item-card"} onClick={() => onClick(item)}>
+                                            {renderContent(item)}
+                                            <div class="filed-item-card-text">{item?.name}</div>
+                                        </div>
+                                    })
+                                    : <Empty style={{ marginTop: '200px' }} />
+                            }
+                        </div>
                     </div>
-                )
-            }
-        }
+
+                </div>
+            )
+        };
+    },
+});
+
+export default Template;
+
+
+ // const slots = {
+        //     item: ({ element }) => {
+        //         return renderContent(element)
+        //     }
+        // }
 
         // const options = {
         //     animation: 150,
@@ -100,47 +134,11 @@ const Template = defineComponent({
         //     data-layout-type={'filed-item'}
         // ></DragGableWrap>
 
-        return () => {
-            return (
-                <Scrollbar height={'100%'}>
-                    <div class="filed-template">
-                        {
-                            list.value.length ?
-                                list.value.map(item => {
-                                    return <div class={"filed-item-children"} onClick={() => {
-                                        if (item?.template?.length) {
-                                            const arr = (item?.template || []).map(i => {
-                                                return {
-                                                    ...i,
-                                                    key: `${i?.type}_${uid()}_template`
-                                                }
-                                            })
-                                            if (!designer.selected.value?.length || map(designer.selected.value, 'key').includes('root')) {
-                                                designer.formData.value = {
-                                                    ...designer.formData.value,
-                                                    children: [...designer.formData.value?.children, ...arr],
-                                                }
-                                            } else {
-                                                const dt = designer.selected.value[designer.selected.value.length - 1]
-                                                const children = copyDataByKey(designer.formData.value?.children, arr, dt)
-                                                designer.formData.value = {
-                                                    ...designer.formData.value,
-                                                    children
-                                                }
-                                            }
-                                            designer.setSelection(arr?.[arr.length - 1] || 'root')
-                                        }
-                                    }}>
-                                        {slots.item({ element: item })}
-                                    </div>
-                                })
-                                : <Empty style={{ marginTop: '200px' }} />
-                        }
-                    </div>
-                </Scrollbar>
-            )
-        };
-    },
-});
 
-export default Template;
+                // const handleClone = (element) => {
+        //     // TODO 多个数据拖拽
+        //     return cloneDeep({
+        //         ...element.template?.[0],
+        //         key: `${element.template?.[0]?.type}_${uid()}_template`
+        //     })
+        // }
