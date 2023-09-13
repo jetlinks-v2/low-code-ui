@@ -220,7 +220,7 @@ const FlowDesigner = defineComponent({
 
     //处理节点插入逻辑
     const insertNode = (type, parentNode) => {
-      proxy?.$refs['_root'].click()
+      //   proxy?.$refs['_root'].click()
       //缓存一下后面的节点
       let afterNode = parentNode.children
       //插入新节点
@@ -462,33 +462,33 @@ const FlowDesigner = defineComponent({
       return err
     }
     const validateNode = (err, node) => {
-      if (proxy?.$refs[node.id].validate) {
-        valid.value = proxy?.$refs[node.id].validate(err)
-      }
+      //   if (proxy?.$refs[node.id].validate) {
+      //     valid.value = proxy?.$refs[node.id].validate(err)
+      //   }
     }
     //更新指定节点的dom
     const nodeDomUpdate = (node) => {
-      proxy?.$refs[node.id].$forceUpdate()
+      //   proxy?.$refs[node.id].$forceUpdate()
     }
 
     //给定一个起始节点，遍历内部所有节点
-    const forEachNode = (parent, node, callback) => {
-      if (isBranchNode(node)) {
-        callback(parent, node)
-        forEachNode(node, node.children, callback)
-        node.branchs.map((branchNode) => {
-          callback(node, branchNode)
-          forEachNode(branchNode, branchNode.children, callback)
-        })
-      } else if (
-        isPrimaryNode(node) ||
-        isEmptyNode(node) ||
-        isBranchSubNode(node)
-      ) {
-        callback(parent, node)
-        forEachNode(node, node.children, callback)
-      }
-    }
+    // const forEachNode = (parent, node, callback) => {
+    //   if (isBranchNode(node)) {
+    //     callback(parent, node)
+    //     forEachNode(node, node.children, callback)
+    //     node.branchs.map((branchNode) => {
+    //       callback(node, branchNode)
+    //       forEachNode(branchNode, branchNode.children, callback)
+    //     })
+    //   } else if (
+    //     isPrimaryNode(node) ||
+    //     isEmptyNode(node) ||
+    //     isBranchSubNode(node)
+    //   ) {
+    //     callback(parent, node)
+    //     forEachNode(node, node.children, callback)
+    //   }
+    // }
 
     //校验所有节点设置
     const validate = (err, node) => {

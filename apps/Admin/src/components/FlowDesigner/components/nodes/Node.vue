@@ -271,12 +271,6 @@ const props = defineProps({
       padding: 18px;
       color: #656363;
       font-size: 14px;
-      i {
-        position: absolute;
-        top: 55%;
-        right: 5px;
-        font-size: medium;
-      }
       .placeholder {
         color: #8c8c8c;
       }

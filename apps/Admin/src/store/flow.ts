@@ -96,7 +96,7 @@ export const useFlowStore = defineStore('flow', () => {
                             expression: '',
                         },
                         name: '条件2',
-                        active: true,
+                        active: false,
                         // 并行分支
                         children: {
                             id: 'node_889251728116',
@@ -104,13 +104,13 @@ export const useFlowStore = defineStore('flow', () => {
                             props: {},
                             type: 'CONCURRENTS',
                             name: '并行分支',
-                            active: true,
+                            active: false,
                             children: {
                                 id: 'node_889251733649',
                                 parentId: 'node_889251728116',
                                 type: 'EMPTY',
                                 children: {},
-                                active: true,
+                                active: false,
                             },
                             branchs: [
                                 {
@@ -142,7 +142,7 @@ export const useFlowStore = defineStore('flow', () => {
                                         isBranchNode: true,
                                     },
                                     children: {},
-                                    active: true,
+                                    active: false,
                                 },
                                 {
                                     id: 'node_889251743503',
