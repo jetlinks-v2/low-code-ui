@@ -80,7 +80,7 @@ const FlowDesigner = defineComponent({
           index++
           return h(
             'div',
-            { class: { 'branch-node-item': true, active: false } },
+            { class: { 'branch-node-item': true, active: branchNode.active } },
             childDoms,
           )
         })
@@ -114,7 +114,13 @@ const FlowDesigner = defineComponent({
         //空节点，存在于分支尾部
         let childDoms = getDomTree(h, node.children)
         decodeAppendDom(h, node, childDoms)
-        return [h('div', { class: { 'empty-node': true } }, childDoms)]
+        return [
+          h(
+            'div',
+            { class: { 'empty-node': true, active: node.active } },
+            childDoms,
+          ),
+        ]
       } else {
         //遍历到了末端，无子节点
         return []
@@ -529,7 +535,7 @@ const FlowDesigner = defineComponent({
           }),
         ]),
       )
-      //   console.log('dom.value: ', dom.value)
+      console.log('dom.value: ', dom.value)
       //   console.log('nodeMap.value: ', nodeMap.value)
       //   console.log('processTrees: ', processTrees)
       return h(

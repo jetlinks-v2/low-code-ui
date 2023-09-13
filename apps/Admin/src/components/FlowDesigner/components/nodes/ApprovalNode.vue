@@ -5,6 +5,7 @@
     :content="content"
     :error-info="errorInfo"
     :style="style"
+    :active="active"
     @selected="emits('selected')"
     @delNode="emits('delNode')"
     @insertNode="(type) => emits('insertNode', type)"
@@ -32,6 +33,7 @@ const props = defineProps({
 const showError = ref(false)
 const errorInfo = ref('')
 
+const active = computed(() => props?.config?.active)
 const style = computed(() => props?.config?.props?.style)
 const content = computed(() => {
   const config = props.config.props

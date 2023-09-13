@@ -184,15 +184,17 @@ const props = defineProps({
     background: #f5f5f7;
   }
   &.active {
-    &::before {
-      border-color: #3056df transparent transparent;
-    }
+    //  节点上方的三角形 激活高亮状态
+    // &::before {
+    //   border-color: #3056df transparent transparent;
+    // }
     .node-body {
       border: 2px solid #3056df;
     }
-    .node-footer::before {
-      background-color: #3056df;
-    }
+    //  节点下方的连接线 激活高亮状态
+    // .node-footer::before {
+    //   background-color: #3056df;
+    // }
   }
   .node-body {
     overflow: hidden;

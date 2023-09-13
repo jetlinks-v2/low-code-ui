@@ -97,11 +97,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  // 节点激活状态
-  active: {
-    type: Boolean,
-    default: false,
-  },
 })
 
 const ValueType = ref({
@@ -119,6 +114,7 @@ const placeholder = ref('请设置条件')
 const errorInfo = ref('')
 const showError = ref(false)
 
+const active = computed(() => props?.config?.active)
 const content = computed(() => {
   const groups = props.config.props.groups
   let confitions: any[] = []

@@ -45,13 +45,14 @@
     height: 100%;
     background-color: #cacaca;
   }
-  &.active {
-    border-top: 2px solid #3056df;
-    border-bottom: 2px solid #3056df;
-    &::before {
-      background-color: #3056df;
-    }
-  }
+  //  分支连接线 激活高亮状态
+  //   &.active {
+  //     border-top: 2px solid #3056df;
+  //     border-bottom: 2px solid #3056df;
+  //     &::before {
+  //       background-color: #3056df;
+  //     }
+  //   }
   .line-top-left,
   .line-top-right,
   .line-bot-left,
@@ -96,4 +97,10 @@
   justify-content: center;
   flex-direction: column;
   align-items: center;
+  //  空节点 激活高亮状态
+  //   &.active {
+  //     .node-footer::before {
+  //       background-color: #3056df !important;
+  //     }
+  //   }
 }
