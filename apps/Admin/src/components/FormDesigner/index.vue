@@ -70,6 +70,7 @@ import {
   checkedConfig,
   getFieldData,
   initData,
+  appendChildItem
 } from './utils/utils'
 import { uid } from './utils/uid'
 
@@ -218,6 +219,16 @@ const onCollect = () => {
   collectVisible.value = true
 }
 
+// 添加子组件
+const onAddChild = (newData: any, parent: any, flag?: boolean) => {
+  const arr = appendChildItem(formData.value?.children, newData, parent, flag)
+  formData.value = {
+      ...formData.value,
+      children: arr || [],
+  }
+  setSelection(newData || 'root')
+}
+
 /**
  * 保存数据
  */
@@ -260,6 +271,7 @@ provide('FormDesigner', {
   onCopy,
   onShear,
   onCollect,
+  onAddChild
 })
 
 const onSave = () => {
