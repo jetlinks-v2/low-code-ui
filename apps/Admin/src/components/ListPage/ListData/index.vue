@@ -1,12 +1,16 @@
 <template>
-  <div className="filter-module-center">
+  <div className="filter-module-center" ref="listDataRef">
+    <img class="modal-config-img" :src="getImage('/list-page/data.png')" v-if="open">
     <j-drawer
       title=""
       placement="right"
+      width="560px"
       :closable="true"
       :visible="open"
+      :getContainer="() => $refs.listDataRef"
+      :destroyOnClose="true"
+      :wrap-style="{ position: 'absolute' }"
       @close="emits('update:open', false)"
-      width="560px"
     >
       <Table
         v-if="configState.type === ''"
@@ -176,6 +180,7 @@ import Config from '@/components/ListPage/ListData/components/Configuration.vue'
 import { DATA_BIND } from '../keys'
 import { validListData } from './utils/valid'
 import { PropType } from 'vue'
+import { getImage } from '@jetlinks/utils';
 
 interface Emit {
   (e: 'update:open', value: boolean): void
