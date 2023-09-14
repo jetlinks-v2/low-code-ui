@@ -82,6 +82,12 @@ const checkedConfigItem = (node: ISchema) => {
                 message: (node.formItemProps?.label || node.name) + '配置错误'
             }
         }
+        if (['table-item', 'collapse-item', 'tabs-item', 'collapse', 'tabs'].includes(_type) && !(node?.formItemProps?.name)) {
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.name || node.name) + '配置错误'
+            }
+        }
     }
     return false
 }
@@ -156,25 +162,26 @@ export const extractCssClass = (formCssCode: string) => {
     return Array.from(new Set(cssNameArray))  //数组去重
 }
 
-export const insertCustomCssToHead = (cssCode, formId) => {
+export const insertCustomCssToHead = (cssCode: string, formId: string) => {
+    if(!cssCode || !formId) return
     let head = document.getElementsByTagName('head')[0]
     let oldStyle = document.getElementById(formId)
     if (!!oldStyle) {
         head.removeChild(oldStyle)  //先清除后插入！！
     }
-    if (!!formId) {
-        oldStyle = document.getElementById(formId)
-        !!oldStyle && head.removeChild(oldStyle)  //先清除后插入！！
-    }
+    const id = `[data-id="${formId}"]`
+    const result = cssCode.replace(/\.([a-zA-Z-]+)/g, `.$1${id}`)
+      .replace(/#([a-zA-Z-]+)/g, `#$1${id}`)
+      .replace(/([a-zA-Z-]+)(?=\s*\{)/g, `$1${id}`);
 
     let newStyle: HTMLStyleElement = document.createElement('style')
     newStyle.type = 'text/css'
     newStyle.rel = 'stylesheet'
     newStyle.id = formId
     try {
-        newStyle.appendChild(document.createTextNode(cssCode))
+        newStyle.appendChild(document.createTextNode(result))
     } catch (ex) {
-        newStyle.styleSheet.cssText = cssCode
+        newStyle.styleSheet.cssText = result
     }
 
     head.appendChild(newStyle)
@@ -356,4 +363,14 @@ export const initData = {
         eventCode: '',
     },
     children: [],
+}
+
+export const handleCopyData = (arr: any[]) => {
+    return arr.map(item => {
+        return {
+            ...item,
+            key: item.type + uid(6),
+            children: handleCopyData(item.children || [])
+        }
+    })
 }
