@@ -28,6 +28,7 @@
           v-model:value="target.componentProps.precision"
           placeholder="请输入"
           :precision="0"
+          :min="0"
           @change="onDataChange"
         />
       </j-form-item>
@@ -90,16 +91,7 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item
-        :rules="[
-          {
-            required: true,
-            message: '请选择',
-          },
-        ]"
-        :name="['componentProps', 'accept']"
-        label="格式"
-      >
+      <j-form-item :name="['componentProps', 'accept']" label="格式">
         <j-select
           mode="multiple"
           placeholder="请选择"
@@ -115,6 +107,7 @@
         required
         :name="['componentProps', 'fileSize']"
         label="单个大小"
+        :rules="rules"
       >
         <j-input-group compact>
           <j-input-number
@@ -310,12 +303,26 @@ const { data: options, run } = useRequest(getGeoType, {
   immediate: false,
 })
 
+const rules = [
+  {
+    required: true,
+    message: '请输入单个大小',
+  },
+  {
+    validator(_: any, value: number) {
+      if (value === 0) return Promise.reject(`单个大小应该大于0`)
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
 const onDataChange = () => {
   emits('refresh', target.value)
 }
 
 const onMultipleChange = (e) => {
-  if(e.target.value){
+  if (e.target.value) {
     target.value.componentProps.treeCheckable = true
   }
   emits('refresh', target.value)

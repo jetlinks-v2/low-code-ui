@@ -73,7 +73,8 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
                 }
             }
         }
-        if ('upload' === _type && (!node?.componentProps?.accept || !node?.componentProps?.maxCount || !node?.componentProps?.fileSize)) {
+        // !node?.componentProps?.accept || 
+        if ('upload' === _type && (!node?.componentProps?.maxCount || !node?.componentProps?.fileSize)) {
             // 个数和单位
             return {
                 key: node?.key,
