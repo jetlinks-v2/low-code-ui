@@ -322,8 +322,7 @@ const statusColor = ref({
 })
 
 const titleOptions = computed(() => {
-  return dataBind.functionInfo?.configuration?.columns?.map((item) => {
-    console.log(item);
+  return dataBind.columnBind?.map((item) => {
     return {
       id: item.alias,
       name: item.comment

@@ -184,27 +184,33 @@ const listDataRef = ref()
 const menuConfigRef = ref()
 const validate = async () => {
   spinning.value = true
-  const promiseArr = [
-    btnTreeRef.value?.valid(),
-    columnsRef.value?.valid(),
-    filterModuleRef.value?.valid(),
-    pagingConfigRef.value?.valid(),
-    listFormRef.value?.valid(),
-    listDataRef.value?.valid(),
-    menuConfigRef.value?.valid(),
-    dataBindRef.value?.valid(),
+  const errorList = [
+    ...btnTreeRef.value?.valid(),
+    ...columnsRef.value?.valid(),
+    ...filterModuleRef.value?.valid(),
+    ...pagingConfigRef.value?.valid(),
+    ...listFormRef.value?.valid(),
+    ...listDataRef.value?.valid(),
+    ...menuConfigRef.value?.valid(),
+    ...dataBindRef.value?.valid(),
   ]
+  console.log(errorList);
   return new Promise((resolve, reject) => {
-    Promise.all(promiseArr)
-      .then((res) => {
-        resolve(res)
-      })
-      .catch((err) => {
-        reject(err)
-      })
-      .finally(() => {
-        spinning.value = false
-      })
+    if(errorList.length) {
+      reject(errorList)
+    } else {
+      resolve([])
+    }
+    // Promise.all(promiseArr)
+    //   .then((res) => {
+    //     resolve(res)
+    //   })
+    //   .catch((err) => {
+    //     reject(err)
+    //   })
+    //   .finally(() => {
+    //     spinning.value = false
+    //   })
   })
 }
 
@@ -236,7 +242,8 @@ const dataBind = reactive({
     function: null,
     command: null,
   },
-  functionInfo: null,
+  filterBind: [],
+  columnBind: [],
 })
 
 provide(DATA_BIND, dataBind)

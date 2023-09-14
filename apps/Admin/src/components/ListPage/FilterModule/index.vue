@@ -25,11 +25,14 @@
         tableType="filter"
         :asyncData="asyncData"
         :errorList="errorList"
+        :bindData="dataBinds.filterBind"
+        :bind-function-id="dataBinds.data.function"
         @handleAdd="handleAdd"
         @configuration="configuration"
         @handleOk="handleOk"
         @bindData="bindData"
         @handleChange="(data) => dataSource = data"
+        @update-bind="(data) => dataBinds.filterBind = data"
       />
       <div v-if="type !== ''">
         <a-page-header title=" " @back="goBack">
@@ -327,11 +330,13 @@ const goBack = () => {
  */
 const errorList: any = ref([])
 const valid = () => {
-  return new Promise((resolve, reject) => {
-    errorList.value = validFilterModule(dataSource.value)
-    if (errorList.value.length) reject([{message: '数据绑定配置错误'}])
-    else resolve([])
-  })
+  errorList.value = validFilterModule(dataSource.value)
+  return errorList.value.length ? [{message: '数据绑定配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validFilterModule(dataSource.value)
+  //   if (errorList.value.length) reject([{message: '数据绑定配置错误'}])
+  //   else resolve([])
+  // })
 }
 
 defineExpose({
@@ -352,20 +357,6 @@ watch(
   { immediate: true, deep: true },
 )
 
-// watch(() => [JSON.stringify(props.dataSource), JSON.stringify(dataBinds)], () => {
-//   if(!props.dataSource.length && dataBinds?.functionInfo?.configuration?.columns) {
-//     dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(
-//       (item) => {
-//         console.log(`output->item`,item)
-//         return {
-//           id: item.name,
-//           name: item.name,
-//           type: 'string',
-//         }
-//       },
-//     ) || []
-//   }
-// }, {immediate: true})
 </script>
 
 <style scoped lang="less"></style>

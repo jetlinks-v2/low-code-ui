@@ -54,11 +54,13 @@ const formData = ref({ pageName: '', main: true, name: '', icon: '' })
 
 const errorList = ref<any[]>([])
 const valid = () => {
-  return new Promise((resolve, reject) => {
-    errorList.value = validMenu(menConfig)
-    if(errorList.value.length) reject([{message: '菜单配置错误'}])
-    else resolve([])
-  })
+  errorList.value = validMenu(menConfig)
+  return errorList.value.length ? [{message: '菜单配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validMenu(menConfig)
+  //   if(errorList.value.length) reject([{message: '菜单配置错误'}])
+  //   else resolve([])
+  // })
 }
 defineExpose({
   errorList,

@@ -182,11 +182,13 @@ const configuredChange = (value: string) => {
 
 const errorList = ref<any[]>([])
 const valid = () => {
-  return new Promise((resolve, reject) => {
-    errorList.value = validListForm(showType!,listFormInfo.value)
-    if(errorList.value.length) reject([{message: '列表形态配置错误'}])
-    else resolve([])
-  })
+  errorList.value = validListForm(showType!,listFormInfo.value)
+  return errorList.value.length ? [{message: '列表形态配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validListForm(showType!,listFormInfo.value)
+  //   if(errorList.value.length) reject([{message: '列表形态配置错误'}])
+  //   else resolve([])
+  // })
 }
 
 defineExpose({
