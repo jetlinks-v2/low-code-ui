@@ -61,7 +61,7 @@ import {
   reactive,
   onMounted,
 } from 'vue'
-import { debounce } from 'lodash-es'
+import { debounce, map } from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
 import { Modal } from 'jetlinks-ui-components'
 import {
@@ -130,7 +130,13 @@ const setSelection = (node: any) => {
   if (['card-item', 'space-item'].includes(node.type)) return
   if (_ctrl.value && model.value === 'edit') {
     if (node === 'root') return
-    selected.value.push(node)
+    if(map(selected.value, 'key').includes('root')){
+      selected.value = [node]
+    } else {
+      if(!map(selected.value, 'key').includes(node.key)){
+        selected.value.push(node)
+      }
+    }
   } else {
     selected.value = []
     if (node === 'root') {

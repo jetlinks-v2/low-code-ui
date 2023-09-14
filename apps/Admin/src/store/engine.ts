@@ -20,6 +20,7 @@ export const useEngine = defineStore('engine', () => {
   const openFile = ref<any>()
   const copyFile = ref<string>('')
   const product = useProduct()
+  const isExpandAll = ref(false)
 
   const initEngineState = () => {
     activeFile.value = null
@@ -28,6 +29,7 @@ export const useEngine = defineStore('engine', () => {
     expandedKeys.value = []
     content.value = []
     files.value = []
+    isExpandAll.value = false
   }
 
   /**
@@ -85,10 +87,12 @@ export const useEngine = defineStore('engine', () => {
   const expandedAll = () => {
     const map = product.getDataMap()
     expandedKeys.value = [...map.keys()]
+    isExpandAll.value = true
   }
 
   const packUpAll = () => {
     expandedKeys.value = []
+    isExpandAll.value = false
   }
 
   const selectFile = (key: string, type?: string) => {
@@ -196,6 +200,7 @@ export const useEngine = defineStore('engine', () => {
     expandedKeys,
     openFile,
     copyFile,
+    isExpandAll,
     removeFile,
     addFile,
     selectFile,
