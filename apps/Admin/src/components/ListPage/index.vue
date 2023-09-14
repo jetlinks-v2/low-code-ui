@@ -1,7 +1,7 @@
 <template>
-  <j-spin :spinning="spinning">
-    <div class="list-page">
-      <Preview
+  <div class="list-page">
+    <j-spin :spinning="spinning">
+    <Preview
         :show="showPreview"
         :id="props.data.id"
         :data="props.data?.configuration?.code"
@@ -65,8 +65,8 @@
         :data="props.data"
         ref="menuConfigRef"
       />
-    </div>
-  </j-spin>
+    </j-spin>
+  </div>
 </template>
 
 <script setup lang="ts" name="ListPage">
@@ -88,9 +88,11 @@ import {
   LIST_FORM_INFO,
   DATA_SOURCE,
   showColumnsKey,
+  ACTION_CONFIG_KEY
 } from './keys'
 import { useProduct } from '@/store'
 import { omit, debounce } from 'lodash-es'
+import { onlyMessage } from '@jetlinks/utils'
 
 const spinning = ref(false)
 const props = defineProps({
@@ -246,6 +248,7 @@ provide(LIST_PAGE_DATA_KEY, listPageData)
 provide(LIST_FORM_INFO, listFormInfo)
 provide(DATA_SOURCE, dataSource)
 provide(showColumnsKey, showColumns)
+provide(ACTION_CONFIG_KEY, actionsConfig)
 // watch(
 //   () => buttonsConfig.value,
 //   () => {
@@ -314,11 +317,14 @@ onMounted(() => {
           others: {
             ...props?.data?.others,
             menu: { ...menuConfig, buttons: [...arrFlat(buttonsConfig.value), ...arrFlat(actionsConfig.value)] },
-            userList: [
+            useList: Array.from(new Set([
               ...actionsConfig.value
                 .filter((item) => item.pages && item.pages !== '')
                 ?.map((item) => item.pages),
-            ],
+              ...buttonsConfig.value
+                .filter((item) => item.pages && item.pages !== '')
+                ?.map((item) => item.pages),
+            ])) ,
           },
         }
         onSave(record)

@@ -9,6 +9,7 @@
           'card-item',
           'table-item',
           'grid-item',
+          'space-item',
           'grid',
           'tabs',
           'collapse',
@@ -41,6 +42,7 @@
           'tabs-item',
           'table-item',
           'grid-item',
+          'space-item'
         ].includes(type)
       "
     >
@@ -147,7 +149,7 @@
             @change="onSwitch"
           />
         </j-form-item>
-        <template v-if="target.formItemProps.isLayout">
+        <!-- <template> -->
           <j-form-item
             label="标识"
             :name="['formItemProps', 'name']"
@@ -161,7 +163,7 @@
               v-model:value="target.formItemProps.name"
             />
           </j-form-item>
-          <j-form-item label="名称" :name="['formItemProps', 'label']" required>
+          <j-form-item v-if="target.formItemProps.isLayout" label="名称" :name="['formItemProps', 'label']" required>
             <j-input
               placeholder="请输入"
               :maxlength="64"
@@ -169,7 +171,7 @@
               v-model:value="target.formItemProps.label"
             />
           </j-form-item>
-        </template>
+        <!-- </template> -->
       </template>
       <template v-if="['collapse-item'].includes(type)">
         <j-form-item label="名称" :name="['componentProps', 'header']" required>
@@ -312,7 +314,7 @@
     <!-- 规则校验 -->
     <template v-if="rulesVisible">
       <j-form-item>
-        <Rule v-model:value="target.formItemProps.rules" @change="onChange" />
+        <Rule :type="type" v-model:value="target.formItemProps.rules" @change="onChange" />
       </j-form-item>
     </template>
 

@@ -15,7 +15,15 @@
         </PermissionButton>
 
 
-        <j-dropdown
+        <BatchDropdown
+            v-model:isCheck="isCheck"
+            :actions="item?.children"
+            @change="onCheckChange"
+            v-else
+        >
+          <j-button>{{ item.title }} <AIcon type="DownOutlined" /></j-button>
+        </BatchDropdown>
+        <!-- <j-dropdown
           :trigger="['click']"
           placement="bottomLeft"
           v-if="item?.children?.length !== 0"
@@ -43,7 +51,7 @@
               </j-menu-item>
             </j-menu>
           </template>
-        </j-dropdown>
+        </j-dropdown> -->
       </div>
     </j-space>
   </div>
@@ -52,6 +60,13 @@
 import { isFunction, isObject } from 'lodash-es'
 import { PropType } from 'vue';
 import { extractCssClass, insertCustomCssToHead } from '@/components/FormDesigner/utils/utils';
+import BatchDropdown from './BatchDropdown/index.vue'
+
+const isCheck = ref(false)
+const onCheckChange = () => {
+
+  
+}
 
 const props = defineProps({
   headerActions: {

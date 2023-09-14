@@ -6,6 +6,7 @@
       :request="props?.query"
       :pagination="props?.pagination"
       :model="model"
+      :params='params'
       :modelValue="defaultFormType"
     >
       <template #headerTitle>
@@ -41,34 +42,36 @@
           </div>
         </div>
         <div v-if="item?.key === 'action'">
-          <PermissionButton
-            v-for="item in tableActions"
-            :key="item.key"
-            type="link"
-            v-bind:="handleFunction(item.permissionProps, slotProps)"
-            style="padding: 0"
-            :danger="item.command === 'Delete'"
-            :popConfirm="
-              handleFunction(item.permissionProps, slotProps)?.popConfirm
-            "
-            :class="extractCssClass(item.style)"
-          >
-            <AIcon v-if="item.icon" :type="item?.icon" />
-            <img v-else-if="item?.icon?.includes('http')" :src="item.icon" />
+          <j-space size="large">
+            <PermissionButton
+              v-for="item in tableActions"
+              :key="item.key"
+              type="link"
+              v-bind:="handleFunction(item.permissionProps, slotProps)"
+              style="padding: 0"
+              :danger="item.command === 'Delete'"
+              :popConfirm="
+                handleFunction(item.permissionProps, slotProps)?.popConfirm
+              "
+              :class="extractCssClass(item.style)"
+            >
+              <AIcon v-if="item.icon" :type="item?.icon" />
+              <img v-else-if="item?.icon?.includes('http')" :src="item.icon" />
 
-            <span v-else> {{ item.text }}</span>
-            <j-divider type="vertical" />
-          </PermissionButton>
+              <span v-else> {{ item.text }}</span>
+            </PermissionButton>
+          </j-space>
         </div>
       </template>
       <template #card="slotProps">
         <Card
           status="notActive"
-          :actions="slotProps?.actions"
+          :actions="tableActions"
           :record="slotProps"
           :statusText="
-            slotProps[props?.cardConfig?.emphasisField] || '强调字段'
+            slotProps[props?.cardConfig?.emphasisField] || ''
           "
+          :showStatus="props?.cardConfig?.emphasisField !== ''"
           :statusNames="{
             online: 'processing',
             offline: 'error',
@@ -101,20 +104,20 @@
               <j-col :span="12">
                 <span
                   v-if="
-                    slotProps[props?.cardConfig?.field1]?.config?.type ===
+                    valueFormat(props?.cardConfig?.field1)?.config?.type ===
                       'object' && isShowIcon
                   "
                 >
                   <AIcon
                     type="SearchOutlined"
                     @click="
-                      jsonOpen(slotProps[props?.cardConfig?.field1]?.value)
+                      jsonOpen(slotProps[props?.cardConfig?.field1])
                     "
                   />
                 </span>
                 <span
                   v-else-if="
-                    slotProps[props?.cardConfig?.field1]?.config?.type ===
+                    valueFormat(props?.cardConfig?.field1)?.config?.type ===
                       'file' && isShowFileIcon
                   "
                 >
@@ -122,8 +125,8 @@
                     style="width: 30px; height: 30px"
                     :src="
                       dataFormat(
-                        slotProps[props?.cardConfig?.field1]?.config,
-                        slotProps[props?.cardConfig?.field1]?.value,
+                        valueFormat(props?.cardConfig?.field1)?.config,
+                        slotProps[props?.cardConfig?.field1],
                       )
                     "
                   />
@@ -131,11 +134,10 @@
                 <h3 v-else>
                   {{
                     dataFormat(
-                      slotProps[props?.cardConfig?.field1]?.config,
-                      slotProps[props?.cardConfig?.field1]?.value,
-                    ) || '字段1'
+                      valueFormat(props?.cardConfig?.field1)?.config,
+                      slotProps[props?.cardConfig?.field1],
+                    ) || slotProps[props?.cardConfig?.field1]
                   }}
-                  <!-- {{ slotProps[props?.cardConfig?.field1] || '字段1' }} -->
                 </h3>
               </j-col>
               <j-col :span="12">
@@ -149,20 +151,20 @@
                 <div>
                   <span
                     v-if="
-                      slotProps[props?.cardConfig?.field2]?.config?.type ===
+                      valueFormat(props?.cardConfig?.field2)?.config?.type ===
                         'object' && isShowIcon
                     "
                   >
                     <AIcon
                       type="SearchOutlined"
                       @click="
-                        jsonOpen(slotProps[props?.cardConfig?.field2]?.value)
+                        jsonOpen(slotProps[props?.cardConfig?.field2])
                       "
                     />
                   </span>
                   <span
                     v-else-if="
-                      slotProps[props?.cardConfig?.field2]?.config?.type ===
+                      valueFormat(props?.cardConfig?.field2)?.config?.type ===
                         'file' && isShowFileIcon
                     "
                   >
@@ -170,8 +172,8 @@
                       style="width: 30px; height: 30px"
                       :src="
                         dataFormat(
-                          slotProps[props?.cardConfig?.field2]?.config,
-                          slotProps[props?.cardConfig?.field2]?.value,
+                          valueFormat(props?.cardConfig?.field2)?.config,
+                          slotProps[props?.cardConfig?.field2],
                         )
                       "
                     />
@@ -179,9 +181,9 @@
                   <span v-else>
                     {{
                       dataFormat(
-                        slotProps[props?.cardConfig?.field2]?.config,
-                        slotProps[props?.cardConfig?.field2]?.value,
-                      ) || '字段2'
+                        valueFormat(props?.cardConfig?.field2)?.config,
+                        slotProps[props?.cardConfig?.field2],
+                      ) || slotProps[props?.cardConfig?.field2]
                     }}
                   </span>
 
@@ -193,20 +195,20 @@
                 <div>
                   <span
                     v-if="
-                      slotProps[props?.cardConfig?.field3]?.config?.type ===
+                      valueFormat(props?.cardConfig?.field3)?.config?.type ===
                         'object' && isShowIcon
                     "
                   >
                     <AIcon
                       type="SearchOutlined"
                       @click="
-                        jsonOpen(slotProps[props?.cardConfig?.field3]?.value)
+                        jsonOpen(slotProps[props?.cardConfig?.field3])
                       "
                     />
                   </span>
                   <span
                     v-else-if="
-                      slotProps[props?.cardConfig?.field3]?.config?.type ===
+                      valueFormat(props?.cardConfig?.field3)?.config?.type ===
                         'file' && isShowFileIcon
                     "
                   >
@@ -214,8 +216,8 @@
                       style="width: 30px; height: 30px"
                       :src="
                         dataFormat(
-                          slotProps[props?.cardConfig?.field3]?.config,
-                          slotProps[props?.cardConfig?.field3]?.value,
+                          valueFormat(props?.cardConfig?.field3)?.config,
+                          slotProps[props?.cardConfig?.field3],
                         )
                       "
                     />
@@ -223,9 +225,9 @@
                   <span v-else>
                     {{
                       dataFormat(
-                        slotProps[props?.cardConfig?.field3]?.config,
-                        slotProps[props?.cardConfig?.field3]?.value,
-                      ) || '字段3'
+                        valueFormat(props?.cardConfig?.field3)?.config,
+                        slotProps[props?.cardConfig?.field3],
+                      ) || slotProps[props?.cardConfig?.field3]
                     }}
                   </span>
 
@@ -289,7 +291,16 @@ const props = defineProps({
     type: Array as PropType<Record<string, any>>,
     default: () => [],
   },
+  params: {
+    type: Object,
+    default: () => {}
+  }
 })
+
+const valueFormat = (val: any) => {
+  return props.dataColumns.find(item => item.dataIndex === val)
+}
+const tableRef = ref();
 const isShowIcon = ref(false)
 const isShowFileIcon = ref(false)
 const emit = defineEmits(['openJson'])
@@ -416,5 +427,11 @@ watchEffect(() => {
     insertCustomCssToHead(item.style, item.key)
     
   })
+})
+
+defineExpose({
+  reload: () => {
+    tableRef.value?.reload()
+  }
 })
 </script>

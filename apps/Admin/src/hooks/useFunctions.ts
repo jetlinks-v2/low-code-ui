@@ -1,5 +1,7 @@
 import { useProduct } from "@/store";
 import { queryCommand } from "@/api/project";
+import { storeToRefs } from "pinia";
+import { providerEnum } from "@/components/ProJect";
 
 type CommandType = {
   id: string
@@ -10,28 +12,25 @@ type CommandType = {
 }
 export const useFunctions = () => {
   const functionOptions = ref<any[]>([])
-  const functionId = ref<string>('')
-  const commandOptions = computed<CommandType[]>(() => {
-    return functionOptions.value.find(item => item.id === functionId.value)?.command || []
-  })
+  const commandOptions = ref<CommandType[]>()
   const productStore = useProduct();
-  const { info } = productStore
-  queryCommand(info.draftId, []).then(res => {
-    res.result?.forEach(item => {
-      const other = productStore.getById(item.id);
-      functionOptions.value.push({
-        ...item,
-        ...other
-      })
+  const { data, info } = storeToRefs(productStore)
+  watch(() => JSON.stringify(data.value), () => {
+    const newFunction = [...productStore.getDataMap().values()].filter(item => {
+      return [providerEnum.CRUD, providerEnum.Function, providerEnum.SQL].includes(item.type)
     })
-  })
-  
+    if(JSON.stringify(newFunction) !== JSON.stringify(functionOptions.value)) {
+      functionOptions.value = newFunction
+    }
+  }, { immediate: true })
   /***
    * 查询功能下的的指令
    * @param functionId 功能id
    */
   const handleFunction = (functionId_: string) => {
-    functionId.value = functionId_;
+    queryCommand(info.value.draftId, []).then(res => {
+      commandOptions.value = res.result?.find(item => item.moduleId + '.' + item.id === functionId_)?.command || []
+    })
   }
   return {
     functionOptions,

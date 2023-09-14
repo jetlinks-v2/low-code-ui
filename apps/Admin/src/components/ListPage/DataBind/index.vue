@@ -11,10 +11,10 @@
           >
             <j-select-option
               v-for="item in functionOptions"
-              :value="item.id"
+              :value="item.fullId"
               :key="item.id"
             >
-              {{ item.name }}
+              {{ item.title }}
             </j-select-option>
           </j-select>
         </ErrorItem>
@@ -92,7 +92,7 @@ const props = defineProps({
 
 const handleChangeFunction = (val: string) => {
   dataBind.functionInfo =
-    functionOptions!.value.find((item) => item.id === val) ||
+    functionOptions!.value.find((item) => item.fullId === val) ||
     dataBind.functionInfo
   handleFunction(val)
 }
@@ -106,7 +106,7 @@ const commandDisabled = computed(() => {
 
 const showCommand = computed(() => {
   return ['rdb-sql-query', 'rdb-crud'].includes(
-    functionOptions!.value.find((item) => item.id === dataBind.data.function)
+    functionOptions!.value.find((item) => item.fullId === dataBind.data.function)
       ?.provider || '',
   )
 })
@@ -127,15 +127,16 @@ const valid = () => {
   console.log(`output->dataBind.data`, dataBind)
   return new Promise((resolve, reject) => {
     errorList.value = validDataBind(dataBind.data, functionOptions.value)
-    if (errorList.value.length) reject(errorList.value)
+    if (errorList.value.length) reject([{message: '数据绑定配置错误'}])
     else resolve([])
   })
 }
 
 watch(
-  () => JSON.stringify(dataBind),
+  () => dataBind.data.function,
   () => {
     if (dataBind.data.function) {
+      console.log(`output->dataBind.data.function`,dataBind.data.function)
       handleChangeFunction(dataBind.data.function)
     }
   },

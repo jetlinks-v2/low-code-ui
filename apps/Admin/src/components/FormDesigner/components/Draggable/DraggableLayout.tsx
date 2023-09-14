@@ -68,12 +68,12 @@ const DraggableLayout = defineComponent({
 
                 switch (element.type) {
                     case 'text':
-                        if (unref(isEditModel)) {
+                        if (unref(isEditModel) || componentMap?.[element?.type]) {
+                            const TypeComponent = componentMap?.[element?.type] || 'div'
                             const params = {
                                 data: element,
                                 parent: props.data
                             }
-                            const TypeComponent = componentMap?.[element?.type] || 'div'
                             return (
                                 <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                                     <TypeComponent data={element} {...element.componentProps} />
@@ -198,6 +198,7 @@ const DraggableLayout = defineComponent({
                                         {
                                             unref(isEditModel) ? 
                                             <TypeComponent
+                                                model={unref(designer.model)}
                                                 data={element}
                                                 {...omit(element.componentProps, ['description'])}
                                                 size={unref(designer.formData)?.componentProps.size}
@@ -222,22 +223,19 @@ const DraggableLayout = defineComponent({
                 }
             },
             footer() {
-                const _style = {
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100%',
-                    minHeight: '60px',
-                    minWidth: '100px'
-                }
                 if (isEmpty(props.data)) {
                     return (
                         <div style={{
-                            ..._style,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            textAlign: 'center', // 不知道为什么justifyContent这个不行 ？？？
+                            alignItems: 'center',
+                            height: '100%',
+                            minHeight: '60px',
                             background: !props.isRoot ? '#F2F8FF !important' : '',
                         }}>
                             Drop here
-                        </div >
+                        </div>
                     )
                 }
                 return ''

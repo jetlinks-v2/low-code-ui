@@ -41,7 +41,7 @@ const getTree = () => {
         console.log('copyData',copyData)
         list.value = copyData.filter(item => {
             // console.log(item)
-            return item.others && item.others?.menu
+            return item.others && item.others?.menu && item.others?.menu.main
         }).map(item => {
             item.parentFullId = maps.get(item.parentId).fullId
             return item

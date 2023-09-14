@@ -21,9 +21,10 @@
 import { regular } from '@jetlinks/utils';
 // import { providerList } from './index';
 import { onKeyStroke } from '@vueuse/core'
-import { providerMap } from '../../index'
+import { providerEnum, providerMap } from '../../index'
 import { useEngine } from '@/store'
 import { randomString } from '@jetlinks/utils'
+import { defaultSetting as CrudBaseData } from '@/components/Database/setting'
 
 const engine = useEngine()
 
@@ -73,12 +74,46 @@ const isOnlyName = async (_,value)=>{
     }
 }
 
+const getConfiguration = (type) => {
+  switch (type) {
+    case providerEnum.SQL:
+      return {
+        sql: undefined
+      };
+    case providerEnum.CRUD:
+      return {
+        columns: CrudBaseData
+      };
+    case providerEnum.Function:
+      return {
+        lang: undefined,
+        script: ''
+      };
+    case providerEnum.FormPage:
+      return {
+        type: 'form',
+        code: ''
+      };
+    case providerEnum.ListPage:
+      return {
+        type: 'list',
+        code: ''
+      };
+    case providerEnum.HtmlPage:
+      return {
+        type: 'html',
+        code: ''
+      };
+  }
+}
+
 onKeyStroke('Enter', async () => {
     const res = await formRef.value.validate()
     if (res && modelRef.title) {
         emit('save', {
             ...modelRef,
             name: modelRef.title,
+            configuration:props.data.configuration?props.data.configuration: getConfiguration(modelRef.type),
             others: {
               type: modelRef.type
             }
@@ -88,7 +123,7 @@ onKeyStroke('Enter', async () => {
 
 onMounted(()=>{
     inputRef.value?.focus()
-    // console.log('inputRef',inputRef.value)
+    console.log('inputRef',props)
     window.navigator.clipboard.writeText('')
 })
 

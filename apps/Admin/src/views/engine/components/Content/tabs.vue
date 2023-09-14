@@ -26,7 +26,7 @@
 <script setup name="ContentTabs">
 import { storeToRefs } from 'pinia'
 import { useEngine,useProduct } from '@/store'
-import Tabs from '../Tabs/tabs.vue'
+// import Tabs from '../Tabs/tabs.vue'
 import Content from './content.vue'
 import ProjectEmpty from '@/components/ProJect/Empty/index.vue'
 

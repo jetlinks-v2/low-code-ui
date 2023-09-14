@@ -5,12 +5,12 @@
         :list="list"
         class="list-group"
         handle=".handle"
-        item-key="name"
+        item-key="key"
       >
         <template #item="{ element, index }">
           <div class="list-group-item">
             <AIcon class="handle" type="AlignLeftOutlined"></AIcon>
-            <DrawerSetter :value="element" @change="onChange" :index="index" />
+            <DrawerSetter :type="type" :value="element" @change="onChange" :index="index" />
             <AIcon type="CloseOutlined" @click="onDelete(index)" />
           </div>
         </template>
@@ -25,6 +25,7 @@
 
 <script lang="ts" setup>
 import { ref, watchEffect, unref } from 'vue'
+import { uid } from '../../../../../utils/uid'
 import Draggable from '../../../../JSortable/index'
 import DrawerSetter from './DrawerSetter.vue'
 
@@ -32,6 +33,10 @@ const props = defineProps({
   value: {
     type: Array,
     default: () => [],
+  },
+  type: {
+    type: String,
+    default: 'root'
   },
 })
 const emits = defineEmits(['update:value', 'change'])
@@ -42,7 +47,7 @@ watchEffect(() => {
 })
 
 const onClick = () => {
-  list.value.push({})
+  list.value.push({ key: uid() })
   emits('update:value', unref(list))
   emits('change', unref(list))
 }

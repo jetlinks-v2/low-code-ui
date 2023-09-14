@@ -2,10 +2,13 @@
   <div class="paging-config">
     <j-drawer
       title="分页器配置"
-      placement="top"
+      placement="right"
       :closable="false"
       :visible="open"
       @close="emits('update:open', false)"
+      getContainer=".list-page"
+      :wrap-style="{position: 'absolute'}"
+      width="560px"
     >
       <p>请配置分页器支持的单页数据量</p>
       <ErrorItem :errorData="errorData('pageList')">

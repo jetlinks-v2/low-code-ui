@@ -39,7 +39,7 @@ export default defineComponent({
                 addContext(props.data, props.parent)
             }
             props.data.context?.appendItem()
-            const addData = unref(list).slice(-1)
+            const addData = unref(list)?.[unref(list).length - 1] ||'root'
             designer.setSelection(addData)
         }
 
@@ -71,7 +71,7 @@ export default defineComponent({
                                     return (
                                         <TabPane key={element.key} {...element.componentProps}>
                                             <Selection
-                                                class={'drag-area'}
+                                                class={isEditModel.value && 'drag-area'}
                                                 data={element}
                                                 tag="div"
                                                 hasCopy={true}
@@ -105,7 +105,7 @@ export default defineComponent({
             }
 
             return (
-                <Selection {...useAttrs()} style={{ padding: '16px' }} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
+                <Selection {...useAttrs()} style={{ padding: isEditModel.value ? '16px' : '0px' }} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
                     {
                         unref(_isLayout) ?
                             <FormItem {...unref(_formItemProps)}>

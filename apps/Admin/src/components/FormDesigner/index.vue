@@ -4,8 +4,13 @@
       <Header @save="onSave" :data="data" @validate="onValidate" />
       <div class="box">
         <div class="left" v-if="model !== 'preview'"><Filed /></div>
-        <div class="right">
-          <Canvas :data="formData"></Canvas>
+        <div
+          class="right"
+          :style="{
+            width: _width,
+          }"
+        >
+          <Canvas></Canvas>
         </div>
         <div class="config" v-if="isShowConfig && model !== 'preview'">
           <Config ref="configRef" />
@@ -49,31 +54,24 @@ import Filed from './components/Panels/Filed/index.vue'
 import {
   provide,
   ref,
-  reactive,
   watch,
   onUnmounted,
   unref,
   computed,
+  reactive,
+  onMounted,
 } from 'vue'
-import { ISchema } from './typings'
-import { omit, debounce } from 'lodash-es'
+import { debounce } from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
-import { useMagicKeys } from '@vueuse/core'
 import { Modal } from 'jetlinks-ui-components'
-import { deleteDataByKey, copyDataByKey, checkedConfig } from './utils/utils'
-import { resolve } from 'dns'
-
-const initData = {
-  type: 'root',
-  key: 'root',
-  componentProps: {
-    layout: 'horizontal',
-    size: 'default',
-    cssCode: '',
-    eventCode: '',
-  },
-  children: [],
-}
+import {
+  deleteDataByKey,
+  copyDataByKey,
+  checkedConfig,
+  getFieldData,
+  initData,
+} from './utils/utils'
+import { uid } from './utils/uid'
 
 const props = defineProps({
   value: {
@@ -94,15 +92,11 @@ const model = ref<'preview' | 'edit'>(props.mode ? 'preview' : 'edit') // 预览
 const formData = ref<any>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
 const selected = ref<any[]>([]) // 被选择数据,需要多选
-const formState = reactive<any>({})
 const errorKey = ref<string[]>([])
-const formRef = ref<any>()
 const configRef = ref<any>()
 const refList = ref<any>({})
-
-const keys = useMagicKeys()
-const _shift = keys['Shift']
-const _ctrl = keys['Ctrl']
+const formRef = ref<any>()
+const formState = reactive({})
 
 const collectVisible = ref<boolean>(false)
 const collectData = ref<any[]>([])
@@ -110,6 +104,8 @@ const delVisible = ref<boolean>(false)
 const spinning = ref<boolean>(false)
 const checkVisible = ref<boolean>(false)
 const editData = ref<string>()
+const _ctrl = ref<boolean>(false)
+const focus = ref<boolean>(false)
 
 const product = useProduct()
 const formDesigner = useFormDesigner()
@@ -118,10 +114,14 @@ const isSelectedRoot = computed(() => {
   return !!selected.value.find((item) => item.key === 'root')
 })
 
+const _width = computed(() => {
+  return model.value === 'preview' ? '100%' : (!unref(isShowConfig) ? 'calc(100% - 200px)' : 'calc(100% - 584px)')
+})
+
 // 设置数据被选中
 const setSelection = (node: any) => {
-  if (['card-item'].includes(node.type)) return
-  if (_shift.value || _ctrl.value) {
+  if (['card-item', 'space-item'].includes(node.type)) return
+  if (_ctrl.value && model.value === 'edit') {
     if (node === 'root') return
     selected.value.push(node)
   } else {
@@ -148,11 +148,7 @@ const onDelete = debounce(() => {
     onOk() {
       delVisible.value = false
       // 删除数据
-      const _data: any = selected.value
-        .map((item) => {
-          return deleteDataByKey(formData.value.children, item)
-        })
-        .pop()
+      const _data = deleteDataByKey(formData.value.children, selected.value)
       formData.value = {
         ...formData.value,
         children: _data?.arr || [],
@@ -175,11 +171,7 @@ const onCopy = () => {
 const onShear = debounce(() => {
   if (unref(isSelectedRoot)) return
   formDesigner.setCopyData(selected.value || [])
-  const _data: any = selected.value
-    .map((item) => {
-      return deleteDataByKey(formData.value.children, item)
-    })
-    .pop()
+  const _data: any = deleteDataByKey(formData.value.children, selected.value)
   formData.value = {
     ...formData.value,
     children: _data?.arr || [],
@@ -194,10 +186,14 @@ const onPaste = () => {
   const list = (_data || []).map((item) => {
     return {
       ...item,
-      key: item.key + '_copy',
+      formItemProps: {
+        ...item?.formItemProps,
+        name: item.formItemProps?.name + 'copy',
+      },
+      key: item.key + '_' + uid(),
     }
   })
-  if (_data.length && selected.value?.length) {
+  if (list.length && selected.value?.length) {
     const dt = selected.value?.[selected.value.length - 1]
     if (dt?.key === 'root') {
       formData.value = {
@@ -210,7 +206,7 @@ const onPaste = () => {
         children: copyDataByKey(formData.value?.children, list, dt),
       }
     }
-    setSelection(_data?.[_data.length - 1] || 'root')
+    setSelection(list?.[list.length - 1] || 'root')
     formDesigner.deleteData()
   }
 }
@@ -221,45 +217,6 @@ const onCollect = () => {
   collectData.value = selected.value || []
   collectVisible.value = true
 }
-
-watch(
-  () => [keys['Ctrl+C'].value, keys['Meta+C'].value],
-  (v1, v2) => {
-    if (v1 || v2) {
-      onCopy()
-    }
-  },
-)
-
-watch(
-  () => [keys['Ctrl+X'].value, keys['Meta+X'].value],
-  (v1, v2) => {
-    if (v1 || v2) {
-      onShear()
-    }
-  },
-)
-
-watch(
-  () => [keys['Ctrl+V'].value, keys['Meta+V'].value],
-  (v1, v2) => {
-    if (v1 || v2) {
-      onPaste()
-    }
-  },
-)
-
-// 删除
-watch(
-  () => [keys['Space'].value, keys['Delete'].value],
-  (v1, v2) => {
-    if (v1 || v2) {
-      if (!delVisible.value) {
-        onDelete()
-      }
-    }
-  },
-)
 
 /**
  * 保存数据
@@ -279,48 +236,22 @@ const setModel = (_type: 'preview' | 'edit') => {
   model.value = _type
 }
 
-const getFieldChildrenData = (data: ISchema[]) => {
-  let obj: any = {}
-  data.map((item: any) => {
-    obj = {
-      ...obj,
-      ...getFieldData(item),
-    }
-  })
-  return obj
-}
-
-const getFieldData = (data: ISchema) => {
-  let obj: any = undefined
-  if (data.children && data.children?.length) {
-    obj = getFieldChildrenData(data?.children)
-  }
-  let _obj: any = {}
-  if (data?.formItemProps?.name) {
-    if (data.type === 'table') {
-      _obj[data?.formItemProps?.name] = [omit(obj, ['actions', 'index'])]
-    } else {
-      _obj[data?.formItemProps?.name] = obj
-    }
-  } else {
-    _obj = obj
-  }
-  return _obj
-}
-
 provide('FormDesigner', {
   tabsId: props.data?.id,
   model,
   formData,
-  isShowConfig,
-  selected,
   formState,
   formRef,
+  isShowConfig,
+  selected,
   errorKey,
   mode: props?.mode,
   refList,
   collectVisible,
   collectData,
+  delVisible,
+  _ctrl,
+  focus,
   setSelection,
   setModel,
   onSaveData,
@@ -332,13 +263,16 @@ provide('FormDesigner', {
 })
 
 const onSave = () => {
-  if (model.value !== 'edit') {
-    return new Promise(async (resolve, inject) => {
-      const values = await formRef?.value.validateFields().catch((info) => {
-        inject(info)
-      })
-      // console.log('Received values of form: ', values)
-      resolve(values)
+  if (model.value === 'preview') {
+    return new Promise((resolve, inject) => {
+      formRef.value
+        .validate()
+        .then((_data: any) => {
+          resolve(_data)
+        })
+        .catch((err: any) => {
+          inject(err)
+        })
     })
   }
 }
@@ -370,6 +304,10 @@ watch(
     immediate: true,
   },
 )
+
+onMounted(() => {
+  setSelection('root')
+})
 
 onUnmounted(() => {
   onSaveData()
@@ -407,24 +345,24 @@ defineExpose({ onSave, validate: onValidate })
 
 <style lang="less" scoped>
 .container {
-  background-color: #fff;
   height: calc(100vh - 125px);
   .box {
     display: flex;
     width: 100%;
     height: calc(100% - 50px);
+    overflow: hidden;
 
     .left {
-      width: 300px;
+      width: 200px;
       height: 100%;
     }
 
     .right {
-      flex: 1;
+      width: 100%;
     }
 
     .config {
-      width: 300px;
+      width: 384px;
     }
   }
 }
@@ -434,7 +372,7 @@ defineExpose({ onSave, validate: onValidate })
   background-color: lightgray;
   padding: 10px 20px;
   width: 100%;
-  bottom: 0;
+  bottom: 25px;
 }
 </style>
 

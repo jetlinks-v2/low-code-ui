@@ -2,6 +2,7 @@
   <div class="engine-header">
     <div class="content">
       <j-button type="link" @click="quit">退出</j-button>
+      <div> {{ product.info?.name }}</div>
     </div>
     <div class="release">
       <j-button type="primary" @click="onRelease">发布</j-button>
@@ -40,6 +41,8 @@ const quit = () => {
 
   .content {
     flex: 1 1 auto;
+    display: flex;
+    align-items: center;
   }
 
   .release {
