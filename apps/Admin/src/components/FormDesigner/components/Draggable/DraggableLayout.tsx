@@ -49,6 +49,7 @@ const DraggableLayout = defineComponent({
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
+        const platform = navigator.platform.toLowerCase();
 
         const product = useProduct()
 
@@ -231,7 +232,7 @@ const DraggableLayout = defineComponent({
             multiDrag: true,
             itemKey: 'key',
             selectedClass: "sortable-selected",
-            multiDragKey: "SHIFT",
+            multiDragKey: platform.includes('mac') ? "Meta" : "Ctrl",
             group: { name: "j-canvas" },
             //拖动结束
             onEnd: (e) => {
