@@ -6,8 +6,6 @@
       @close="close"
       destroy-on-close
       placement="right"
-      getContainer=".list-page"
-      :wrap-style="{position: 'absolute'}"
       width="560px"
     >
       <BtnsList

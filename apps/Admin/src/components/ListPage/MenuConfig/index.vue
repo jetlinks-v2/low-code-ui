@@ -6,8 +6,6 @@
       :closable="false"
       :visible="open"
       @close="emits('update:open', false)"
-      getContainer=".list-page"
-      :wrap-style="{position: 'absolute'}"
       width="560px"
     >
       <Menu

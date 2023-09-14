@@ -1,10 +1,10 @@
-// import { Row, Col } from 'jetlinks-ui-components'
 import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
 import './index.less'
 import { withModifiers } from 'vue'
 import { cloneDeep, omit } from 'lodash-es'
-import { addContext } from '../../utils/addContext'
+import { useTool } from '../../hooks'
+import generatorData from '../../utils/generatorData'
 
 export default defineComponent({
     name: 'GridLayout',
@@ -30,21 +30,22 @@ export default defineComponent({
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
+        const { isEditModel, isDragArea, layoutPadStyle } = useTool()
+
         const list = computed(() => {
             return props.data?.children || []
         })
 
         const handleAdd = () => {
-            if (!props.data?.context) {
-                addContext(props.data, props.parent)
-            }
-            props.data.context?.appendItem()
-            designer.setSelection(props.data)
+            const _item = generatorData({
+                type: props.data?.type + '-item',
+                children: [],
+                componentProps: {
+                    span: 1
+                }
+            })
+            designer.onAddChild(_item, props.data)
         }
-
-        const isEditModel = computed(() => {
-            return unref(designer?.model) === 'edit'
-        })
 
         return () => {
             const _path = cloneDeep(props?.path || []);
@@ -54,7 +55,7 @@ export default defineComponent({
             }
             const _span = (props.data.componentProps?.inlineMax || 1)
             return (
-                <Selection {...useAttrs()} style={{ padding: isEditModel.value ? '16px' : '0px' }} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
+                <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
                     <div
                         data-layout-type={'grid'}
                         {...omit(props.data.componentProps, ['rowSpan', 'colSpan', 'inlineMax'])}
@@ -70,7 +71,7 @@ export default defineComponent({
                                 return (
                                     <div key={element.key} {...omit(element.componentProps, 'span')} style={{ gridColumn: `span ${a} / auto` }}>
                                         <Selection
-                                            class={isEditModel.value && 'drag-area'}
+                                            class={unref(isDragArea) && 'drag-area'}
                                             hasDel={unref(list).length > 1}
                                             data={element}
                                             tag="div"

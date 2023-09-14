@@ -4,7 +4,8 @@ import { Space } from 'jetlinks-ui-components'
 import './index.less'
 import { cloneDeep } from 'lodash-es'
 import { withModifiers } from 'vue'
-import { addContext } from '../../utils/addContext'
+import { useTool } from '../../hooks'
+import generatorData from '../../utils/generatorData'
 
 export default defineComponent({
     name: 'SpaceLayout',
@@ -31,11 +32,10 @@ export default defineComponent({
     setup(props) {
         const designer: any = inject('FormDesigner')
 
+        const { isEditModel, isDragArea, layoutPadStyle } = useTool()
+
         const list = computed(() => {
             return props.data?.children || []
-        })
-        const isEditModel = computed(() => {
-            return unref(designer?.model) === 'edit'
         })
 
         return () => {
@@ -48,14 +48,15 @@ export default defineComponent({
             }
 
             const handleAdd = () => {
-                if (!props.data?.context) {
-                    addContext(props.data, props.parent)
-                }
-                props.data.context?.appendItem()
-                designer.setSelection(props.data)
+                const _item = generatorData({
+                    type: props.data?.type + '-item',
+                    children: [],
+                    componentProps: {}
+                })
+                designer.onAddChild(_item, props.data)
             }
             return (
-                <Selection {...useAttrs()} style={{ padding: isEditModel.value ? '16px' : '0px' }} hasDrag={true} hasDel={true} hasCopy={true} data={props.data} parent={props.parent}>
+                <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDrag={true} hasDel={true} hasCopy={true} data={props.data} parent={props.parent}>
                     {
                         unref(list).length ? <Space data-layout-type={'space'} {...props.data.componentProps}>
                             {
@@ -63,7 +64,7 @@ export default defineComponent({
                                     return (
                                         <div key={element.key} {...element.componentProps}>
                                             <Selection
-                                                class={isEditModel.value && 'drag-area'}
+                                                class={unref(isDragArea) && 'drag-area'}
                                                 data={element}
                                                 tag="div"
                                                 hasCopy={true}

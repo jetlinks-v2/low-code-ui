@@ -102,7 +102,7 @@ export const checkedConfig = (node: ISchema) => {
     return _rules
 }
 
-export const updateData = (list: ISchema[], item: ISchema) => {
+export const updateData = (list: ISchema[], item?: any) => {
     return (list || []).map(_item => {
         if (_item.key === item.key) {
             return {
@@ -281,6 +281,40 @@ export const copyDataByKey = (arr: any[], newData: any[], _item: any) => {
     } else {
         return [...arr.slice(0, _index + 1), ...newData, ...arr.slice(_index + 1, arr?.length)]
     }
+}
+
+// 添加子组件flag: true: 开头， undefined: 尾部，false: 中间
+export const appendChildItem = (arr: any[], newData: any, parent: any, flag?: boolean) => {
+    return arr.map(item => {
+        let child: any[] = item?.children || []
+        if (item.key === parent?.key) {
+            if (flag === undefined) {
+                child = [...child, newData]
+            }
+            if (flag === false) {
+                const _f = child.find(item => item?.formItemProps?.name === 'actions')
+                if(_f){
+                    child.splice(child.length - 1, 0, newData)
+                } else {
+                    child.push(newData)
+                }
+            }
+            if (flag === true) {
+                child = [newData, ...child]
+            }
+            return {
+                ...item,
+                children: child
+            }
+        }
+        if (item.children?.length) {
+            child = appendChildItem(item.children, newData, parent)
+        }
+        return {
+            ...item,
+            children: [...child]
+        }
+    })
 }
 
 const getFieldChildrenData = (data: ISchema[]) => {

@@ -1,5 +1,5 @@
 
-import { cloneDeep, get, isEmpty, set } from 'lodash-es';
+import { cloneDeep, get, isEmpty, omit, set } from 'lodash-es';
 import DraggableWrap from './DragGableWrap'
 import Selection from '../Selection'
 import { FormItem } from 'jetlinks-ui-components'
@@ -97,14 +97,34 @@ const DraggableLayout = defineComponent({
                     default:
                         if (unref(isEditModel) || componentMap?.[element?.type]) {
                             const TypeComponent = componentMap?.[element?.type] || 'div'
-                            const _props = useProps(element, unref(designer.formData), unref(isEditModel), unref(designer.mode))
+                            const _props = useProps(element, unref(designer.formData))
+
+                            console.log(_props)
 
                             const selectRef = ref<any>(null)
+                            const options = ref<any[]>(element?.componentProps?.options || [])
 
                             const params = {
                                 data: element,
                                 parent: props.data
                             }
+
+                            // const formItemProps = computed(() => {
+                            //     const rules = (element.formItemProps?.rules || []).map(item => {
+                            //         if(item?.validator) { // 处理自定义校验函数
+                            //             return {
+                            //                 ...omit(item, 'validator'),
+                            //                 validator(rule, value, callback){
+                            //                     let customFn = new Function('rule', 'value', 'callback', item?.validator)
+                            //                     return customFn(rule, value, callback)
+                            //                 }
+                            //             }
+                            //         }
+                            //         return item
+                            //     })
+                                
+                            //     return { ...element?.formItemProps, rules }
+                            // })
 
                             if (element?.formItemProps?.name) {
                                 _path[_index] = element?.formItemProps?.name
@@ -141,12 +161,8 @@ const DraggableLayout = defineComponent({
                                     }
                                 }
                                 if(!element?.componentProps?.eventCode && !unref(isEditModel)) return 
-                                if(['input', 'textarea', 'input-password'].includes(element.type)){
+                                if(['input', 'input-number', 'textarea', 'input-password'].includes(element.type)){
                                     let customFn = new Function('e', element?.componentProps?.eventCode)
-                                    customFn.call(_this, arg?.[0])
-                                }
-                                if(['input-number'].includes(element.type)){
-                                    let customFn = new Function('value', element?.componentProps?.eventCode)
                                     customFn.call(_this, arg?.[0])
                                 }
                                 if(['select', 'switch', 'select-card', 'tree-select'].includes(element.type)){
@@ -176,7 +192,7 @@ const DraggableLayout = defineComponent({
 
                             if(!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
                                 queryOptions(element.componentProps.source, product.info?.id).then(resp => {
-                                    _props.componentProps.options = resp
+                                    options.value = resp
                                 })
                             }
 
@@ -189,13 +205,17 @@ const DraggableLayout = defineComponent({
                                                 model={unref(designer.model)}
                                                 data={element}
                                                 {..._props.componentProps}
+                                                size={unref(designer.formData)?.componentProps.size}
                                             ></TypeComponent> : 
                                             <TypeComponent
                                                 data={element}
                                                 {..._props.componentProps}
+                                                size={unref(designer.formData)?.componentProps.size}
                                                 v-model:value={myValue.value}
                                                 v-model:checked={checked.value}
                                                 onChange={onChange}
+                                                disabled={element?.componentProps?.disabled || (unref(designer.mode) === 'edit' && !element?.componentProps?.editable)}
+                                                options={unref(options)}
                                             ></TypeComponent>
                                         }
                                         <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{element.componentProps?.description}</div>
