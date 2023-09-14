@@ -1,14 +1,17 @@
 <template>
   <div class="operation-drawer" ref="operationDrawer">
-    <img class="modal-config-img" :src="getImage('/list-page/button.png')" v-if="open">
+    <template v-if="open">
+      <img class="modal-config-img" :src="getImage('/list-page/column-config.png')" v-if="type === 'columns'">
+      <img class="modal-config-img" :src="getImage('/list-page/button.png')" v-else>
+    </template>
     <j-drawer
       placement="right"
       width="560px"
       destroy-on-close
       :visible="_visible"
-      :title="type == 'columns' ? '操作列' : '添加按钮'"
+      :title="type == 'columns' ? '操作列配置' : '添加按钮配置'"
       :getContainer="() => $refs.operationDrawer"
-      :wrap-style="{ position: 'absolute' }"
+      :wrap-style="{ position: 'absolute', zIndex: 1 }"
       @close="close"
 
     >
@@ -107,12 +110,14 @@ const save = async () => {
   })
 }
 
-const valid = async () => {
-  return new Promise((resolve, reject) => {
-    errorList.value = validOperationsBtn(columnsTree.value)
-    if(errorList.value.length) reject([{message: '操作按钮配置错误'}])
-    else resolve([])
-  })
+const valid = () => {
+  errorList.value = validOperationsBtn(columnsTree.value)
+  return errorList.value.length ? [{message: props.type === 'columns' ? '操作列配置错误': '操作按钮配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validOperationsBtn(columnsTree.value)
+  //   if(errorList.value.length) reject([{message: '操作按钮配置错误'}])
+  //   else resolve([])
+  // })
 }
 
 
