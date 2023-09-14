@@ -55,7 +55,7 @@ export default defineComponent({
             return _path
         })
 
-        const data = ref<any[]>(get(designer.formState, __path.value) || [{}])
+        const data = ref<any[]>(get(designer.formState, __path.value) || [])
 
         const handleAdd = () => {
             const _item = generatorData({
@@ -149,15 +149,15 @@ export default defineComponent({
                         <FormItem {...unref(_formItemProps)}>
                             <Table
                                 pagination={false}
-                                dataSource={data.value}
-                                scroll={{ y: 300, x: 'max-content' }}
+                                dataSource={isEditModel.value ? [] : data.value}
+                                scroll={{ y: props.data.componentProps?.height, x: 'max-content' }}
                             >
                                 {
                                     unref(list).map(element => {
                                         return <TableColumn
                                             key={element.key}
-                                            {...omit(element.componentProps, 'name')}
-                                            align={props.data.componentProps?.align}
+                                            {...omit(element.componentProps, ['name', 'align'])}
+                                            align={element?.componentProps?.align || props.data.componentProps?.align}
                                             v-slots={{
                                                 title: () => {
                                                     return <Selection
@@ -181,11 +181,11 @@ export default defineComponent({
                                     })
                                 }
                             </Table>
-                            <Button disabled={isEditModel.value} onClick={() => {
-                                if (!isEditModel.value) {
+                            {
+                                !unref(isEditModel) && <Button onClick={() => {
                                     data.value.push({})
-                                }
-                            }} style={{ width: '100%', marginTop: '10px' }}><AIcon type="PlusOutlined" />新增</Button>
+                                }} style={{ width: '100%', marginTop: '10px' }}><AIcon type="PlusOutlined" />新增</Button>
+                            }
                             {
                                 unref(isEditModel) &&
                                 <div class="draggable-add">
