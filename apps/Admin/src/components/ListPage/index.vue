@@ -1,6 +1,5 @@
 <template>
   <div class="list-page">
-    <j-spin :spinning="spinning">
     <Preview
         :show="showPreview"
         :id="props.data.id"
@@ -65,11 +64,11 @@
         :data="props.data"
         ref="menuConfigRef"
       />
-    </j-spin>
   </div>
 </template>
 
 <script setup lang="ts" name="ListPage">
+import './style.less'
 import DataBind from './DataBind/index.vue'
 import FilterModule from './FilterModule/index.vue'
 import ListData from './ListData/index.vue'
@@ -363,5 +362,6 @@ defineExpose({
 .list-page {
   height: 100%;
   position: relative;
+  background-color: #e9e9e9;
 }
 </style>

@@ -1,12 +1,16 @@
 <template>
-  <div class="operation-drawer">
+  <div class="operation-drawer" ref="operationDrawer">
+    <img class="modal-config-img" :src="getImage('/list-page/button.png')" v-if="open">
     <j-drawer
-      :visible="_visible"
-      :title="type == 'columns' ? '操作列' : '添加按钮'"
-      @close="close"
-      destroy-on-close
       placement="right"
       width="560px"
+      destroy-on-close
+      :visible="_visible"
+      :title="type == 'columns' ? '操作列' : '添加按钮'"
+      :getContainer="() => $refs.operationDrawer"
+      :wrap-style="{ position: 'absolute' }"
+      @close="close"
+
     >
       <BtnsList
         v-model:data="columnsTree"
@@ -43,6 +47,7 @@ import {
 } from './keys'
 import { validOperationsBtn } from './index'
 import { PropType } from 'vue'
+import { getImage } from '@jetlinks/utils';
 
 interface Emit {
   (e: 'update:open', value: boolean): void

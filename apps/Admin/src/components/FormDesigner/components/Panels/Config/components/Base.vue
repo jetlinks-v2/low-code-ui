@@ -216,13 +216,17 @@
         </j-form-item>
       </template>
       <template v-if="['tabs-item'].includes(type)">
-        <j-form-item label="名称" :name="['componentProps', 'tab']" :rules="[
-          {
-            required: true,
-            message: '请输入名称',
-            trigger: 'change',
-          },
-        ]">
+        <j-form-item
+          label="名称"
+          :name="['componentProps', 'tab']"
+          :rules="[
+            {
+              required: true,
+              message: '请输入名称',
+              trigger: 'change',
+            },
+          ]"
+        >
           <j-input
             placeholder="请输入"
             :maxlength="64"
@@ -275,6 +279,29 @@
             @change="onDataChange"
             v-model:value="target.formItemProps.name"
           />
+        </j-form-item>
+        <!-- <j-form-item
+          label="表头跨列"
+          :name="['componentProps', 'name']"
+          required
+          :rules="rules"
+        >
+          <j-input-number
+            placeholder="请输入表头跨列"
+            @change="onDataChange"
+            v-model:value="target.componentProps.name"
+          />
+        </j-form-item> -->
+        <j-form-item label="内容对齐" :name="['componentProps', 'align']">
+          <j-select
+            v-model:value="target.componentProps.align"
+            placeholder="请选择"
+            @change="onDataChange"
+          >
+            <j-select-option :value="'left'">左</j-select-option>
+            <j-select-option :value="'right'">右</j-select-option>
+            <j-select-option :value="'center'">中</j-select-option>
+          </j-select>
         </j-form-item>
       </template>
       <template v-if="['grid', 'space'].includes(type)">

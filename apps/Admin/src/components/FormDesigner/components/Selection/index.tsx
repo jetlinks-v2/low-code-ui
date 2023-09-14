@@ -176,6 +176,7 @@ const Selection = defineComponent({
 
     const renderSelected = () => {
       return <TagComponent
+        data-id={props.data?.key}
         class={[
           'selectElement',
           unref(isEditModel) && unref(_hasDrag) && 'handle',

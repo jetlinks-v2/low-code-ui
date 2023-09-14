@@ -71,6 +71,7 @@ import {
   getFieldData,
   initData,
   appendChildItem,
+handleCopyData,
 } from './utils/utils'
 import { uid } from './utils/uid'
 
@@ -197,6 +198,7 @@ const onPaste = () => {
         name: item.formItemProps?.name + 'copy',
       },
       key: item.key + '_' + uid(),
+      children: handleCopyData(item?.children || [])
     }
   })
   if (list.length && selected.value?.length) {
