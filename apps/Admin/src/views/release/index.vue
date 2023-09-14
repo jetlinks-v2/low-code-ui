@@ -10,30 +10,30 @@
       <!-- <j-button type="primary">发布</j-button> -->
     </div>
     <div class="release-body">
+      <CardBox class="card ">
+        <j-steps :current="step">
+          <j-step title="状态确认">
+            <template #icon>
+            </template>
+          </j-step>
+          <j-step title="系统菜单">
+            <template #icon>
+            </template>
+          </j-step>
+          <j-step title="完成">
+            <template #icon>
+            </template>
+          </j-step>
+        </j-steps>
+      </CardBox>
 
-      <div class="release-content">
-        <div class="release-step">
-          <j-steps :current="step">
-            <j-step title="状态确认">
-              <template #icon>
-              </template>
-            </j-step>
-            <j-step title="系统菜单">
-              <template #icon>
-              </template>
-            </j-step>
-            <j-step title="完成">
-              <template #icon>
-              </template>
-            </j-step>
-          </j-steps>
-        </div>
+      <CardBox>
         <div class="release-step-content" v-if="loading">
           <Status v-show="step === 1" v-model:status="status" />
           <Tree v-show="step === 2" ref="treeRef" @change="treeChange" />
           <Finish ref="finishRef" v-show="step === 3" v-model:value="finishStatus" :tree="tree" />
         </div>
-      </div>
+      </CardBox>
     </div>
     <div class="release-footer">
       <j-button v-if="step === 1" @click="cancel">取消</j-button>
@@ -149,19 +149,21 @@ product.queryProduct(route.params.id, () => {
   .release-body {
     padding: 24px;
     height: calc(100% - 112px);
+    background-color: rgb(246,246,246);
+
+    .card {
+      margin-bottom: 16px;
+    }
 
     .release-content {
-      display: flex;
-      flex-direction: column;
       width: 100%;
       height: 100%;
 
       .release-step {
-        width: 50%;
-        margin-left: 25%;
-        margin-bottom: 12px;
-        display: flex;
-        justify-content: space-between;
+        padding: 44px;
+        margin-bottom: 16px;
+        border-radius: 8px;
+        background-color: #fff;
       }
 
       .release-step-content {

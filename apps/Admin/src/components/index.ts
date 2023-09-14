@@ -18,6 +18,7 @@ import CRUD from './Database'
 import {BooleanSelect, EmptySelect} from './Select'
 import { SQLCode, FunctionCode } from './SQL'
 import OppositeSelect from './OppositeSelect/index.vue'
+import CardBox from './CardBox/index.vue'
 
 export default  {
     install(app: App) {
@@ -41,5 +42,6 @@ export default  {
           .component('SQLCode', SQLCode)
           .component('FunctionCode', FunctionCode)
           .component('OppositeSelect',OppositeSelect)
+          .component('CardBox',CardBox)
     }
 }

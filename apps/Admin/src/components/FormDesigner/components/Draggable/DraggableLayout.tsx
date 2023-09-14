@@ -181,6 +181,8 @@ const DraggableLayout = defineComponent({
                                 })
                             }
 
+                            console.log(_props.formItemProps)
+
                             return (
                                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                                     <FormItem {...unref(_props.formItemProps)} name={_path}>
