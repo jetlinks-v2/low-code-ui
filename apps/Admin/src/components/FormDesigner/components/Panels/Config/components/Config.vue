@@ -36,7 +36,6 @@
       v-if="
         [
           'select-card',
-          'tree-select',
           'select',
           'org',
           'role',
@@ -137,8 +136,19 @@
       </j-form-item>
     </template>
     <template v-if="['tree-select'].includes(type)">
+      <j-form-item label="类型" :name="['componentProps', 'multiple']">
+        <j-radio-group
+          v-model:value="target.componentProps.multiple"
+          button-style="solid"
+          @change="onMultipleChange"
+        >
+          <j-radio-button :value="false">单选项</j-radio-button>
+          <j-radio-button :value="true">多选项</j-radio-button>
+        </j-radio-group>
+      </j-form-item>
       <j-form-item
         label="可选节点"
+        v-if="target.componentProps.multiple"
         :name="['componentProps', 'treeCheckStrictly']"
         :rules="[
           {
@@ -186,7 +196,7 @@
           v-model:value="target.componentProps.height"
           placeholder="请输入"
           :min="1"
-          style="width: 100%;"
+          style="width: 100%"
           @change="onDataChange"
         />
       </j-form-item>
@@ -272,7 +282,7 @@
 
 <script lang="ts" setup>
 import { useTarget } from '../../../../hooks'
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 import { useRequest } from '@jetlinks/hooks'
 import { getGeoType } from '@/api/form'
 
@@ -301,6 +311,13 @@ const { data: options, run } = useRequest(getGeoType, {
 })
 
 const onDataChange = () => {
+  emits('refresh', target.value)
+}
+
+const onMultipleChange = (e) => {
+  if(e.target.value){
+    target.value.componentProps.treeCheckable = true
+  }
   emits('refresh', target.value)
 }
 

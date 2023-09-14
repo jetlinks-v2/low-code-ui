@@ -71,7 +71,7 @@ import {
   getFieldData,
   initData,
   appendChildItem,
-handleCopyData,
+  handleCopyData,
 } from './utils/utils'
 import { uid } from './utils/uid'
 
@@ -198,7 +198,7 @@ const onPaste = () => {
         name: item.formItemProps?.name + 'copy',
       },
       key: item.key + '_' + uid(),
-      children: handleCopyData(item?.children || [])
+      children: handleCopyData(item?.children || []),
     }
   })
   if (list.length && selected.value?.length) {
@@ -336,8 +336,10 @@ onUnmounted(() => {
 // 校验
 const onValidate = () => {
   spinning.value = true
-  errorKey.value = checkedConfig(unref(formData))
-  spinning.value = false
+  setTimeout(() => {
+    errorKey.value = checkedConfig(unref(formData))
+    spinning.value = false
+  }, 100)
   return new Promise((resolve, reject) => {
     if (errorKey.value?.length) {
       reject(errorKey.value)

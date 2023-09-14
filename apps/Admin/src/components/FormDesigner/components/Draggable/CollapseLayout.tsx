@@ -4,7 +4,7 @@ import Selection from '../Selection/index'
 import { Collapse, CollapsePanel, FormItem } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, omit } from 'lodash-es'
 import { useTool } from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import { uid } from '../../utils/uid'
@@ -48,7 +48,7 @@ export default defineComponent({
           name: uid(6)
         },
         componentProps: {
-          header: 'Collapse' + uid(6)
+          name: 'Collapse' + uid(6)
         }
       })
       designer.onAddChild(_item, props.data)
@@ -82,7 +82,7 @@ export default defineComponent({
             {
               unref(list).map((element) => {
                 return (
-                  <CollapsePanel key={element.key} {...element.componentProps}>
+                  <CollapsePanel key={element.key} {...omit(element.componentProps, 'header')} header={element.componentProps?.name}>
                     <Selection
                       class={unref(isDragArea) && 'drag-area'}
                       data={element}

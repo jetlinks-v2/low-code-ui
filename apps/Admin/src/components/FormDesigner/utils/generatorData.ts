@@ -63,9 +63,16 @@ const handleProps = (node: any) => {
             result.mode = undefined
             break
         case 'tree-select':
-            result.treeData = generateOptions(3)
+            result.treeData = [
+                ...generateOptions(3),
+                {
+                    label: '选项4',
+                    value: uid(),
+                    children: generateOptions(3)
+                }
+            ]
             result.showSearch = false
-            result.mode = undefined
+            result.multiple = false
             result.treeCheckStrictly = false
             break
         case 'upload':
@@ -113,9 +120,10 @@ const generatorData = (node: any) => {
         result.formItemProps = handleFormItemProps(result)
     }
 
-    if (result.type === 'grid' || result.type === 'space') {
+    if (result.type === 'grid' || result.type === 'space' || result.type === 'collapse' || result.type === 'tabs') {
         result.formItemProps = {
-            name: result?.key
+            name: result?.key,
+            isLayout: false
         }
     }
 
