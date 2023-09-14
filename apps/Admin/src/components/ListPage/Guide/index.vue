@@ -1,18 +1,21 @@
 <template>
   <div class="guide-steps" @click="handleClick" v-if="open" ref="maskRef">
-    <div class="info" style="position: absolute" ref="info">
-      <p>{{ title }}</p>
-      <p>{{ description }}</p>
+    <div class="info" style="position: absolute;" ref="info">
+      <img src="images/list-page/line.png" :style="style1">
+      <div :style="style" class="message">
+        <h3>{{ title }}</h3>
+        <p>{{ description }}</p>
+      </div>
     </div>
-    <div style="position: absolute; top: 50%; left: 50%">
+    <div style="">
       <j-space size="large">
         <p @click.stop="steps--" v-if="steps != 1">查看上一步</p>
         <p v-if="steps !== stepList.length">点击任意位置查看下一步</p>
         <p v-else>点击任意位置结束向导</p>
       </j-space>
     </div>
-    <div class="stop">
-      <j-button @click.stop="handleJump">跳过向导</j-button>
+    <div class="stop" v-if="steps !== stepList.length">
+      <j-button type="primary" @click.stop="handleJump">跳过向导</j-button>
     </div>
   </div>
 </template>
@@ -37,6 +40,51 @@ const props = defineProps({
   },
 })
 
+const style1 = computed(() => {
+  let result = {}
+  switch(steps.value) {
+    case 2:
+      result = {
+        transform: 'rotateX(180deg)',
+      }
+    break;
+    case 3:
+      result = {
+        transform: 'rotateY(180deg)',
+      }
+    break;
+  }
+  return result
+})
+
+const style = computed(() => {
+  let result = {}
+  switch(steps.value) {
+    case 1:
+      result = {
+        left: '92px',
+        bottom: '-60px',
+        position: 'absolute'
+      }
+    break;
+    case 2:
+      result = {
+        left: '92px',
+        top: '-7px',
+        position: 'absolute'
+      }
+    break;
+    case 3:
+      result = {
+        left: '-350px',
+        bottom: '-62px',
+        position: 'absolute',
+        textAlign: 'right'
+      }
+    break;
+  }
+  return result
+})
 const info = ref()
 const maskRef = ref()
 
@@ -84,10 +132,12 @@ watch(
       props.stepList[val - 1]?.placement,
     )[0]
     props.stepList[val - 1].target?.().forEach((item) => {
+
       item.el.style.backgroundColor = <string>item.backgroundColor
       item.el.style.pointerEvents = 'none'
       item.el.style.position = 'relative'
       item.el.style.zIndex = '1001'
+      item.el.style.top = steps.value === 1 ? '10px' : '0px';
       const node = document.createElement('div')
       node.setAttribute('class', `temp-element`)
       node.setAttribute(
@@ -106,13 +156,14 @@ const handleJump = () => {
   steps.value = 0;
 }
 function position(el: HTMLElement, position?: string) {
+  console.log(el);
   let result: string[] = ['0px', '0px']
   switch (position) {
     case 'top':
       result = [
         el.getBoundingClientRect().top -
           el.offsetHeight -
-          maskRef.value?.getBoundingClientRect().top +
+          maskRef.value?.getBoundingClientRect().top - 50 +
           'px',
         el.getBoundingClientRect().left + 'px',
       ]
@@ -129,17 +180,18 @@ function position(el: HTMLElement, position?: string) {
       result = [
         el.getBoundingClientRect().top +
           el.offsetHeight -
-          maskRef.value?.getBoundingClientRect().top +
+          maskRef.value?.getBoundingClientRect().top + 10 +
           'px',
         el.getBoundingClientRect().left + 'px',
       ]
       break
     case 'left':
+      console.log(el.getBoundingClientRect().left - el.offsetWidth - info.value?.offsetWidth - 867 + 'px');
       result = [
         el.getBoundingClientRect().top -
           maskRef.value?.getBoundingClientRect().top +
           'px',
-        el.getBoundingClientRect().left - el.offsetWidth + 'px',
+        el.getBoundingClientRect().left - el.offsetWidth - info.value?.offsetWidth - 300 + 'px',
       ]
       break
     // (<HTMLElement>info.value).style.left = props.steps[val - 1].target()[0]?.el.getBoundingClientRect()?.left + 'px';
@@ -170,12 +222,23 @@ watch(
   left: 0;
   color: #ffffff;
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   .stop {
     position: absolute;
     right: 20px;
     top: 72px;
     z-index: 1001;
+  }
+  .message {
+    white-space: nowrap;
+    h3 {
+      color: #ffffff;
+      font-weight: 500;
+      font-size: 24px;
+    }
   }
 }
 </style>

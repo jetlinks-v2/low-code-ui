@@ -1,12 +1,16 @@
 <template>
-  <div className="filter-module-center">
+  <div className="filter-module-center" ref="filterModuleRef">
+    <img class="modal-config-img" :src="getImage('/list-page/filter.png')" v-if="open">
     <j-drawer
       title="配置"
       placement="right"
+      width="560px"
       :closable="true"
       :visible="open"
+      :getContainer="() => $refs.filterModuleRef"
+      :wrap-style="{ position: 'absolute' }"
+      :destroyOnClose="true"
       @close="emits('update:open', false)"
-      width="560px"
     >
       <Table
         v-if="type === ''"
@@ -80,6 +84,7 @@ import {
   NumberType,
   DateType,
 } from '@/components/ListPage/FilterModule/components/index'
+import { getImage } from '@jetlinks/utils';
 
 import { validFilterModule } from './utils/valid'
 import { DATA_BIND } from '../keys'
