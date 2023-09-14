@@ -58,7 +58,7 @@
          </div>
       </div>
    </div>
-   <InputModal v-if="visible" :provider="provider" @close="visible=false" @save="onSave"/>
+   <InputModal v-if="visible" :provider="provider" @close="visible=false" @save="onSave" :name-list="nameList"/>
 </template>
 
 <script setup lang='ts' name="Empty">
@@ -73,11 +73,11 @@ const props = defineProps({
 })
 
 const provider = ref()
+const nameList = ref()
 
 const visible = ref<boolean>(false)
 
 const onClick = (type: string) => {
-   // console.log('type',type)
    provider.value = type
    visible.value = true
 }
@@ -86,6 +86,10 @@ const onSave = (data)=>{
    product.add(data,data.parentId)
    visible.value = false
 }
+
+onMounted(()=>{
+   nameList.value= props.data?.children?.map(item=>item.name)
+})
 
 </script>
 
