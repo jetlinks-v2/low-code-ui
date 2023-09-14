@@ -11,7 +11,10 @@
         <j-radio-button :value="'end'">后端接口</j-radio-button>
       </j-radio-group>
     </j-form-item>
-    <j-form-item :name="['componentProps', 'source', 'dictionary']" v-if="target.componentProps?.source?.type === 'dic'">
+    <j-form-item
+      :name="['componentProps', 'source', 'dictionary']"
+      v-if="target.componentProps?.source?.type === 'dic'"
+    >
       <j-select
         placeholder="请选择"
         v-model:value="target.componentProps.source.dictionary"
@@ -22,29 +25,42 @@
         </j-select-option>
       </j-select>
     </j-form-item>
-    <j-form-item v-else :name="['componentProps', 'source', 'commandId']">
+    <template v-else>
       <j-row :gutter="16">
         <j-col :span="12">
-          <j-select
-            v-model:value="target.componentProps.source.functionId"
-            placeholder="请选择"
-            :options="functionList"
-            allowClear
-            @change="onFunChange"
-          >
-          </j-select>
+          <j-form-item :name="['componentProps', 'source', 'functionId']">
+            <j-select
+              v-model:value="target.componentProps.source.functionId"
+              placeholder="请选择"
+              :options="functionList"
+              allowClear
+              @change="onFunChange"
+            >
+            </j-select>
+          </j-form-item>
         </j-col>
         <j-col :span="12">
-          <j-select
-            v-model:value="target.componentProps.source.commandId"
-            placeholder="请选择"
-            :options="commandList"
-            allowClear
-            @change="onCommandChange"
-          ></j-select>
+          <j-form-item
+            :rules="[
+              {
+                required: target.componentProps.source.functionId,
+                message: '请选择',
+                trigger: 'change',
+              },
+            ]"
+            :name="['componentProps', 'source', 'commandId']"
+          >
+            <j-select
+              v-model:value="target.componentProps.source.commandId"
+              placeholder="请选择"
+              :options="commandList"
+              allowClear
+              @change="onCommandChange"
+            ></j-select>
+          </j-form-item>
         </j-col>
       </j-row>
-    </j-form-item>
+    </template>
     <template v-if="target.componentProps?.source?.type === 'end'">
       <j-form-item :name="['componentProps', 'source', 'source']">
         <template #label>
@@ -63,15 +79,7 @@
         >
         </j-tree-select>
       </j-form-item>
-      <j-form-item
-        :rules="[
-          {
-            required: true,
-            message: '请输入',
-          },
-        ]"
-        :name="['componentProps', 'source', 'label']"
-      >
+      <j-form-item :name="['componentProps', 'source', 'label']">
         <template #label>
           展示字段<j-tooltip title="选择树结构进行展示的数据">
             <AIcon type="QuestionCircleOutlined" />
@@ -86,15 +94,7 @@
         >
         </j-select>
       </j-form-item>
-      <j-form-item
-        :rules="[
-          {
-            required: true,
-            message: '请输入',
-          },
-        ]"
-        :name="['componentProps', 'source', 'value']"
-      >
+      <j-form-item :name="['componentProps', 'source', 'value']">
         <template #label>
           存入后端字段<j-tooltip title="选择树结构存入后端的数据">
             <AIcon type="QuestionCircleOutlined" />
@@ -139,7 +139,7 @@ const getDictionary = () => {
 
 const getEnd = () => {
   const id = product.info?.draftId
-  queryEndCommands(id, ["rdb-crud"]).then((resp) => {
+  queryEndCommands(id, ['rdb-crud']).then((resp) => {
     if (resp.success) {
       end.value = resp.result || []
     }

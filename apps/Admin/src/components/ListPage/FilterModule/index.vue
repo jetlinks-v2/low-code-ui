@@ -1,12 +1,16 @@
 <template>
-  <div className="filter-module-center">
+  <div className="filter-module-center" ref="filterModuleRef">
+    <img class="modal-config-img" :src="getImage('/list-page/filter.png')" v-if="open">
     <j-drawer
-      title="配置"
-      placement="bottom"
+      title="筛选模块配置"
+      placement="right"
+      width="560px"
       :closable="true"
       :visible="open"
+      :getContainer="() => $refs.filterModuleRef"
+      :wrap-style="{ position: 'absolute', zIndex: 1 }"
+      :destroyOnClose="true"
       @close="emits('update:open', false)"
-      height="520px"
     >
       <Table
         v-if="type === ''"
@@ -18,16 +22,20 @@
         :dataSource="dataSource"
         :modelActiveKey="activeKey"
         :show="show"
+        tableType="filter"
         :asyncData="asyncData"
-        :configChange="configChange"
         :errorList="errorList"
+        :bindData="dataBinds.filterBind"
+        :bind-function-id="dataBinds.data.function"
         @handleAdd="handleAdd"
         @configuration="configuration"
         @handleOk="handleOk"
         @bindData="bindData"
+        @handleChange="(data) => dataSource = data"
+        @update-bind="(data) => dataBinds.filterBind = data"
       />
       <div v-if="type !== ''">
-        <a-page-header title="配置筛选项" sub-title="配置筛选项" @back="goBack">
+        <a-page-header title=" " @back="goBack">
           <template #backIcon>
             <AIcon type="LeftOutlined" />
             返回
@@ -60,12 +68,14 @@
       </div>
 
       <template #footer v-if="type !== ''">
-        <j-button style="float: right" type="primary" @click="submit">
-          确定
-        </j-button>
-        <j-button style="float: right; margin-right: 8px" @click="goBack">
-          取消
-        </j-button>
+        <j-space>
+          <j-button @click="goBack">
+            取消
+          </j-button>
+          <j-button type="primary" @click="submit">
+            确定
+          </j-button>
+        </j-space>
       </template>
     </j-drawer>
   </div>
@@ -79,6 +89,7 @@ import {
   NumberType,
   DateType,
 } from '@/components/ListPage/FilterModule/components/index'
+import { getImage } from '@jetlinks/utils';
 
 import { validFilterModule } from './utils/valid'
 import { DATA_BIND } from '../keys'
@@ -152,7 +163,7 @@ const columns: any = [
     key: 'id',
     ellipsis: true,
     align: 'center',
-    width: 150,
+    width: 140,
     type: 'text',
     form: {
       isVerify: true,
@@ -191,7 +202,7 @@ const columns: any = [
     key: 'name',
     ellipsis: true,
     align: 'center',
-    width: 150,
+    width: 140,
     type: 'text',
     form: {
       isVerify: true,
@@ -216,7 +227,7 @@ const columns: any = [
     align: 'center',
     type: 'select',
     options: options,
-    width: 150,
+    width: 110,
     tips: true,
   },
   {
@@ -225,7 +236,7 @@ const columns: any = [
     dataIndex: 'action',
     ellipsis: true,
     align: 'center',
-    width: 140,
+    width: 100,
   },
 ]
 
@@ -259,40 +270,33 @@ const configuration = (data: any, value: any) => {
 //处理方式弹窗
 const handleOk = (value: any, data: any) => {
   activeKey.value = value
-  let source: any = []
   switch (value) {
     case '1':
-      source = data
+      dataSource.value = data
       break
     case '2':
-      if (configChange.value) {
-        data?.map((item: any) => {
-          const dataFind = dataSource.value?.find(
-            (i: any) => i?.id === item?.id,
-          )
-          if (dataFind?.config !== item?.config) {
-            source.push(item)
-          }
-        })
-      } else {
-        data?.map((item: any) => {
-          if (item?.mark === 'add') {
-            source.push(item)
-          }
-        })
-      }
+      console.log(...data);
+      dataSource.value.push(...data)
+      // if (configChange.value) {
+      //   data?.map((item: any) => {
+      //     const dataFind = dataSource.value?.find(
+      //       (i: any) => i?.id === item?.id,
+      //     )
+      //     if (dataFind?.config !== item?.config) {
+      //       dataSource.value.push(item)
+      //     }
+      //   })
+      // } else {
+      //   data?.map((item: any) => {
+      //     if (item?.mark === 'add') {
+      //       dataSource.value.push(item)
+      //     }
+      //   })
+      // }
       break
     case '3':
-      source = dataSource.value?.map((item) => {
-        return {
-          id: item.name,
-          name: item.name,
-          type: 'string',
-        }
-      })
       break
   }
-  dataSource.value = source
   configChange.value = false
 }
 //点击显示table的同步数据
@@ -326,11 +330,13 @@ const goBack = () => {
  */
 const errorList: any = ref([])
 const valid = () => {
-  return new Promise((resolve, reject) => {
-    errorList.value = validFilterModule(dataSource.value)
-    if (errorList.value.length) reject(errorList.value)
-    else resolve([])
-  })
+  errorList.value = validFilterModule(dataSource.value)
+  return errorList.value.length ? [{message: '数据绑定配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validFilterModule(dataSource.value)
+  //   if (errorList.value.length) reject([{message: '数据绑定配置错误'}])
+  //   else resolve([])
+  // })
 }
 
 defineExpose({
@@ -341,7 +347,7 @@ defineExpose({
 watch(
   () => dataBinds,
   () => {
-    if (dataBinds.functionInfo) {
+    if (dataBinds.data.function) {
       dataBind.value = true
     } else {
       dataBind.value = false
@@ -351,20 +357,6 @@ watch(
   { immediate: true, deep: true },
 )
 
-// watch(() => [JSON.stringify(props.dataSource), JSON.stringify(dataBinds)], () => {
-//   if(!props.dataSource.length && dataBinds?.functionInfo?.configuration?.columns) {
-//     dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(
-//       (item) => {
-//         console.log(`output->item`,item)
-//         return {
-//           id: item.name,
-//           name: item.name,
-//           type: 'string',
-//         }
-//       },
-//     ) || []
-//   }
-// }, {immediate: true})
 </script>
 
 <style scoped lang="less"></style>

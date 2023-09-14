@@ -1,5 +1,5 @@
 <template>
-  <div class="data-bind">
+  <div class="data-bind" :class="{ 'is-guide': open }">
     <j-form :model="dataBind" layout="inline">
       <j-form-item label="数据绑定">
         <ErrorItem :errorData="errorData('function')">
@@ -11,6 +11,23 @@
           >
             <j-select-option
               v-for="item in functionOptions"
+              :value="item.fullId"
+              :key="item.id"
+            >
+              {{ item.title }}
+            </j-select-option>
+          </j-select>
+        </ErrorItem>
+      </j-form-item>
+      <j-form-item v-if="showCommand">
+        <ErrorItem :errorData="errorData('command')">
+          <j-select
+            v-model:value="dataBind.data.command"
+            :disabled="commandDisabled"
+            style="width: 200px"
+          >
+            <j-select-option
+              v-for="item in commandOptions"
               :value="item.id"
               :key="item.id"
             >
@@ -19,31 +36,16 @@
           </j-select>
         </ErrorItem>
       </j-form-item>
-      <j-form-item v-if="showCommand">
-        <j-select
-          v-model:value="dataBind.data.command"
-          :disabled="commandDisabled"
-          style="width: 200px"
-        >
-        <j-select-option
-          v-for="item in commandOptions"
-          :value="item.id"
-          :key="item.id"
-        >
-          {{ item.name }}
-        </j-select-option>
-      </j-select>
-      </j-form-item>
-      <j-form-item>
-        <j-button type="link" @click="handleModify">变更</j-button>
-      </j-form-item>
-      <j-form-item>
-        <j-button type="link" @click="handleValid">校验</j-button>
-      </j-form-item>
-      <j-form-item v-if="!open">
-        <j-button @click="emits('update:open', true)">操作向导</j-button>
-      </j-form-item>
+      <j-button type="link" @click="handleModify">变更</j-button>
     </j-form>
+    <j-space>
+      <j-form-item-rest>
+        <j-button type="primary" @click="handleValid">校验</j-button>
+      </j-form-item-rest>
+      <j-form-item-rest v-if="!open">
+        <j-button type="primary" @click="emits('update:open', true)">操作向导</j-button>
+      </j-form-item-rest>
+    </j-space>
     <j-modal v-model:visible="visible" title="提示" @ok="handleOk">
       <p class="text">
         变更后将清空筛选组件及数据列表的所有数据<br />确认变更？
@@ -59,7 +61,6 @@ import { validDataBind } from './utils/valid'
 import { useFunctions } from '@/hooks/useFunctions'
 
 const { functionOptions, commandOptions, handleFunction } = useFunctions()
-
 
 const visible = ref(false)
 const handleValid = () => {
@@ -86,11 +87,13 @@ const props = defineProps({
   id: {
     type: String,
     default: '',
-  }
+  },
 })
 
 const handleChangeFunction = (val: string) => {
-  dataBind.functionInfo = functionOptions!.value.find(item => item.id === val) || dataBind.functionInfo
+  dataBind.filterBind = dataBind.columnBind =
+    functionOptions!.value.find((item) => item.fullId === val)?.configuration?.columns ||
+    dataBind.filterBind
   handleFunction(val)
 }
 const functionDisabled = computed(() => {
@@ -102,7 +105,10 @@ const commandDisabled = computed(() => {
 })
 
 const showCommand = computed(() => {
-  return ['rdb-sql-query', 'rdb-crud'].includes(functionOptions!.value.find(item => item.id === dataBind.data.function)?.provider || '')
+  return ['rdb-sql-query', 'rdb-crud'].includes(
+    functionOptions!.value.find((item) => item.fullId === dataBind.data.function)
+      ?.provider || '',
+  )
 })
 
 const handleModify = () => {
@@ -110,28 +116,25 @@ const handleModify = () => {
 }
 
 const handleOk = () => {
-  dataBind.data.function = undefined
-  dataBind.data.command = undefined
-  dataBind.functionInfo = undefined
+  dataBind.filterBind = dataBind.columnBind = dataBind.data.command = dataBind.data.function  = null
   visible.value = false
 }
 
-
-
 const errorList = ref<any[]>([])
 const valid = () => {
-  return new Promise((resolve, reject) => {
-    errorList.value = validDataBind(dataBind.data)
-    if(errorList.value.length) reject(errorList.value)
-    else resolve([])
-  })
+  errorList.value = validDataBind(dataBind.data, functionOptions.value)
+  return errorList.value.length ? [{message: '数据绑定配置错误'}] : []
 }
 
-watch(() => JSON.stringify(dataBind), () => {
-  if(dataBind.data.function) {
-    handleChangeFunction(dataBind.data.function)
-  }
-})
+watch(
+  () => dataBind.data.function,
+  () => {
+    if (dataBind.data.function) {
+      console.log(`output->dataBind.data.function`,dataBind.data.function)
+      handleChangeFunction(dataBind.data.function)
+    }
+  },
+)
 
 defineExpose({
   valid,
@@ -141,11 +144,19 @@ defineExpose({
 
 <style scoped lang="less">
 .data-bind {
-  padding: 20px;
+  padding: 0 20px;
   background-color: #ffffff;
   box-shadow: 0 1px 4px #0015291f;
   margin-bottom: 5px;
+  height: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+.is-guide {
+    margin: 0 20px;
+    border-radius: 4px;
+  }
 .text {
   text-align: center;
 }

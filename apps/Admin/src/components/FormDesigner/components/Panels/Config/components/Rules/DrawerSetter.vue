@@ -1,6 +1,6 @@
 <template>
   <div>
-    <j-button size="small" @click="onClickItem">配置规则{{ uid() }}</j-button>
+    <j-button size="small" @click="onClickItem">配置规则</j-button>
     <Teleport to="#config-container">
       <div v-if="visible" class="box">
         <div class="header">
@@ -25,7 +25,7 @@
           </j-form-item>
           <j-form-item name="validator">
             <template #label>
-              自定义校验器<j-tooltip title="格式：">
+              自定义校验器<j-tooltip title="格式：return 'Error Message'">
                 <AIcon type="QuestionCircleOutlined" />
               </j-tooltip>
             </template>
@@ -55,14 +55,14 @@
           <j-form-item label="正则表达式" name="pattern">
             <j-textarea placeholder="请输入" v-model:value="inputRef" />
           </j-form-item>
-          <j-form-item label="最小长度限制" name="min">
+          <j-form-item label="最小长度限制" name="min" v-if="!['date-picker', 'time-picker'].includes(type)">
             <j-input-number
               placeholder="请输入"
               style="width: 100%"
               v-model:value="ruleModel.min"
             />
           </j-form-item>
-          <j-form-item label="最大长度限制" name="max">
+          <j-form-item label="最大长度限制" name="max" v-if="!['date-picker', 'time-picker'].includes(type)">
             <j-input-number
               placeholder="请输入"
               style="width: 100%"
@@ -79,7 +79,6 @@
 import { ref, reactive, unref, watchEffect, watch } from 'vue'
 import { patternList } from './index'
 import EditorBtn from '../EditorBtn.vue'
-import { uid } from '@/components/FormDesigner/utils/uid';
 
 const props = defineProps({
   value: {
@@ -89,6 +88,10 @@ const props = defineProps({
   index: {
     type: Number,
     default: 0,
+  },
+  type: {
+    type: String,
+    default: 'root'
   },
 })
 const emits = defineEmits(['change'])
@@ -156,6 +159,7 @@ const onBack = () => {
   z-index: 10;
   display: flex;
   flex-direction: column;
+  padding: 10px 20px;
 
   .header {
     width: 100%;

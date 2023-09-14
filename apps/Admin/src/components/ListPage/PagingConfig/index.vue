@@ -1,10 +1,15 @@
 <template>
-  <div class="paging-config">
+  <div class="paging-config" ref="pagingConfig">
+    <img class="modal-config-img" :src="getImage('/list-page/pagination.png')" v-if="open">
     <j-drawer
       title="分页器配置"
-      placement="top"
+      placement="right"
+      width="560px"
       :closable="false"
       :visible="open"
+      :getContainer="() => $refs.pagingConfig"
+      :destroyOnClose="true"
+      :wrap-style="{ position: 'absolute', zIndex: 1 }"
       @close="emits('update:open', false)"
     >
       <p>请配置分页器支持的单页数据量</p>
@@ -12,12 +17,13 @@
         <div style="display: flex; flex-flow: wrap;align-items: center;">
           <div v-for="(item, index) in pagingData" :key="index">
             <j-input-number
-              style="margin: 10px"
+              class="input-number"
               v-model:value="item.pageSize"
               :min="1"
               :precision="0"
               :max="9999"
               :step="1"
+              :controls="false"
               @blur="blur()"
               @pressEnter="blur()"
             />
@@ -27,7 +33,7 @@
           <span
               v-if="pagingData.length < 99"
             >
-              <j-button type="text" @click="onAdd">+</j-button>
+              <j-button type="text" @click="onAdd" class="add-pagination">+</j-button>
           </span>
         </div>
       </ErrorItem>
@@ -37,6 +43,7 @@
 <script setup lang="ts">
 import { ErrorItem } from '../index'
 import { PropType } from 'vue';
+import { getImage } from '@jetlinks/utils';
 const pagingData = computed({
   get() {
     return props.pagingData
@@ -112,11 +119,13 @@ const blur = () => {
  */
 const errorList = ref<any[]>([])
 const valid = () => {
-  return new Promise((resolve, reject) => {
-    errorList.value = pagingData.value.length ? [] : [{key: 'pageList', message: '请配置分页器支持的单页数据量'}]
-    if(errorList.value.length) reject(errorList.value)
-    else resolve([])
-  })
+  errorList.value =  pagingData.value.length ? [] : [{key: 'pageList', message: '请配置分页器支持的单页数据量'}]
+  return errorList.value
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = pagingData.value.length ? [] : [{key: 'pageList', message: '请配置分页器支持的单页数据量'}]
+  //   if(errorList.value.length) reject(errorList.value)
+  //   else resolve([])
+  // })
 }
 
 defineExpose({
@@ -124,4 +133,15 @@ defineExpose({
   errorList
 })
 </script>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.input-number {
+  margin: 10px;
+  width: 56px;
+}
+.add-pagination{
+  width: 24px;
+  height: 24px;
+  border: 1px dashed #dcdcdc;
+  padding: 0;
+}
+</style>

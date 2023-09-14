@@ -1,11 +1,12 @@
 <template>
   <div class="quick">
-    <j-button type="primary" @click="visible = true">快速添加</j-button>
+    <j-button type="link" @click="visible = true">快速添加</j-button>
     <j-drawer
       :destroyOnClose="true"
       v-model:visible="visible"
       title="快速添加"
       placement="right"
+      :width="550"
     >
       <p>自由组合快速添加表单页内容</p>
       <div class="content">
@@ -66,7 +67,11 @@
         </j-space>
       </div>
     </j-drawer>
-    <j-modal v-model:visible="modalVisible" @ok="onOk" @cancel="modalVisible = false">
+    <j-modal
+      v-model:visible="modalVisible"
+      @ok="onOk"
+      @cancel="modalVisible = false"
+    >
       <p>数据重复，请选择处理方式</p>
       <j-radio-group v-model:value="value" name="radioGroup">
         <j-radio :value="true">覆盖当前组件</j-radio>
@@ -76,7 +81,7 @@
   </div>
 </template>
   <script lang="ts" setup>
-import { ref, reactive, onMounted, computed, inject, unref } from 'vue'
+import { ref, reactive, computed, inject, unref, watch } from 'vue'
 import Editor from '@/components/EditorModal'
 import { queryEndCommands } from '@/api/form'
 import { useProduct } from '@/store'
@@ -178,7 +183,7 @@ const sourceList = computed(() => {
       label: '输入',
       value: 'inputs',
       disabled: true,
-      children: getArray(_item?.inputs || [], ''),
+      children: getArray(_item?.inputs || [], 'inputs'),
     })
   }
   if (_item?.output && _item?.output?.properties?.length) {
@@ -186,7 +191,7 @@ const sourceList = computed(() => {
       label: '输出',
       value: 'output',
       disabled: true,
-      children: getArray(_item?.output?.properties || [], ''),
+      children: getArray(_item?.output?.properties || [], 'output'),
     })
   }
   return arr
@@ -201,9 +206,24 @@ const onCommChange = () => {
   modelRef.source.sourceData = undefined
 }
 
-onMounted(() => {
-  getEnd()
-})
+watch(
+  () => visible.value,
+  () => {
+    if (visible.value) {
+      modelRef.json = undefined
+      modelRef.formCopy = []
+      modelRef.source = {
+        functionId: undefined,
+        commandId: undefined,
+        sourceData: undefined,
+      }
+      getEnd()
+    }
+  },
+  {
+    immediate: true,
+  },
+)
 
 const formDataOptions = computed(() => {
   const arr = product.getDataMapByType(providerEnum.FormPage)
@@ -356,21 +376,26 @@ const onSave = () => {
 
 const onOk = () => {
   let arr: any[] = []
-  if(unref(value)) {
+  if (unref(value)) {
     arr = [...dataList.value, ...designer.formData.value.children]
   } else {
     arr = [...designer.formData.value.children, ...dataList.value]
   }
   designer.formData.value = {
-      ...designer.formData.value,
-      children: uniqBy(arr, 'formItemProps.name')
-    }
+    ...designer.formData.value,
+    children: uniqBy(arr, 'formItemProps.name'),
+  }
   modalVisible.value = false
   visible.value = false
 }
 </script>
 
 <style lang="less" scoped>
+.content {
+  background-color: #f7f8f9;
+  border: 1px solid #f0f2f5;
+  padding: 16px;
+}
 .btn {
   position: absolute;
   bottom: 0;

@@ -1,11 +1,10 @@
-import { Row } from 'jetlinks-ui-components'
 import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
-import { Col } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
-import { cloneDeep } from 'lodash-es'
-import { addContext } from '../../utils/addContext'
+import { cloneDeep, omit } from 'lodash-es'
+import { useTool } from '../../hooks'
+import generatorData from '../../utils/generatorData'
 
 export default defineComponent({
     name: 'GridLayout',
@@ -31,21 +30,22 @@ export default defineComponent({
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
+        const { isEditModel, isDragArea, layoutPadStyle } = useTool()
+
         const list = computed(() => {
             return props.data?.children || []
         })
 
         const handleAdd = () => {
-            if (!props.data?.context) {
-                addContext(props.data, props.parent)
-            }
-            props.data.context?.appendItem()
-            designer.setSelection(props.data)
+            const _item = generatorData({
+                type: props.data?.type + '-item',
+                children: [],
+                componentProps: {
+                    span: 1
+                }
+            })
+            designer.onAddChild(_item, props.data)
         }
-
-        const isEditModel = computed(() => {
-            return unref(designer?.model) === 'edit'
-        })
 
         return () => {
             const _path = cloneDeep(props?.path || []);
@@ -53,15 +53,25 @@ export default defineComponent({
             if (props.data?.formItemProps?.name) {
                 _path[_index] = props.data.formItemProps.name || ''
             }
+            const _span = (props.data.componentProps?.inlineMax || 1)
             return (
-                <Selection {...useAttrs()} style={{ padding: '16px' }} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
-                    <Row data-layout-type={'grid'} {...props.data.componentProps}>
+                <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
+                    <div
+                        data-layout-type={'grid'}
+                        {...omit(props.data.componentProps, ['rowSpan', 'colSpan', 'inlineMax'])}
+                        style={{
+                            display: 'grid',
+                            gap: `${props.data.componentProps?.rowSpan}px ${props.data.componentProps?.colSpan}px`,
+                            gridTemplateColumns: `repeat(${_span}, 1fr)`
+                        }}
+                    >
                         {
                             unref(list).map((element) => {
+                                const a = (element.componentProps?.span || 1)
                                 return (
-                                    <Col key={element.key} {...element.componentProps} span={24 / (props.data.componentProps?.inlineMax || 1)}>
+                                    <div key={element.key} {...omit(element.componentProps, 'span')} style={{ gridColumn: `span ${a} / auto` }}>
                                         <Selection
-                                            class={'drag-area'}
+                                            class={unref(isDragArea) && 'drag-area'}
                                             hasDel={unref(list).length > 1}
                                             data={element}
                                             tag="div"
@@ -76,18 +86,18 @@ export default defineComponent({
                                                 index={_index + 1}
                                             />
                                         </Selection>
-                                    </Col>
+                                    </div>
                                 )
                             })
                         }
-                    </Row>
+                    </div>
                     {
                         unref(isEditModel) &&
                         <div class="draggable-add">
                             <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}><span>添加网格列</span></div>
                         </div>
                     }
-                </Selection>
+                </Selection >
             )
         }
     }

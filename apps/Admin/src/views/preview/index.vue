@@ -6,7 +6,7 @@
 <script setup name="Preview">
 import { getResource } from '@/api/basis'
 import { useRequest } from '@jetlinks/hooks'
-import ListPage from '@/components/ListPage/Preview/index.vue'
+import ListPage from '@/components/ListPage/Output/index.vue'
 import HtmlPage from '@/components/CustomHTML/output/Preview.vue'
 
 const route = useRoute()

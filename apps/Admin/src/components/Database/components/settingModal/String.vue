@@ -11,7 +11,14 @@
     />
   </j-form-item>
   <j-form-item v-if="showRegexp" label="正则表达式" :name="['validator', 'configuration', 'regexp']" :rules="rules.regexp">
-    <j-input v-model:value="model.validator.configuration.regexp" :maxLength="256"/>
+    <j-input v-model:value="model.validator.configuration.regexp" :maxLength="256">
+      <template #addonBefore>
+        /
+      </template>
+      <template #addonAfter>
+        /
+      </template>
+    </j-input>
   </j-form-item>
   <j-form-item v-if="showGroup" label="校验生效" :name="['validator', 'configuration', 'group']">
     <j-card-select
@@ -82,19 +89,17 @@ const rules = {
     { max: model.value.length, message: `请输入长度在${model.value.length}以内的字符`}
   ],
   regexp: [
+    { required: true, message: '请输入正则表达式' },
     {
       validator(_, value) {
-        if (!value) {
-          return Promise.resolve();
-        }
         try {
-          if (eval(value) instanceof RegExp) {
+          if (eval(`/${value}/`) instanceof RegExp) {
             return Promise.resolve();
           } else {
-            return Promise.reject('请输入正确的正则表达式')
+            return Promise.reject('请输入正确的正则表达式, 比如：^[a-z]')
           }
         } catch (e) {
-          return Promise.reject('请输入正确的正则表达式')
+          return Promise.reject('请输入正确的正则表达式, 比如：^[a-z]')
         }
       }
     }

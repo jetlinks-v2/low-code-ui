@@ -3,7 +3,7 @@ import { filedData } from '../../../utils/defaultData'
 import DragGableWrap from '../../Draggable/DragGableWrap'
 import './index.less';
 import { Card, AIcon } from 'jetlinks-ui-components';
-// import { onEnd, onMove } from '@/components/FormDesigner/components/Draggable/ControlInsertionPlugin';
+import { onEnd } from '@/components/FormDesigner/components/Draggable/ControlInsertionPlugin';
 import generatorData from '@/components/FormDesigner/utils/generatorData';
 import { cloneDeep, omit } from 'lodash-es';
 
@@ -11,7 +11,7 @@ const Library = defineComponent({
     name: 'Library',
     inheritAttrs: false,
     setup() {
-        // const designer: any = inject('FormDesigner')
+        const designer: any = inject('FormDesigner')
 
         const handleClone = (element) => {
             const item = { ...generatorData(omit(element, ['icon'])) }
@@ -22,12 +22,10 @@ const Library = defineComponent({
             item: ({ element }) => {
                 return (
                     <div class="filed-item-card">
-                        <Card hoverable>
-                            <div class="filed-item-card-item">
-                                <AIcon type={element.icon} style={{ fontSize: '25px' }} />
-                                <span>{element.name}</span>
-                            </div>
-                        </Card>
+                        <div class="filed-item-card-icon">
+                            <AIcon type={element.icon} style={{ fontSize: '25px' }} />
+                        </div>
+                        <div class="filed-item-card-text">{element.name}</div>
                     </div>
                 )
             }
@@ -60,6 +58,9 @@ const Library = defineComponent({
                                             v-slots={slots}
                                             item-key="type"
                                             data-layout-type={'filed-item'}
+                                            onEnd={(e) => {
+                                                onEnd(e, designer)
+                                            }}
                                         ></DragGableWrap>
                                     )
                                 }

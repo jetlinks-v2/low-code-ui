@@ -36,11 +36,11 @@
       </template>
       <template #length="{ record, index }">
         <span v-if="index <= maxLen">{{record.length}}</span>
-        <j-input-number v-else v-model:value="record.length" :precision="0" :maxLength="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
+        <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
       </template>
       <template #scale="{ record, index }">
         <span v-if="index <= maxLen || !['Double','BigDecimal','Float'].includes(record.javaType)">{{record.scale}}</span>
-        <j-input-number v-else v-model:value="record.scale" :precision="0" :maxLength="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
+        <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
       </template>
       <template #updatable="{ record }">
         <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" />
@@ -118,6 +118,11 @@ import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly } from './compon
 import { provide } from 'vue'
 import { defaultSetting, defaultTreeSetting } from './setting'
 import { onlyMessage, regular } from '@jetlinks/utils'
+import EnumItem from "@/components/Database/components/settingModal/Enum.vue";
+import StringItem from "@/components/Database/components/settingModal/String.vue";
+import NumberItem from "@/components/Database/components/settingModal/Number.vue";
+import ListItem from "@/components/Database/components/settingModal/List.vue";
+import MapItem from "@/components/Database/components/settingModal/Map.vue";
 
 const props = defineProps({
   tree: {
@@ -306,6 +311,68 @@ const deleteFn = async (index) => {
 
 const JavaTypeChange = (record) => {
   record.jdbcType = undefined
+  switch(record.javaType) {
+    case 'Enum':
+      Object.assign(record, {
+        dictionary: {
+          dictionaryId: undefined,
+          multiple: undefined
+        },
+        spec: undefined
+      })
+    case 'String':
+    case 'Byte':
+    case 'Long':
+      Object.assign(record, {
+        defaultValueSpec: {
+          fixValue: undefined
+        },
+        validator: {
+          provider: undefined,
+          configuration: {
+            message: undefined,
+            group: undefined
+          }
+        },
+        spec: undefined
+      })
+    case 'Double':
+    case 'Int':
+    case 'Float':
+    case 'BigDecimal':
+    case 'BigInteger':
+      Object.assign(record, {
+        defaultValueSpec: {
+          fixValue: undefined
+        },
+        validator: {
+          provider: undefined,
+          configuration: {
+            message: '数据格式错误',
+            group: undefined,
+            classType: record.javaType,
+            regexp: undefined,
+            min: undefined,
+            max: undefined
+          }
+        },
+        spec: undefined
+      })
+    case 'List':
+      Object.assign(record, {
+        others: {
+          valueJavaType: undefined
+        }
+      })
+    case 'Map':
+      Object.assign(record, {
+        others: {
+          keyJavaType: undefined,
+          valueJavaType: undefined
+        },
+      })
+  }
+
   if (!['Double','BigDecimal','Float'].includes(record.javaType)) {
     record.scale = undefined
   }

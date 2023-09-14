@@ -11,12 +11,29 @@
         </ErrorItem>
       </j-form-item>
       <j-form-item :label="iconType ? '图标' : '自定义图标'">
-        <AIcon
-          :type="activeBtn?.icon"
-          v-if="iconType"
-          style="border: 1px solid #d9d9d9; padding: 5px"
-        />
-        <UploadIcon v-model:modelValue="form.icon" v-else />
+        <div class="default-btn" v-if="iconType">
+            <AIcon
+            :type="activeBtn?.icon"
+            class="default-icon"
+          />
+        </div>
+        <!-- <UploadIcon v-model:modelValue="form.icon" v-else /> -->
+        <div class="custom-upload" v-else>
+          <Upload v-model:value="form.icon" accept=".jpg,.jpeg,.png" :borderStyle="{border: 'none'}">
+            <template #content="{imageUrl}">
+              <template v-if="imageUrl">
+                <div class="default-btn">
+                  <img :src="imageUrl" class="upload-image" />
+                </div>
+              </template>
+              <template v-else>
+                <div class="default-btn">
+                  <AIcon type="PlusOutlined"  class="default-icon"/>
+                </div>
+              </template>
+            </template>
+          </Upload>
+        </div>
       </j-form-item>
       <template v-if="activeBtn!.type !== 'customer'">
         <j-row :gutter="20" v-if="activeBtn?.type !== 'Detail'">
@@ -32,7 +49,7 @@
               >
                 <j-select-option
                   v-for="item in functionOptions"
-                  :value="item.id"
+                  :value="item.fullId"
                   :key="item.id"
                   >{{ item.name }}</j-select-option
                 >
@@ -97,7 +114,8 @@
 </template>
 
 <script setup lang="ts" name="Edit">
-import UploadIcon from './UploadIcon.vue'
+import Upload from '@/components/Upload/Image/ImageUpload.vue'
+
 import { FormInstance } from 'jetlinks-ui-components'
 import { useProduct } from '@/store'
 import EditorModal from '@/components/EditorModal'
@@ -160,7 +178,7 @@ const form = reactive({
   key: props.data.key,
   functions:
     editType!.value === 'add' &&
-    functionOptions!.value.find((item) => item.id === props.data.functions)
+    functionOptions!.value.find((item) => item.fullId === props.data.functions)
       ?.provider === providerEnum.Function
       ? ''
       : props.data.functions,
@@ -188,6 +206,7 @@ const rules = {
 
 const handlePages = (val: string) => {
   const data = pagesOptions.value.find(item => item.id === val)
+  console.log(data);
   form.resource = {...pick(data, ['id', 'parentId', 'type']), projectId: info.id}
   form.resource.parentId = `${form.resource.projectId}.${form.resource.parentId}`
 }
@@ -210,14 +229,37 @@ watch(
 )
 
 watch(() => commandOptions.value, () => {
-  form.command = commandOptions.value.find(item => item.id === form.type)?.id
+  form.command = commandOptions.value?.find(item => item.id === form.type)?.id
 })
 defineExpose({
   submit,
 })
 </script>
 <style scoped lang="less">
-form {
-  padding: 20px;
+.edit-btn {
+  .default-btn{
+    width: 48px;
+    height: 48px;
+    background: #F0F1F4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    .default-icon {
+      border: 1px dashed #d9d9d9;
+      padding: 5px;
+    }
+  }
+  form {
+    padding: 20px;
+  }
+  .custom-upload {
+    width: 48px;
+    height: 48px;
+    .upload-image {
+      width: 24px;
+      height: 24px;
+    }
+  }
 }
 </style>

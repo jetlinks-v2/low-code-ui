@@ -72,7 +72,7 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
 
   return new Promise((resolve) => {
     if (maxSize < file.size) {
-      onlyMessage(`文件大小必须小于${props.fileSize}${props.unit}`, 'error')
+      onlyMessage(`该文件超过${props.fileSize}${props.unit}, 请重新上传`, 'error')
       // reject(file)
       return false
     } else if (!isType) {

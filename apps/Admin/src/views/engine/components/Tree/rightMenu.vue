@@ -97,9 +97,16 @@ const onContextMenuClick = (node, menuKey) => {
       emit('click', {
         data: node.data,
         cacheData: node.data,
-        provider: menuKey,
+        provider: node.data.type,
         nameList: (product.getById(node.parentId)?.children || []).map(item => item.name),
         type: 'Rename'
+      })
+      break;
+    case actionMap.Profile.key:
+    emit('click', {
+        data: node.data,
+        cacheData: node.data,
+        menuKey:'Profile',
       })
       break;
     case actionMap.Delete.key:

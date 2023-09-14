@@ -8,6 +8,8 @@
           'card',
           'card-item',
           'table-item',
+          'grid-item',
+          'space-item',
           'grid',
           'tabs',
           'collapse',
@@ -39,19 +41,19 @@
           'collapse-item',
           'tabs-item',
           'table-item',
+          'grid-item',
+          'space-item',
         ].includes(type)
       "
     >
       <j-form-item
         label="名称"
         :name="['formItemProps', 'label']"
-        v-if="
-          !['text', 'org', 'role', 'user', 'product', 'device'].includes(type)
-        "
+        v-if="!['text'].includes(type)"
         :rules="[
           {
             required: true,
-            message: '请输入',
+            message: '请输入名称',
             trigger: 'change',
           },
         ]"
@@ -121,7 +123,7 @@
           :rules="[
             {
               required: true,
-              message: '请输入',
+              message: '请输入名称',
               trigger: 'change',
             },
           ]"
@@ -136,46 +138,73 @@
       </template>
       <template v-if="['card', 'collapse', 'tabs'].includes(type)">
         <j-form-item
-          required
           label="容器组件"
           :name="['formItemProps', 'isLayout']"
+          :rules="[
+            {
+              required: true,
+              message: '请选择',
+              trigger: 'change',
+            },
+          ]"
         >
           <j-switch
             v-model:checked="target.formItemProps.isLayout"
             @change="onSwitch"
           />
         </j-form-item>
-        <template v-if="target.formItemProps.isLayout">
-          <j-form-item
-            label="标识"
-            :name="['formItemProps', 'name']"
-            required
-            :rules="rules"
-          >
-            <j-input
-              placeholder="请输入"
-              :maxlength="64"
-              @change="onDataChange"
-              v-model:value="target.formItemProps.name"
-            />
-          </j-form-item>
-          <j-form-item label="名称" :name="['formItemProps', 'label']" required>
-            <j-input
-              placeholder="请输入"
-              :maxlength="64"
-              @change="onDataChange"
-              v-model:value="target.formItemProps.label"
-            />
-          </j-form-item>
-        </template>
-      </template>
-      <template v-if="['collapse-item'].includes(type)">
-        <j-form-item label="名称" :name="['componentProps', 'header']" required>
+        <!-- <template> -->
+        <j-form-item
+          label="标识"
+          :name="['formItemProps', 'name']"
+          required
+          :rules="rules"
+        >
           <j-input
             placeholder="请输入"
             :maxlength="64"
             @change="onDataChange"
-            v-model:value="target.componentProps.header"
+            v-model:value="target.formItemProps.name"
+          />
+        </j-form-item>
+        <j-form-item
+          v-if="target.formItemProps.isLayout"
+          label="名称"
+          :name="['formItemProps', 'label']"
+          :rules="[
+            {
+              required: true,
+              message: '请输入名称',
+              trigger: 'change',
+            },
+          ]"
+        >
+          <j-input
+            placeholder="请输入"
+            :maxlength="64"
+            @change="onDataChange"
+            v-model:value="target.formItemProps.label"
+          />
+        </j-form-item>
+        <!-- </template> -->
+      </template>
+      <template v-if="['collapse-item'].includes(type)">
+        <j-form-item
+          label="名称"
+          :name="['componentProps', 'name']"
+          :rules="[
+            {
+              required: true,
+              message: '请输入名称',
+              trigger: 'change',
+            },
+          ]"
+        >
+          <j-input
+            placeholder="请输入"
+            :maxlength="64"
+            @change="onDataChange"
+            v-model:value="target.componentProps.name"
           />
         </j-form-item>
         <j-form-item
@@ -193,12 +222,22 @@
         </j-form-item>
       </template>
       <template v-if="['tabs-item'].includes(type)">
-        <j-form-item label="名称" :name="['componentProps', 'tab']" required>
+        <j-form-item
+          label="名称"
+          :name="['componentProps', 'name']"
+          :rules="[
+            {
+              required: true,
+              message: '请输入名称',
+              trigger: 'change',
+            },
+          ]"
+        >
           <j-input
             placeholder="请输入"
             :maxlength="64"
             @change="onDataChange"
-            v-model:value="target.componentProps.tab"
+            v-model:value="target.componentProps.name"
           />
         </j-form-item>
         <j-form-item
@@ -216,12 +255,22 @@
         </j-form-item>
       </template>
       <template v-if="['table-item'].includes(type)">
-        <j-form-item label="名称" :name="['componentProps', 'title']" required>
+        <j-form-item
+          label="名称"
+          :name="['componentProps', 'name']"
+          :rules="[
+            {
+              required: true,
+              message: '请输入名称',
+              trigger: 'change',
+            },
+          ]"
+        >
           <j-input
             placeholder="请输入"
             :maxlength="64"
             @change="onDataChange"
-            v-model:value="target.componentProps.title"
+            v-model:value="target.componentProps.name"
           />
         </j-form-item>
         <j-form-item
@@ -236,6 +285,29 @@
             @change="onDataChange"
             v-model:value="target.formItemProps.name"
           />
+        </j-form-item>
+        <j-form-item
+          label="表头跨列"
+          :name="['componentProps', 'colSpan']"
+          required
+        >
+          <j-input-number
+            placeholder="请输入表头跨列"
+            @change="onDataChange"
+            style="width: 100%"
+            v-model:value="target.componentProps.colSpan"
+          />
+        </j-form-item>
+        <j-form-item label="内容对齐" :name="['componentProps', 'align']">
+          <j-select
+            v-model:value="target.componentProps.align"
+            placeholder="请选择"
+            @change="onDataChange"
+          >
+            <j-select-option :value="'left'">左</j-select-option>
+            <j-select-option :value="'right'">右</j-select-option>
+            <j-select-option :value="'center'">中</j-select-option>
+          </j-select>
         </j-form-item>
       </template>
       <template v-if="['grid', 'space'].includes(type)">
@@ -310,7 +382,11 @@
     <!-- 规则校验 -->
     <template v-if="rulesVisible">
       <j-form-item>
-        <Rule v-model:value="target.formItemProps.rules" @change="onChange" />
+        <Rule
+          :type="type"
+          v-model:value="target.formItemProps.rules"
+          @change="onChange"
+        />
       </j-form-item>
     </template>
 
@@ -354,7 +430,7 @@ const emits = defineEmits(['refresh'])
 
 const onSwitch = (_checked: boolean) => {
   target.value.formItemProps.label = _checked ? target.value.name : undefined
-  target.value.formItemProps.name = undefined
+  // target.value.formItemProps.name = undefined
   emits('refresh', target.value)
 }
 
@@ -413,14 +489,15 @@ const rules = [
       const flag = arr
         .filter((item) => item.key !== target.value.key)
         .find((i) => i?.formItemProps?.name === value)
-      if (flag) return Promise.reject('标识已存在')
+      if (flag) return Promise.reject(`标识${value}已被占用`)
       return Promise.resolve()
     },
+    trigger: 'change',
   },
 ]
 
 const typeOptions = computed(() => {
-  return [...basic, { name: '地区', type: 'geo' }].map((item) => {
+  return [...basic].map((item) => {
     return {
       label: item.name,
       value: item.type,
@@ -437,7 +514,7 @@ const onTypeChange = (val: string) => {
   const arr = updateData(unref(designer.formData)?.children, obj)
   designer.formData.value = {
     ...designer.formData.value,
-    children: arr
+    children: arr,
   }
   designer.setSelection(obj)
 }

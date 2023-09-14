@@ -6,6 +6,7 @@
           v-model:expandedKeys="expandedKeys"
           :selectedKeys="[activeFile]"
           :treeData="treeData"
+          block-node
           :fieldNames="{
             key: 'id'
           }"
@@ -13,7 +14,10 @@
         >
           <template #title="node">
             <j-dropdown :trigger="['contextmenu']">
-              <span>{{ node.title }}</span>
+              <span class="title">
+                <div class="icon"><img :src="providerImages[node.type]"></div>
+                {{ node.title }}
+              </span>
               <template #overlay>
                 <RightMenu :node="node" @click="menuClick" />
               </template>
@@ -28,6 +32,7 @@
       @save="save"
       @close="close"
     />
+    <FileDrawer :data="menuState.data" v-if="menuState.fileVisible"  @close="close"/>
   </div>
 </template>
 
@@ -36,10 +41,12 @@ import { useEngine, useProduct } from '@/store'
 import { storeToRefs } from 'pinia'
 import RightMenu from './rightMenu.vue'
 import InputModal from '@/components/ProJect/components/Action/InputModal.vue'
+import FileDrawer from '@/components/ProJect/components/Action/FileDrawer.vue'
 import { providerEnum } from "@/components/ProJect/index";
 import { randomString } from '@jetlinks/utils'
 import { defaultSetting as CrudBaseData } from '@/components/Database/setting'
 import { onlyMessage } from '@jetlinks/utils';
+import { providerImages } from '@/components/ProJect/index'
 
 const engine = useEngine()
 const product = useProduct()
@@ -55,6 +62,7 @@ const props = defineProps({
 
 const menuState = reactive({
   visible: false,
+  fileVisible:false,
   provider: '',
   cacheData: undefined,
   data: undefined,
@@ -70,6 +78,7 @@ const select = (key, e) => {
 
 const close = () => {
   menuState.visible = false
+  menuState.fileVisible = false
   menuState.provider = ''
   menuState.data = undefined
   menuState.cacheData = undefined
@@ -110,27 +119,35 @@ const getConfiguration = (type) => {
   }
 }
 
-const save = ({ name, others,children }) => {
+const save = (data) => {
   const node = menuState.cacheData
-
+  // console.log('---data',data,menuState.type)
   const parentId = node.type === providerEnum.Module ? node.id : node.parentId
-  product.add({
-    name,
-    others,
+  if(menuState.type !== 'Add'){
+    product.update(data)
+  }else{
+    product.add({
+    name:data.name,
+    others:data.others,
     id: randomString(16),
-    title: name,
-    type: others.type,
-    configuration: getConfiguration(others.type),
+    title: data.name,
+    type: data.others.type,
+    configuration: getConfiguration(data.others.type),
     parentId: parentId,
-    children:children
+    children:data.children
   }, parentId)
+  }
   close()
 }
 
 const menuClick = (record) => {
+  console.log('record',record)
   if(record.menuKey  === 'Copy'){
     engine.setCopyFile(record.data)
     onlyMessage('复制成功')
+  }else if(record.menuKey === 'Profile'){
+    Object.assign(menuState, record)
+    menuState.fileVisible = true
   }else{
     Object.assign(menuState, record)
     menuState.visible = true
@@ -145,6 +162,29 @@ const menuClick = (record) => {
 
   .tree-content-body {
     height: 100%;
+    padding: 0 12px;
+    :deep(.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected){
+      background-color: #F6F7F9;
+      color: #315EFB;
+      img{
+        transform: translateX(100px);
+        filter: drop-shadow(-100px 0px 0px #315EFB);
+      }
+    }
+    :deep(.ant-tree-switcher){
+      line-height: 40px;
+    }
+    .title{
+      display: flex;
+      height: 40px;
+      line-height: 40px;
+      font-size: 16px;
+    
+      .icon{
+        margin-right: 10px;
+        overflow: hidden;
+      }
+    }
   }
   //:deep(.ant-tree) {
   //  background-color: transparent;

@@ -1,82 +1,44 @@
 .filed-container {
     .filed-item {
-        margin: 10px 0 10px 10px;
-        border: 1px solid #eee;
-        padding: 10px;
+        padding: 0 10px;
+    }
 
-        .filed-item-title {
-            margin-bottom: 10px;
-            font-size: 16px;
-            font-weight: 600;
-        }
+    .filed-item-title {
+        font-size: 14px;
+        margin: 10px 0;
+        color: #333333;
+        font-weight: 600;
+    }
 
-        .filed-item-children {
-            display: flex;
-            flex-wrap: wrap;
+    .filed-item-children {
+        display: grid;
+        gap: 14px 16px;
+        grid-template-columns: repeat(2, 1fr);
 
-            .filed-item-card {
-                width: 50%;
-                padding: 5px;
-                text-align: center;
+        .filed-item-card {
+            grid-column: span 1 / auto;
+
+            .filed-item-card-icon {
+                background-color: #F6F6F6;
+                height: 54px;
+                border-radius: 4px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
                 cursor: grab;
-                color: #333333;
 
                 &[draggable="true"] {
                     cursor: grabbing;
                 }
 
-                .ant-card-body {
-                    padding: 10px;
-                }
-
-                .filed-item-card-item {
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-
-                    span {
-                        margin-top: 5px;
-                    }
+                &:hover {
+                    box-shadow: 0 1px 2px -2px #00000029, 0 3px 6px #0000001f, 0 5px 12px 4px #00000017;
                 }
             }
-        }
-    }
-}
 
-.filed-template {
-    .filed-item-children {
-        display: flex;
-        flex-wrap: wrap;
-
-        .filed-item-card {
-            width: 50%;
-            padding: 5px;
-            text-align: center;
-            cursor: grab;
-            color: #333333;
-
-            &[draggable="true"] {
-                cursor: grabbing;
-            }
-
-            .ant-card {
-                background-color: #fafafa;
-            }
-
-            .ant-card-body {
-                padding: 10px;
-            }
-
-            .filed-item-card-item {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-
-                span {
-                    font-size: 16px;
-                }
+            .filed-item-card-text {
+                text-align: center;
+                color: #333333;
             }
         }
     }

@@ -1,17 +1,17 @@
 <template>
   <Scrollbar>
-    <div class="header"><h3>页面搭建</h3></div>
+    <div class="header">组件配置</div>
     <div class="config-container" id="config-container">
-      <j-form ref="formRef" :model="target" layout="vertical">
+      <j-form ref="formRef" :model="formState" layout="vertical">
         <j-collapse
           v-model:activeKey="activeKey"
           :expand-icon-position="'right'"
+          :bordered="false"
         >
-          <j-collapse-panel
-            v-for="item in panelsList"
-            :key="item.key"
-            :header="item.header"
-          >
+          <j-collapse-panel v-for="item in panelsList" :key="item.key">
+            <template #header>
+              <TitleComponent :data="item.header" />
+            </template>
             <component :is="Panels[item.key]" @refresh="onRefresh" />
           </j-collapse-panel>
         </j-collapse>
@@ -21,7 +21,7 @@
 </template>
   
 <script lang="ts" setup>
-import { ref, computed, watchEffect, inject, watch, unref } from 'vue'
+import { ref, computed, watchEffect, inject, watch, unref, reactive } from 'vue'
 import { Scrollbar } from 'jetlinks-ui-components'
 import Base from './components/Base.vue'
 import Status from './components/Status.vue'
@@ -38,6 +38,7 @@ import { updateData } from '../../../utils/utils'
 const formRef = ref<any>()
 
 const { target } = useTarget()
+const formState = reactive({ ...unref(target) })
 
 const designer: any = inject('FormDesigner')
 
@@ -52,7 +53,7 @@ const Panels = {
   Status,
   Source,
   Grid,
-  SourceForm
+  SourceForm,
 }
 
 const panelsList = computed(() => {
@@ -72,7 +73,7 @@ const onSave = () => {
       console.log('Received values of form: ', values)
     })
     .catch((info) => {
-      console.log('Validate Failed:', info)
+      console.error('Validate Failed:', info)
     })
 }
 
@@ -81,7 +82,7 @@ const onRefresh = (obj: any) => {
     if (obj.key === 'root') {
       designer.formData.value = {
         ...obj,
-        children: designer.formData.value?.children || []
+        children: designer.formData.value?.children || [],
       }
     } else {
       const arr = updateData(unref(designer.formData)?.children, obj)
@@ -106,15 +107,55 @@ watch(
     deep: true,
   },
 )
+
+watch(
+  () => target.value,
+  (newVal) => {
+    Object.assign(formState, newVal)
+    if (unref(designer.errorKey)?.length) {
+      setTimeout(() => {
+        onSave()
+      })
+    }
+  },
+  {
+    immediate: true,
+    deep: true,
+  },
+)
 </script>
 
 <style lang="less" scoped>
 .header {
-  margin-top: 15px;
+  font-size: 18px;
+  font-weight: 500;
+  border-bottom: 1px solid #f0f0f0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
 }
 .config-container {
   height: 100%;
-  margin-top: 10px;
+  padding: 16px;
   position: relative;
+
+  :deep(.ant-collapse) {
+    background-color: #fff;
+    .ant-collapse-item {
+      border: none !important;
+      margin-bottom: 2px;
+      .ant-collapse-header {
+        background-color: #fafafa !important;
+        padding: 13px;
+        .title {
+          margin: 0;
+        }
+        span {
+          color: #333333;
+        }
+      }
+    }
+  }
 }
 </style>
