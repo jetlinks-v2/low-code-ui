@@ -320,6 +320,7 @@ const JavaTypeChange = (record) => {
         },
         spec: undefined
       })
+      break;
     case 'String':
     case 'Byte':
     case 'Long':
@@ -336,6 +337,7 @@ const JavaTypeChange = (record) => {
         },
         spec: undefined
       })
+      break;
     case 'Double':
     case 'Int':
     case 'Float':
@@ -358,12 +360,14 @@ const JavaTypeChange = (record) => {
         },
         spec: undefined
       })
+      break;
     case 'List':
       Object.assign(record, {
         others: {
           valueJavaType: undefined
         }
       })
+      break;
     case 'Map':
       Object.assign(record, {
         others: {
@@ -371,6 +375,7 @@ const JavaTypeChange = (record) => {
           valueJavaType: undefined
         },
       })
+      break;
   }
 
   if (!['Double','BigDecimal','Float'].includes(record.javaType)) {

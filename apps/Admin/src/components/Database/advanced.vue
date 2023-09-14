@@ -1,93 +1,94 @@
 <template>
   <div class="advanced">
     <div class="content">
-      <div class="card">
-        <div class="title">
-          开启关系
-          <j-tooltip title="开启关系后，平台被关联方和关联方同时增加一条数据">
-            <AIcon type="QuestionCircleOutlined" style="margin-left: 12px;color: #333;" />
-          </j-tooltip>
-        </div>
-        <div>
-          <j-switch v-model:checked="myRelation.enabled" />
-          <div class="descriptions-warp" style="margin-top: 24px;width: 500px;" v-if="myRelation.enabled">
-            <div class="descriptions-item">
-              <div class="descriptions-title">
-                关系标识
-              </div>
-              <div class="descriptions-content">
-                <j-select :options="columnOptions" v-model:value="myRelation.relationType" style="width: 100%" @change="relationChange" />
-              </div>
-            </div>
-            <div class="descriptions-item">
-              <div class="descriptions-title">
-                关系名称
-              </div>
-              <div class="descriptions-content">
-                <j-input v-model:value="myRelation.relationTypeName" placeholder="请为关系命名" @change="relationChange" :maxLength="16" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="title">
-          树形结构
-        </div>
-        <div style="display: flex; gap: 24px;">
-          <j-switch v-model:checked="myTree" @change="treeChange" />
-          <div style="width: 400px;">
-            <div class="descriptions-warp">
-              <div class="descriptions-item">
-                <div class="descriptions-title" style="padding: 4px;text-align: left">
-                  字段
-                </div>
-                <div class="descriptions-content">
-                 parentId
-                </div>
-                <div class="descriptions-content">
-                  path
-                </div>
-                <div class="descriptions-content">
-                  sortIndex
-                </div>
-                <div class="descriptions-content">
-                  level
-                </div>
-              </div>
-              <div class="descriptions-item">
-                <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
-                  说明
-                </div>
-                <div class="descriptions-content">
-                  父节点ID
-                </div>
-                <div class="descriptions-content">
-                  树路径
-                </div>
-                <div class="descriptions-content">
-                  排序序号
-                </div>
-                <div class="descriptions-content">
-                  树层级
-                </div>
-              </div>
-            </div>
+      <j-form :model="formModel" >
+        <div class="card">
+          <div class="title">
+            开启关系
+            <j-tooltip title="开启关系后，平台被关联方和关联方同时增加一条数据">
+              <AIcon type="QuestionCircleOutlined" style="margin-left: 12px;color: #333;" />
+            </j-tooltip>
           </div>
           <div>
-            <p>
-              自动增加功能:
-            </p>
-            <p>
-              查询时返回树结构
-            </p>
-            <p>
-              删除的时候会联动删除下级界面
-            </p>
+            <j-switch v-model:checked="myRelation.enabled" />
+            <div class="descriptions-warp" style="margin-top: 24px;width: 500px;" v-if="myRelation.enabled">
+              <div class="descriptions-item">
+                <div class="descriptions-title">
+                  关系标识
+                </div>
+                <div class="descriptions-content">
+                  <j-input placeholder="请输入关系标识" :options="columnOptions" v-model:value="myRelation.relationType" @change="relationChange" />
+                </div>
+              </div>
+              <div class="descriptions-item">
+                <div class="descriptions-title">
+                  关系名称
+                </div>
+                <div class="descriptions-content">
+                  <j-input v-model:value="myRelation.relationTypeName" placeholder="请为关系命名" @change="relationChange" :maxLength="16" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="card">
+        <div class="card">
+          <div class="title">
+            树形结构
+          </div>
+          <div style="display: flex; gap: 24px;">
+            <j-switch v-model:checked="myTree" @change="treeChange" />
+            <div style="width: 400px;">
+              <div class="descriptions-warp">
+                <div class="descriptions-item">
+                  <div class="descriptions-title" style="padding: 4px;text-align: left">
+                    字段
+                  </div>
+                  <div class="descriptions-content">
+                   parentId
+                  </div>
+                  <div class="descriptions-content">
+                    path
+                  </div>
+                  <div class="descriptions-content">
+                    sortIndex
+                  </div>
+                  <div class="descriptions-content">
+                    level
+                  </div>
+                </div>
+                <div class="descriptions-item">
+                  <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
+                    说明
+                  </div>
+                  <div class="descriptions-content">
+                    父节点ID
+                  </div>
+                  <div class="descriptions-content">
+                    树路径
+                  </div>
+                  <div class="descriptions-content">
+                    排序序号
+                  </div>
+                  <div class="descriptions-content">
+                    树层级
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p>
+                自动增加功能:
+              </p>
+              <p>
+                查询时返回树结构
+              </p>
+              <p>
+                删除的时候会联动删除下级界面
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="card">
         <div class="title">
           开启资产
         </div>
@@ -149,9 +150,10 @@
           </template>
         </div>
       </div>
+      </j-form>
     </div>
     <div class="api">
-        <j-popover placement="leftBottom" trigger="click" >
+        <j-popover placement="leftBottom" trigger="click" @visibleChange="getApi">
           <template #content>
             <div style="width: 750px">
               <j-table
@@ -175,7 +177,7 @@
               </j-table>
             </div>
           </template>
-          <j-button>查看接口能力</j-button>
+          <j-button >查看接口能力</j-button>
         </j-popover>
     </div>
   </div>
@@ -261,7 +263,7 @@ const apiColumns = [
     width: 120
   },
 ]
-
+const formModel = reactive({})
 
 const myRelation = reactive(props.relation || {
   enabled: true,
@@ -299,9 +301,11 @@ const relationChange = () => {
   emit('update')
 }
 
-onMounted(() => {
-  apiRun(route.params.id)
-})
+const getApi = (v) => {
+  if (v) {
+    apiRun(route.params.id, [])
+  }
+}
 
 </script>
 
