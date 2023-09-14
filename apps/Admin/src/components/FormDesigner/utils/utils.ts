@@ -21,7 +21,7 @@ export const generateOptions = (len: number) => {
 
 const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo']
 
-const checkedConfigItem = (node: ISchema) => {
+const checkedConfigItem = (node: ISchema, allData: any[]) => {
     const _type = node.type || 'root'
     if (_type === 'root') {
         return false
@@ -42,6 +42,15 @@ const checkedConfigItem = (node: ISchema) => {
                 return {
                     key: node?.key,
                     message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
+            } else {
+                const arr = getBrotherList(node?.key || '', allData)
+                const flag = arr.filter((item) => item.key !== node.key).find((i) => i?.formItemProps?.name === node?.formItemProps?.name)
+                if (flag) { // `标识${value}已被占用`
+                    return {
+                        key: node?.key,
+                        message: (node.formItemProps?.label || node.name) + '配置错误'
+                    }
                 }
             }
         }
@@ -93,19 +102,23 @@ const checkedConfigItem = (node: ISchema) => {
 }
 
 // 校验配置项必填
-export const checkedConfig = (node: ISchema) => {
-    const _data: any = checkedConfigItem(node);
+const checkConfig = (node: ISchema, allData: any[]) => {
+    const _data: any = checkedConfigItem(node, allData);
     let _rules: any[] = []
     if (_data) {
         _rules.push(_data)
     }
     if (node.children && node.children?.length) {
         node?.children.map(item => {
-            const arr = checkedConfig(item)
+            const arr = checkConfig(item, allData)
             _rules = [..._rules, ...arr]
         })
     }
     return _rules
+}
+
+export const checkedConfig = (node: ISchema) => {
+    return checkConfig(node, node?.children || [])
 }
 
 export const updateData = (list: ISchema[], item?: any) => {
@@ -163,7 +176,7 @@ export const extractCssClass = (formCssCode: string) => {
 }
 
 export const insertCustomCssToHead = (cssCode: string, formId: string) => {
-    if(!cssCode || !formId) return
+    if (!cssCode || !formId) return
     let head = document.getElementsByTagName('head')[0]
     let oldStyle = document.getElementById(formId)
     if (!!oldStyle) {
@@ -171,8 +184,8 @@ export const insertCustomCssToHead = (cssCode: string, formId: string) => {
     }
     const id = `[data-id="${formId}"]`
     const result = cssCode.replace(/\.([a-zA-Z-]+)/g, `.$1${id}`)
-      .replace(/#([a-zA-Z-]+)/g, `#$1${id}`)
-      .replace(/([a-zA-Z-]+)(?=\s*\{)/g, `$1${id}`);
+        .replace(/#([a-zA-Z-]+)/g, `#$1${id}`)
+        .replace(/([a-zA-Z-]+)(?=\s*\{)/g, `$1${id}`);
 
     let newStyle: HTMLStyleElement = document.createElement('style')
     newStyle.type = 'text/css'
@@ -188,7 +201,7 @@ export const insertCustomCssToHead = (cssCode: string, formId: string) => {
 }
 
 // 查询数据
-export const getBrotherList = (value: string, arr: any[]) => {
+export const getBrotherList = (value: string | number, arr: any[]) => {
     if (Array.isArray(arr) && arr?.length) {
         for (let index = 0; index < arr?.length; index++) {
             const element = arr[index];
@@ -300,7 +313,7 @@ export const appendChildItem = (arr: any[], newData: any, parent: any, flag?: bo
             }
             if (flag === false) {
                 const _f = child.find(item => item?.formItemProps?.name === 'actions')
-                if(_f){
+                if (_f) {
                     child.splice(child.length - 1, 0, newData)
                 } else {
                     child.push(newData)

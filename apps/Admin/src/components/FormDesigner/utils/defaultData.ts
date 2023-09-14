@@ -102,7 +102,9 @@ export const basic: ISchema[] = [
         type: 'table',
         name: '表格',
         icon: 'AuditOutlined',
-        componentProps: {},
+        componentProps: {
+            align: 'left'
+        },
         children: []
     },
 ]

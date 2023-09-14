@@ -73,7 +73,7 @@ const onSave = () => {
       console.log('Received values of form: ', values)
     })
     .catch((info) => {
-      console.log('Validate Failed:', info)
+      console.error('Validate Failed:', info)
     })
 }
 
@@ -113,7 +113,9 @@ watch(
   (newVal) => {
     Object.assign(formState, newVal)
     if (unref(designer.errorKey)?.length) {
-      onSave()
+      setTimeout(() => {
+        onSave()
+      })
     }
   },
   {
