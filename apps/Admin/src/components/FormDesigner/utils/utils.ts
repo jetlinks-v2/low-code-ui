@@ -65,7 +65,8 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
             // if (node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
             //     return node?.key
             // }
-            if (node?.componentProps?.source?.type === 'end' && (!node?.componentProps.source?.commandId || !node?.componentProps.source?.functionId || !node?.componentProps.source?.label || !node?.componentProps.source?.value)) {
+            // if (node?.componentProps?.source?.type === 'end' && (!node?.componentProps.source?.commandId || !node?.componentProps.source?.functionId || !node?.componentProps.source?.label || !node?.componentProps.source?.value)) {
+            if (node?.componentProps.source?.functionId && !node?.componentProps.source?.commandId) {
                 return {
                     key: node?.key,
                     message: (node.formItemProps?.label || node.name) + '配置错误'
@@ -92,6 +93,12 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
             }
         }
         if (['table-item', 'collapse-item', 'tabs-item', 'collapse', 'tabs'].includes(_type) && !(node?.formItemProps?.name)) {
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.name || node.name) + '配置错误'
+            }
+        }
+        if (['table-item', 'collapse-item', 'tabs-item'].includes(_type) && !(node?.componentProps?.name)) {
             return {
                 key: node?.key,
                 message: (node.formItemProps?.name || node.name) + '配置错误'
