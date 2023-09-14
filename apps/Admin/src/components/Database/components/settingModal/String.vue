@@ -9,7 +9,7 @@
       @change="providerChange"
     />
   </j-form-item>
-  <j-form-item v-if="showRegexp" label="正则表达式" :name="['validator', 'configuration', 'regexp']" :rules="rules.regexp">
+  <j-form-item v-if="showRegexp" label="正则表达式" :name="['validator', 'configuration', 'regexp']" :rules="rules.regexp" :validateFirst="true">
     <j-input v-model:value="model.validator.configuration.regexp" :maxLength="256">
       <template #addonBefore>
         /

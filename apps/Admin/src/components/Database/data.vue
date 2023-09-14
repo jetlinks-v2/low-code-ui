@@ -6,7 +6,7 @@
     <div class="table">
       <j-pro-table
         model="TABLE"
-        :columns="columns"
+        :columns="myColumns"
         :request="getData"
         :scroll="{x: 1300, y: 500}"
       />
@@ -34,6 +34,19 @@ const columns = inject(CRUD_COLUMNS)
 
 const project = useProduct()
 const total = ref(0)
+
+const myColumns = computed(() => {
+  return columns.value.map(item => {
+    if (item.width) {
+      return item
+    }
+    return {
+      ...item,
+      width: 140,
+      ellipsis: true,
+    }
+  })
+})
 const getData = async (params) => {
   const resp = await queryRuntime(project.info.id, props.parentId, 'QueryPager', params)
   total.value = resp.result?.total || 0

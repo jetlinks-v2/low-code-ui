@@ -1,163 +1,184 @@
 <template>
   <div class="advanced">
     <div class="content">
-      <j-form :model="formModel" >
-        <div class="card">
-          <div class="title">
-            开启关系
-            <j-tooltip title="开启关系后，平台被关联方和关联方同时增加一条数据">
-              <AIcon type="QuestionCircleOutlined" style="margin-left: 12px;color: #333;" />
-            </j-tooltip>
-          </div>
-          <div>
-            <j-switch v-model:checked="myRelation.enabled" />
-            <div class="descriptions-warp" style="margin-top: 24px;width: 500px;" v-if="myRelation.enabled">
-              <div class="descriptions-item">
-                <div class="descriptions-title">
-                  关系标识
+      <div class="card">
+        <j-form :model="myRelation" ref="relationRef">
+            <div class="title">
+              开启关系
+              <j-tooltip title="开启关系后，平台被关联方和关联方同时增加一条数据">
+                <AIcon type="QuestionCircleOutlined" style="margin-left: 12px;color: #333;" />
+              </j-tooltip>
+            </div>
+            <div>
+              <j-switch v-model:checked="myRelation.enabled" @change="updateRelation" />
+              <div class="descriptions-warp" style="margin-top: 24px;width: 500px;" v-if="myRelation.enabled">
+                <div class="descriptions-item">
+                  <div class="descriptions-title">
+                    关系标识
+                  </div>
+                  <div class="descriptions-content">
+                    <j-form-item name="relationType" :rules="[{ required: true, message: '请输入关系标识'}, { max: 64, message: '最多可输入64位字符'}]">
+                      <j-input :options="columnOptions" placeholder="请输入关系标识" v-model:value="myRelation.relationType" style="width: 100%" @change="updateRelation" />
+                    </j-form-item>
+                  </div>
                 </div>
-                <div class="descriptions-content">
-                  <j-input placeholder="请输入关系标识" :options="columnOptions" v-model:value="myRelation.relationType" @change="relationChange" />
-                </div>
-              </div>
-              <div class="descriptions-item">
-                <div class="descriptions-title">
-                  关系名称
-                </div>
-                <div class="descriptions-content">
-                  <j-input v-model:value="myRelation.relationTypeName" placeholder="请为关系命名" @change="relationChange" :maxLength="16" />
+                <div class="descriptions-item">
+                  <div class="descriptions-title">
+                    关系名称
+                  </div>
+                  <div class="descriptions-content">
+                    <j-form-item name="relationTypeName" :rules="[{ required: true, message: '请输入关系名称'},{ max: 16, message: '最多可输入16位字符'}]">
+                      <j-input v-model:value="myRelation.relationTypeName" placeholder="请为关系命名" @change="updateRelation" />
+                    </j-form-item>
+                  </div>
                 </div>
               </div>
             </div>
+        </j-form>
+      </div>
+      <div class="card">
+            <div class="title">
+              树形结构
+            </div>
+            <div style="display: flex; gap: 24px;">
+              <j-switch v-model:checked="myTree" @change="treeChange" />
+              <div style="width: 400px;">
+                <div class="descriptions-warp">
+                  <div class="descriptions-item">
+                    <div class="descriptions-title" style="padding: 4px;text-align: left">
+                      字段
+                    </div>
+                    <div class="descriptions-content">
+                     parentId
+                    </div>
+                    <div class="descriptions-content">
+                      path
+                    </div>
+                    <div class="descriptions-content">
+                      sortIndex
+                    </div>
+                    <div class="descriptions-content">
+                      level
+                    </div>
+                  </div>
+                  <div class="descriptions-item">
+                    <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
+                      说明
+                    </div>
+                    <div class="descriptions-content">
+                      父节点ID
+                    </div>
+                    <div class="descriptions-content">
+                      树路径
+                    </div>
+                    <div class="descriptions-content">
+                      排序序号
+                    </div>
+                    <div class="descriptions-content">
+                      树层级
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <p>
+                  自动增加功能:
+                </p>
+                <p>
+                  查询时返回树结构
+                </p>
+                <p>
+                  删除的时候会联动删除下级界面
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="card">
+      <div class="card">
+        <j-form :model="myAsset" ref="assetRef">
           <div class="title">
-            树形结构
+            开启资产
           </div>
-          <div style="display: flex; gap: 24px;">
-            <j-switch v-model:checked="myTree" @change="treeChange" />
-            <div style="width: 400px;">
-              <div class="descriptions-warp">
+          <div >
+            <div>
+              <j-switch v-model:checked="myAsset.enabled" style="margin-bottom: 24px" />
+            </div>
+            <template v-if="myAsset.enabled">
+              <div style="margin-bottom: 24px">
+                <j-radio-group :value="myAsset.correlatesAssets ? 'true' : 'false'" button-style="solid" @change="assetRadioChange">
+                  <j-radio-button value="false">设为资产</j-radio-button>
+                  <j-radio-button value="true">间接资产</j-radio-button>
+                </j-radio-group>
+              </div>
+              <div v-if="!myAsset.correlatesAssets" class="descriptions-warp" style="width: 600px;">
                 <div class="descriptions-item">
                   <div class="descriptions-title" style="padding: 4px;text-align: left">
-                    字段
+                    列名称
                   </div>
                   <div class="descriptions-content">
-                   parentId
-                  </div>
-                  <div class="descriptions-content">
-                    path
-                  </div>
-                  <div class="descriptions-content">
-                    sortIndex
-                  </div>
-                  <div class="descriptions-content">
-                    level
+                      <j-select style="width: 100%;" value="id" :options="columnOptions" disabled />
                   </div>
                 </div>
                 <div class="descriptions-item">
                   <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
-                    说明
+                    资产标识
                   </div>
                   <div class="descriptions-content">
-                    父节点ID
+                    <j-form-item
+                      name="assetType"
+                      :validateFirst="true"
+                      :rules="[
+                        { pattern: regular.modalReg, message: '请输入字母+数字+下划线组成，并以字母开头'},
+                        { required: true, message: '请输入资产标识'},
+                        { max: 64, message: '最多可输入64位字符'}
+                        ]">
+                      <j-input v-model:value="myAsset.assetType" placeholder="请输入资产标识" @change="assetChange" />
+                    </j-form-item>
+                  </div>
+                </div>
+                <div class="descriptions-item">
+                  <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
+                    资产名称
                   </div>
                   <div class="descriptions-content">
-                    树路径
-                  </div>
-                  <div class="descriptions-content">
-                    排序序号
-                  </div>
-                  <div class="descriptions-content">
-                    树层级
+                    <j-form-item name="assetTypeName" :rules="[{ required: true, message: '请输入资产名称'},{ max: 16, message: '最多可输入16位字符'}]">
+                      <j-input v-model:value="myAsset.assetTypeName" placeholder="请输入资产名称" @change="assetChange" />
+                    </j-form-item>
                   </div>
                 </div>
               </div>
-            </div>
-            <div>
-              <p>
-                自动增加功能:
-              </p>
-              <p>
-                查询时返回树结构
-              </p>
-              <p>
-                删除的时候会联动删除下级界面
-              </p>
-            </div>
+              <div v-else class="descriptions-warp" style="width: 600px;">
+                <div class="descriptions-item">
+                  <div class="descriptions-title" style="padding: 4px;text-align: left">
+                    当前表字段
+                  </div>
+                  <div class="descriptions-content">
+                    <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" :options="columnOptions" @change="assetChange" />
+                  </div>
+                </div>
+                <div class="descriptions-item">
+                  <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
+                    资产标识
+                  </div>
+                  <div class="descriptions-content">
+                    <j-form-item
+                      name="assetType"
+                      :rules="[{ required: true, message: '请选择资产标识'}]">
+                      <j-select style="width: 100%;" v-model:value="myAsset.assetType" :options="options" :fieldNames="{ label: 'name', value: 'id'}" @change="assetChange" />
+                    </j-form-item>
+                  </div>
+                </div>
+              </div>
+            </template>
           </div>
-        </div>
-        <div class="card">
-        <div class="title">
-          开启资产
-        </div>
-        <div >
-          <div>
-            <j-switch v-model:checked="myAsset.enabled" style="margin-bottom: 24px" />
-          </div>
-          <template v-if="myAsset.enabled">
-            <div style="margin-bottom: 24px">
-              <j-radio-group :value="myAsset.correlatesAssets ? 'true' : 'false'" button-style="solid" @change="assetChange">
-                <j-radio-button value="false">设为资产</j-radio-button>
-                <j-radio-button value="true">间接资产</j-radio-button>
-              </j-radio-group>
-            </div>
-            <div v-if="!myAsset.correlatesAssets" class="descriptions-warp" style="width: 600px;">
-              <div class="descriptions-item">
-                <div class="descriptions-title" style="padding: 4px;text-align: left">
-                  列名称
-                </div>
-                <div class="descriptions-content">
-                  <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" :options="columnOptions" @change="assetChange" />
-                </div>
-              </div>
-              <div class="descriptions-item">
-                <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
-                  资产标识
-                </div>
-                <div class="descriptions-content">
-                  <j-input v-model:value="myAsset.assetType" @change="assetChange" :maxLength="64" />
-                </div>
-              </div>
-              <div class="descriptions-item">
-                <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
-                  资产名称
-                </div>
-                <div class="descriptions-content">
-                  <j-input v-model:value="myAsset.assetTypeName" @change="assetChange" :maxLength="16" />
-                </div>
-              </div>
-            </div>
-            <div v-else class="descriptions-warp" style="width: 600px;">
-              <div class="descriptions-item">
-                <div class="descriptions-title" style="padding: 4px;text-align: left">
-                  当前表字段
-                </div>
-                <div class="descriptions-content">
-                  <j-select style="width: 100%;" v-model:value="myAsset.assetIdColumn" :options="columnOptions" @change="assetChange" />
-                </div>
-              </div>
-              <div class="descriptions-item">
-                <div class="descriptions-title" style="padding: 4px 8px;text-align: left">
-                  资产标识
-                </div>
-                <div class="descriptions-content">
-                  <j-select style="width: 100%;" v-model:value="myAsset.assetTypeName" :options="options" :fieldNames="{ label: 'name', value: 'id'}" @change="assetChange" />
-                </div>
-              </div>
-            </div>
-          </template>
-        </div>
+        </j-form>
       </div>
-      </j-form>
     </div>
     <div class="api">
         <j-popover placement="leftBottom" trigger="click" @visibleChange="getApi">
           <template #content>
             <div style="width: 750px">
               <j-table
-                :columns="apiColumns"
+                :columns="AdvancedApiColumns"
                 :dataSource="apiDataSource"
                 size="small"
                 :pagination="false"
@@ -186,9 +207,11 @@
 <script setup name="CRUDAdvanced">
 import { getAssetType } from '@/api/basis'
 import { useRequest } from '@jetlinks/hooks'
+import { regular } from '@jetlinks/utils'
 import {CRUD_COLUMNS} from "@/components/Database/util";
 import { queryEndCommands } from '@/api/form'
 import { useProduct } from '@/store'
+import { AdvancedApiColumns } from './util'
 
 const props = defineProps({
   tree: {
@@ -218,6 +241,8 @@ const emit = defineEmits(['update:tree','update:asset','update:relation', 'updat
 const CrudColumns = inject(CRUD_COLUMNS)
 const route = useRoute()
 const project = useProduct()
+const relationRef = ref()
+const assetRef = ref()
 
 const { data:options } = useRequest(getAssetType)
 const { data: apiDataSource, run: apiRun } = useRequest(queryEndCommands,
@@ -242,29 +267,6 @@ const columnOptions = computed(() => {
   return CrudColumns.value.map(item => ({ label: item.dataIndex, value: item.dataIndex }))
 })
 
-const apiColumns = [
-  {
-    dataIndex: 'ability',
-    title: '能力',
-    width: 100
-  },
-  {
-    dataIndex: 'api',
-    title: 'API'
-  },
-  {
-    dataIndex: 'instruction',
-    title: '指令',
-    width: 100
-  },
-  {
-    dataIndex: 'description',
-    title: '说明',
-    width: 120
-  },
-]
-const formModel = reactive({})
-
 const myRelation = reactive(props.relation || {
   enabled: true,
   relationType: undefined,
@@ -273,14 +275,30 @@ const myRelation = reactive(props.relation || {
 
 const myAsset = reactive(props.asset || {
   enabled: false,
-  assetIdColumn: undefined,
+  assetIdColumn: 'id',
   assetType: undefined,
   assetTypeName: undefined,
   correlatesAssets: false
 })
 
+
+const updateRelation = () => { // 关系数据发生变化
+  emit('update:relation', myRelation)
+  emit('update')
+}
+
 const myTree = ref(props.tree || false)
 
+const assetRadioChange = (v) => {
+  myAsset.assetType = undefined
+  myAsset.assetTypeName = undefined
+
+  if (v.target.value === 'false') {
+    myAsset.assetIdColumn = 'id'
+  }
+
+  assetChange(v)
+}
 const assetChange = (v) => {
   if (v.target) {
     myAsset.correlatesAssets = v.target.value === 'true'
@@ -291,13 +309,7 @@ const assetChange = (v) => {
 }
 
 const treeChange = () => {
-  console.log(myTree.value)
   emit('update:tree', myTree.value)
-  emit('update')
-}
-
-const relationChange = () => {
-  emit('update:relation', myRelation)
   emit('update')
 }
 
@@ -306,6 +318,20 @@ const getApi = (v) => {
     apiRun(route.params.id, [])
   }
 }
+
+defineExpose({
+  validates: () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const r = await relationRef.value?.validate()
+        const a = await assetRef.value?.validate()
+        resolve(r)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+})
 
 </script>
 
