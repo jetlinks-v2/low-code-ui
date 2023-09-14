@@ -280,18 +280,18 @@
             v-model:value="target.formItemProps.name"
           />
         </j-form-item>
-        <!-- <j-form-item
+        <j-form-item
           label="表头跨列"
-          :name="['componentProps', 'name']"
+          :name="['componentProps', 'colSpan']"
           required
-          :rules="rules"
         >
           <j-input-number
             placeholder="请输入表头跨列"
             @change="onDataChange"
-            v-model:value="target.componentProps.name"
+            style="width: 100%;"
+            v-model:value="target.componentProps.colSpan"
           />
-        </j-form-item> -->
+        </j-form-item>
         <j-form-item label="内容对齐" :name="['componentProps', 'align']">
           <j-select
             v-model:value="target.componentProps.align"
@@ -486,6 +486,7 @@ const rules = [
       if (flag) return Promise.reject(`标识${value}已被占用`)
       return Promise.resolve()
     },
+    trigger: 'change'
   },
 ]
 

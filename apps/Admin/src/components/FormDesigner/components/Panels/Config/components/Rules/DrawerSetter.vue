@@ -159,6 +159,7 @@ const onBack = () => {
   z-index: 10;
   display: flex;
   flex-direction: column;
+  padding: 10px 20px;
 
   .header {
     width: 100%;

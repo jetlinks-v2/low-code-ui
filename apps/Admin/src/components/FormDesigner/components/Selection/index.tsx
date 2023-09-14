@@ -170,7 +170,7 @@ const Selection = defineComponent({
           }
         }}
       >
-        <div class={['mask']}></div>
+        {slots?.default()}
       </Dropdown>
     }
 
@@ -189,7 +189,7 @@ const Selection = defineComponent({
         {...useAttrs()}
         onClick={withModifiers(handleClick, ['stop'])}
       >
-        {slots?.default()}
+        {!unref(isEditModel) ? slots?.default() : maskNode()}
         {
           unref(isEditModel) && Selected.value && !isMultiple.value && (
             <div class="bottomRight">
@@ -216,7 +216,7 @@ const Selection = defineComponent({
             </div>
           )
         }
-        {unref(isEditModel) && props.hasMask && maskNode()}
+        {unref(isEditModel) && props.hasMask && <div class={['mask']}></div>}
       </TagComponent>
     }
 
