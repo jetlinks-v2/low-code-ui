@@ -5,11 +5,11 @@
       <div v-if="visible" class="box">
         <div class="header">
           <j-button
-            type="link"
+            type="text"
             style="padding: 0; margin: 0"
             @click="onBack"
           >
-            <AIcon type="ArrowLeftOutlined" style="font-size: 15px" />返回
+            <AIcon type="LeftOutlined" style="font-size: 15px" />返回
           </j-button>
         </div>
         <j-form ref="formRef" :model="ruleModel" layout="vertical">

@@ -403,3 +403,17 @@ export const handleCopyData = (arr: any[]) => {
         }
     })
 }
+
+// 查找父节点
+export const findParentById = (obj: any, _item: any) => {
+    if (obj?.children?.length) {
+        for (let index = 0; index < obj.children.length; index++) {
+            const element = obj?.children[index];
+            if(element.key === _item.key){
+                return obj
+            }
+            return findParentById(element, _item)
+        }
+    }
+    return undefined
+}
