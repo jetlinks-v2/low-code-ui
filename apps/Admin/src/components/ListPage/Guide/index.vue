@@ -1,7 +1,7 @@
 <template>
   <div class="guide-steps" @click="handleClick" v-if="open" ref="maskRef">
     <div class="info" style="position: absolute;" ref="info">
-      <img src="images/list-page/line.png" :style="style1">
+      <img :src="getImage('/list-page/line.png')" :style="style1">
       <div :style="style" class="message">
         <h3>{{ title }}</h3>
         <p>{{ description }}</p>
@@ -23,6 +23,7 @@
 <script setup lang="ts" name="Guide">
 import type { PropType } from 'vue'
 import type { GuideProps } from './type'
+import { getImage } from '@jetlinks/utils'
 interface Emit {
   (e: 'update:open', value: boolean): void
 }

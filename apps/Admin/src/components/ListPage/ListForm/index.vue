@@ -1,12 +1,9 @@
 <template>
   <div class="list-form-center" ref="listFormRef">
     <img class="modal-config-img" :src="getImage('/list-page/form.png')" v-if="open">
-  <div class="list-form-center" ref="listFormRef">
-    <img class="modal-config-img" :src="getImage('/list-page/form.png')" v-if="open">
     <j-drawer
       title="列表形态配置"
       placement="right"
-      width="560px"
       width="560px"
       :closable="true"
       :visible="open"
@@ -76,7 +73,6 @@ import { cloneDeep } from 'lodash-es'
 import { validListForm } from './utils/valid'
 import { LIST_FORM_INFO, SHOW_TYPE_KEY } from '../keys';
 import { PropType } from 'vue';
-import { getImage } from '@jetlinks/utils';
 import { getImage } from '@jetlinks/utils';
 
 interface Emit {
