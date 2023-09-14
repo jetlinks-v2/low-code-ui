@@ -2,13 +2,13 @@
   <div className="filter-module-center" ref="filterModuleRef">
     <img class="modal-config-img" :src="getImage('/list-page/filter.png')" v-if="open">
     <j-drawer
-      title="配置"
+      title="筛选模块配置"
       placement="right"
       width="560px"
       :closable="true"
       :visible="open"
       :getContainer="() => $refs.filterModuleRef"
-      :wrap-style="{ position: 'absolute' }"
+      :wrap-style="{ position: 'absolute', zIndex: 1 }"
       :destroyOnClose="true"
       @close="emits('update:open', false)"
     >
@@ -32,7 +32,7 @@
         @handleChange="(data) => dataSource = data"
       />
       <div v-if="type !== ''">
-        <a-page-header title="配置筛选项" sub-title="配置筛选项" @back="goBack">
+        <a-page-header title=" " @back="goBack">
           <template #backIcon>
             <AIcon type="LeftOutlined" />
             返回
@@ -65,12 +65,14 @@
       </div>
 
       <template #footer v-if="type !== ''">
-        <j-button style="float: right" type="primary" @click="submit">
-          确定
-        </j-button>
-        <j-button style="float: right; margin-right: 8px" @click="goBack">
-          取消
-        </j-button>
+        <j-space>
+          <j-button @click="goBack">
+            取消
+          </j-button>
+          <j-button type="primary" @click="submit">
+            确定
+          </j-button>
+        </j-space>
       </template>
     </j-drawer>
   </div>
@@ -270,14 +272,8 @@ const handleOk = (value: any, data: any) => {
       dataSource.value = data
       break
     case '2':
-      data?.forEach((item: any) => {
-        const dataFind: any = dataSource.value?.find(
-          (i: any) => i?.id === item?.id,
-        )
-        if (dataFind?.id !== item?.id) {
-          dataSource.value.push(item)
-        }
-      })
+      console.log(...data);
+      dataSource.value.push(...data)
       // if (configChange.value) {
       //   data?.map((item: any) => {
       //     const dataFind = dataSource.value?.find(

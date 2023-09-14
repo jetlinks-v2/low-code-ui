@@ -11,20 +11,25 @@
         </ErrorItem>
       </j-form-item>
       <j-form-item :label="iconType ? '图标' : '自定义图标'">
-        <AIcon
-          :type="activeBtn?.icon"
-          v-if="iconType"
-          style="border: 1px solid #d9d9d9; padding: 5px"
-        />
+        <div class="default-btn" v-if="iconType">
+            <AIcon
+            :type="activeBtn?.icon"
+            class="default-icon"
+          />
+        </div>
         <!-- <UploadIcon v-model:modelValue="form.icon" v-else /> -->
         <div class="custom-upload" v-else>
           <Upload v-model:value="form.icon" accept=".jpg,.jpeg,.png" :borderStyle="{border: 'none'}">
             <template #content="{imageUrl}">
               <template v-if="imageUrl">
-                <img :src="imageUrl" class="upload-image" />
+                <div class="default-btn">
+                  <img :src="imageUrl" class="upload-image" />
+                </div>
               </template>
               <template v-else>
-                <AIcon type="PlusOutlined" style="font-size: 20px" />
+                <div class="default-btn">
+                  <AIcon type="PlusOutlined"  class="default-icon"/>
+                </div>
               </template>
             </template>
           </Upload>
@@ -231,15 +236,30 @@ defineExpose({
 })
 </script>
 <style scoped lang="less">
-form {
-  padding: 20px;
-}
-.custom-upload {
-  width: 24px;
-  height: 24px;
-  .upload-image {
-    width: 24px;
-    height: 24px;
+.edit-btn {
+  .default-btn{
+    width: 48px;
+    height: 48px;
+    background: #F0F1F4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    .default-icon {
+      border: 1px dashed #d9d9d9;
+      padding: 5px;
+    }
+  }
+  form {
+    padding: 20px;
+  }
+  .custom-upload {
+    width: 48px;
+    height: 48px;
+    .upload-image {
+      width: 24px;
+      height: 24px;
+    }
   }
 }
 </style>

@@ -9,7 +9,7 @@
       :visible="open"
       :getContainer="() => $refs.listDataRef"
       :destroyOnClose="true"
-      :wrap-style="{ position: 'absolute' }"
+      :wrap-style="{ position: 'absolute', zIndex: 1 }"
       @close="emits('update:open', false)"
     >
       <Table
@@ -437,14 +437,7 @@ const handleOk = (value: any, data: any) => {
       dataSource.value = data
       break
     case '2':
-      data?.map((item: any) => {
-        const dataFind = dataSource.value?.find(
-          (i: any) => i?.id === item?.id,
-        )
-        if (dataFind?.config !== item?.config) {
-          dataSource.value.push(item)
-        }
-      })
+      dataSource.value.push(...data)
       break
     case '3':
       break
