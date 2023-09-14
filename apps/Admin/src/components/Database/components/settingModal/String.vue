@@ -3,8 +3,7 @@
     <j-input v-model:value="model.defaultValueSpec.fixValue" placeholder="请输入默认值" :maxLength="256" />
   </j-form-item>
   <j-form-item label="校验规则" :name="['validator', 'provider']">
-    <j-select
-      allowClear
+    <SelectNull
       :options="rulesOptions"
       v-model:value="model.validator.provider"
       @change="providerChange"
@@ -20,7 +19,7 @@
       </template>
     </j-input>
   </j-form-item>
-  <j-form-item v-if="showGroup" label="校验生效" :name="['validator', 'configuration', 'group']">
+  <j-form-item v-if="showGroup" label="校验生效" :name="['validator', 'configuration', 'group']" :rules="rules.group">
     <j-card-select
       :options="[
         {
@@ -35,6 +34,7 @@
       :column="2"
       :showImage="false"
       :multiple="true"
+      @change="groupChange"
       v-model:value="model.validator.configuration.group"
     />
   </j-form-item>
@@ -54,6 +54,7 @@ import { SETTING_FORM_MODEL } from "@/components/Database/util";
 import {inject} from "vue";
 import Spec from './Spec.vue'
 import { regular } from '@jetlinks/utils'
+import SelectNull from './SelectNull.vue'
 
 const model = inject(SETTING_FORM_MODEL, {})
 
@@ -84,6 +85,16 @@ const rulesOptions = [
   },
 ]
 
+const groupChange = (v) => {
+  const groupSet = new Set(v)
+  if (groupSet.has('add')) {
+    groupSet.add('save')
+  } else {
+    groupSet.delete('save')
+  }
+  model.value.validator.configuration.group = [...groupSet.values()]
+}
+
 const rules = {
   fixValue: [
     { max: model.value.length, message: `请输入长度在${model.value.length}以内的字符`}
@@ -106,39 +117,46 @@ const rules = {
   ],
   message: [
     { max: 64, message: '最多输入64位字符'}
+  ],
+  group: [
+    { required: true, message: '请选择校验生效' },
   ]
 }
 
 const providerChange = (key) => {
   const configuration = model.value.validator.configuration
+  const _group = configuration.group || ['save', 'update', 'insert']
   switch (key) {
     case 'noEmpty':
       model.value.validator.configuration = {
         message: configuration.message,
-        group: configuration.group
+        group: _group
       }
       break;
     case 'pattern':
       model.value.validator.configuration = {
         message: configuration.message,
-        group: configuration.group,
+        group: _group,
         regexp: undefined
       }
       break;
     case 'email':
       model.value.validator.configuration = {
         message: configuration.message,
-        group: configuration.group,
+        group: _group,
         regexp: regular.emailReg
       }
       break;
     case 'phone':
       model.value.validator.configuration = {
         message: configuration.message,
-        group: configuration.group,
+        group: _group,
         regexp: regular.cellphoneReg
       }
       break;
+    default:
+      model.value.validator.configuration = { }
+      break
   }
 }
 

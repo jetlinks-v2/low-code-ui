@@ -331,7 +331,7 @@ const JavaTypeChange = (record) => {
           provider: undefined,
           configuration: {
             message: undefined,
-            group: undefined
+            group: []
           }
         },
         spec: undefined
@@ -349,7 +349,7 @@ const JavaTypeChange = (record) => {
           provider: undefined,
           configuration: {
             message: '数据格式错误',
-            group: undefined,
+            group: [],
             classType: record.javaType,
             regexp: undefined,
             min: undefined,
