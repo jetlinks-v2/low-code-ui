@@ -133,7 +133,9 @@ const setSelection = (node: any) => {
     if(map(selected.value, 'key').includes('root')){
       selected.value = [node]
     } else {
-      selected.value.push(node)
+      if(!map(selected.value, 'key').includes(node.key)){
+        selected.value.push(node)
+      }
     }
   } else {
     selected.value = []

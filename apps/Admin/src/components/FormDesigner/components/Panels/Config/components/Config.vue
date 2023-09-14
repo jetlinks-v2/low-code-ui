@@ -2,19 +2,21 @@
 <template>
   <div>
     <template v-if="['input-number'].includes(type)">
-      <j-form-item label="最大值" :name="['componentProps', 'max']" required>
+      <j-form-item :rules="maxRules" label="最大值" :name="['componentProps', 'max']">
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.max"
           placeholder="请输入"
+          :max="99999999999999"
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item label="最小值" :name="['componentProps', 'min']" required>
+      <j-form-item :rules="minRules" label="最小值" :name="['componentProps', 'min']">
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.min"
           placeholder="请输入"
+          :max="99999999999999"
           @change="onDataChange"
         />
       </j-form-item>
@@ -29,6 +31,7 @@
           placeholder="请输入"
           :precision="0"
           :min="0"
+          :max="99999999999999"
           @change="onDataChange"
         />
       </j-form-item>
@@ -310,7 +313,38 @@ const rules = [
   },
   {
     validator(_: any, value: number) {
+      if(value === null || value === undefined) return Promise.resolve()
       if (value === 0) return Promise.reject(`单个大小应该大于0`)
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
+const maxRules = [
+  {
+    required: true,
+    message: '请输入最大值',
+  },
+  {
+    validator(_: any, value: number) {
+      if(value === null || value === undefined) return Promise.resolve()
+      if (value < target.value.componentProps.min) return Promise.reject(`最大值必须大于最小值`)
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
+const minRules = [
+  {
+    required: true,
+    message: '请输入最小值',
+  },
+  {
+    validator(_: any, value: number) {
+      if(value === null || value === undefined) return Promise.resolve()
+      if (value > target.value.componentProps.max) return Promise.reject(`最大值必须大于最小值`)
       return Promise.resolve()
     },
     trigger: 'change',

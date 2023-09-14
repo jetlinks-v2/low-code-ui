@@ -60,6 +60,14 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
                 message: (node.formItemProps?.label || node.name) + '配置错误'
             }
         }
+        if ('input-number' === _type && (node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined)) {
+            if (node?.componentProps?.max < node?.componentProps?.min) {
+                return {
+                    key: node?.key,
+                    message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
+            }
+        }
         if (['select', 'tree-select', 'select-card'].includes(_type)) {
             // 数据源
             // if (node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
