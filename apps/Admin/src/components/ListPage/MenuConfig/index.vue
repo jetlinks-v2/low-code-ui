@@ -1,12 +1,15 @@
 <template>
-  <div class="menu-config">
+  <div class="menu-config" ref="menuConfigRef">
     <j-drawer
       title="菜单配置"
       placement="right"
+      width="560px"
       :closable="false"
       :visible="open"
+      :destroyOnClose="true"
+      :getContainer="() => $refs.menuConfigRef"
+      :wrap-style="{ position: 'absolute' }"
       @close="emits('update:open', false)"
-      width="560px"
     >
       <Menu
         ref="menuRef"
