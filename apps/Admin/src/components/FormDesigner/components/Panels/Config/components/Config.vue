@@ -2,19 +2,21 @@
 <template>
   <div>
     <template v-if="['input-number'].includes(type)">
-      <j-form-item label="最大值" :name="['componentProps', 'max']" required>
+      <j-form-item :rules="maxRules" label="最大值" :name="['componentProps', 'max']">
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.max"
           placeholder="请输入"
+          :max="99999999999999"
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item label="最小值" :name="['componentProps', 'min']" required>
+      <j-form-item :rules="minRules" label="最小值" :name="['componentProps', 'min']">
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.min"
           placeholder="请输入"
+          :max="99999999999999"
           @change="onDataChange"
         />
       </j-form-item>
@@ -28,6 +30,8 @@
           v-model:value="target.componentProps.precision"
           placeholder="请输入"
           :precision="0"
+          :min="0"
+          :max="99999999999999"
           @change="onDataChange"
         />
       </j-form-item>
@@ -90,16 +94,7 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item
-        :rules="[
-          {
-            required: true,
-            message: '请选择',
-          },
-        ]"
-        :name="['componentProps', 'accept']"
-        label="格式"
-      >
+      <j-form-item :name="['componentProps', 'accept']" label="格式">
         <j-select
           mode="multiple"
           placeholder="请选择"
@@ -115,6 +110,7 @@
         required
         :name="['componentProps', 'fileSize']"
         label="单个大小"
+        :rules="rules"
       >
         <j-input-group compact>
           <j-input-number
@@ -310,12 +306,57 @@ const { data: options, run } = useRequest(getGeoType, {
   immediate: false,
 })
 
+const rules = [
+  {
+    required: true,
+    message: '请输入单个大小',
+  },
+  {
+    validator(_: any, value: number) {
+      if(value === null || value === undefined) return Promise.resolve()
+      if (value === 0) return Promise.reject(`单个大小应该大于0`)
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
+const maxRules = [
+  {
+    required: true,
+    message: '请输入最大值',
+  },
+  {
+    validator(_: any, value: number) {
+      if(value === null || value === undefined) return Promise.resolve()
+      if (value < target.value.componentProps.min) return Promise.reject(`最大值必须大于最小值`)
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
+const minRules = [
+  {
+    required: true,
+    message: '请输入最小值',
+  },
+  {
+    validator(_: any, value: number) {
+      if(value === null || value === undefined) return Promise.resolve()
+      if (value > target.value.componentProps.max) return Promise.reject(`最大值必须大于最小值`)
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
 const onDataChange = () => {
   emits('refresh', target.value)
 }
 
 const onMultipleChange = (e) => {
-  if(e.target.value){
+  if (e.target.value) {
     target.value.componentProps.treeCheckable = true
   }
   emits('refresh', target.value)
