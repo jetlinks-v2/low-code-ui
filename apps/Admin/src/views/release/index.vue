@@ -1,8 +1,13 @@
 <template>
   <div class="release-warp">
     <div class="release-header">
-      <j-button type="link" @click="cancel">返回</j-button>
+      <!-- <j-button type="link" @click="cancel">返回</j-button> -->
+      <j-button type="link" @click="cancel" class="btn">
+        <div class="out"><img :src="getImage('/left.png')"></div>
+        <p>退出</p>
+      </j-button>
       <span>发布</span>
+      <!-- <j-button type="primary">发布</j-button> -->
     </div>
     <div class="release-body">
 
@@ -47,6 +52,7 @@ import Status from './status.vue'
 import Tree from './projectTree.vue'
 import Finish from './finish.vue'
 import { useProduct, useEngine } from "@/store";
+import { getImage } from '@jetlinks/utils';
 
 const route = useRoute()
 const product = useProduct()
@@ -109,10 +115,35 @@ product.queryProduct(route.params.id, () => {
 
   .release-header {
     display: flex;
-    padding:  12px 48px;
+    padding:  12px 24px;
     background-color: @layout-header;
     height: 56px;
     align-items: center;
+    box-sizing: border-box;
+    border-width: 0px 0px 1px 0px;
+    border-style: solid;
+    border-color: #D9D9D9;
+    .btn {
+      display: flex;
+      color: #333333;
+      .out {
+        width: 18px;
+        height: 15px;
+
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+      p{
+        line-height: 22px;
+        font-size: 16px;
+        margin-left: 10px;
+      }
+    }
+    span{
+      font-size: 18px;
+    }
   }
 
   .release-body {
