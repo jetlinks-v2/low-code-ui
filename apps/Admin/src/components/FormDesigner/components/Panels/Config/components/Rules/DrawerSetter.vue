@@ -25,7 +25,7 @@
           </j-form-item>
           <j-form-item name="validator">
             <template #label>
-              自定义校验器<j-tooltip title="格式：return '错误信息'">
+              自定义校验器<j-tooltip title="格式：return 'Error Message'">
                 <AIcon type="QuestionCircleOutlined" />
               </j-tooltip>
             </template>
@@ -159,6 +159,7 @@ const onBack = () => {
   z-index: 10;
   display: flex;
   flex-direction: column;
+  padding: 10px 20px;
 
   .header {
     width: 100%;

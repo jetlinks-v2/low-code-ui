@@ -1,14 +1,19 @@
 <template>
-  <div class="operation-drawer">
+  <div class="operation-drawer" ref="operationDrawer">
+    <template v-if="open">
+      <img class="modal-config-img" :src="getImage('/list-page/column-config.png')" v-if="type === 'columns'">
+      <img class="modal-config-img" :src="getImage('/list-page/button.png')" v-else>
+    </template>
     <j-drawer
-      :visible="_visible"
-      :title="type == 'columns' ? '操作列' : '添加按钮'"
-      @close="close"
-      destroy-on-close
       placement="right"
-      getContainer=".list-page"
-      :wrap-style="{position: 'absolute'}"
       width="560px"
+      destroy-on-close
+      :visible="_visible"
+      :title="type == 'columns' ? '操作列配置' : '添加按钮配置'"
+      :getContainer="() => $refs.operationDrawer"
+      :wrap-style="{ position: 'absolute', zIndex: 1 }"
+      @close="close"
+
     >
       <BtnsList
         v-model:data="columnsTree"
@@ -45,6 +50,7 @@ import {
 } from './keys'
 import { validOperationsBtn } from './index'
 import { PropType } from 'vue'
+import { getImage } from '@jetlinks/utils';
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -104,12 +110,14 @@ const save = async () => {
   })
 }
 
-const valid = async () => {
-  return new Promise((resolve, reject) => {
-    errorList.value = validOperationsBtn(columnsTree.value)
-    if(errorList.value.length) reject([{message: '操作按钮配置错误'}])
-    else resolve([])
-  })
+const valid = () => {
+  errorList.value = validOperationsBtn(columnsTree.value)
+  return errorList.value.length ? [{message: props.type === 'columns' ? '操作列配置错误': '操作按钮配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validOperationsBtn(columnsTree.value)
+  //   if(errorList.value.length) reject([{message: '操作按钮配置错误'}])
+  //   else resolve([])
+  // })
 }
 
 

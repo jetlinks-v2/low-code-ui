@@ -61,7 +61,7 @@ import {
   reactive,
   onMounted,
 } from 'vue'
-import { debounce } from 'lodash-es'
+import { debounce, map } from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
 import { Modal } from 'jetlinks-ui-components'
 import {
@@ -70,6 +70,8 @@ import {
   checkedConfig,
   getFieldData,
   initData,
+  appendChildItem,
+  handleCopyData,
 } from './utils/utils'
 import { uid } from './utils/uid'
 
@@ -106,6 +108,7 @@ const checkVisible = ref<boolean>(false)
 const editData = ref<string>()
 const _ctrl = ref<boolean>(false)
 const focus = ref<boolean>(false)
+const focused = ref<boolean>(false)
 
 const product = useProduct()
 const formDesigner = useFormDesigner()
@@ -115,7 +118,11 @@ const isSelectedRoot = computed(() => {
 })
 
 const _width = computed(() => {
-  return model.value === 'preview' ? '100%' : (!unref(isShowConfig) ? 'calc(100% - 200px)' : 'calc(100% - 584px)')
+  return model.value === 'preview'
+    ? '100%'
+    : !unref(isShowConfig)
+    ? 'calc(100% - 200px)'
+    : 'calc(100% - 584px)'
 })
 
 // 设置数据被选中
@@ -123,7 +130,13 @@ const setSelection = (node: any) => {
   if (['card-item', 'space-item'].includes(node.type)) return
   if (_ctrl.value && model.value === 'edit') {
     if (node === 'root') return
-    selected.value.push(node)
+    if(map(selected.value, 'key').includes('root')){
+      selected.value = [node]
+    } else {
+      if(!map(selected.value, 'key').includes(node.key)){
+        selected.value.push(node)
+      }
+    }
   } else {
     selected.value = []
     if (node === 'root') {
@@ -139,7 +152,7 @@ const setSelection = (node: any) => {
 // 删除
 const onDelete = debounce(() => {
   const arr = selected.value || []
-  if (unref(isSelectedRoot) || !arr?.length) return
+  if (unref(isSelectedRoot) || !arr?.length || focused.value) return
   delVisible.value = true
   Modal.confirm({
     title: '确定删除组件及其配置？',
@@ -163,13 +176,13 @@ const onDelete = debounce(() => {
 
 // 复制
 const onCopy = () => {
-  if (unref(isSelectedRoot)) return
+  if (unref(isSelectedRoot) || focused.value) return
   formDesigner.setCopyData(selected.value || [])
 }
 
 // 剪切
 const onShear = debounce(() => {
-  if (unref(isSelectedRoot)) return
+  if (unref(isSelectedRoot) || focused.value) return
   formDesigner.setCopyData(selected.value || [])
   const _data: any = deleteDataByKey(formData.value.children, selected.value)
   formData.value = {
@@ -181,7 +194,7 @@ const onShear = debounce(() => {
 
 // 粘贴
 const onPaste = () => {
-  if (!selected.value?.length) return
+  if (!selected.value?.length || focused.value) return
   const _data = formDesigner.getCopyData()
   const list = (_data || []).map((item) => {
     return {
@@ -191,6 +204,7 @@ const onPaste = () => {
         name: item.formItemProps?.name + 'copy',
       },
       key: item.key + '_' + uid(),
+      children: handleCopyData(item?.children || []),
     }
   })
   if (list.length && selected.value?.length) {
@@ -216,6 +230,16 @@ const onCollect = () => {
   if (unref(isSelectedRoot)) return
   collectData.value = selected.value || []
   collectVisible.value = true
+}
+
+// 添加子组件
+const onAddChild = (newData: any, parent: any, flag?: boolean) => {
+  const arr = appendChildItem(formData.value?.children, newData, parent, flag)
+  formData.value = {
+    ...formData.value,
+    children: arr || [],
+  }
+  setSelection(newData || 'root')
 }
 
 /**
@@ -252,6 +276,7 @@ provide('FormDesigner', {
   delVisible,
   _ctrl,
   focus,
+  focused, // 其他组件
   setSelection,
   setModel,
   onSaveData,
@@ -260,6 +285,7 @@ provide('FormDesigner', {
   onCopy,
   onShear,
   onCollect,
+  onAddChild,
 })
 
 const onSave = () => {
@@ -316,8 +342,10 @@ onUnmounted(() => {
 // 校验
 const onValidate = () => {
   spinning.value = true
-  errorKey.value = checkedConfig(unref(formData))
-  spinning.value = false
+  setTimeout(() => {
+    errorKey.value = checkedConfig(unref(formData))
+    spinning.value = false
+  }, 100)
   return new Promise((resolve, reject) => {
     if (errorKey.value?.length) {
       reject(errorKey.value)

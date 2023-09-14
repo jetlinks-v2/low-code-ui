@@ -295,14 +295,14 @@ const query = (_params: Record<string, any>) =>
     dataColumns.value.map((item: any, index: number) => {
       map.set(item.key, { config: item.config, key: item.key })
     })
+    console.log(map);
     let data: any = new Array(22).fill(1).map((item, index) => {
       const obj = {}
       map.forEach((value, key) => {
-        obj[key] = 1694078805427
+        obj[key] = key
       })
       return obj
     })
-    console.log(data);
     const _from = _params.pageIndex * _params.pageSize
     const _to = (_params.pageIndex + 1) * _params.pageSize
     setTimeout(() => {

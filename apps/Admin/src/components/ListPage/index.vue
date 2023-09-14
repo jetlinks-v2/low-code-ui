@@ -1,6 +1,5 @@
 <template>
   <div class="list-page">
-    <j-spin :spinning="spinning">
     <Preview
         :show="showPreview"
         :id="props.data.id"
@@ -65,11 +64,11 @@
         :data="props.data"
         ref="menuConfigRef"
       />
-    </j-spin>
   </div>
 </template>
 
 <script setup lang="ts" name="ListPage">
+import './style.less'
 import DataBind from './DataBind/index.vue'
 import FilterModule from './FilterModule/index.vue'
 import ListData from './ListData/index.vue'
@@ -185,27 +184,33 @@ const listDataRef = ref()
 const menuConfigRef = ref()
 const validate = async () => {
   spinning.value = true
-  const promiseArr = [
-    btnTreeRef.value?.valid(),
-    columnsRef.value?.valid(),
-    filterModuleRef.value?.valid(),
-    pagingConfigRef.value?.valid(),
-    listFormRef.value?.valid(),
-    listDataRef.value?.valid(),
-    menuConfigRef.value?.valid(),
-    dataBindRef.value?.valid(),
+  const errorList = [
+    ...btnTreeRef.value?.valid(),
+    ...columnsRef.value?.valid(),
+    ...filterModuleRef.value?.valid(),
+    ...pagingConfigRef.value?.valid(),
+    ...listFormRef.value?.valid(),
+    ...listDataRef.value?.valid(),
+    ...menuConfigRef.value?.valid(),
+    ...dataBindRef.value?.valid(),
   ]
+  console.log(errorList);
   return new Promise((resolve, reject) => {
-    Promise.all(promiseArr)
-      .then((res) => {
-        resolve(res)
-      })
-      .catch((err) => {
-        reject(err)
-      })
-      .finally(() => {
-        spinning.value = false
-      })
+    if(errorList.length) {
+      reject(errorList)
+    } else {
+      resolve([])
+    }
+    // Promise.all(promiseArr)
+    //   .then((res) => {
+    //     resolve(res)
+    //   })
+    //   .catch((err) => {
+    //     reject(err)
+    //   })
+    //   .finally(() => {
+    //     spinning.value = false
+    //   })
   })
 }
 
@@ -237,7 +242,8 @@ const dataBind = reactive({
     function: null,
     command: null,
   },
-  functionInfo: null,
+  filterBind: [],
+  columnBind: [],
 })
 
 provide(DATA_BIND, dataBind)
@@ -363,5 +369,6 @@ defineExpose({
 .list-page {
   height: 100%;
   position: relative;
+  background-color: #e9e9e9;
 }
 </style>

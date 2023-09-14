@@ -118,7 +118,7 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   // return false
   return new Promise(() => {
     if (maxSize < file.size) {
-      onlyMessage(`文件大小必须小于${props.fileSize}${props.unit}`, 'error')
+      onlyMessage(`该文件超过${props.fileSize}${props.unit}, 请重新上传`, 'error')
       return false
     } else if (!isType) {
       onlyMessage(`格式错误，请重新上传`, 'error')

@@ -102,7 +102,9 @@ export const basic: ISchema[] = [
         type: 'table',
         name: '表格',
         icon: 'AuditOutlined',
-        componentProps: {},
+        componentProps: {
+            align: 'left'
+        },
         children: []
     },
 ]
@@ -131,35 +133,35 @@ export const layout: ISchema[] = [
         name: '网格布局',
         icon: 'AppstoreOutlined',
         componentProps: {
-            gutter: [24, 24],
-            // justify: 'space-around',
-            // align: 'top'
+            inlineMax: 10,
+            rowSpan: 5,
+            colSpan: 10
         },
         children: [
             {
                 componentProps: {
-                    span: 6,
+                    span: 1,
                 },
                 type: 'grid-item',
                 children: []
             },
             {
                 componentProps: {
-                    span: 6,
+                    span: 1,
                 },
                 type: 'grid-item',
                 children: []
             },
             {
                 componentProps: {
-                    span: 6,
+                    span: 1,
                 },
                 type: 'grid-item',
                 children: []
             },
             {
                 componentProps: {
-                    span: 6,
+                    span: 1,
                 },
                 type: 'grid-item',
                 children: []

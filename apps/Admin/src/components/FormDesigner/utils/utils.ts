@@ -21,7 +21,7 @@ export const generateOptions = (len: number) => {
 
 const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo']
 
-const checkedConfigItem = (node: ISchema) => {
+const checkedConfigItem = (node: ISchema, allData: any[]) => {
     const _type = node.type || 'root'
     if (_type === 'root') {
         return false
@@ -43,6 +43,15 @@ const checkedConfigItem = (node: ISchema) => {
                     key: node?.key,
                     message: (node.formItemProps?.label || node.name) + '配置错误'
                 }
+            } else {
+                const arr = getBrotherList(node?.key || '', allData)
+                const flag = arr.filter((item) => item.key !== node.key).find((i) => i?.formItemProps?.name === node?.formItemProps?.name)
+                if (flag) { // `标识${value}已被占用`
+                    return {
+                        key: node?.key,
+                        message: (node.formItemProps?.label || node.name) + '配置错误'
+                    }
+                }
             }
         }
         if ('input-number' === _type && (node?.componentProps?.max === undefined || node?.componentProps?.min === undefined || node?.componentProps?.precision === undefined)) {
@@ -51,19 +60,29 @@ const checkedConfigItem = (node: ISchema) => {
                 message: (node.formItemProps?.label || node.name) + '配置错误'
             }
         }
-        if (['select', 'tree-select', 'select-card'].includes(_type)) {
-            // 数据源
-            // if (node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
-            //     return node?.key
-            // }
-            if (node?.componentProps?.source?.type === 'end' && (!node?.componentProps.source?.commandId || !node?.componentProps.source?.functionId || !node?.componentProps.source?.label || !node?.componentProps.source?.value)) {
+        if ('input-number' === _type && (node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined)) {
+            if (node?.componentProps?.max < node?.componentProps?.min) {
                 return {
                     key: node?.key,
                     message: (node.formItemProps?.label || node.name) + '配置错误'
                 }
             }
         }
-        if ('upload' === _type && (!node?.componentProps?.accept || !node?.componentProps?.maxCount || !node?.componentProps?.fileSize)) {
+        if (['select', 'tree-select', 'select-card'].includes(_type)) {
+            // 数据源
+            // if (node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
+            //     return node?.key
+            // }
+            // if (node?.componentProps?.source?.type === 'end' && (!node?.componentProps.source?.commandId || !node?.componentProps.source?.functionId || !node?.componentProps.source?.label || !node?.componentProps.source?.value)) {
+            if (node?.componentProps.source?.functionId && !node?.componentProps.source?.commandId) {
+                return {
+                    key: node?.key,
+                    message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
+            }
+        }
+        // !node?.componentProps?.accept || 
+        if ('upload' === _type && (!node?.componentProps?.maxCount || !node?.componentProps?.fileSize)) {
             // 个数和单位
             return {
                 key: node?.key,
@@ -82,27 +101,43 @@ const checkedConfigItem = (node: ISchema) => {
                 message: (node.formItemProps?.label || node.name) + '配置错误'
             }
         }
+        if (['table-item', 'collapse-item', 'tabs-item', 'collapse', 'tabs'].includes(_type) && !(node?.formItemProps?.name)) {
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.name || node.name) + '配置错误'
+            }
+        }
+        if (['table-item', 'collapse-item', 'tabs-item'].includes(_type) && !(node?.componentProps?.name)) {
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.name || node.name) + '配置错误'
+            }
+        }
     }
     return false
 }
 
 // 校验配置项必填
-export const checkedConfig = (node: ISchema) => {
-    const _data: any = checkedConfigItem(node);
+const checkConfig = (node: ISchema, allData: any[]) => {
+    const _data: any = checkedConfigItem(node, allData);
     let _rules: any[] = []
     if (_data) {
         _rules.push(_data)
     }
     if (node.children && node.children?.length) {
         node?.children.map(item => {
-            const arr = checkedConfig(item)
+            const arr = checkConfig(item, allData)
             _rules = [..._rules, ...arr]
         })
     }
     return _rules
 }
 
-export const updateData = (list: ISchema[], item: ISchema) => {
+export const checkedConfig = (node: ISchema) => {
+    return checkConfig(node, node?.children || [])
+}
+
+export const updateData = (list: ISchema[], item?: any) => {
     return (list || []).map(_item => {
         if (_item.key === item.key) {
             return {
@@ -156,32 +191,33 @@ export const extractCssClass = (formCssCode: string) => {
     return Array.from(new Set(cssNameArray))  //数组去重
 }
 
-export const insertCustomCssToHead = (cssCode, formId) => {
+export const insertCustomCssToHead = (cssCode: string, formId: string) => {
+    if (!cssCode || !formId) return
     let head = document.getElementsByTagName('head')[0]
     let oldStyle = document.getElementById(formId)
     if (!!oldStyle) {
         head.removeChild(oldStyle)  //先清除后插入！！
     }
-    if (!!formId) {
-        oldStyle = document.getElementById(formId)
-        !!oldStyle && head.removeChild(oldStyle)  //先清除后插入！！
-    }
+    const id = `[data-id="${formId}"]`
+    const result = cssCode.replace(/\.([a-zA-Z-]+)/g, `.$1${id}`)
+        .replace(/#([a-zA-Z-]+)/g, `#$1${id}`)
+        .replace(/([a-zA-Z-]+)(?=\s*\{)/g, `$1${id}`);
 
     let newStyle: HTMLStyleElement = document.createElement('style')
     newStyle.type = 'text/css'
     newStyle.rel = 'stylesheet'
     newStyle.id = formId
     try {
-        newStyle.appendChild(document.createTextNode(cssCode))
+        newStyle.appendChild(document.createTextNode(result))
     } catch (ex) {
-        newStyle.styleSheet.cssText = cssCode
+        newStyle.styleSheet.cssText = result
     }
 
     head.appendChild(newStyle)
 }
 
 // 查询数据
-export const getBrotherList = (value: string, arr: any[]) => {
+export const getBrotherList = (value: string | number, arr: any[]) => {
     if (Array.isArray(arr) && arr?.length) {
         for (let index = 0; index < arr?.length; index++) {
             const element = arr[index];
@@ -283,6 +319,40 @@ export const copyDataByKey = (arr: any[], newData: any[], _item: any) => {
     }
 }
 
+// 添加子组件flag: true: 开头， undefined: 尾部，false: 中间
+export const appendChildItem = (arr: any[], newData: any, parent: any, flag?: boolean) => {
+    return arr.map(item => {
+        let child: any[] = item?.children || []
+        if (item.key === parent?.key) {
+            if (flag === undefined) {
+                child = [...child, newData]
+            }
+            if (flag === false) {
+                const _f = child.find(item => item?.formItemProps?.name === 'actions')
+                if (_f) {
+                    child.splice(child.length - 1, 0, newData)
+                } else {
+                    child.push(newData)
+                }
+            }
+            if (flag === true) {
+                child = [newData, ...child]
+            }
+            return {
+                ...item,
+                children: child
+            }
+        }
+        if (item.children?.length) {
+            child = appendChildItem(item.children, newData, parent)
+        }
+        return {
+            ...item,
+            children: [...child]
+        }
+    })
+}
+
 const getFieldChildrenData = (data: ISchema[]) => {
     let obj: any = {}
     data.map((item: any) => {
@@ -322,4 +392,14 @@ export const initData = {
         eventCode: '',
     },
     children: [],
+}
+
+export const handleCopyData = (arr: any[]) => {
+    return arr.map(item => {
+        return {
+            ...item,
+            key: item.type + uid(6),
+            children: handleCopyData(item.children || [])
+        }
+    })
 }

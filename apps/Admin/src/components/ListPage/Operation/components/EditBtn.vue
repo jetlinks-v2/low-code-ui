@@ -1,7 +1,7 @@
 <template>
   <div>
     <j-space>
-      <j-button @click="emits('update:steps', 'BtnsType')" type="text">
+      <j-button @click="handleBack" type="text">
         <AIcon type="LeftOutlined"></AIcon>
         返回
       </j-button>
@@ -64,6 +64,13 @@ const title = computed(() => {
   return text
 })
 
+const handleBack = () => {
+  if(activeBtn!.value.key) {
+    emits('update:steps', 'BtnsList')
+  } else {
+    emits('update:steps', 'BtnsType')
+  }
+}
 
 const save = async (callback: () => void) => {
   const valid = await EditRef.value?.submit()
