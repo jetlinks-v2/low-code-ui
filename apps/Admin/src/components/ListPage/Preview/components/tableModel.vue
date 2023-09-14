@@ -54,9 +54,10 @@
                 handleFunction(item.permissionProps, slotProps)?.popConfirm
               "
               :class="extractCssClass(item.style)"
+              
             >
                 <template v-if="item.icon">
-                  <img :src="item.icon" alt="" v-if="item.icon.includes('http')" style="width: 14px;height: 14px;">
+                  <img :src="item.icon" alt="" v-if="item.icon.includes('http')" class="image-icon">
                   <AIcon v-else :type="item?.icon" />
                 </template>
                 <span>{{ item?.text }}</span>
@@ -431,3 +432,10 @@ defineExpose({
   }
 })
 </script>
+
+<style scoped lang="less">
+.image-icon {
+  width: 14px;
+  height: 14px;
+}
+</style>

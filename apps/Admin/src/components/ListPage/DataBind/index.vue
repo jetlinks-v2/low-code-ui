@@ -91,9 +91,9 @@ const props = defineProps({
 })
 
 const handleChangeFunction = (val: string) => {
-  dataBind.functionInfo =
-    functionOptions!.value.find((item) => item.fullId === val) ||
-    dataBind.functionInfo
+  dataBind.filterBind = dataBind.columnBind =
+    functionOptions!.value.find((item) => item.fullId === val)?.configuration?.columns ||
+    dataBind.filterBind
   handleFunction(val)
 }
 const functionDisabled = computed(() => {
@@ -116,20 +116,14 @@ const handleModify = () => {
 }
 
 const handleOk = () => {
-  dataBind.data.function = null
-  dataBind.data.command = null
-  dataBind.functionInfo = null
+  dataBind.filterBind = dataBind.columnBind = dataBind.data.command = dataBind.data.function  = null
   visible.value = false
 }
 
 const errorList = ref<any[]>([])
 const valid = () => {
-  console.log(`output->dataBind.data`, dataBind)
-  return new Promise((resolve, reject) => {
-    errorList.value = validDataBind(dataBind.data, functionOptions.value)
-    if (errorList.value.length) reject([{message: '数据绑定配置错误'}])
-    else resolve([])
-  })
+  errorList.value = validDataBind(dataBind.data, functionOptions.value)
+  return errorList.value.length ? [{message: '数据绑定配置错误'}] : []
 }
 
 watch(
