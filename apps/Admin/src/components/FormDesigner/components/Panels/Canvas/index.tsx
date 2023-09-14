@@ -30,10 +30,10 @@ const Canvas = defineComponent({
       return unref(designer?.model) === 'edit'
     })
 
-    watch( // keys['Ctrl']?.value, keys['Meta']?.value, 
-      () => keys['Shift']?.value,
-      (v1) => {
-        designer._ctrl.value = v1
+    watch( 
+      () => [keys['Ctrl']?.value, keys['Meta']?.value],
+      ([v1, v2]) => {
+        designer._ctrl.value = v1 || v2
       },
     )
 

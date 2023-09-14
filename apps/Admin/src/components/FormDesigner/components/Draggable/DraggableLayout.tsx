@@ -1,5 +1,5 @@
 
-import { cloneDeep, get, isEmpty, set } from 'lodash-es';
+import { cloneDeep, get, isEmpty, omit, set } from 'lodash-es';
 import DraggableWrap from './DragGableWrap'
 import Selection from '../Selection'
 import { FormItem } from 'jetlinks-ui-components'
@@ -49,6 +49,7 @@ const DraggableLayout = defineComponent({
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
+        const platform = navigator.platform.toLowerCase();
 
         const product = useProduct()
 
@@ -188,7 +189,7 @@ const DraggableLayout = defineComponent({
                                             <TypeComponent
                                                 model={unref(designer.model)}
                                                 data={element}
-                                                {..._props.componentProps}
+                                                {...omit(_props.componentProps, ['disabled'])}
                                             ></TypeComponent> : 
                                             <TypeComponent
                                                 data={element}
@@ -231,7 +232,7 @@ const DraggableLayout = defineComponent({
             multiDrag: true,
             itemKey: 'key',
             selectedClass: "sortable-selected",
-            multiDragKey: "SHIFT",
+            multiDragKey: platform.includes('mac') ? "Meta" : "Ctrl",
             group: { name: "j-canvas" },
             //拖动结束
             onEnd: (e) => {
