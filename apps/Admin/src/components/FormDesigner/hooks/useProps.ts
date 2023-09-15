@@ -5,14 +5,14 @@ const useProps = (element: any, _data: any, isEditModel: boolean, mode?: string)
   const rules = (element.formItemProps?.rules || []).map(item => {
     if (item?.validator) { // 处理自定义校验函数
       return {
-        ...omit(item, 'validator'),
+        ...omit(item, ['validator', 'key']),
         validator(rule, value, callback) {
           let customFn = new Function('rule', 'value', 'callback', item?.validator)
           return customFn(rule, value, callback)
         }
       }
     }
-    return item
+    return {...omit(item, 'key')}
   })
   // componentProps
   const _componentProps = {

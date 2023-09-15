@@ -55,14 +55,16 @@ export default defineComponent({
             return _path
         })
 
-        const data = ref<any[]>(get(designer.formState, __path.value) || [{}])
+        const data = ref<any[]>(get(designer.formState, __path.value) || [])
 
         const handleAdd = () => {
             const _item = generatorData({
                 type: props.data?.type + '-item',
                 children: [],
                 componentProps: {
-                    name: '列名' + uid(6)
+                    name: '列名' + uid(6),
+                    colSpan: 1,
+                    align: 'left'
                 },
                 formItemProps: {
                     name: uid(6),
@@ -82,6 +84,9 @@ export default defineComponent({
                     componentProps: {
                         name: '索引',
                         width: 60,
+                        colSpan: 1,
+                        align: 'left',
+                        // fixed: 'left',
                     },
                     formItemProps: {
                         name: 'index',
@@ -102,6 +107,9 @@ export default defineComponent({
                     componentProps: {
                         name: '操作',
                         width: 60,
+                        colSpan: 1,
+                        align: 'left',
+                        // fixed: 'right'
                     },
                     formItemProps: {
                         name: 'actions',
@@ -142,6 +150,22 @@ export default defineComponent({
             }
         }
 
+        const editContent = (element: any, dt: any) => {
+            return <Selection
+                class={
+                    unref(isDragArea) && 'drag-area'
+                }
+                data={element}
+                tag="div"
+                hasCopy={!['actions', 'index'].includes(element?.formItemProps?.name)}
+                hasDel={true}
+                hasMask={true}
+                parent={unref(list)}
+            >
+                {renderContent(element, dt)}
+            </Selection>
+        }
+
         return () => {
             return (
                 <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
@@ -149,43 +173,44 @@ export default defineComponent({
                         <FormItem {...unref(_formItemProps)}>
                             <Table
                                 pagination={false}
-                                dataSource={data.value}
-                                scroll={{ y: 300, x: 'max-content' }}
+                                dataSource={isEditModel.value ? [{}] : data.value}
+                                scroll={{ y: props.data.componentProps?.height, x: 'max-content' }}
                             >
                                 {
                                     unref(list).map(element => {
                                         return <TableColumn
                                             key={element.key}
-                                            {...omit(element.componentProps, 'name')}
-                                            align={props.data.componentProps?.align}
+                                            {...omit(element.componentProps, ['name', 'align'])}
+                                            align={element?.componentProps?.align || props.data.componentProps?.align}
                                             v-slots={{
                                                 title: () => {
-                                                    return <Selection
-                                                        class={
-                                                            unref(isDragArea) && 'drag-area'
-                                                        }
-                                                        data={element}
-                                                        tag="div"
-                                                        hasCopy={!['actions', 'index'].includes(element?.formItemProps?.name)}
-                                                        hasDel={true}
-                                                        parent={unref(list)}
-                                                    >
-                                                        {element.componentProps?.name}
-                                                    </Selection>
+                                                    return element.componentProps?.name
+                                                    // <Selection
+                                                    //     class={
+                                                    //         unref(isDragArea) && 'drag-area'
+                                                    //     }
+                                                    //     data={element}
+                                                    //     tag="div"
+                                                    //     hasCopy={!['actions', 'index'].includes(element?.formItemProps?.name)}
+                                                    //     hasDel={true}
+                                                    //     parent={unref(list)}
+                                                    // >
+                                                        // {element.componentProps?.name}
+                                                    // </Selection>
                                                 },
                                                 default: (dt: any) => {
-                                                    return renderContent(element, dt)
+                                                    return editContent(element, dt) // unref(isEditModel) ? editContent(element, dt) : renderContent(element, dt)
                                                 }
                                             }}
                                         />
                                     })
                                 }
                             </Table>
-                            <Button disabled={isEditModel.value} onClick={() => {
-                                if (!isEditModel.value) {
+                            {
+                                !unref(isEditModel) && <Button onClick={() => {
                                     data.value.push({})
-                                }
-                            }} style={{ width: '100%', marginTop: '10px' }}><AIcon type="PlusOutlined" />新增</Button>
+                                }} style={{ width: '100%', marginTop: '10px' }}><AIcon type="PlusOutlined" />新增</Button>
+                            }
                             {
                                 unref(isEditModel) &&
                                 <div class="draggable-add">

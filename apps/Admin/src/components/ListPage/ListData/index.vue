@@ -1,12 +1,16 @@
 <template>
-  <div className="filter-module-center">
+  <div className="filter-module-center" ref="listDataRef">
+    <img class="modal-config-img" :src="getImage('/list-page/data.png')" v-if="open">
     <j-drawer
       title=""
       placement="right"
+      width="560px"
       :closable="true"
       :visible="open"
+      :getContainer="() => $refs.listDataRef"
+      :destroyOnClose="true"
+      :wrap-style="{ position: 'absolute', zIndex: 1 }"
       @close="emits('update:open', false)"
-      width="560px"
     >
       <Table
         v-if="configState.type === ''"
@@ -21,12 +25,15 @@
         :asyncData="asyncData"
         :configChange="configChange"
         :errorList="errorList"
+        :bindData="dataBinds.columnBind"
+        :bind-function-id="dataBinds.data.function"
         tableType="columnData"
         @handleAdd="handleAdd"
         @configuration="configuration"
         @handleOk="handleOk"
         @bindData="bindData"
         @handleChange="(data) => dataSource = data"
+        @update-bind="(data) => dataBinds.columnBind = data"
       />
       <div v-else>
         <a-page-header title="表头配置" sub-title="" @back="goBack">
@@ -176,6 +183,7 @@ import Config from '@/components/ListPage/ListData/components/Configuration.vue'
 import { DATA_BIND } from '../keys'
 import { validListData } from './utils/valid'
 import { PropType } from 'vue'
+import { getImage } from '@jetlinks/utils';
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -432,14 +440,7 @@ const handleOk = (value: any, data: any) => {
       dataSource.value = data
       break
     case '2':
-      data?.map((item: any) => {
-        const dataFind = dataSource.value?.find(
-          (i: any) => i?.id === item?.id,
-        )
-        if (dataFind?.config !== item?.config) {
-          dataSource.value.push(item)
-        }
-      })
+      dataSource.value.push(...data)
       break
     case '3':
       break
@@ -532,27 +533,15 @@ watch(
   { immediate: true, deep: true },
 )
 
-// watch(() => [JSON.stringify(props.dataSource), JSON.stringify(dataBinds)], () => {
-//   if(!props.dataSource.length && dataBinds?.functionInfo?.configuration?.columns) {
-//     dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(
-//       (item) => {
-//         console.log(`output->item`,item)
-//         return {
-//           id: item.name,
-//           name: item.name,
-//           type: 'string',
-//         }
-//       },
-//     ) || []
-//   }
-// }, {immediate: true})
 
 const valid = () => {
-  return new Promise((resolve) => {
-    errorList.value = validListData(dataSource.value);
-    if(errorList.value.length) throw [{message: '列表数据配置错误'}]
-    else resolve(errorList.value)
-  })
+  errorList.value = validListData(dataSource.value)
+  return errorList.value.length ? [{message: '列表数据配置错误'}] : []
+  // return new Promise((resolve) => {
+  //   errorList.value = validListData(dataSource.value);
+  //   if(errorList.value.length) throw [{message: '列表数据配置错误'}]
+  //   else resolve(errorList.value)
+  // })
 }
 defineExpose({
   errorList,

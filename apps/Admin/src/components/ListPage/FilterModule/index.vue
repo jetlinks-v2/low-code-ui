@@ -1,12 +1,16 @@
 <template>
-  <div className="filter-module-center">
+  <div className="filter-module-center" ref="filterModuleRef">
+    <img class="modal-config-img" :src="getImage('/list-page/filter.png')" v-if="open">
     <j-drawer
-      title="配置"
+      title="筛选模块配置"
       placement="right"
+      width="560px"
       :closable="true"
       :visible="open"
+      :getContainer="() => $refs.filterModuleRef"
+      :wrap-style="{ position: 'absolute', zIndex: 1 }"
+      :destroyOnClose="true"
       @close="emits('update:open', false)"
-      width="560px"
     >
       <Table
         v-if="type === ''"
@@ -21,14 +25,17 @@
         tableType="filter"
         :asyncData="asyncData"
         :errorList="errorList"
+        :bindData="dataBinds.filterBind"
+        :bind-function-id="dataBinds.data.function"
         @handleAdd="handleAdd"
         @configuration="configuration"
         @handleOk="handleOk"
         @bindData="bindData"
         @handleChange="(data) => dataSource = data"
+        @update-bind="(data) => dataBinds.filterBind = data"
       />
       <div v-if="type !== ''">
-        <a-page-header title="配置筛选项" sub-title="配置筛选项" @back="goBack">
+        <a-page-header title=" " @back="goBack">
           <template #backIcon>
             <AIcon type="LeftOutlined" />
             返回
@@ -61,12 +68,14 @@
       </div>
 
       <template #footer v-if="type !== ''">
-        <j-button style="float: right" type="primary" @click="submit">
-          确定
-        </j-button>
-        <j-button style="float: right; margin-right: 8px" @click="goBack">
-          取消
-        </j-button>
+        <j-space>
+          <j-button @click="goBack">
+            取消
+          </j-button>
+          <j-button type="primary" @click="submit">
+            确定
+          </j-button>
+        </j-space>
       </template>
     </j-drawer>
   </div>
@@ -80,6 +89,7 @@ import {
   NumberType,
   DateType,
 } from '@/components/ListPage/FilterModule/components/index'
+import { getImage } from '@jetlinks/utils';
 
 import { validFilterModule } from './utils/valid'
 import { DATA_BIND } from '../keys'
@@ -265,14 +275,8 @@ const handleOk = (value: any, data: any) => {
       dataSource.value = data
       break
     case '2':
-      data?.forEach((item: any) => {
-        const dataFind: any = dataSource.value?.find(
-          (i: any) => i?.id === item?.id,
-        )
-        if (dataFind?.id !== item?.id) {
-          dataSource.value.push(item)
-        }
-      })
+      console.log(...data);
+      dataSource.value.push(...data)
       // if (configChange.value) {
       //   data?.map((item: any) => {
       //     const dataFind = dataSource.value?.find(
@@ -326,11 +330,13 @@ const goBack = () => {
  */
 const errorList: any = ref([])
 const valid = () => {
-  return new Promise((resolve, reject) => {
-    errorList.value = validFilterModule(dataSource.value)
-    if (errorList.value.length) reject([{message: '数据绑定配置错误'}])
-    else resolve([])
-  })
+  errorList.value = validFilterModule(dataSource.value)
+  return errorList.value.length ? [{message: '数据绑定配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validFilterModule(dataSource.value)
+  //   if (errorList.value.length) reject([{message: '数据绑定配置错误'}])
+  //   else resolve([])
+  // })
 }
 
 defineExpose({
@@ -351,20 +357,6 @@ watch(
   { immediate: true, deep: true },
 )
 
-// watch(() => [JSON.stringify(props.dataSource), JSON.stringify(dataBinds)], () => {
-//   if(!props.dataSource.length && dataBinds?.functionInfo?.configuration?.columns) {
-//     dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(
-//       (item) => {
-//         console.log(`output->item`,item)
-//         return {
-//           id: item.name,
-//           name: item.name,
-//           type: 'string',
-//         }
-//       },
-//     ) || []
-//   }
-// }, {immediate: true})
 </script>
 
 <style scoped lang="less"></style>

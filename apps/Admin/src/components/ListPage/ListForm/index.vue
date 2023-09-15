@@ -1,12 +1,16 @@
 <template>
-  <div class="list-form-center">
+  <div class="list-form-center" ref="listFormRef">
+    <img class="modal-config-img" :src="getImage('/list-page/form.png')" v-if="open">
     <j-drawer
       title="列表形态配置"
       placement="right"
+      width="560px"
       :closable="true"
       :visible="open"
+      :getContainer="() => $refs.listFormRef"
+      :destroyOnClose="true"
+      :wrap-style="{ position: 'absolute', zIndex: 1 }"
       @close="emits('update:open', false)"
-      width="560px"
     >
       <div v-if="!showType!.configurationShow">
         <p>数据展示方式</p>
@@ -69,6 +73,7 @@ import { cloneDeep } from 'lodash-es'
 import { validListForm } from './utils/valid'
 import { LIST_FORM_INFO, SHOW_TYPE_KEY } from '../keys';
 import { PropType } from 'vue';
+import { getImage } from '@jetlinks/utils';
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -177,11 +182,13 @@ const configuredChange = (value: string) => {
 
 const errorList = ref<any[]>([])
 const valid = () => {
-  return new Promise((resolve, reject) => {
-    errorList.value = validListForm(showType!,listFormInfo.value)
-    if(errorList.value.length) reject([{message: '列表形态配置错误'}])
-    else resolve([])
-  })
+  errorList.value = validListForm(showType!,listFormInfo.value)
+  return errorList.value.length ? [{message: '列表形态配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validListForm(showType!,listFormInfo.value)
+  //   if(errorList.value.length) reject([{message: '列表形态配置错误'}])
+  //   else resolve([])
+  // })
 }
 
 defineExpose({

@@ -6,6 +6,7 @@
       myIcon="SyncOutlined"
       size="small"
       :type="props.dataBind ? 'primary' : 'stroke'"
+      ghost
     >
       同步数据绑定
     </j-button>
@@ -25,6 +26,7 @@
         <template #headerCell="{ column }">
           <template v-if="column.tips">
             <span>
+              {{ column.title }}
               <j-popover trigger="hover">
                 <template #content>
                   <div class="hover-tips">
@@ -39,7 +41,6 @@
                 </template>
                 <AIcon type="QuestionCircleOutlined" />
               </j-popover>
-              {{ column.title }}
             </span>
           </template>
         </template>
@@ -54,53 +55,41 @@
           </ErrorItem>
         </template>
         <template #action="{ data }">
-          <span>
-            <a @click="configuration(data)">配置</a>
-            <j-divider type="vertical" />
+          <j-space>
+            <j-button type="link" @click="configuration(data)">配置</j-button>
             <JPopconfirm
               @confirm="confirm(data)"
               :loading="loading"
               title="确定删除此数据？"
             >
-              <a>删除</a>
+              <j-button type="text" danger>删除</j-button>
             </JPopconfirm>
-          </span>
+          </j-space>
         </template>
       </j-data-table>
     </div>
     <br />
     <j-button
       class="editable-add-btn"
-      style="margin-bottom: 8px"
-      type="link"
       @click="handleAdd"
+      type="dashed"
     >
       + {{ props.addBtnName }}
     </j-button>
     <!--处理方式弹窗-->
     <j-modal
       :visible="visible"
+      width="800px"
       title="数据绑定内容有变动，请选择处理方式"
       @ok="handleOk"
       @cancel="handleCancel"
       class="handle-modal"
     >
-      <j-row :gutter="16">
-        <j-col
-          :span="8"
-          v-for="(item, index) in props.handleOptions"
-          :key="index"
-        >
-          <j-card
-            style="height: 150px"
-            @click="() => handleSelect(item.value)"
-            :class="activeKey === item.value ? 'active' : 'data-handle'"
-          >
-            <p class="custom-label">{{ item.label }}</p>
-            <p class="custom-sub-label">{{ item.subLabel }}</p>
-          </j-card>
-        </j-col>
-      </j-row>
+    <j-card-select v-model:value="activeKey" float="right" :options="handleOptions">
+      <template #image="data">
+        <img :src="getImage(data.option.image)">
+      </template>
+    </j-card-select>
     </j-modal>
   </div>
 </template>
@@ -109,8 +98,9 @@
 import { onlyMessage } from '@/utils/comm'
 import { ErrorItem } from '../..'
 import type { PropType } from 'vue'
-import { DATA_BIND } from '../../keys';
 import { useProduct } from '@/store';
+import { getImage } from '@jetlinks/utils';
+import { cloneDeep } from 'lodash-es';
 const props = defineProps({
   title: {
     type: String,
@@ -164,16 +154,19 @@ const props = defineProps({
         value: '1',
         label: '覆盖',
         subLabel: '以下功能的数据覆盖页面已有内容',
+        image: '/list-page/cover.png',
       },
       {
         value: '2',
         label: '追加',
         subLabel: '在页面已有内容的基础上追加新增内容',
+        image: '/list-page/append.png',
       },
       {
         value: '3',
         label: '忽略',
         subLabel: '保留页面已有内容，忽略变动',
+        image: '/list-page/ignore.png',
       },
     ],
   },
@@ -187,6 +180,15 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  //绑定功能表数据
+  bindData: {
+    type: Array as PropType<Record<string, any>>,
+    default: () => []
+  },
+  bindFunctionId: {
+    type: String,
+    default: ''
+  }
 })
 
 enum javaType {
@@ -222,7 +224,6 @@ enum filterType {
 
 const tableRef = ref()
 const visible = ref<boolean>(false)
-const dataBinds: any = inject(DATA_BIND)
 const loading = ref<boolean>(false)
 const emit = defineEmits([
   'configuration',
@@ -232,14 +233,15 @@ const emit = defineEmits([
   'handleOk',
   'handleChange',
   'update:data',
-  'bindData'
+  'bindData',
+  'updateBind'
 ])
 
 const handleChange = (data) => {
   emit('handleChange', data)
 }
 
-const activeKey = ref('1')
+const activeKey = ref(['1'])
 
 const errorData = computed(() => {
   return (val: string): any => {
@@ -367,14 +369,21 @@ const syncData = async () => {
     bindShow.value = false
     return onlyMessage('请先完成数据绑定', 'error')
   }
-  asyncDataBind()
-  // tempData.value = await tableRef.value?.getData()
-  // if (data?.length !== props.dataSource?.length || props.configChange) {
+  const changeFunctionData = asyncDataBind()
   if(!props.dataSource.length) {
     handleChange(tempData.value)
     return
   }
-  if (dataBinds.functionInfo?.configuration?.columns?.length !== tempData.value.length) {
+  tempData.value = [];
+  changeFunctionData.forEach((item) => {
+    let find = props.bindData?.find((i) => i.alias === item.alias)
+    if(!find) tempData.value.push({
+      id: item.alias,
+      name: item.comment,
+      type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
+    })
+  })
+  if (tempData.value.length) {
     openModel(props.modelActiveKey)
   } else {
     onlyMessage('已是最新数据', 'success')
@@ -382,17 +391,9 @@ const syncData = async () => {
 }
 
 const productStore = useProduct()
-const asyncDataBind = async () => {
-  const functionId = dataBinds.data.function.split('.')
-  tempData.value = productStore.getById(functionId[functionId.length - 1])?.configuration?.columns?.map((item) => {
-      return {
-        id: item.alias,
-        name: item.comment,
-        type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
-      }
-    },
-  ) || []
-  
+const asyncDataBind = () => {
+  const functionId = props.bindFunctionId.split('.')
+  return productStore.getById(functionId[functionId.length - 1])?.configuration?.columns || []
 }
 //打开弹窗
 const openModel = (value: any) => {
@@ -401,24 +402,29 @@ const openModel = (value: any) => {
 }
 //处理方式弹窗
 const handleOk = async () => {
-  const dataSource = tempData.value
+  const newBind = asyncDataBind()
+  const dataSource = activeKey.value?.[0] === '1' ? newBind.map((item) => {
+    return {
+      id: item.alias,
+      name: item.comment,
+      type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
+    }
+  }) : tempData.value
+  emit('updateBind', cloneDeep(newBind))
   tableRef.value.cleanEditStatus()
-  emit('handleOk', activeKey.value, dataSource)
+  emit('handleOk', activeKey.value?.[0], dataSource)
   visible.value = false
 }
 const handleCancel = () => {
   visible.value = false
 }
-const handleSelect = (key: string) => {
-  activeKey.value = key
-}
 
-const tempData = ref([])
+const tempData = ref<any[]>([])
 
-watch(() => JSON.stringify(dataBinds), () => {
-  if(!dataBinds.function) asyncData.value = false;
+watch(() => props.bindFunctionId, () => {
+  if(!props.bindFunctionId) asyncData.value = false;
   bindShow.value = true
-  tempData.value = props.dataSource.length ? props.dataSource : dataBinds.functionInfo?.configuration?.columns?.map(
+  tempData.value = props.dataSource.length ? props.dataSource : props.bindData?.map(
     (item) => {
       return {
         id: item.alias,
@@ -438,6 +444,9 @@ watch(() => JSON.stringify(dataBinds), () => {
   }
   .table {
     padding-top: 18px;
+  }
+  .editable-add-btn{
+    width: 100%;
   }
 }
 .handle-modal {
@@ -463,5 +472,21 @@ watch(() => JSON.stringify(dataBinds), () => {
 
 :deep(.ant-table-cell) {
   text-align: left !important;
+}
+:deep(.ant-btn-link) {
+  padding: 0 !important;
+}
+:deep(.ant-btn-text) {
+  padding: 0 !important;
+}
+:deep(.j-card-item.active) {
+  background-color: var(--ant-primary-color);
+  color: #ffffff;
+  .sub-title {
+    color: #ffffff !important;
+  }
+}
+:deep(.sub-title) {
+  color: #666666 !important;
 }
 </style>

@@ -73,7 +73,7 @@ watch(
 .content-files {
   //border-top: 1px solid #515665;
   //border-bottom: 1px solid #515665;
-  height: calc(100% - 44px);
+  height: calc(100% - 40px);
   user-select: none;
 
   .content-tabs {
@@ -134,7 +134,7 @@ watch(
     height: calc(100% - 100px);
     background-color: rgb(255, 255, 255);
     position: absolute;
-    top: 56px;
+    top: 60px;
     width: calc(100% - 320px);
     z-index: 2;
   }

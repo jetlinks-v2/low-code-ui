@@ -147,7 +147,7 @@ const Selection = defineComponent({
 
     expose({ setVisible, setOptions, setValue, setDisabled })
 
-    const maskNode = () => {
+    const editNode = () => {
       return <Dropdown
         trigger={['contextmenu']}
         onContextmenu={withModifiers(() => {
@@ -170,12 +170,16 @@ const Selection = defineComponent({
           }
         }}
       >
-        <div class={['mask']}></div>
+        <div style={{position: 'relative'}}>
+          {slots?.default()}
+          {props.hasMask && <div class={['mask']}></div>}
+        </div>
       </Dropdown>
     }
 
     const renderSelected = () => {
       return <TagComponent
+        data-id={props.data?.key}
         class={[
           'selectElement',
           unref(isEditModel) && unref(_hasDrag) && 'handle',
@@ -188,7 +192,7 @@ const Selection = defineComponent({
         {...useAttrs()}
         onClick={withModifiers(handleClick, ['stop'])}
       >
-        {slots?.default()}
+        {unref(isEditModel) ? editNode() : slots?.default()}
         {
           unref(isEditModel) && Selected.value && !isMultiple.value && (
             <div class="bottomRight">
@@ -215,7 +219,6 @@ const Selection = defineComponent({
             </div>
           )
         }
-        {unref(isEditModel) && props.hasMask && maskNode()}
       </TagComponent>
     }
 

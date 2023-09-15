@@ -6,7 +6,7 @@
       v-model:visible="visible"
       title="快速添加"
       placement="right"
-      :width="550" 
+      :width="550"
     >
       <p>自由组合快速添加表单页内容</p>
       <div class="content">
@@ -183,7 +183,7 @@ const sourceList = computed(() => {
       label: '输入',
       value: 'inputs',
       disabled: true,
-      children: getArray(_item?.inputs || [], ''),
+      children: getArray(_item?.inputs || [], 'inputs'),
     })
   }
   if (_item?.output && _item?.output?.properties?.length) {
@@ -191,7 +191,7 @@ const sourceList = computed(() => {
       label: '输出',
       value: 'output',
       disabled: true,
-      children: getArray(_item?.output?.properties || [], ''),
+      children: getArray(_item?.output?.properties || [], 'output'),
     })
   }
   return arr
@@ -210,6 +210,13 @@ watch(
   () => visible.value,
   () => {
     if (visible.value) {
+      modelRef.json = undefined
+      modelRef.formCopy = []
+      modelRef.source = {
+        functionId: undefined,
+        commandId: undefined,
+        sourceData: undefined,
+      }
       getEnd()
     }
   },
@@ -385,8 +392,8 @@ const onOk = () => {
 
 <style lang="less" scoped>
 .content {
-  background-color: #F7F8F9;
-  border: 1px solid #F0F2F5;
+  background-color: #f7f8f9;
+  border: 1px solid #f0f2f5;
   padding: 16px;
 }
 .btn {

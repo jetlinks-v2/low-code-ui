@@ -6,6 +6,7 @@
           v-model:expandedKeys="expandedKeys"
           :selectedKeys="[activeFile]"
           :treeData="treeData"
+          block-node
           :fieldNames="{
             key: 'id'
           }"
@@ -13,7 +14,10 @@
         >
           <template #title="node">
             <j-dropdown :trigger="['contextmenu']">
-              <span>{{ node.title }}</span>
+              <span class="title">
+                <div class="icon"><img :src="providerImages[node.type]"></div>
+                {{ node.title }}
+              </span>
               <template #overlay>
                 <RightMenu :node="node" @click="menuClick" />
               </template>
@@ -42,6 +46,7 @@ import { providerEnum } from "@/components/ProJect/index";
 import { randomString } from '@jetlinks/utils'
 import { defaultSetting as CrudBaseData } from '@/components/Database/setting'
 import { onlyMessage } from '@jetlinks/utils';
+import { providerImages } from '@/components/ProJect/index'
 
 const engine = useEngine()
 const product = useProduct()
@@ -157,6 +162,29 @@ const menuClick = (record) => {
 
   .tree-content-body {
     height: 100%;
+    padding: 0 12px;
+    :deep(.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected){
+      background-color: #F6F7F9;
+      color: #315EFB;
+      img{
+        transform: translateX(100px);
+        filter: drop-shadow(-100px 0px 0px #315EFB);
+      }
+    }
+    :deep(.ant-tree-switcher){
+      line-height: 40px;
+    }
+    .title{
+      display: flex;
+      height: 40px;
+      line-height: 40px;
+      font-size: 16px;
+    
+      .icon{
+        margin-right: 10px;
+        overflow: hidden;
+      }
+    }
   }
   //:deep(.ant-tree) {
   //  background-color: transparent;

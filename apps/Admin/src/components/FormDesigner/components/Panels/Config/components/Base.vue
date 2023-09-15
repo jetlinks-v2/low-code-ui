@@ -138,9 +138,15 @@
       </template>
       <template v-if="['card', 'collapse', 'tabs'].includes(type)">
         <j-form-item
-          required
           label="容器组件"
           :name="['formItemProps', 'isLayout']"
+          :rules="[
+            {
+              required: true,
+              message: '请选择',
+              trigger: 'change',
+            },
+          ]"
         >
           <j-switch
             v-model:checked="target.formItemProps.isLayout"
@@ -185,7 +191,7 @@
       <template v-if="['collapse-item'].includes(type)">
         <j-form-item
           label="名称"
-          :name="['componentProps', 'header']"
+          :name="['componentProps', 'name']"
           :rules="[
             {
               required: true,
@@ -198,7 +204,7 @@
             placeholder="请输入"
             :maxlength="64"
             @change="onDataChange"
-            v-model:value="target.componentProps.header"
+            v-model:value="target.componentProps.name"
           />
         </j-form-item>
         <j-form-item
@@ -216,18 +222,22 @@
         </j-form-item>
       </template>
       <template v-if="['tabs-item'].includes(type)">
-        <j-form-item label="名称" :name="['componentProps', 'tab']" :rules="[
-          {
-            required: true,
-            message: '请输入名称',
-            trigger: 'change',
-          },
-        ]">
+        <j-form-item
+          label="名称"
+          :name="['componentProps', 'name']"
+          :rules="[
+            {
+              required: true,
+              message: '请输入名称',
+              trigger: 'change',
+            },
+          ]"
+        >
           <j-input
             placeholder="请输入"
             :maxlength="64"
             @change="onDataChange"
-            v-model:value="target.componentProps.tab"
+            v-model:value="target.componentProps.name"
           />
         </j-form-item>
         <j-form-item
@@ -275,6 +285,29 @@
             @change="onDataChange"
             v-model:value="target.formItemProps.name"
           />
+        </j-form-item>
+        <j-form-item
+          label="表头跨列"
+          :name="['componentProps', 'colSpan']"
+          required
+        >
+          <j-input-number
+            placeholder="请输入表头跨列"
+            @change="onDataChange"
+            style="width: 100%"
+            v-model:value="target.componentProps.colSpan"
+          />
+        </j-form-item>
+        <j-form-item label="内容对齐" :name="['componentProps', 'align']">
+          <j-select
+            v-model:value="target.componentProps.align"
+            placeholder="请选择"
+            @change="onDataChange"
+          >
+            <j-select-option :value="'left'">左</j-select-option>
+            <j-select-option :value="'right'">右</j-select-option>
+            <j-select-option :value="'center'">中</j-select-option>
+          </j-select>
         </j-form-item>
       </template>
       <template v-if="['grid', 'space'].includes(type)">
@@ -397,7 +430,7 @@ const emits = defineEmits(['refresh'])
 
 const onSwitch = (_checked: boolean) => {
   target.value.formItemProps.label = _checked ? target.value.name : undefined
-  target.value.formItemProps.name = undefined
+  // target.value.formItemProps.name = undefined
   emits('refresh', target.value)
 }
 
@@ -459,6 +492,7 @@ const rules = [
       if (flag) return Promise.reject(`标识${value}已被占用`)
       return Promise.resolve()
     },
+    trigger: 'change',
   },
 ]
 
