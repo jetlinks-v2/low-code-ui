@@ -52,7 +52,8 @@
       </div>
     </div>
     <div class="status-theme">
-      <div>
+      <TitleComponent data="主题色配置"></TitleComponent>
+      <div style="margin-bottom: 4px">
         主题色
       </div>
       <a-select
@@ -161,7 +162,7 @@ const validateContent = reactive({
 const nextCheck = async () => {
   const _id = Object.keys(status)[validateContent.step]
   if (validateContent.step >= Object.keys(status).length) {
-    emit('update:status', Object.keys(statusMsg).length)
+    emit('update:status', Object.values(statusMsg).filter(a => a.length).length)
     check.type = 'end'
   } else {
     check.type = 'loading'
