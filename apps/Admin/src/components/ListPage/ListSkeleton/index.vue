@@ -283,7 +283,7 @@ watchEffect(() => {
 @paginationBg: #C3D1FF;
 
 .list-skeleton {
-  height: calc(100% - 48px);
+  height: calc(100% - 70px);
   width: 100%;
   display: flex;
   .mb-50 {
