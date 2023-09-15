@@ -25,9 +25,10 @@
         <j-tab-pane key="3" >
           <template #tab>
             高级配置
-            <j-badge v-if="errorTips.relation || errorTips.asset" :count="errorTips.asset + errorTips.relation" />
+            <j-badge v-if="errorTips.relation.length" :count="errorTips.relation.length" />
           </template>
           <Advanced
+            ref="advancedRef"
             v-model:tree="tree"
             v-model:asset="asset"
             v-model:relation="relation"
@@ -86,6 +87,7 @@ const props = defineProps({
 
 const tableColumns = ref([])
 const dataTableRef = ref()
+const advancedRef = ref()
 
 const project = useProduct()
 
@@ -105,12 +107,9 @@ const loading = ref(false)
 
 const update = () => {
   const { configuration, ...extra} = props
-  if (errorTips.relation && (!relation.value.enabled || relation.value.assetIdColumn)) {
-    errorTips.relation = 0
-  }
 
-  if (errorTips.asset && (!asset.value.enabled || asset.value.assetIdColumn)) {
-    errorTips.asset = 0
+  if (errorTips.relation && (!relation.value.enabled || relation.value.assetIdColumn)) {
+    errorTips.relation = []
   }
 
   project.update({
@@ -126,68 +125,66 @@ const update = () => {
 }
 
 const errorTips = reactive({
-  dataTable: {}
+  dataTable: {},
+  relation: []
 })
 
 const errorDataTableLength = computed(() => {
-  return Object.keys(errorTips.dataTable).length
+  return errorTips.dataTable ? Object.keys(errorTips.dataTable).length : false
 })
 
 
 const validate = async () => {
   loading.value = ref(true)
-  errorTips.relation = 0
-  errorTips.asset = 0
+  errorTips.relation = {}
 
-  if (relation.value.enabled && !relation.value.relationType) {
-    errorTips.relation = 1
-  }
-
-  if (asset.value.enabled && !asset.value.assetIdColumn) {
-    errorTips.asset += 1
+  try {
+    await advancedRef.value.validates()
+    errorTips.relation = []
+  } catch (e) {
+    errorTips.relation = e
   }
 
   try {
-    const resp = await dataTableRef.value.validates()
+    await dataTableRef.value.validates()
     errorTips.dataTable = {}
   } catch (e) {
 
-    errorTips.dataTable = e
+    errorTips.dataTable = e.errorFields || {}
   }
 
-
-  const res = await executeReq('rdb-crud', 'CheckTableName', { tableName: tableName.value, ownerId: ownerId.value }).finally(() => loading.value = false)
-  if (res.success && res.result) {
-    errorTips.dataTable['tableName'] = 1
-  } else {
-    delete errorTips.dataTable['tableName']
-  }
   loading.value = false
 }
 
 defineExpose({
   validate: () => {
     return new Promise(async (resolve, reject) => {
-      resolve()
-      // await validate()
-      // const err = []
+      await validate()
+      const err = []
+
+      console.log(errorTips.relation)
+      if(errorTips.relation.length) {
+        errorTips.relation.forEach(a => {
+          err.push({ id: a.name[0], message: a.errors[0]})
+        })
+      }
       // if (errorTips.relation) {
       //   err.push({
       //     message: '请配置关系标识'
       //   })
       // }
-
+      //
       // if (errorTips.asset) {
       //   err.push({
       //     message: '请配置资产列名称'
       //   })
       // }
-      // if(Object.keys(errorTips.dataTable).length) {
-      //   Object.values(errorTips.dataTable).forEach(a => {
-      //     err.push(a[0])
-      //   })
-      // }
-      // !err.length ? resolve() : reject(err)
+      if(Object.keys(errorTips.dataTable).length) {
+        Object.values(errorTips.dataTable).forEach(a => {
+          err.push(a[0])
+        })
+      }
+      !err.length ? resolve() : reject(err)
     })
   }
 })
