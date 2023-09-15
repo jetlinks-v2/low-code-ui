@@ -54,6 +54,14 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
     },
   },
   {
+    path: '/model',
+    name: 'Model',
+    component: () => import('@/views/model/index.vue'),
+    meta: {
+      title: '测试页',
+    },
+  },
+  {
     path: '/card',
     name: 'Card',
     component: () => import('@/views/demo/Card.vue'),
