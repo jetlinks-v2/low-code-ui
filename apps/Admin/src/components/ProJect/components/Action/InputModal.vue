@@ -22,11 +22,12 @@ import { regular } from '@jetlinks/utils';
 // import { providerList } from './index';
 import { onKeyStroke } from '@vueuse/core'
 import { providerEnum, providerMap } from '../../index'
-import { useEngine } from '@/store'
+import { useEngine, useProduct } from '@/store'
 import { randomString } from '@jetlinks/utils'
 import { defaultSetting as CrudBaseData } from '@/components/Database/setting'
 
 const engine = useEngine()
+const product = useProduct()
 
 type Emits = {
     (e: 'save', data: any): void;
@@ -49,7 +50,7 @@ const props = defineProps({
     },
     nameList:{
         type:Array,
-        default:[]
+        default:() => []
     }
 })
 
@@ -81,7 +82,10 @@ const getConfiguration = (type) => {
         sql: undefined
       };
     case providerEnum.CRUD:
+      const productId = product.info.id.substr(0, 4)
+      const moduleId = (props.data.parentId || engine.activeFile).substr(0, 4)
       return {
+        tableName: `${productId}_${moduleId}_${randomString(3)}`,
         columns: CrudBaseData
       };
     case providerEnum.Function:
