@@ -167,7 +167,12 @@
       <j-form-item
         label="支持模糊搜索"
         :name="['componentProps', 'showSearch']"
-        required
+        :rules="[
+          {
+            required: true,
+            message: '请选择',
+          },
+        ]"
       >
         <j-switch
           @change="onDataChange"
