@@ -1,14 +1,14 @@
 <template>
-  <div class="menu-config">
+  <div class="menu-config" ref="menuConfig">
     <div class="card">
       <h3>基本信息</h3>
       <p>页面名称</p>
-      <j-input v-model:value="baseInfo.title" disabled/>
+      <j-input v-model:value="baseInfo.title" disabled />
 
       <h3 class="title">设置该页面为系统主菜单</h3>
       <j-form ref="basicFormRef" :model="form" class="basic-form">
         <j-form-item name="main">
-          <j-switch v-model:checked="form!.main"/>
+          <j-switch v-model:checked="form!.main" />
         </j-form-item>
         <template v-if="form!.main">
           <j-form-item
@@ -30,12 +30,12 @@
                       中文名将应用于系统菜单名称、面包屑等位置，建议设置2-8个字符
                     </p>
                   </template>
-                  <AIcon type="InfoCircleOutlined"/>
+                  <AIcon type="InfoCircleOutlined" />
                 </j-tooltip>
               </span>
             </template>
             <ErrorItem :error-data="errorData('name')">
-              <j-input v-model:value="form!.name"/>
+              <j-input v-model:value="form!.name" />
             </ErrorItem>
           </j-form-item>
           <j-form-item
@@ -50,25 +50,23 @@
             ]"
             style="flex: 0 0 186px"
           >
-              <div class="icon-upload has-icon" v-if="form!.icon">
-                <AIcon :type="form!.icon" style="font-size: 50px"/>
-                <span class="mark" @click="dialogVisible = true">点击修改</span>
-              </div>
+            <div class="icon-upload has-icon" v-if="form!.icon">
+              <AIcon :type="form!.icon" style="font-size: 20px" />
+              <span class="mark" @click="dialogVisible = true"></span>
+            </div>
 
-              <div class="icon-upload no-icon" v-else>
-            <ErrorItem :error-data="errorData('icon')">
+            <div class="icon-upload no-icon" v-else>
+              <ErrorItem :error-data="errorData('icon')">
                 <div
                   @click="dialogVisible = true"
-                  style="width: 100px; height: 100px;display: flex; align-items: center;justify-content: center;"
+                  class="choose-icon"
                 >
                   <span>
-                    <AIcon type="PlusOutlined" style="font-size: 20px"/>
-                    <p>点击选择图标</p>
+                    <AIcon type="PlusOutlined" style="font-size: 20px" />
                   </span>
                 </div>
-            </ErrorItem>
-
-              </div>
+              </ErrorItem>
+            </div>
           </j-form-item>
         </template>
       </j-form>
@@ -78,26 +76,30 @@
   <ChooseIconDialog
     v-model:visible="dialogVisible"
     @confirm="(typeStr:string)=>form!.icon = typeStr"
+    :refs="$refs.menuConfig"
   />
 </template>
 <script setup lang="ts">
 import ChooseIconDialog from '@/components/ListPage/MenuConfig/components/icon.vue'
 import { BASE_INFO, MENU_CONFIG } from '../../keys'
-import { useAllListDataStore } from '@/store/listForm';
-import { ErrorItem } from '../..';
+import { useAllListDataStore } from '@/store/listForm'
+import { ErrorItem } from '../..'
 
 const props = defineProps({
   errorList: {
     type: Array,
     default: () => [],
   },
+  refs: {
+    type: Object,
+  }
 })
 
 const dialogVisible = ref<boolean>(false)
 const baseInfo = inject(BASE_INFO)
 const form = inject(MENU_CONFIG)
 const emits = defineEmits(['change', 'update:open', 'confirm'])
-const configurationStore = useAllListDataStore();
+const configurationStore = useAllListDataStore()
 
 const errorData = computed(() => {
   return (val: string): any => {
@@ -124,11 +126,12 @@ watch(
   (value) => {
     emits('change', value)
     emits('update:form', form)
-  }, {deep: true}
+  },
+  { deep: true },
 )
 defineExpose({
   vaildate: onCheck,
-  form: form
+  form: form,
 })
 </script>
 <style lang="less" scoped>
@@ -184,16 +187,24 @@ defineExpose({
 
       :deep(.ant-form-item-control-input-content) {
         .icon-upload {
-          width: 100px;
-          height: 100px;
-          border: 1px dashed #d9d9d9;
+          width: 48px;
+          height: 48px;
           font-size: 14px;
           display: flex;
           justify-content: center;
           align-items: center;
           text-align: center;
           cursor: pointer;
+          border-radius: 4px;
           transition: 0.5s;
+          .choose-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed #d9d9d9;
+          }
 
           &:hover {
             border-color: #415ed1;
@@ -203,6 +214,7 @@ defineExpose({
         .has-icon {
           position: relative;
           text-align: center;
+          background-color: rgba(0, 0, 0, 0.06);
 
           .mark {
             position: absolute;

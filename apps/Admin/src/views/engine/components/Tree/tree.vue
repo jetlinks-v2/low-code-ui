@@ -86,40 +86,8 @@ const close = () => {
   menuState.nameList = []
 }
 
-const getConfiguration = (type) => {
-  switch (type) {
-    case providerEnum.SQL:
-      return {
-        sql: undefined
-      };
-    case providerEnum.CRUD:
-      return {
-        columns: CrudBaseData
-      };
-    case providerEnum.Function:
-      return {
-        lang: undefined,
-        script: ''
-      };
-    case providerEnum.FormPage:
-      return {
-        type: 'form',
-        code: ''
-      };
-    case providerEnum.ListPage:
-      return {
-        type: 'list',
-        code: ''
-      };
-    case providerEnum.HtmlPage:
-      return {
-        type: 'html',
-        code: ''
-      };
-  }
-}
-
 const save = (data) => {
+  console.log(data)
   const node = menuState.cacheData
   // console.log('---data',data,menuState.type)
   const parentId = node.type === providerEnum.Module ? node.id : node.parentId
@@ -127,15 +95,15 @@ const save = (data) => {
     product.update(data)
   }else{
     product.add({
-    name:data.name,
-    others:data.others,
-    id: randomString(16),
-    title: data.name,
-    type: data.others.type,
-    configuration: getConfiguration(data.others.type),
-    parentId: parentId,
-    children:data.children
-  }, parentId)
+      name:data.name,
+      others:data.others,
+      id: randomString(16),
+      title: data.name,
+      type: data.others.type,
+      configuration: data.configuration,
+      parentId: parentId,
+      children:data.children
+    }, parentId)
   }
   close()
 }

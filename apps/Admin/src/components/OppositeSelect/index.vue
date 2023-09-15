@@ -1,7 +1,14 @@
 
 <template>
-    <j-select v-model:value="_value" max-tag-count="responsive" mode="multiple" placeholder="请选择" style="width:100%"
-        @change="onChange">
+    <j-select
+      allowClear
+      v-model:value="_value"
+      max-tag-count="responsive"
+      mode="multiple"
+      placeholder="请选择"
+      style="width:100%"
+      @change="onChange"
+    >
         <j-select-option :value="defaultOption.value" :disabled="_value?.length && !_value?.includes('default')">{{
             defaultOption.label }}</j-select-option>
         <j-select-option v-for="item in options" :value="item.value" :disabled="_value?.includes('default')">{{ item.label
@@ -30,17 +37,15 @@ const props = defineProps({
     value: Array
 })
 
-const emits = defineEmits(['update:value'])
+const emits = defineEmits(['update:value', 'change'])
 
 const _value = ref(props.defaultOption.value ? [props.defaultOption.value] : undefined)
 
 const onChange = (val) => {
     // console.log('val', val)
-    if (val.includes('default')) {
-        emits('update:value', [])
-    } else {
-        emits('update:value', val.length === 0 ? undefined : val)
-    }
+    let _val = val.includes('default') ? [] : val.length === 0 ? undefined : val
+    emits('update:value', _val)
+    emits('change', _val)
 }
 
 watch(
