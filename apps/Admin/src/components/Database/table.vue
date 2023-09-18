@@ -77,7 +77,7 @@
             :tooltip="{ title: '新增'}"
             @click="() => add(index)"
           >
-            <AIcon type="PlusSquareOutlined" />
+            <AIcon type="PlusCircleOutlined" />
           </PermissionButton>
           <PermissionButton
             v-if="index > maxLen"
@@ -91,8 +91,10 @@
           </PermissionButton>
           <PermissionButton
             v-if="index > maxLen"
+            danger
             type="link"
             class="action-btn"
+            placement="topRight"
             :hasPermission="true"
             :tooltip="{ title: '删除'}"
             :popConfirm="{
@@ -105,20 +107,22 @@
         </j-space>
       </template>
     </QuickEditTable>
-    <SettingModal
-      v-if="setting.visible"
-      :data="setting.data"
-      @cancel="settingCancel"
-      @save="settingSave"
-    />
+
   </div>
+  <SettingModal
+    v-if="setting.visible"
+    :data="setting.data"
+    :warp="WarpRef"
+    @cancel="settingCancel"
+    @save="settingSave"
+  />
 </template>
 
 <script setup name="CRUDTable">
 import { upperCase } from "@/utils/comm";
 import { executeReq } from '@/api/basis'
 import { cloneDeep, debounce, omit } from 'lodash-es'
-import { TYPE_PROVIDE, CRUD_COLUMNS } from "@/components/Database/util";
+import {TYPE_PROVIDE, CRUD_COLUMNS, WARP_REF} from "@/components/Database/util";
 import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly } from './components'
 import { provide } from 'vue'
 import { defaultSetting, defaultTreeSetting } from './setting'
@@ -259,6 +263,7 @@ const setting = reactive({
 })
 
 const CrudColumns = inject(CRUD_COLUMNS)
+const WarpRef = inject(WARP_REF)
 
 const tableNameRule = [{
   trigger: 'blur',
@@ -452,7 +457,6 @@ const getTypes = () => {
 }
 
 watch(() => props.tree, () => {
-  console.log('watch', props.columns)
   if (dataSource.value.length) {
     const isTreeNow = dataSource.value[1].name === 'parent_id'
     const arr = JSON.parse(JSON.stringify(dataSource.value))

@@ -1,9 +1,14 @@
 <template>
   <div class="data-warp">
     <div class="tips">
-      正在查看 {{ project.info.version }} 发布版本下的 {{total}} 条数据
+      <span v-if="project.published">
+        正在查看 {{ project.info.version }} 发布版本下的 {{total}} 条数据
+      </span>
+      <span v-else>
+        暂无数据，请发布后查看
+      </span>
     </div>
-    <div class="table">
+    <div class="table" v-if="project.published">
       <j-pro-table
         model="TABLE"
         :columns="myColumns"
@@ -61,7 +66,6 @@ const getData = async (params) => {
 
 <style scoped lang="less">
 .data-warp {
-  padding: 0 24px;
   .tips {
     color: #3f3f3f;
   }
