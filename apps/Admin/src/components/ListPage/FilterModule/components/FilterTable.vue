@@ -234,7 +234,8 @@ const emit = defineEmits([
   'handleChange',
   'update:data',
   'bindData',
-  'updateBind'
+  'updateBind',
+  'update:asyncData'
 ])
 
 const handleChange = (data) => {
@@ -362,7 +363,6 @@ const confirm = (data: any) => {
 }
 const bindShow = ref(false)
 //是否同步数据绑定
-const asyncData = ref(props.asyncData)
 //同步数据绑定
 const syncData = async () => {
   if (!props.dataBind) {
@@ -370,8 +370,15 @@ const syncData = async () => {
     return onlyMessage('请先完成数据绑定', 'error')
   }
   const changeFunctionData = asyncDataBind()
-  if(!props.dataSource.length) {
-    handleChange(tempData.value)
+  if(!props.asyncData) { 
+    handleChange([...props.dataSource, ...asyncDataBind().map(item => {
+      return {
+        id: item.alias,
+        name: item.comment,
+        type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
+      }
+    })])
+    emit('update:asyncData', true)
     return
   }
   tempData.value = [];
@@ -422,7 +429,7 @@ const handleCancel = () => {
 const tempData = ref<any[]>([])
 
 watch(() => props.bindFunctionId, () => {
-  if(!props.bindFunctionId) asyncData.value = false;
+  if(!props.bindFunctionId) emit('update:asyncData', false);
   bindShow.value = true
   tempData.value = props.dataSource.length ? props.dataSource : props.bindData?.map(
     (item) => {

@@ -9,7 +9,7 @@
       :visible="open"
       :getContainer="() => $refs.listFormRef"
       :destroyOnClose="true"
-      :wrap-style="{ position: 'absolute', zIndex: 1 }"
+      :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
       @close="emits('update:open', false)"
     >
       <div v-if="!showType!.configurationShow">
