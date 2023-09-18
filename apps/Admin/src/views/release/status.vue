@@ -2,12 +2,17 @@
   <div class="release-status">
     <div class="status-tree">
       <div class="status-result">
-        总共 {{ Object.keys(status).length }} 条
+        总共  <span class="processing">{{ Object.keys(status).length }}</span> 条
         <span v-if="check.type === 'loading'">
-         ，已校验 {{ check.fail + check.success }} 条，未校验 {{ Object.keys(status).length - (check.fail + check.success)  }} 条
+         ，已校验
+          <span class="processing">{{ check.fail + check.success }}</span> 条，未校验
+          <span class="processing">{{ Object.keys(status).length - (check.fail + check.success)  }}</span> 条
         </span>
         <span v-if="check.type === 'end'">
-         ，已校验 {{ check.fail + check.success }} 条，正常 {{ check.success }} 条，失败 {{ check.fail }} 条
+         ，已校验
+          <span class="processing">{{ check.fail + check.success }}</span> 条，正常
+          <span class="success">{{ check.success }}</span> 条，失败
+          <span class="error">{{ check.fail }}</span> 条
         </span>
       </div>
       <div class="status-source">
@@ -23,14 +28,22 @@
               <div class="release-status-tree tree--node">
                 <span>{{ node.title }}</span>
                 <div v-if="status[node.id] === 0">
-                  <AIcon type="LoadingOutlined" />
-                  正在校验...
+                  <span style="color: #315EFB">
+                    <AIcon type="LoadingOutlined" />
+                    正在校验
+                  </span>
                 </div>
                 <div v-else-if="status[node.id] === 1" @click="() => showModal(node.id)">
-                  <j-badge color="#f50" :text="statusMsg[node.id]" />
+                  <AIcon style="color: #FF3333" type="CloseCircleFilled"/>
+                  <span style="color: #FF3333;padding-left: 4px;">
+                    {{ statusMsg[node.id][0] }}
+                    <span v-if="statusMsg[node.id].length > 1">
+                      等{{ statusMsg[node.id].length }}个问题
+                    </span>
+                  </span>
                 </div>
                 <div v-else-if="status[node.id] === 2">
-                  <j-badge color="#87d068" text="通过" />
+                  <AIcon style="color: #78E845" type="CheckCircleFilled"/>
                 </div>
               </div>
             </template>
@@ -39,7 +52,8 @@
       </div>
     </div>
     <div class="status-theme">
-      <div>
+      <TitleComponent data="主题色配置"></TitleComponent>
+      <div style="margin-bottom: 4px">
         主题色
       </div>
       <a-select
@@ -58,13 +72,6 @@
         </template>
       </a-select>
     </div>
-    <div class="release-validate-box">
-      <FormDesigner v-if="validateContent.type === providerEnum.FormPage" :key="validateContent.data.id" :data="validateContent.data" ref="validateRef"/>
-      <CustomHTML v-else-if="validateContent.type === providerEnum.HtmlPage" :key="validateContent.data.id" :data="validateContent.data" ref="validateRef"/>
-      <CRUD v-else-if="validateContent.type === providerEnum.CRUD" :key="validateContent.data.id" v-bind="validateContent.data" ref="validateRef"/>
-      <ListPage v-else-if="validateContent.type === providerEnum.ListPage" :key="validateContent.data.id" :data="validateContent.data" ref="validateRef"/>
-    </div>
-
     <div class="update-modal" v-show="visible">
       <div class="update-modal-header">
         <span>快速修改</span>
@@ -81,13 +88,19 @@
         <FunctionCode v-else-if="modelData.type === providerEnum.Function"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
       </div>
     </div>
+    <div class="release-validate-box">
+      <FormDesigner v-if="validateContent.type === providerEnum.FormPage" :key="validateContent.data.id" :data="validateContent.data" ref="validateRef"/>
+      <CustomHTML v-else-if="validateContent.type === providerEnum.HtmlPage" :key="validateContent.data.id" :data="validateContent.data" ref="validateRef"/>
+      <CRUD v-else-if="validateContent.type === providerEnum.CRUD" :key="validateContent.data.id" v-bind="validateContent.data" ref="validateRef"/>
+      <ListPage v-else-if="validateContent.type === providerEnum.ListPage" :key="validateContent.data.id" :data="validateContent.data" ref="validateRef"/>
+    </div>
   </div>
 </template>
 
 <script setup name="ReleaseStatus">
 import { useEngine, useProduct } from '@/store'
 import { providerEnum } from '@/components/ProJect/index'
-
+import { validateDraft } from "@/api/project";
 
 const emit = defineEmits(['update:status'])
 
@@ -125,7 +138,12 @@ const check = reactive({
 
 const status = reactive({})
 const statusMsg = reactive({})
+const respStatus = reactive({
+  status: {},
+  msg: {}
+})
 const visible = ref(false)
+const route = useRoute()
 
 const validateRef = ref()
 const modelRef = ref()
@@ -144,7 +162,7 @@ const validateContent = reactive({
 const nextCheck = async () => {
   const _id = Object.keys(status)[validateContent.step]
   if (validateContent.step >= Object.keys(status).length) {
-    emit('update:status', Object.keys(statusMsg).length)
+    emit('update:status', Object.values(statusMsg).filter(a => a.length).length)
     check.type = 'end'
   } else {
     check.type = 'loading'
@@ -159,43 +177,71 @@ const nextCheck = async () => {
   })
 }
 
+const validateDraftFn = async () => {
+  respStatus.status = {}
+  respStatus.msg = {}
+  return new Promise((resolve) => {
+    validateDraft(route.params.id).then(resp => {
+      if (resp.success && resp.result) {
+        for (let i =0;i< resp.result.length; i++) {
+          const item = resp.result[i]
+          if (!item.passed) {
+            respStatus.status[item.id] = 1
+            respStatus.msg[item.id] = item.messages
+          }
+        }
+      }
+      resolve()
+    }).catch(() => { resolve() })
+  })
+
+}
+
 /**
  * 开始校验
  */
-const startCheck = () => {
+const startCheck = async () => {
   validateContent.step = 0
   const maps = product.getDataMap()
   expandedKeys.value = [...maps.values()].map(item => item.id);
   [...maps.values()].filter(item => ![providerEnum.Module, 'project'].includes(item.type) ).map(item => { status[item.id] = 0})
-  nextCheck()
+  await validateDraftFn()
+  await nextCheck()
+}
+
+const handleStatusItem = (id, s, error) => {
+  const resp = respStatus.status[id] // 是否有后端校验异常
+  if (resp) {
+    console.log(respStatus.msg, id)
+    status[id] = 1
+    // 处理 error.message
+    statusMsg[id] = error.concat(respStatus.msg[id])
+  } else {
+    status[id] = s
+    statusMsg[id] = error
+  }
 }
 
 const validateAll = async (id, cb) => {
   const item = product.getById(id)
 
   if (providerEnum.SQL === item.type) {
-    if (!item.configuration.sql) {
-      statusMsg[item.id] = '请输入sql'
-    }
-    status[item.id] = !item.configuration.sql ? 1 : 2
+    const hasSql = !item.configuration.sql
+    handleStatusItem(item.id, hasSql ? 1 : 2, hasSql ? ['请输入sql'] : [] )
     cb?.()
     return
   }
 
   if (providerEnum.HtmlPage === item.type) {
-    if (!item.configuration.code) {
-      statusMsg[item.id] = '页面代码为空'
-    }
-    status[item.id] = !item.configuration.code ? 1 : 2
+    const hasCode = !item.configuration.code
+    handleStatusItem(item.id, hasCode ? 1 : 2, hasCode ? ['页面代码为空'] : [] )
     cb?.()
     return
   }
 
   if (providerEnum.Function === item.type) {
-    if (!item.configuration.script) {
-      statusMsg[item.id] = '请输入函数'
-    }
-    status[item.id] = !item.configuration.script ? 1 : 2
+    const hasScript = !item.configuration.script
+    handleStatusItem(item.id, hasScript ? 1 : 2, hasScript ? ['请输入函数'] : [] )
     cb?.()
     return
   }
@@ -207,7 +253,7 @@ const validateAll = async (id, cb) => {
       setTimeout(() => {
         validateRef.value.validate().then(ref => {
           status[item.id] = 2
-          delete statusMsg[item.id]
+          handleStatusItem(item.id, 2, [] )
           if (cb) {
             cb()
           } else {
@@ -215,8 +261,8 @@ const validateAll = async (id, cb) => {
           }
 
         }).catch(e => {
-          status[item.id] = 1
-          statusMsg[item.id] = e.map(a => a.message).join(',')
+          console.log(e)
+          handleStatusItem(item.id, 1, e.map(a => a.message) )
           if (cb) {
             cb()
           } else {
@@ -287,16 +333,16 @@ watch( () => JSON.stringify(status), () => {
 </script>
 
 <style scoped lang="less">
+.release-validate-box {
+  overflow: hidden;
+  height: 0;
+  width: 0;
+}
+
 .release-status {
   display: flex;
   height: 100%;
   gap: 24px;
-
-  .release-validate-box {
-    overflow: hidden;
-    height: 0;
-    width: 0;
-  }
 
   .status-tree {
     height: 100%;
@@ -305,6 +351,18 @@ watch( () => JSON.stringify(status), () => {
     .status-result {
       height: 40px;
       margin-bottom: 12px;
+
+      .processing {
+        color: #315EFB;
+      }
+
+      .success {
+        color: #78E845;
+      }
+
+      .error {
+        color: #FF3333;
+      }
     }
 
     .status-source {
@@ -326,13 +384,16 @@ watch( () => JSON.stringify(status), () => {
   }
 
   .status-theme {
-    width: 300px;
+    width: 30%;
+    min-width: 300px;
+    padding-left: 24px;
+    border-left: 1px solid #e9e9e9;
   }
 }
 
 .update-modal {
   background-color: #fff;
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
