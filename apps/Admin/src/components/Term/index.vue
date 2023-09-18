@@ -32,7 +32,7 @@
               :fieldNames="
                 fieldNames ?? {
                   children: 'children',
-                  label: 'name',
+                  label: 'fullName',
                   value: 'column',
                 }
               "
@@ -128,16 +128,25 @@
         </div>
         <!-- 单组条件连接符 -->
         <div v-else>
-          <j-select
-            :showArrow="false"
-            v-model:value="item.inner"
-            style="width: 60px"
-            :options="[
-              { label: '并且', value: '&&' },
-              { label: '或者', value: '||' },
-            ]"
-            placeholder="请选择操作符"
-          ></j-select>
+          <j-form-item
+            label=""
+            :name="['term', index, 'inner']"
+            :rules="{
+              required: true,
+              message: '请选择',
+            }"
+          >
+            <j-select
+              :showArrow="false"
+              v-model:value="item.inner"
+              style="min-width: 60px"
+              :options="[
+                { label: '并且', value: '&&' },
+                { label: '或者', value: '||' },
+              ]"
+              placeholder="请选择"
+            ></j-select>
+          </j-form-item>
         </div>
       </j-space>
     </j-form>
@@ -227,11 +236,11 @@ const addTerm = (index: number) => {
 }
 
 
-const change  = (value, labelNode, extra) =>{
-  const v = extra.triggerNode.props.fullName;
-  value.label =  v
-  console.log(`output->`,v)
-    }
+// const change  = (value, labelNode, extra) =>{
+//   const v = extra.triggerNode.props.fullName;
+//   value.label =  v
+//   console.log(`output->`,v)
+//     }
 /**
  * 变量选择
  */

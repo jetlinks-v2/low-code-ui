@@ -40,7 +40,7 @@
               <j-tree
                 multiple
                 block-node
-                :tree-data="treeData"
+                :tree-data="treeDataCom"
                 v-model:selectedKeys="selectedKeys"
                 :fieldNames="{ children: 'children', title: 'name', key: 'id' }"
                 :height="400"
@@ -107,6 +107,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { treeFilter } from 'jetlinks-ui-components/es/Tree'
 import { defaultColumns, flattenTree } from './const'
 import { DataSourceProps } from '../types'
 import {
@@ -137,6 +138,12 @@ const columns = computed(() => {
 
 // 筛选关键字
 const searchText = ref('')
+const treeDataCom = computed(() => {
+  return searchText.value
+    ? treeFilter(treeData.value, searchText.value, 'name')
+    : treeData.value
+})
+
 const active = ref('0')
 const itemClick = (key) => {
   // 树形数据

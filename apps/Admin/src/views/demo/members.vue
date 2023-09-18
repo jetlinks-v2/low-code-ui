@@ -1,18 +1,7 @@
-<!-- <template>
-  <div>
-   <ConfigureMembers v-model:members="list"></ConfigureMembers>
- </div>
- </template>
- <script setup lang="ts">
- const list = ref([]);
- watchEffect(() => {
-   console.log(`output->11111`,list.value)
- })
- </script>
- <style scoped lang="less">
- </style> -->
 <template>
   <div>
+    <ConfigureMembers v-model:members="list"></ConfigureMembers>
+    <br>
     <Term
       ref="termRef"
       :variableData="propertyOption"
@@ -22,6 +11,13 @@
   </div>
 </template>
 <script setup lang="ts">
+// 成员选择
+const list = ref([]);
+ watchEffect(() => {
+   console.log(`output->11111`,list.value)
+ })
+
+// 条件分支
 const propertyOption = [
   {
     column: 'timestamp',
@@ -240,42 +236,6 @@ const propertyOption = [
             id: 'eq',
             name: '等于',
           },
-          {
-            id: 'neq',
-            name: '不等于',
-          },
-          {
-            id: 'gt',
-            name: '大于',
-          },
-          {
-            id: 'gte',
-            name: '大于等于',
-          },
-          {
-            id: 'lt',
-            name: '小于',
-          },
-          {
-            id: 'lte',
-            name: '小于等于',
-          },
-          {
-            id: 'btw',
-            name: '在...之间',
-          },
-          {
-            id: 'nbtw',
-            name: '不在...之间',
-          },
-          {
-            id: 'in',
-            name: '在...之中',
-          },
-          {
-            id: 'nin',
-            name: '不在...之中',
-          },
         ],
         metrics: [],
       },
@@ -285,13 +245,13 @@ const propertyOption = [
 
 const formData = [
   {
-    column: 'properties.degrees.last',
+    column: 'properties.total_power_factor.last',
     operator: 'eq',
     value: 12,
   },
   {
-    column: 'lng',
-    operator: '=',
+    column: 'properties.degrees.last',
+    operator: 'eq',
     value: '123',
   },
 ]
