@@ -172,6 +172,12 @@ const myColumns = [
             if (!regular.isModalReg(value)) {
               return Promise.reject('请以小写字母开头，使用字母、数字和下划线完成命名')
             }
+            if (typesOptions.value.some(item =>
+              item.javaType === upperCase(value) ||
+              item.javaType === (value.charAt(0).toUpperCase() + value.slice(1))
+            )) {
+              return Promise.reject('不能与保留字重名')
+            }
 
             const someName = dataSource.value.filter(item => item.index !== source.record.index).some(item => item.name === value)
             if (someName) {

@@ -23,7 +23,7 @@ import { regular } from '@jetlinks/utils';
 import { onKeyStroke } from '@vueuse/core'
 import { providerEnum, providerMap } from '../../index'
 import { useEngine, useProduct } from '@/store'
-import { randomString } from '@jetlinks/utils'
+import { randomString, generateSerialNumber } from '@jetlinks/utils'
 
 const engine = useEngine()
 const product = useProduct()
@@ -84,7 +84,7 @@ const getConfiguration = (type) => {
       const productId = product.info.id.substr(0, 4)
       const moduleId = (props.data.parentId || engine.activeFile).substr(0, 4)
       return {
-        tableName: `${productId}_${moduleId}_${randomString(3)}`,
+        tableName: `${productId}_${moduleId}_${generateSerialNumber(3)}`,
         columns: []
       };
     case providerEnum.Function:

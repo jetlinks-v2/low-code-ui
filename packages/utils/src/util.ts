@@ -83,3 +83,8 @@ export const hexToRgb = (hex: string) => {
 
   return `${r}, ${g}, ${b}`
 }
+
+export const generateSerialNumber = (length) => {
+  let serialNumber = Math.floor(Math.random() * (900 - 100 + 1)) + 100;
+  return serialNumber.toString().padStart(length, '0');
+}
