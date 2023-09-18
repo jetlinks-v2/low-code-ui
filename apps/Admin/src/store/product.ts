@@ -76,6 +76,7 @@ export const useProduct = defineStore('product', () => {
   const dataMap: Map<string, any> = new Map()
   const dataById = ref()
   const info = ref()
+  const published = ref(false)
 
   const engine = useEngine()
 
@@ -250,6 +251,7 @@ export const useProduct = defineStore('product', () => {
       data.value = treeData
       engine.activeFile = treeData[0]?.id
       info.value = extra
+      published.value = extra.state?.value === 'published'
       cb?.()
     }
   }
@@ -274,6 +276,7 @@ export const useProduct = defineStore('product', () => {
     getById,
     getParent,
     initProjectState,
-    getServerModulesData
+    getServerModulesData,
+    published
   }
 })

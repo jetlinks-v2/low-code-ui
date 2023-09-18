@@ -1,4 +1,8 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 importers:
 
@@ -126,8 +130,8 @@ importers:
         specifier: ^1.11.8
         version: 1.11.8
       jetlinks-ui-components:
-        specifier: ^1.0.31
-        version: 1.0.31(vue-router@4.2.2)(vue@3.3.4)
+        specifier: ^1.0.33
+        version: 1.0.33(vue-router@4.2.2)(vue@3.3.4)
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -209,7 +213,7 @@ importers:
         version: 1.15.0(vite@4.3.9)
       vite-plugin-monaco-editor:
         specifier: ^1.1.0
-        version: 1.1.0(monaco-editor@0.41.0)
+        version: 1.1.0(monaco-editor@0.43.0)
       vite-plugin-style-import:
         specifier: ^2.0.0
         version: 2.0.0(vite@4.3.9)
@@ -254,7 +258,7 @@ importers:
         version: 4.3.9(@types/node@20.4.5)(less@4.1.3)
       vite-plugin-monaco-editor:
         specifier: ^1.1.0
-        version: 1.1.0(monaco-editor@0.41.0)
+        version: 1.1.0(monaco-editor@0.43.0)
     devDependencies:
       rollup:
         specifier: ^3.23.1
@@ -336,7 +340,7 @@ importers:
         version: 1.15.0(vite@4.3.9)
       vite-plugin-monaco-editor:
         specifier: ^1.1.0
-        version: 1.1.0(monaco-editor@0.41.0)
+        version: 1.1.0(monaco-editor@0.43.0)
       vite-plugin-style-import:
         specifier: ^2.0.0
         version: 2.0.0(vite@4.3.9)
@@ -4839,12 +4843,12 @@ packages:
       - vue-router
     dev: false
 
-  /jetlinks-ui-components@1.0.31(vue-router@4.2.2)(vue@3.3.4):
+  /jetlinks-ui-components@1.0.31(vue-router@4.2.4)(vue@3.3.4):
     resolution: {integrity: sha512-8Kyc5Wif7r9uGHmZLCcUdDZcN/Eb0yyvPIGwKy2VhJ2IF5rmqjJUyDtC2wwM/ul3uk/wFhobi8Q8h9WqYJ0Iqg==}
     engines: {node: '>=18.14.0'}
     dependencies:
       '@vueuse/core': 9.13.0(vue@3.3.4)
-      '@vueuse/router': 9.13.0(vue-router@4.2.2)(vue@3.3.4)
+      '@vueuse/router': 9.13.0(vue-router@4.2.4)(vue@3.3.4)
       ant-design-vue: 3.2.15(vue@3.3.4)
       colorpicker-v3: 2.10.2
       lodash-es: 4.17.21
@@ -4858,12 +4862,12 @@ packages:
       - vue-router
     dev: false
 
-  /jetlinks-ui-components@1.0.31(vue-router@4.2.4)(vue@3.3.4):
-    resolution: {integrity: sha512-8Kyc5Wif7r9uGHmZLCcUdDZcN/Eb0yyvPIGwKy2VhJ2IF5rmqjJUyDtC2wwM/ul3uk/wFhobi8Q8h9WqYJ0Iqg==}
+  /jetlinks-ui-components@1.0.33(vue-router@4.2.2)(vue@3.3.4):
+    resolution: {integrity: sha512-ETXffDspT5G1QvEggKsu5Ox0PQ+V4Rb1SO/lvoM5KwSID3UT2qwhWoqs5qGFPrAB2TCZA2IBVVHWKP9MP++6gQ==}
     engines: {node: '>=18.14.0'}
     dependencies:
       '@vueuse/core': 9.13.0(vue@3.3.4)
-      '@vueuse/router': 9.13.0(vue-router@4.2.4)(vue@3.3.4)
+      '@vueuse/router': 9.13.0(vue-router@4.2.2)(vue@3.3.4)
       ant-design-vue: 3.2.15(vue@3.3.4)
       colorpicker-v3: 2.10.2
       lodash-es: 4.17.21
@@ -5348,8 +5352,8 @@ packages:
     resolution: {integrity: sha512-1wymccLEuFSMBvCk/jT1YDW/GuxMLYwnFwF9CDyYCxoTw2Pt379J3FUhwy9c43j51JdcxVPjwk0jm0EVDsBS2g==}
     dev: false
 
-  /monaco-editor@0.41.0:
-    resolution: {integrity: sha512-1o4olnZJsiLmv5pwLEAmzHTE/5geLKQ07BrGxlF4Ri/AXAc2yyDGZwHjiTqD8D/ROKUZmwMA28A+yEowLNOEcA==}
+  /monaco-editor@0.43.0:
+    resolution: {integrity: sha512-cnoqwQi/9fml2Szamv1XbSJieGJ1Dc8tENVMD26Kcfl7xGQWp7OBKMjlwKVGYFJ3/AXJjSOGvcqK7Ry/j9BM1Q==}
 
   /monaco-textmate@3.0.1(onigasm@2.2.5):
     resolution: {integrity: sha512-ZxxY3OsqUczYP1sGqo97tu+CJmMBwuSW+dL0WEBdDhOZ5G1zntw72hvBc68ZQAirosWvbDKgN1dL5k173QtFww==}
@@ -7347,12 +7351,12 @@ packages:
       - supports-color
     dev: true
 
-  /vite-plugin-monaco-editor@1.1.0(monaco-editor@0.41.0):
+  /vite-plugin-monaco-editor@1.1.0(monaco-editor@0.43.0):
     resolution: {integrity: sha512-IvtUqZotrRoVqwT0PBBDIZPNraya3BxN/bfcNfnxZ5rkJiGcNtO5eAOWWSgT7zullIAEqQwxMU83yL9J5k7gww==}
     peerDependencies:
       monaco-editor: '>=0.33.0'
     dependencies:
-      monaco-editor: 0.41.0
+      monaco-editor: 0.43.0
 
   /vite-plugin-style-import@2.0.0(vite@4.3.9):
     resolution: {integrity: sha512-qtoHQae5dSUQPo/rYz/8p190VU5y19rtBaeV7ryLa/AYAU/e9CG89NrN/3+k7MR8mJy/GPIu91iJ3zk9foUOSA==}
@@ -7838,7 +7842,3 @@ packages:
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
