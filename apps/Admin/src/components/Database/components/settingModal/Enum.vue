@@ -25,7 +25,7 @@
     @cancel="visible = false"
   >
     <div>
-      当前javaType类型为{{model.jdbcType}}
+      当前jdbcType类型为{{model.jdbcType}}
     </div>
     <div>
       建议修改为BIGINT类型

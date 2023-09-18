@@ -2,7 +2,7 @@
   <div class="release-warp">
     <div class="release-header">
       <!-- <j-button type="link" @click="cancel">返回</j-button> -->
-      <j-button type="link" @click="cancel" class="btn">
+      <j-button type="link" @click="cancel" class="btn" :disabled="['success', 'loading'].includes(releaseStatus)">
         <div class="out"><img :src="getImage('/left.png')"></div>
         <p>退出</p>
       </j-button>
@@ -25,7 +25,7 @@
         <div class="release-step-content">
           <Status v-show="step === 0" v-model:status="status" />
           <Tree v-show="step === 1" ref="treeRef" @change="treeChange" />
-          <Finish v-show="step === 2" ref="finishRef"  v-model:value="finishStatus" :tree="tree" />
+          <Finish v-show="step === 2" ref="finishRef"  v-model:value="finishStatus" :tree="tree" @statusChange="e => releaseStatus = e" />
         </div>
         <div class="release-footer">
           <j-button v-if="step === 0" @click="cancel">取消</j-button>
@@ -65,6 +65,8 @@ const router = useRouter()
 
 const status = ref(true)
 const finishStatus = ref(0)
+
+const releaseStatus = ref('')
 
 const prev = () => {
   step.value -= 1
@@ -134,6 +136,10 @@ product.queryProduct(route.params.id, () => {
         line-height: 22px;
         font-size: 16px;
         margin-left: 10px;
+      }
+
+      &[disabled] {
+        color: rgba(0, 0, 0, 0.25);
       }
     }
     span{

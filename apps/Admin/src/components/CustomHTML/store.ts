@@ -61,6 +61,7 @@ export class ReplStore implements Store {
 
   private defaultVueRuntimeURL: string
   constructor(code?: string) {
+    console.log(code)
     const files: StoreState['files'] = {}
     if (!code) {
       setFile(files, defaultMainFile, defaultVueCode)

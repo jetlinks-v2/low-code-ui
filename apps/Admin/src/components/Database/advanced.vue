@@ -228,7 +228,7 @@
 import {getAssetType} from '@/api/basis'
 import {useRequest} from '@jetlinks/hooks'
 import {regular} from '@jetlinks/utils'
-import {CRUD_COLUMNS} from "@/components/Database/util";
+import {CRUD_COLUMNS, formErrorFieldsToObj, proAll} from "@/components/Database/util";
 import {queryEndCommands} from '@/api/form'
 import {useProduct} from '@/store'
 import {AdvancedApiColumns} from './util'
@@ -342,13 +342,22 @@ const getApi = (v) => {
 defineExpose({
   validates: () => {
     return new Promise(async (resolve, reject) => {
-      try {
-        const r = await relationRef.value?.validate()
-        const a = await assetRef.value?.validate()
+      proAll([
+        relationRef.value?.validate,
+        assetRef.value?.validate
+      ]).then(r => {
         resolve(r)
-      } catch (e) {
-        reject(e)
-      }
+      }).catch(e => {
+        const errorMsg = {}
+        e.forEach(item => {
+          if(item.errorFields) {
+            Object.assign(errorMsg, formErrorFieldsToObj(item.errorFields))
+          } else {
+            Object.assign(errorMsg, item)
+          }
+        })
+        reject(errorMsg)
+      })
     })
   }
 })
