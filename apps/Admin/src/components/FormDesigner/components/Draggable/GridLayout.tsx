@@ -74,6 +74,7 @@ export default defineComponent({
                                             class={unref(isDragArea) && 'drag-area'}
                                             hasDel={unref(list).length > 1}
                                             data={element}
+                                            style={unref(layoutPadStyle)}
                                             tag="div"
                                             hasCopy={true}
                                             parent={unref(list)}

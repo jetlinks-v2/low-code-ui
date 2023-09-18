@@ -47,6 +47,7 @@
           <j-form-item label="格式校验" name="pattern">
             <j-select
               placeholder="请选择"
+              allowClear
               v-model:value="regRef"
               @change="handleChange"
             >
@@ -64,7 +65,7 @@
               style="width: 100%"
               :precision="0"
               :max="ruleModel.max"
-              :min="0"
+              :min="1"
               v-model:value="ruleModel.min"
               @change="onChange"
             />
@@ -73,7 +74,7 @@
             <j-input-number
               placeholder="请输入"
               style="width: 100%"
-              :min="ruleModel.min || 0"
+              :min="ruleModel.min || 1"
               :precision="0"
               v-model:value="ruleModel.max"
               @change="onChange"
@@ -121,8 +122,8 @@ const regRef = ref<any>(undefined)
 const inputRef = ref<any>('')
 
 const handleChange = (e: any) => {
-  const reg = new RegExp(e)
-  ruleModel.pattern = reg
+  // const reg = new RegExp(e) // 使用的时候处理
+  ruleModel.pattern = e
   emits('change', unref(ruleModel), props.index)
 }
 
@@ -139,11 +140,10 @@ watch(
 )
 
 watchEffect(() => {
-  // console.log('props.value',props.value)
   Object.assign(ruleModel, props.value)
   if (props.value.pattern) {
-    const reg = `${props.value.pattern}`
-    inputRef.value = reg.slice(1, reg.length - 1)
+    // const reg = `${props.value.pattern}`
+    inputRef.value = props.value.pattern // reg.slice(1, reg.length - 1)
   }
 })
 

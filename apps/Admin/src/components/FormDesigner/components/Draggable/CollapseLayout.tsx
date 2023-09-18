@@ -113,7 +113,7 @@ export default defineComponent({
         <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasCopy={true} hasDel={true} hasDrag={true} data={props.data} parent={props.parent}>
           {
             unref(_isLayout) ?
-              <FormItem {...unref(_formItemProps)}>
+              <FormItem {...unref(_formItemProps)} validateFirst={true}>
                 {renderContent()}
                 {addButton()}
               </FormItem>

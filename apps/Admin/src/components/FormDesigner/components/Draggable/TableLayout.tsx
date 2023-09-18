@@ -170,10 +170,10 @@ export default defineComponent({
             return (
                 <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <div class={'table'}>
-                        <FormItem {...unref(_formItemProps)}>
+                        <FormItem {...unref(_formItemProps)} validateFirst={true}>
                             <Table
                                 pagination={false}
-                                dataSource={isEditModel.value ? [{}] : data.value}
+                                dataSource={isEditModel.value ? [{}] : data.value} 
                                 scroll={{ y: props.data.componentProps?.height, x: 'max-content' }}
                             >
                                 {
