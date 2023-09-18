@@ -12,7 +12,7 @@
 
     <div class="content-module" v-if="activeData?.type === 'project' || activeData?.type === 'module'"
       :key="activeData.id">
-      <ProjectEmpty v-if="activeData?.type === 'project'" :data="activeData" />
+      <ProjectEmpty v-if="activeData?.type === 'project' && activeData.children.length===0" :data="activeData" />
       <Project v-else :data="activeData.children" />
     </div>
 
@@ -61,7 +61,6 @@ watch(
         title: item.title,
         type: item.type
       }))
-      console.log('data-------', activeData.value)
     }
   },
   { deep: true, immediate: true }
@@ -134,13 +133,14 @@ watch(
     height: calc(100% - 100px);
     background-color: rgb(255, 255, 255);
     position: absolute;
-    top: 60px;
+    top: 57px;
     width: calc(100% - 320px);
     z-index: 2;
+    overflow: hidden;
   }
 
   .footer {
-    border: 1px solid #D9D9D9;
+    border-top: 1px solid #D9D9D9;
     z-index: 3;
     height: 44px;
     line-height: 44px;
