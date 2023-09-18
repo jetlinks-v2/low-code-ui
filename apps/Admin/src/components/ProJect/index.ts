@@ -39,12 +39,75 @@ export const providerImages = {
   [providerEnum.SQL]:getImage('/tree/sql.svg'),
   [providerEnum.CRUD]:getImage('/tree/curd.svg'),
   [providerEnum.Page]:getImage('/tree/page.svg'),
-  [providerEnum.HtmlPage]:getImage('/tree/page.svg'),
   [providerEnum.ListPage]:getImage('/tree/page.svg'),
+  [providerEnum.HtmlPage]:getImage('/tree/page.svg'),
   [providerEnum.FormPage]:getImage('/tree/page.svg'),
   [providerEnum.Function]:getImage('/tree/function.svg'),
   'project':getImage('/tree/project.svg'),
 }
+
+export const typeImages = {
+  [providerEnum.Module]:getImage('/project/module.png'),
+  [providerEnum.SQL]:getImage('/project/sql.png'),
+  [providerEnum.CRUD]:getImage('/project/curd.png'),
+  [providerEnum.ListPage]:getImage('/project/list.png'),
+  [providerEnum.HtmlPage]:getImage('/project/html.png'),
+  [providerEnum.FormPage]:getImage('/project/form.png'),
+  [providerEnum.Function]:getImage('/project/function.png'),
+}
+
+export const projectList = [
+  {
+     title:'通用能力',
+     children:[
+        {
+           type:providerEnum.Module,
+           img:getImage('/project/module.png'),
+           text:'使用模块对项目进行分层管理'
+        }
+     ]
+  },
+  {
+     title:'前端资源',
+     children:[
+        {
+           type:providerEnum.ListPage,
+           img:getImage('/project/html.png'),
+           text:'高度灵活，自由扩展定制化页面需求'
+        },
+        {
+          type:providerEnum.FormPage,
+          img:getImage('/project/form.png'),
+          text:'拖拽组件自定义完成表单页设计'
+       },
+       {
+          type:providerEnum.ListPage,
+          img:getImage('/project/list.png'),
+          text:'通用页面格式，5分钟快速完成数据列表页配置'
+       }
+     ]
+  },
+  {
+      title:'后端能力',
+      children:[
+         {
+            type:providerEnum.CRUD,
+            img:getImage('/project/curd.png'),
+            text:'用于管理业务数据、提供增删改查等能力'
+         },
+         {
+           type:providerEnum.SQL,
+           img:getImage('/project/sql.png'),
+           text:'定制化查询能力'
+        },
+        {
+           type:providerEnum.Function,
+           img:getImage('/project/function.png'),
+           text:'使用脚本自定义业务逻辑'
+        }
+      ]
+   },
+]
 
 //右键操作类
 export const actionMap = {
