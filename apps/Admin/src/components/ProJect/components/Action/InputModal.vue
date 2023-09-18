@@ -24,7 +24,6 @@ import { onKeyStroke } from '@vueuse/core'
 import { providerEnum, providerMap } from '../../index'
 import { useEngine, useProduct } from '@/store'
 import { randomString } from '@jetlinks/utils'
-import { defaultSetting as CrudBaseData } from '@/components/Database/setting'
 
 const engine = useEngine()
 const product = useProduct()
@@ -86,7 +85,7 @@ const getConfiguration = (type) => {
       const moduleId = (props.data.parentId || engine.activeFile).substr(0, 4)
       return {
         tableName: `${productId}_${moduleId}_${randomString(3)}`,
-        columns: CrudBaseData
+        columns: []
       };
     case providerEnum.Function:
       return {

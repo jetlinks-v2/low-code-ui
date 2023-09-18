@@ -1,13 +1,15 @@
-<script setup lang="ts">
+<script setup>
 const $slots = useSlots()
+const emit = defineEmits(['dbClick'])
 defineProps({
   title: String,
 })
+
 </script>
 
 <template>
   <div class="editor-container">
-    <div class="title">
+    <div class="title" @dblclick.stop="emit('dbClick')">
       <slot name="title"></slot>
       {{ $slots.title ? '' : title }}
     </div>

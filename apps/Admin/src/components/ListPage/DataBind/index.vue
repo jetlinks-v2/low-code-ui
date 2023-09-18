@@ -124,6 +124,7 @@ const handleOk = () => {
 const errorList = ref<any[]>([])
 const valid = () => {
   errorList.value = validDataBind(dataBind.data, functionOptions.value)
+  console.log('valid',errorList.value)
   return errorList.value.length ? [{message: '数据绑定配置错误'}] : []
 }
 
