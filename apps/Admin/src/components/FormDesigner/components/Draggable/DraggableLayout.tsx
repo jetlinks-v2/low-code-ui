@@ -121,7 +121,8 @@ const DraggableLayout = defineComponent({
                                     set(designer.formState, _path, newValue)
                                 }, 
                                 {
-                                    deep: true
+                                    deep: true,
+                                    immediate: true
                                 }
                             )
                             watch(
@@ -130,7 +131,8 @@ const DraggableLayout = defineComponent({
                                     set(designer.formState, _path, newValue)
                                 }, 
                                 {
-                                    deep: true
+                                    deep: true,
+                                    immediate: true
                                 }
                             )
 
