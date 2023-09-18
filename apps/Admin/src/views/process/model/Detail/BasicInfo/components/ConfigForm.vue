@@ -21,7 +21,7 @@
       }"
       :footerStyle="{ textAlign: 'right' }"
     >
-      <j-row :gutter="[16,16]">
+      <j-row :gutter="[16, 16]">
         <j-col :span="24">
           <div>选择多个流程表单时将以流程表单名称隔开拼接整合为新表单</div>
         </j-col>
@@ -59,6 +59,7 @@
           <div>请配置表单展示样式</div>
           <draggable
             v-model="selectedRow"
+            handle=".sort"
             group="form"
             animation="500"
             chosen-class="chosen-class"
@@ -88,7 +89,14 @@
                   <j-button type="link" @click="onSelectChange(element)"
                     >删除</j-button
                   >
-                  <j-button type="link" :disabled="selectedRow.length === 1">移动</j-button>
+                  <j-button
+                    class="sort"
+                    type="link"
+                    :disabled="selectedRow.length === 1"
+                  >
+                    <!-- <AIcon type="DragOutlined" /> -->
+                    移动
+                  </j-button>
                 </j-space>
               </div>
             </template>
@@ -234,10 +242,10 @@ watch(
 .active {
   background: #1890ff;
 }
-// .chosen-class {
-//   // background: #1890ff;
-//   background-color: #eee;
-//   opacity: 1;
-//   border: solid 1px red;
-// }
+.chosen-class {
+  // background: #1890ff;
+  background-color: #eee;
+  opacity: 1;
+  border: solid 1px red;
+}
 </style>
