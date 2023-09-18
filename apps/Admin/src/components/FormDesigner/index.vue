@@ -182,8 +182,11 @@ const onDelete = debounce(() => {
 
 // 复制
 const onCopy = () => {
+  const list = selected.value.filter(item => {
+    return !['collapse-item', 'tabs-item', 'grid-item', 'table-item'].includes(item.type)
+  })
   if (unref(isSelectedRoot) || focused.value) return
-  formDesigner.setCopyData(selected.value || [])
+  formDesigner.setCopyData(list || [])
 }
 
 // 剪切

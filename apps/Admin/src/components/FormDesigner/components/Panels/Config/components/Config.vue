@@ -167,7 +167,12 @@
       <j-form-item
         label="支持模糊搜索"
         :name="['componentProps', 'showSearch']"
-        required
+        :rules="[
+          {
+            required: true,
+            message: '请选择',
+          },
+        ]"
       >
         <j-switch
           @change="onDataChange"
@@ -358,6 +363,9 @@ const onDataChange = () => {
 const onMultipleChange = (e) => {
   if (e.target.value) {
     target.value.componentProps.treeCheckable = true
+  } else {
+    target.value.componentProps.treeCheckable = false
+    target.value.componentProps.treeCheckStrictly = false
   }
   emits('refresh', target.value)
 }
