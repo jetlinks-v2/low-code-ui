@@ -363,6 +363,9 @@ const onDataChange = () => {
 const onMultipleChange = (e) => {
   if (e.target.value) {
     target.value.componentProps.treeCheckable = true
+  } else {
+    target.value.componentProps.treeCheckable = false
+    target.value.componentProps.treeCheckStrictly = false
   }
   emits('refresh', target.value)
 }
