@@ -2,7 +2,7 @@
   <Scrollbar>
     <div class="header">组件配置</div>
     <div class="config-container" id="config-container">
-      <j-form ref="formRef" :model="formState" layout="vertical">
+      <j-form ref="formRef" :model="formState" layout="vertical" :validateFirst="true">
         <j-collapse
           v-model:activeKey="activeKey"
           :expand-icon-position="'right'"

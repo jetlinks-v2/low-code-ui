@@ -45,7 +45,7 @@
         >
           <template #img>
             <slot name="img">
-              <img :src="slotProps.photoUrl || ''" class="productImg" />
+              <img :src="slotProps.photoUrl || '/images/form-designer/device-card.png'" class="productImg" />
             </slot>
           </template>
           <template #content>
@@ -79,7 +79,7 @@
 
 <script lang="ts" setup>
 import { queryProductList, queryDeviceList } from '@/api/form'
-import { inject } from 'vue'
+import { inject, ref } from 'vue'
 const props = defineProps({
   select: {
     type: Array,
