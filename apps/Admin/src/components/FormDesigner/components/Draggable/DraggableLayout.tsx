@@ -231,7 +231,7 @@ const DraggableLayout = defineComponent({
             animation: 150,
             multiDrag: true,
             itemKey: 'key',
-            selectedClass: "sortable-selected",
+            // selectedClass: "sortable-selected",
             multiDragKey: platform.includes('mac') ? "Meta" : "Ctrl",
             group: { name: "j-canvas" },
             //拖动结束

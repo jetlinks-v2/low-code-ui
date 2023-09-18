@@ -173,8 +173,8 @@ export default defineComponent({
                         <FormItem {...unref(_formItemProps)} validateFirst={true}>
                             <Table
                                 pagination={false}
-                                dataSource={isEditModel.value ? [{}] : data.value} // 'max-content'
-                                scroll={{ y: props.data.componentProps?.height, x: 'calc(100% + 100px)' }}
+                                dataSource={isEditModel.value ? [{}] : data.value} 
+                                scroll={{ y: props.data.componentProps?.height, x: 'max-content' }}
                             >
                                 {
                                     unref(list).map(element => {

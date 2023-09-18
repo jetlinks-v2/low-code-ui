@@ -123,7 +123,7 @@ const inputRef = ref<any>('')
 const handleChange = (e: any) => {
   const reg = new RegExp(e)
   ruleModel.pattern = reg
-  console.log(ruleModel)
+  // console.log(ruleModel)
   emits('change', unref(ruleModel), props.index)
 }
 

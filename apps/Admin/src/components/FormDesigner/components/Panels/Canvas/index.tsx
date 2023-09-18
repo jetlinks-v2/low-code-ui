@@ -30,7 +30,7 @@ const Canvas = defineComponent({
       return unref(designer?.model) === 'edit'
     })
 
-    watch( 
+    watch(
       () => [keys['Ctrl']?.value, keys['Meta']?.value],
       ([v1, v2]) => {
         designer._ctrl.value = v1 || v2
@@ -119,23 +119,21 @@ const Canvas = defineComponent({
       )
 
       return (
-        <div style={{ height: '100%' }}>
-          <Form
-            ref={designer.formRef}
-            model={designer.formState}
-            {...omit(unref(designer.formData)?.componentProps, ['size'])}
-            onClick={unref(isEditModel) && handleClick}
-            class={[...unref(cssClassList)]}
-            onValidate={(name, status, errorMsgs) => {
-              if (unref(designer.formData)?.componentProps?.eventCode) {
-                let customFn = new Function('e', unref(designer.formData)?.componentProps?.eventCode)
-                customFn.call({ getWidgetRef: getWidgetRef }, name, status, errorMsgs)
-              }
-            }}
-          >
-            {Layout}
-          </Form>
-        </div>
+        <Form
+          ref={designer.formRef}
+          model={designer.formState}
+          {...omit(unref(designer.formData)?.componentProps, ['size', 'cssCode', 'eventCode'])}
+          onClick={unref(isEditModel) && handleClick}
+          class={[...unref(cssClassList)]}
+          onValidate={(name, status, errorMsgs) => {
+            if (unref(designer.formData)?.componentProps?.eventCode) {
+              let customFn = new Function('e', unref(designer.formData)?.componentProps?.eventCode)
+              customFn.call({ getWidgetRef: getWidgetRef }, name, status, errorMsgs)
+            }
+          }}
+        >
+          {Layout}
+        </Form>
       )
     }
 
@@ -166,11 +164,9 @@ const Canvas = defineComponent({
       return (
         <div ref={canvasRef} class={['canvas-box', unref(isEditModel) && 'editModel']}>
           <div class="container">
-            <Scrollbar height={'100%'}>
-              <div class="subject">
-                {unref(isEditModel) ? renderChildren() : renderContent()}
-              </div>
-            </Scrollbar>
+            <div class="subject">
+              {unref(isEditModel) ? renderChildren() : renderContent()}
+            </div>
           </div>
           {unref(designer.collectVisible) && unref(isEditModel) && <CollectModal
             onSave={(name: string) => {
