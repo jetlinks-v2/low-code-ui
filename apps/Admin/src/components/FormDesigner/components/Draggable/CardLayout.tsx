@@ -3,6 +3,7 @@ import Selection from '../Selection/index'
 import { Card, FormItem } from 'jetlinks-ui-components'
 import './index.less'
 import { cloneDeep } from 'lodash-es'
+import { useTool } from '../../hooks'
 
 export default defineComponent({
     name: 'CardLayout',
@@ -27,7 +28,8 @@ export default defineComponent({
         }
     },
     setup(props) {
-        const designer: any = inject('FormDesigner')
+        const { isDragArea, layoutPadStyle } = useTool()
+
         const _data = computed(() => {
             return props.data
         })
@@ -42,10 +44,6 @@ export default defineComponent({
 
         const _isLayout = computed(() => {
             return props.data?.formItemProps.isLayout
-        })
-
-        const isEditModel = computed(() => {
-            return unref(designer?.model) === 'edit'
         })
 
         return () => {
@@ -66,7 +64,7 @@ export default defineComponent({
                             unref(list).map(element => {
                                 return (
                                     <Selection
-                                        class={isEditModel.value && 'drag-area'}
+                                        class={unref(isDragArea) && 'drag-area'}
                                         data={element}
                                         tag="div"
                                         hasCopy={true}
@@ -88,7 +86,7 @@ export default defineComponent({
                 )
             }
             return (
-                <Selection {...useAttrs()} style={{ padding: isEditModel.value ? '16px' : '0px' }} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
+                <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     {
                         unref(_isLayout) ?
                             <FormItem {...unref(_formItemProps)}>

@@ -308,7 +308,7 @@ watchEffect(() => {
 
 .content {
   background-color: #f5f5f5;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 140px);
 
   .content-col {
     display: flex;

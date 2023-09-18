@@ -263,7 +263,9 @@ const onResize = debounce((e) => {
         padding: 2px 0;
         background-color: rgba(#5995f5, 0.15);
         transform: skewX(45deg);
-
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
         &.success {
           background-color: @success-color-deprecated-bg;
         }

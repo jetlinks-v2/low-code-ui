@@ -29,7 +29,7 @@
           v-model:value="state.abilityValue"
           showSearch
           :options="functionOptions"
-          :field-names="{label: 'name', value: 'id'}"
+          :field-names="{label: 'name', value: 'fullId'}"
         />
         <!--选中功能类型为SQL/函数时，下拉框后方展示指令下拉框-->
         <j-select
@@ -73,7 +73,7 @@ const dataOptions = ref([])
 
 watch(() => state.abilityValue, () => {
   handleFunction(state.abilityValue)
-})
+}, { immediate: true })
 
 watch(
   () => state,

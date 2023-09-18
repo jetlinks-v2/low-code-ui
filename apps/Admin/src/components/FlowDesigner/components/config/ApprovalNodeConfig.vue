@@ -1,29 +1,26 @@
 <template>
-  <a-tabs v-model:activeKey="activeKey" type="card">
-    <a-tab-pane key="basic" tab="基础配置">
+  <j-tabs v-model:activeKey="activeKey" type="card">
+    <j-tab-pane key="basic" tab="基础配置">
       <j-form ref="basicFormRef" :model="basicFormData" layout="vertical">
         <h3>表单配置</h3>
         <j-form-item
           label="请确认当前节点需要候选人办理的表单内容"
-          name="configForm"
+          name="forms"
           :rules="[{ required: true, message: '请配置表单内容' }]"
         >
-          <j-button type="primary" block size="small" ghost>
-            配置表单内容
-          </j-button>
+          <ConfigureForm v-model:value="basicFormData.forms" />
         </j-form-item>
 
         <h3 style="margin-top: 20px">节点控制</h3>
         <j-form-item name="autoPass">
           <template #label>
             自动通过
-            <a-popover placement="right">
-              <template #content>
-                某候选人在上一个审批节点中担任过审批人角色，
-                <br />开启后其在当前节点的审批意见为自动通过
+            <j-tooltip placement="right">
+              <template #title>
+                某候选人在上一个审批节点中担任过审批人角色，开启后其在当前节点的审批意见为自动通过
               </template>
               <AIcon type="InfoCircleOutlined" />
-            </a-popover>
+            </j-tooltip>
           </template>
           <j-switch
             size="small"
@@ -37,18 +34,16 @@
           ></j-switch>
         </j-form-item>
       </j-form>
-    </a-tab-pane>
-    <a-tab-pane key="member" tab="成员配置">
+    </j-tab-pane>
+    <j-tab-pane key="member" tab="成员配置">
       <j-form ref="memberFormRef" :model="memberFormData" layout="vertical">
         <h3>候选人配置</h3>
         <j-form-item
           label="请选择可参与审批的候选成员"
-          name="configForm"
+          name="members"
           :rules="[{ required: true, message: '请选择成员' }]"
         >
-          <j-button type="primary" block size="small" ghost>
-            选择成员
-          </j-button>
+          <ConfigureMembers v-model:members="memberFormData.members" />
         </j-form-item>
 
         <h3 style="margin-top: 20px">权重控制</h3>
@@ -58,12 +53,12 @@
         >
           <template #label>
             通过权重
-            <a-popover placement="right">
-              <template #content>
+            <j-tooltip placement="right">
+              <template #title>
                 审批意见为“通过”的成员权重总和达到设定值时，审批通过
               </template>
               <AIcon type="InfoCircleOutlined" />
-            </a-popover>
+            </j-tooltip>
           </template>
           <j-input v-model:value="memberFormData.passWeight" />
         </j-form-item>
@@ -73,12 +68,12 @@
         >
           <template #label>
             驳回权重
-            <a-popover placement="right">
-              <template #content>
+            <j-tooltip placement="right">
+              <template #title>
                 审批意见为“通过”的成员权重总和达到设定值时，审批通过
               </template>
               <AIcon type="InfoCircleOutlined" />
-            </a-popover>
+            </j-tooltip>
           </template>
           <j-input v-model:value="memberFormData.rejectWeight" />
         </j-form-item>
@@ -89,7 +84,7 @@
           name="authButtons"
           :rules="[{ required: true, message: '请选择按钮' }]"
         >
-          <a-checkbox-group
+          <j-checkbox-group
             v-model:value="memberFormData.authButtons"
             :options="allButtons"
           />
@@ -99,13 +94,13 @@
           name="rejectConfig"
           :rules="[{ required: true, message: '请选择驳回配置' }]"
         >
-          <a-radio-group
+          <j-radio-group
             v-model:value="memberFormData.rejectConfig"
             button-style="solid"
           >
-            <a-radio-button value="node">驳回至节点</a-radio-button>
-            <a-radio-button value="end">结束流程</a-radio-button>
-          </a-radio-group>
+            <j-radio-button value="node">驳回至节点</j-radio-button>
+            <j-radio-button value="end">结束流程</j-radio-button>
+          </j-radio-group>
         </j-form-item>
         <j-form-item
           label="请选择驳回至哪个节点"
@@ -119,11 +114,13 @@
           />
         </j-form-item>
       </j-form>
-    </a-tab-pane>
-  </a-tabs>
+    </j-tab-pane>
+  </j-tabs>
 </template>
 
 <script setup lang="ts">
+import ConfigureForm from '../ConfigureForm.vue'
+
 const activeKey = ref('basic')
 const props = defineProps({
   config: {
@@ -132,12 +129,16 @@ const props = defineProps({
   },
 })
 
+// 基础配置
+const basicFormRef = ref()
 const basicFormData = ref({
-  configForm: '',
+  forms: [],
   autoPass: false,
   dealRequired: false,
 })
 
+// 成员配置
+const memberFormRef = ref()
 const memberFormData = ref({
   members: [],
   passWeight: 0,
@@ -145,6 +146,9 @@ const memberFormData = ref({
   authButtons: [],
   rejectConfig: 'node',
   rejectToNode: '',
+})
+watchEffect(() => {
+  console.log('memberFormData:', memberFormData.value)
 })
 const allButtons = ref([
   { label: '通过', value: 'pass' },

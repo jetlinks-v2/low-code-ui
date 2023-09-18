@@ -2,7 +2,7 @@
   <j-spin :spinning="spinning">
     <div class="container">
       <Header @save="onSave" :data="data" @validate="onValidate" />
-      <div class="box">
+      <div class="box" :style="{ height: _height }">
         <div class="left" v-if="model !== 'preview'"><Filed /></div>
         <div
           class="right"
@@ -16,32 +16,30 @@
           <Config ref="configRef" />
         </div>
       </div>
-    </div>
-    <div class="check" v-if="model === 'preview' && !mode">
-      <div style="margin-bottom: 5px">
-        <j-button
-          v-if="!checkVisible"
-          type="primary"
-          @click="checkVisible = true"
-          >数据校验</j-button
-        >
-        <j-space v-else>
-          <j-button @click="checkVisible = false">取消</j-button>
-          <j-button type="primary" @click="onInput('get')"
-            >获取数据<j-tooltip title="将表单中填写的所有数据获取到代码框中">
-              <AIcon type="QuestionCircleOutlined" /> </j-tooltip
-          ></j-button>
-          <j-button type="primary" @click="onInput('set')"
-            >加载数据<j-tooltip title="将代码框输入的模拟数据显示到代码框中">
-              <AIcon type="QuestionCircleOutlined" /> </j-tooltip
-          ></j-button>
-        </j-space>
-      </div>
-      <template v-if="checkVisible">
-        <div>
+      <div class="check" v-if="model === 'preview' && !mode">
+        <div class="check-btn">
+          <j-button
+            v-if="!checkVisible"
+            type="primary"
+            @click="checkVisible = true"
+            >数据校验</j-button
+          >
+          <j-space v-else>
+            <j-button class="btn" @click="checkVisible = false; editData = ''">取消</j-button>
+            <j-button class="btn" @click="onInput('get')"
+              >获取数据<j-tooltip title="将表单中填写的所有数据获取到代码框中">
+                <AIcon type="QuestionCircleOutlined" /> </j-tooltip
+            ></j-button>
+            <j-button class="btn" @click="onInput('set')"
+              >加载数据<j-tooltip title="将代码框输入的模拟数据显示到代码框中">
+                <AIcon type="QuestionCircleOutlined" /> </j-tooltip
+            ></j-button>
+          </j-space>
+        </div>
+        <div style="height: 200px" v-if="checkVisible">
           <j-monaco-editor v-model="editData" :language="'json'" />
         </div>
-      </template>
+      </div>
     </div>
   </j-spin>
 </template>
@@ -61,7 +59,7 @@ import {
   reactive,
   onMounted,
 } from 'vue'
-import { debounce } from 'lodash-es'
+import { debounce, map } from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
 import { Modal } from 'jetlinks-ui-components'
 import {
@@ -70,6 +68,8 @@ import {
   checkedConfig,
   getFieldData,
   initData,
+  appendChildItem,
+  handleCopyData,
 } from './utils/utils'
 import { uid } from './utils/uid'
 
@@ -106,6 +106,7 @@ const checkVisible = ref<boolean>(false)
 const editData = ref<string>()
 const _ctrl = ref<boolean>(false)
 const focus = ref<boolean>(false)
+const focused = ref<boolean>(false)
 
 const product = useProduct()
 const formDesigner = useFormDesigner()
@@ -115,7 +116,19 @@ const isSelectedRoot = computed(() => {
 })
 
 const _width = computed(() => {
-  return model.value === 'preview' ? '100%' : (!unref(isShowConfig) ? 'calc(100% - 200px)' : 'calc(100% - 584px)')
+  return model.value === 'preview'
+    ? '100%'
+    : !unref(isShowConfig)
+    ? 'calc(100% - 200px)'
+    : 'calc(100% - 584px)'
+})
+
+const _height = computed(() => {
+  return model.value !== 'preview'
+    ? 'calc(100% - 50px)'
+    : !unref(checkVisible)
+    ? 'calc(100% - 100px)'
+    : 'calc(100% - 300px)'
 })
 
 // 设置数据被选中
@@ -123,7 +136,13 @@ const setSelection = (node: any) => {
   if (['card-item', 'space-item'].includes(node.type)) return
   if (_ctrl.value && model.value === 'edit') {
     if (node === 'root') return
-    selected.value.push(node)
+    if (map(selected.value, 'key').includes('root')) {
+      selected.value = [node]
+    } else {
+      if (!map(selected.value, 'key').includes(node.key)) {
+        selected.value.push(node)
+      }
+    }
   } else {
     selected.value = []
     if (node === 'root') {
@@ -139,7 +158,7 @@ const setSelection = (node: any) => {
 // 删除
 const onDelete = debounce(() => {
   const arr = selected.value || []
-  if (unref(isSelectedRoot) || !arr?.length) return
+  if (unref(isSelectedRoot) || !arr?.length || focused.value) return
   delVisible.value = true
   Modal.confirm({
     title: '确定删除组件及其配置？',
@@ -163,13 +182,13 @@ const onDelete = debounce(() => {
 
 // 复制
 const onCopy = () => {
-  if (unref(isSelectedRoot)) return
+  if (unref(isSelectedRoot) || focused.value) return
   formDesigner.setCopyData(selected.value || [])
 }
 
 // 剪切
 const onShear = debounce(() => {
-  if (unref(isSelectedRoot)) return
+  if (unref(isSelectedRoot) || focused.value) return
   formDesigner.setCopyData(selected.value || [])
   const _data: any = deleteDataByKey(formData.value.children, selected.value)
   formData.value = {
@@ -181,7 +200,7 @@ const onShear = debounce(() => {
 
 // 粘贴
 const onPaste = () => {
-  if (!selected.value?.length) return
+  if (!selected.value?.length || focused.value) return
   const _data = formDesigner.getCopyData()
   const list = (_data || []).map((item) => {
     return {
@@ -191,6 +210,7 @@ const onPaste = () => {
         name: item.formItemProps?.name + 'copy',
       },
       key: item.key + '_' + uid(),
+      children: handleCopyData(item?.children || []),
     }
   })
   if (list.length && selected.value?.length) {
@@ -216,6 +236,16 @@ const onCollect = () => {
   if (unref(isSelectedRoot)) return
   collectData.value = selected.value || []
   collectVisible.value = true
+}
+
+// 添加子组件
+const onAddChild = (newData: any, parent: any, flag?: boolean) => {
+  const arr = appendChildItem(formData.value?.children, newData, parent, flag)
+  formData.value = {
+    ...formData.value,
+    children: arr || [],
+  }
+  setSelection(newData || 'root')
 }
 
 /**
@@ -252,6 +282,7 @@ provide('FormDesigner', {
   delVisible,
   _ctrl,
   focus,
+  focused, // 其他组件
   setSelection,
   setModel,
   onSaveData,
@@ -260,6 +291,7 @@ provide('FormDesigner', {
   onCopy,
   onShear,
   onCollect,
+  onAddChild,
 })
 
 const onSave = () => {
@@ -316,8 +348,10 @@ onUnmounted(() => {
 // 校验
 const onValidate = () => {
   spinning.value = true
-  errorKey.value = checkedConfig(unref(formData))
-  spinning.value = false
+  setTimeout(() => {
+    errorKey.value = checkedConfig(unref(formData))
+    spinning.value = false
+  }, 100)
   return new Promise((resolve, reject) => {
     if (errorKey.value?.length) {
       reject(errorKey.value)
@@ -346,12 +380,12 @@ defineExpose({ onSave, validate: onValidate })
 <style lang="less" scoped>
 .container {
   height: calc(100vh - 125px);
+  position: relative;
   .box {
     display: flex;
     width: 100%;
-    height: calc(100% - 50px);
+    height: calc(100% - 68px);
     overflow: hidden;
-
     .left {
       width: 200px;
       height: 100%;
@@ -365,14 +399,27 @@ defineExpose({ onSave, validate: onValidate })
       width: 384px;
     }
   }
-}
 
-.check {
-  position: fixed;
-  background-color: lightgray;
-  padding: 10px 20px;
-  width: 100%;
-  bottom: 25px;
+  .check {
+    position: absolute;
+    background-color: #1b1f29;
+    width: 100%;
+    bottom: 10px;
+    .check-btn {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      justify-content: flex-end;
+      padding-right: 24px;
+
+      .btn {
+        background-color: #404756;
+        box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, 0.02);
+        border: none;
+        color: #CFCFD0;
+      }
+    }
+  }
 }
 </style>
 

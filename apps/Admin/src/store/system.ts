@@ -57,14 +57,14 @@ export const useSystemStore = defineStore('system', () => {
     document.title = value
   }
 
-  const queryAmap = async () => {
-    const resp = await settingDetail('amap')
-    if (resp.success) {
-      const { apiKey } = resp.result
-      amapKey.value = apiKey
-      systemInfo.value.apiKey = apiKey
-    }
-  }
+  // const queryAmap = async () => {
+  //   const resp = await settingDetail('amap')
+  //   if (resp.success) {
+  //     const { apiKey } = resp.result
+  //     amapKey.value = apiKey
+  //     systemInfo.value.apiKey = apiKey
+  //   }
+  // }
 
   const queryInfo = async () => {
     const resp = await settingDetail('front')
@@ -77,7 +77,7 @@ export const useSystemStore = defineStore('system', () => {
       layout.logo = logo
       theme.value = headerTheme
     }
-    await queryAmap()
+    // await queryAmap()
   }
 
 

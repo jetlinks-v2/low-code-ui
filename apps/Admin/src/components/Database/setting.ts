@@ -55,6 +55,14 @@ export const defaultTreeSetting = [
     "updatable":false
   },
   {
+    "name":"parent_id",
+    "alias":"parentId",
+    "comment":"上级节点ID",
+    "jdbcType":"VARCHAR",
+    "javaType":"String",
+    "length":64
+  },
+  {
     "name":"create_time",
     "alias":"createTime",
     "comment":"创建时间",
@@ -84,14 +92,6 @@ export const defaultTreeSetting = [
     "name":"modifier_id",
     "alias":"modifierId",
     "comment":"修改人ID",
-    "jdbcType":"VARCHAR",
-    "javaType":"String",
-    "length":64
-  },
-  {
-    "name":"parent_id",
-    "alias":"parentId",
-    "comment":"上级节点ID",
     "jdbcType":"VARCHAR",
     "javaType":"String",
     "length":64

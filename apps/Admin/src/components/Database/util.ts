@@ -59,3 +59,61 @@ export const TypeList = [
     label: 'object(结构体)',
   },
 ]
+
+export const AdvancedRelationColumns = [
+  {
+    dataIndex: 'relationType',
+    title: '关系标识',
+    width: 250,
+    form: {
+      rules: [{
+        asyncValidator: (_, value) => {
+          if (!value) {
+            return Promise.reject('请输入关系标识')
+          }
+          if(value.length > 64) {
+            return Promise.reject('最多可输入64位字符')
+          }
+          return Promise.resolve()
+        }
+      }]
+    }
+  },
+  {
+    dataIndex: 'relationTypeName',
+    title: '关系名称',
+    width: 250,
+    form: {
+      rules: [{
+        asyncValidator: (_, value) => {
+          if (!value) {
+            return Promise.reject('请输入关系名称')
+          }
+          return Promise.resolve()
+        }
+      }]
+    }
+  },
+]
+
+export const AdvancedApiColumns = [
+  {
+    dataIndex: 'ability',
+    title: '能力',
+    width: 100
+  },
+  {
+    dataIndex: 'api',
+    title: 'API'
+  },
+  {
+    dataIndex: 'instruction',
+    title: '指令',
+    width: 100
+  },
+  {
+    dataIndex: 'description',
+    title: '说明',
+    width: 120
+  },
+]

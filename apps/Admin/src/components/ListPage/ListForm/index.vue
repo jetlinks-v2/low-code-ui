@@ -1,14 +1,16 @@
 <template>
-  <div class="list-form-center">
+  <div class="list-form-center" ref="listFormRef">
+    <img class="modal-config-img" :src="getImage('/list-page/form.png')" v-if="open">
     <j-drawer
       title="列表形态配置"
       placement="right"
+      width="560px"
       :closable="true"
       :visible="open"
+      :getContainer="() => $refs.listFormRef"
+      :destroyOnClose="true"
+      :wrap-style="{ position: 'absolute', zIndex: 1 }"
       @close="emits('update:open', false)"
-      getContainer=".list-page"
-      :wrap-style="{position: 'absolute'}"
-      width="608px"
     >
       <div v-if="!showType!.configurationShow">
         <p>数据展示方式</p>
@@ -71,6 +73,7 @@ import { cloneDeep } from 'lodash-es'
 import { validListForm } from './utils/valid'
 import { LIST_FORM_INFO, SHOW_TYPE_KEY } from '../keys';
 import { PropType } from 'vue';
+import { getImage } from '@jetlinks/utils';
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -179,11 +182,13 @@ const configuredChange = (value: string) => {
 
 const errorList = ref<any[]>([])
 const valid = () => {
-  return new Promise((resolve, reject) => {
-    errorList.value = validListForm(showType!,listFormInfo.value)
-    if(errorList.value.length) reject([{message: '列表形态配置错误'}])
-    else resolve([])
-  })
+  errorList.value = validListForm(showType!,listFormInfo.value)
+  return errorList.value.length ? [{message: '列表形态配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validListForm(showType!,listFormInfo.value)
+  //   if(errorList.value.length) reject([{message: '列表形态配置错误'}])
+  //   else resolve([])
+  // })
 }
 
 defineExpose({
@@ -194,7 +199,7 @@ defineExpose({
 
 <style lang="less" scoped>
 .check-btn {
-  width: 150px;
+  width: 90px;
   text-align: center;
 }
 .card-type {
@@ -208,7 +213,8 @@ defineExpose({
   gap: 0;
   .j-check-btn-item:first-child {
     border-left: 1px solid #d9d9d9;
-    border-radius: 2px 0 0 2px;
+    margin-right: 16px;
+    border-radius: 2px;
   }
   .j-check-btn-item:last-child {
     border-left: 1px solid #d9d9d9;
@@ -247,5 +253,13 @@ defineExpose({
 }
 .title {
   margin-top: 20px;
+}
+:deep(.ant-radio-group) {
+  .ant-radio-button-wrapper:first-child{
+    border-radius: 6px 0px 0px 6px !important;
+  }
+  .ant-radio-button-wrapper:last-child{
+    border-radius: 0px 6px 6px 0px !important;
+  }
 }
 </style>

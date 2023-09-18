@@ -109,7 +109,7 @@
           </j-form-item>
         </div>
         <div v-if="cardState.type === 'field1'">
-          <ErrorItem :errorData="errorList?.[0]">
+          <ErrorItem :errorData="errorData('field1')">
             <j-form-item
               label="字段1"
               name="field1"
@@ -125,6 +125,7 @@
                 placeholder="请先配置列表数据"
                 v-model:value="formState.field1"
                 showSearch
+                allowClear
                 :options="titleOptions"
                 :field-names="{ label: 'name', value: 'id' }"
               />
@@ -138,6 +139,7 @@
               placeholder="请先配置列表数据"
               v-model:value="formState.field2"
               showSearch
+              allowClear
               :options="titleOptions"
               :field-names="{ label: 'name', value: 'id' }"
               @change="field2Change"
@@ -165,6 +167,7 @@
                 placeholder="请先配置列表数据"
                 v-model:value="formState.emphasisField"
                 showSearch
+                allowClear
                 :options="titleOptions"
                 :field-names="{ label: 'name', value: 'id' }"
               />
@@ -300,7 +303,6 @@ const onCheck = async () => {
   if(valid) {
     validateValue()
     if (formState.field1 !== '') {
-      Object.assign(listFormInfo, formState)
       return true
     }
   } else {
@@ -320,14 +322,14 @@ const statusColor = ref({
 })
 
 const titleOptions = computed(() => {
-  return dataBind.functionInfo?.configuration?.columns?.map((item) => {
-    console.log(item);
+  return dataBind.columnBind?.map((item) => {
     return {
       id: item.alias,
       name: item.comment
     }
   })
 })
+
 defineExpose({
   vaildate: onCheck,
 })

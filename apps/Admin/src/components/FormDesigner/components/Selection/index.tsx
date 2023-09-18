@@ -2,7 +2,7 @@ import { isHTMLTag } from '@vue/shared'
 import { withModifiers } from 'vue'
 import './index.less'
 import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
-import { checkIsField, extractCssClass, insertCustomCssToHead } from '../../utils/utils'
+import { checkIsField, extractCssClass, insertCustomCssToHead, updateData } from '../../utils/utils'
 import { map, set } from 'lodash-es'
 
 const Selection = defineComponent({
@@ -88,7 +88,18 @@ const Selection = defineComponent({
     }
 
     const setOptions = (arr: any[]) => {
-      props.data.context?.updateProps(arr, 'options')
+      const _list = updateData(unref(designer.formData)?.children, {
+        ...props.data,
+        componentProps: {
+          ...props.data.componentProps,
+          options: arr
+        }
+      })
+      designer.formData.value = {
+        ...designer.formData.value,
+        children: _list || [],
+      }
+      designer.setSelection(props.data || 'root')
     }
 
     const setValue = (_val: any) => {
@@ -98,7 +109,18 @@ const Selection = defineComponent({
     }
 
     const setDisabled = (bool: boolean) => {
-      props.data.context?.updateProps(bool, 'disabled')
+      const _list = updateData(unref(designer.formData)?.children, {
+        ...props.data,
+        componentProps: {
+          ...props.data.componentProps,
+          disabled: bool
+        }
+      })
+      designer.formData.value = {
+        ...designer.formData.value,
+        children: _list || [],
+      }
+      designer.setSelection(props.data || 'root')
     }
 
     // 复制
@@ -125,12 +147,12 @@ const Selection = defineComponent({
 
     expose({ setVisible, setOptions, setValue, setDisabled })
 
-    const maskNode = () => {
+    const editNode = () => {
       return <Dropdown
         trigger={['contextmenu']}
         onContextmenu={withModifiers(() => {
           const flag = designer.selected.value.find(item => item.key === props.data.key)
-          if(!flag) {
+          if (!flag) {
             designer.setSelection(props.data)
           }
         }, ['stop'])}
@@ -148,12 +170,16 @@ const Selection = defineComponent({
           }
         }}
       >
-        <div class={['mask']}></div>
+        <div style={{position: 'relative'}}>
+          {slots?.default()}
+          {props.hasMask && <div class={['mask']}></div>}
+        </div>
       </Dropdown>
     }
 
     const renderSelected = () => {
       return <TagComponent
+        data-id={props.data?.key}
         class={[
           'selectElement',
           unref(isEditModel) && unref(_hasDrag) && 'handle',
@@ -166,7 +192,7 @@ const Selection = defineComponent({
         {...useAttrs()}
         onClick={withModifiers(handleClick, ['stop'])}
       >
-        {slots?.default()}
+        {unref(isEditModel) ? editNode() : slots?.default()}
         {
           unref(isEditModel) && Selected.value && !isMultiple.value && (
             <div class="bottomRight">
@@ -193,7 +219,6 @@ const Selection = defineComponent({
             </div>
           )
         }
-        {unref(isEditModel) && props.hasMask && maskNode()}
       </TagComponent>
     }
 

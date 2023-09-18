@@ -54,11 +54,13 @@
                 handleFunction(item.permissionProps, slotProps)?.popConfirm
               "
               :class="extractCssClass(item.style)"
+              
             >
-              <AIcon v-if="item.icon" :type="item?.icon" />
-              <img v-else-if="item?.icon?.includes('http')" :src="item.icon" />
-
-              <span v-else> {{ item.text }}</span>
+                <template v-if="item.icon">
+                  <img :src="item.icon" alt="" v-if="item.icon.includes('http')" class="image-icon">
+                  <AIcon v-else :type="item?.icon" />
+                </template>
+                <span>{{ item?.text }}</span>
             </PermissionButton>
           </j-space>
         </div>
@@ -86,16 +88,11 @@
             <j-avatar
               shape="square"
               :size="100"
-              :src="slotProps[props?.cardConfig?.dynamicIcon]"
+              :src="props?.cardConfig?.customIcon"
               class="card-icon"
             >
               <template #icon>
-                <pro-image
-                  :src="
-                    props?.cardConfig?.customIcon ||
-                    `https://www.antdv.com/#error`
-                  "
-                />
+                <pro-image src="https://www.antdv.com/#error" />
               </template>
             </j-avatar>
           </template>
@@ -435,3 +432,10 @@ defineExpose({
   }
 })
 </script>
+
+<style scoped lang="less">
+.image-icon {
+  width: 14px;
+  height: 14px;
+}
+</style>
