@@ -244,6 +244,8 @@ const dataBind = reactive({
   },
   filterBind: [],
   columnBind: [],
+  filterAsync: false,
+  columnAsync: false,
 })
 
 provide(DATA_BIND, dataBind)

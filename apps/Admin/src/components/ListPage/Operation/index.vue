@@ -11,7 +11,7 @@
       :visible="_visible"
       :title="type == 'columns' ? '操作列配置' : '添加按钮配置'"
       :getContainer="() => $refs.operationDrawer"
-      :wrap-style="{ position: 'absolute', zIndex: 1 }"
+      :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
       @close="close"
 
     >
