@@ -105,7 +105,7 @@ import dayjs from 'dayjs'
 import Dialog from './Dialog/index.vue'
 import Drawer from './Drawer/index.vue'
 import { isFunction, isObject, debounce, cloneDeep } from 'lodash-es'
-import { getProcess_api, deploy_api, del_api } from '@/api/model'
+import { getProcess_api, deploy_api, del_api } from '@/api/process/model'
 
 const tableRef = ref()
 const columns = [
@@ -194,7 +194,7 @@ const getActions = computed(() => (record, type = 'card') => {
         },
         hasPermission: false,
         onClick: () => {
-          // handleSave('edit', data)
+          _view(data)
         },
       }),
     },
@@ -222,7 +222,7 @@ const getActions = computed(() => (record, type = 'card') => {
         },
         hasPermission: false,
         onClick: () => {
-          _view(data)
+          // _view(data)
           // handleSave(data)
         },
       }),
@@ -344,3 +344,4 @@ const refresh = () => {
   // flex布局，一行两个
 }
 </style>
+@/api/process/model

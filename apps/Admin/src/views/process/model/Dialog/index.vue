@@ -92,7 +92,7 @@
 
 <script setup lang="ts">
 import { onlyMessage, getToken } from '@jetlinks/utils'
-import { saveProcess_api, providerEnum } from '@/api/model'
+import { saveProcess_api, providerEnum } from '@/api/process/model'
 import { useRequest } from '@jetlinks/hooks'
 import { _fileUpload } from '@/api/comm'
 import { TOKEN_KEY, BASE_API } from '@jetlinks/constants'
@@ -242,3 +242,4 @@ watch(
   }
 }
 </style>
+@/api/process/model

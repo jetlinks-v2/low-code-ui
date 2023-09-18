@@ -22,6 +22,6 @@ export const providerEnum = () => request.get('/dictionary/sys_process_classific
  */
 export const deploy_api = (id: string) => request.post(`/process/definition/${id}/_deploy`)
 /**
- * 部署模型
+ * 删除模型
  */
 export const del_api = (id: string) => request.remove(`/process/definition/${id}`)
