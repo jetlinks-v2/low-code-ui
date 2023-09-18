@@ -53,7 +53,7 @@
                                 </span></j-ellipsis 
                             >
                             <j-row>
-                                <j-col :span="12">
+                                <j-col>
                                     <div class="card-item-content-text">
                                         ID
                                     </div>
@@ -213,6 +213,9 @@ onMounted(()=>{
 .table {
     height: 400px;
     overflow: auto;
-    min-height: auto;
+    // min-height: auto;
+}
+.productImg {
+    height: 100px;
 }
 </style>
