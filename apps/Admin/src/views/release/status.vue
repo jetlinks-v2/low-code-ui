@@ -89,10 +89,10 @@
       </div>
     </div>
     <div class="release-validate-box">
-      <FormDesigner v-if="validateContent.type === providerEnum.FormPage" :key="validateContent.data.id" :data="validateContent.data" ref="validateRef"/>
-      <CustomHTML v-else-if="validateContent.type === providerEnum.HtmlPage" :key="validateContent.data.id" :data="validateContent.data" ref="validateRef"/>
-      <CRUD v-else-if="validateContent.type === providerEnum.CRUD" :key="validateContent.data.id" v-bind="validateContent.data" ref="validateRef"/>
-      <ListPage v-else-if="validateContent.type === providerEnum.ListPage" :key="validateContent.data.id" :data="validateContent.data" ref="validateRef"/>
+      <FormDesigner v-if="validateContent.type === providerEnum.FormPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef"/>
+      <CustomHTML v-else-if="validateContent.type === providerEnum.HtmlPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef"/>
+      <CRUD v-else-if="validateContent.type === providerEnum.CRUD" :key="validateContent.key" v-bind="validateContent.data" ref="validateRef"/>
+      <ListPage v-else-if="validateContent.type === providerEnum.ListPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef"/>
     </div>
   </div>
 </template>
@@ -157,6 +157,7 @@ const modelData = reactive({
 const validateContent = reactive({
   type: undefined,
   data: {},
+  key: '',
   step: 0
 })
 
@@ -191,6 +192,9 @@ const validateDraftFn = async () => {
             respStatus.msg[item.id] = item.messages
           }
         }
+      } else {
+        respStatus.status = {}
+        respStatus.msg = {}
       }
       resolve()
     }).catch(() => { resolve() })
@@ -255,6 +259,7 @@ const validateAll = async (id, cb) => {
   if (item) {
     validateContent.type = item.type
     validateContent.data = item
+    validateContent.key = item.id + '_' + new Date().getTime()
     nextTick(async () => {
       setTimeout(() => {
         validateRef.value.validate().then(ref => {

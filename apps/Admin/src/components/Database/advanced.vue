@@ -228,7 +228,7 @@
 import {getAssetType} from '@/api/basis'
 import {useRequest} from '@jetlinks/hooks'
 import {regular} from '@jetlinks/utils'
-import {CRUD_COLUMNS} from "@/components/Database/util";
+import {CRUD_COLUMNS, formErrorFieldsToObj, proAll} from "@/components/Database/util";
 import {queryEndCommands} from '@/api/form'
 import {useProduct} from '@/store'
 import {AdvancedApiColumns} from './util'
@@ -342,29 +342,21 @@ const getApi = (v) => {
 defineExpose({
   validates: () => {
     return new Promise(async (resolve, reject) => {
-      relationRef.value?.validate().then((r) => {
-        assetRef.value?.validate().then(() => {
-          resolve(r)
-        }).catch(e => {
-          reject(e.errorFields.map(item => {
-            const key = item.name[0]
-            const msg = item.errors[0]
-            return {
-              [key]: msg
-            }
-          }))
+      proAll([
+        relationRef.value?.validate,
+        assetRef.value?.validate
+      ]).then(r => {
+        resolve(r)
+      }).catch(e => {
+        const errorMsg = {}
+        e.forEach(item => {
+          if(item.errorFields) {
+            Object.assign(errorMsg, formErrorFieldsToObj(item.errorFields))
+          } else {
+            Object.assign(errorMsg, item)
+          }
         })
-      }).catch((e) => {
-        assetRef.value?.validate().catch(ea => {
-          const errors = [...e.errorFields, ...ea.errorFields]
-          reject(errors.map(item => {
-            const key = item.name[0]
-            const msg = item.errors[0]
-            return {
-              [key]: msg
-            }
-          }))
-        })
+        reject(errorMsg)
       })
     })
   }

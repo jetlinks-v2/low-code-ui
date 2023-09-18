@@ -176,23 +176,13 @@ defineExpose({
       await validate()
       const err = []
 
-      console.log(errorTips.relation)
       if(errorTips.relation.length) {
+        console.log(errorTips.relation)
         errorTips.relation.forEach(a => {
-          err.push({ id: a.name[0], message: a.errors[0]})
+          err.push(a)
         })
       }
-      // if (errorTips.relation) {
-      //   err.push({
-      //     message: '请配置关系标识'
-      //   })
-      // }
-      //
-      // if (errorTips.asset) {
-      //   err.push({
-      //     message: '请配置资产列名称'
-      //   })
-      // }
+
       if(Object.keys(errorTips.dataTable).length) {
         Object.values(errorTips.dataTable).forEach(a => {
           err.push(a[0])
