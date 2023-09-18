@@ -117,6 +117,7 @@ const handleModify = () => {
 
 const handleOk = () => {
   dataBind.filterBind = dataBind.columnBind = dataBind.data.command = dataBind.data.function  = null
+  dataBind.filterAsync = dataBind.columnAsync = false
   visible.value = false
 }
 

@@ -8,7 +8,7 @@
       :closable="true"
       :visible="open"
       :getContainer="() => $refs.filterModuleRef"
-      :wrap-style="{ position: 'absolute', zIndex: 1 }"
+      :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
       :destroyOnClose="true"
       @close="emits('update:open', false)"
     >
@@ -23,7 +23,7 @@
         :modelActiveKey="activeKey"
         :show="show"
         tableType="filter"
-        :asyncData="asyncData"
+        v-model:asyncData="dataBinds.filterAsync"
         :errorList="errorList"
         :bindData="dataBinds.filterBind"
         :bind-function-id="dataBinds.data.function"
@@ -130,7 +130,6 @@ const show = ref(false)
 //是否完成数据绑定
 const dataBind = ref(false)
 //是否同步数据
-const asyncData = ref(false)
 //数据是否有变动
 const dataChange = ref(false)
 //是否修改配置
@@ -315,14 +314,14 @@ const submit = () => {
   type.value = ''
   show.value = true
   dataBind.value = true
-  asyncData.value = true
+  dataBinds.filterAsync = true
   configChange.value = true
 }
 const goBack = () => {
   type.value = ''
   show.value = true
   dataBind.value = true
-  asyncData.value = true
+  dataBinds.filterAsync = true
   configChange.value = false
 }
 /**
