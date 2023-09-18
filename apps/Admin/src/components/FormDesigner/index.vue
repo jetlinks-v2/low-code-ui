@@ -2,7 +2,7 @@
   <j-spin :spinning="spinning">
     <div class="container">
       <Header @save="onSave" :data="data" @validate="onValidate" />
-      <div class="box">
+      <div class="box" :style="{ height: _height }">
         <div class="left" v-if="model !== 'preview'"><Filed /></div>
         <div
           class="right"
@@ -16,32 +16,30 @@
           <Config ref="configRef" />
         </div>
       </div>
-    </div>
-    <div class="check" v-if="model === 'preview' && !mode">
-      <div style="margin-bottom: 5px">
-        <j-button
-          v-if="!checkVisible"
-          type="primary"
-          @click="checkVisible = true"
-          >数据校验</j-button
-        >
-        <j-space v-else>
-          <j-button @click="checkVisible = false">取消</j-button>
-          <j-button type="primary" @click="onInput('get')"
-            >获取数据<j-tooltip title="将表单中填写的所有数据获取到代码框中">
-              <AIcon type="QuestionCircleOutlined" /> </j-tooltip
-          ></j-button>
-          <j-button type="primary" @click="onInput('set')"
-            >加载数据<j-tooltip title="将代码框输入的模拟数据显示到代码框中">
-              <AIcon type="QuestionCircleOutlined" /> </j-tooltip
-          ></j-button>
-        </j-space>
-      </div>
-      <template v-if="checkVisible">
-        <div>
+      <div class="check" v-if="model === 'preview' && !mode">
+        <div class="check-btn">
+          <j-button
+            v-if="!checkVisible"
+            type="primary"
+            @click="checkVisible = true"
+            >数据校验</j-button
+          >
+          <j-space v-else>
+            <j-button class="btn" @click="checkVisible = false; editData = ''">取消</j-button>
+            <j-button class="btn" @click="onInput('get')"
+              >获取数据<j-tooltip title="将表单中填写的所有数据获取到代码框中">
+                <AIcon type="QuestionCircleOutlined" /> </j-tooltip
+            ></j-button>
+            <j-button class="btn" @click="onInput('set')"
+              >加载数据<j-tooltip title="将代码框输入的模拟数据显示到代码框中">
+                <AIcon type="QuestionCircleOutlined" /> </j-tooltip
+            ></j-button>
+          </j-space>
+        </div>
+        <div style="height: 200px" v-if="checkVisible">
           <j-monaco-editor v-model="editData" :language="'json'" />
         </div>
-      </template>
+      </div>
     </div>
   </j-spin>
 </template>
@@ -61,7 +59,7 @@ import {
   reactive,
   onMounted,
 } from 'vue'
-import { debounce } from 'lodash-es'
+import { debounce, map } from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
 import { Modal } from 'jetlinks-ui-components'
 import {
@@ -125,12 +123,26 @@ const _width = computed(() => {
     : 'calc(100% - 584px)'
 })
 
+const _height = computed(() => {
+  return model.value !== 'preview'
+    ? 'calc(100% - 50px)'
+    : !unref(checkVisible)
+    ? 'calc(100% - 100px)'
+    : 'calc(100% - 300px)'
+})
+
 // 设置数据被选中
 const setSelection = (node: any) => {
   if (['card-item', 'space-item'].includes(node.type)) return
   if (_ctrl.value && model.value === 'edit') {
     if (node === 'root') return
-    selected.value.push(node)
+    if (map(selected.value, 'key').includes('root')) {
+      selected.value = [node]
+    } else {
+      if (!map(selected.value, 'key').includes(node.key)) {
+        selected.value.push(node)
+      }
+    }
   } else {
     selected.value = []
     if (node === 'root') {
@@ -368,12 +380,12 @@ defineExpose({ onSave, validate: onValidate })
 <style lang="less" scoped>
 .container {
   height: calc(100vh - 125px);
+  position: relative;
   .box {
     display: flex;
     width: 100%;
-    height: calc(100% - 50px);
+    height: calc(100% - 68px);
     overflow: hidden;
-
     .left {
       width: 200px;
       height: 100%;
@@ -387,14 +399,27 @@ defineExpose({ onSave, validate: onValidate })
       width: 384px;
     }
   }
-}
 
-.check {
-  position: fixed;
-  background-color: lightgray;
-  padding: 10px 20px;
-  width: 100%;
-  bottom: 25px;
+  .check {
+    position: absolute;
+    background-color: #1b1f29;
+    width: 100%;
+    bottom: 10px;
+    .check-btn {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      justify-content: flex-end;
+      padding-right: 24px;
+
+      .btn {
+        background-color: #404756;
+        box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, 0.02);
+        border: none;
+        color: #CFCFD0;
+      }
+    }
+  }
 }
 </style>
 

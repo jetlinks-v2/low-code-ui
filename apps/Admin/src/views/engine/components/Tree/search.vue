@@ -36,6 +36,7 @@ import { getImage } from '@jetlinks/utils';
 const engine = useEngine()
 
 const emit = defineEmits(['collapsed'])
+const isExpand = ref(false)
 
 const props = defineProps({
   collapsed: {

@@ -27,7 +27,7 @@ const undefinedValue = 'undefined'
 const rulesOptions = computed(() => {
   return [
     {
-      label: '空',
+      label: '无',
       value: undefinedValue
     },
     ...(props.options || [])

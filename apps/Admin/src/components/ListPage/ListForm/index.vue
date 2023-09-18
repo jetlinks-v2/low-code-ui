@@ -9,7 +9,7 @@
       :visible="open"
       :getContainer="() => $refs.listFormRef"
       :destroyOnClose="true"
-      :wrap-style="{ position: 'absolute' }"
+      :wrap-style="{ position: 'absolute', zIndex: 1 }"
       @close="emits('update:open', false)"
     >
       <div v-if="!showType!.configurationShow">
@@ -182,11 +182,13 @@ const configuredChange = (value: string) => {
 
 const errorList = ref<any[]>([])
 const valid = () => {
-  return new Promise((resolve, reject) => {
-    errorList.value = validListForm(showType!,listFormInfo.value)
-    if(errorList.value.length) reject([{message: '列表形态配置错误'}])
-    else resolve([])
-  })
+  errorList.value = validListForm(showType!,listFormInfo.value)
+  return errorList.value.length ? [{message: '列表形态配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validListForm(showType!,listFormInfo.value)
+  //   if(errorList.value.length) reject([{message: '列表形态配置错误'}])
+  //   else resolve([])
+  // })
 }
 
 defineExpose({
@@ -197,7 +199,7 @@ defineExpose({
 
 <style lang="less" scoped>
 .check-btn {
-  width: 150px;
+  width: 90px;
   text-align: center;
 }
 .card-type {
@@ -211,7 +213,8 @@ defineExpose({
   gap: 0;
   .j-check-btn-item:first-child {
     border-left: 1px solid #d9d9d9;
-    border-radius: 2px 0 0 2px;
+    margin-right: 16px;
+    border-radius: 2px;
   }
   .j-check-btn-item:last-child {
     border-left: 1px solid #d9d9d9;
@@ -250,5 +253,13 @@ defineExpose({
 }
 .title {
   margin-top: 20px;
+}
+:deep(.ant-radio-group) {
+  .ant-radio-button-wrapper:first-child{
+    border-radius: 6px 0px 0px 6px !important;
+  }
+  .ant-radio-button-wrapper:last-child{
+    border-radius: 0px 6px 6px 0px !important;
+  }
 }
 </style>

@@ -60,6 +60,14 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
                 message: (node.formItemProps?.label || node.name) + '配置错误'
             }
         }
+        if ('input-number' === _type && (node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined)) {
+            if (node?.componentProps?.max < node?.componentProps?.min) {
+                return {
+                    key: node?.key,
+                    message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
+            }
+        }
         if (['select', 'tree-select', 'select-card'].includes(_type)) {
             // 数据源
             // if (node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
@@ -73,7 +81,8 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
                 }
             }
         }
-        if ('upload' === _type && (!node?.componentProps?.accept || !node?.componentProps?.maxCount || !node?.componentProps?.fileSize)) {
+        // !node?.componentProps?.accept || 
+        if ('upload' === _type && (!node?.componentProps?.maxCount || !node?.componentProps?.fileSize)) {
             // 个数和单位
             return {
                 key: node?.key,
@@ -393,4 +402,18 @@ export const handleCopyData = (arr: any[]) => {
             children: handleCopyData(item.children || [])
         }
     })
+}
+
+// 查找父节点
+export const findParentById = (obj: any, _item: any) => {
+    if (obj?.children?.length) {
+        for (let index = 0; index < obj.children.length; index++) {
+            const element = obj?.children[index];
+            if(element.key === _item.key){
+                return obj
+            }
+            return findParentById(element, _item)
+        }
+    }
+    return undefined
 }

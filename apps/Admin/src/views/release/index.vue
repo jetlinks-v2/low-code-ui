@@ -10,40 +10,35 @@
       <!-- <j-button type="primary">发布</j-button> -->
     </div>
     <div class="release-body">
+      <CardBox class="card ">
+        <j-steps :current="step">
+          <j-step title="状态确认">
+          </j-step>
+          <j-step title="系统菜单">
+          </j-step>
+          <j-step title="完成">
+          </j-step>
+        </j-steps>
+      </CardBox>
 
-      <div class="release-content">
-        <div class="release-step">
-          <j-steps :current="step">
-            <j-step title="状态确认">
-              <template #icon>
-              </template>
-            </j-step>
-            <j-step title="系统菜单">
-              <template #icon>
-              </template>
-            </j-step>
-            <j-step title="完成">
-              <template #icon>
-              </template>
-            </j-step>
-          </j-steps>
+      <CardBox class="release-content"  v-if="loading">
+        <div class="release-step-content">
+          <Status v-show="step === 0" v-model:status="status" />
+          <Tree v-show="step === 1" ref="treeRef" @change="treeChange" />
+          <Finish v-show="step === 2" ref="finishRef"  v-model:value="finishStatus" :tree="tree" />
         </div>
-        <div class="release-step-content" v-if="loading">
-          <Status v-show="step === 1" v-model:status="status" />
-          <Tree v-show="step === 2" ref="treeRef" @change="treeChange" />
-          <Finish ref="finishRef" v-show="step === 3" v-model:value="finishStatus" :tree="tree" />
+        <div class="release-footer">
+          <j-button v-if="step === 0" @click="cancel">取消</j-button>
+          <j-button v-if="step === 0" type="primary" @click="next" :disabled="status">下一步</j-button>
+
+          <j-button v-if="step === 1" @click="prev">上一步</j-button>
+          <j-button v-if="step === 1" type="primary" @click="release">发布</j-button>
+
+          <j-button v-if="step === 2" type="primary" @click="cancel" :disabled="finishStatus !== 100">完成</j-button>
         </div>
-      </div>
+      </CardBox>
     </div>
-    <div class="release-footer">
-      <j-button v-if="step === 1" @click="cancel">取消</j-button>
-      <j-button v-if="step === 1" type="primary" @click="next" :disabled="status">下一步</j-button>
 
-      <j-button v-if="step === 2" @click="prev">上一步</j-button>
-      <j-button v-if="step === 2" type="primary" @click="release">发布</j-button>
-
-      <j-button v-if="step === 3" type="primary" @click="cancel" :disabled="finishStatus !== 100">完成</j-button>
-    </div>
   </div>
 </template>
 
@@ -58,7 +53,7 @@ const route = useRoute()
 const product = useProduct()
 const engine = useEngine()
 
-const step = ref(1)
+const step = ref(0)
 
 const loading = ref(false)
 const tree = ref([])
@@ -77,7 +72,7 @@ const prev = () => {
 
 const next = () => {
   step.value += 1
-  if (step.value === 2) {
+  if (step.value === 1) {
     treeRef.value.init()
   }
 }
@@ -148,33 +143,37 @@ product.queryProduct(route.params.id, () => {
 
   .release-body {
     padding: 24px;
-    height: calc(100% - 112px);
+    height: calc(100% - 56px);
+    background-color: rgb(246,246,246);
+
+    .card {
+      margin-bottom: 16px;
+    }
 
     .release-content {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      height: 100%;
-
-      .release-step {
-        width: 50%;
-        margin-left: 25%;
-        margin-bottom: 12px;
-        display: flex;
-        justify-content: space-between;
-      }
+      height: calc(100% - 96px);
+      position: relative;
 
       .release-step-content {
-        height: calc(100% - 56px);
+        height: calc(100% - 82px);
+      }
+
+      .release-footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 24px;
+        border-top: 1px solid #e9e9e9;
       }
     }
+
+
   }
 
-  .release-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    padding: 12px 24px;
-  }
+
 }
 </style>

@@ -13,7 +13,7 @@
               : '请配置当前页面需要的操作按钮'
           }}
         </p>
-        <j-button @click="handleAddBtn()">{{
+        <j-button class="add-btn" @click="handleAddBtn()" type="dashed">{{
           type == 'columns' ? '添加操作' : '添加按钮'
         }}</j-button>
       </div>
@@ -23,24 +23,28 @@
           :draggable="type === 'columns' ? false : true"
         >
           <template #config="{ data }">
-            <j-button
-              type="link"
-              v-if="
-                data.type === 'customer' && data.level === 0 && type !== 'columns'
-              "
-              @click="handleAddBtn(data.key)"
-              >+下级</j-button
-            >
-            <j-button
-              type="link"
-              @click="handleEditBtn(data)"
-              :class="{ error: errorList!.find((item) => item.key == data.key) }"
-              >配置</j-button
-            >
-            <j-button type="link" @click="handleDel(data.key)">删除</j-button>
+            <j-space size="middle">
+              <AIcon
+                v-if="
+                  data.type === 'customer' &&
+                  data.level === 0 &&
+                  type !== 'columns'
+                "
+                type="PlusOutlined"
+                @click="handleAddBtn(data.key)"
+              />
+              <AIcon
+                type="EditOutlined"
+                @click="handleEditBtn(data)"
+                :class="{ error: errorList!.find((item) => item.key == data.key) }"
+              />
+              <AIcon type="DeleteOutlined" @click="handleDel(data.key)" />
+            </j-space>
           </template>
         </BtnTree>
-        <j-button type="text" @click="handleAddBtn()">+ {{ type == 'columns' ? '添加操作' : '添加按钮' }}</j-button>
+        <j-button class="add-btn" type="dashed" @click="handleAddBtn()"
+          >+ {{ type == 'columns' ? '添加操作' : '添加按钮' }}</j-button
+        >
       </div>
     </template>
   </div>
@@ -55,7 +59,7 @@ import {
   typeKey,
   parentKeyKey,
   showColumnsKey,
-  errorListKey
+  errorListKey,
 } from '../keys'
 
 interface Emit {
@@ -84,7 +88,7 @@ const handleEditBtn = (dataRef: OperationConfigTreeItem) => {
 const emits = defineEmits<Emit>()
 
 const handleAddBtn = (parent?: string) => {
-  console.log(editType);
+  console.log(editType)
   editType!.value = 'add'
   parentKey!.value = parent
   emits('update:steps', 'BtnsType')
@@ -102,7 +106,13 @@ const handleDel = (key: string) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
+.btns-list {
+  width: 320px;
+  .add-btn {
+    width: 100%;
+  }
+}
 .title {
   border-left: 1px solid;
   padding: 2px 50px 2px 10px;
@@ -110,5 +120,8 @@ const handleDel = (key: string) => {
 }
 .error {
   color: red;
+}
+:deep(.ant-tree-switcher-noop) {
+  opacity: 0;
 }
 </style>

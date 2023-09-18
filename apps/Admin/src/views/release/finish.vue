@@ -4,20 +4,24 @@
       <div class="label">
         正在发布
       </div>
-      <div class="progress-warp">
-        <div class="progress-inner">
-          <div :class="{'progress-bg': true, 'error': status === 'error'}" :style="{ width: width + '%' }"></div>
+      <div class="finish-body">
+        <div class="progress-warp">
+          <div class="progress-inner">
+            <div :class="{'progress-bg': true, 'error': status === 'error', success: status === 'success'}" :style="{ width: width + '%' }"></div>
+          </div>
         </div>
+        <div style="width:60px; ">{{ width }}%</div>
       </div>
-      <div>{{ width }}%</div>
     </div>
-    <div v-if="loading">
-      {{ status === 'success' ? '发布成功' : '发布失败'}}
+    <div class="finish-status" v-if="loading">
+      <h3 class="status">
+        {{ status === 'success' ? '发布成功!' : '发布失败!'}}
+      </h3>
       <template v-if="status === 'error'">
-        <span >
+        <div class="error-msg" >
           {{ errorMsg }}
-        </span>
-        <j-button type="link" @click="restart">
+        </div>
+        <j-button type="link" @click="restart" danger>
           <template #icon><AIcon type="RedoOutlined" /></template>
            重试
         </j-button>
@@ -41,9 +45,9 @@ const props = defineProps({
 const emit = defineEmits(['update:value'])
 
 const width = ref(0)
-const status = ref('success')
-const loading = ref(false)
-const errorMsg = ref('')
+const status = ref('error')
+const loading = ref(true)
+const errorMsg = ref('errorerrorerrorerrorerrorerrorerror')
 const route = useRoute()
 let count = 0
 
@@ -54,28 +58,28 @@ const { pause, resume } = useIntervalFn(() => {
   }
 }, 100)
 
-const validateDraftFn = (id) => {
-  count = 33.333
-  validateDraft(id).then(resp => {
-    width.value = 33.33
-    releaseDraftFn(id)
-  }).catch((e) => {
-    width.value = 33.33
-    status.value = 'error'
-    loading.value = true
-    errorMsg.value = e?.response?.data?.message
-    console.log(e)
-    pause()
-  })
-}
+// const validateDraftFn = (id) => {
+//   count = 33.333
+//   validateDraft(id).then(resp => {
+//     width.value = 33.33
+//     releaseDraftFn(id)
+//   }).catch((e) => {
+//     width.value = 33.33
+//     status.value = 'error'
+//     loading.value = true
+//     errorMsg.value = e?.response?.data?.message
+//     console.log(e)
+//     pause()
+//   })
+// }
 
 const releaseDraftFn = (id) => {
-  count = 66.66
+  count = 50
   releaseDraft(id).then(resp => {
-    width.value = 66.66
+    width.value = 50
     saveMenuFn()
   }).catch((e) => {
-    width.value = 66.66
+    width.value = 50
     status.value = 'error'
     loading.value = true
     errorMsg.value = e?.response?.data?.message
@@ -84,14 +88,14 @@ const releaseDraftFn = (id) => {
   })
 }
 const saveMenuFn = (id) => {
-  count = 99.99
-  saveMenu(id).then(resp => {
+  count = 90
+  saveMenu(props.tree).then(resp => {
     width.value = 100
     count = 100
     loading.value = true
     pause()
   }).catch((e) => {
-    width.value = 99.99
+    width.value = 90
     status.value = 'error'
     loading.value = true
     errorMsg.value = e?.response?.data?.message
@@ -105,7 +109,7 @@ const releaseStart = async () => {
   const { id } = route.params
 
   if (id) {
-    validateDraftFn(id)
+    releaseDraftFn(id)
   }
 }
 
@@ -142,22 +146,43 @@ defineExpose({
 <style scoped lang="less">
 .finish {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: 12%;
+  padding-top: 10%;
 
   .finish-content {
     .label {
-
+      padding-bottom: 8px;
     }
+
+    .finish-body {
+      display: flex;
+      gap: 24px;
+    }
+  }
+
+  .finish-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+      > h3 {
+        margin: 24px;
+      }
+
+      .error-msg {
+        text-align: center;
+      }
   }
 }
 
 .progress-warp {
-  height: 38px;
-  width: 500px;
+  height: 20px;
+  width: 520px;
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: 10px;
+
 
   .progress-inner {
     height: 100%;
@@ -171,7 +196,11 @@ defineExpose({
   }
 
   .error {
-    background-color: #ff4d4f;
+    background-color: #F74F46;
+  }
+
+  .success {
+    background-color: #24B276;
   }
 }
 </style>

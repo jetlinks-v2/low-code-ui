@@ -9,7 +9,7 @@
       :visible="open"
       :getContainer="() => $refs.listDataRef"
       :destroyOnClose="true"
-      :wrap-style="{ position: 'absolute' }"
+      :wrap-style="{ position: 'absolute', zIndex: 1 }"
       @close="emits('update:open', false)"
     >
       <Table
@@ -25,12 +25,15 @@
         :asyncData="asyncData"
         :configChange="configChange"
         :errorList="errorList"
+        :bindData="dataBinds.columnBind"
+        :bind-function-id="dataBinds.data.function"
         tableType="columnData"
         @handleAdd="handleAdd"
         @configuration="configuration"
         @handleOk="handleOk"
         @bindData="bindData"
         @handleChange="(data) => dataSource = data"
+        @update-bind="(data) => dataBinds.columnBind = data"
       />
       <div v-else>
         <a-page-header title="表头配置" sub-title="" @back="goBack">
@@ -437,14 +440,7 @@ const handleOk = (value: any, data: any) => {
       dataSource.value = data
       break
     case '2':
-      data?.map((item: any) => {
-        const dataFind = dataSource.value?.find(
-          (i: any) => i?.id === item?.id,
-        )
-        if (dataFind?.config !== item?.config) {
-          dataSource.value.push(item)
-        }
-      })
+      dataSource.value.push(...data)
       break
     case '3':
       break
@@ -537,27 +533,15 @@ watch(
   { immediate: true, deep: true },
 )
 
-// watch(() => [JSON.stringify(props.dataSource), JSON.stringify(dataBinds)], () => {
-//   if(!props.dataSource.length && dataBinds?.functionInfo?.configuration?.columns) {
-//     dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(
-//       (item) => {
-//         console.log(`output->item`,item)
-//         return {
-//           id: item.name,
-//           name: item.name,
-//           type: 'string',
-//         }
-//       },
-//     ) || []
-//   }
-// }, {immediate: true})
 
 const valid = () => {
-  return new Promise((resolve) => {
-    errorList.value = validListData(dataSource.value);
-    if(errorList.value.length) throw [{message: '列表数据配置错误'}]
-    else resolve(errorList.value)
-  })
+  errorList.value = validListData(dataSource.value)
+  return errorList.value.length ? [{message: '列表数据配置错误'}] : []
+  // return new Promise((resolve) => {
+  //   errorList.value = validListData(dataSource.value);
+  //   if(errorList.value.length) throw [{message: '列表数据配置错误'}]
+  //   else resolve(errorList.value)
+  // })
 }
 defineExpose({
   errorList,
