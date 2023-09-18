@@ -14,16 +14,15 @@
       </j-form-item>
       <j-form-item
         name="members"
-        :rules="[{ validator: rules.checkMembersList, trigger: 'change' }]"
-      >
+        >
+        <!-- :rules="[{ validator: rules.checkMembersList, trigger: 'change' }]" -->
         <template #label>
           <TitleComponent data="权限控制" />
         </template>
         <div>配置可以使用该流程的成员</div>
-        <ConfigureMembers v-model:members="form.members"></ConfigureMembers>
+        <ConfigureMembers :isNode="false" v-model:members="form.members"></ConfigureMembers>
       </j-form-item>
     </j-form>
-    <!-- <j-button style="width: 200px" @click="submit1">提交</j-button> -->
   </div>
 </template>
 <script setup lang="ts">
@@ -59,14 +58,14 @@ const rules = {
       return Promise.resolve()
     }
   },
-  checkMembersList: async (_rule: any, value: string): Promise<any> => {
-    console.log(`output->value`, value)
-    if (form.members.length === 0) {
-      return Promise.reject('请配置成员')
-    } else {
-      return Promise.resolve()
-    }
-  },
+  // checkMembersList: async (_rule: any, value: string): Promise<any> => {
+  //   console.log(`output->value`, value)
+  //   if (form.members.length === 0) {
+  //     return Promise.reject('请配置成员')
+  //   } else {
+  //     return Promise.resolve()
+  //   }
+  // },
 }
 watch(
   () => form,

@@ -130,9 +130,9 @@ const members: any = inject('members')
 
 const columns = computed(() => {
   if (props.isNode) {
-    return defaultColumns
+    return defaultColumns(props.selectKey)
   } else {
-    return defaultColumns.filter((item) => item.key !== 'weights')
+    return defaultColumns(props.selectKey).filter((item) => item.key !== 'weights')
   }
 })
 
@@ -295,7 +295,7 @@ watch(
   () => {
     if (!props.isNode) {
       // 基础信息
-      // getTreeData
+      getTreeData()
     } else {
       // 设计流程
       getTreeData()

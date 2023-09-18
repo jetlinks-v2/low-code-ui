@@ -56,7 +56,7 @@
             undeployed: 'error',
             deployed: 'success',
           }"
-          @click="_view(record)"
+          @click="handleView(record)"
         >
           <template #content>
             <div class="card-item">
@@ -223,8 +223,7 @@ const getActions = computed(() => (record, type = 'card') => {
         },
         hasPermission: false,
         onClick: () => {
-          // _view(data)
-          // handleSave(data)
+          handleView(data)
         },
       }),
     },
@@ -326,7 +325,13 @@ const handleSave = (data: any) => {
  */
 const _view = (data: any) => {
   drawer.selectItem = { ...data }
-  //   drawer.visible = true
+  drawer.visible = true
+}
+/**
+ * 查看
+ * @param data 
+ */
+const handleView = (data: any) => {
   router.push({
     path: '/flow-engine/model/detail',
     query: {
