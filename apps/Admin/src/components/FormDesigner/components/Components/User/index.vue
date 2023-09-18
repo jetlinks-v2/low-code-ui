@@ -8,6 +8,8 @@
     :options="selectOptions"
     :mode="mode"
     :disabled="disabled"
+    :size="size"
+    style="min-width: 230px;"
   >
   </j-select>
   <UserChoice
@@ -35,6 +37,10 @@ const props = defineProps({
   disabled: {
     type: Boolean,
     default: false,
+  },
+  size: {
+    type: String,
+    default: '',
   },
 })
 
