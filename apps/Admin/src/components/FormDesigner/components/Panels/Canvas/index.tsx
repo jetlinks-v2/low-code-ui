@@ -85,7 +85,8 @@ const Canvas = defineComponent({
       margin: '10px 10px 0 10px',
       paddingTop: '10px',
       height: '100%',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      width: !unref(designer.formData)?.children?.length && "100%"
     }
 
     const onPaste = () => {

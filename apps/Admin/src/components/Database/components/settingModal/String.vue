@@ -24,7 +24,7 @@
       :options="[
         {
           label: '新增/保存',
-          value: 'add'
+          value: 'insert'
         },
         {
           label: '修改',
@@ -87,7 +87,7 @@ const rulesOptions = [
 
 const groupChange = (v) => {
   const groupSet = new Set(v)
-  if (groupSet.has('add')) {
+  if (groupSet.has('insert')) {
     groupSet.add('save')
   } else {
     groupSet.delete('save')

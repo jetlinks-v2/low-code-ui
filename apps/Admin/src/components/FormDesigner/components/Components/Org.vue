@@ -6,6 +6,8 @@
     :multiple="mode === 'multiple'"
     :disabled="disabled"
     placeholder="请选择"
+   :size="size"
+   style="min-width: 230px;"
   >
   </j-tree-select>
 </template>
@@ -30,6 +32,10 @@ const props = defineProps({
   disabled: {
     type: Boolean,
     default: false,
+  },
+  size: {
+    type: String,
+    default: '',
   },
 })
 const emit = defineEmits(['update:value'])

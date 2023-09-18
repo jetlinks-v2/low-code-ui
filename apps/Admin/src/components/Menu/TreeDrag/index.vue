@@ -89,8 +89,7 @@ const expandMap = new Map()
 const handleTree = (tree) => {
     const arr = cloneDeep(tree)
     arr.forEach(item => {
-        if (item.options) {
-            if (item.options?.pageId) {
+        if (item.options?.pageId) {
                 expandMap.set(item.id, item.options?.pageId)
                 if (countMap.value.has(item.options.pageId)) {
                     // debugger;
@@ -103,7 +102,6 @@ const handleTree = (tree) => {
             if (item.children) {
                 handleTree(item.children)
             }
-        }
         return;
     });
 }
@@ -117,11 +115,22 @@ const onAction = (data: any, option: string) => {
     }
 }
 
+//判断children下的pageId
+const deleteMap = (arr)=>{
+    arr.forEach(item=>{
+        if(item.options?.pageId){
+            countMap.value.set(item.options.pageId, countMap.value.get(item.options.pageId) - 1)
+        }
+        if(item.children){
+            deleteMap(item.children)
+        }
+        return;
+    })
+}
+
 const onDel = (item) => {
     treeData.value = DeleteTreeById(treeData.value, item.id)
-    if (item.options) {
-        countMap.value.set(item.options.pageId, countMap.value.get(item.options.pageId) - 1)
-    }
+    deleteMap([item])
     visibleDel.value = false
 }
 
@@ -137,7 +146,7 @@ const setVisible = (value) => {
 
 //拖拽
 const onDrop = (info: AntTreeNodeDropEvent) => {
-    // console.log('info-----------', info)
+    // console.log('info-----------', info.dropToGap,info)
     const dropKey = info.node.key;
     const dragKey = info.dragNode.key;
     const dropPos: any = info.node.pos?.split('-');
@@ -154,12 +163,14 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
         });
     };
     const data = cloneDeep([...treeData.value]);
+    // const data = [...treeData.value]
     let dragObj: any;
     loop(data, dragKey, (item: TreeDataItem, index: number, arr: TreeProps['treeData']) => {
         arr?.splice(index, 1);
         dragObj = item;
     });
     if (!info.dropToGap) {
+       
         // Drop on the content
         loop(data, dropKey, (item: any) => {
             item.children = item.children || [];
@@ -171,10 +182,13 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
         info.node.expanded && // Is expanded
         dropPosition === 1 // On the bottom gap
     ) {
-        loop(data, dropKey, (item: any) => {
+        console.log('-----------',info,)
+        loop(data, dropKey, (item: any,index:number,arr:any) => {
             item.children = item.children || [];
             // where to insert 示例添加到头部，可以是随意位置
-            item.children.unshift(dragObj);
+            console.log('item--------',item)
+            arr.splice(index + 1, 0, dragObj);
+
         });
     } else {
         let ar: TreeProps['treeData'] = [];
@@ -189,7 +203,6 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
             ar.splice(i + 1, 0, dragObj);
         }
     }
-    // console.log('data',data)
     const level = getTreeLevel(data)
 
     if (level > 2) {
@@ -200,25 +213,27 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
 }
 
 const onExpand = (keys) => {
-    console.log('keys', keys)
+    // console.log('keys', keys)
     autoExpandParent.value = false
 }
 
 const getKeyByValue = (arr) => {
     const keys: any = []
+    const ids = treeData.value.map(item=>item.id)
     for (const [key, value] of expandMap.entries()) {
         if (arr.includes(value)) {
             keys.push(key);
         }
     }
-    return keys
+    //父级不展开
+    return keys.filter(item=>!ids.includes(item))
 }
 
 watch(
     () => props.list,
     (val: any) => {
         countMap.value.clear()
-        treeData.value = [...treeData.value, ...val]
+        treeData.value = [...val,...treeData.value]
         handleTree(treeData.value)
     },
     { immediate: true }
@@ -244,11 +259,11 @@ watch(
 watch(
     () => props.checkedKey,
     (val) => {
-        console.log('val', val)
         const arr = getKeyByValue(val)
         expandedKeys.value = arr
         autoExpandParent.value = true
-    }
+    },
+    { deep: true, immediate: true }
 )
 
 const getTree = async () => {

@@ -10,7 +10,6 @@ import { ReplStore } from './store'
 import 'splitpanes/dist/splitpanes.css'
 import { useProduct } from '@/store/product'
 import { storeToRefs } from 'pinia'
-import { useEngine } from '@/store/engine'
 import { onlyMessage } from '@jetlinks/utils'
 import { BASE_INFO, MENU_CONFIG } from "@/components/ListPage/keys";
 
@@ -18,10 +17,9 @@ const props = defineProps({
   data: Object
 })
 
-const engineStore = useEngine()
+
 const productStore = useProduct()
-const { files, activeFile } = storeToRefs(engineStore)
-const store = new ReplStore(files.value[activeFile.value]?.configuration?.code)
+const store = new ReplStore(props.data?.configuration?.code)
 const vueMode = ref(true)
 store.init()
 provide('store', store)
@@ -34,23 +32,38 @@ enum OperType {
 }
 
 const onChange = debounce((code: string) => {
-  store.state.activeFile.code = code
+  productStore.update({
+    ...props.data,
+    configuration: {
+      type: 'html',
+      code
+    }
+  })
 }, 250)
 
-const onBlur = debounce(() => updateStoreCode(), 250)
+// const onBlur = debounce(() => updateStoreCode(), 250)
 
 const drawerVisible = ref(false)
 const $drawerWidth = ref('50%')
 const drawerTitle = ref('预览')
 
 const handleDbClickViewName = () => {
-  $drawerWidth.value = $drawerWidth.value === '98%' ? '50%' : '98%'
+  if (activeOper.value === OperType.View) {
+    $drawerWidth.value = $drawerWidth.value === 'calc(100% - 50px)' ? '50%' : 'calc(100% - 50px)'
+  }
+}
+
+const handleDbCLickEditor = () => {
+  if (activeOper.value === OperType.View) {
+    $drawerWidth.value = $drawerWidth.value === '50%' ? '0%' : '50%'
+  }
 }
 
 const activeOper = ref('')
 const menuListRef = ref()
 const menuFormData = ref({ pageName: '', main: true, name: '', icon: '' })
 const menuChangeValue = ref()
+const replRef = ref()
 const errors = ref([] as any)
 const handleOperClick = (type: OperType) => {
   if (type === activeOper.value) {
@@ -162,13 +175,12 @@ defineExpose({
 </script>
 
 <template>
-  <div class="jetlinks-repl">
+  <div class="jetlinks-repl" ref="replRef">
     <SplitPane class="split-pane">
       <template #editor>
-        <EditorContainer>
+        <EditorContainer @dbClick="handleDbCLickEditor">
           <MonacoEditor
             @change="onChange"
-            @blur="onBlur"
             :filename="store.state.activeFile.filename"
             :value="store.state.activeFile.code"
           />
@@ -198,19 +210,48 @@ defineExpose({
           :class="{ active: activeOper === OperType.View }"
           @click="handleOperClick(OperType.View)"
         >
-          预览
+          <AIcon type="CaretRightOutlined"/>
         </div>
         <div
           class="list-item"
           :class="{ active: activeOper === OperType.Menu }"
           @click="handleOperClick(OperType.Menu)"
         >
-          菜单配置
+          <AIcon type="MenuOutlined"/>
         </div>
       </div>
     </div>
-
-    <div class="drawer-content" v-show="drawerVisible">
+<!--    <j-drawer-->
+<!--      v-model:visible="drawerVisible"-->
+<!--      :title="drawerTitle"-->
+<!--      :width=" activeOper === OperType.View ? '50%' : 500"-->
+<!--      placement="right"-->
+<!--      :style="{ position: 'absolute' }"-->
+<!--      :closable="false"-->
+<!--      :get-container="false"-->
+<!--      :maskStyle="{-->
+<!--        opacity: 0.5-->
+<!--      }"-->
+<!--      @close="activeOper = ''"-->
+<!--    >-->
+<!--      <template #extra>-->
+<!--        <j-button-->
+<!--          v-if="activeOper === OperType.View"-->
+<!--          type="primary"-->
+<!--          @click.stop="runCode"-->
+<!--          @dblclick.stop-->
+<!--          :loading="runLoading"-->
+<!--        >运行</j-button>-->
+<!--      </template>-->
+<!--      <Preview v-if="activeOper === OperType.View" ref="previewRef" />-->
+<!--      <MenuList-->
+<!--        v-else-if="activeOper === OperType.Menu"-->
+<!--        ref="menuListRef"-->
+<!--        :form-data="menuFormData"-->
+<!--        @update:form="updateMenuFormData"-->
+<!--      />-->
+<!--    </j-drawer>-->
+    <div class="drawer-content" :style="{ width: $drawerWidth }" v-show="drawerVisible">
       <div class="drawer-header">
         <div class="drawer-title" @dblclick="handleDbClickViewName">
           {{ drawerTitle }}
@@ -222,8 +263,7 @@ defineExpose({
             @dblclick.stop
             :loading="runLoading"
           >运行
-          </j-button
-          >
+          </j-button>
         </div>
       </div>
       <div class="drawer-body">
@@ -241,34 +281,43 @@ defineExpose({
 
 <style lang="less" scoped>
 .jetlinks-repl {
-  height: calc(100vh - 48px);
+  height: 100%;
   display: flex;
   position: relative;
   .split-pane {
-    width: 98%;
+    width: calc(100% - 50px);
   }
   .right-oper {
-    width: 2%;
+    padding: 0 8px;
 
     .oper-list {
       width: 100%;
       text-align: center;
       display: grid;
       justify-content: center;
-      margin-top: 14px;
+      margin-top: 16px;
 
       .list-item {
         cursor: pointer;
         writing-mode: vertical-rl;
         text-orientation: upright;
-        padding-bottom: 18px;
-        font-size: 17px;
+        font-size: 16px;
         user-select: none;
+        border-radius: 4px;
+        background-color: #F6F6F6;
+        padding: 8px 4px;
+        transition: all .3s ease-in;
+
+        &:not(:last-child) {
+          margin-bottom: 16px;
+        }
+
         &:hover {
           color: var(--ant-primary-color);
         }
         &.active {
           color: var(--ant-primary-color);
+          background-color: #F0F0F0;
         }
       }
     }
@@ -276,13 +325,16 @@ defineExpose({
 }
 .drawer-content {
   position: absolute;
-  right: 2%;
+  right: 50px;
   top: 0;
-  width: v-bind('$drawerWidth');
+  width: 50%;
   height: 100%;
   margin: 0;
   background-color: #fff;
   overflow-y: auto;
+  border-right: 1px solid #f0f0f0;
+  z-index: 20;
+
   .drawer-header {
     position: relative;
     padding: 16px 24px;
