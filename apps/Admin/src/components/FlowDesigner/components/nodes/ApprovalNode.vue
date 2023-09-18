@@ -1,3 +1,4 @@
+<!-- 审批节点 -->
 <template>
   <Node
     :title="config.name"

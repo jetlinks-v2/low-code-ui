@@ -1,3 +1,4 @@
+<!-- 根节点 -->
 <template>
   <Node
     title="发起申请"

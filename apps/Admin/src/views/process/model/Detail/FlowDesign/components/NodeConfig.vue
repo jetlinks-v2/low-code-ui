@@ -1,3 +1,4 @@
+<!-- 节点配置 -->
 <template>
   <component
     :is="componentsMap[(selectedNode.type || '').toUpperCase()]"

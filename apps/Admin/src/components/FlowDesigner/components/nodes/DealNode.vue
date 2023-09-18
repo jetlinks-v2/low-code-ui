@@ -1,3 +1,4 @@
+<!-- 处理节点 -->
 <template>
   <node
     :title="config.name"
