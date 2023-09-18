@@ -87,6 +87,7 @@
           <j-input
             placeholder="请输入"
             @change="onDataChange"
+            :maxlength="32"
             v-model:value="target.componentProps.value"
           />
         </j-form-item>

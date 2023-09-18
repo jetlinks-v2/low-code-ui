@@ -306,7 +306,7 @@ export const deleteDataByKey = (arr: any[], _items: any[]) => {
 
 // 插入数据，主要是为了粘贴
 export const copyDataByKey = (arr: any[], newData: any[], _item: any) => {
-    const _index = arr.findIndex(item => item.key === _item.key)
+    const _index = arr.findIndex(item => item?.key === _item?.key)
     if (_index === -1) {
         return arr.map(item => {
             return {
@@ -405,15 +405,18 @@ export const handleCopyData = (arr: any[]) => {
 }
 
 // 查找父节点
-export const findParentById = (obj: any, _item: any) => {
-    if (obj?.children?.length) {
-        for (let index = 0; index < obj.children.length; index++) {
-            const element = obj?.children[index];
-            if(element.key === _item.key){
-                return obj
+export const findParentById = (tree: any, node: any) => {
+    let result: any = []
+    function find(node, tree){
+        tree?.children.forEach(item => {
+            if(item.key === node.key){
+                result.push(tree)
             }
-            return findParentById(element, _item)
-        }
+            if('children' in item){
+                find(node, item)
+            }
+        })
     }
-    return undefined
+    find(node, tree)
+    return result?.[0]
 }

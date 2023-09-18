@@ -121,7 +121,8 @@ const DraggableLayout = defineComponent({
                                     set(designer.formState, _path, newValue)
                                 }, 
                                 {
-                                    deep: true
+                                    deep: true,
+                                    immediate: true
                                 }
                             )
                             watch(
@@ -130,7 +131,8 @@ const DraggableLayout = defineComponent({
                                     set(designer.formState, _path, newValue)
                                 }, 
                                 {
-                                    deep: true
+                                    deep: true,
+                                    immediate: true
                                 }
                             )
 
@@ -183,7 +185,7 @@ const DraggableLayout = defineComponent({
 
                             return (
                                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                                    <FormItem {...unref(_props.formItemProps)} name={_path}>
+                                    <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true}>
                                         {
                                             unref(isEditModel) ? 
                                             <TypeComponent
@@ -231,7 +233,7 @@ const DraggableLayout = defineComponent({
             animation: 150,
             multiDrag: true,
             itemKey: 'key',
-            selectedClass: "sortable-selected",
+            // selectedClass: "sortable-selected",
             multiDragKey: platform.includes('mac') ? "Meta" : "Ctrl",
             group: { name: "j-canvas" },
             //拖动结束

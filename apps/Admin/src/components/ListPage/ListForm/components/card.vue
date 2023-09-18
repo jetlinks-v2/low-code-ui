@@ -192,7 +192,7 @@
 import Upload from '@/components/Upload/Image/ImageUpload.vue'
 import { ErrorItem } from '../..';
 import EditorModal from '@/components/EditorModal'
-import { LIST_FORM_INFO, ACTION_CONFIG_KEY, DATA_BIND } from '../../keys';
+import { LIST_FORM_INFO, ACTION_CONFIG_KEY, DATA_BIND, DATA_SOURCE } from '../../keys';
 const props = defineProps({
   id: {
     type: null,
@@ -210,6 +210,7 @@ const cardState = reactive({
 //卡片展示内容form
 const formState = inject(LIST_FORM_INFO)
 const dataBind = inject(DATA_BIND)
+const dataSource = inject(DATA_SOURCE)
 
 const errorData = computed(() => {
   return (val: string) => {
@@ -322,12 +323,7 @@ const statusColor = ref({
 })
 
 const titleOptions = computed(() => {
-  return dataBind.columnBind?.map((item) => {
-    return {
-      id: item.alias,
-      name: item.comment
-    }
-  })
+  return dataSource
 })
 
 defineExpose({

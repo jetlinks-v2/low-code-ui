@@ -1,33 +1,45 @@
 <template>
-  <div class="crud-warp">
-    <j-spin tip="正在校验..." :spinning="loading">
-      <j-tabs >
-        <j-tab-pane key="1">
-          <template #tab>
+  <div class="crud-warp" ref="warpRef">
+    <div class="crud-header">
+      <div class="crud-tabs">
+        <j-badge :count="errorDataTableLength" >
+          <div :class="{'crud-tabs-item': true, 'active': activeKey === 'table'}" @click=" activeKey = 'table'">
             表结构
-            <j-badge v-if="errorDataTableLength" :count="errorDataTableLength" />
-          </template>
-          <DataTable
-            ref="dataTableRef"
-            v-model:tableName="tableName"
-            v-model:columns="columns"
-            :tree="tree"
-            :ownerId="ownerId"
-            @update="update"
-          />
-        </j-tab-pane>
-        <j-tab-pane key="2" tab="数据">
-          <DataSetting
-            :id="props.id"
-            :parentId="props.parentId"
-          />
-        </j-tab-pane>
-        <j-tab-pane key="3" >
-          <template #tab>
+          </div>
+        </j-badge>
+        <div :class="{'crud-tabs-item': true, 'active': activeKey === 'data'}" @click=" activeKey = 'data'">
+          数据
+        </div>
+        <j-badge :count="errorRelationLength" >
+          <div :class="{'crud-tabs-item': true, 'active': activeKey === 'adv'}" @click=" activeKey = 'adv'">
             高级配置
-            <j-badge v-if="errorTips.relation.length" :count="errorTips.relation.length" />
-          </template>
+          </div>
+        </j-badge>
+      </div>
+      <j-button class="extra-check" type="primary" @click="validate">校验</j-button>
+    </div>
+    <div class="crud-body">
+      <CardBox  v-show="activeKey === 'table'" style="height: 100%">
+        <DataTable
+
+          ref="dataTableRef"
+          v-model:tableName="tableName"
+          v-model:columns="columns"
+          :tree="tree"
+          :ownerId="ownerId"
+          @update="update"
+        />
+      </CardBox>
+      <CardBox v-show="activeKey === 'data'" style="height: 100%">
+        <DataSetting
+
+          :id="props.id"
+          :parentId="props.parentId"
+        />
+      </CardBox>
+        <j-scrollbar>
           <Advanced
+            v-show="activeKey === 'adv'"
             ref="advancedRef"
             v-model:tree="tree"
             v-model:asset="asset"
@@ -36,23 +48,18 @@
             :parentId="props.parentId"
             @update="update"
           />
-        </j-tab-pane>
-        <template #rightExtra>
-          <j-button class="extra-check" @click="validate">校验</j-button>
-        </template>
-      </j-tabs>
-    </j-spin>
+        </j-scrollbar>
+    </div>
   </div>
 </template>
 
 <script setup class="CRUDBase">
-import { CRUD_COLUMNS } from "@/components/Database/util";
+import {CRUD_COLUMNS, WARP_REF} from "@/components/Database/util";
 import DataTable from './table.vue'
 import DataSetting from './data.vue'
 import Advanced from './advanced.vue'
 import { useProduct } from '@/store'
 import { defaultSetting } from './setting'
-import {executeReq} from "@/api/basis";
 
 const props = defineProps({
   configuration: {
@@ -88,10 +95,13 @@ const props = defineProps({
 const tableColumns = ref([])
 const dataTableRef = ref()
 const advancedRef = ref()
+const warpRef = ref()
+const activeKey = ref('table')
 
 const project = useProduct()
 
 provide(CRUD_COLUMNS, tableColumns)
+provide(WARP_REF, warpRef)
 
 const ownerId = computed(() => {
   return `${project.info?.id}.${props.parentId}.${props.id}`
@@ -130,9 +140,12 @@ const errorTips = reactive({
 })
 
 const errorDataTableLength = computed(() => {
-  return errorTips.dataTable ? Object.keys(errorTips.dataTable).length : false
+  return errorTips.dataTable ? Object.keys(errorTips.dataTable).length : 0
 })
 
+const errorRelationLength = computed(() =>{
+  return errorTips.relation?.length || 0
+})
 
 const validate = async () => {
   loading.value = ref(true)
@@ -142,6 +155,7 @@ const validate = async () => {
     await advancedRef.value.validates()
     errorTips.relation = []
   } catch (e) {
+    console.log('crud-advanced',e)
     errorTips.relation = e
   }
 
@@ -149,8 +163,8 @@ const validate = async () => {
     await dataTableRef.value.validates()
     errorTips.dataTable = {}
   } catch (e) {
-
-    errorTips.dataTable = e.errorFields || {}
+    console.log('crud-table',e)
+    errorTips.dataTable = e || {}
   }
 
   loading.value = false
@@ -193,12 +207,40 @@ defineExpose({
 
 <style scoped lang="less">
 .crud-warp {
-  .crud-content {
-    padding: 0 24px;
+  height: 100%;
+  position: relative;
+  width: 100% !important;
+
+  .crud-header {
+    padding: 4px 24px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #D9D9D9;
+
+    .crud-tabs {
+      display: flex;
+      gap: 8px;
+
+      .crud-tabs-item {
+        width: 98px;
+        text-align: center;
+        border-radius: 4px;
+        line-height: 32px;
+        cursor: pointer;
+        transition: all .3s ease-in;
+
+        &.active {
+          color: #315EFB;
+          background-color: #E4EAFF;
+        }
+      }
+    }
   }
 
-  .extra-check {
-    margin-right: 24px;
+  .crud-body {
+    height: calc(100% - 42px);
+    background-color: rgb(246,246,246);
+    padding: 24px;
   }
 }
 </style>

@@ -11,7 +11,9 @@ defineProps({
       <slot name="title"></slot>
       {{ $slots.title ? '' : title }}
     </div>
-    <slot></slot>
+    <div class="content">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -27,6 +29,10 @@ defineProps({
     border-bottom: 1px #2a2a2a solid;
     display: flex;
     justify-content: flex-start;
+  }
+
+  .content {
+    height: calc(100% - 36px);
   }
 }
 </style>

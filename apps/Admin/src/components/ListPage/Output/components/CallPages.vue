@@ -83,13 +83,13 @@ const getInfo = async () => {
 }
 
 const handleSubmit = async () => {
-  // formPage.value.onSave()
+  const data = await formPage.value.onSave()
   confirmLoading.value = true;
-  const data = {
-    data: { name: '123' },
+  const params = {
+    data,
   }
   if(mode.value == 'edit') {
-    data['terms'] = [
+    params['terms'] = [
       {
         terms: [
           { column: 'id', termType: 'eq', value: props.popData.id }
@@ -101,7 +101,7 @@ const handleSubmit = async () => {
     props.resource.callPage.projectId,
     props.resource.function,
     props.resource.command,
-    data,
+    params,
   ).finally(() => confirmLoading.value = false)
   emit('reload')
 }
@@ -122,6 +122,7 @@ watch(
 watch(
   () => props.popData,
   (val) => {
+    console.log(val);
     editValue.value = val
   },
   { immediate: true }

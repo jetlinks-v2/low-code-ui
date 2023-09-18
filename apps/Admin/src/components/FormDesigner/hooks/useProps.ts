@@ -12,6 +12,18 @@ const useProps = (element: any, _data: any, isEditModel: boolean, mode?: string)
         }
       }
     }
+    if(item?.pattern){
+      let _pattern: any;
+      try {
+        _pattern = new RegExp(item?.pattern)
+      } catch (error) {
+      }
+      
+      return {
+        ...omit(item, ['pattern', 'key']),
+        pattern: _pattern
+      }
+    }
     return {...omit(item, 'key')}
   })
   // componentProps

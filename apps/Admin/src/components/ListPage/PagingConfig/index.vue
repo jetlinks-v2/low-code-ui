@@ -9,7 +9,7 @@
       :visible="open"
       :getContainer="() => $refs.pagingConfig"
       :destroyOnClose="true"
-      :wrap-style="{ position: 'absolute', zIndex: 1 }"
+      :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
       @close="emits('update:open', false)"
     >
       <p>请配置分页器支持的单页数据量</p>

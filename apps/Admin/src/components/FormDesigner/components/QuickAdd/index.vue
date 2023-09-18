@@ -11,9 +11,9 @@
       <p>自由组合快速添加表单页内容</p>
       <div class="content">
         <j-form :layout="'vertical'" ref="formRef" :model="modelRef">
-          <j-form-item label="后端功能">
-            <j-row :gutter="24">
-              <j-col :span="12">
+          <j-row :gutter="24">
+            <j-col :span="12">
+              <j-form-item label="后端功能" :name="['source', 'functionId']">
                 <j-select
                   showSearch
                   placeholder="请选择"
@@ -22,8 +22,19 @@
                   @change="onFunChange"
                   allowClear
                 />
-              </j-col>
-              <j-col :span="12">
+              </j-form-item>
+            </j-col>
+            <j-col :span="12">
+              <j-form-item
+                :rules="[
+                  {
+                    required: modelRef.source.functionId,
+                    message: '请选择',
+                  },
+                ]"
+                :name="['source', 'commandId']"
+                style="padding-top: 28px"
+              >
                 <j-select
                   showSearch
                   placeholder="请选择"
@@ -32,10 +43,18 @@
                   @change="onCommChange"
                   allowClear
                 />
-              </j-col>
-            </j-row>
-          </j-form-item>
-          <j-form-item name="sourceData">
+              </j-form-item>
+            </j-col>
+          </j-row>
+          <j-form-item
+            :name="['source', 'sourceData']"
+            :rules="[
+              {
+                required: modelRef.source.functionId,
+                message: '请选择',
+              },
+            ]"
+          >
             <j-tree-select
               showSearch
               placeholder="请选择"
@@ -323,7 +342,10 @@ const handleSource = (arr: any[]) => {
   return _array
 }
 
-const onSave = () => {
+const onSave = async () => {
+  const valid = await formRef.value?.validate()
+  console.log(valid)
+  if (!valid) return
   const obj: any = {
     json: undefined,
     formCopy: undefined,
@@ -402,7 +424,7 @@ const onOk = () => {
   display: flex;
   width: 100%;
   right: 0;
-  justify-content: flex-end;
+  // justify-content: flex-end;
   padding: 10px 24px;
   border-top: 1px solid #f0f0f0;
   background-color: #ffffff;
