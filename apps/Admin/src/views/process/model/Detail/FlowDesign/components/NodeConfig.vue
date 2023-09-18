@@ -8,6 +8,7 @@
 <script setup lang="ts">
 import { useFlowStore } from '@/store/flow'
 import ApprovalNodeConfig from './ApprovalNodeConfig.vue'
+import DealNodeConfig from './DealNodeConfig.vue'
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
@@ -15,7 +16,7 @@ const selectedNode = computed(() => flowStore.selectedNode)
 
 const componentsMap = {
   APPROVAL: ApprovalNodeConfig,
-  //   DEAL: Deal,
+  DEAL: DealNodeConfig,
   //   CONDITION: Condition,
 }
 </script>
