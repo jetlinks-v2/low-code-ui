@@ -147,7 +147,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="preview-container" ref="preview"></div>
+    <div class="preview-container" ref="preview"></div>
 </template>
 
 <style lang="less" scoped>
