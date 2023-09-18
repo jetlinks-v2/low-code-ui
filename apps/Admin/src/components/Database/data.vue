@@ -5,7 +5,7 @@
         正在查看 {{ project.info.version }} 发布版本下的 {{total}} 条数据
       </span>
       <span v-else>
-        暂无数据，请发布后查看
+        暂无数据，请在项目发布后查看
       </span>
     </div>
     <div class="table" v-if="project.published">

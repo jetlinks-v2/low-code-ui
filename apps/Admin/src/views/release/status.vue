@@ -101,6 +101,7 @@
 import { useEngine, useProduct } from '@/store'
 import { providerEnum } from '@/components/ProJect/index'
 import { validateDraft } from "@/api/project";
+import { regular } from '@jetlinks/utils'
 
 const emit = defineEmits(['update:status'])
 
@@ -227,7 +228,12 @@ const validateAll = async (id, cb) => {
 
   if (providerEnum.SQL === item.type) {
     const hasSql = !item.configuration.sql
-    handleStatusItem(item.id, hasSql ? 1 : 2, hasSql ? ['请输入sql'] : [] )
+    if (!hasSql) {
+      handleStatusItem(item.id, hasSql ? 1 : 2, hasSql ? ['请输入sql'] : [] )
+    } else {
+      const _sql = !regular.isSql(item.configuration.sql)
+      handleStatusItem(item.id, _sql ? 1 : 2, _sql ? ['请输入正确的sql'] : [] )
+    }
     cb?.()
     return
   }

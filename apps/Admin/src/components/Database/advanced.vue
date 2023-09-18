@@ -342,13 +342,30 @@ const getApi = (v) => {
 defineExpose({
   validates: () => {
     return new Promise(async (resolve, reject) => {
-      try {
-        const r = await relationRef.value?.validate()
-        const a = await assetRef.value?.validate()
-        resolve(r)
-      } catch (e) {
-        reject(e)
-      }
+      relationRef.value?.validate().then((r) => {
+        assetRef.value?.validate().then(() => {
+          resolve(r)
+        }).catch(e => {
+          reject(e.errorFields.map(item => {
+            const key = item.name[0]
+            const msg = item.errors[0]
+            return {
+              [key]: msg
+            }
+          }))
+        })
+      }).catch((e) => {
+        assetRef.value?.validate().catch(ea => {
+          const errors = [...e.errorFields, ...ea.errorFields]
+          reject(errors.map(item => {
+            const key = item.name[0]
+            const msg = item.errors[0]
+            return {
+              [key]: msg
+            }
+          }))
+        })
+      })
     })
   }
 })

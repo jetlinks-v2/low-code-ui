@@ -369,7 +369,7 @@ const JavaTypeChange = (record) => {
           provider: undefined,
           configuration: {
             message: undefined,
-            group: []
+            group: ['save', 'update', 'insert']
           }
         },
         spec: undefined
