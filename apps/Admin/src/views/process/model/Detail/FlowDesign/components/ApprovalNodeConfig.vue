@@ -119,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import ConfigureForm from '../ConfigureForm.vue'
+import ConfigureForm from './ConfigureForm.vue'
 
 const activeKey = ref('basic')
 const props = defineProps({

@@ -45,9 +45,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import BasicInfo from './BasicInfo.vue'
-import FlowDesign from './FlowDesign.vue'
-import ShowCopy from './ShowCopy.vue'
+import BasicInfo from './BasicInfo/index.vue'
+import FlowDesign from './FlowDesign/index.vue'
+import ShowCopy from './ShowCopy/index.vue'
 
 const current = ref(0)
 const componentsMap = {

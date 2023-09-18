@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import FlowDesigner from '@/components/FlowDesigner'
-import NodeConfig from '@/components/FlowDesigner/components/config/NodeConfig.vue'
+import NodeConfig from './components/NodeConfig.vue'
 import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
