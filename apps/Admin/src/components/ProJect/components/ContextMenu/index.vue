@@ -15,18 +15,54 @@
                <j-menu-item :key="actionMap['Rename'].key">{{ actionMap['Rename'].value }}</j-menu-item>
                <j-menu-item :key="actionMap['Delete'].key">{{ actionMap['Delete'].value }}</j-menu-item>
             </j-menu>
-            
+
             <j-menu v-else @click="handleClick">
                <j-sub-menu :key="actionMap['Add'].key" :title="actionMap['Add'].value" style="width: 150px;">
-                  <j-menu-item :key="providerEnum.Module">{{ providerMap[providerEnum.Module] }}</j-menu-item>
-                  <j-menu-item :key="providerEnum.HtmlPage">{{ providerMap[providerEnum.HtmlPage] }}</j-menu-item>
-                  <j-menu-item :key="providerEnum.ListPage">{{ providerMap[providerEnum.ListPage] }}</j-menu-item>
-                  <j-menu-item :key="providerEnum.FormPage">{{ providerMap[providerEnum.FormPage] }}</j-menu-item>
-                  <j-menu-item :key="providerEnum.CRUD">{{ providerMap[providerEnum.CRUD] }}</j-menu-item> 
-                  <j-menu-item :key="providerEnum.SQL">{{ providerMap[providerEnum.SQL] }}</j-menu-item>
-                  <j-menu-item :key="providerEnum.Function">{{ providerMap[providerEnum.Function] }}</j-menu-item>
+                  <j-menu-item :key="providerEnum.Module">
+                     <template #icon>
+                        <img :src="getImage('/project/module.png')" style="width: 24px; height: 24px;">
+                     </template>
+                     {{ providerMap[providerEnum.Module] }}
+                  </j-menu-item>
+                  <j-menu-item :key="providerEnum.HtmlPage">
+                     <template #icon>
+                        <img :src="getImage('/project/html.png')" style="width: 24px; height: 24px;">
+                     </template>
+                     {{ providerMap[providerEnum.HtmlPage] }}
+                  </j-menu-item>
+                  <j-menu-item :key="providerEnum.ListPage">
+                     <template #icon>
+                        <img :src="getImage('/project/list.png')" style="width: 24px; height: 24px;">
+                     </template>
+                     {{ providerMap[providerEnum.ListPage] }}
+                  </j-menu-item>
+                  <j-menu-item :key="providerEnum.FormPage">
+                     <template #icon>
+                        <img :src="getImage('/project/form.png')" style="width: 24px; height: 24px;">
+                     </template>
+                     {{ providerMap[providerEnum.FormPage] }}
+                  </j-menu-item>
+                  <j-menu-item :key="providerEnum.CRUD">
+                     <template #icon>
+                        <img :src="getImage('/project/curd.png')" style="width: 24px; height: 24px;">
+                     </template>
+                     {{ providerMap[providerEnum.CRUD] }}
+                  </j-menu-item>
+                  <j-menu-item :key="providerEnum.SQL">
+                     <template #icon>
+                        <img :src="getImage('/project/sql.png')" style="width: 24px; height: 24px;">
+                     </template>
+                     {{ providerMap[providerEnum.SQL] }}
+                  </j-menu-item>
+                  <j-menu-item :key="providerEnum.Function">
+                     <template #icon>
+                        <img :src="getImage('/project/function.png')" style="width: 24px; height: 24px;">
+                     </template>
+                     {{ providerMap[providerEnum.Function] }}
+                  </j-menu-item>
                </j-sub-menu>
-               <j-menu-item :key="actionMap['Paste'].key" :disabled="disabled" v-if="type!=='project'">{{ actionMap['Paste'].value }}</j-menu-item>
+               <j-menu-item :key="actionMap['Paste'].key" :disabled="disabled" v-if="type !== 'project'">{{
+                  actionMap['Paste'].value }}</j-menu-item>
             </j-menu>
          </div>
       </Teleport>
@@ -37,6 +73,7 @@
 import { useContextMenu } from '@/hooks/useContextMenu';
 import { useEngine } from '@/store'
 import { providerEnum, providerMap, actionMap } from '../../index'
+import { getImage } from '@jetlinks/utils';
 
 const engine = useEngine()
 
@@ -67,7 +104,7 @@ const disabled = computed(() => engine.copyFile === '')
 
 const emit = defineEmits<{
    select: [menuKey: string, divData?: object]
-   show:[isShow:boolean]
+   show: [isShow: boolean]
 }>()
 
 
@@ -80,9 +117,9 @@ const handleClick = (item: any) => {
 }
 
 watch(
-   ()=>showMenu.value,
-   ()=>{
-      emit('show',showMenu.value)
+   () => showMenu.value,
+   () => {
+      emit('show', showMenu.value)
    }
 )
 
@@ -93,8 +130,14 @@ watch(
    // width: 150px;
    position: absolute;
    z-index: 999;
-   :deep(.ant-menu){
+
+   :deep(.ant-menu) {
       border: 1px solid #eee;
+   }
+
+   .menu-img {
+      width: 24px;
+      height: 24px;
    }
 }
 </style>

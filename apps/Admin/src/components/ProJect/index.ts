@@ -40,10 +40,20 @@ export const providerImages = {
   [providerEnum.CRUD]:getImage('/tree/curd.svg'),
   [providerEnum.Page]:getImage('/tree/page.svg'),
   [providerEnum.ListPage]:getImage('/tree/page.svg'),
-  [providerEnum.ListPage]:getImage('/tree/page.svg'),
+  [providerEnum.HtmlPage]:getImage('/tree/page.svg'),
   [providerEnum.FormPage]:getImage('/tree/page.svg'),
   [providerEnum.Function]:getImage('/tree/function.svg'),
   'project':getImage('/tree/project.svg'),
+}
+
+export const typeImages = {
+  [providerEnum.Module]:getImage('/project/module.png'),
+  [providerEnum.SQL]:getImage('/project/sql.png'),
+  [providerEnum.CRUD]:getImage('/project/curd.png'),
+  [providerEnum.ListPage]:getImage('/project/list.png'),
+  [providerEnum.HtmlPage]:getImage('/project/html.png'),
+  [providerEnum.FormPage]:getImage('/project/form.png'),
+  [providerEnum.Function]:getImage('/project/function.png'),
 }
 
 export const projectList = [

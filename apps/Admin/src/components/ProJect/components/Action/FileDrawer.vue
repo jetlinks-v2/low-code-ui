@@ -1,6 +1,8 @@
 
 <template>
-   <j-drawer visible :closable="false" @close="emit('close')" :get-container="false">
+   <j-drawer visible :closable="false" @close="emit('close')" :get-container="false" :style="{ position: 'absolute' }" :maskStyle="{
+      'background-color': '#ffffff00'
+   }">
       <div class="title">{{ props.data.name }} 简介</div>
       <div>
          添加时间：{{ props.data.others.createTime }}

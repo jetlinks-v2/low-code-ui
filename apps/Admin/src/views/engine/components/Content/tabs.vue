@@ -12,7 +12,7 @@
 
     <div class="content-module" v-if="activeData?.type === 'project' || activeData?.type === 'module'"
       :key="activeData.id">
-      <ProjectEmpty v-if="activeData?.type === 'project'" :data="activeData" />
+      <ProjectEmpty v-if="activeData?.type === 'project' && activeData.children.length===0" :data="activeData" />
       <Project v-else :data="activeData.children" />
     </div>
 
@@ -61,7 +61,6 @@ watch(
         title: item.title,
         type: item.type
       }))
-      console.log('data-------', activeData.value)
     }
   },
   { deep: true, immediate: true }

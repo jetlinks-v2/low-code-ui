@@ -17,27 +17,49 @@
     </j-select>
   </div>
   <div class="content" v-if="viewType === 'card'">
-    <ContextMenu type="empty" @select="handleChange">
+    <ContextMenu type="empty" @select="handleChange" @show="onShow">
       <j-scrollbar>
         <a-row>
-        <a-col :span="3" v-for="item in list" class="content-col">
-          <div @click="onClick(item.id)" @dblclick="onDbClick(item)" :class="{
-            'content-item': true,
-            'active': selectKey === item.id
-          }">
-            <ContextMenu type="list" :data="item" @select="handleChange">
-              <div class="box">{{ providerMap[item.type] }}</div>
-              <j-ellipsis style="width: 100px">{{ item.name }}</j-ellipsis>
-            </ContextMenu>
-          </div>
-        </a-col>
-      </a-row>
+          <a-col :span="3" v-for="item in list" class="content-col">
+            <div @click="onClick(item.id)" @dblclick="onDbClick(item)" class="content-item">
+              <ContextMenu type="list" :data="item" @select="handleChange">
+                <div :class="{
+                  'box': true,
+                  'active': selectKey === item.id
+                }">
+                  <div class="box-img">
+                    <img :src="typeImages[item.type]">
+                  </div>
+                  <j-ellipsis style="max-width: 100px">{{ item.name }}</j-ellipsis>
+                </div>
+              </ContextMenu>
+            </div>
+          </a-col>
+        </a-row>
       </j-scrollbar>
     </ContextMenu>
+    <a-drawer title="添加项目说明" :closable="false" :visible="showMenu" :style="{ position: 'absolute' }" :getContainer="false"
+      @close="showMenu = false" :mask="false">
+      <div class="drawer" v-for="items in projectList">
+        <div class="drawer-title">{{ items.title }}</div>
+        <div class="drawer-items" v-for="item in items.children">
+          <div class="items-img">
+            <img :src="item.img">
+          </div>
+          <div class="items-text">
+            <div class="text">{{ providerMap[item.type] }}</div>
+            <span>{{ item.text }}</span>
+          </div>
+        </div>
+      </div>
+    </a-drawer>
+    <FileDrawer v-if="visibleFile" @close="visibleFile = false" :data="current" />
   </div>
+  
   <div v-else>
     <j-pro-table :columns="columns" :dataSource="list" model="TABLE" :noPagination="true" :childrenColumnName="'list'"
-      :scroll="{ y: 'calc(100vh - 300px)' }" :customRow="(record) => ({ onContextmenu: (e) => onContextmenu(e, record) })">
+      :scroll="{ y: 'calc(100vh - 300px)' }"
+      :customRow="(record) => ({ onContextmenu: (e) => onContextmenu(e, record) })">
       <template #type="{ type }">
         {{ providerMap[type] }}
       </template>
@@ -54,7 +76,7 @@
       </j-menu>
     </div>
   </div>
-  <FileDrawer v-if="visibleFile" @close="visibleFile = false" :data="current" />
+  
   <InputModal v-if="visible" @close="visible = false" @save="onSave" :provider="provider" :data="current" :type="type"
     :name-list="nameList" />
   <ToastModal v-if="visibleToast" @close="visibleToast = false" @save="onSave" :data="current" />
@@ -68,7 +90,7 @@ import FileDrawer from '../components/Action/FileDrawer.vue'
 import ToastModal from '../components/Action/ToastModal.vue'
 import DelModal from '../components/Action/DelModal.vue'
 import { onlyMessage } from '@jetlinks/utils';
-import { providerMap, restId, actionMap } from '../index'
+import { providerMap, restId, actionMap, typeImages, projectList } from '../index'
 import { onKeyStroke, useMagicKeys } from '@vueuse/core'
 import { useProduct, useEngine } from '@/store'
 
@@ -96,6 +118,7 @@ const selectSort = ref<number>(0)
 const list = ref<any>([])
 const nameList = ref<any>([])
 const sorts = ref<any>(undefined)
+const showMenu = ref(false)
 
 const viewType = ref<string>('card')
 const menuData = reactive({
@@ -130,7 +153,9 @@ const columns = [
   },
 ]
 
-
+const onShow = (val) => {
+  showMenu.value = val
+}
 
 const onSave = (data?: any) => {
   if (data) {
@@ -307,8 +332,57 @@ watchEffect(() => {
 }
 
 .content {
-  background-color: #f5f5f5;
+  // background-color: #f5f5f5;
   height: calc(100vh - 140px);
+  padding: 12px;
+  
+  :deep(.ant-drawer-wrapper-body) {
+      background-color: #FAFAFA;
+
+      .ant-drawer-header {
+         background-color: #FAFAFA;
+      }
+   }
+   .drawer {
+
+.drawer-title {
+   font-size: 14px;
+   font-weight: 500;
+   line-height: 24px;
+   margin: 10px 0;
+}
+
+.drawer-items {
+   height: 64px;
+   display: flex;
+   background-color: #FFF;
+   align-items: center;
+   padding: 0 12px;
+
+   .items-img {
+      height: 24px;
+      width: 24px;
+
+      img {
+         width: 100%;
+         height: 100%;
+      }
+   }
+
+   .items-text {
+      margin-left: 10px;
+
+      .text {
+         font-size: 14px;
+         line-height: 14px;
+      }
+
+      span {
+         color: #666666;
+      }
+   }
+}
+}
 
   .content-col {
     display: flex;
@@ -319,18 +393,34 @@ watchEffect(() => {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 5px 15px 0 15px;
 
-      &.active {
-        background-color: #377de22b;
-        outline: 1px solid #1422df47;
-      }
 
       .box {
-        width: 100px;
+        width: 132px;
         height: 100px;
-        margin-top: 10px;
-        background-color: rgb(253, 253, 253);
+
+        display: flex;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        &.active {
+          background-color: #CCE8FF;
+          outline: 1px solid #89C4F4;
+          border-radius: 8px;
+        }
+
+
+        .box-img {
+          width: 40px;
+          height: 40px;
+
+          img {
+            width: 100%;
+            height: 100%;
+          }
+        }
       }
     }
   }
