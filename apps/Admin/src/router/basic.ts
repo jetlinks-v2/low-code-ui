@@ -2,111 +2,132 @@ import { RouteRecordItem } from '@jetlinks/types'
 import { BasicLayoutPage } from '@/layout'
 
 export const BASIC_ROUTERS: RouteRecordItem[] = [
-  {
-    path: '/delivery',
-    name: 'Delivery',
-    redirect: '/delivery/center',
-    component: BasicLayoutPage,
-    meta: {
-      title: '交付中心',
-    },
-    children: [
-      {
-        path: '/delivery/center',
-        name: 'delivery/center',
+    {
+        path: '/delivery',
+        name: 'Delivery',
+        redirect: '/delivery/center',
+        component: BasicLayoutPage,
         meta: {
-          title: '低码引擎',
+            title: '交付中心',
         },
-        component: () => import('@/views/center/index.vue'),
-      },
-    ],
-  },
-  {
-    path: '/engine/:id',
-    name: 'Engine',
-    component: () => import('@/views/engine/index.vue'),
-    meta: {
-      title: '项目编辑器',
+        children: [
+            {
+                path: '/delivery/center',
+                name: 'delivery/center',
+                meta: {
+                    title: '低码引擎',
+                },
+                component: () => import('@/views/center/index.vue'),
+            },
+        ],
     },
-  },
-  {
-    path: '/release/:id',
-    name: 'Release',
-    component: () => import('@/views/release/index.vue'),
-    meta: {
-      title: '项目发布',
+    {
+        path: '/engine/:id',
+        name: 'Engine',
+        component: () => import('@/views/engine/index.vue'),
+        meta: {
+            title: '项目编辑器',
+        },
     },
-  },
-  {
-    path: '/demo',
-    name: 'Demo',
-    component: () => import('@/views/demo/index.vue'),
-    meta: {
-      title: '测试页',
+    {
+        path: '/release/:id',
+        name: 'Release',
+        component: () => import('@/views/release/index.vue'),
+        meta: {
+            title: '项目发布',
+        },
     },
-  },
-  {
-    path: '/members',
-    name: 'Members',
-    component: () => import('@/views/demo/members.vue'),
-    meta: {
-      title: '测试页',
+    {
+        path: '/demo',
+        name: 'Demo',
+        component: () => import('@/views/demo/index.vue'),
+        meta: {
+            title: '测试页',
+        },
     },
-  },
-  {
-    path: '/model',
-    name: 'Model',
-    component: () => import('@/views/process/model/index.vue'),
-    meta: {
-      title: '流程模型',
+    {
+        path: '/members',
+        name: 'Members',
+        component: () => import('@/views/demo/members.vue'),
+        meta: {
+            title: '测试页',
+        },
     },
-  },
-  {
-    path: '/instance',
-    name: 'Instance',
-    component: () => import('@/views/process/instance/index.vue'),
-    meta: {
-      title: '流程实例',
+    {
+        path: '/flow-engine',
+        name: 'FlowEngine',
+        redirect: '/flow-engine/model',
+        component: BasicLayoutPage,
+        meta: {
+            title: '流程引擎',
+        },
+        children: [
+            {
+                path: '/flow-engine/model',
+                name: 'flow-engine/model',
+                component: () => import('@/views/process/model/index.vue'),
+                meta: {
+                    title: '流程模型'
+                },
+                children: [
+                    {
+                        path: 'detail',
+                        name: 'detail',
+                        component: () => import('@/views/process/model/Detail/index.vue'),
+                        meta: {
+                            title: '流程详情'
+                        }
+                    },
+                ]
+            }
+        ]
     },
-  },
-  {
-    path: '/card',
-    name: 'Card',
-    component: () => import('@/views/demo/Card.vue'),
-    meta: {
-      title: '测试页',
+    {
+        path: '/instance',
+        name: 'Instance',
+        component: () => import('@/views/process/instance/index.vue'),
+        meta: {
+            title: '流程实例',
+        },
     },
-  },
-  {
-    path: '/editor',
-    name: 'Editor',
-    component: () => import('@/views/demo/EditorModal.vue'),
-    meta: {
-      title: '测试页',
+    {
+        path: '/card',
+        name: 'Card',
+        component: () => import('@/views/demo/Card.vue'),
+        meta: {
+            title: '测试页',
+        },
     },
-  },
-  {
-    path: '/quick',
-    name: 'Quick',
-    component: () => import('@/views/demo/add.vue'),
-    meta: {
-      title: '测试页'
-    }
-  },
-  {
-    path: '/preview/:project/:module/:id/:type/:sid',
-    name: 'Preview',
-    meta: {
-      title: '预览',
+    {
+        path: '/editor',
+        name: 'Editor',
+        component: () => import('@/views/demo/EditorModal.vue'),
+        meta: {
+            title: '测试页',
+        },
     },
-    component: () => import('@/views/preview/index.vue'),
-  },
-  {
-    path: '/flow-designer',
-    name: 'FlowDesigner',
-    component: () => import('@/views/demo/flow.vue'),
-    meta: {
-      title: '测试页'
-    }
-  },
+    {
+        path: '/quick',
+        name: 'Quick',
+        component: () => import('@/views/demo/add.vue'),
+        meta: {
+            title: '测试页'
+        }
+    },
+    {
+        path: '/preview/:project/:module/:id/:type/:sid',
+        name: 'Preview',
+        meta: {
+            title: '预览',
+        },
+        component: () => import('@/views/preview/index.vue'),
+    },
+    {
+        path: '/flow-designer',
+        name: 'FlowDesigner',
+        component: () => import('@/views/demo/flow.vue'),
+        meta: {
+            title: '测试页'
+        }
+    },
 ]

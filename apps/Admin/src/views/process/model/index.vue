@@ -107,6 +107,7 @@ import Drawer from './Drawer/index.vue'
 import { isFunction, isObject, debounce, cloneDeep } from 'lodash-es'
 import { getProcess_api, deploy_api, del_api } from '@/api/process/model'
 
+const router = useRouter()
 const tableRef = ref()
 const columns = [
   {
@@ -325,7 +326,13 @@ const handleSave = (data: any) => {
  */
 const _view = (data: any) => {
   drawer.selectItem = { ...data }
-  drawer.visible = true
+  //   drawer.visible = true
+  router.push({
+    path: '/flow-engine/model/detail',
+    query: {
+      id: data.id,
+    },
+  })
 }
 
 /**
