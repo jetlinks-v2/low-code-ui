@@ -9,7 +9,7 @@
       :visible="open"
       :getContainer="() => $refs.listDataRef"
       :destroyOnClose="true"
-      :wrap-style="{ position: 'absolute', zIndex: 1 }"
+      :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
       @close="emits('update:open', false)"
     >
       <Table
@@ -22,7 +22,7 @@
         :dataSource="dataSource"
         :modelActiveKey="activeKey"
         :show="show"
-        :asyncData="asyncData"
+        v-model:asyncData="dataBinds.columnAsync"
         :configChange="configChange"
         :errorList="errorList"
         :bindData="dataBinds.columnBind"
@@ -258,7 +258,6 @@ const getPopupContainer = (trigger: HTMLElement) => {
 //是否完成数据绑定
 const dataBind = ref(true)
 //是否同步数据
-const asyncData = ref(false)
 //数据是否有变动
 const dataChange = ref(false)
 //是否修改配置
@@ -510,14 +509,14 @@ const submit = () => {
   configState.type = ''
   show.value = true
   dataBind.value = true
-  asyncData.value = true
+  dataBinds.columnAsync = true
   configChange.value = true
 }
 const goBack = () => {
   configState.type = ''
   show.value = true
   dataBind.value = true
-  asyncData.value = true
+  dataBinds.columnAsync = true
   configChange.value = false
 }
 const errorList = ref([])

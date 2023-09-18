@@ -44,7 +44,7 @@
     :popData="popData"
     @close="addVisible = false"
     @save="addVisible = false"
-    @reload="tableRef?.reload()"
+    @reload="reloadTable"
   />
   <!-- 查看 -->
   <JsonPreview
@@ -318,6 +318,10 @@ const handleSearch = (data: any) => {
   params.value = data
 }
 
+const reloadTable = () => {
+  tableRef.value?.reload();
+  addVisible.value = false;
+}
 watch(() => JSON.stringify(allData.value), () => {
   console.log(`output->allData.value`,allData.value)
   //分页

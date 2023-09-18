@@ -18,6 +18,7 @@
         v-model:value="state.dataValue"
         showSearch
         :options="dataOptions"
+        :field-names="{ label: 'name', value: 'id' }"
       />
     </div>
     <div v-else>
@@ -46,6 +47,7 @@
 
 <script lang="ts" setup>
 import { useFunctions } from '@/hooks/useFunctions';
+import { queryDictionary } from '@/api/form'
 interface Emit {
   (e: 'update:state', value: any): void
 }
@@ -70,6 +72,14 @@ const state = reactive({
   instructValue: data?.instructValue || '',
 })
 const dataOptions = ref([])
+
+/**查询数据字典列表 */
+const queryData = () => {
+  queryDictionary().then((res) => {
+    dataOptions.value = res.result
+  })
+}
+queryData()
 
 watch(() => state.abilityValue, () => {
   handleFunction(state.abilityValue)
