@@ -146,12 +146,13 @@ defineExpose({
 .data-bind {
   padding: 0 20px;
   background-color: #ffffff;
-  box-shadow: 0 1px 4px #0015291f;
-  margin-bottom: 5px;
-  height: 48px;
+  height: 70px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-width: 0px 0px 1px 0px;
+  border-style: solid;
+  border-color: #D9D9D9;
 }
 .is-guide {
     margin: 0 20px;
