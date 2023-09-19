@@ -12,15 +12,15 @@
         <div>请选择该流程中需要使用的流程表单</div>
         <ConfigForm v-model="form.formList"></ConfigForm>
       </j-form-item>
-      <j-form-item
-        name="members"
-        >
-        <!-- :rules="[{ validator: rules.checkMembersList, trigger: 'change' }]" -->
+      <j-form-item name="members">
         <template #label>
           <TitleComponent data="权限控制" />
         </template>
         <div>配置可以使用该流程的成员</div>
-        <ConfigureMembers :isNode="false" v-model:members="form.members"></ConfigureMembers>
+        <ConfigureMembers
+          :isNode="false"
+          v-model:members="form.members"
+        ></ConfigureMembers>
       </j-form-item>
     </j-form>
   </div>
@@ -29,11 +29,6 @@
 import ConfigForm from './components/ConfigForm.vue'
 
 const formRef = ref()
-
-// const submit1 = async () => {
-//   const res = await submit()
-//   console.log(`output->res`, res)
-// }
 
 /**
  * 基础信息保存
@@ -58,17 +53,12 @@ const rules = {
       return Promise.resolve()
     }
   },
-  // checkMembersList: async (_rule: any, value: string): Promise<any> => {
-  //   console.log(`output->value`, value)
-  //   if (form.members.length === 0) {
-  //     return Promise.reject('请配置成员')
-  //   } else {
-  //     return Promise.resolve()
-  //   }
-  // },
 }
+
+defineExpose({ submit })
+
 watch(
-  () => form,
+  () => form.formList,
   () => {
     formRef.value.validate()
   },
@@ -78,7 +68,6 @@ watch(
 <style scoped lang="less">
 .base-info {
   display: flex;
-  // flex-direction: column;
   justify-content: center;
   padding-top: 20px;
 }

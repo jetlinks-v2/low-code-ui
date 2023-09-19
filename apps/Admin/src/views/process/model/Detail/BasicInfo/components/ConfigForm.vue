@@ -123,10 +123,10 @@ const props = defineProps<{
 const emits = defineEmits(['update:modelValue', 'change'])
 
 const drag = ref(true)
-const moveable = (flag) => {
-  console.log(`output->1`, 1)
-  drag.value = flag
-}
+// const moveable = (flag) => {
+//   console.log(`output->1`, 1)
+//   drag.value = flag
+// }
 
 const handleClick = () => {
   visible.value = true
@@ -141,6 +141,7 @@ const drawerState = reactive({
    * 保存数据
    */
   submit: () => {
+    drawerState.visible = true
     if (selectedRow.value.length < 1) {
       onlyMessage('请至少选择一条数据', 'error')
       return
