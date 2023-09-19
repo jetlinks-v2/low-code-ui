@@ -51,7 +51,7 @@
 
 <script setup lang='ts' name="TreeDrag">
 import { cloneDeep } from 'lodash-es';
-import { DeleteTreeById, getTreeLevel, handleTreeModal } from '../index'
+import { DeleteTreeById, getTreeLevel, handleSort, handleTreeModal } from '../index'
 import { AntTreeNodeDropEvent, TreeProps } from 'ant-design-vue/es/tree/Tree';
 import { onlyMessage, getImage } from '@jetlinks/utils';
 import Save from '../components/Save.vue'
@@ -86,6 +86,7 @@ const visibleImg = ref<boolean>(false)
 const countMap = ref(new Map())
 const expandMap = new Map()
 
+//引用关系
 const handleTree = (tree) => {
     const arr = cloneDeep(tree)
     arr.forEach(item => {
@@ -250,6 +251,7 @@ watch(
 watch(
     () => treeData.value,
     (val) => {
+        console.log('----',handleSort(val))
         emit('changeTree', val)
     },
     { deep: true, immediate: true }
@@ -277,10 +279,13 @@ const getTree = async () => {
                         termType: 'eq',
                         value: 'iot',
                     },
+                    {
 
+                    }
                 ],
             },
         ],
+        sorts: [{ name: 'sortIndex', order: 'asc' }],
     };
     const res = await getAllMenuTree(params)
     if (res.status === 200) {

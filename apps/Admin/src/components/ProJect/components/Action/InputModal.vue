@@ -67,9 +67,12 @@ const inputRef = ref()
 const titleType = computed(() => props.type === 'Add' ? '新增' : '重命名')
 
 const isOnlyName = async (_,value)=>{
-    const pass = props.nameList.find(item=>item===value)
+    const pass =props.nameList.find(item=>item===value)
+    if(!value){
+      return Promise.reject(`请输入名称`)
+    }
     if(value && pass){
-        return Promise.reject(`名称"{${value}}"已被占用，请重新命名`)
+        return  Promise.reject(`名称${value}已被占用，请重新命名`)
     }else{
         return Promise.resolve()
     }
@@ -127,7 +130,6 @@ onKeyStroke('Enter', async () => {
 
 onMounted(()=>{
     inputRef.value?.focus()
-    console.log('inputRef',props)
     window.navigator.clipboard.writeText('')
 })
 
