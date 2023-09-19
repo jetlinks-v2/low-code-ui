@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { throttle, cloneDeep, omit } from 'lodash-es'
 import { Integrate } from '@/utils/project'
 import { providerEnum } from  '@/components/ProJect/index'
+import { filterTreeNodes } from '@jetlinks/utils'
 
 type TreeData = {
   title: string
@@ -77,6 +78,7 @@ export const useProduct = defineStore('product', () => {
   const dataById = ref()
   const info = ref()
   const published = ref(false)
+  let dataCache = '[]'
 
   const engine = useEngine()
 
@@ -174,6 +176,9 @@ export const useProduct = defineStore('product', () => {
     })
   }
 
+  const updateDataCache = () => {
+    dataCache = JSON.stringify(data.value)
+  }
   const getProduct = (data: any[], id: string) => {
     data.some(item => {
       if (item.id === id) {
@@ -191,6 +196,7 @@ export const useProduct = defineStore('product', () => {
   const add = (record: any, parentId: string) => {
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
+    updateDataCache()
     engine.updateFile(record, 'add')
     updateProductReq(data.value)
   }
@@ -199,6 +205,7 @@ export const useProduct = defineStore('product', () => {
     // console.log('item---',record)
     dataMap.set(record.id, omit(record, ['children']))
     data.value = updateProduct(data.value, record)
+    updateDataCache()
     engine.updateFile(record, 'edit')
     updateProductReq(data.value)
   }
@@ -207,6 +214,7 @@ export const useProduct = defineStore('product', () => {
     // dataMap.delete(record.id))
     data.value = removeProduct(data.value, record)
     dataMap.delete(record.id)
+    updateDataCache()
     engine.updateFile(record, 'del')
     updateProductReq(data.value)
   }
@@ -223,8 +231,9 @@ export const useProduct = defineStore('product', () => {
   }
   
   //通过名称搜索
-  const filterTree = ()=>{
-    
+  const filterTree = (name) =>{
+    data.value = name ? filterTreeNodes(JSON.parse(dataCache), name, 'title') : JSON.parse(dataCache)
+    engine.expandedAll()
   }
 
   const getServerModulesData = async () => {
@@ -249,6 +258,7 @@ export const useProduct = defineStore('product', () => {
       })
       handleDataMap(treeData);
       data.value = treeData
+      updateDataCache()
       engine.activeFile = treeData[0]?.id
       info.value = extra
       published.value = extra.state?.value === 'published'
@@ -277,6 +287,7 @@ export const useProduct = defineStore('product', () => {
     getParent,
     initProjectState,
     getServerModulesData,
-    published
+    published,
+    filterTree
   }
 })
