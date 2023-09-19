@@ -144,7 +144,7 @@ const errorDataTableLength = computed(() => {
 })
 
 const errorRelationLength = computed(() =>{
-  return errorTips.relation?.length || 0
+  return errorTips.dataTable ? Object.keys(errorTips.relation).length : 0
 })
 
 const validate = async () => {
@@ -153,7 +153,7 @@ const validate = async () => {
 
   try {
     await advancedRef.value.validates()
-    errorTips.relation = []
+    errorTips.relation = {}
   } catch (e) {
     console.log('crud-advanced',e)
     errorTips.relation = e
@@ -176,18 +176,18 @@ defineExpose({
       await validate()
       const err = []
 
-      if(errorTips.relation.length) {
-        console.log(errorTips.relation)
-        errorTips.relation.forEach(a => {
-          err.push(a)
+      if(Object.keys(errorTips.relation).length) {
+        Object.values(errorTips.relation).forEach(a => {
+          err.push({ message: a})
         })
       }
 
       if(Object.keys(errorTips.dataTable).length) {
         Object.values(errorTips.dataTable).forEach(a => {
-          err.push(a[0])
+          err.push({ message: a})
         })
       }
+
       !err.length ? resolve() : reject(err)
     })
   }

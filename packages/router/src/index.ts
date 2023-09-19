@@ -48,6 +48,7 @@ export const initRoute = (options?: RouteOptions): Router => {
 export const jumpLogin = () => {
     setTimeout(() => {
         removeToken()
+      console.log(LOGIN_ROUTE)
         router.replace({
           path: LOGIN_ROUTE.path
         })

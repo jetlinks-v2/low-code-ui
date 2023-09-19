@@ -92,7 +92,7 @@ const componentName = computed(() => {
       }
       return StringItem;
     case 'Double':
-    case 'Int':
+    case 'Integer':
     case 'Float':
     case 'BigDecimal':
     case 'BigInteger':

@@ -273,6 +273,7 @@ const validateAll = async (id, cb) => {
           }
 
         }).catch(e => {
+          console.log(e)
           handleStatusItem(item.id, 1, e.map(a => a.message) )
           if (cb) {
             cb()
