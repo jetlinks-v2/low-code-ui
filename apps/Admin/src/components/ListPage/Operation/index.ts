@@ -9,7 +9,7 @@ export const commonUseBtn = [
   { title: '删除', type: 'Delete', icon: 'DeleteOutlined' },
 ]
 
-export const validOperationsBtn = (tree: OperationConfigTreeItem[]) => {
+export const validOperationsBtn = (tree: OperationConfigTreeItem[], functionOptions: any[]) => {
   const errorItems: any[] = [];
   const commonUseBtnNames = commonUseBtn.map((item) => item.title);
 
@@ -23,6 +23,15 @@ export const validOperationsBtn = (tree: OperationConfigTreeItem[]) => {
               errorKey: 'functions',
               message: '配置功能',
             });
+          } else {
+            const result = functionOptions.find(val => val.fullId === item.functions)
+            if(!result) {
+              errorItems.push({
+                key: item.key,
+                errorKey: 'functions',
+                message: '绑定功能已被删除，请重新选择',
+              });
+            }
           }
           if (!item.command) {
             errorItems.push({

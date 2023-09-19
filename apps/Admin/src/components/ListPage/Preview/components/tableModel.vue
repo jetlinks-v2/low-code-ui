@@ -67,7 +67,7 @@
       </template>
       <template #card="slotProps">
         <Card
-          status="notActive"
+          :status="slotProps[props?.cardConfig?.emphasisField]"
           :actions="tableActions"
           :record="slotProps"
           :statusText="
