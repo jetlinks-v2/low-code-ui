@@ -4,7 +4,7 @@
     <SelectModal v-if="visible" @close="closeModal" @update-data="updateData" :select="selectData"></SelectModal>
     <div class="select">
       <div v-for="(item) in selectData" :key="item.id" class="selectItem">
-        <div>{{ '哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈' || item.name }}</div>
+        <div>{{ item.name }}</div>
         <div @click="cancelSelect(item.id)"><AIcon type="CloseOutlined" class="selectItemIcon" /></div>
       </div>
     </div>
