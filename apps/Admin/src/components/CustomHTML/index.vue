@@ -10,7 +10,6 @@ import { ReplStore } from './store'
 import 'splitpanes/dist/splitpanes.css'
 import { useProduct } from '@/store/product'
 import { storeToRefs } from 'pinia'
-import { useEngine } from '@/store/engine'
 import { onlyMessage } from '@jetlinks/utils'
 import { BASE_INFO, MENU_CONFIG } from "@/components/ListPage/keys";
 
@@ -18,10 +17,9 @@ const props = defineProps({
   data: Object
 })
 
-const engineStore = useEngine()
+
 const productStore = useProduct()
-const { files, activeFile } = storeToRefs(engineStore)
-const store = new ReplStore(files.value[activeFile.value]?.configuration?.code)
+const store = new ReplStore(props.data?.configuration?.code)
 const vueMode = ref(true)
 store.init()
 provide('store', store)
@@ -34,17 +32,31 @@ enum OperType {
 }
 
 const onChange = debounce((code: string) => {
-  store.state.activeFile.code = code
+  productStore.update({
+    ...props.data,
+    configuration: {
+      type: 'html',
+      code
+    }
+  })
 }, 250)
 
-const onBlur = debounce(() => updateStoreCode(), 250)
+// const onBlur = debounce(() => updateStoreCode(), 250)
 
 const drawerVisible = ref(false)
 const $drawerWidth = ref('50%')
 const drawerTitle = ref('预览')
 
 const handleDbClickViewName = () => {
-  $drawerWidth.value = $drawerWidth.value === '98%' ? '50%' : '98%'
+  if (activeOper.value === OperType.View) {
+    $drawerWidth.value = $drawerWidth.value === 'calc(100% - 50px)' ? '50%' : 'calc(100% - 50px)'
+  }
+}
+
+const handleDbCLickEditor = () => {
+  if (activeOper.value === OperType.View) {
+    $drawerWidth.value = $drawerWidth.value === '50%' ? '0%' : '50%'
+  }
 }
 
 const activeOper = ref('')
@@ -166,10 +178,9 @@ defineExpose({
   <div class="jetlinks-repl" ref="replRef">
     <SplitPane class="split-pane">
       <template #editor>
-        <EditorContainer>
+        <EditorContainer @dbClick="handleDbCLickEditor">
           <MonacoEditor
             @change="onChange"
-            @blur="onBlur"
             :filename="store.state.activeFile.filename"
             :value="store.state.activeFile.code"
           />
@@ -240,7 +251,7 @@ defineExpose({
 <!--        @update:form="updateMenuFormData"-->
 <!--      />-->
 <!--    </j-drawer>-->
-    <div class="drawer-content" v-show="drawerVisible">
+    <div class="drawer-content" :style="{ width: $drawerWidth }" v-show="drawerVisible">
       <div class="drawer-header">
         <div class="drawer-title" @dblclick="handleDbClickViewName">
           {{ drawerTitle }}
@@ -316,12 +327,14 @@ defineExpose({
   position: absolute;
   right: 50px;
   top: 0;
-  width: v-bind('$drawerWidth');
+  width: 50%;
   height: 100%;
   margin: 0;
   background-color: #fff;
   overflow-y: auto;
   border-right: 1px solid #f0f0f0;
+  z-index: 20;
+
   .drawer-header {
     position: relative;
     padding: 16px 24px;

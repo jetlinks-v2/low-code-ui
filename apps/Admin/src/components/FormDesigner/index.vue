@@ -351,8 +351,8 @@ onUnmounted(() => {
 // 校验
 const onValidate = () => {
   spinning.value = true
+  errorKey.value = checkedConfig(unref(formData))
   setTimeout(() => {
-    errorKey.value = checkedConfig(unref(formData))
     spinning.value = false
   }, 100)
   return new Promise((resolve, reject) => {

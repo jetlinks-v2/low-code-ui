@@ -118,3 +118,44 @@ export const AdvancedApiColumns = [
     width: 120
   },
 ]
+
+export const proAll = (array: Array<() => Promise<any>>) => {
+  return new Promise((resolve, reject) => {
+    const length = array.length
+    const error: any[] = []
+    const success: any[] = []
+    let count = 0
+
+    const jump = () => {
+      if (count >= length) {
+        error.length ? reject(error) : resolve(success)
+      }
+    }
+
+    for (let i=0;i<length;i++) {
+      array[i]().then(r => {
+        success.push(r)
+        count++
+        jump()
+      }, (e) => {
+        error.push(e)
+        count++
+        jump()
+      })
+    }
+  })
+}
+
+type ErrorField = {
+  name: string[]
+  errors: string[]
+}
+
+export const formErrorFieldsToObj = (errorFields: ErrorField[]) => {
+  const obj:any = {}
+  errorFields.forEach(item => {
+    const key = item.name[0]
+    obj[key] = item.errors[0]
+  })
+  return obj
+}

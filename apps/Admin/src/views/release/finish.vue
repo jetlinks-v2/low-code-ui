@@ -42,12 +42,12 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value', 'statusChange'])
 
 const width = ref(0)
-const status = ref('error')
+const status = ref('')
 const loading = ref(true)
-const errorMsg = ref('errorerrorerrorerrorerrorerrorerror')
+const errorMsg = ref('')
 const route = useRoute()
 let count = 0
 
@@ -93,6 +93,7 @@ const saveMenuFn = (id) => {
     width.value = 100
     count = 100
     loading.value = true
+    status.value = 'success'
     pause()
   }).catch((e) => {
     width.value = 90
@@ -109,6 +110,7 @@ const releaseStart = async () => {
   const { id } = route.params
 
   if (id) {
+    status.value = 'loading'
     releaseDraftFn(id)
   }
 }
@@ -123,7 +125,7 @@ const restart = () => {
 const reset = () => {
   count = 0
   width.value = 0
-  status.value = 'success'
+  status.value = ''
   errorMsg.value = ''
   loading.value = false
   resume()
@@ -131,6 +133,10 @@ const reset = () => {
 
 watch(() => width.value, () => {
   emit('update:value', count)
+})
+
+watch(() => status.value, () => {
+  emit('statusChange', status.value)
 })
 
 onBeforeMount(() => {
