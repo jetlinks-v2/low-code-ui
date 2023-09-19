@@ -179,12 +179,13 @@ const submit = () => {
   cancel()
 }
 
-onMounted(() => {
+watch(() => props.data?.title, () => {
+  console.log('watch', props.data?.title, )
   menuFormData.value = {
     ...props.data.others.menu,
-    pageName: props.data.pageName || props.data?.title || '',
+    pageName: props.data?.title || '',
   }
-})
+}, { immediate: true })
 
 defineExpose({
   validate: errorValidate
@@ -258,8 +259,7 @@ defineExpose({
         <MenuList
           v-else-if="activeOper === OperType.Menu"
           ref="menuListRef"
-          :form-data="menuFormData"
-          @update:form="updateMenuFormData"
+          @change="updateMenuFormData"
         />
       </div>
       <div class="drawer-footer" v-show="activeOper === OperType.Menu">
