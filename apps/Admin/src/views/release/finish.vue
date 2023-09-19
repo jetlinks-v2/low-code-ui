@@ -31,9 +31,10 @@
 </template>
 
 <script setup name="Finish">
-import { releaseDraft, validateDraft } from '@/api/project'
+import { releaseDraft } from '@/api/project'
 import { saveMenu } from '@/api/menu'
 import { useIntervalFn } from '@vueuse/core'
+import { useNetwork } from '@jetlinks/hooks'
 
 const props = defineProps({
   tree: {
@@ -43,6 +44,14 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:value', 'statusChange'])
+
+useNetwork({
+  onLine() {
+    if (status.value !== 'success') { // 网络重连，并且状态不是成功时
+      restart()
+    }
+  }
+})
 
 const width = ref(0)
 const status = ref('')
@@ -57,21 +66,6 @@ const { pause, resume } = useIntervalFn(() => {
     width.value += 0.5
   }
 }, 100)
-
-// const validateDraftFn = (id) => {
-//   count = 33.333
-//   validateDraft(id).then(resp => {
-//     width.value = 33.33
-//     releaseDraftFn(id)
-//   }).catch((e) => {
-//     width.value = 33.33
-//     status.value = 'error'
-//     loading.value = true
-//     errorMsg.value = e?.response?.data?.message
-//     console.log(e)
-//     pause()
-//   })
-// }
 
 const releaseDraftFn = (id) => {
   count = 50
@@ -104,8 +98,6 @@ const saveMenuFn = (id) => {
   })
 }
 
-
-
 const releaseStart = async () => {
   const { id } = route.params
 
@@ -131,8 +123,8 @@ const reset = () => {
   resume()
 }
 
-watch(() => width.value, () => {
-  emit('update:value', count)
+watch(() => loading.value, () => {
+  emit('update:value', loading.value)
 })
 
 watch(() => status.value, () => {

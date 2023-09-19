@@ -83,7 +83,7 @@ const componentName = computed(() => {
         validator: {
           provider: undefined,
           configuration: {
-            message: undefined,
+            message: '数据格式错误',
             group: undefined
           }
         },
@@ -92,7 +92,7 @@ const componentName = computed(() => {
       }
       return StringItem;
     case 'Double':
-    case 'Int':
+    case 'Integer':
     case 'Float':
     case 'BigDecimal':
     case 'BigInteger':

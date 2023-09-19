@@ -242,7 +242,7 @@ const validateAll = async (id, cb) => {
     return
   }
 
-  if (providerEnum.HtmlPage === item.type) {
+  if (providerEnum.HtmlPage === item.type && !item.configuration.code) {
     const hasCode = !item.configuration.code
     handleStatusItem(item.id, hasCode ? 1 : 2, hasCode ? ['页面代码为空'] : [] )
     cb?.()
@@ -268,16 +268,16 @@ const validateAll = async (id, cb) => {
           if (cb) {
             cb()
           } else {
-            emit('update:status', Object.keys(statusMsg).length)
+            emit('update:status', Object.values(statusMsg).filter(item => item.length).length)
           }
 
         }).catch(e => {
-          console.log(e)
+          console.log('validateRef', e, e.map(a => a.message))
           handleStatusItem(item.id, 1, e.map(a => a.message) )
           if (cb) {
             cb()
           } else {
-            emit('update:status', Object.keys(statusMsg).length)
+            emit('update:status', Object.values(statusMsg).filter(item => item.length).length)
           }
         })
       }, 1000)
