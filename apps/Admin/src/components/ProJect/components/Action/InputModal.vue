@@ -113,6 +113,21 @@ const getConfiguration = (type) => {
   }
 }
 
+const handleOthers = (type, title) => {
+  const others: any = {
+    type
+  }
+  if ([providerEnum.ListPage, providerEnum.HtmlPage].includes(type)){
+    others.menu = {
+      main: true,
+      name: '',
+      icon: '',
+      pageName: title
+    }
+  }
+  return others
+}
+
 onKeyStroke('Enter', async () => {
     const res = await formRef.value.validate()
     if (res && modelRef.title) {
@@ -120,9 +135,7 @@ onKeyStroke('Enter', async () => {
             ...modelRef,
             name: modelRef.title,
             configuration:props.data.configuration?props.data.configuration: getConfiguration(modelRef.type),
-            others: {
-              type: modelRef.type
-            }
+            others: handleOthers(modelRef.type, modelRef.title)
         })
     }
 })
