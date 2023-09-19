@@ -57,7 +57,7 @@
             </j-select>
           </j-form-item>
           <j-form-item label="正则表达式" name="pattern">
-            <j-textarea placeholder="请输入" v-model:value="inputRef" @change="onChange" />
+            <j-textarea placeholder="请输入" v-model:value="inputRef" @change="onPatternChange" />
           </j-form-item>
           <j-form-item label="最小长度限制" name="min" v-if="!['date-picker', 'time-picker'].includes(type)">
             <j-input-number
@@ -151,6 +151,11 @@ const onClickItem = () => {
   // console.log('ruleModel',ruleModel)
   emits('change', unref(ruleModel), props.index)
   visible.value = true
+}
+
+const onPatternChange = (e) => {
+  ruleModel.pattern = e.target?.value
+  emits('change', unref(ruleModel), props.index)
 }
 
 const onChange = () => {
