@@ -157,6 +157,11 @@ const treeData = ref<any[]>([])
 // 选中的树节点
 const selectedKeys = ref<string[]>([])
 const onSelect = (keys: string[], { node }) => {
+  // 按关系
+  if(active.value === '2'){
+
+    return
+  }
   const index = dataSource.value
     .map((i) => i.key)
     .findIndex((i) => i === node.id)
