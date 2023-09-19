@@ -61,3 +61,19 @@ export const handleTreeModal = (data, record) => {
     return [...arr, record]
   }
 }
+
+//sortIndex
+export const handleSort = (tree) => {
+  return tree.map((item, index) => {
+    if (item) {
+      return {
+        ...item,
+        sortIndex: index
+      }
+    }
+    if (item.children) {
+      item.children = handleSort(item.children)
+    }
+    return item
+  })
+}

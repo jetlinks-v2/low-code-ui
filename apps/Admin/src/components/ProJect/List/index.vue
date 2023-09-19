@@ -10,8 +10,9 @@
       </a-radio-button>
     </a-radio-group>
     <j-select v-model:value="sorts" class="title-sorts" placeholder="排序方式" @change="handleSorts">
+      <j-select-option value="default">默认排序</j-select-option>
       <j-select-option value="type">种类</j-select-option>
-      <j-select-option value="name">名字</j-select-option>
+      <j-select-option value="name">名称</j-select-option>
       <j-select-option value="createTime">添加日期</j-select-option>
       <j-select-option value="modifyTime">修改日期</j-select-option>
     </j-select>
@@ -30,7 +31,7 @@
                   <div class="box-img">
                     <img :src="typeImages[item.type]">
                   </div>
-                  <j-ellipsis style="max-width: 100px">{{ item.name }}</j-ellipsis>
+                  <j-ellipsis style="max-width: 100px" placement="leftTop">{{ item.name }}</j-ellipsis>
                 </div>
               </ContextMenu>
             </div>
@@ -59,7 +60,10 @@
   <div v-else>
     <j-pro-table :columns="columns" :dataSource="list" model="TABLE" :noPagination="true" :childrenColumnName="'list'"
       :scroll="{ y: 'calc(100vh - 300px)' }"
-      :customRow="(record) => ({ onContextmenu: (e) => onContextmenu(e, record) })">
+      :customRow="(record) => ({ 
+        onContextmenu: (e) => onContextmenu(e, record),
+        onDblclick:()=>onDbClick(record)
+       })">
       <template #type="{ type }">
         {{ providerMap[type] }}
       </template>
@@ -117,7 +121,7 @@ const selectKey = ref<string>('')
 const selectSort = ref<number>(0)
 const list = ref<any>([])
 const nameList = ref<any>([])
-const sorts = ref<any>(undefined)
+const sorts = ref<any>('default')
 const showMenu = ref(false)
 
 const viewType = ref<string>('card')
@@ -145,7 +149,7 @@ const columns = [
 
   },
   {
-    title: '修改时间',
+    title: '修改日期',
     dataIndex: 'modifyTime',
     key: 'modifyTime',
     scopedSlots: true,
@@ -186,8 +190,8 @@ const onContextmenu = (e, record) => {
   visibleMenu.value = true
   menuData.style = {
     position: 'absolute',
-    left: e.clientX - 340 + "px",
-    top: e.clientY - 30 + "px",
+    left: e.clientX - 300 + "px",
+    top: e.clientY -210  + "px",
   }
   menuData.data = record
   //点击取消菜单
@@ -281,14 +285,14 @@ onKeyStroke(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'], (e) => {
 })
 
 watchEffect(() => {
-  if (!props.data?.length) return
+  if (!props.data?.length) return;
 
-  if (props.data?.[0].parentId === engine.activeFile && viewType.value === 'card') {
+  if (props.data?.[0].parentId === engine.activeFile && viewType.value === 'card' && !visible.value) {
     if (ControlLeft.value && KeyC.value || MetaLeft.value && KeyC.value) {
       const item = list.value.find(it => it.id === selectKey.value)
       engine.setCopyFile(item)
       onlyMessage('复制成功')
-      // console.log('ctrl+c', item)
+      console.log('ctrl+c', item)
     }
     if (ControlLeft.value && KeyV.value || MetaLeft.value && KeyV.value) {
       console.log('ctrl+V', engine.copyFile)
@@ -309,7 +313,7 @@ watchEffect(() => {
       return item
     })
   }
-  sorts.value = product.getById(engine.activeFile)?.others?.sorts
+  sorts.value = product.getById(engine.activeFile)?.others?.sorts || 'default'
 })
 
 

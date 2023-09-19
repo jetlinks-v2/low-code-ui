@@ -1,6 +1,6 @@
 
 <template>
-   <j-drawer visible :closable="false" @close="emit('close')" :get-container="false" :style="{ position: 'absolute' }" :maskStyle="{
+   <j-drawer visible :closable="false" @close="emit('close')" :get-container="getContainer" :style="{ position: 'absolute' }" :maskStyle="{
       'background-color': '#ffffff00'
    }">
       <div class="title">{{ props.data.name }} 简介</div>
@@ -30,6 +30,10 @@ const props = defineProps({
       type: Object,
       default: {}
    },
+   getContainer:{
+      type:Boolean,
+      default:false
+   }
 })
 const emit = defineEmits(['close'])
 const web = [providerEnum.HtmlPage, providerEnum.FormPage, providerEnum.ListPage, providerEnum.Page]

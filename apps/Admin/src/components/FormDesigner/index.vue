@@ -2,7 +2,7 @@
   <j-spin :spinning="spinning">
     <div class="container">
       <Header @save="onSave" :data="data" @validate="onValidate" />
-      <div class="box" :style="{ height: _height }">
+      <div class="box">
         <div class="left" v-if="model !== 'preview'"><Filed /></div>
         <div
           class="right"
@@ -16,7 +16,11 @@
           <Config ref="configRef" />
         </div>
       </div>
-      <div class="check" v-if="model === 'preview' && !mode">
+      <div
+        class="check"
+        :style="{ height: _height }"
+        v-if="model === 'preview' && !mode"
+      >
         <div class="check-btn">
           <j-button
             v-if="!checkVisible"
@@ -25,19 +29,28 @@
             >数据校验</j-button
           >
           <j-space v-else>
-            <j-button class="btn" @click="checkVisible = false; editData = ''">取消</j-button>
+            <j-button
+              class="btn"
+              @click="
+                checkVisible = false;editData = ''
+              "
+              >取消</j-button
+            >
             <j-button class="btn" @click="onInput('get')"
               >获取数据<j-tooltip title="将表单中填写的所有数据获取到代码框中">
                 <AIcon type="QuestionCircleOutlined" /> </j-tooltip
             ></j-button>
             <j-button class="btn" @click="onInput('set')"
-              >加载数据<j-tooltip title="将代码框输入的模拟数据显示到代码框中">
+              >加载数据<j-tooltip title="将代码框输入的模拟数据反显到表单">
                 <AIcon type="QuestionCircleOutlined" /> </j-tooltip
             ></j-button>
           </j-space>
         </div>
-        <div style="height: 200px" v-if="checkVisible">
-          <j-monaco-editor v-model="editData" :language="'json'" />
+        <div class="check-editor" v-if="checkVisible">
+          <j-monaco-editor
+            v-model="editData"
+            :language="'json'"
+          />
         </div>
       </div>
     </div>
@@ -124,18 +137,20 @@ const _width = computed(() => {
 })
 
 const _height = computed(() => {
-  return model.value !== 'preview'
-    ? 'calc(100% - 50px)'
-    : !unref(checkVisible)
-    ? 'calc(100% - 100px)'
-    : 'calc(100% - 300px)'
+  return !unref(checkVisible) ? '40px' : '248px'
 })
 
 // 设置数据被选中
 const setSelection = (node: any) => {
-  if (['card-item', 'space-item'].includes(node.type)) return
+  if (['card-item', 'space-item'].includes(node.type)) {
+    onSaveData()
+    return
+  }
   if (_ctrl.value && model.value === 'edit') {
-    if (node === 'root') return
+    if (node === 'root') {
+      onSaveData()
+      return
+    }
     if (map(selected.value, 'key').includes('root')) {
       selected.value = [node]
     } else {
@@ -182,8 +197,10 @@ const onDelete = debounce(() => {
 
 // 复制
 const onCopy = () => {
-  const list = selected.value.filter(item => {
-    return !['collapse-item', 'tabs-item', 'grid-item', 'table-item'].includes(item.type)
+  const list = selected.value.filter((item) => {
+    return !['collapse-item', 'tabs-item', 'grid-item', 'table-item'].includes(
+      item.type,
+    )
   })
   if (unref(isSelectedRoot) || focused.value) return
   formDesigner.setCopyData(list || [])
@@ -382,13 +399,16 @@ defineExpose({ onSave, validate: onValidate })
 
 <style lang="less" scoped>
 .container {
-  height: calc(100vh - 125px);
-  position: relative;
+  height: calc(100vh - 132px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
   .box {
     display: flex;
     width: 100%;
-    height: calc(100% - 68px);
     overflow: hidden;
+    flex: 1;
     .left {
       width: 200px;
       height: 100%;
@@ -404,10 +424,8 @@ defineExpose({ onSave, validate: onValidate })
   }
 
   .check {
-    position: absolute;
     background-color: #1b1f29;
     width: 100%;
-    bottom: 10px;
     .check-btn {
       display: flex;
       align-items: center;
@@ -419,8 +437,13 @@ defineExpose({ onSave, validate: onValidate })
         background-color: #404756;
         box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, 0.02);
         border: none;
-        color: #CFCFD0;
+        color: #cfcfd0;
       }
+    }
+
+    .check-editor {
+      height: 200px;
+      overflow: hidden;
     }
   }
 }

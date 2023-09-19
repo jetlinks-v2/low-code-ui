@@ -1,6 +1,6 @@
 <template>
   <div>
-    <j-form-item label="组件布局" name="layout">
+    <j-form-item :validateFirst="true" label="组件布局" name="layout">
       <!-- <j-radio-group
         v-model:value="target.componentProps.layout"
         button-style="solid"
@@ -22,7 +22,7 @@
       </div>
       </div>
     </j-form-item>
-    <j-form-item label="组件尺寸" name="size">
+    <j-form-item :validateFirst="true" label="组件尺寸" name="size">
       <j-radio-group
         v-model:value="target.componentProps.size"
         button-style="solid"

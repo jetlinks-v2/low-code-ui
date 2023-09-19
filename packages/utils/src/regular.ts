@@ -35,7 +35,7 @@ export const regular = {
   passwordReg: /^\S*(?=\S{8,})(?=\S*\d)(?=\S*[A-Z])(?=\S*[a-z])\S*$/,
   isPassword: (value: string) => regular.passwordReg.test(value),
   /*数字字母，小写字母开头*/
-  inputReg: /^[a-z][a-zA-Z0-9]*$/,
+  inputReg: /^[a-z][a-zA-Z0-9_]*$/,
   isInputReg: (value: string) => regular.inputReg.test(value),
   /*数字字母下划线，字母开头*/
   modalReg: /^[a-zA-Z][a-zA-Z0-9_]*$/,
