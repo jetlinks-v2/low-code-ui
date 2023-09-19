@@ -66,12 +66,19 @@ const inputRef = ref()
 const titleType = computed(() => props.type === 'Add' ? '新增' : '重命名')
 
 const isOnlyName = async (_,value)=>{
-    const pass =props.nameList.find(item=>item===value)
+    const pass =props.nameList.some(item=>{
+      if(props.type === 'Add'){
+        return item ===value
+      }else{
+        return item === value && value!==props.data.title
+      }
+    })
+    
     if(!value){
       return Promise.reject(`请输入名称`)
     }
     if(value && pass){
-        return  Promise.reject(`名称${value}已被占用，请重新命名`)
+        return  Promise.reject(`名称"${value}"已被占用，请重新命名`)
     }else{
         return Promise.resolve()
     }

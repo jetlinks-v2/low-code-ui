@@ -20,7 +20,7 @@
       ref="formPage"
     />
     <CustomHtml
-      :code="JSON.stringify(data)"
+      :code="data || null"
       v-else-if="props.resource.callPage.type === providerEnum.HtmlPage"
     />
   </j-modal>
@@ -36,7 +36,7 @@ import { useProduct } from '@/store'
 import { queryRuntime } from '@/api/form'
 import { values } from 'lodash-es'
 
-const data = ref<Record<string, any>>()
+const data = ref<any>()
 
 const productStore = useProduct()
 const vueMode = ref(true)
