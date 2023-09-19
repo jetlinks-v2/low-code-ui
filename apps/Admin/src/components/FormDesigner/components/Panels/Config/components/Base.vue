@@ -22,7 +22,7 @@
         ].includes(type)
       "
     >
-      <j-form-item required label="组件类型" name="type">
+      <j-form-item :validateFirst="true" required label="组件类型" name="type">
         <j-select
           :value="target.type"
           @change="onTypeChange"
@@ -50,6 +50,7 @@
         label="名称"
         :name="['formItemProps', 'label']"
         v-if="!['text'].includes(type)"
+        :validateFirst="true"
         :rules="[
           {
             required: true,
@@ -70,6 +71,7 @@
         :name="['formItemProps', 'name']"
         required
         :rules="rules"
+        :validateFirst="true"
       >
         <j-input
           placeholder="请输入"
@@ -83,6 +85,7 @@
           label="文本内容"
           :name="['componentProps', 'value']"
           required
+          :validateFirst="true"
         >
           <j-input
             placeholder="请输入"
@@ -106,7 +109,7 @@
           ].includes(type)
         "
       >
-        <j-form-item label="占位提示" :name="['componentProps', 'placeholder']">
+        <j-form-item :validateFirst="true" label="占位提示" :name="['componentProps', 'placeholder']">
           <j-input
             placeholder="请输入"
             v-model:value="target.componentProps.placeholder"
@@ -120,6 +123,7 @@
       <template v-if="type === 'card'">
         <j-form-item
           label="卡片名称"
+          :validateFirst="true"
           :name="['componentProps', 'title']"
           :rules="[
             {
@@ -140,6 +144,7 @@
       <template v-if="['card', 'collapse', 'tabs'].includes(type)">
         <j-form-item
           label="容器组件"
+          :validateFirst="true"
           :name="['formItemProps', 'isLayout']"
           :rules="[
             {
@@ -159,6 +164,7 @@
           label="标识"
           :name="['formItemProps', 'name']"
           required
+          :validateFirst="true"
           :rules="rules"
         >
           <j-input
@@ -171,6 +177,7 @@
         <j-form-item
           v-if="target.formItemProps.isLayout"
           label="名称"
+          :validateFirst="true"
           :name="['formItemProps', 'label']"
           :rules="[
             {
@@ -193,6 +200,7 @@
         <j-form-item
           label="名称"
           :name="['componentProps', 'name']"
+          :validateFirst="true"
           :rules="[
             {
               required: true,
@@ -212,6 +220,7 @@
           label="标识"
           :name="['formItemProps', 'name']"
           required
+          :validateFirst="true"
           :rules="rules"
         >
           <j-input
@@ -226,6 +235,7 @@
         <j-form-item
           label="名称"
           :name="['componentProps', 'name']"
+          :validateFirst="true"
           :rules="[
             {
               required: true,
@@ -245,6 +255,7 @@
           label="标识"
           :name="['formItemProps', 'name']"
           required
+          :validateFirst="true"
           :rules="rules"
         >
           <j-input
@@ -259,6 +270,7 @@
         <j-form-item
           label="名称"
           :name="['componentProps', 'name']"
+          :validateFirst="true"
           :rules="[
             {
               required: true,
@@ -278,6 +290,7 @@
           label="标识"
           :name="['formItemProps', 'name']"
           required
+          :validateFirst="true"
           :rules="rules"
         >
           <j-input
@@ -291,6 +304,7 @@
           label="表头跨列"
           :name="['componentProps', 'colSpan']"
           required
+          :validateFirst="true"
         >
           <j-input-number
             placeholder="请输入表头跨列"
@@ -299,7 +313,7 @@
             v-model:value="target.componentProps.colSpan"
           />
         </j-form-item>
-        <j-form-item label="内容对齐" :name="['componentProps', 'align']">
+        <j-form-item :validateFirst="true" label="内容对齐" :name="['componentProps', 'align']">
           <j-select
             v-model:value="target.componentProps.align"
             placeholder="请选择"
@@ -316,6 +330,7 @@
           label="标识"
           :name="['formItemProps', 'name']"
           required
+          :validateFirst="true"
           :rules="rules"
         >
           <j-input
@@ -327,7 +342,7 @@
         </j-form-item>
       </template>
       <template v-if="['tabs'].includes(type)">
-        <j-form-item :name="['componentProps', 'type']" label="切卡样式">
+        <j-form-item :validateFirst="true" :name="['componentProps', 'type']" label="切卡样式">
           <j-radio-group
             v-model:value="target.componentProps.type"
             button-style="solid"
@@ -339,7 +354,7 @@
         </j-form-item>
       </template>
       <template v-if="['space'].includes(type)">
-        <j-form-item :name="['componentProps', 'align']" label="对齐">
+        <j-form-item :validateFirst="true" :name="['componentProps', 'align']" label="对齐">
           <j-select
             v-model:value="target.componentProps.align"
             placeholder="请选择"
@@ -355,6 +370,7 @@
           :name="['componentProps', 'direction']"
           label="类型"
           required
+          :validateFirst="true"
         >
           <j-radio-group
             v-model:value="target.componentProps.direction"
@@ -368,6 +384,7 @@
         <j-form-item
           :name="['componentProps', 'size']"
           label="间隔尺寸"
+          :validateFirst="true"
           required
         >
           <j-input-number
@@ -382,7 +399,7 @@
 
     <!-- 规则校验 -->
     <template v-if="rulesVisible">
-      <j-form-item>
+      <j-form-item :name="['formItemProps', 'rules']" :validateFirst="true">
         <Rule
           :type="type"
           v-model:value="target.formItemProps.rules"
@@ -393,7 +410,7 @@
 
     <!-- 说明 -->
     <template v-if="descVisible">
-      <j-form-item :name="['componentProps', 'description']">
+      <j-form-item :validateFirst="true" :name="['componentProps', 'description']">
         <template #label>
           说明内容<j-tooltip title="配置后会在该配置项名称后方展示">
             <AIcon type="QuestionCircleOutlined" />

@@ -2,7 +2,7 @@
 <template>
   <div>
     <template v-if="['input-number'].includes(type)">
-      <j-form-item :rules="maxRules" label="最大值" :name="['componentProps', 'max']">
+      <j-form-item :validateFirst="true" :rules="maxRules" label="最大值" :name="['componentProps', 'max']">
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.max"
@@ -11,7 +11,7 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item :rules="minRules" label="最小值" :name="['componentProps', 'min']">
+      <j-form-item :validateFirst="true" :rules="minRules" label="最小值" :name="['componentProps', 'min']">
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.min"
@@ -24,6 +24,7 @@
         label="精度"
         :name="['componentProps', 'precision']"
         required
+        :validateFirst="true"
       >
         <j-input-number
           style="width: 100%"
@@ -49,7 +50,7 @@
         ].includes(type)
       "
     >
-      <j-form-item label="类型" :name="['componentProps', 'mode']">
+      <j-form-item :validateFirst="true" label="类型" :name="['componentProps', 'mode']">
         <j-radio-group
           v-model:value="target.componentProps.mode"
           button-style="solid"
@@ -63,6 +64,7 @@
     <template v-if="['upload'].includes(type)">
       <j-form-item
         label="上传内容"
+        :validateFirst="true"
         :name="['componentProps', 'listType']"
         :rules="[
           {
@@ -84,6 +86,7 @@
         label="上传个数"
         :name="['componentProps', 'maxCount']"
         required
+        :validateFirst="true"
       >
         <j-input-number
           style="width: 100%"
@@ -94,7 +97,7 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item :name="['componentProps', 'accept']" label="格式">
+      <j-form-item :validateFirst="true" :name="['componentProps', 'accept']" label="格式">
         <j-select
           mode="multiple"
           placeholder="请选择"
@@ -111,6 +114,7 @@
         :name="['componentProps', 'fileSize']"
         label="单个大小"
         :rules="rules"
+        :validateFirst="true"
       >
         <j-input-group compact>
           <j-input-number
@@ -132,7 +136,7 @@
       </j-form-item>
     </template>
     <template v-if="['tree-select'].includes(type)">
-      <j-form-item label="类型" :name="['componentProps', 'multiple']">
+      <j-form-item :validateFirst="true" label="类型" :name="['componentProps', 'multiple']">
         <j-radio-group
           v-model:value="target.componentProps.multiple"
           button-style="solid"
@@ -146,6 +150,7 @@
         label="可选节点"
         v-if="target.componentProps.multiple"
         :name="['componentProps', 'treeCheckStrictly']"
+        :validateFirst="true"
         :rules="[
           {
             required: true,
@@ -167,6 +172,7 @@
       <j-form-item
         label="支持模糊搜索"
         :name="['componentProps', 'showSearch']"
+        :validateFirst="true"
         :rules="[
           {
             required: true,
@@ -181,7 +187,7 @@
       </j-form-item>
     </template>
     <template v-if="['table'].includes(type)">
-      <j-form-item label="内容对齐" :name="['componentProps', 'align']">
+      <j-form-item :validateFirst="true" label="内容对齐" :name="['componentProps', 'align']">
         <j-select
           v-model:value="target.componentProps.align"
           placeholder="请选择"
@@ -192,7 +198,7 @@
           <j-select-option :value="'center'">中</j-select-option>
         </j-select>
       </j-form-item>
-      <j-form-item label="表格高度" :name="['componentProps', 'height']">
+      <j-form-item :validateFirst="true" label="表格高度" :name="['componentProps', 'height']">
         <j-input-number
           v-model:value="target.componentProps.height"
           placeholder="请输入"
@@ -217,6 +223,7 @@
       <j-form-item
         label="可选项"
         :name="['componentProps', 'geoType']"
+        :validateFirst="true"
         :rules="[
           {
             required: true,
@@ -261,6 +268,7 @@
       <j-form-item
         label="约束"
         :name="['formItemProps', 'required']"
+        :validateFirst="true"
         :rules="[
           {
             required: true,
