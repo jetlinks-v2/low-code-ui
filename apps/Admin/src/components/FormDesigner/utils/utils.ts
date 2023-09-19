@@ -109,6 +109,12 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
                 message: (node.formItemProps?.label || node.name) + '配置错误'
             }
         }
+        if (node?.formItemProps?.isLayout && !node.formItemProps?.label) {
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.label || node.name) + '配置错误'
+            }
+        }
     }
     return false
 }
