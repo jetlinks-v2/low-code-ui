@@ -15,7 +15,7 @@
           <template #title="node">
             <j-dropdown :trigger="['contextmenu']">
               <span class="title">
-                <div class="icon"><img :src="providerImages[node.type]"></div>
+                <div class="icon"><img :src="typeImages[node.type]"></div>
                 {{ node.title }}
               </span>
               <template #overlay>
@@ -32,7 +32,7 @@
       @save="save"
       @close="close"
     />
-    <FileDrawer :data="menuState.data" v-if="menuState.fileVisible"  @close="close"/>
+    <FileDrawer :data="menuState.data" v-if="menuState.fileVisible"  @close="close" :getContainer="true"/>
   </div>
 </template>
 
@@ -46,7 +46,7 @@ import { providerEnum } from "@/components/ProJect/index";
 import { randomString } from '@jetlinks/utils'
 import { defaultSetting as CrudBaseData } from '@/components/Database/setting'
 import { onlyMessage } from '@jetlinks/utils';
-import { providerImages } from '@/components/ProJect/index'
+import { typeImages } from '@/components/ProJect/index'
 
 const engine = useEngine()
 const product = useProduct()
@@ -134,10 +134,10 @@ const menuClick = (record) => {
     :deep(.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected){
       background-color: #F6F7F9;
       color: #315EFB;
-      img{
-        transform: translateX(100px);
-        filter: drop-shadow(-100px 0px 0px #315EFB);
-      }
+      // img{
+      //   transform: translateX(100px);
+      //   filter: drop-shadow(-100px 0px 0px #315EFB);
+      // }
     }
     :deep(.ant-tree-switcher){
       line-height: 40px;
@@ -150,7 +150,12 @@ const menuClick = (record) => {
     
       .icon{
         margin-right: 10px;
-        overflow: hidden;
+        width: 20px;
+        height: 20px;
+        img{
+          width: 100%;
+          height: 100%;
+        }
       }
     }
   }

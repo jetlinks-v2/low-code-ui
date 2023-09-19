@@ -51,6 +51,7 @@ import {
 import { validOperationsBtn } from './index'
 import { PropType } from 'vue'
 import { getImage } from '@jetlinks/utils';
+import { useFunctions } from '@/hooks'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -73,6 +74,7 @@ const props = defineProps({
   }
 })
 
+const { functionOptions } = useFunctions()
 const columnsTree = computed({
   get() {
     return props.columnsTree
@@ -111,7 +113,7 @@ const save = async () => {
 }
 
 const valid = () => {
-  errorList.value = validOperationsBtn(columnsTree.value)
+  errorList.value = validOperationsBtn(columnsTree.value, functionOptions.value)
   return errorList.value.length ? [{message: props.type === 'columns' ? '操作列配置错误': '操作按钮配置错误'}] : []
   // return new Promise((resolve, reject) => {
   //   errorList.value = validOperationsBtn(columnsTree.value)

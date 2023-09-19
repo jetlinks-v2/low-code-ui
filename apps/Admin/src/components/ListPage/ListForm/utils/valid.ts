@@ -5,7 +5,7 @@ export const validListForm = (data1, data2) => {
       key: 'field1',
       message: '字段1必填'
     })
-    if(data2.specialStyle?.length && !data2.emphasisFiled?.length) {
+    if(data2.specialStyle?.length && !data2.emphasisField?.length) {
       errorList.push({
         key: 'emphasisField',
         message: '请配置'

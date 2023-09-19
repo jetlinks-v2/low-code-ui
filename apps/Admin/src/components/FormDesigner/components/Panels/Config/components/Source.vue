@@ -1,7 +1,10 @@
 <template>
   <div>
     <p>请配置可选项的数据来源</p>
-    <j-form-item :name="['componentProps', 'source', 'type']">
+    <j-form-item
+      :validateFirst="true"
+      :name="['componentProps', 'source', 'type']"
+    >
       <j-radio-group
         v-model:value="target.componentProps.source.type"
         button-style="solid"
@@ -12,6 +15,7 @@
       </j-radio-group>
     </j-form-item>
     <j-form-item
+      :validateFirst="true"
       :name="['componentProps', 'source', 'dictionary']"
       v-if="target.componentProps?.source?.type === 'dic'"
     >
@@ -28,7 +32,10 @@
     <template v-else>
       <j-row :gutter="16">
         <j-col :span="12">
-          <j-form-item :name="['componentProps', 'source', 'functionId']">
+          <j-form-item
+            :validateFirst="true"
+            :name="['componentProps', 'source', 'functionId']"
+          >
             <j-select
               v-model:value="target.componentProps.source.functionId"
               placeholder="请选择"
@@ -41,6 +48,7 @@
         </j-col>
         <j-col :span="12">
           <j-form-item
+            :validateFirst="true"
             :rules="[
               {
                 required: target.componentProps.source.functionId,
@@ -62,7 +70,7 @@
       </j-row>
     </template>
     <template v-if="target.componentProps?.source?.type === 'end'">
-      <j-form-item :name="['componentProps', 'source', 'source']">
+      <j-form-item :validateFirst="true" :name="['componentProps', 'source', 'source']">
         <template #label>
           数据层级<j-tooltip title="选择树结构的数据在接口的哪一层">
             <AIcon type="QuestionCircleOutlined" />
@@ -79,7 +87,7 @@
         >
         </j-tree-select>
       </j-form-item>
-      <j-form-item :name="['componentProps', 'source', 'label']">
+      <j-form-item :validateFirst="true" :name="['componentProps', 'source', 'label']">
         <template #label>
           展示字段<j-tooltip title="选择树结构进行展示的数据">
             <AIcon type="QuestionCircleOutlined" />
@@ -94,7 +102,7 @@
         >
         </j-select>
       </j-form-item>
-      <j-form-item :name="['componentProps', 'source', 'value']">
+      <j-form-item :validateFirst="true" :name="['componentProps', 'source', 'value']">
         <template #label>
           存入后端字段<j-tooltip title="选择树结构存入后端的数据">
             <AIcon type="QuestionCircleOutlined" />

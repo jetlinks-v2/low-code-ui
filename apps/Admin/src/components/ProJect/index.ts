@@ -54,6 +54,7 @@ export const typeImages = {
   [providerEnum.HtmlPage]:getImage('/project/html.png'),
   [providerEnum.FormPage]:getImage('/project/form.png'),
   [providerEnum.Function]:getImage('/project/function.png'),
+  'project':getImage('/project/project.png'),
 }
 
 export const projectList = [
