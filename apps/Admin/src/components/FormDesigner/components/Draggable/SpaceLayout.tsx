@@ -57,6 +57,7 @@ export default defineComponent({
             }
             return (
                 <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDrag={true} hasDel={true} hasCopy={true} data={props.data} parent={props.parent}>
+                    {/* <div style={{ overflowX: 'auto' }}> */}
                     {
                         unref(list).length ? <Space data-layout-type={'space'} {...props.data.componentProps}>
                             {
@@ -85,6 +86,7 @@ export default defineComponent({
                             }
                         </Space> : (unref(isEditModel) ? <div class="draggable-empty">弹性间距</div> : <div></div>)
                     }
+                    {/* </div> */}
                     {
                         unref(isEditModel) &&
                         <div class="draggable-add">
