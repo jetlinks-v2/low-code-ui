@@ -5,7 +5,13 @@
       <template #moreIcon>
         <AIcon type="MoreOutlined" />
       </template>
-      <j-tab-pane v-for="item in files" :key="item.id" :tab="item.title" :closable="true">
+      <j-tab-pane v-for="item in files" :key="item.id"  :closable="true">
+        <template #tab>
+        <span>
+          <img :src="typeImages[item.type]" style="width: 20px;height: 20px;margin-right: 5px;">
+          {{item.title}}
+        </span>
+      </template>
         <Content :data="item" />
       </j-tab-pane>
     </j-tabs>
@@ -34,7 +40,7 @@ import { useEngine, useProduct } from '@/store'
 // import Tabs from '../Tabs/tabs.vue'
 import Content from './content.vue'
 import ProjectEmpty from '@/components/ProJect/Empty/index.vue'
-import { providerImages } from '@/components/ProJect/index'
+import { providerImages ,typeImages} from '@/components/ProJect/index'
 
 
 const engine = useEngine()
