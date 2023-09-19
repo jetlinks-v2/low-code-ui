@@ -10,6 +10,9 @@
 import { useFlowStore } from '@/store/flow'
 import ApprovalNodeConfig from './ApprovalNodeConfig.vue'
 import DealNodeConfig from './DealNodeConfig.vue'
+import ConditionNodeConfig from './ConditionNodeConfig.vue'
+import ConditionsConfig from './ConditionsConfig.vue'
+import ConcurrentsConfig from './ConcurrentsConfig.vue'
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
@@ -18,7 +21,9 @@ const selectedNode = computed(() => flowStore.selectedNode)
 const componentsMap = {
   APPROVAL: ApprovalNodeConfig,
   DEAL: DealNodeConfig,
-  //   CONDITION: Condition,
+  CONDITION: ConditionNodeConfig,
+  CONDITIONS: ConditionsConfig,
+  CONCURRENTS: ConcurrentsConfig,
 }
 </script>
 
