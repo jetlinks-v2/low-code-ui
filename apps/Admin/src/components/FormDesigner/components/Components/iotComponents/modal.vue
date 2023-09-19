@@ -18,6 +18,7 @@
       :defaultParams="{
         sorts: [{ name: 'createTime', order: 'desc' }],
       }"
+      rowKey="id"
       :params="params"
       :gridColumn="2"
       :gridColumns="[2]"
@@ -34,18 +35,36 @@
         <Card
           :value="slotProps"
           v-bind="slotProps"
-          :status="slotProps.state"
+          :status="
+            type === 'product' ? slotProps.state : slotProps.state?.value
+          "
           :active="_selectedRowKeys.includes(slotProps.id)"
           @click="() => onSelectChange(slotProps)"
-          :statusText="slotProps.state === 1 ? '正常' : '禁用'"
-          :statusNames="{
-            1: 'processing',
-            0: 'error',
-          }"
+          :statusText="
+            type === 'product'
+              ? slotProps.state === 1
+                ? '正常'
+                : '禁用'
+              : slotProps.state?.text
+          "
+          :statusNames="
+            type === 'product'
+              ? { 1: 'processing', 0: 'error' }
+              : {
+                  online: 'processing',
+                  offline: 'error',
+                  notActive: 'warning',
+                }
+          "
         >
           <template #img>
             <slot name="img">
-              <img :src="slotProps.photoUrl || '/images/form-designer/device-card.png'" class="productImg" />
+              <img
+                :src="
+                  slotProps.photoUrl || '/images/form-designer/device-card.png'
+                "
+                class="productImg"
+              />
             </slot>
           </template>
           <template #content>
@@ -65,12 +84,20 @@
       </template>
       <template #state="slotProps">
         <BadgeStatus
-          :text="slotProps.state === 1 ? '正常' : '禁用'"
-          :status="slotProps.state"
-          :statusNames="{
-            1: 'processing',
-            0: 'error',
-          }"
+          :text="type === 'product' ? (slotProps.state === 1 ? '正常' : '禁用') : slotProps.state?.text"
+          :status="type === 'product' ? slotProps.state : slotProps.state?.value"
+          :statusNames="
+            type === 'product'
+              ? {
+                  1: 'processing',
+                  0: 'error',
+                }
+              : {
+                  online: 'processing',
+                  offline: 'error',
+                  notActive: 'warning',
+                }
+          "
         />
       </template>
     </JProTable>
