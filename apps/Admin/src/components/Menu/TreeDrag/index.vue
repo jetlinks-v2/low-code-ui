@@ -251,8 +251,8 @@ watch(
 watch(
     () => treeData.value,
     (val) => {
-        console.log('----',handleSort(val))
-        emit('changeTree', val)
+        // console.log('----',handleSort(val))
+        emit('changeTree', handleSort(val))
     },
     { deep: true, immediate: true }
 )
