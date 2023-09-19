@@ -19,39 +19,45 @@ export const generateOptions = (len: number) => {
     return result
 }
 
-const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo', 'product', 'device', 'org', 'user', 'role']
+const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'card', 'geo', 'product', 'device', 'org', 'user', 'role']
 
 const checkedConfigItem = (node: ISchema, allData: any[]) => {
     const _type = node.type || 'root'
     if (_type === 'root') {
         return false
     } else {
-        if (['text'].includes(_type) && !(node?.componentProps?.value && node?.formItemProps?.name)) {
+        if (arr.includes(_type)) {
+            if (!node?.formItemProps?.label) {
+                return {
+                    key: node?.key,
+                    message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
+            }
+        }
+        if (!node?.formItemProps?.name) {
             return {
                 key: node?.key,
                 message: (node.formItemProps?.label || node.name) + '配置错误'
             }
+        } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.label || node.name) + '配置错误'
+            }
+        } else {
+            const arr = getBrotherList(node?.key || '', allData)
+            const flag = arr.filter((item) => item.key !== node.key).find((i) => i?.formItemProps?.name === node?.formItemProps?.name)
+            if (flag) { // `标识${value}已被占用`
+                return {
+                    key: node?.key,
+                    message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
+            }
         }
-        if (arr.includes(_type)) {
-            if (!node?.formItemProps?.name || !node?.formItemProps?.label) {
-                return {
-                    key: node?.key,
-                    message: (node.formItemProps?.label || node.name) + '配置错误'
-                }
-            } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
-                return {
-                    key: node?.key,
-                    message: (node.formItemProps?.label || node.name) + '配置错误'
-                }
-            } else {
-                const arr = getBrotherList(node?.key || '', allData)
-                const flag = arr.filter((item) => item.key !== node.key).find((i) => i?.formItemProps?.name === node?.formItemProps?.name)
-                if (flag) { // `标识${value}已被占用`
-                    return {
-                        key: node?.key,
-                        message: (node.formItemProps?.label || node.name) + '配置错误'
-                    }
-                }
+        if (['text'].includes(_type) && !node?.componentProps?.value) {
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.label || node.name) + '配置错误'
             }
         }
         if ('input-number' === _type && (node?.componentProps?.max === undefined || node?.componentProps?.min === undefined || node?.componentProps?.precision === undefined)) {
@@ -99,18 +105,6 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
             return {
                 key: node?.key,
                 message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
-        }
-        if (['table-item', 'collapse-item', 'tabs-item', 'collapse', 'tabs'].includes(_type) && !(node?.formItemProps?.name)) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.name || node.name) + '配置错误'
-            }
-        }
-        if (['table-item', 'collapse-item', 'tabs-item'].includes(_type) && !(node?.componentProps?.name)) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.name || node.name) + '配置错误'
             }
         }
     }
@@ -407,12 +401,12 @@ export const handleCopyData = (arr: any[]) => {
 // 查找父节点
 export const findParentById = (tree: any, node: any) => {
     let result: any = []
-    function find(node, tree){
+    function find(node, tree) {
         tree?.children.forEach(item => {
-            if(item.key === node.key){
+            if (item.key === node.key) {
                 result.push(tree)
             }
-            if('children' in item){
+            if ('children' in item) {
                 find(node, item)
             }
         })

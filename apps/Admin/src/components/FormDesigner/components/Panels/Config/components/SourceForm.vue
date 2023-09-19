@@ -2,6 +2,7 @@
   <div>
     <j-form-item
       label="数据绑定"
+      :validateFirst="true"
       :name="['componentProps', 'source', 'value']"
       :rules="[
           {

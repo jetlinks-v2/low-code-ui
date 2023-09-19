@@ -40,7 +40,7 @@ const Canvas = defineComponent({
     watch(
       () => [keys['Ctrl+C']?.value, keys['Meta+C']?.value],
       ([v1, v2]) => {
-        if ((v1 || v2) && isEditModel.value && designer.focus) {
+        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
           designer.onCopy()
         }
       },
@@ -49,7 +49,7 @@ const Canvas = defineComponent({
     watch(
       () => [keys['Ctrl+X']?.value, keys['Meta+X']?.value],
       ([v1, v2]) => {
-        if ((v1 || v2) && isEditModel.value && designer.focus) {
+        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
           designer.onShear()
         }
       },
@@ -58,7 +58,7 @@ const Canvas = defineComponent({
     watch(
       () => [keys['Ctrl+V']?.value, keys['Meta+V']?.value],
       ([v1, v2]) => {
-        if ((v1 || v2) && isEditModel.value && designer.focus) {
+        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
           designer.onPaste()
         }
       },
@@ -68,7 +68,7 @@ const Canvas = defineComponent({
     watch(
       () => [keys['Backspace'].value, keys['Delete'].value],
       ([v1, v2]) => {
-        if ((v1 || v2) && isEditModel.value && designer.focus) {
+        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
           if (!designer.delVisible.value) {
             designer.onDelete()
           }
@@ -81,13 +81,9 @@ const Canvas = defineComponent({
       return foundRef
     }
 
-    const _style = {
-      margin: '10px 10px 0 10px',
-      paddingTop: '10px',
-      height: '100%',
-      boxSizing: 'border-box',
-      width: !unref(designer.formData)?.children?.length && "100%"
-    }
+    const _width = computed(() => {
+      return !unref(designer.formData)?.children?.length ? "100%" : ''
+    })
 
     const onPaste = () => {
       designer.onPaste()
@@ -99,12 +95,18 @@ const Canvas = defineComponent({
       insertCustomCssToHead(unref(designer.formData)?.componentProps?.cssCode, 'root')
     })
 
-    watch(() => focused.value, (newValue) => {
-      designer.focus = newValue
-    }, {
-      immediate: true,
-      deep: true
-    })
+    watch(
+      () => focused?.value,
+      (newValue) => {
+        if (designer.focus) {
+          designer.focus.value = newValue
+        }
+      },
+      {
+        immediate: true,
+        deep: true
+      }
+    )
 
     const renderContent = () => {
       const Layout = (
@@ -112,7 +114,13 @@ const Canvas = defineComponent({
           path={[]}
           index={0}
           data-layout-type={'root'}
-          style={_style}
+          style={{
+            margin: '10px 10px 0 10px',
+            paddingTop: '10px',
+            height: '100%',
+            boxSizing: 'border-box',
+            width: unref(_width)
+          }}
           data={unref(designer.formData)?.children}
           parent={unref(designer.formData)}
           isRoot
