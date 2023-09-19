@@ -136,6 +136,7 @@ const rules = {
     { max: model.value.length, message: `请输入长度在${model.value.length}以内的字符`}
   ],
   message: [
+    { required: true, message: '请输入校验不通过时提示语' },
     { max: 64, message: '最多输入64位字符'}
   ],
   min: [

@@ -3,7 +3,7 @@
     <div class="card">
       <h3>基本信息</h3>
       <p>页面名称</p>
-      <j-input v-model:value="form!.pageName" disabled />
+      <j-input v-model:value="form.pageName" disabled />
 
       <h3 class="title">设置该页面为系统主菜单</h3>
       <j-form ref="basicFormRef" :model="form" class="basic-form">

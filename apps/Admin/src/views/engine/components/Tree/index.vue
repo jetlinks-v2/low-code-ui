@@ -1,6 +1,6 @@
 <template>
   <div class="engine-tree" :style="{ flex: `0 0 ${collapsed ? width : 34}px` }">
-    <drag-box v-show="visible" position="right" :max="200" @move="move">
+    <drag-box v-show="visible" position="right" :max="360" @move="move">
       <div style="overflow: hidden; height: 100%">
         <div class="engine-tree-content">
           <Search :collapsed="collapsed" @collapsed="collapsedChange" />

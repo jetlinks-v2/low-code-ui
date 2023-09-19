@@ -34,7 +34,7 @@
           <j-button v-if="step === 1" @click="prev">上一步</j-button>
           <j-button v-if="step === 1" type="primary" @click="release">发布</j-button>
 
-          <j-button v-if="step === 2" type="primary" @click="cancel" :disabled="finishStatus !== 100">完成</j-button>
+          <j-button v-if="step === 2" type="primary" @click="cancel" :disabled="!finishStatus">完成</j-button>
         </div>
       </CardBox>
     </div>
@@ -64,7 +64,7 @@ const finishRef = ref()
 const router = useRouter()
 
 const status = ref(true)
-const finishStatus = ref(0)
+const finishStatus = ref(false)
 
 const releaseStatus = ref('')
 
