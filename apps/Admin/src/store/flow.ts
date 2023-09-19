@@ -44,7 +44,7 @@ export const useFlowStore = defineStore('flow', () => {
                     type: 'EMPTY',
                     active: false,
                 },
-                branchs: [
+                branches: [
                     {
                         id: 'node_888640882246',
                         parentId: 'node_888640864603',
@@ -112,7 +112,7 @@ export const useFlowStore = defineStore('flow', () => {
                                 children: {},
                                 active: false,
                             },
-                            branchs: [
+                            branches: [
                                 {
                                     id: 'node_889251745120',
                                     name: '审批节点',

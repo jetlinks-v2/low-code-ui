@@ -66,16 +66,16 @@ const FlowDesigner = defineComponent({
       } else if (isBranchNode(node)) {
         let index = 0
         //遍历分支节点，包含并行及条件节点
-        let branchItems = node.branchs.map((branchNode) => {
+        let branchItems = node.branches.map((branchNode) => {
           //处理每个分支内子节点
           toMapping(branchNode)
           let childDoms = getDomTree(h, branchNode.children)
           decodeAppendDom(h, branchNode, childDoms, {
             level: index + 1,
-            size: node.branchs.length,
+            size: node.branches.length,
           })
           //插入4条横线，遮挡掉条件节点左右半边线条
-          insertCoverLine(h, index, childDoms, node.branchs)
+          insertCoverLine(h, index, childDoms, node.branches)
           //遍历子分支尾部分支
           index++
           return h(
@@ -159,12 +159,12 @@ const FlowDesigner = defineComponent({
       }
     }
 
-    const insertCoverLine = (h, index, doms, branchs) => {
+    const insertCoverLine = (h, index, doms, branches) => {
       if (index === 0) {
         //最左侧分支
         doms.unshift(h('div', { class: { 'line-top-left': true } }, []))
         doms.unshift(h('div', { class: { 'line-bot-left': true } }, []))
-      } else if (index === branchs.length - 1) {
+      } else if (index === branches.length - 1) {
         //最右侧分支
         doms.unshift(h('div', { class: { 'line-top-right': true } }, []))
         doms.unshift(h('div', { class: { 'line-bot-right': true } }, []))
@@ -173,10 +173,10 @@ const FlowDesigner = defineComponent({
 
     const branchMove = (node, offset) => {
       let parentNode = nodeMap.value.get(node.parentId)
-      let index = parentNode.branchs.indexOf(node)
-      let branch = parentNode.branchs[index + offset]
-      parentNode.branchs[index + offset] = parentNode.branchs[index]
-      parentNode.branchs[index] = branch
+      let index = parentNode.branches.indexOf(node)
+      let branch = parentNode.branches[index + offset]
+      parentNode.branches[index + offset] = parentNode.branches[index]
+      parentNode.branches[index] = branch
       proxy?.$forceUpdate()
     }
 
@@ -276,7 +276,7 @@ const FlowDesigner = defineComponent({
         parentId: parentNode.children.id,
         type: 'EMPTY',
       }
-      parentNode.children.branchs = [
+      parentNode.children.branches = [
         {
           id: getRandomId(),
           parentId: parentNode.children.id,
@@ -303,7 +303,7 @@ const FlowDesigner = defineComponent({
         type: 'EMPTY',
       }
 
-      parentNode.children.branchs = [
+      parentNode.children.branches = [
         {
           id: getRandomId(),
           name: '审批节点',
@@ -348,23 +348,23 @@ const FlowDesigner = defineComponent({
      * @param type (CONDITIONS: 条件分支  APPROVAL:审批节点 DEAL:办理节点)
      */
     const addBranchNode = (node, type) => {
-      if (node.branchs.length < 8) {
+      if (node.branches.length < 8) {
         switch (type) {
           case 'CONDITIONS':
-            node.branchs.push({
+            node.branches.push({
               id: getRandomId(),
               parentId: node.id,
-              name: '条件' + (node.branchs.length + 1),
+              name: '条件' + (node.branches.length + 1),
               props: cloneDeep(DefaultProps.CONDITION_PROPS),
               type: 'CONDITION',
               children: {},
             })
             break
           case 'APPROVAL':
-            node.branchs.push({
+            node.branches.push({
               id: getRandomId(),
               parentId: node.id,
-              name: '审批人' + (node.branchs.length + 1),
+              name: '审批人' + (node.branches.length + 1),
               props: {
                 ...cloneDeep(DefaultProps.APPROVAL_PROPS),
                 style: {
@@ -377,10 +377,10 @@ const FlowDesigner = defineComponent({
             })
             break
           case 'DEAL':
-            node.branchs.push({
+            node.branches.push({
               id: getRandomId(),
               parentId: node.id,
-              name: '办理人' + (node.branchs.length + 1),
+              name: '办理人' + (node.branches.length + 1),
               props: {
                 ...cloneDeep(DefaultProps.DEAL_PROPS),
                 style: {
@@ -416,21 +416,21 @@ const FlowDesigner = defineComponent({
         //判断该节点的父节点是不是分支节点
         if (isBranchNode(parentNode)) {
           //移除该分支
-          parentNode.branchs.splice(parentNode.branchs.indexOf(node), 1)
+          parentNode.branches.splice(parentNode.branches.indexOf(node), 1)
           //处理只剩1个分支的情况
-          if (parentNode.branchs.length < 2) {
+          if (parentNode.branches.length < 2) {
             //获取条件组的父节点
             let ppNode = nodeMap.value.get(parentNode.parentId)
             //判断唯一分支是否存在业务节点
             if (
-              parentNode.branchs[0].children &&
-              parentNode.branchs[0].children.id
+              parentNode.branches[0].children &&
+              parentNode.branches[0].children.id
             ) {
               //将剩下的唯一分支头部合并到主干
-              ppNode.children = parentNode.branchs[0].children
+              ppNode.children = parentNode.branches[0].children
               ppNode.children.parentId = ppNode.id
               //搜索唯一分支末端最后一个节点
-              let endNode = getBranchEndNode(parentNode.branchs[0])
+              let endNode = getBranchEndNode(parentNode.branches[0])
               //后续节点进行拼接, 这里要取EMPTY后的节点
               endNode.children = parentNode.children.children
               if (endNode.children && endNode.children.id) {
@@ -478,7 +478,7 @@ const FlowDesigner = defineComponent({
     //   if (isBranchNode(node)) {
     //     callback(parent, node)
     //     forEachNode(node, node.children, callback)
-    //     node.branchs.map((branchNode) => {
+    //     node.branches.map((branchNode) => {
     //       callback(node, branchNode)
     //       forEachNode(branchNode, branchNode.children, callback)
     //     })
@@ -499,7 +499,7 @@ const FlowDesigner = defineComponent({
         validate(err, node.children)
       } else if (isBranchNode(node)) {
         //校验每个分支
-        node.branchs.map((branchNode) => {
+        node.branches.map((branchNode) => {
           //校验条件节点
           validateNode(err, branchNode)
           //校验条件节点后面的节点
