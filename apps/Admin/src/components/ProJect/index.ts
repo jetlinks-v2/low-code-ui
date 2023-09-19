@@ -72,20 +72,20 @@ export const projectList = [
      title:'前端资源',
      children:[
         {
-           type:providerEnum.ListPage,
+           type:providerEnum.HtmlPage,
            img:getImage('/project/html.png'),
            text:'高度灵活，自由扩展定制化页面需求'
         },
-        {
-          type:providerEnum.FormPage,
-          img:getImage('/project/form.png'),
-          text:'拖拽组件自定义完成表单页设计'
-       },
        {
           type:providerEnum.ListPage,
           img:getImage('/project/list.png'),
           text:'通用页面格式，5分钟快速完成数据列表页配置'
-       }
+       },
+       {
+        type:providerEnum.FormPage,
+        img:getImage('/project/form.png'),
+        text:'拖拽组件自定义完成表单页设计'
+     },
      ]
   },
   {

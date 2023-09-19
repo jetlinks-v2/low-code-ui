@@ -188,10 +188,10 @@ export const useProduct = defineStore('product', () => {
     return dataById.value
   }
 
-  const add = (record: any, parentId: string) => {
+  const add = (record: any, parentId: string,open?:any) => {
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
-    engine.updateFile(record, 'add')
+    engine.updateFile(record,'add',open)
     updateProductReq(data.value)
   }
 

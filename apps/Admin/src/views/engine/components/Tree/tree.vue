@@ -33,6 +33,7 @@
       @close="close"
     />
     <FileDrawer :data="menuState.data" v-if="menuState.fileVisible"  @close="close" :getContainer="true"/>
+    <DelModal v-if="menuState.visibleDel" @close="close" @save="onDel" :data="menuState.data" />
   </div>
 </template>
 
@@ -42,6 +43,7 @@ import { storeToRefs } from 'pinia'
 import RightMenu from './rightMenu.vue'
 import InputModal from '@/components/ProJect/components/Action/InputModal.vue'
 import FileDrawer from '@/components/ProJect/components/Action/FileDrawer.vue'
+import DelModal from '@/components/ProJect/components/Action/DelModal.vue'
 import { providerEnum } from "@/components/ProJect/index";
 import { randomString } from '@jetlinks/utils'
 import { defaultSetting as CrudBaseData } from '@/components/Database/setting'
@@ -63,6 +65,7 @@ const props = defineProps({
 const menuState = reactive({
   visible: false,
   fileVisible:false,
+  visibleDel:false,
   provider: '',
   cacheData: undefined,
   data: undefined,
@@ -79,6 +82,7 @@ const select = (key, e) => {
 const close = () => {
   menuState.visible = false
   menuState.fileVisible = false
+  menuState.visibleDel = false
   menuState.provider = ''
   menuState.data = undefined
   menuState.cacheData = undefined
@@ -108,6 +112,11 @@ const save = (data) => {
   close()
 }
 
+const onDel = (data) => {
+  product.remove(data)
+  menuState.visibleDel = false
+}
+
 const menuClick = (record) => {
   console.log('record',record)
   if(record.menuKey  === 'Copy'){
@@ -116,6 +125,9 @@ const menuClick = (record) => {
   }else if(record.menuKey === 'Profile'){
     Object.assign(menuState, record)
     menuState.fileVisible = true
+  }else if(record.menuKey === 'Delete'){
+    Object.assign(menuState, record)
+    menuState.visibleDel = true
   }else{
     Object.assign(menuState, record)
     menuState.visible = true

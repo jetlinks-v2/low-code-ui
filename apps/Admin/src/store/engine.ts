@@ -103,8 +103,11 @@ export const useEngine = defineStore('engine', () => {
    * 新增打开的文件
    * @param record
    */
-  const addFile = (record: FileItemType) => {
-    activeFile.value = record.id
+  const addFile = (record: FileItemType,open?:any) => {
+    // console.log('------open',open)
+    if(!open){
+      activeFile.value = record.id
+    }
     const type = record.type
     if (!files.value.some(item => item.id === record.id)) {
       const cloneRecord = cloneDeep(record)
@@ -167,7 +170,7 @@ export const useEngine = defineStore('engine', () => {
    * @param record
    * @param type
    */
-  const updateFile = (record: any, type: string) => {
+  const updateFile = (record: any, type: string,open?:any) => {
     const index = files.value.findIndex(item => item.id === record.id)
 
     files.value = files.value.map(item => {
@@ -175,9 +178,14 @@ export const useEngine = defineStore('engine', () => {
     })
 
     if (['del', 'edit'].includes(type)) {
-      type === 'del' ? files.value.splice(index,1) : files.value[index] = record
+      if( type === 'del'){
+        files.value.splice(index,1)
+        activeFile.value = record.id ===activeFile.value? product.data[0].id : activeFile.value
+      }else{
+        files.value[index] = record
+      }
     } else if (type === 'add') {
-      addFile(record)
+      addFile(record,open)
     }
   }
 
