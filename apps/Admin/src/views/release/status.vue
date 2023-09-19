@@ -163,6 +163,7 @@ const validateContent = reactive({
 
 const nextCheck = async () => {
   const _id = Object.keys(status)[validateContent.step]
+  console.log('nextCheck', validateContent.step, Object.keys(status).length)
   if (validateContent.step >= Object.keys(status).length) {
     emit('update:status', Object.values(statusMsg).filter(a => a.length).length)
     check.type = 'end'
@@ -268,16 +269,15 @@ const validateAll = async (id, cb) => {
           if (cb) {
             cb()
           } else {
-            emit('update:status', Object.keys(statusMsg).length)
+            emit('update:status', Object.values(statusMsg).filter(item => item.length).length)
           }
 
         }).catch(e => {
-          console.log(e)
           handleStatusItem(item.id, 1, e.map(a => a.message) )
           if (cb) {
             cb()
           } else {
-            emit('update:status', Object.keys(statusMsg).length)
+            emit('update:status', Object.values(statusMsg).filter(item => item.length).length)
           }
         })
       }, 1000)
