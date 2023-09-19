@@ -39,6 +39,7 @@ const onChange = debounce((code: string) => {
       code
     }
   })
+
 }, 250)
 
 // const onBlur = debounce(() => updateStoreCode(), 250)
@@ -66,6 +67,11 @@ const menuChangeValue = ref()
 const replRef = ref()
 const errors = ref([] as any)
 const handleOperClick = (type: OperType) => {
+  if (type === OperType.View && drawerVisible.value && $drawerWidth.value === '0%') {
+    $drawerWidth.value = '50%'
+    return
+  }
+
   if (type === activeOper.value) {
     drawerVisible.value = !drawerVisible.value
   } else {
@@ -78,6 +84,7 @@ const handleOperClick = (type: OperType) => {
   } else if (type === OperType.Menu) {
     drawerTitle.value = '菜单配置'
   }
+  console.log(drawerVisible.value)
   !drawerVisible.value && (activeOper.value = '')
 }
 
@@ -162,6 +169,16 @@ const errorValidate = async () => {
   });
 }
 
+const cancel = () => {
+  drawerVisible.value = false
+  activeOper.value = ''
+}
+
+const submit = () => {
+  menuListRef.value?.vaildate()
+  cancel()
+}
+
 onMounted(() => {
   menuFormData.value = {
     ...props.data.others.menu,
@@ -221,36 +238,6 @@ defineExpose({
         </div>
       </div>
     </div>
-<!--    <j-drawer-->
-<!--      v-model:visible="drawerVisible"-->
-<!--      :title="drawerTitle"-->
-<!--      :width=" activeOper === OperType.View ? '50%' : 500"-->
-<!--      placement="right"-->
-<!--      :style="{ position: 'absolute' }"-->
-<!--      :closable="false"-->
-<!--      :get-container="false"-->
-<!--      :maskStyle="{-->
-<!--        opacity: 0.5-->
-<!--      }"-->
-<!--      @close="activeOper = ''"-->
-<!--    >-->
-<!--      <template #extra>-->
-<!--        <j-button-->
-<!--          v-if="activeOper === OperType.View"-->
-<!--          type="primary"-->
-<!--          @click.stop="runCode"-->
-<!--          @dblclick.stop-->
-<!--          :loading="runLoading"-->
-<!--        >运行</j-button>-->
-<!--      </template>-->
-<!--      <Preview v-if="activeOper === OperType.View" ref="previewRef" />-->
-<!--      <MenuList-->
-<!--        v-else-if="activeOper === OperType.Menu"-->
-<!--        ref="menuListRef"-->
-<!--        :form-data="menuFormData"-->
-<!--        @update:form="updateMenuFormData"-->
-<!--      />-->
-<!--    </j-drawer>-->
     <div class="drawer-content" :style="{ width: $drawerWidth }" v-show="drawerVisible">
       <div class="drawer-header">
         <div class="drawer-title" @dblclick="handleDbClickViewName">
@@ -267,13 +254,17 @@ defineExpose({
         </div>
       </div>
       <div class="drawer-body">
-        <Preview v-if="activeOper === OperType.View" ref="previewRef" />
+        <Preview v-if="activeOper === OperType.View" ref="previewRef" :code="data?.configuration?.code" />
         <MenuList
           v-else-if="activeOper === OperType.Menu"
           ref="menuListRef"
           :form-data="menuFormData"
           @update:form="updateMenuFormData"
         />
+      </div>
+      <div class="drawer-footer" v-show="activeOper === OperType.Menu">
+        <j-button @click="cancel">取消</j-button>
+        <j-button type="primary"  @click="submit">确认</j-button>
       </div>
     </div>
   </div>
@@ -334,6 +325,8 @@ defineExpose({
   overflow-y: auto;
   border-right: 1px solid #f0f0f0;
   z-index: 20;
+  display: flex;
+  flex-direction: column;
 
   .drawer-header {
     position: relative;
@@ -357,6 +350,14 @@ defineExpose({
     font-size: 14px;
     line-height: 1.5715;
     word-wrap: break-word;
+    flex: 1 1 auto;
+  }
+
+  .drawer-footer {
+    border-top: 1px solid #f0f0f0;
+    padding: 16px 24px;
+    display: flex;
+    gap: 24px;
   }
 }
 </style>
