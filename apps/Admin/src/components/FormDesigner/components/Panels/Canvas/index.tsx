@@ -1,4 +1,4 @@
-import { Form, Scrollbar, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
+import { Form, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import DraggableLayout from "../../Draggable/DraggableLayout"
 import './index.less'
 import { cloneDeep, omit } from "lodash-es"
@@ -118,7 +118,6 @@ const Canvas = defineComponent({
             margin: '10px 10px 0 10px',
             paddingTop: '10px',
             height: '100%',
-            boxSizing: 'border-box',
             width: unref(_width)
           }}
           data={unref(designer.formData)?.children}
