@@ -2,28 +2,30 @@
   <div class="tree-content-warp">
     <div class="tree-content-body">
       <j-scrollbar>
-        <j-tree
-          v-model:expandedKeys="expandedKeys"
-          :selectedKeys="[activeFile]"
-          :treeData="treeData"
-          block-node
-          :fieldNames="{
-            key: 'id'
-          }"
-          @select="select"
-        >
-          <template #title="node">
-            <j-dropdown :trigger="['contextmenu']">
-              <span class="title">
-                <div class="icon"><img :src="typeImages[node.type]"></div>
-                {{ node.title }}
-              </span>
-              <template #overlay>
-                <RightMenu :node="node" @click="menuClick" />
-              </template>
-            </j-dropdown>
-          </template>
-        </j-tree>
+        <div class="tree-box">
+          <j-tree
+            v-model:expandedKeys="expandedKeys"
+            :selectedKeys="[activeFile]"
+            :treeData="treeData"
+            block-node
+            :fieldNames="{
+              key: 'id'
+            }"
+            @select="select"
+          >
+            <template #title="node">
+              <j-dropdown :trigger="['contextmenu']">
+                <span class="title">
+                  <div class="icon"><img :src="typeImages[node.type]"></div>
+                  {{ node.title }}
+                </span>
+                <template #overlay>
+                  <RightMenu :node="node" @click="menuClick" />
+                </template>
+              </j-dropdown>
+            </template>
+          </j-tree>
+        </div>
       </j-scrollbar>
     </div>
     <InputModal
@@ -126,11 +128,11 @@ const menuClick = (record) => {
 
 <style scoped lang="less">
 .tree-content-warp {
-  height: calc(100% - 44px);
+  height: calc(100% - 54px);
 
   .tree-content-body {
     height: 100%;
-    padding: 0 12px;
+
     :deep(.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected){
       background-color: #F6F7F9;
       color: #315EFB;
@@ -147,6 +149,7 @@ const menuClick = (record) => {
       height: 40px;
       line-height: 40px;
       font-size: 16px;
+      white-space: nowrap;
     
       .icon{
         margin-right: 10px;

@@ -312,10 +312,7 @@ const myTree = ref(props.tree || false)
 const assetRadioChange = (v) => {
   myAsset.assetType = undefined
   myAsset.assetTypeName = undefined
-
-  if (v.target.value === 'false') {
-    myAsset.assetIdColumn = 'id'
-  }
+  myAsset.assetIdColumn = 'id'
 
   assetChange(v)
 }

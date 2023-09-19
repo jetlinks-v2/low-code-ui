@@ -39,6 +39,7 @@ const onChange = debounce((code: string) => {
       code
     }
   })
+
 }, 250)
 
 // const onBlur = debounce(() => updateStoreCode(), 250)
@@ -46,6 +47,7 @@ const onChange = debounce((code: string) => {
 const drawerVisible = ref(false)
 const $drawerWidth = ref('50%')
 const drawerTitle = ref('预览')
+const menuError = ref(0)
 
 const handleDbClickViewName = () => {
   if (activeOper.value === OperType.View) {
@@ -66,6 +68,11 @@ const menuChangeValue = ref()
 const replRef = ref()
 const errors = ref([] as any)
 const handleOperClick = (type: OperType) => {
+  if (type === OperType.View && drawerVisible.value && $drawerWidth.value === '0%') {
+    $drawerWidth.value = '50%'
+    return
+  }
+
   if (type === activeOper.value) {
     drawerVisible.value = !drawerVisible.value
   } else {
@@ -78,6 +85,7 @@ const handleOperClick = (type: OperType) => {
   } else if (type === OperType.Menu) {
     drawerTitle.value = '菜单配置'
   }
+  console.log(drawerVisible.value)
   !drawerVisible.value && (activeOper.value = '')
 }
 
@@ -103,9 +111,10 @@ const runCode = () => {
   })
 }
 
-const handleValidate = () => {
-  if (errors.value.length > 0) {
-    onlyMessage(errors.value[0].errors[0], 'error')
+const handleValidate = async () => {
+  const menuStatus = await validateMenu()
+  if (menuStatus) {
+    // onlyMessage(errors.value[0].errors[0], 'error')
   } else if(!store.state.activeFile.code){
     onlyMessage('页面代码为空', 'error')
   } else if(store.state.errors?.length > 0) {
@@ -113,19 +122,26 @@ const handleValidate = () => {
   } else {
     onlyMessage('校验成功', 'success')
   }
-  updateStoreCode()
 }
 
 provide(BASE_INFO, props.data)
 provide(MENU_CONFIG, menuFormData)
 
+const validateMenu = async () => {
+  const resp = await menuListRef.value?.vaildate()
+  console.log(resp)
+  if (resp.errorFields) {
+    menuError.value = resp.errorFields.length
+    return true
+  } else {
+    menuError.value = 0
+    return false
+  }
+}
+
 const updateMenuFormData = (val) => {
   nextTick(() => {
-    menuListRef.value?.vaildate().then(vaild => {
-      if (vaild?.errorFields?.length > 0) {
-        errors.value = vaild.errorFields ?? []
-      }
-    })
+    validateMenu()
   })
 
   productStore.update({
@@ -138,21 +154,31 @@ const updateMenuFormData = (val) => {
 }
 
 const errorValidate = async () => {
-  const err = [];
+  const err: any[] = [];
+  const menuResp = await menuListRef.value?.vaildate()
+  if (menuResp.errorFields) {
+    menuError.value = menuResp.errorFields.length
+    menuResp.errorFields.forEach(item => {
+      const msg = item.errors[0]
+      err.push({ message: msg })
+    })
+  } else {
+    menuError.value = 0
+  }
   store.state.errors.forEach((error: any) => {
     err.push({
-      massage: error.message ?? error
+      message: error.message ?? error
     })
   })
   errors.value.forEach((error: any) => {
     err.push({
-      massage: error.errors[0]
+      message: error.errors[0]
     })
   })
   if (!store.state.activeFile.code) {
-    err.push({massage: '页面代码为空'})
+    err.push({message: '页面代码为空'})
   }
-
+  console.log('errorValidate',err)
   return new Promise((resolve, reject) => {
     if (err.length) {
       reject(err)
@@ -162,12 +188,22 @@ const errorValidate = async () => {
   });
 }
 
-onMounted(() => {
+const cancel = () => {
+  drawerVisible.value = false
+  activeOper.value = ''
+}
+
+const submit = () => {
+  menuListRef.value?.vaildate()
+  cancel()
+}
+
+watch(() => props.data?.title, () => {
   menuFormData.value = {
     ...props.data.others.menu,
-    pageName: props.data.pageName || props.data?.title || '',
+    pageName: props.data?.title || '',
   }
-})
+}, { immediate: true })
 
 defineExpose({
   validate: errorValidate
@@ -212,45 +248,19 @@ defineExpose({
         >
           <AIcon type="CaretRightOutlined"/>
         </div>
+        <j-badge :count="menuError">
         <div
           class="list-item"
           :class="{ active: activeOper === OperType.Menu }"
           @click="handleOperClick(OperType.Menu)"
         >
-          <AIcon type="MenuOutlined"/>
+
+            <AIcon type="MenuOutlined"/>
+
         </div>
+        </j-badge>
       </div>
     </div>
-<!--    <j-drawer-->
-<!--      v-model:visible="drawerVisible"-->
-<!--      :title="drawerTitle"-->
-<!--      :width=" activeOper === OperType.View ? '50%' : 500"-->
-<!--      placement="right"-->
-<!--      :style="{ position: 'absolute' }"-->
-<!--      :closable="false"-->
-<!--      :get-container="false"-->
-<!--      :maskStyle="{-->
-<!--        opacity: 0.5-->
-<!--      }"-->
-<!--      @close="activeOper = ''"-->
-<!--    >-->
-<!--      <template #extra>-->
-<!--        <j-button-->
-<!--          v-if="activeOper === OperType.View"-->
-<!--          type="primary"-->
-<!--          @click.stop="runCode"-->
-<!--          @dblclick.stop-->
-<!--          :loading="runLoading"-->
-<!--        >运行</j-button>-->
-<!--      </template>-->
-<!--      <Preview v-if="activeOper === OperType.View" ref="previewRef" />-->
-<!--      <MenuList-->
-<!--        v-else-if="activeOper === OperType.Menu"-->
-<!--        ref="menuListRef"-->
-<!--        :form-data="menuFormData"-->
-<!--        @update:form="updateMenuFormData"-->
-<!--      />-->
-<!--    </j-drawer>-->
     <div class="drawer-content" :style="{ width: $drawerWidth }" v-show="drawerVisible">
       <div class="drawer-header">
         <div class="drawer-title" @dblclick="handleDbClickViewName">
@@ -267,13 +277,16 @@ defineExpose({
         </div>
       </div>
       <div class="drawer-body">
-        <Preview v-if="activeOper === OperType.View" ref="previewRef" />
+        <Preview v-if="activeOper === OperType.View" ref="previewRef" :code="data?.configuration?.code" />
         <MenuList
-          v-else-if="activeOper === OperType.Menu"
+          v-show="activeOper === OperType.Menu"
           ref="menuListRef"
-          :form-data="menuFormData"
-          @update:form="updateMenuFormData"
+          @change="updateMenuFormData"
         />
+      </div>
+      <div class="drawer-footer" v-show="activeOper === OperType.Menu">
+        <j-button @click="cancel">取消</j-button>
+        <j-button type="primary"  @click="submit">确认</j-button>
       </div>
     </div>
   </div>
@@ -299,14 +312,14 @@ defineExpose({
 
       .list-item {
         cursor: pointer;
-        writing-mode: vertical-rl;
-        text-orientation: upright;
         font-size: 16px;
         user-select: none;
         border-radius: 4px;
         background-color: #F6F6F6;
-        padding: 8px 4px;
         transition: all .3s ease-in;
+        width: 36px;
+        height: 36px;
+        line-height: 36px;
 
         &:not(:last-child) {
           margin-bottom: 16px;
@@ -334,6 +347,8 @@ defineExpose({
   overflow-y: auto;
   border-right: 1px solid #f0f0f0;
   z-index: 20;
+  display: flex;
+  flex-direction: column;
 
   .drawer-header {
     position: relative;
@@ -357,6 +372,14 @@ defineExpose({
     font-size: 14px;
     line-height: 1.5715;
     word-wrap: break-word;
+    flex: 1 1 auto;
+  }
+
+  .drawer-footer {
+    border-top: 1px solid #f0f0f0;
+    padding: 16px 24px;
+    display: flex;
+    gap: 24px;
   }
 }
 </style>

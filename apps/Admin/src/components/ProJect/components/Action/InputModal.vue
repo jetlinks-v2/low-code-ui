@@ -23,7 +23,7 @@ import { regular } from '@jetlinks/utils';
 import { onKeyStroke } from '@vueuse/core'
 import { providerEnum, providerMap } from '../../index'
 import { useEngine, useProduct } from '@/store'
-import { randomString } from '@jetlinks/utils'
+import { randomString, generateSerialNumber } from '@jetlinks/utils'
 
 const engine = useEngine()
 const product = useProduct()
@@ -92,9 +92,12 @@ const getConfiguration = (type) => {
       };
     case providerEnum.CRUD:
       const productId = product.info.id.substr(0, 4)
-      const moduleId = (props.data.parentId || engine.activeFile).substr(0, 4)
+      const _moduleId = props.data.parentId || engine.activeFile
+      const moduleId = _moduleId.substr(0, 4)
+      console.log(product.info.id, _moduleId)
+      const tableName = product.info.id === _moduleId ? `${productId}_${generateSerialNumber(3)}` : `${productId}_${moduleId}_${generateSerialNumber(3)}`
       return {
-        tableName: `${productId}_${moduleId}_${randomString(3)}`,
+        tableName: tableName,
         columns: []
       };
     case providerEnum.Function:
@@ -120,6 +123,21 @@ const getConfiguration = (type) => {
   }
 }
 
+const handleOthers = (type, title) => {
+  const others: any = {
+    type
+  }
+  if ([providerEnum.ListPage, providerEnum.HtmlPage].includes(type)){
+    others.menu = {
+      main: true,
+      name: '',
+      icon: '',
+      pageName: title
+    }
+  }
+  return others
+}
+
 onKeyStroke('Enter', async () => {
     const res = await formRef.value.validate()
     if (res && modelRef.title) {
@@ -127,9 +145,7 @@ onKeyStroke('Enter', async () => {
             ...modelRef,
             name: modelRef.title,
             configuration:props.data.configuration?props.data.configuration: getConfiguration(modelRef.type),
-            others: {
-              type: modelRef.type
-            }
+            others: handleOthers(modelRef.type, modelRef.title)
         })
     }
 })

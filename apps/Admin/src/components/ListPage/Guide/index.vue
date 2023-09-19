@@ -157,7 +157,6 @@ const handleJump = () => {
   steps.value = 0;
 }
 function position(el: HTMLElement, position?: string) {
-  console.log(el);
   let result: string[] = ['0px', '0px']
   switch (position) {
     case 'top':
