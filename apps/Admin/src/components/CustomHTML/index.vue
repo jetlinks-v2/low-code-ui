@@ -113,7 +113,7 @@ const handleValidate = () => {
   } else {
     onlyMessage('校验成功', 'success')
   }
-  updateStoreCode()
+  // updateStoreCode()
 }
 
 provide(BASE_INFO, props.data)
