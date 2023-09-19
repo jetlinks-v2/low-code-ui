@@ -125,7 +125,8 @@ const setSelection = (node: any) => {
       selected.value.push(node)
     }
   }
-  isShowConfig.value = !(selected.value?.length > 1)
+  console.log(selected.value)
+  isShowConfig.value = !(selected.value?.length > 1) && !map(selected.value, 'type').includes('space-item')
   onSaveData()
 }
 
@@ -157,7 +158,7 @@ const onDelete = debounce(() => {
 // 复制
 const onCopy = () => {
   const list = selected.value.filter((item) => {
-    return !['collapse-item', 'tabs-item', 'grid-item', 'table-item'].includes(
+    return !['collapse-item', 'tabs-item', 'grid-item', 'table-item', 'space-item'].includes(
       item.type,
     )
   })
