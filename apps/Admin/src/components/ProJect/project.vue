@@ -30,6 +30,8 @@ const handleSort = (value) => {
     const result = value?.sort((a,b)=>{
         if(sortKey==='name' || sortKey==='type'){
             return a[sortKey].localeCompare(b[sortKey],'zh-CN')
+        }else if(sortKey === 'default'){
+            return  true
         }else{
             return  dayjs(b.others[sortKey]).valueOf() - dayjs(a.others[sortKey]).valueOf()
         }

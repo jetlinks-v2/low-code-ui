@@ -90,9 +90,9 @@ const onSave = async()=>{
 }
 
 
-onMounted(()=>{
-   console.log('props',props.data)
-})
+// onMounted(()=>{
+//    console.log('props',props.data)
+// })
 </script>
    
 <style scoped lang='less'>
