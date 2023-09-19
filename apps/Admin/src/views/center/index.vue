@@ -36,7 +36,7 @@
               <div>创建时间：{{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}</div>
               <div class="bottom">
                 <div>最近发布：{{ record.deployTime ? dayjs(record.deployTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}</div>
-                <div v-if="record.changed" class="bottom-icon">
+                <div v-if="record.changed && record.state.value==='published'" class="bottom-icon">
                   <j-tooltip>
                     <template #title>存在未发布的草稿，点击任意位置继续编辑</template>
                     <AIcon type="FormOutlined" style="color: black;" />
@@ -153,7 +153,6 @@ const columns = [
 ]
 
 const getActions = (record) => {
-  console.log(record)
   return [
     {
       key: 'edit',
@@ -213,7 +212,7 @@ const getActions = (record) => {
           title: data?.runningState.value === 'enabled' ? '启用状态的项目不支持删除' : '删除',
         },
         popConfirm: {
-          title: '确认删除？',
+          title: '项目菜单及其子菜单均会被删除',
           onConfirm: () => {
             _del(data.id)
           }
@@ -236,9 +235,12 @@ const handleSave = (type: string, data?: any) => {
   current.value = data
 }
 
-const handleClose = () => {
+const handleClose = (val) => {
   visible.value = false
-  tableRef.value?.reload()
+  if(!val){
+    tableRef.value?.reload()
+  }
+  
 }
 
 const _view = (id: string) => {

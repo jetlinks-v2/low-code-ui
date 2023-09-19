@@ -10,8 +10,9 @@
       </a-radio-button>
     </a-radio-group>
     <j-select v-model:value="sorts" class="title-sorts" placeholder="排序方式" @change="handleSorts">
+      <j-select-option value="default">默认排序</j-select-option>
       <j-select-option value="type">种类</j-select-option>
-      <j-select-option value="name">名字</j-select-option>
+      <j-select-option value="name">名称</j-select-option>
       <j-select-option value="createTime">添加日期</j-select-option>
       <j-select-option value="modifyTime">修改日期</j-select-option>
     </j-select>
@@ -117,7 +118,7 @@ const selectKey = ref<string>('')
 const selectSort = ref<number>(0)
 const list = ref<any>([])
 const nameList = ref<any>([])
-const sorts = ref<any>(undefined)
+const sorts = ref<any>('default')
 const showMenu = ref(false)
 
 const viewType = ref<string>('card')
@@ -145,7 +146,7 @@ const columns = [
 
   },
   {
-    title: '修改时间',
+    title: '修改日期',
     dataIndex: 'modifyTime',
     key: 'modifyTime',
     scopedSlots: true,
@@ -309,7 +310,7 @@ watchEffect(() => {
       return item
     })
   }
-  sorts.value = product.getById(engine.activeFile)?.others?.sorts
+  sorts.value = product.getById(engine.activeFile)?.others?.sorts || 'default'
 })
 
 

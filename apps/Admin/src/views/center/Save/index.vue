@@ -100,7 +100,7 @@ const vailId = async (_: Record<string, any>, value: string) => {
 };
 
 const handleCancel = () => {
-    emit('close')
+    emit('close',true)
 }
 
 </script>
