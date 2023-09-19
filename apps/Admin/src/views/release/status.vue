@@ -163,7 +163,6 @@ const validateContent = reactive({
 
 const nextCheck = async () => {
   const _id = Object.keys(status)[validateContent.step]
-  console.log('nextCheck', validateContent.step, Object.keys(status).length)
   if (validateContent.step >= Object.keys(status).length) {
     emit('update:status', Object.values(statusMsg).filter(a => a.length).length)
     check.type = 'end'
@@ -243,7 +242,7 @@ const validateAll = async (id, cb) => {
     return
   }
 
-  if (providerEnum.HtmlPage === item.type) {
+  if (providerEnum.HtmlPage === item.type && !item.configuration.code) {
     const hasCode = !item.configuration.code
     handleStatusItem(item.id, hasCode ? 1 : 2, hasCode ? ['页面代码为空'] : [] )
     cb?.()
@@ -273,7 +272,7 @@ const validateAll = async (id, cb) => {
           }
 
         }).catch(e => {
-          console.log(e)
+          console.log('validateRef', e, e.map(a => a.message))
           handleStatusItem(item.id, 1, e.map(a => a.message) )
           if (cb) {
             cb()

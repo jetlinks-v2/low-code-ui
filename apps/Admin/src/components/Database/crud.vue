@@ -155,7 +155,6 @@ const validate = async () => {
     await advancedRef.value.validates()
     errorTips.relation = {}
   } catch (e) {
-    console.log('crud-advanced',e)
     errorTips.relation = e
   }
 
@@ -163,7 +162,6 @@ const validate = async () => {
     await dataTableRef.value.validates()
     errorTips.dataTable = {}
   } catch (e) {
-    console.log('crud-table',e)
     errorTips.dataTable = e || {}
   }
 
@@ -184,7 +182,7 @@ defineExpose({
 
       if(Object.keys(errorTips.dataTable).length) {
         Object.values(errorTips.dataTable).forEach(a => {
-          err.push({ message: a})
+          err.push(a[0])
         })
       }
 

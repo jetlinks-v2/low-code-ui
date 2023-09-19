@@ -155,7 +155,7 @@ export const formErrorFieldsToObj = (errorFields: ErrorField[]) => {
   const obj:any = {}
   errorFields.forEach(item => {
     const key = item.name[0]
-    obj[key] = item.errors[0]
+    obj[key] = [{ message: item.errors[0] }]
   })
   return obj
 }

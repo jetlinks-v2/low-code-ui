@@ -112,7 +112,7 @@ const runCode = () => {
 
 const handleValidate = () => {
   if (errors.value.length > 0) {
-    onlyMessage(errors.value[0].errors[0], 'error')
+    // onlyMessage(errors.value[0].errors[0], 'error')
   } else if(!store.state.activeFile.code){
     onlyMessage('页面代码为空', 'error')
   } else if(store.state.errors?.length > 0) {
@@ -148,16 +148,16 @@ const errorValidate = async () => {
   const err = [];
   store.state.errors.forEach((error: any) => {
     err.push({
-      massage: error.message ?? error
+      message: error.message ?? error
     })
   })
   errors.value.forEach((error: any) => {
     err.push({
-      massage: error.errors[0]
+      message: error.errors[0]
     })
   })
   if (!store.state.activeFile.code) {
-    err.push({massage: '页面代码为空'})
+    err.push({message: '页面代码为空'})
   }
 
   return new Promise((resolve, reject) => {
@@ -180,7 +180,6 @@ const submit = () => {
 }
 
 watch(() => props.data?.title, () => {
-  console.log('watch', props.data?.title, )
   menuFormData.value = {
     ...props.data.others.menu,
     pageName: props.data?.title || '',
