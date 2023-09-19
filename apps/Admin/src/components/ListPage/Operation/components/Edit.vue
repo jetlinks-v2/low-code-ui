@@ -51,7 +51,8 @@
                   v-for="item in functionOptions"
                   :value="item.fullId"
                   :key="item.id"
-                  >{{ item.name }}</j-select-option
+                  :title="functionName(item.title, item.moduleId)"
+                  >{{ functionName(item.title, item.moduleId) }}</j-select-option
                 >
               </j-select>
               </ErrorItem>
@@ -142,6 +143,17 @@ const errorList = inject(errorListKey)
 const productStore = useProduct();
 const { info } = productStore
 const { functionOptions, commandOptions, handleFunction } = useFunctions()
+
+const functionName = computed(() => {
+  return (title: string, moduleId: string) => {
+    if(moduleId) {
+      const moduleIdArr = moduleId.split('.')
+      return `${moduleIdArr[moduleIdArr.length - 1]}-${title}`
+    } else {
+      return title
+    }
+  }
+})
 const errorMessage = computed(() => {
   let data = {}
   let result = errorList!.value?.filter(
