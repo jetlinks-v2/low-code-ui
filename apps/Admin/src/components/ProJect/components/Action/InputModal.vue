@@ -92,9 +92,12 @@ const getConfiguration = (type) => {
       };
     case providerEnum.CRUD:
       const productId = product.info.id.substr(0, 4)
-      const moduleId = (props.data.parentId || engine.activeFile).substr(0, 4)
+      const _moduleId = props.data.parentId || engine.activeFile
+      const moduleId = _moduleId.substr(0, 4)
+      console.log(product.info.id, _moduleId)
+      const tableName = product.info.id === _moduleId ? `${productId}_${generateSerialNumber(3)}` : `${productId}_${moduleId}_${generateSerialNumber(3)}`
       return {
-        tableName: `${productId}_${moduleId}_${generateSerialNumber(3)}`,
+        tableName: tableName,
         columns: []
       };
     case providerEnum.Function:

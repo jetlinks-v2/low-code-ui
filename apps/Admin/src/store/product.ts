@@ -67,9 +67,13 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
 /**
  * 保存草稿
  */
-const updateProductReq = throttle((data: any[]) => {
+const updateProductReq = throttle((data: any[], cb) => {
   const integrateData = Integrate(data)
-  updateDraft(integrateData.draftId, integrateData)
+  updateDraft(integrateData.draftId, integrateData).then(resp => {
+    if (resp.success) {
+      cb?.(resp.result)
+    }
+  })
 }, 1000)
 
 export const useProduct = defineStore('product', () => {
@@ -176,6 +180,9 @@ export const useProduct = defineStore('product', () => {
     })
   }
 
+  /**
+   * 更新缓存
+   */
   const updateDataCache = () => {
     dataCache = JSON.stringify(data.value)
   }
@@ -193,12 +200,40 @@ export const useProduct = defineStore('product', () => {
     return dataById.value
   }
 
+  /**
+   * 将后端结构转换为前端需要的数据结构
+   * @param result
+   * @param isActive
+   */
+  const handleProjectData = (result, isActive?: boolean) => {
+    const {modules, ...extra } = result
+    const treeData: TreeData[] = []
+    const children: TreeData[] = modules?.[0] ? handleChildren(modules[0], extra.id) : []
+    treeData.push({
+      ...extra,
+      title: extra.name,
+      type: 'project',
+      children: children,
+      others: modules ? modules[0]?.others : {}
+    })
+    handleDataMap(treeData);
+    data.value = treeData
+    updateDataCache()
+    if (isActive) {
+      engine.setActiveFile(treeData[0]?.id)
+    }
+    info.value = extra
+    published.value = extra.state?.value === 'published'
+  }
+
   const add = (record: any, parentId: string) => {
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
     updateDataCache()
     engine.updateFile(record, 'add')
-    updateProductReq(data.value)
+    updateProductReq(data.value, (result) => {
+      handleProjectData(result)
+    })
   }
 
   const update = (record: any) => {
@@ -207,7 +242,9 @@ export const useProduct = defineStore('product', () => {
     data.value = updateProduct(data.value, record)
     updateDataCache()
     engine.updateFile(record, 'edit')
-    updateProductReq(data.value)
+    updateProductReq(data.value, (result) => {
+      handleProjectData(result)
+    })
   }
 
   const remove = (record: any) => {
@@ -216,7 +253,9 @@ export const useProduct = defineStore('product', () => {
     dataMap.delete(record.id)
     updateDataCache()
     engine.updateFile(record, 'del')
-    updateProductReq(data.value)
+    updateProductReq(data.value, (result) => {
+      handleProjectData(result)
+    })
   }
   //通过id查找对应节点
   const getById = (id: string) => {
@@ -246,22 +285,7 @@ export const useProduct = defineStore('product', () => {
     dataMap.clear()
     const resp = await queryProjectDraft(id)
     if (resp.success) {
-      const {modules, ...extra } = resp.result
-      const treeData: TreeData[] = []
-      const children: TreeData[] = modules?.[0] ? handleChildren(modules[0], extra.id) : []
-      treeData.push({
-        ...extra,
-        title: extra.name,
-        type: 'project',
-        children: children,
-        others: modules ? modules[0]?.others : {}
-      })
-      handleDataMap(treeData);
-      data.value = treeData
-      updateDataCache()
-      engine.activeFile = treeData[0]?.id
-      info.value = extra
-      published.value = extra.state?.value === 'published'
+      handleProjectData(resp.result, true)
       cb?.()
     }
   }

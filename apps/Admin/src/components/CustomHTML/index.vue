@@ -47,6 +47,7 @@ const onChange = debounce((code: string) => {
 const drawerVisible = ref(false)
 const $drawerWidth = ref('50%')
 const drawerTitle = ref('预览')
+const menuError = ref(0)
 
 const handleDbClickViewName = () => {
   if (activeOper.value === OperType.View) {
@@ -110,8 +111,9 @@ const runCode = () => {
   })
 }
 
-const handleValidate = () => {
-  if (errors.value.length > 0) {
+const handleValidate = async () => {
+  const menuStatus = await validateMenu()
+  if (menuStatus) {
     // onlyMessage(errors.value[0].errors[0], 'error')
   } else if(!store.state.activeFile.code){
     onlyMessage('页面代码为空', 'error')
@@ -120,19 +122,26 @@ const handleValidate = () => {
   } else {
     onlyMessage('校验成功', 'success')
   }
-  // updateStoreCode()
 }
 
 provide(BASE_INFO, props.data)
 provide(MENU_CONFIG, menuFormData)
 
+const validateMenu = async () => {
+  const resp = await menuListRef.value?.vaildate()
+  console.log(resp)
+  if (resp.errorFields) {
+    menuError.value = resp.errorFields.length
+    return true
+  } else {
+    menuError.value = 0
+    return false
+  }
+}
+
 const updateMenuFormData = (val) => {
   nextTick(() => {
-    menuListRef.value?.vaildate().then(vaild => {
-      if (vaild?.errorFields?.length > 0) {
-        errors.value = vaild.errorFields ?? []
-      }
-    })
+    validateMenu()
   })
 
   productStore.update({
@@ -145,7 +154,17 @@ const updateMenuFormData = (val) => {
 }
 
 const errorValidate = async () => {
-  const err = [];
+  const err: any[] = [];
+  const menuResp = await menuListRef.value?.vaildate()
+  if (menuResp.errorFields) {
+    menuError.value = menuResp.errorFields.length
+    menuResp.errorFields.forEach(item => {
+      const msg = item.errors[0]
+      err.push({ message: msg })
+    })
+  } else {
+    menuError.value = 0
+  }
   store.state.errors.forEach((error: any) => {
     err.push({
       message: error.message ?? error
@@ -159,7 +178,7 @@ const errorValidate = async () => {
   if (!store.state.activeFile.code) {
     err.push({message: '页面代码为空'})
   }
-
+  console.log('errorValidate',err)
   return new Promise((resolve, reject) => {
     if (err.length) {
       reject(err)
@@ -229,13 +248,17 @@ defineExpose({
         >
           <AIcon type="CaretRightOutlined"/>
         </div>
+        <j-badge :count="menuError">
         <div
           class="list-item"
           :class="{ active: activeOper === OperType.Menu }"
           @click="handleOperClick(OperType.Menu)"
         >
-          <AIcon type="MenuOutlined"/>
+
+            <AIcon type="MenuOutlined"/>
+
         </div>
+        </j-badge>
       </div>
     </div>
     <div class="drawer-content" :style="{ width: $drawerWidth }" v-show="drawerVisible">
@@ -256,7 +279,7 @@ defineExpose({
       <div class="drawer-body">
         <Preview v-if="activeOper === OperType.View" ref="previewRef" :code="data?.configuration?.code" />
         <MenuList
-          v-else-if="activeOper === OperType.Menu"
+          v-show="activeOper === OperType.Menu"
           ref="menuListRef"
           @change="updateMenuFormData"
         />
@@ -289,14 +312,14 @@ defineExpose({
 
       .list-item {
         cursor: pointer;
-        writing-mode: vertical-rl;
-        text-orientation: upright;
         font-size: 16px;
         user-select: none;
         border-radius: 4px;
         background-color: #F6F6F6;
-        padding: 8px 4px;
         transition: all .3s ease-in;
+        width: 36px;
+        height: 36px;
+        line-height: 36px;
 
         &:not(:last-child) {
           margin-bottom: 16px;

@@ -189,6 +189,10 @@ export const useEngine = defineStore('engine', () => {
     copyFile.value = record.id
   }
 
+  const setActiveFile = (v) => {
+    activeFile.value = v
+  }
+
   // watch(() => activeFile.value, () => {
   //   console.log(activeFile.value)
   // }, { immediate: true })
@@ -208,6 +212,7 @@ export const useEngine = defineStore('engine', () => {
     packUpAll,
     setCopyFile,
     updateFile,
-    initEngineState
+    initEngineState,
+    setActiveFile
   }
 })
