@@ -57,24 +57,24 @@ const FlowDesigner = defineComponent({
     const getDomTree = (h, node) => {
       toMapping(node)
       if (isPrimaryNode(node)) {
-        //普通业务节点
+        // 普通业务节点
         let childDoms = getDomTree(h, node.children)
         decodeAppendDom(h, node, childDoms)
         return [h('div', { class: { 'primary-node': true } }, childDoms)]
       } else if (isBranchNode(node)) {
         let index = 0
-        //遍历分支节点，包含并行及条件节点
+        // 遍历分支节点，包含并行及条件节点
         let branchItems = node.branches.map((branchNode) => {
-          //处理每个分支内子节点
+          // 处理每个分支内子节点
           toMapping(branchNode)
           let childDoms = getDomTree(h, branchNode.children)
           decodeAppendDom(h, branchNode, childDoms, {
             level: index + 1,
             size: node.branches.length,
           })
-          //插入4条横线，遮挡掉条件节点左右半边线条
+          // 插入4条横线，遮挡掉条件节点左右半边线条
           insertCoverLine(h, index, childDoms, node.branches)
-          //遍历子分支尾部分支
+          // 遍历子分支尾部分支
           index++
           return h(
             'div',
@@ -82,7 +82,7 @@ const FlowDesigner = defineComponent({
             childDoms,
           )
         })
-        //插入添加分支/条件的按钮
+        // 插入添加分支/条件的按钮
         branchItems.unshift(
           h(
             'div',
@@ -94,9 +94,7 @@ const FlowDesigner = defineComponent({
                   class: { 'add-branch-btn-el': true },
                   size: 'small',
                   round: true,
-                  text: isConditionNode(node)
-                    ? `条件分支-${node.id}`
-                    : `并行分支-${node.id}`,
+                  text: isConditionNode(node) ? `条件分支` : `并行分支`,
                   isConditionNode: isConditionNode(node),
                   onAddBranchNode: (type) => addBranchNode(node, type),
                   onOpenConfig: () => openConfig(node),
@@ -107,11 +105,11 @@ const FlowDesigner = defineComponent({
           ),
         )
         let bchDom = [h('div', { class: { 'branch-node': true } }, branchItems)]
-        //继续遍历分支后的节点
+        // 继续遍历分支后的节点
         let afterChildDoms = getDomTree(h, node.children)
         return [h('div', {}, [bchDom, afterChildDoms])]
       } else if (isEmptyNode(node)) {
-        //空节点，存在于分支尾部
+        // 空节点，存在于分支尾部
         let childDoms = getDomTree(h, node.children)
         decodeAppendDom(h, node, childDoms)
         return [
@@ -122,12 +120,18 @@ const FlowDesigner = defineComponent({
           ),
         ]
       } else {
-        //遍历到了末端，无子节点
+        // 遍历到了末端，无子节点
         return []
       }
     }
 
-    // 解码渲染的时候插入dom到同级
+    /**
+     * 解码渲染的时候插入dom到同级
+     * @param h
+     * @param node
+     * @param dom
+     * @param props
+     */
     const decodeAppendDom = (h, node, dom, props = {}) => {
       props['config'] = node
 
@@ -151,7 +155,10 @@ const FlowDesigner = defineComponent({
       )
     }
 
-    //id映射到map，用来向上遍历
+    /**
+     * id映射到map，用来向上遍历
+     * @param node
+     */
     const toMapping = (node) => {
       if (node && node.id) {
         //console.log("node=> " + node.id + " name:" + node.name + " type:" + node.type)
@@ -161,16 +168,21 @@ const FlowDesigner = defineComponent({
 
     const insertCoverLine = (h, index, doms, branches) => {
       if (index === 0) {
-        //最左侧分支
+        // 最左侧分支
         doms.unshift(h('div', { class: { 'line-top-left': true } }, []))
         doms.unshift(h('div', { class: { 'line-bot-left': true } }, []))
       } else if (index === branches.length - 1) {
-        //最右侧分支
+        // 最右侧分支
         doms.unshift(h('div', { class: { 'line-top-right': true } }, []))
         doms.unshift(h('div', { class: { 'line-bot-right': true } }, []))
       }
     }
 
+    /**
+     * 分支交换位置
+     * @param node
+     * @param offset
+     */
     const branchMove = (node, offset) => {
       let parentNode = nodeMap.value.get(node.parentId)
       let index = parentNode.branches.indexOf(node)
@@ -180,7 +192,11 @@ const FlowDesigner = defineComponent({
       proxy?.$forceUpdate()
     }
 
-    // 判断是否为主要业务节点
+    /**
+     * 判断是否为主要业务节点
+     * @param node
+     * @returns
+     */
     const isPrimaryNode = (node) => {
       return (
         node &&
@@ -192,21 +208,21 @@ const FlowDesigner = defineComponent({
       )
     }
 
+    // 是否是条件分支或者并行分支节点
     const isBranchNode = (node) => {
       return node && (node.type === 'CONDITIONS' || node.type === 'CONCURRENTS')
     }
-
     const isEmptyNode = (node) => {
       return node && node.type === 'EMPTY'
     }
-    //是分支节点
+    // 是否是条件分支节点
     const isConditionNode = (node) => {
       return node.type === 'CONDITIONS'
     }
-    //是分支节点
-    const isBranchSubNode = (node) => {
-      return node && (node.type === 'CONDITION' || node.type === 'CONCURRENT')
-    }
+    // 是否是分支子节点
+    // const isBranchSubNode = (node) => {
+    //   return node && (node.type === 'CONDITION' || node.type === 'CONCURRENT')
+    // }
     const getRandomId = () => {
       return `node_${new Date().getTime().toString().substring(5)}${Math.round(
         Math.random() * 9000 + 1000,
@@ -218,7 +234,11 @@ const FlowDesigner = defineComponent({
       emit('selectNode', node)
     }
 
-    //处理节点插入逻辑
+    /**
+     * 节点插入
+     * @param type
+     * @param parentNode
+     */
     const insertNode = (type, parentNode) => {
       //   proxy?.$refs['_root'].click()
       //缓存一下后面的节点
@@ -246,7 +266,7 @@ const FlowDesigner = defineComponent({
         default:
           break
       }
-      //拼接后续节点
+      // 拼接后续节点
       if (isBranchNode({ type: type })) {
         if (afterNode && afterNode.id) {
           afterNode.parentId = parentNode.children.children.id
@@ -261,20 +281,46 @@ const FlowDesigner = defineComponent({
       proxy?.$forceUpdate()
     }
 
+    /**
+     * 审批节点插入
+     * @param parentNode
+     */
     const insertApprovalNode = (parentNode) => {
       parentNode.children.name = '审批人'
-      parentNode.children.props = cloneDeep(DefaultProps.APPROVAL_PROPS)
+      parentNode.children.props = {
+        ...cloneDeep(DefaultProps.APPROVAL_PROPS),
+        branchBy: parentNode.props.branchBy || null,
+      }
     }
+
+    /**
+     * 处理节点插入
+     * @param parentNode
+     */
     const insertDealNode = (parentNode) => {
       parentNode.children.name = '办理人'
-      parentNode.children.props = cloneDeep(DefaultProps.DEAL_PROPS)
+      parentNode.children.props = {
+        ...cloneDeep(DefaultProps.DEAL_PROPS),
+        branchBy: parentNode.props.branchBy || null,
+      }
     }
+
+    /**
+     * 条件分支节点插入
+     * @param parentNode
+     */
     const insertConditionsNode = (parentNode) => {
       parentNode.children.name = '条件分支'
+      parentNode.children.props = {
+        branchBy: parentNode.props.branchBy || null,
+      }
       parentNode.children.children = {
         id: getRandomId(),
         parentId: parentNode.children.id,
         type: 'EMPTY',
+        props: {
+          branchBy: parentNode.props.branchBy || null,
+        },
       }
       parentNode.children.branches = [
         {
@@ -301,12 +347,23 @@ const FlowDesigner = defineComponent({
         },
       ]
     }
+
+    /**
+     * 并行分支插入
+     * @param parentNode
+     */
     const insertConcurrentsNode = (parentNode) => {
       parentNode.children.name = '并行分支'
+      parentNode.children.props = {
+        branchBy: parentNode.props.branchBy || null,
+      }
       parentNode.children.children = {
         id: getRandomId(),
         parentId: parentNode.children.id,
         type: 'EMPTY',
+        props: {
+          branchBy: parentNode.props.branchBy || null,
+        },
       }
 
       parentNode.children.branches = [
@@ -419,37 +476,40 @@ const FlowDesigner = defineComponent({
       emit('selectNode', node)
     }
 
-    //删除当前节点
+    /**
+     * 删除当前节点
+     * @param node
+     */
     const delNode = (node) => {
       console.log('删除节点', node)
-      //获取该节点的父节点
+      // 获取该节点的父节点
       let parentNode = nodeMap.value.get(node.parentId)
       if (parentNode) {
-        //判断该节点的父节点是不是分支节点
+        // 判断该节点的父节点是不是分支节点
         if (isBranchNode(parentNode)) {
-          //移除该分支
+          // 移除该分支
           parentNode.branches.splice(parentNode.branches.indexOf(node), 1)
-          //处理只剩1个分支的情况
+          // 处理只剩1个分支的情况
           if (parentNode.branches.length < 2) {
-            //获取条件组的父节点
+            // 获取条件组的父节点
             let ppNode = nodeMap.value.get(parentNode.parentId)
-            //判断唯一分支是否存在业务节点
+            // 判断唯一分支是否存在业务节点
             if (
               parentNode.branches[0].children &&
               parentNode.branches[0].children.id
             ) {
-              //将剩下的唯一分支头部合并到主干
+              // 将剩下的唯一分支头部合并到主干
               ppNode.children = parentNode.branches[0].children
               ppNode.children.parentId = ppNode.id
-              //搜索唯一分支末端最后一个节点
+              // 搜索唯一分支末端最后一个节点
               let endNode = getBranchEndNode(parentNode.branches[0])
-              //后续节点进行拼接, 这里要取EMPTY后的节点
+              // 后续节点进行拼接, 这里要取EMPTY后的节点
               endNode.children = parentNode.children.children
               if (endNode.children && endNode.children.id) {
                 endNode.children.parentId = endNode.id
               }
             } else {
-              //直接合并分支后面的节点，这里要取EMPTY后的节点
+              // 直接合并分支后面的节点，这里要取EMPTY后的节点
               ppNode.children = parentNode.children.children
               if (ppNode.children && ppNode.children.id) {
                 ppNode.children.parentId = ppNode.id
@@ -457,7 +517,7 @@ const FlowDesigner = defineComponent({
             }
           }
         } else {
-          //不是的话就直接删除
+          // 不是的话就直接删除
           if (node.children && node.children.id) {
             node.children.parentId = parentNode.id
           }
