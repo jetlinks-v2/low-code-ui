@@ -16,7 +16,7 @@
             :rules="[
               {
                 required: true,
-                message: '',
+                message: errorData('name') ? '' : '请输入2-16个字符',
                 trigger: 'change',
               },
             ]"
@@ -44,7 +44,7 @@
             :rules="[
               {
                 required: true,
-                message: '',
+                message: errorData('name') ? '' : '请配置图标',
                 trigger: 'change',
               },
             ]"

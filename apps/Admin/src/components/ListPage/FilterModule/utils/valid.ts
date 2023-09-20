@@ -10,7 +10,7 @@ export const validFilterModule = (list: any[]) => {
       if(item.name.length > 64) {
         errorList.push({
           key: 'name' + index,
-          message: '名称超出范围'
+          message: '最多可输入64个字符'
         })
       }
     }
@@ -30,8 +30,29 @@ export const validFilterModule = (list: any[]) => {
       if(item.id.length > 64) {
         errorList.push({
           key: 'id' + index,
-          message: '标识超出范围'
+          message: '最多可输入64个字符'
         })
+      }
+    }
+    if(item.config) {
+      if(item.config.value == 'data' && item.config.instructValue.length === 0) {
+        errorList.push({
+          key: 'config' + index,
+          message: '请配置数据字典'
+        })
+      } else if(item.config.value === 'rearEnd') {
+        if(item.config.abilityValue.length === 0) {
+          errorList.push({
+            key: 'config' + index,
+            message: '请配置后端功能'
+          })
+        }
+        if(item.config.dataValue.length === 0) {
+          errorList.push({
+            key: 'config' + index,
+            message: '请配置后端指令'
+          })
+        }
       }
     }
   })

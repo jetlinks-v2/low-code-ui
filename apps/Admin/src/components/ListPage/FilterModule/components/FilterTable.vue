@@ -6,7 +6,6 @@
       myIcon="SyncOutlined"
       size="small"
       :type="dataBinds.data.dataSource.length ? 'primary' : 'default'"
-      :disabled="dataBinds.data.dataSource.length === 0"
     >
       同步数据绑定
     </j-button>
@@ -56,7 +55,8 @@
         </template>
         <template #action="{ data }">
           <j-space>
-            <j-button type="link" @click="configuration(data)">配置</j-button>
+            {{ errorData('config' + data.record?._sortIndex) }}
+            <j-button type="link" @click="configuration(data)" :style="{ color: errorData('config' + data.record?._sortIndex) ? 'red' : '' }">配置</j-button>
             <JPopconfirm
               @confirm="confirm(data)"
               :loading="loading"
