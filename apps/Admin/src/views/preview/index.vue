@@ -22,7 +22,7 @@ const showHtml = computed(() => {
 const getInfo = async () => {
   const { project, module, id } = route.params
   getResource(project, module, id).then(resp => {
-    data.value = resp
+    data.value = typeof resp === 'string' ? resp : JSON.stringify(resp)
   })
 }
 
