@@ -1,7 +1,7 @@
 <template>
   <j-spin :spinning="spinning">
     <div class="container">
-      <Header @save="onSave" :data="data" @validate="onValidate" />
+      <Header @save="onSave" :data="data" @validate="onValid" />
       <div class="box">
         <div class="left" v-if="model !== 'preview'"><Filed /></div>
         <div
@@ -50,6 +50,7 @@ import {
 } from './utils/utils'
 import { uid } from './utils/uid'
 import Check from './components/Check/index.vue'
+import { onlyMessage } from '@jetlinks/utils'
 
 const props = defineProps({
   value: {
@@ -125,7 +126,6 @@ const setSelection = (node: any) => {
       selected.value.push(node)
     }
   }
-  console.log(selected.value)
   isShowConfig.value = !(selected.value?.length > 1) && !map(selected.value, 'type').includes('space-item')
   onSaveData()
 }
@@ -187,8 +187,8 @@ const onPaste = () => {
       ...item,
       formItemProps: {
         ...item?.formItemProps,
-        label: obj.key === props.data?.id ? item.formItemProps?.label + '_copy' : item.formItemProps?.label,
-        name: obj.key === props.data?.id ? item.formItemProps?.name + '_copy' : item.formItemProps?.name,
+        label: obj.key === props.data?.id ? 'copy_' + item.formItemProps?.label : item.formItemProps?.label,
+        name: obj.key === props.data?.id ? 'copy_' + item.formItemProps?.name : item.formItemProps?.name,
       },
       key: item.key + '_' + uid(),
       children: handleCopyData(item?.children || []),
@@ -342,6 +342,13 @@ const onValidate = () => {
       resolve(true)
     }
   })
+}
+
+const onValid = async () => {
+  const _val = await onValidate()
+  if(_val) {
+    onlyMessage('校验成功！')
+  }
 }
 
 defineExpose({ onSave, validate: onValidate })
