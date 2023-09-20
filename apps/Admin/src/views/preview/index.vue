@@ -5,25 +5,25 @@
 
 <script setup name="Preview">
 import { getResource } from '@/api/basis'
-import { useRequest } from '@jetlinks/hooks'
 import ListPage from '@/components/ListPage/Output/index.vue'
 import HtmlPage from '@/components/CustomHTML/output/Preview.vue'
 
 const route = useRoute()
-
-const { data, loading, run } = useRequest(getResource, { immediate: false })
+const data = ref()
 
 const showList = computed(() => {
-  return route.params.type === 'list'
+  return route.params.type === 'list' && data.value
 })
 
 const showHtml = computed(() => {
-  return route.params.type === 'html'
+  return route.params.type === 'html' && data.value
 })
 
 const getInfo = async () => {
   const { project, module, id } = route.params
-  run(project, module, id)
+  getResource(project, module, id).then(resp => {
+    data.value = resp
+  })
 }
 
 watch(() => {

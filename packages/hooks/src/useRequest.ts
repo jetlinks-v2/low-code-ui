@@ -19,6 +19,8 @@ interface RequestOptions<T, S> {
     onError: (e: any) => void
 
     defaultParams: S | any | any[]
+
+    handleResponse: (data: any) => any
 }
 
 const defaultOptions: any = {

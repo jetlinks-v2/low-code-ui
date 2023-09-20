@@ -71,7 +71,7 @@ const updateProductReq = throttle((draftData: any[], cb) => {
   const integrateData = Integrate(draftData)
   updateDraft(integrateData.draftId, integrateData).then(resp => {
     if (resp.success) {
-      const { children, ...oldProject } = data.value
+      const { children, ...oldProject } = draftData[0]
       cb?.({
         ...resp.result,
         ...oldProject
@@ -236,6 +236,7 @@ export const useProduct = defineStore('product', () => {
     updateDataCache()
     engine.updateFile(record,'add',open)
     updateProductReq(data.value, (result) => {
+      console.log(result)
       handleProjectData(result)
     })
   }
