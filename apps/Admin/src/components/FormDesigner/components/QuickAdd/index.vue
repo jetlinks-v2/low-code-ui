@@ -1,18 +1,19 @@
 <template>
   <div class="quick">
-    <j-button type="primary" @click="visible = true">快速添加</j-button>
+    <j-button type="link" @click="visible = true">快速添加</j-button>
     <j-drawer
       :destroyOnClose="true"
       v-model:visible="visible"
       title="快速添加"
       placement="right"
+      :width="550"
     >
       <p>自由组合快速添加表单页内容</p>
       <div class="content">
         <j-form :layout="'vertical'" ref="formRef" :model="modelRef">
-          <j-form-item label="后端功能">
-            <j-row :gutter="24">
-              <j-col :span="12">
+          <j-row :gutter="24">
+            <j-col :span="12">
+              <j-form-item label="后端功能" :name="['source', 'functionId']">
                 <j-select
                   showSearch
                   placeholder="请选择"
@@ -21,8 +22,19 @@
                   @change="onFunChange"
                   allowClear
                 />
-              </j-col>
-              <j-col :span="12">
+              </j-form-item>
+            </j-col>
+            <j-col :span="12">
+              <j-form-item
+                :rules="[
+                  {
+                    required: modelRef.source.functionId,
+                    message: '请选择',
+                  },
+                ]"
+                :name="['source', 'commandId']"
+                style="padding-top: 28px"
+              >
                 <j-select
                   showSearch
                   placeholder="请选择"
@@ -31,10 +43,18 @@
                   @change="onCommChange"
                   allowClear
                 />
-              </j-col>
-            </j-row>
-          </j-form-item>
-          <j-form-item name="sourceData">
+              </j-form-item>
+            </j-col>
+          </j-row>
+          <j-form-item
+            :name="['source', 'sourceData']"
+            :rules="[
+              {
+                required: modelRef.source.functionId,
+                message: '请选择',
+              },
+            ]"
+          >
             <j-tree-select
               showSearch
               placeholder="请选择"
@@ -66,7 +86,11 @@
         </j-space>
       </div>
     </j-drawer>
-    <j-modal v-model:visible="modalVisible" @ok="onOk" @cancel="modalVisible = false">
+    <j-modal
+      v-model:visible="modalVisible"
+      @ok="onOk"
+      @cancel="modalVisible = false"
+    >
       <p>数据重复，请选择处理方式</p>
       <j-radio-group v-model:value="value" name="radioGroup">
         <j-radio :value="true">覆盖当前组件</j-radio>
@@ -76,7 +100,7 @@
   </div>
 </template>
   <script lang="ts" setup>
-import { ref, reactive, onMounted, computed, inject, unref } from 'vue'
+import { ref, reactive, computed, inject, unref, watch } from 'vue'
 import Editor from '@/components/EditorModal'
 import { queryEndCommands } from '@/api/form'
 import { useProduct } from '@/store'
@@ -178,7 +202,7 @@ const sourceList = computed(() => {
       label: '输入',
       value: 'inputs',
       disabled: true,
-      children: getArray(_item?.inputs || [], ''),
+      children: getArray(_item?.inputs || [], 'inputs'),
     })
   }
   if (_item?.output && _item?.output?.properties?.length) {
@@ -186,7 +210,7 @@ const sourceList = computed(() => {
       label: '输出',
       value: 'output',
       disabled: true,
-      children: getArray(_item?.output?.properties || [], ''),
+      children: getArray(_item?.output?.properties || [], 'output'),
     })
   }
   return arr
@@ -201,9 +225,24 @@ const onCommChange = () => {
   modelRef.source.sourceData = undefined
 }
 
-onMounted(() => {
-  getEnd()
-})
+watch(
+  () => visible.value,
+  () => {
+    if (visible.value) {
+      modelRef.json = undefined
+      modelRef.formCopy = []
+      modelRef.source = {
+        functionId: undefined,
+        commandId: undefined,
+        sourceData: undefined,
+      }
+      getEnd()
+    }
+  },
+  {
+    immediate: true,
+  },
+)
 
 const formDataOptions = computed(() => {
   const arr = product.getDataMapByType(providerEnum.FormPage)
@@ -303,7 +342,10 @@ const handleSource = (arr: any[]) => {
   return _array
 }
 
-const onSave = () => {
+const onSave = async () => {
+  const valid = await formRef.value?.validate()
+  console.log(valid)
+  if (!valid) return
   const obj: any = {
     json: undefined,
     formCopy: undefined,
@@ -356,28 +398,33 @@ const onSave = () => {
 
 const onOk = () => {
   let arr: any[] = []
-  if(unref(value)) {
+  if (unref(value)) {
     arr = [...dataList.value, ...designer.formData.value.children]
   } else {
     arr = [...designer.formData.value.children, ...dataList.value]
   }
   designer.formData.value = {
-      ...designer.formData.value,
-      children: uniqBy(arr, 'formItemProps.name')
-    }
+    ...designer.formData.value,
+    children: uniqBy(arr, 'formItemProps.name'),
+  }
   modalVisible.value = false
   visible.value = false
 }
 </script>
 
 <style lang="less" scoped>
+.content {
+  background-color: #f7f8f9;
+  border: 1px solid #f0f2f5;
+  padding: 16px;
+}
 .btn {
   position: absolute;
   bottom: 0;
   display: flex;
   width: 100%;
   right: 0;
-  justify-content: flex-end;
+  // justify-content: flex-end;
   padding: 10px 24px;
   border-top: 1px solid #f0f0f0;
   background-color: #ffffff;

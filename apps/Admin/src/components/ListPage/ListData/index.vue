@@ -1,12 +1,16 @@
 <template>
-  <div className="filter-module-center">
+  <div className="filter-module-center" ref="listDataRef">
+    <img class="modal-config-img" :src="getImage('/list-page/data.png')" v-if="open">
     <j-drawer
       title=""
-      placement="bottom"
+      placement="right"
+      width="560px"
       :closable="true"
       :visible="open"
+      :getContainer="() => $refs.listDataRef"
+      :destroyOnClose="true"
+      :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
       @close="emits('update:open', false)"
-      height="520px"
     >
       <Table
         v-if="configState.type === ''"
@@ -18,13 +22,18 @@
         :dataSource="dataSource"
         :modelActiveKey="activeKey"
         :show="show"
-        :asyncData="asyncData"
+        v-model:asyncData="dataBinds.columnAsync"
         :configChange="configChange"
         :errorList="errorList"
+        :bindData="dataBinds.columnBind"
+        :bind-function-id="dataBinds.data.function"
+        tableType="columnData"
         @handleAdd="handleAdd"
         @configuration="configuration"
         @handleOk="handleOk"
         @bindData="bindData"
+        @handleChange="(data) => dataSource = data"
+        @update-bind="(data) => dataBinds.columnBind = data"
       />
       <div v-else>
         <a-page-header title="表头配置" sub-title="" @back="goBack">
@@ -174,6 +183,7 @@ import Config from '@/components/ListPage/ListData/components/Configuration.vue'
 import { DATA_BIND } from '../keys'
 import { validListData } from './utils/valid'
 import { PropType } from 'vue'
+import { getImage } from '@jetlinks/utils';
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -219,16 +229,16 @@ const configState = reactive({
 
 const dateOptions = [
   {
-    value: 'yyyy-MM-dd HH:mm:ss',
-    label: 'yyyy-MM-dd HH:mm:ss',
+    value: 'YYYY-MM-DD HH:mm:ss',
+    label: 'YYYY-MM-DD HH:mm:ss',
   },
   {
     value: 'HH:mm:ss',
     label: 'HH:mm:ss',
   },
   {
-    value: 'yyyy-MM-dd',
-    label: 'yyyy-MM-dd',
+    value: 'YYYY-MM-DD',
+    label: 'YYYY-MM-DD',
   },
 ]
 const fileOptions = [
@@ -248,7 +258,6 @@ const getPopupContainer = (trigger: HTMLElement) => {
 //是否完成数据绑定
 const dataBind = ref(true)
 //是否同步数据
-const asyncData = ref(false)
 //数据是否有变动
 const dataChange = ref(false)
 //是否修改配置
@@ -274,8 +283,8 @@ const options = [
     label: 'double',
   },
   {
-    value: 'string',
-    label: 'string',
+    value: 'text',
+    label: 'text',
   },
   {
     value: 'boolean',
@@ -313,7 +322,7 @@ const columns: any = [
     key: 'id',
     ellipsis: true,
     align: 'center',
-    width: 150,
+    width: 140,
     type: 'text',
     form: {
       isVerify: true,
@@ -352,7 +361,7 @@ const columns: any = [
     key: 'name',
     ellipsis: true,
     align: 'center',
-    width: 150,
+    width: 140,
     type: 'text',
     form: {
       isVerify: true,
@@ -377,7 +386,7 @@ const columns: any = [
     align: 'center',
     type: 'select',
     options: options,
-    width: 150,
+    width: 110,
     tips: false,
   },
   {
@@ -386,7 +395,7 @@ const columns: any = [
     dataIndex: 'action',
     ellipsis: true,
     align: 'center',
-    width: 140,
+    width: 100,
   },
 ]
 //数据
@@ -425,41 +434,16 @@ const configuration = (data: any, value: any) => {
 }
 //处理方式弹窗
 const handleOk = (value: any, data: any) => {
-  let source: any = []
   switch (value) {
     case '1':
-      source = data
+      dataSource.value = data
       break
     case '2':
-      if (configChange.value) {
-        data?.map((item: any) => {
-          const dataFind = dataSource.value?.find(
-            (i: any) => i?.id === item?.id,
-          )
-          if (dataFind?.config !== item?.config) {
-            source.push(item)
-          }
-        })
-      } else {
-        data?.map((item: any) => {
-          if (item?.mark === 'add') {
-            source.push(item)
-          }
-        })
-      }
+      dataSource.value.push(...data)
       break
     case '3':
-      source = dataSource.value?.map((item) => {
-        return {
-          id: item?.id,
-          name: item?.name,
-          type: item?.type,
-        }
-      })
       break
   }
-
-  dataSource.value = source
   configChange.value = false
 }
 //点击显示table的同步数据
@@ -525,51 +509,38 @@ const submit = () => {
   configState.type = ''
   show.value = true
   dataBind.value = true
-  asyncData.value = true
+  dataBinds.columnAsync = true
   configChange.value = true
 }
 const goBack = () => {
   configState.type = ''
   show.value = true
   dataBind.value = true
-  asyncData.value = true
+  dataBinds.columnAsync = true
   configChange.value = false
 }
 const errorList = ref([])
 watch(
   () => dataBinds,
   () => {
-    if (dataBinds.functionInfo) {
+    if (dataBinds.data.function) {
       dataBind.value = true
     } else {
-      dataBind.value = false
       dataSource.value = [];
     }
   },
   { immediate: true, deep: true },
 )
 
-// watch(() => [JSON.stringify(props.dataSource), JSON.stringify(dataBinds)], () => {
-//   if(!props.dataSource.length && dataBinds?.functionInfo?.configuration?.columns) {
-//     dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(
-//       (item) => {
-//         console.log(`output->item`,item)
-//         return {
-//           id: item.name,
-//           name: item.name,
-//           type: 'string',
-//         }
-//       },
-//     ) || []
-//   }
-// }, {immediate: true})
 
 const valid = () => {
-  return new Promise((resolve) => {
-    errorList.value = validListData(dataSource.value);
-    if(errorList.value.length) throw errorList.value
-    else resolve(errorList.value)
-  })
+  errorList.value = validListData(dataSource.value)
+  return errorList.value.length ? [{message: '列表数据配置错误'}] : []
+  // return new Promise((resolve) => {
+  //   errorList.value = validListData(dataSource.value);
+  //   if(errorList.value.length) throw [{message: '列表数据配置错误'}]
+  //   else resolve(errorList.value)
+  // })
 }
 defineExpose({
   errorList,

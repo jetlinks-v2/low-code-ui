@@ -8,11 +8,14 @@
             { required: true, message: '请输入菜单名称' },
          ]">
             <template #label>
-               菜单名称
+               <span>菜单名称</span>
+               <j-tooltip title="分组名称将应用于系统菜单名称、页面路径等位置，建议设置2-8个字符" >
+                <AIcon type="ExclamationCircleOutlined" style="margin-left: 5px;"/>
+              </j-tooltip>
             </template>
-            <j-input v-model:value="modelRef.name" placeholder="请输入" />
+            <j-input v-model:value="modelRef.name" placeholder="请输入菜单名称" />
          </j-form-item>
-         <j-form-item ref="uploadIcon" label="菜单图标" name="icon" :rules="[
+         <j-form-item ref="uploadIcon" label="icon" name="icon" :rules="[
             {
                required: true,
                message: '请上传图标',
@@ -33,7 +36,7 @@
          </j-form-item>
       </j-form>
    </j-modal>
-   <SaveIcon v-if="dialogVisible" v-model:visible="dialogVisible" @confirm="(typeStr: string) => choseIcon(typeStr)" />
+   <SaveIcon v-if="dialogVisible" v-model:visible="dialogVisible" @confirm="(typeStr: string) => choseIcon(typeStr)" :selected="modelRef.icon"/>
 </template>
    
 <script setup lang='ts' name="Save">
@@ -87,9 +90,9 @@ const onSave = async()=>{
 }
 
 
-onMounted(()=>{
-   console.log('props',props.data)
-})
+// onMounted(()=>{
+//    console.log('props',props.data)
+// })
 </script>
    
 <style scoped lang='less'>

@@ -6,6 +6,7 @@
       :request="props?.query"
       :pagination="props?.pagination"
       :model="model"
+      :params='params'
       :modelValue="defaultFormType"
     >
       <template #headerTitle>
@@ -17,21 +18,21 @@
         #[item.key]="slotProps"
       >
         <div v-if="item.key !== 'action'">
-          <div v-if="slotProps[item.key]?.config">
+          <div v-if="item?.config">
             <span v-if="item?.config?.type === 'object' && isShowIcon">
               <AIcon
                 type="SearchOutlined"
-                @click="jsonOpen(slotProps[item.key]?.value)"
+                @click="jsonOpen(slotProps[item.key])"
               />
             </span>
             <span v-else-if="item?.config?.type === 'file' && isShowFileIcon">
               <img
                 style="width: 30px; height: 30px"
-                :src="dataFormat(item?.config, slotProps[item.key]?.value)"
+                :src="dataFormat(item?.config, slotProps[item.key])"
               />
             </span>
             <span v-else>
-              {{ dataFormat(item?.config, slotProps[item.key]?.value) }}
+              {{ dataFormat(item?.config, slotProps[item.key]) }}
             </span>
           </div>
           <div v-else>
@@ -41,33 +42,38 @@
           </div>
         </div>
         <div v-if="item?.key === 'action'">
-          <PermissionButton
-            v-for="item in tableActions"
-            :key="item.key"
-            type="link"
-            v-bind:="handleFunction(item.permissionProps, slotProps)"
-            style="padding: 0"
-            :danger="item.command === 'Delete'"
-            :popConfirm="
-              handleFunction(item.permissionProps, slotProps)?.popConfirm
-            "
-          >
-            <AIcon v-if="item.icon" :type="item?.icon" />
-            <img v-else-if="item?.icon?.includes('http')" :src="item.icon" />
-
-            <span v-else> {{ item.text }}</span>
-            <j-divider type="vertical" />
-          </PermissionButton>
+          <j-space size="large">
+            <PermissionButton
+              v-for="item in tableActions"
+              :key="item.key"
+              type="link"
+              v-bind:="handleFunction(item.permissionProps, slotProps)"
+              style="padding: 0"
+              :danger="item.command === 'Delete'"
+              :popConfirm="
+                handleFunction(item.permissionProps, slotProps)?.popConfirm
+              "
+              :class="extractCssClass(item.style)"
+              
+            >
+                <template v-if="item.icon">
+                  <img :src="item.icon" alt="" v-if="item.icon.includes('http')" class="image-icon">
+                  <AIcon v-else :type="item?.icon" />
+                </template>
+                <span>{{ item?.text }}</span>
+            </PermissionButton>
+          </j-space>
         </div>
       </template>
       <template #card="slotProps">
         <Card
-          status="notActive"
-          :actions="slotProps?.actions"
+          :status="slotProps[props?.cardConfig?.emphasisField]"
+          :actions="tableActions"
           :record="slotProps"
           :statusText="
-            slotProps[props?.cardConfig?.emphasisField] || '强调字段'
+            slotProps[props?.cardConfig?.emphasisField] || ''
           "
+          :showStatus="props?.cardConfig?.emphasisField !== ''"
           :statusNames="{
             online: 'processing',
             offline: 'error',
@@ -82,16 +88,11 @@
             <j-avatar
               shape="square"
               :size="100"
-              :src="slotProps[props?.cardConfig?.dynamicIcon]"
+              :src="props?.cardConfig?.customIcon"
               class="card-icon"
             >
               <template #icon>
-                <pro-image
-                  :src="
-                    props?.cardConfig?.customIcon ||
-                    `https://www.antdv.com/#error`
-                  "
-                />
+                <pro-image src="https://www.antdv.com/#error" />
               </template>
             </j-avatar>
           </template>
@@ -100,20 +101,20 @@
               <j-col :span="12">
                 <span
                   v-if="
-                    slotProps[props?.cardConfig?.field1]?.config?.type ===
+                    valueFormat(props?.cardConfig?.field1)?.config?.type ===
                       'object' && isShowIcon
                   "
                 >
                   <AIcon
                     type="SearchOutlined"
                     @click="
-                      jsonOpen(slotProps[props?.cardConfig?.field1]?.value)
+                      jsonOpen(slotProps[props?.cardConfig?.field1])
                     "
                   />
                 </span>
                 <span
                   v-else-if="
-                    slotProps[props?.cardConfig?.field1]?.config?.type ===
+                    valueFormat(props?.cardConfig?.field1)?.config?.type ===
                       'file' && isShowFileIcon
                   "
                 >
@@ -121,8 +122,8 @@
                     style="width: 30px; height: 30px"
                     :src="
                       dataFormat(
-                        slotProps[props?.cardConfig?.field1]?.config,
-                        slotProps[props?.cardConfig?.field1]?.value,
+                        valueFormat(props?.cardConfig?.field1)?.config,
+                        slotProps[props?.cardConfig?.field1],
                       )
                     "
                   />
@@ -130,11 +131,10 @@
                 <h3 v-else>
                   {{
                     dataFormat(
-                      slotProps[props?.cardConfig?.field1]?.config,
-                      slotProps[props?.cardConfig?.field1]?.value,
-                    ) || '字段1'
+                      valueFormat(props?.cardConfig?.field1)?.config,
+                      slotProps[props?.cardConfig?.field1],
+                    ) || slotProps[props?.cardConfig?.field1]
                   }}
-                  <!-- {{ slotProps[props?.cardConfig?.field1] || '字段1' }} -->
                 </h3>
               </j-col>
               <j-col :span="12">
@@ -148,20 +148,20 @@
                 <div>
                   <span
                     v-if="
-                      slotProps[props?.cardConfig?.field2]?.config?.type ===
+                      valueFormat(props?.cardConfig?.field2)?.config?.type ===
                         'object' && isShowIcon
                     "
                   >
                     <AIcon
                       type="SearchOutlined"
                       @click="
-                        jsonOpen(slotProps[props?.cardConfig?.field2]?.value)
+                        jsonOpen(slotProps[props?.cardConfig?.field2])
                       "
                     />
                   </span>
                   <span
                     v-else-if="
-                      slotProps[props?.cardConfig?.field2]?.config?.type ===
+                      valueFormat(props?.cardConfig?.field2)?.config?.type ===
                         'file' && isShowFileIcon
                     "
                   >
@@ -169,8 +169,8 @@
                       style="width: 30px; height: 30px"
                       :src="
                         dataFormat(
-                          slotProps[props?.cardConfig?.field2]?.config,
-                          slotProps[props?.cardConfig?.field2]?.value,
+                          valueFormat(props?.cardConfig?.field2)?.config,
+                          slotProps[props?.cardConfig?.field2],
                         )
                       "
                     />
@@ -178,9 +178,9 @@
                   <span v-else>
                     {{
                       dataFormat(
-                        slotProps[props?.cardConfig?.field2]?.config,
-                        slotProps[props?.cardConfig?.field2]?.value,
-                      ) || '字段2'
+                        valueFormat(props?.cardConfig?.field2)?.config,
+                        slotProps[props?.cardConfig?.field2],
+                      ) || slotProps[props?.cardConfig?.field2]
                     }}
                   </span>
 
@@ -192,20 +192,20 @@
                 <div>
                   <span
                     v-if="
-                      slotProps[props?.cardConfig?.field3]?.config?.type ===
+                      valueFormat(props?.cardConfig?.field3)?.config?.type ===
                         'object' && isShowIcon
                     "
                   >
                     <AIcon
                       type="SearchOutlined"
                       @click="
-                        jsonOpen(slotProps[props?.cardConfig?.field3]?.value)
+                        jsonOpen(slotProps[props?.cardConfig?.field3])
                       "
                     />
                   </span>
                   <span
                     v-else-if="
-                      slotProps[props?.cardConfig?.field3]?.config?.type ===
+                      valueFormat(props?.cardConfig?.field3)?.config?.type ===
                         'file' && isShowFileIcon
                     "
                   >
@@ -213,8 +213,8 @@
                       style="width: 30px; height: 30px"
                       :src="
                         dataFormat(
-                          slotProps[props?.cardConfig?.field3]?.config,
-                          slotProps[props?.cardConfig?.field3]?.value,
+                          valueFormat(props?.cardConfig?.field3)?.config,
+                          slotProps[props?.cardConfig?.field3],
                         )
                       "
                     />
@@ -222,9 +222,9 @@
                   <span v-else>
                     {{
                       dataFormat(
-                        slotProps[props?.cardConfig?.field3]?.config,
-                        slotProps[props?.cardConfig?.field3]?.value,
-                      ) || '字段3'
+                        valueFormat(props?.cardConfig?.field3)?.config,
+                        slotProps[props?.cardConfig?.field3],
+                      ) || slotProps[props?.cardConfig?.field3]
                     }}
                   </span>
 
@@ -244,13 +244,14 @@ import HeaderButton from '@/components/ListPage/Preview/components/HederActions.
 import { isFunction, isObject } from 'lodash-es'
 import dayjs from 'dayjs'
 import { PropType } from 'vue'
+import { extractCssClass, insertCustomCssToHead } from '@/components/FormDesigner/utils/utils';
 const props = defineProps({
   model: {
     type: String,
     default: 'card',
   },
   dataColumns: {
-    type: Array,
+    type: Array as PropType<Record<string, any>[]>,
     default: () => [],
   },
   query: {
@@ -276,7 +277,7 @@ const props = defineProps({
     },
   },
   headerActions: {
-    type: Array,
+    type: Array as PropType<Record<string, any>[]>,
     default: () => [],
   },
   defaultFormType: {
@@ -287,7 +288,16 @@ const props = defineProps({
     type: Array as PropType<Record<string, any>>,
     default: () => [],
   },
+  params: {
+    type: Object,
+    default: () => {}
+  }
 })
+
+const valueFormat = (val: any) => {
+  return props.dataColumns.find(item => item.dataIndex === val)
+}
+const tableRef = ref();
 const isShowIcon = ref(false)
 const isShowFileIcon = ref(false)
 const emit = defineEmits(['openJson'])
@@ -407,4 +417,25 @@ const handleFunction = (item: any, data?: any) => {
   }
   return undefined
 }
+
+
+watchEffect(() => {
+  props.tableActions.forEach((item) => {
+    insertCustomCssToHead(item.style, item.key)
+    
+  })
+})
+
+defineExpose({
+  reload: () => {
+    tableRef.value?.reload()
+  }
+})
 </script>
+
+<style scoped lang="less">
+.image-icon {
+  width: 14px;
+  height: 14px;
+}
+</style>

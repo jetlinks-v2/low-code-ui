@@ -13,6 +13,8 @@ import TableLayout from './TableLayout'
 import { watch, PropType } from 'vue';
 import { queryOptions } from '../../utils/utils';
 import { useProduct } from '@/store';
+import { onEnd } from './ControlInsertionPlugin';
+import { useProps } from '../../hooks';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -47,6 +49,7 @@ const DraggableLayout = defineComponent({
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
+        const platform = navigator.platform.toLowerCase();
 
         const product = useProduct()
 
@@ -67,12 +70,12 @@ const DraggableLayout = defineComponent({
 
                 switch (element.type) {
                     case 'text':
-                        if (unref(isEditModel)) {
+                        if (unref(isEditModel) || componentMap?.[element?.type]) {
+                            const TypeComponent = componentMap?.[element?.type] || 'div'
                             const params = {
                                 data: element,
                                 parent: props.data
                             }
-                            const TypeComponent = componentMap?.[element?.type] || 'div'
                             return (
                                 <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                                     <TypeComponent data={element} {...element.componentProps} />
@@ -95,31 +98,14 @@ const DraggableLayout = defineComponent({
                     default:
                         if (unref(isEditModel) || componentMap?.[element?.type]) {
                             const TypeComponent = componentMap?.[element?.type] || 'div'
+                            const _props = useProps(element, unref(designer.formData), unref(isEditModel), unref(designer.mode))
 
                             const selectRef = ref<any>(null)
-                            const options = ref<any[]>(element?.componentProps?.options || [])
 
                             const params = {
                                 data: element,
                                 parent: props.data
                             }
-
-                            const formItemProps = computed(() => {
-                                const rules = (element.formItemProps?.rules || []).map(item => {
-                                    if(item?.validator) { // 处理自定义校验函数
-                                        return {
-                                            ...omit(item, 'validator'),
-                                            validator(rule, value, callback){
-                                                let customFn = new Function('rule', 'value', 'callback', item?.validator)
-                                                return customFn(rule, value, callback)
-                                            }
-                                        }
-                                    }
-                                    return item
-                                })
-                                
-                                return { ...element?.formItemProps, rules }
-                            })
 
                             if (element?.formItemProps?.name) {
                                 _path[_index] = element?.formItemProps?.name
@@ -135,7 +121,8 @@ const DraggableLayout = defineComponent({
                                     set(designer.formState, _path, newValue)
                                 }, 
                                 {
-                                    deep: true
+                                    deep: true,
+                                    immediate: true
                                 }
                             )
                             watch(
@@ -144,7 +131,8 @@ const DraggableLayout = defineComponent({
                                     set(designer.formState, _path, newValue)
                                 }, 
                                 {
-                                    deep: true
+                                    deep: true,
+                                    immediate: true
                                 }
                             )
 
@@ -156,8 +144,12 @@ const DraggableLayout = defineComponent({
                                     }
                                 }
                                 if(!element?.componentProps?.eventCode && !unref(isEditModel)) return 
-                                if(['input', 'input-number', 'textarea', 'input-password'].includes(element.type)){
+                                if(['input', 'textarea', 'input-password'].includes(element.type)){
                                     let customFn = new Function('e', element?.componentProps?.eventCode)
+                                    customFn.call(_this, arg?.[0])
+                                }
+                                if(['input-number'].includes(element.type)){
+                                    let customFn = new Function('value', element?.componentProps?.eventCode)
                                     customFn.call(_this, arg?.[0])
                                 }
                                 if(['select', 'switch', 'select-card', 'tree-select'].includes(element.type)){
@@ -187,29 +179,26 @@ const DraggableLayout = defineComponent({
 
                             if(!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
                                 queryOptions(element.componentProps.source, product.info?.id).then(resp => {
-                                    options.value = resp
+                                    _props.componentProps.options = resp
                                 })
                             }
 
                             return (
                                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                                    <FormItem {...unref(formItemProps)} name={_path}>
+                                    <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true}>
                                         {
                                             unref(isEditModel) ? 
                                             <TypeComponent
+                                                model={unref(designer.model)}
                                                 data={element}
-                                                {...omit(element.componentProps, ['description'])}
-                                                size={unref(designer.formData)?.componentProps.size}
+                                                {...omit(_props.componentProps, ['disabled'])}
                                             ></TypeComponent> : 
                                             <TypeComponent
                                                 data={element}
-                                                {...omit(element.componentProps, ['description'])}
-                                                size={unref(designer.formData)?.componentProps.size}
+                                                {..._props.componentProps}
                                                 v-model:value={myValue.value}
                                                 v-model:checked={checked.value}
                                                 onChange={onChange}
-                                                disabled={element?.componentProps?.disabled || (unref(designer.mode) === 'edit' && !element?.componentProps?.editable)}
-                                                options={unref(options)}
                                             ></TypeComponent>
                                         }
                                         <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{element.componentProps?.description}</div>
@@ -221,22 +210,19 @@ const DraggableLayout = defineComponent({
                 }
             },
             footer() {
-                const _style = {
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100%',
-                    minHeight: '60px',
-                    minWidth: '100px'
-                }
                 if (isEmpty(props.data)) {
                     return (
                         <div style={{
-                            ..._style,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            textAlign: 'center', // 不知道为什么justifyContent这个不行 ？？？
+                            alignItems: 'center',
+                            height: '100%',
+                            minHeight: '60px',
                             background: !props.isRoot ? '#F2F8FF !important' : '',
                         }}>
                             Drop here
-                        </div >
+                        </div>
                     )
                 }
                 return ''
@@ -247,13 +233,13 @@ const DraggableLayout = defineComponent({
             animation: 150,
             multiDrag: true,
             itemKey: 'key',
-            selectedClass: "sortable-selected",
-            multiDragKey: "SHIFT",
+            // selectedClass: "sortable-selected",
+            multiDragKey: platform.includes('mac') ? "Meta" : "Ctrl",
             group: { name: "j-canvas" },
             //拖动结束
-            // onEnd: function (evt) {
-            //   console.log(evt);
-            // }
+            onEnd: (e) => {
+                onEnd(e, designer)
+            }
         }
 
         return () => {

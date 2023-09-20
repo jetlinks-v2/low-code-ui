@@ -40,15 +40,15 @@ const handleProps = (node: any) => {
     }
 
     switch (node.type) {
-        case 'input':
-            result.maxLength = result?.maxLength || 64
-            break
-        case 'textarea':
-            result.maxLength = result?.maxLength || 200
-            break
-        case 'input-password':
-            result.maxLength = result?.maxLength || 64
-            break
+        // case 'input':
+        //     result.maxLength = result?.maxLength || 64
+        //     break
+        // case 'textarea':
+        //     result.maxLength = result?.maxLength || 200
+        //     break
+        // case 'input-password':
+        //     result.maxLength = result?.maxLength || 64
+        //     break
         case 'input-number':
             result.max = undefined
             result.min = undefined
@@ -56,16 +56,23 @@ const handleProps = (node: any) => {
             break
         case 'select-card':
             result.options = generateOptions(3)
-            result.mode = ''
+            result.mode = undefined
             break
         case 'select':
             result.options = generateOptions(3)
-            result.mode = ''
+            result.mode = undefined
             break
         case 'tree-select':
-            result.treeData = generateOptions(3)
+            result.treeData = [
+                ...generateOptions(3),
+                {
+                    label: '选项4',
+                    value: uid(),
+                    children: generateOptions(3)
+                }
+            ]
             result.showSearch = false
-            result.mode = ''
+            result.multiple = false
             result.treeCheckStrictly = false
             break
         case 'upload':
@@ -79,14 +86,20 @@ const handleProps = (node: any) => {
             result.geoType = 'country'
             break
         case 'grid':
-            result.inlineMax = 4
+            result.inlineMax = 10
+            result.rowSpan = 5
+            result.colSpan = 10
             break
         case 'form':
             result.source = {
-              value: undefined,
-              code: ''
+                value: undefined,
+                code: ''
             }
-          break
+            break
+        case 'space':
+            result.align = 'center'
+            result.direction = 'vertical'
+            break
     }
 
     return result
@@ -107,8 +120,15 @@ const generatorData = (node: any) => {
     if (!result.key) {
         result.key = `${result.type}_${uid()}`
     }
-    if (checkIsField(result) || result.type === 'table') {
+    if (checkIsField(result) || result.type === 'table' || result.type === 'card') {
         result.formItemProps = handleFormItemProps(result)
+    }
+
+    if (result.type === 'grid' || result.type === 'space' || result.type === 'collapse' || result.type === 'tabs') {
+        result.formItemProps = {
+            name: result?.key,
+            isLayout: false
+        }
     }
 
     result.componentProps = {

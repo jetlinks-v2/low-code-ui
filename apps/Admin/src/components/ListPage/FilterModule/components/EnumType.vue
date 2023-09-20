@@ -18,6 +18,7 @@
         v-model:value="state.dataValue"
         showSearch
         :options="dataOptions"
+        :field-names="{ label: 'name', value: 'id' }"
       />
     </div>
     <div v-else>
@@ -29,7 +30,7 @@
           v-model:value="state.abilityValue"
           showSearch
           :options="functionOptions"
-          :field-names="{label: 'name', value: 'id'}"
+          :field-names="{label: 'name', value: 'fullId'}"
         />
         <!--选中功能类型为SQL/函数时，下拉框后方展示指令下拉框-->
         <j-select
@@ -46,6 +47,7 @@
 
 <script lang="ts" setup>
 import { useFunctions } from '@/hooks/useFunctions';
+import { queryDictionary } from '@/api/form'
 interface Emit {
   (e: 'update:state', value: any): void
 }
@@ -71,9 +73,17 @@ const state = reactive({
 })
 const dataOptions = ref([])
 
+/**查询数据字典列表 */
+const queryData = () => {
+  queryDictionary().then((res) => {
+    dataOptions.value = res.result
+  })
+}
+queryData()
+
 watch(() => state.abilityValue, () => {
   handleFunction(state.abilityValue)
-})
+}, { immediate: true })
 
 watch(
   () => state,

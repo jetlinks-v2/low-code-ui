@@ -1,10 +1,14 @@
 <template>
-  <div class="menu-config">
+  <div class="menu-config" ref="menuConfigRef">
     <j-drawer
       title="菜单配置"
       placement="right"
+      width="560px"
       :closable="false"
       :visible="open"
+      :destroyOnClose="true"
+      :getContainer="() => $refs.menuConfigRef"
+      :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
       @close="emits('update:open', false)"
     >
       <Menu
@@ -50,11 +54,13 @@ const formData = ref({ pageName: '', main: true, name: '', icon: '' })
 
 const errorList = ref<any[]>([])
 const valid = () => {
-  return new Promise((resolve, reject) => {
-    errorList.value = validMenu(menConfig)
-    if(errorList.value.length) reject(errorList.value)
-    else resolve([])
-  })
+  errorList.value = validMenu(menConfig)
+  return errorList.value.length ? [{message: '菜单配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validMenu(menConfig)
+  //   if(errorList.value.length) reject([{message: '菜单配置错误'}])
+  //   else resolve([])
+  // })
 }
 defineExpose({
   errorList,

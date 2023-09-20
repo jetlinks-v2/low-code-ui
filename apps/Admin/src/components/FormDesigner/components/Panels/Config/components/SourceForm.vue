@@ -2,6 +2,7 @@
   <div>
     <j-form-item
       label="数据绑定"
+      :validateFirst="true"
       :name="['componentProps', 'source', 'value']"
       :rules="[
           {
@@ -17,7 +18,6 @@
         v-model:value="target.componentProps.source.value"
         @change="onDataChange"
       >
-
       </j-select>
     </j-form-item>
   </div>
@@ -43,13 +43,13 @@ const getFormList = () => {
     return {
       label: item.title,
       value: item.id,
-      code: item.configuration.code
+      code: item.configuration?.code
     }
   })
 }
 
 const onDataChange = (e, node) => {
-  target.value.componentProps.source.code = node.code
+  target.value.componentProps.source.code = node?.code
   emits('refresh', target.value)
 }
 

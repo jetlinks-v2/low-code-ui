@@ -11,6 +11,7 @@
         offline: 'error',
         notActive: 'warning',
       }"
+      :warpStyle="{width: '385px'}"
       :statusColor="statusColor"
     >
       <template #img>
@@ -108,7 +109,7 @@
           </j-form-item>
         </div>
         <div v-if="cardState.type === 'field1'">
-          <ErrorItem :errorData="errorList?.[0]">
+          <ErrorItem :errorData="errorData('field1')">
             <j-form-item
               label="字段1"
               name="field1"
@@ -124,6 +125,7 @@
                 placeholder="请先配置列表数据"
                 v-model:value="formState.field1"
                 showSearch
+                allowClear
                 :options="titleOptions"
                 :field-names="{ label: 'name', value: 'id' }"
               />
@@ -137,6 +139,7 @@
               placeholder="请先配置列表数据"
               v-model:value="formState.field2"
               showSearch
+              allowClear
               :options="titleOptions"
               :field-names="{ label: 'name', value: 'id' }"
               @change="field2Change"
@@ -164,6 +167,7 @@
                 placeholder="请先配置列表数据"
                 v-model:value="formState.emphasisField"
                 showSearch
+                allowClear
                 :options="titleOptions"
                 :field-names="{ label: 'name', value: 'id' }"
               />
@@ -188,7 +192,7 @@
 import Upload from '@/components/Upload/Image/ImageUpload.vue'
 import { ErrorItem } from '../..';
 import EditorModal from '@/components/EditorModal'
-import { LIST_FORM_INFO, DATA_SOURCE } from '../../keys';
+import { LIST_FORM_INFO, ACTION_CONFIG_KEY, DATA_BIND, DATA_SOURCE } from '../../keys';
 const props = defineProps({
   id: {
     type: null,
@@ -198,25 +202,14 @@ const props = defineProps({
     default: () => []
   }
 })
-const titleOptions = ref([])
 const formRef = ref()
 //卡片样式点击类型
 const cardState = reactive({
   type: 'customIcon', //customIcon,field1,field2,field3,emphasisField
 })
 //卡片展示内容form
-const formState = reactive({
-  customIcon: '',
-  dynamicIcon: '',
-  field2Title: '',
-  field3Title: '',
-  field1: '',
-  field2: '',
-  field3: '',
-  emphasisField: '',
-  specialStyle: ``,
-})
-const listFormInfo = inject(LIST_FORM_INFO)
+const formState = inject(LIST_FORM_INFO)
+const dataBind = inject(DATA_BIND)
 const dataSource = inject(DATA_SOURCE)
 
 const errorData = computed(() => {
@@ -231,54 +224,70 @@ const getPopupContainer = (trigger: HTMLElement) => {
   return trigger.parentElement
 }
 //卡片
-const actions = [
-  {
-    key: 'view',
-    text: '查看',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '查看',
-      },
-      hasPermission: false,
-      icon: 'EyeOutlined',
-      onClick: (e) => {},
-    }),
-  },
-  {
-    key: 'view1',
-    text: '查看1',
-    permissionProps: {
-      tooltip: {
-        title: '查看1',
-      },
-      hasPermission: false,
-      icon: 'EyeOutlined',
-    },
-  },
-  {
-    key: 'view2',
-    text: '查看2',
-  },
-
-  {
-    key: 'delete',
-    text: '删除',
-    permissionProps: (data) => ({
-      tooltip: {
-        title: '删除',
-      },
-      popConfirm: {
-        title: data.status === 'error' ? '禁用' : '确认删除？',
-        onConfirm: () => {
-          console.log(data)
+const actionsConfig = inject(ACTION_CONFIG_KEY)
+const actions = computed(() => {
+  return actionsConfig.value.map((item) => {
+    return {
+      key: item?.key,
+      text: item?.title,
+      icon: item?.icon,
+      permissionProps: (data: any) => ({
+        tooltip: {
+          title: item?.title,
         },
-      },
-      hasPermission: true,
-      icon: 'EyeOutlined',
-      onClick: () => {},
-    }),
-  },
-]
+      }),
+    }
+  })
+})
+
+//  [
+//   {
+//     key: 'view',
+//     text: '查看',
+//     permissionProps: (data) => ({
+//       tooltip: {
+//         title: '查看',
+//       },
+//       hasPermission: false,
+//       icon: 'EyeOutlined',
+//       onClick: (e) => {},
+//     }),
+//   },
+//   {
+//     key: 'view1',
+//     text: '查看1',
+//     permissionProps: {
+//       tooltip: {
+//         title: '查看1',
+//       },
+//       hasPermission: false,
+//       icon: 'EyeOutlined',
+//     },
+//   },
+//   {
+//     key: 'view2',
+//     text: '查看2',
+//   },
+
+//   {
+//     key: 'delete',
+//     text: '删除',
+//     permissionProps: (data) => ({
+//       tooltip: {
+//         title: '删除',
+//       },
+//       popConfirm: {
+//         title: data.status === 'error' ? '禁用' : '确认删除？',
+//         onConfirm: () => {
+//           console.log(data)
+//         },
+//       },
+//       hasPermission: true,
+//       icon: 'EyeOutlined',
+//       onClick: () => {},
+//     }),
+//   },
+// ]
 
 const validateValue = () => {
   const value = ['field1']
@@ -295,7 +304,6 @@ const onCheck = async () => {
   if(valid) {
     validateValue()
     if (formState.field1 !== '') {
-      Object.assign(listFormInfo, formState)
       return true
     }
   } else {
@@ -313,15 +321,11 @@ const statusColor = ref({
   offline: '',
   warning: '#13c2c2',
 })
-const init = () => {
-  titleOptions.value = dataSource.value || []
-  Object.assign(formState, listFormInfo)
-  statusColor.value = JSON.parse(formState.specialStyle || '{}')
-}
 
-onMounted(() => {
-  init()
+const titleOptions = computed(() => {
+  return dataSource
 })
+
 defineExpose({
   vaildate: onCheck,
 })

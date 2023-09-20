@@ -3,6 +3,7 @@ import { useUserStore } from '@/store/user'
 import { useMenuStore } from '@/store/menu'
 import { useSystemStore } from '@/store/system'
 import { useAuthStore } from '@/store/auth'
+import { setToken } from '@jetlinks/utils'
 
 async function setupRouter() {
 
@@ -13,7 +14,11 @@ async function setupRouter() {
         AuthStore: useAuthStore()
     })
 
-    createAuthRoute()
+    createAuthRoute((to) => {
+      if (to.query.token) {
+        setToken(to.query.token)
+      }
+    })
 }
 
 export { setupRouter }

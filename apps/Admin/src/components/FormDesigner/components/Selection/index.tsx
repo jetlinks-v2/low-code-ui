@@ -2,8 +2,9 @@ import { isHTMLTag } from '@vue/shared'
 import { withModifiers } from 'vue'
 import './index.less'
 import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
-import { checkIsField, extractCssClass, insertCustomCssToHead } from '../../utils/utils'
-import { set } from 'lodash-es'
+import { checkIsField, copyDataByKey, extractCssClass, findParentById, handleCopyData, insertCustomCssToHead, updateData } from '../../utils/utils'
+import { map, set } from 'lodash-es'
+import { uid } from '../../utils/uid'
 
 const Selection = defineComponent({
   name: 'Selection',
@@ -73,7 +74,8 @@ const Selection = defineComponent({
     const _hasDrag = computed(() => { return props.hasDrag })
 
     const _error = computed(() => {
-      return designer.errorKey?.value.includes(props.data?.key)
+      const arr = map(designer.errorKey?.value, 'key')
+      return arr.includes(props.data?.key)
     })
 
     watchEffect(() => {
@@ -87,7 +89,18 @@ const Selection = defineComponent({
     }
 
     const setOptions = (arr: any[]) => {
-      props.data.context?.updateProps(arr, 'options')
+      const _list = updateData(unref(designer.formData)?.children, {
+        ...props.data,
+        componentProps: {
+          ...props.data.componentProps,
+          options: arr
+        }
+      })
+      designer.formData.value = {
+        ...designer.formData.value,
+        children: _list || [],
+      }
+      designer.setSelection(props.data || 'root')
     }
 
     const setValue = (_val: any) => {
@@ -97,12 +110,46 @@ const Selection = defineComponent({
     }
 
     const setDisabled = (bool: boolean) => {
-      props.data.context?.updateProps(bool, 'disabled')
+      const _list = updateData(unref(designer.formData)?.children, {
+        ...props.data,
+        componentProps: {
+          ...props.data.componentProps,
+          disabled: bool
+        }
+      })
+      designer.formData.value = {
+        ...designer.formData.value,
+        children: _list || [],
+      }
+      designer.setSelection(props.data || 'root')
     }
 
     // 复制
     const onCopy = () => {
-      designer.onCopy()
+      const _data: any = {
+        ...props.data,
+        key: props.data?.key + '_' + uid(),
+        children: handleCopyData(props.data?.children || []),
+      }
+      if (!['grid-item'].includes(props.data?.type)) {
+        _data.formItemProps = {
+          ...props.data?.formItemProps,
+          name: props.data?.formItemProps?.name + 'copy',
+        }
+      }
+      const dt = findParentById(designer.formData.value, props.data)
+      if (dt?.key === 'root') {
+        designer.formData.value = {
+          ...designer.formData.value,
+          children: [...designer.formData.value?.children, _data],
+        }
+      } else {
+        designer.formData.value = {
+          ...designer.formData.value,
+          children: copyDataByKey(designer.formData.value?.children, [_data], props.data),
+        }
+      }
+      designer.setSelection(_data || 'root')
     }
     // 粘贴
     const onPaste = () => {
@@ -124,12 +171,12 @@ const Selection = defineComponent({
 
     expose({ setVisible, setOptions, setValue, setDisabled })
 
-    const maskNode = () => {
+    const editNode = () => {
       return <Dropdown
         trigger={['contextmenu']}
         onContextmenu={withModifiers(() => {
           const flag = designer.selected.value.find(item => item.key === props.data.key)
-          if(!flag) {
+          if (!flag) {
             designer.setSelection(props.data)
           }
         }, ['stop'])}
@@ -137,7 +184,7 @@ const Selection = defineComponent({
           overlay: () => {
             return (
               <Menu>
-                <MenuItem key="copy"><Button type="link" onClick={onCopy}>复制</Button></MenuItem>
+                <MenuItem key="copy"><Button type="link" onClick={() => { designer.onCopy() }}>复制</Button></MenuItem>
                 <MenuItem key="paste"><Button type="link" onClick={onPaste}>粘贴</Button></MenuItem>
                 <MenuItem key="shear"><Button type="link" onClick={onShear}>剪切</Button></MenuItem>
                 <MenuItem key="delete"><Button danger type="link" onClick={onDelete}>删除</Button></MenuItem>
@@ -147,12 +194,16 @@ const Selection = defineComponent({
           }
         }}
       >
-        <div class={['mask']}></div>
+        <div style={{ position: 'relative' }}>
+          {slots?.default()}
+          {props.hasMask && <div class={['mask']}></div>}
+        </div>
       </Dropdown>
     }
 
     const renderSelected = () => {
       return <TagComponent
+        data-id={props.data?.key}
         class={[
           'selectElement',
           unref(isEditModel) && unref(_hasDrag) && 'handle',
@@ -165,7 +216,7 @@ const Selection = defineComponent({
         {...useAttrs()}
         onClick={withModifiers(handleClick, ['stop'])}
       >
-        {slots?.default()}
+        {unref(isEditModel) ? editNode() : slots?.default()}
         {
           unref(isEditModel) && Selected.value && !isMultiple.value && (
             <div class="bottomRight">
@@ -192,7 +243,6 @@ const Selection = defineComponent({
             </div>
           )
         }
-        {unref(isEditModel) && props.hasMask && maskNode()}
       </TagComponent>
     }
 

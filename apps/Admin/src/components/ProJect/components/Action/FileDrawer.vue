@@ -1,6 +1,8 @@
 
 <template>
-   <j-drawer visible :closable="false" @close="emit('close')" :get-container="false">
+   <j-drawer visible :closable="false" @close="emit('close')" :get-container="getContainer" :style="{ position: 'absolute' }" :maskStyle="{
+      'background-color': '#ffffff00'
+   }">
       <div class="title">{{ props.data.name }} 简介</div>
       <div>
          添加时间：{{ props.data.others.createTime }}
@@ -8,9 +10,7 @@
       <div>
          修改时间：{{ props.data.others.modifyTime }}
       </div>
-      <j-divider></j-divider>
-      <div class="title">通用：</div>
-      <div>类型：{{ type }} - {{ providerMap, providerEnum[props.data.type] }}</div>
+      <div>类型：{{ type }} - {{  providerMap[props.data.type] }}</div>
       <div>位置：{{ location }}</div>
       <j-divider></j-divider>
       <div class="title">引用关系：</div>
@@ -30,6 +30,10 @@ const props = defineProps({
       type: Object,
       default: {}
    },
+   getContainer:{
+      type:Boolean,
+      default:false
+   }
 })
 const emit = defineEmits(['close'])
 const web = [providerEnum.HtmlPage, providerEnum.FormPage, providerEnum.ListPage, providerEnum.Page]

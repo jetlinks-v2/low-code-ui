@@ -11,8 +11,8 @@
     @cancel="emit('close', true)"
     @ok="emit('close', true)"
   >
-    <FormPreview :data="data" v-if="props.resource.type === providerEnum.FormPage" mode="add"/>
-    <CustomHtml :code="JSON.stringify(data)" v-else-if="props.resource.type === providerEnum.HtmlPage"/>
+    <FormPreview :data="JSON.parse(data)" v-if="props.resource.type === providerEnum.FormPage" mode="add"/>
+    <CustomHtml :code="data" v-else-if="props.resource.type === providerEnum.HtmlPage"/>
   </j-modal>
 </template>
 <script setup lang="ts">
@@ -21,8 +21,16 @@ import CustomHtml from '@/components/CustomHTML/output/Preview.vue'
 import { PropType } from 'vue';
 import { getResource } from '@/api/basis'
 import { providerEnum } from '@/components/ProJect';
+import { ReplStore } from '@/components/CustomHTML/store';
+import { useProduct } from '@/store';
 
-const data = ref<Record<string, any>>()
+const data = ref<string>('')
+
+const productStore = useProduct();
+const vueMode = ref(true)
+const store = new ReplStore(JSON.stringify(data.value))
+provide('store', store)
+provide('useVueMode', vueMode)
 const props = defineProps({
   open: {
     type: Boolean,
@@ -39,8 +47,10 @@ const confirmLoading = ref(false)
 
 const getInfo = async () => {
   const { projectId, parentId, id } = props.resource
-  const res = await getResource(projectId, parentId, id)
-  data.value = res
+  // const res = await getResource(projectId, parentId, id)
+  // data.value = res
+  const res = productStore.getById(id)
+  data.value = res?.configuration?.code;
 }
 
 watch(() => JSON.stringify(props.resource), () => {

@@ -1,7 +1,11 @@
 <template>
   <div class="crud-table crud-content">
     <div class="crud-query">
-      <j-input v-model:value="myTableName" placeholder="表名" @change="tableNameChange" />
+      <j-form ref="queryForm" :model="formModel">
+        <j-form-item name="tableName" :rules="tableNameRule" :validateFirst="true">
+          <j-input v-model:value="formModel.tableName" placeholder="表名" @change="tableNameChange" />
+        </j-form-item>
+      </j-form>
     </div>
     <QuickEditTable
       serial
@@ -36,14 +40,15 @@
       </template>
       <template #length="{ record, index }">
         <span v-if="index <= maxLen">{{record.length}}</span>
-        <j-input-number v-else v-model:value="record.length" :precision="0" :maxLength="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
+        <span v-else-if="!['DECIMAL','VARCHAR','LONGVARCHAR'].includes(record.jdbcType)"></span>
+        <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
       </template>
       <template #scale="{ record, index }">
-        <span v-if="index <= maxLen || !['Double','BigDecimal','Float'].includes(record.javaType)">{{record.scale}}</span>
-        <j-input-number v-else v-model:value="record.scale" :precision="0" :maxLength="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
+        <span v-if="index <= maxLen || !['DECIMAL'].includes(record.jdbcType)">{{record.scale}}</span>
+        <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
       </template>
-      <template #updatable="{ record }">
-        <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" />
+      <template #updatable="{ record, index }">
+        <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" :disabled="index <= maxLen" />
       </template>
       <template #setting="{ record, index }">
         <span v-if="index <= maxLen"></span>
@@ -72,7 +77,7 @@
             :tooltip="{ title: '新增'}"
             @click="() => add(index)"
           >
-            <AIcon type="PlusSquareOutlined" />
+            <AIcon type="PlusCircleOutlined" />
           </PermissionButton>
           <PermissionButton
             v-if="index > maxLen"
@@ -86,8 +91,10 @@
           </PermissionButton>
           <PermissionButton
             v-if="index > maxLen"
+            danger
             type="link"
             class="action-btn"
+            placement="topRight"
             :hasPermission="true"
             :tooltip="{ title: '删除'}"
             :popConfirm="{
@@ -100,24 +107,32 @@
         </j-space>
       </template>
     </QuickEditTable>
-    <SettingModal
-      v-if="setting.visible"
-      :data="setting.data"
-      @cancel="settingCancel"
-      @save="settingSave"
-    />
+
   </div>
+  <SettingModal
+    v-if="setting.visible"
+    :data="setting.data"
+    :warp="WarpRef"
+    @cancel="settingCancel"
+    @save="settingSave"
+  />
 </template>
 
 <script setup name="CRUDTable">
 import { upperCase } from "@/utils/comm";
 import { executeReq } from '@/api/basis'
 import { cloneDeep, debounce, omit } from 'lodash-es'
-import { TYPE_PROVIDE, CRUD_COLUMNS } from "@/components/Database/util";
+import {
+  TYPE_PROVIDE,
+  CRUD_COLUMNS,
+  WARP_REF,
+  proAll,
+  formErrorFieldsToObj
+} from "@/components/Database/util";
 import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly } from './components'
 import { provide } from 'vue'
 import { defaultSetting, defaultTreeSetting } from './setting'
-import { onlyMessage, regular } from '@jetlinks/utils'
+import { regular } from '@jetlinks/utils'
 
 const props = defineProps({
   tree: {
@@ -138,7 +153,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update'])
+const emit = defineEmits(['update', 'update:columns'])
 
 const myColumns = [
   {
@@ -156,6 +171,12 @@ const myColumns = [
 
             if (!regular.isModalReg(value)) {
               return Promise.reject('请以小写字母开头，使用字母、数字和下划线完成命名')
+            }
+            if (typesOptions.value.some(item =>
+              item.javaType === upperCase(value) ||
+              item.javaType === (value.charAt(0).toUpperCase() + value.slice(1))
+            )) {
+              return Promise.reject('不能与保留字重名')
             }
 
             const someName = dataSource.value.filter(item => item.index !== source.record.index).some(item => item.name === value)
@@ -238,10 +259,13 @@ const myColumns = [
 ]
 
 const tableRef = ref()
-const myTableName = ref()
+const queryForm = ref()
+const formModel = reactive({
+  tableName: undefined
+})
 const maxLen = ref(defaultSetting.length)
 
-const dataSource = ref(props.columns ? props.columns : defaultSetting)
+const dataSource = ref([])
 
 const typesOptions = ref([])
 
@@ -251,26 +275,56 @@ const setting = reactive({
 })
 
 const CrudColumns = inject(CRUD_COLUMNS)
+const WarpRef = inject(WARP_REF)
 
+const tableNameRule = [{
+  trigger: 'blur',
+  validator: async (_, value) => {
+    if (!value) {
+      return Promise.reject('请输入表名')
+    } else {
+      const res = await executeReq('rdb-crud', 'CheckTableName', {
+        tableName: value,
+        ownerId: props.ownerId
+      })
+      if (res.success && res.result) {
+        return Promise.reject('表名重复')
+      }
+    }
+    return Promise.resolve();
+  }
+},
+  {
+    max: 16,
+    message: '最多可输入16位字符'
+  }
+]
 
 provide(TYPE_PROVIDE, typesOptions)
 
 const dataSourceChange = () => {
-  CrudColumns.value = dataSource.value.filter(item => item.name).map(item => ({
+  CrudColumns.value = dataSource.value.filter(item => item.name && item.javaType && item.jdbcType).map(item => ({
     dataIndex: item.name,
     title: item.comment
   }))
 }
 
 const emitUpdateDataSource = () => {
-  emit('update:columns', dataSource.value)
+  const isTreeNow = dataSource.value[1].name === 'parent_id'
+  let myValue = cloneDeep(dataSource.value)
+  if (isTreeNow) { // 后端不需要defaultTreeSetting或者defaultSetting中的值，需要剔除
+    myValue = myValue.slice(9, myValue.length )
+  } else {
+    myValue = myValue.slice(5, myValue.length )
+  }
+  emit('update:columns', myValue)
   emit('update')
 }
 
 const updateDataSource = (record, index) => {
   const _record = omit(record, ['index', '_quick_id', 'offsetTop'])
   dataSource.value.splice(index, 0, _record)
-  dataSourceChange()
+  // dataSourceChange()
   emitUpdateDataSource()
 }
 
@@ -300,12 +354,79 @@ const copy = (record, index) => {
 
 const deleteFn = async (index) => {
   dataSource.value.splice(index-1, 1)
-  dataSourceChange()
+  // dataSourceChange()
   emitUpdateDataSource()
 }
 
 const JavaTypeChange = (record) => {
   record.jdbcType = undefined
+  switch(record.javaType) {
+    case 'Enum':
+      Object.assign(record, {
+        dictionary: {
+          dictionaryId: undefined,
+          multiple: undefined
+        },
+        spec: undefined
+      })
+      break;
+    case 'String':
+    case 'Byte':
+    case 'Long':
+      Object.assign(record, {
+        defaultValueSpec: {
+          fixValue: undefined
+        },
+        validator: {
+          provider: undefined,
+          configuration: {
+            message: undefined,
+            group: ['save', 'update', 'insert']
+          }
+        },
+        spec: undefined
+      })
+      break;
+    case 'Double':
+    case 'Int':
+    case 'Float':
+    case 'BigDecimal':
+    case 'BigInteger':
+      Object.assign(record, {
+        defaultValueSpec: {
+          fixValue: undefined
+        },
+        validator: {
+          provider: undefined,
+          configuration: {
+            message: '数据格式错误',
+            group: [],
+            classType: record.javaType,
+            regexp: undefined,
+            min: undefined,
+            max: undefined
+          }
+        },
+        spec: undefined
+      })
+      break;
+    case 'List':
+      Object.assign(record, {
+        others: {
+          valueJavaType: undefined
+        }
+      })
+      break;
+    case 'Map':
+      Object.assign(record, {
+        others: {
+          keyJavaType: undefined,
+          valueJavaType: undefined
+        },
+      })
+      break;
+  }
+
   if (!['Double','BigDecimal','Float'].includes(record.javaType)) {
     record.scale = undefined
   }
@@ -330,19 +451,13 @@ const settingCancel = () => {
 const settingSave = (data) => {
   dataSource.value.splice(data.index - 1, 1, data)
   settingCancel()
-  emit('update:columns', dataSource.value)
-  emit('update')
+  emitUpdateDataSource()
 }
 
 const tableNameChange = debounce((e) => {
   const _value = e.target.value
-  executeReq('rdb-crud', 'CheckTableName', { tableName: _value, ownerId: props.ownerId }).then(res => {
-    if(res.success && res.result) {
-      return onlyMessage('表名重复', "warning")
-    }
-    emit('update:tableName', _value)
-    emit('update')
-  })
+  emit('update:tableName', _value)
+  emit('update')
 }, 300)
 
 const getTypes = () => {
@@ -354,36 +469,55 @@ const getTypes = () => {
 }
 
 watch(() => props.tree, () => {
-  const isTreeNow = dataSource.value.some(item => item.name === 'parent_id')
-  const arr = JSON.parse(JSON.stringify(dataSource.value))
+  if (dataSource.value.length) {
+    const isTreeNow = dataSource.value[1].name === 'parent_id'
+    const arr = JSON.parse(JSON.stringify(dataSource.value))
 
-  if (props.tree) {
-    if (!isTreeNow) {
-      const other = arr.slice(5, arr.length )
-      dataSource.value = defaultTreeSetting.concat(other)
-      maxLen.value = 9
+    if (props.tree) {
+      if (!isTreeNow) {
+        const other = arr.slice(5, arr.length )
+        dataSource.value = defaultTreeSetting.concat(other)
+        maxLen.value = 9
+      }
+    } else {
+      if (isTreeNow) {
+        dataSource.value = defaultSetting.concat(arr.slice(9, arr.length))
+        maxLen.value = 5
+      }
     }
-  } else {
-    if (isTreeNow) {
-      dataSource.value = defaultSetting.concat(arr.slice(9, arr.length))
-      maxLen.value = 5
-    }
+  } else { // 新增数据
+    dataSource.value = props.tree ? [...defaultTreeSetting, ...props.columns] : [...defaultSetting, ...props.columns]
   }
+
 }, { immediate: true })
 
 watch(() => props.tableName, () => {
-  myTableName.value = props.tableName
+  formModel.tableName = props.tableName
+}, { immediate: true })
+
+watch(() => JSON.stringify(dataSource.value), () => {
+  dataSourceChange()
 }, { immediate: true })
 
 defineExpose({
   validates: () => {
     return new Promise(async (resolve, reject) => {
-      try {
-        const v = await tableRef.value?.validates()
-        resolve(v)
-      } catch (e) {
-        reject(e)
-      }
+      proAll([
+        tableRef.value?.validates,
+        queryForm.value?.validate
+      ]).then(r => {
+        resolve(r)
+      }).catch(e => {
+        const errorMsg = {}
+        e.forEach(item => {
+          if(item.errorFields) {
+            Object.assign(errorMsg, formErrorFieldsToObj(item.errorFields))
+          } else {
+            Object.assign(errorMsg, item)
+          }
+        })
+        reject(errorMsg)
+      })
     })
   }
 })
@@ -397,7 +531,6 @@ dataSourceChange()
 .crud-table {
   .crud-query {
     width: 400px;
-    margin-bottom: 24px;
   }
   :deep(.action-btn) {
     padding: 4px 8px !important;

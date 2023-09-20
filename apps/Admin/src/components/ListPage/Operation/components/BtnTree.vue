@@ -1,21 +1,26 @@
 <template>
-  <j-tree
-    :tree-data="btnTree"
-    :show-icon="false"
-    :draggable="draggable"
-    block-node
-    :selectable="false"
-    :defaultExpandAll="true"
-    @drop="onDrop"
-  >
-    <template #switcherIcon="{ switcherCls }">
-      <AIcon type="DownOutlined" :class="switcherCls"></AIcon>
-    </template>
-    <template #title="{ dataRef, title }">
-      <span class="title">{{ title }}</span>
-      <slot name="config" :data="dataRef"></slot>
-    </template>
-  </j-tree>
+  <div class="btn-tree">
+    <j-tree
+      :tree-data="btnTree"
+      :show-icon="false"
+      :draggable="draggable"
+      show-line
+      block-node
+      :selectable="false"
+      :defaultExpandAll="true"
+      @drop="onDrop"
+    >
+      <template #switcherIcon="{ switcherCls }">
+        <AIcon type="CaretDownOutlined" :class="switcherCls"></AIcon>
+      </template>
+      <template #title="{ dataRef, title }">
+        <div class="title-config">
+          <span class="title">{{ title }}</span>
+          <slot name="config" :data="dataRef"></slot>
+        </div>
+      </template>
+    </j-tree>
+  </div>
 </template>
 <script setup lang="ts" name="BtnTree">
 import type { PropType } from 'vue';
@@ -77,7 +82,7 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
     return ;
   }
   if(info.dragNode.children?.length && (dropPosition === 0 || info.node.level === 1)) {
-    onlyMessage('该按钮下存在2级按钮', 'error');
+    onlyMessage('仅支持2级按钮', 'error');
     return
   }
   // Find dragObject
@@ -117,10 +122,13 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
   btnTree.value = data;
 };
 </script>
-<style scoped>
-.title {
-  border-left: 1px solid;
-  padding: 2px 50px 2px 10px;
-  border-bottom: 1px solid;
+<style scoped lang="less">
+.btn-tree {
+  margin: 20px 0;
+    .title-config{
+    display: flex;
+    justify-content: space-between;
+  }
 }
+
 </style>

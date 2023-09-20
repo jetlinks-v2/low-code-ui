@@ -1,53 +1,76 @@
 <template>
-  <j-select v-model:value="selectData" :open="false" :showArrow="false" @focus="showModal" :options="selectOptions"   :mode="mode" :disabled="disabled">
+  <j-select
+    placeholder="请选择"
+    v-model:value="selectData"
+    :open="false"
+    :showArrow="false"
+    @focus="showModal"
+    :options="selectOptions"
+    :mode="mode"
+    :disabled="disabled"
+    :size="size"
+    style="min-width: 230px;"
+  >
   </j-select>
-  <UserChoice v-if="modalVisible" @closeModal="closeModal" @selectedUser="selectedUser" :selected="selectData" :mode="mode"></UserChoice>
+  <UserChoice
+    v-if="modalVisible"
+    @closeModal="closeModal"
+    @selectedUser="selectedUser"
+    :selected="selectData"
+    :mode="mode"
+  ></UserChoice>
 </template>
 
 <script lang="ts" setup>
 import UserChoice from './UserChoice.vue'
 import { getUser_PaginateNot } from '@/api/form'
+import { ref, watch } from 'vue'
 const props = defineProps({
-    value:{
-        type:Array,
-        default:[]
-    },
-    mode:{
-        type:String,
-        default:''
-    },
-    disabled:{
-        type:Boolean,
-        default:false
-    }
+  value: {
+    type: Array,
+    default: [],
+  },
+  mode: {
+    type: String,
+    default: '',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  size: {
+    type: String,
+    default: '',
+  },
 })
 
 const emit = defineEmits(['update:value'])
 
-const selectData:any = ref([]);
+const selectData: any = ref([])
 const modalVisible = ref(false)
-const selectOptions = ref([]);
-const showModal = () =>{
+const selectOptions = ref([])
+
+const showModal = () => {
   modalVisible.value = true
 }
-const closeModal = () =>{
+const closeModal = () => {
   modalVisible.value = false
 }
 
-const selectedUser = (data:any) =>{
+const selectedUser = (data: any) => {
   modalVisible.value = false
-  emit('update:value',data)
+  emit('update:value', data)
 }
 
-const queryUser = () =>{
+const queryUser = () => {
   getUser_PaginateNot({
-    paging: false
-  }).then((res:any)=>{
-    if(res.status === 200){
-      selectOptions.value = res.result.map((item:any)=>{
+    paging: false,
+  }).then((res: any) => {
+    if (res.status === 200) {
+      selectOptions.value = res.result.map((item: any) => {
         return {
-          label:item.name,
-          value:item.id
+          label: item.name,
+          value: item.id,
         }
       })
     }
@@ -55,12 +78,16 @@ const queryUser = () =>{
 }
 queryUser()
 
-watch(()=>props.value,()=>{
-  selectData.value = props.value
-},{
-  deep:true,
-  immediate:true
-})
+watch(
+  () => props.value,
+  () => {
+    selectData.value = props.value
+  },
+  {
+    deep: true,
+    // immediate:true
+  },
+)
 </script>
 <style lang="less" scoped>
 </style>

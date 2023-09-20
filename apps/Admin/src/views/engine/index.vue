@@ -3,8 +3,8 @@
     <Header />
     <DragContent>
       <div class="engine-warp">
-          <Tree />
-          <Content />
+        <Tree />
+        <Content />
       </div>
     </DragContent>
   </div>
@@ -12,6 +12,7 @@
 
 <script setup name="Engine">
 import { Header, Tree, Content } from './components'
+
 
 </script>
 

@@ -1,9 +1,13 @@
 <template>
-  <j-modal
+  <j-drawer
     visible
     title="配置"
-    @cancel="cancel"
-    @ok="save"
+    placement="right"
+    :style="{ position: 'absolute' }"
+    :closable="false"
+    :width="500"
+    :get-container="warp"
+    @close="cancel"
   >
     <j-form
       ref="formRef"
@@ -12,7 +16,11 @@
     >
       <component :is="componentName" />
     </j-form>
-  </j-modal>
+    <template #footer>
+      <j-button style="margin-right: 8px" @click="cancel">取消</j-button>
+      <j-button type="primary" @click="save">确定</j-button>
+    </template>
+  </j-drawer>
 </template>
 
 <script setup name="TypeModal">
@@ -27,6 +35,9 @@ const props = defineProps({
   data: {
     type: Object,
     default: () => ({})
+  },
+  warp: {
+    type: Object
   }
 })
 
@@ -37,6 +48,11 @@ const formModel = ref({})
 
 provide(SETTING_FORM_MODEL, formModel)
 provide(SETTING_FORM_REF, formRef)
+
+const getContainer = () => {
+  console.log(props.warp)
+  return document.querySelector('.crud-warp')
+}
 
 const componentName = computed(() => {
   const { javaType } = props.data
@@ -67,7 +83,7 @@ const componentName = computed(() => {
         validator: {
           provider: undefined,
           configuration: {
-            message: undefined,
+            message: '数据格式错误',
             group: undefined
           }
         },
@@ -76,7 +92,7 @@ const componentName = computed(() => {
       }
       return StringItem;
     case 'Double':
-    case 'Int':
+    case 'Integer':
     case 'Float':
     case 'BigDecimal':
     case 'BigInteger':
@@ -87,7 +103,7 @@ const componentName = computed(() => {
         validator: {
           provider: undefined,
           configuration: {
-            message: undefined,
+            message: '数据格式错误',
             group: undefined,
             classType: javaType,
             regexp: undefined,

@@ -1,48 +1,77 @@
 <template>
   <div class="content-files">
-    <j-tabs
-      v-model:activeKey="activeFile"
-      hide-add
-      type="editable-card"
-      class="content-tabs"
-      @edit="onEdit"
-      @tabClick="select"
-    >
+    <j-tabs v-model:activeKey="activeFile" hide-add type="editable-card" class="content-tabs" @edit="onEdit"
+      @tabClick="select">
       <template #moreIcon>
         <AIcon type="MoreOutlined" />
       </template>
-      <j-tab-pane v-for="item in files" :key="item.id" :tab="item.title" :closable="true">
+      <j-tab-pane v-for="item in files" :key="item.id"  :closable="true">
+        <template #tab>
+        <span>
+          <img :src="typeImages[item.type]" style="width: 20px;height: 20px;margin-right: 5px;">
+          {{item.title}}
+        </span>
+      </template>
         <Content :data="item" />
       </j-tab-pane>
     </j-tabs>
-<!--    <Tabs-->
-<!--      v-model:activeKey="activeFile"-->
-<!--      :options="files"-->
-<!--      @edit="onEdit"-->
-<!--      @select="select"-->
-<!--    />-->
-<!--    <Content/>-->
+
+    <div class="content-module" v-if="activeData?.type === 'project' || activeData?.type === 'module'"
+      :key="activeData.id">
+      <ProjectEmpty v-if="activeData?.type === 'project' && activeData.children.length===0" :data="activeData" />
+      <Project v-else :data="activeData.children" />
+    </div>
+
+    <div class="footer">
+      <div v-for="(item, index) in path" class="item">
+        <div>
+          <img :src="providerImages[item.type]">
+          {{ item.title }}
+        </div>
+        <div v-if="path.length !== index + 1" class="path"> > </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup name="ContentTabs">
 import { storeToRefs } from 'pinia'
-import { useEngine } from '@/store'
-import Tabs from '../Tabs/tabs.vue'
+import { useEngine, useProduct } from '@/store'
+// import Tabs from '../Tabs/tabs.vue'
 import Content from './content.vue'
+import ProjectEmpty from '@/components/ProJect/Empty/index.vue'
+import { providerImages ,typeImages} from '@/components/ProJect/index'
+
 
 const engine = useEngine()
+const product = useProduct()
+const path = ref()
 
 const { files, activeFile } = storeToRefs(engine)
+const activeData = ref()
 
 const onEdit = (targetKey) => {
   engine.removeFile(targetKey)
 }
 
 const select = (key) => {
-  // console.log(key)
   engine.selectFile(key)
 }
+
+watch(
+  () => [activeFile.value,product.data],
+  (val) => {
+    // console.log('val',val)
+    if (val) {
+      activeData.value = product.getById(val[0])
+      path.value = product.getParent(activeData.value).map((item) => ({
+        title: item.title,
+        type: item.type
+      }))
+    }
+  },
+  { deep: true, immediate: true }
+)
 
 </script>
 
@@ -50,17 +79,19 @@ const select = (key) => {
 .content-files {
   //border-top: 1px solid #515665;
   //border-bottom: 1px solid #515665;
-  height: 100%;
+  height: calc(100% - 40px);
   user-select: none;
 
   .content-tabs {
     height: 100%;
+    z-index: 1;
 
     &>:deep(.ant-tabs) {
       height: 100%;
 
       &>.ant-tabs-content-holder {
         height: calc(100% - 36px);
+
         &>.ant-tabs-content {
           height: 100%;
         }
@@ -71,6 +102,7 @@ const select = (key) => {
 
         &>.ant-tabs-nav-operations {
           padding: 4px;
+
           .ant-tabs-nav-more {
             //background-color: #21252b !important;
             //color: #fdd835;
@@ -104,6 +136,31 @@ const select = (key) => {
 
   }
 
+  .content-module {
+    height: calc(100% - 100px);
+    background-color: rgb(255, 255, 255);
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 2;
+    overflow: hidden;
+  }
 
+  .footer {
+    border-top: 1px solid #D9D9D9;
+    z-index: 3;
+    height: 44px;
+    line-height: 44px;
+    font-size: 16px;
+    display: flex;
+    padding-left: 10px;
+
+    .item {
+      display: flex;
+      .path{
+        margin: 0 16px;
+      }
+    }
+  }
 }
 </style>

@@ -17,6 +17,7 @@ const props = defineProps({
 })
 
 const _value = computed(() => {
+    console.log(props.value)
     return props.value
 })
 </script>

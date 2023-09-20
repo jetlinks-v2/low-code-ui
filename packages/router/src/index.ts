@@ -48,6 +48,7 @@ export const initRoute = (options?: RouteOptions): Router => {
 export const jumpLogin = () => {
     setTimeout(() => {
         removeToken()
+      console.log(LOGIN_ROUTE)
         router.replace({
           path: LOGIN_ROUTE.path
         })
@@ -104,9 +105,9 @@ const getRoutesByServer = async (to: any, next: any) => {
  */
 export const createAuthRoute = (beforeEachFn?: Function) => {
     router.beforeEach((to, from, next) => {
+        beforeEachFn?.(to, from, next)
         const token = getToken()
         const isLogin = to.path === LOGIN_ROUTE.path
-        beforeEachFn?.(to, from, next)
         if (token) {
             if (isLogin) {
                 next({ path: '/'})

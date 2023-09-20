@@ -19,8 +19,8 @@ export const useEngine = defineStore('engine', () => {
   const expandedKeys = ref<string[]>([])
   const openFile = ref<any>()
   const copyFile = ref<string>('')
-
   const product = useProduct()
+  const isExpandAll = ref(false)
 
   const initEngineState = () => {
     activeFile.value = null
@@ -29,6 +29,7 @@ export const useEngine = defineStore('engine', () => {
     expandedKeys.value = []
     content.value = []
     files.value = []
+    isExpandAll.value = false
   }
 
   /**
@@ -86,10 +87,12 @@ export const useEngine = defineStore('engine', () => {
   const expandedAll = () => {
     const map = product.getDataMap()
     expandedKeys.value = [...map.keys()]
+    isExpandAll.value = true
   }
 
   const packUpAll = () => {
     expandedKeys.value = []
+    isExpandAll.value = false
   }
 
   const selectFile = (key: string, type?: string) => {
@@ -100,17 +103,22 @@ export const useEngine = defineStore('engine', () => {
    * 新增打开的文件
    * @param record
    */
-  const addFile = (record: FileItemType) => {
-    activeFile.value = record.id
+  const addFile = (record: FileItemType,open?:any) => {
+    // console.log('------open',open)
+    if(!open){
+      activeFile.value = record.id
+    }
     const type = record.type
     if (!files.value.some(item => item.id === record.id)) {
       const cloneRecord = cloneDeep(record)
       if (type === 'project') {
         delete cloneRecord.children
       }
-      files.value.push(cloneRecord)
+      if(type!=='module'&& type!=='project'){
+        files.value.unshift(cloneRecord)
+      }
+      // files.value.push(cloneRecord)
     }
-
     selectFile(record.id, type)
   }
 
@@ -162,7 +170,7 @@ export const useEngine = defineStore('engine', () => {
    * @param record
    * @param type
    */
-  const updateFile = (record: any, type: string) => {
+  const updateFile = (record: any, type: string,open?:any) => {
     const index = files.value.findIndex(item => item.id === record.id)
 
     files.value = files.value.map(item => {
@@ -170,9 +178,14 @@ export const useEngine = defineStore('engine', () => {
     })
 
     if (['del', 'edit'].includes(type)) {
-      type === 'del' ? files.value.splice(index,1) : files.value[index] = record
+      if( type === 'del'){
+        files.value.splice(index,1)
+        activeFile.value = record.id ===activeFile.value? product.data[0].id : activeFile.value
+      }else{
+        files.value[index] = record
+      }
     } else if (type === 'add') {
-      addFile(record)
+      addFile(record,open)
     }
   }
 
@@ -182,6 +195,10 @@ export const useEngine = defineStore('engine', () => {
  */
   const setCopyFile = (record: FileItemType) => {
     copyFile.value = record.id
+  }
+
+  const setActiveFile = (v) => {
+    activeFile.value = v
   }
 
   // watch(() => activeFile.value, () => {
@@ -195,6 +212,7 @@ export const useEngine = defineStore('engine', () => {
     expandedKeys,
     openFile,
     copyFile,
+    isExpandAll,
     removeFile,
     addFile,
     selectFile,
@@ -202,8 +220,7 @@ export const useEngine = defineStore('engine', () => {
     packUpAll,
     setCopyFile,
     updateFile,
-    initEngineState
+    initEngineState,
+    setActiveFile
   }
-},{
-  persist:false
 })

@@ -99,7 +99,7 @@ const dataColumns: any = computed(() => {
       config: item.config,
     }
   })
-  if (actions.value?.length !== 0) {
+  if (actions.value?.length !== 0 && allData.value?.showColumns) {
     arr.push({
       title: '操作',
       key: 'action',
@@ -140,7 +140,7 @@ const pagingData = () => {
   const paging = allData.value?.pagingData || []
   let map = new Map()
   for (let item of paging) {
-    map.set(item, item.pageSize)
+    map.set(item, String(item.pageSize))
   }
   pagination.pageSizeOptions = [...map.values()]
   pagination.defaultPageSize = [...map.values()][0] || 12
@@ -213,7 +213,7 @@ const searchData = () => {
       key: item.id,
       ellipsis: true,
       search: {
-        type: item.type === 'date' ? componentProps?.type : item.type,
+        type: searchType(item.type),
         componentProps: {
           placeholder: placeholder,
           ...componentProps,
@@ -223,10 +223,23 @@ const searchData = () => {
   })
 }
 
+const searchType = (type_: string) => {
+  let type = '';
+  switch(type_) {
+    case 'enum':
+      type = 'select'
+    break;
+    default:
+      type = type_
+    break
+  }
+  return type;
+}
 const actionsBtnFormat = (data: any) => {
   const finalData = data?.map((item: any) => {
     console.log(item);
     return {
+      ...item,
       key: item?.key,
       text: item?.title,
       icon: item?.icon,
@@ -282,14 +295,14 @@ const query = (_params: Record<string, any>) =>
     dataColumns.value.map((item: any, index: number) => {
       map.set(item.key, { config: item.config, key: item.key })
     })
+    console.log(map);
     let data: any = new Array(22).fill(1).map((item, index) => {
       const obj = {}
       map.forEach((value, key) => {
-        obj[key] = key + index
+        obj[key] = key
       })
       return obj
     })
-    console.log(data);
     const _from = _params.pageIndex * _params.pageSize
     const _to = (_params.pageIndex + 1) * _params.pageSize
     setTimeout(() => {

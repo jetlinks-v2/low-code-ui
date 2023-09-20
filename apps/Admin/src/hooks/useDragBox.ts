@@ -45,7 +45,6 @@ export const useDragBox = (target: Ref<HTMLElement>, dragBox: Ref<HTMLElement>, 
   }
 
   const dragController = () => {
-    console.log('dragController', target.value)
     if (target.value) {
       target.value.addEventListener('mousedown', mouseDown)
     }

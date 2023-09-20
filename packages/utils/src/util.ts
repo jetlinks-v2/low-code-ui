@@ -83,3 +83,29 @@ export const hexToRgb = (hex: string) => {
 
   return `${r}, ${g}, ${b}`
 }
+
+export const generateSerialNumber = (length) => {
+  let serialNumber = Math.floor(Math.random() * (900 - 100 + 1)) + 100;
+  return serialNumber.toString().padStart(length, '0');
+}
+
+/**
+ * 过滤节点，并返回父节点
+ * @param tree
+ * @param condition
+ * @param key
+ */
+export const filterTreeNodes = (tree, condition, key) => {
+  return tree.filter(item => {
+    if (item[key] && item[key].includes(condition)) {
+      return true
+    }
+
+    if (item.children) {
+      item.children = filterTreeNodes(item.children, condition, key)
+      return !!item.children.length
+    }
+
+    return false
+  })
+}

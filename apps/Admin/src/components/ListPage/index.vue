@@ -68,6 +68,7 @@
 </template>
 
 <script setup lang="ts" name="ListPage">
+import './style.less'
 import DataBind from './DataBind/index.vue'
 import FilterModule from './FilterModule/index.vue'
 import ListData from './ListData/index.vue'
@@ -77,10 +78,22 @@ import MenuConfig from './MenuConfig/index.vue'
 import ListSkeleton from './ListSkeleton/index.vue'
 import OperationColumns from './Operation/index.vue'
 import Preview from './Preview/index.vue'
-import { DATA_BIND, BASE_INFO, MENU_CONFIG, SHOW_TYPE_KEY, LIST_PAGE_DATA_KEY, LIST_FORM_INFO, DATA_SOURCE } from './keys'
+import {
+  DATA_BIND,
+  BASE_INFO,
+  MENU_CONFIG,
+  SHOW_TYPE_KEY,
+  LIST_PAGE_DATA_KEY,
+  LIST_FORM_INFO,
+  DATA_SOURCE,
+  showColumnsKey,
+  ACTION_CONFIG_KEY,
+} from './keys'
 import { useProduct } from '@/store'
-import { debounce } from 'lodash-es'
+import { omit, debounce } from 'lodash-es'
+import { onlyMessage } from '@jetlinks/utils'
 
+const spinning = ref(false)
 const props = defineProps({
   data: {
     type: Object,
@@ -110,6 +123,7 @@ const goPreview = () => {
   showPreview.value = true
 }
 
+const showColumns = ref(true)
 const buttonsConfig = ref<any[]>([])
 const actionsConfig = ref<any[]>([])
 const dataSource = ref<any[]>([])
@@ -121,7 +135,14 @@ const pagingData = ref<any[]>([
   { pageSize: 96 },
 ])
 const menuConfig = reactive({
-  pageName: props.data.title,
+  pageName: computed({
+    get() {
+      return props.data.title
+    },
+    set(val) {
+      
+    }
+  }),
   main: true,
   name: '',
   icon: '',
@@ -154,6 +175,7 @@ const listPageData = computed(() => {
     dataBind,
     listFormInfo,
     showType,
+    showColumns: showColumns.value,
   }
 })
 /**
@@ -168,26 +190,34 @@ const listFormRef = ref()
 const listDataRef = ref()
 const menuConfigRef = ref()
 const validate = async () => {
-  const promiseArr = [
-    btnTreeRef.value?.valid(),
-    columnsRef.value?.valid(),
-    filterModuleRef.value?.valid(),
-    pagingConfigRef.value?.valid(),
-    listFormRef.value?.valid(),
-    listDataRef.value?.valid(),
-    menuConfigRef.value?.valid(),
-    dataBindRef.value?.valid(),
+  spinning.value = true
+  const errorList = [
+    ...btnTreeRef.value?.valid(),
+    ...columnsRef.value?.valid(),
+    ...filterModuleRef.value?.valid(),
+    ...pagingConfigRef.value?.valid(),
+    ...listFormRef.value?.valid(),
+    ...listDataRef.value?.valid(),
+    ...menuConfigRef.value?.valid(),
+    ...dataBindRef.value?.valid(),
   ]
-  return new Promise((resolve) => {
-    Promise.all(promiseArr)
-      .then((res) => {
-        console.log(res)
-        resolve(res)
-      })
-      .catch((err) => {
-        console.log(err)
-        throw err
-      })
+  console.log(errorList)
+  return new Promise((resolve, reject) => {
+    if (errorList.length) {
+      reject(errorList)
+    } else {
+      resolve([])
+    }
+    // Promise.all(promiseArr)
+    //   .then((res) => {
+    //     resolve(res)
+    //   })
+    //   .catch((err) => {
+    //     reject(err)
+    //   })
+    //   .finally(() => {
+    //     spinning.value = false
+    //   })
   })
 }
 
@@ -200,6 +230,7 @@ const errorCount = computed(() => {
     filterModule: filterModuleRef.value?.errorList.length,
     listData: listDataRef.value?.errorList.length,
     menuConfig: menuConfigRef.value?.errorList.length,
+    dataBind: dataBindRef.value?.errorList.length,
   }
 })
 
@@ -210,16 +241,20 @@ const configDone = computed(() => {
     filterModule: searchData.value?.length,
     listData: dataSource.value?.length,
     pagination: pagingData.value?.length,
-    ListForm: listFormInfo
+    ListForm: listFormInfo,
   }
 })
 
 const dataBind = reactive({
   data: {
-    function: undefined,
-    command: undefined,
+    function: null,
+    command: null,
+    dataSource: [],
   },
-  functionInfo: undefined,
+  filterBind: [],
+  columnBind: [],
+  filterAsync: false,
+  columnAsync: false,
 })
 
 provide(DATA_BIND, dataBind)
@@ -229,6 +264,8 @@ provide(MENU_CONFIG, menuConfig)
 provide(LIST_PAGE_DATA_KEY, listPageData)
 provide(LIST_FORM_INFO, listFormInfo)
 provide(DATA_SOURCE, dataSource)
+provide(showColumnsKey, showColumns)
+provide(ACTION_CONFIG_KEY, actionsConfig)
 // watch(
 //   () => buttonsConfig.value,
 //   () => {
@@ -254,24 +291,49 @@ provide(DATA_SOURCE, dataSource)
 //   configurationStore.setALLlistDataInfo('dataBind', dataBind, props.data.id)
 // })
 
+//树形结构转换成数组
+const arrFlat = (arr: any[]) => {
+  const arr_: any[] = []
+  function flat(arr: any[]) {
+    arr.forEach((item) => {
+      arr_.push({ id: item.key, name: item.title })
+      if (item.children) {
+        flat(item.children)
+      }
+    })
+  }
+  flat(arr)
+  return arr_
+}
+
 onMounted(() => {
   visibles.GuideVisible = !props.data.configuration?.code
   const initData = JSON.parse(props.data.configuration?.code || '{}')
-  if(initData) {
+  if (initData) {
     Object.assign(dataBind, initData?.dataBind)
     Object.assign(showType, initData?.showType)
-    Object.assign(menuConfig, initData?.menu)
+    Object.assign(menuConfig, omit(initData?.menu, 'buttons'))
     Object.assign(listFormInfo, initData?.listFormInfo)
     pagingData.value = initData?.pagingData || pagingData.value
     buttonsConfig.value = initData?.addButton || []
     actionsConfig.value = initData?.actionsButton || []
     searchData.value = initData?.searchData || []
     dataSource.value = initData?.dataSource || []
+    showColumns.value = initData?.showColumns
   }
   setTimeout(() => {
     watch(
       () => JSON.stringify(listPageData.value),
       () => {
+        if (!listPageData.value.dataBind.data.function) {
+          listFormInfo.field1 =
+            listFormInfo.field2 =
+            listFormInfo.field3 =
+            listFormInfo.emphasisField =
+            listFormInfo.field2Title =
+            listFormInfo.field3Title =
+              ''
+        }
         const record = {
           ...props.data,
           configuration: {
@@ -280,8 +342,23 @@ onMounted(() => {
           },
           others: {
             ...props?.data?.others,
-            menu: menuConfig,
-            userList: [...actionsConfig.value.filter(item => item.pages && item.pages !== '')?.map(item => item.pages)]
+            menu: {
+              ...menuConfig,
+              buttons: [
+                ...arrFlat(buttonsConfig.value),
+                ...arrFlat(actionsConfig.value),
+              ],
+            },
+            useList: Array.from(
+              new Set([
+                ...actionsConfig.value
+                  .filter((item) => item.pages && item.pages !== '')
+                  ?.map((item) => item.pages),
+                ...buttonsConfig.value
+                  .filter((item) => item.pages && item.pages !== '')
+                  ?.map((item) => item.pages),
+              ]),
+            ),
           },
         }
         onSave(record)
@@ -312,14 +389,14 @@ const onSave = debounce((record) => {
 }, 1000)
 
 defineExpose({
-  validate
+  validate,
 })
-
 </script>
 
 <style scoped lang="less">
 .list-page {
   height: 100%;
   position: relative;
+  background-color: #e9e9e9;
 }
 </style>

@@ -35,7 +35,7 @@ export const regular = {
   passwordReg: /^\S*(?=\S{8,})(?=\S*\d)(?=\S*[A-Z])(?=\S*[a-z])\S*$/,
   isPassword: (value: string) => regular.passwordReg.test(value),
   /*数字字母，小写字母开头*/
-  inputReg: /^[a-z][a-zA-Z0-9]*$/,
+  inputReg: /^[a-z][a-zA-Z0-9_]*$/,
   isInputReg: (value: string) => regular.inputReg.test(value),
   /*数字字母下划线，字母开头*/
   modalReg: /^[a-zA-Z][a-zA-Z0-9_]*$/,
@@ -45,5 +45,6 @@ export const regular = {
   isTextReg: (value: string) => regular.textReg.test(value),
   colorReg: /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
   isColorReg: (value: string) => regular.colorReg.test(value),
-
+  sqlReg: /^SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|TRUNCATE|COPY|GRANT|REVOKE|COMMIT|ROLLBACK|SAVEPOINT|RELEASE|LOCK|UNLOCK|EXPLAIN|ANALYZE|OPTIMIZE|PRAGMA|REINDEX|SHOW|DESCRIBE|ATTACH|DETACH|CHECKPOINT|RENAME|SET|BEGIN|START TRANSACTION|COMMIT TRANSACTION|ROLLBACK TRANSACTION|SHOW TRANSACTION STATUS|DECLARE CURSOR|FETCH|CLOSE CURSOR|PREPARE|EXECUTE|DESCRIBE INPUT|DESCRIBE OUTPUT|OPEN|CLOSE|START SAVEPOINT|RELEASE SAVEPOINT|SET TRANSACTION|VACUUM|PRAGMA user_version = \d+|PRAGMA page_size = \d+/i,
+  isSql: (value: string) => regular.sqlReg.test(value),
 }
