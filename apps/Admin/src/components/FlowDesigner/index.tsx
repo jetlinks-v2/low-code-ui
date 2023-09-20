@@ -353,8 +353,11 @@ const FlowDesigner = defineComponent({
               id: getRandomId(),
               parentId: node.id,
               name: '条件' + (node.branches.length + 1),
-              props: cloneDeep(DefaultProps.CONDITION_PROPS),
               type: 'CONDITION',
+              props: {
+                ...cloneDeep(DefaultProps.CONDITION_PROPS),
+                branchBy: node.id,
+              },
               children: {},
             })
             break
@@ -363,14 +366,15 @@ const FlowDesigner = defineComponent({
               id: getRandomId(),
               parentId: node.id,
               name: '审批人' + (node.branches.length + 1),
+              type: 'APPROVAL',
               props: {
                 ...cloneDeep(DefaultProps.APPROVAL_PROPS),
+                branchBy: node.id,
                 style: {
                   margin: '30px',
                 },
                 isBranchNode: true,
               },
-              type: 'APPROVAL',
               children: {},
             })
             break
@@ -379,14 +383,15 @@ const FlowDesigner = defineComponent({
               id: getRandomId(),
               parentId: node.id,
               name: '办理人' + (node.branches.length + 1),
+              type: 'DEAL',
               props: {
                 ...cloneDeep(DefaultProps.DEAL_PROPS),
+                branchBy: node.id,
                 style: {
                   margin: '30px',
                 },
                 isBranchNode: true,
               },
-              type: 'DEAL',
               children: {},
             })
             break
@@ -533,7 +538,7 @@ const FlowDesigner = defineComponent({
           }),
         ]),
       )
-      //   console.log('dom.value: ', dom.value)
+      console.log('dom.value: ', dom.value)
 
       return h(
         'div',
