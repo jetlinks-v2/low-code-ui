@@ -37,9 +37,10 @@
           :parentId="props.parentId"
         />
       </CardBox>
+      <div v-show="activeKey === 'adv'">
         <j-scrollbar>
           <Advanced
-            v-show="activeKey === 'adv'"
+
             ref="advancedRef"
             v-model:tree="tree"
             v-model:asset="asset"
@@ -49,6 +50,8 @@
             @update="update"
           />
         </j-scrollbar>
+      </div>
+
     </div>
   </div>
 </template>

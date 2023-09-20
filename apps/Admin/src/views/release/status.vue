@@ -75,6 +75,7 @@
     <div class="update-modal" v-show="visible">
       <div class="update-modal-header">
         <span>快速修改</span>
+        <span></span>
         <div class="update-modal-header-close" @click="cancel">
           <AIcon type="CloseOutlined" />
         </div>
