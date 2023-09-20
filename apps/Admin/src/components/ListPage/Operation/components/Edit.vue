@@ -51,9 +51,11 @@
                   v-for="item in functionOptions"
                   :value="item.fullId"
                   :key="item.id"
-                  :title="functionName(item.title, item.moduleId)"
-                  >{{ functionName(item.title, item.moduleId) }}</j-select-option
+                  :title="item.title"
                 >
+                  <img :src="getImages(item.type)" class="options-img">
+                  {{ item.title }}
+                </j-select-option>
               </j-select>
               </ErrorItem>
             </j-form-item>
@@ -96,6 +98,7 @@
                 :value="item.id"
                 :key="item.id"
               >
+                <img :src="getImages(item.type)" class="options-img">
                 {{ item.name }}
               </j-select-option>
             </j-select>
@@ -124,6 +127,7 @@ import { activeBtnKey, errorListKey, editTypeKey } from '../keys'
 import { providerEnum } from '@/components/ProJect'
 import { ErrorItem } from '../..'
 import { useFunctions } from '@/hooks/useFunctions'
+import { useImages } from '../../hooks/useImages'
 import { pick } from 'lodash-es'
 
 const props = defineProps({
@@ -143,6 +147,7 @@ const errorList = inject(errorListKey)
 const productStore = useProduct();
 const { info } = productStore
 const { functionOptions, commandOptions, handleFunction } = useFunctions()
+const { getImages } = useImages();
 
 const functionName = computed(() => {
   return (title: string, moduleId: string) => {

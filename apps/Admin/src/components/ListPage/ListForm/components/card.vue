@@ -36,7 +36,7 @@
           >
             <ErrorItem :errorData="errorData('field1')">
               <h3>
-                {{ formState.field1 || '字段1' }}
+                {{ formState.field1 || '字段1内容' }}
               </h3>
             </ErrorItem>
           </j-col>
@@ -57,7 +57,7 @@
           >
             <div>{{ formState.field2Title || '展示字段2' }}</div>
             <div>
-              {{ formState.field2 || '字段2' }}
+              {{ formState.field2 || '字段2内容' }}
             </div>
           </j-col>
           <j-col
@@ -67,7 +67,7 @@
           >
             <div>{{ formState.field3Title || '展示字段3' }}</div>
             <div>
-              {{ formState.field3 || '字段3' }}
+              {{ formState.field3 || '字段3内容' }}
             </div>
           </j-col>
         </j-row>
@@ -94,7 +94,7 @@
       >
         <div v-if="cardState.type === 'customIcon'">
           <j-form-item label="自定义图标" name="customIcon" class="upload-icon">
-            <Upload v-model:value="formState.customIcon" :accept="accept" />
+            <Upload v-model:value="formState.customIcon" :accept="accept" cropperTitle="自定义图标"/>
           </j-form-item>
 
           <j-form-item label="动态图标" name="dynamicIcon">

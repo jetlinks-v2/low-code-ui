@@ -28,9 +28,10 @@
                       v-for="item in functionOptions"
                       :value="item.fullId"
                       :key="item.id"
-                      :title="item.title + '.' + item.id "
+                      :title="item.title"
                     >
-                      {{ item.title + '.' + item.id }}
+                      <img class="options-img" :src="getImages(item.type)">
+                      {{ item.title }}
                     </j-select-option>
                   </j-select>
                 </ErrorItem>
@@ -87,11 +88,14 @@
 </template>
 
 <script setup lang="ts">
+import { providerEnum } from '@/components/ProJect';
 import { ErrorItem } from '../../index'
 import { DATA_BIND } from '../../keys'
 import { useFunctions } from '@/hooks/useFunctions'
+import { useImages } from '@/components/ListPage/hooks/useImages'
 
 const { functionOptions, commandOptions, handleFunction } = useFunctions()
+const { getImages } = useImages()
 
 const visible = ref(false)
 
