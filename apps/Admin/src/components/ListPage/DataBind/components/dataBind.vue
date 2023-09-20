@@ -18,13 +18,15 @@
             <j-space style="align-items: start;">
               <j-form-item>
                 <ErrorItem :errorData="errorData('function')">
-                  <j-select
+                  <a-select
                     style="width: 200px;"
                     v-model:value="dataBind.data.function"
                     :disabled="functionDisabled"
                     placeholder="请选择功能"
+                    optionFilterProp="title"
+                    show-search
                   >
-                    <j-select-option
+                    <a-select-option
                       v-for="item in functionOptions"
                       :value="item.fullId"
                       :key="item.id"
@@ -32,26 +34,30 @@
                     >
                       <img class="options-img" :src="getImages(item.type)">
                       {{ item.title }}
-                    </j-select-option>
-                  </j-select>
+                    </a-select-option>
+                  </a-select>
                 </ErrorItem>
               </j-form-item>
               <j-form-item>
                 <ErrorItem :errorData="errorData('command')">
-                  <j-select
+                  <a-select
                     style="width: 200px;"
                     v-model:value="dataBind.data.command"
                     :disabled="commandDisabled"
                     placeholder="请选择指令"
+                    optionFilterProp="label"
+                    show-search
                   >
-                    <j-select-option
+                    <a-select-option
                       v-for="item in commandOptions"
                       :value="item.id"
                       :key="item.id"
+                      :title="item.name"
+                      :label="item.name"
                     >
-                      {{ item.name }}
-                    </j-select-option>
-                  </j-select>
+                      {{ item.name }}({{ item.id }})
+                    </a-select-option>
+                  </a-select>
                 </ErrorItem>
               </j-form-item>
             </j-space>

@@ -1,21 +1,25 @@
 <template>
   <div class="date-type">
-    <p>精度</p>
-    <j-select
-      style="width: 200px"
-      v-model:value="state.accuracy"
-      showSearch
-      :options="options"
-    />
-    <p class="tips">默认值</p>
-    <j-radio-group v-model:value="state.defaultValue" button-style="solid">
-      <j-space size="large">
-        <j-radio-button value="not" class="check-btn"> 无 </j-radio-button>
-        <j-radio-button value="time" class="check-btn">
-          系统当前时间
-        </j-radio-button>
-      </j-space>
-    </j-radio-group>
+    <j-form layout="vertical">
+      <j-form-item label="精度">
+        <j-select
+          style="width: 200px"
+          v-model:value="state.accuracy"
+          showSearch
+          :options="options"
+        />
+      </j-form-item>
+      <j-form-item label="默认值">
+        <j-radio-group v-model:value="state.defaultValue" button-style="solid">
+          <j-space size="large">
+            <j-radio-button value="not" class="check-btn"> 无 </j-radio-button>
+            <j-radio-button value="time" class="check-btn">
+              系统当前时间
+            </j-radio-button>
+          </j-space>
+        </j-radio-group>
+      </j-form-item>
+    </j-form>
   </div>
 </template>
 
