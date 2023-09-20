@@ -74,7 +74,7 @@ const maxLen = ref(10)
 const updateList = ref([])
 const left = inject(SCROLL_LEFT)
 
-const { errorMap, validate, createValidate, validates } = useValidate(props.data)
+const { errorMap, validate, createValidate, validates: validatesFn } = useValidate(props.data)
 
 const slots = useSlots()
 
@@ -139,18 +139,13 @@ maxLength()
 watch(() => JSON.stringify(props.data), (newValue, oldValue) => {
   myData.value = dataAddID(props.data, cellHeight)
   update()
-  // console.log(newValue)
-  // console.log(oldValue)
-  // console.log(isValidate.value)
-  // console.log(JSON.parse(newValue || '[]').length)
-  // console.log(JSON.parse(oldValue || '[]').length)
 }, { immediate: true })
 
 defineExpose({
   validates: () => {
     return new Promise(async (resolve, reject) => {
       try {
-        const v = await validates()
+        const v = await validatesFn()
         resolve(v)
       } catch (e) {
         reject(e)

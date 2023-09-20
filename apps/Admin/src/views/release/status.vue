@@ -74,8 +74,10 @@
     </div>
     <div class="update-modal" v-show="visible">
       <div class="update-modal-header">
-        <span>快速修改</span>
-        <span></span>
+        <span>
+          快速修改
+          <span style="padding: 24px;color: #777;font-size: 14px; font-weight: 400;">修改完成后，请点击校验</span>
+        </span>
         <div class="update-modal-header-close" @click="cancel">
           <AIcon type="CloseOutlined" />
         </div>

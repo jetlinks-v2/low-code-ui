@@ -49,7 +49,6 @@ export const useValidate = (dataSource) => {
           { firstFields: true },
           (err) => {
             const hasName = err?.find(item => item.field === name)
-
             const path = createPath(name, record._quick_id)
             if (err && hasName) { // 有错误
               errorMap.value[path] = hasName.message

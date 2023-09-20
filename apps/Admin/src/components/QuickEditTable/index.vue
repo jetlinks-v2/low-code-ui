@@ -93,6 +93,10 @@ const onResize = debounce((e) => {
   myColumns.value = array
 }, 100)
 
+onMounted(() => {
+  onResize({ width: 0 })
+})
+
 </script>
 
 <style scoped lang="less">
