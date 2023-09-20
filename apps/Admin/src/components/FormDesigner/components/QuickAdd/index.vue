@@ -279,26 +279,23 @@ const generatorSource = (_item: any) => {
   const _type = _item.valueType.type || 'string'
   let type: string = 'input'
   switch (_type) {
-    case 'enum':
-      type = 'select'
-      break
-    case 'file':
-      type = 'file'
-      break
-    case 'date':
-      type = 'date-picker'
+    case 'object':
+      type = 'form'
       break
     case 'array':
       type = 'table'
       break
+    case 'long':
+    case 'int':
+    case 'float':
+    case 'double':
+      type = 'input-number'
+      break
     case 'boolean':
       type = 'switch'
       break
-    case 'password':
-      type = 'input-password'
-      break
-    case 'object':
-      type = 'form'
+    case 'date':
+      type = 'date-picker'
       break
     default:
       type = 'input'
