@@ -242,4 +242,3 @@ watch(
   }
 }
 </style>
-@/api/process/model

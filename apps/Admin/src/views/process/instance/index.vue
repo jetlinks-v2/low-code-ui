@@ -41,7 +41,7 @@
               <AIcon :type="item.icon ? item.icon : 'DeleteOutlined'" />
             </template>
             <span v-if="item.key !== 'delete'">
-              {{ item.text }}
+              <!-- {{ item.text }} -->
             </span>
           </PermissionButton>
         </div>
@@ -86,17 +86,23 @@
         </Card>
       </template>
     </JProTable>
-    <!-- <Drawer
+    <Dialog
+      v-if="dialog.visible"
+      v-model:visible="dialog.visible"
+      :data="dialog.selectItem"
+      @refresh="refresh"
+    />
+    <Drawer
       v-if="drawer.visible"
       v-model:visible="drawer.visible"
       :data="drawer.selectItem"
-    ></Drawer> -->
+    />
   </page-container>
 </template>
 <script setup lang="ts">
 import { onlyMessage } from '@jetlinks/utils'
 import dayjs from 'dayjs'
-// import Dialog from './Dialog/index.vue'
+import Dialog from './Dialog/index.vue'
 import Drawer from './Drawer/index.vue'
 import { isFunction, isObject, pick } from 'lodash-es'
 import { getList_api, copy_api, del_api } from '@/api/process/instance'
@@ -134,6 +140,18 @@ const columns = [
     },
   },
   {
+    title: '版本号',
+    dataIndex: 'version',
+    key: 'version',
+    ellipsis: true,
+    search: {
+      type: 'string',
+      componentProps: {
+        placeholder: '请输入版本号',
+      },
+    },
+  },
+  {
     title: '状态',
     dataIndex: 'state',
     key: 'state',
@@ -148,19 +166,19 @@ const columns = [
     },
   },
   {
-    title: '创建人',
+    title: '部署人',
     dataIndex: 'creatorName',
     key: 'creatorName',
     ellipsis: true,
     search: {
       type: 'string',
       componentProps: {
-        placeholder: '请输入创建人',
+        placeholder: '请输入部署人',
       },
     },
   },
   {
-    title: '创建时间',
+    title: '部署时间',
     dataIndex: 'createTime',
     key: 'createTime',
     ellipsis: true,
@@ -188,27 +206,42 @@ const getActions = computed(() => (record, type = 'card') => {
         },
         hasPermission: false,
         onClick: () => {
-          const param = pick(data, ['id', 'name', 'icon', 'classifiedId'])
-          copy_api(param).then((res) => {
-            if (res.success) {
-              onlyMessage('操作成功')
-            } else {
-              onlyMessage('操作失败', 'error')
-            }
-          })
+          copyAsModel(data)
+          // const param = pick(data, ['id', 'name', 'icon', 'classifiedId'])
+          // copy_api(param).then((res) => {
+          //   if (res.success) {
+          //     onlyMessage('操作成功')
+          //   } else {
+          //     onlyMessage('操作失败', 'error')
+          //   }
+          // })
         },
       }),
     },
     {
       key: 'action',
-      text: record.state?.value !== 'disable' ? '禁用' : '启用',
-      icon: 'CheckCircleOutlined',
+      text: record.state?.value !== 'disabled' ? '禁用' : '启用',
+      icon:
+        record.state?.value !== 'disabled'
+          ? 'StopOutlined'
+          : 'CheckCircleOutlined',
       permissionProps: (data) => ({
         tooltip: {
-          title: record.state?.value !== 'disable' ? '禁用' : '启用',
-          onConfirm: () => {},
+          title: record.state?.value !== 'disabled' ? '禁用' : '启用',
         },
         hasPermission: false,
+        popConfirm: {
+          title: `确认${record.state?.value !== 'disabled' ? '禁用' : '启用'}`,
+          onConfirm: () => {
+            // del_api(data.id).then((res) => {
+            //   if (res.success) {
+            //     onlyMessage('操作成功')
+            //   } else {
+            //     onlyMessage('操作失败', 'error')
+            //   }
+            // })
+          },
+        },
       }),
     },
     {
@@ -235,7 +268,7 @@ const getActions = computed(() => (record, type = 'card') => {
       }),
     },
   ]
-  if (type === 'card') { 
+  if (type === 'table') {
     actions.splice(0, 0, {
       key: 'view',
       text: '查看',
@@ -273,11 +306,11 @@ const handleSearch = (data: any) => {
   params.value = data
 }
 
-// // 弹窗
-// const dialog = reactive({
-//   selectItem: {},
-//   visible: false,
-// })
+// 复制为模型弹窗
+const dialog = reactive({
+  selectItem: {},
+  visible: false,
+})
 
 // 抽屉
 const drawer = reactive({
@@ -285,14 +318,14 @@ const drawer = reactive({
   visible: false,
 })
 
-// /**
-//  * 新增/修改
-//  * @param data
-//  */
-// const handleSave = (data: any) => {
-//   dialog.selectItem = { ...data }
-//   dialog.visible = true
-// }
+/**
+ * 复制为模型
+ * @param data
+ */
+const copyAsModel = (data: any) => {
+  dialog.selectItem = { ...data }
+  dialog.visible = true
+}
 
 /**
  * 展示流程详情抽屉页
