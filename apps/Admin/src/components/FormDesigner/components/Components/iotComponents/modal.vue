@@ -172,23 +172,16 @@ const params = ref()
 const handleSearch = (i: any) => {
   params.value = i
 }
-let selectData: any = []
 const onSelectChange = (row: any) => {
   if (mode !== 'multiple') {
     _selectedRowKeys.value = [row.id]
-    selectData = [{ name: row.name, id: row.id }]
   } else {
     const arr = new Set(_selectedRowKeys.value)
     const index = _selectedRowKeys.value.indexOf(row.id)
     if (index === -1) {
       arr.add(row.id)
-      selectData.push({
-        name: row.name,
-        id: row.id,
-      })
     } else {
       arr.delete(row.id)
-      selectData.splice(index, 1)
     }
     _selectedRowKeys.value = [...arr.values()]
   }
@@ -196,7 +189,6 @@ const onSelectChange = (row: any) => {
 
 const onSelectNone = () => {
   _selectedRowKeys.value = []
-  selectData = []
 }
 
 const onAllSelect = (selected: Boolean, selectedRows: any, changeRows: any) => {
@@ -204,27 +196,17 @@ const onAllSelect = (selected: Boolean, selectedRows: any, changeRows: any) => {
     changeRows.map((i: any) => {
       if (!_selectedRowKeys.value.includes(i.id)) {
         _selectedRowKeys.value.push(i.id)
-        selectData.push({
-          name: i.name,
-          id: i.id,
-        })
       }
     })
   } else {
     const arr = changeRows.map((item: any) => item.id)
     const _ids: string[] = []
-    const _row: any[] = []
-    selectData.map((i: any) => {
-      if (!arr.includes(i.id)) {
+    _selectedRowKeys.value.map((i: any) => {
+      if (!arr.includes(i)) {
         _ids.push(i.id)
-        _row.push({
-          name: i.name,
-          id: i.id,
-        })
       }
     })
     _selectedRowKeys.value = _ids
-    selectData = _row
   }
 }
 const closeModal = () => {
@@ -232,15 +214,12 @@ const closeModal = () => {
 }
 
 const submitData = () => {
-  emit('updateData', selectData)
+  emit('updateData', _selectedRowKeys.value)
 }
 
 onMounted(() => {
   if (props.select.length) {
-    selectData = props.select
-    _selectedRowKeys.value = props.select.map((item: any) => {
-      return item.id
-    })
+    _selectedRowKeys.value = props.select
   }
 })
 </script>
