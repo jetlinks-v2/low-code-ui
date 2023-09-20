@@ -194,34 +194,36 @@ const props = defineProps({
 
 const dataBinds = inject(DATA_BIND)
 enum javaType {
-  Enum = 'enum',
-  String = 'text',
-  Double = 'double',
-  Int = 'int',
-  BigDecimal = 'text',
-  DateTime = 'date',
-  Float = 'float',
-  Byte = 'int',
-  Long = 'long',
-  List = 'array',
-  Boolean = 'boolean',
-  Map = 'object',
+  enum = 'enum',
+  string = 'text',
+  double = 'double',
+  int = 'int',
+  bigDecimal = 'text',
+  dateTime = 'date',
+  date = 'date',
+  float = 'float',
+  byte = 'int',
+  long = 'long',
+  list = 'array',
+  boolean = 'boolean',
+  object = 'object',
 }
 
 enum filterType {
-  Enum = 'enum',
-  String = 'string',
-  Double = 'number',
-  Int = 'number',
-  BigDecimal = 'string',
-  DateTime = 'date',
-  Float = 'number',
-  Byte = 'number',
-  Long = 'string',
-  List = 'string',
-  Boolean = 'string',
-  Map = 'string',
-  int = 'number'
+  enum = 'enum',
+  string = 'string',
+  double = 'number',
+  int = 'number',
+  bigDecimal = 'string',
+  dateTime = 'date',
+  date = 'date',
+  float = 'number',
+  byte = 'number',
+  long = 'string',
+  list = 'string',
+  boolean = 'string',
+  map = 'string',
+  object = 'enum',
 }
 
 
@@ -394,7 +396,12 @@ const syncData = async () => {
 
 const productStore = useProduct()
 const asyncDataBind = () => {
-  return dataBinds.data.dataSource || []
+  return dataBinds.data.dataSource.map(item => {
+    return {
+      ...item,
+      type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type]
+    }
+  }) || []
 }
 //打开弹窗
 const openModel = (value: any) => {
