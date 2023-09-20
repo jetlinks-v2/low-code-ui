@@ -101,6 +101,7 @@ import type { PropType } from 'vue'
 import { useProduct } from '@/store';
 import { getImage } from '@jetlinks/utils';
 import { cloneDeep } from 'lodash-es';
+import { DATA_BIND } from '../../keys';
 const props = defineProps({
   title: {
     type: String,
@@ -191,6 +192,7 @@ const props = defineProps({
   }
 })
 
+const dataBinds = inject(DATA_BIND)
 enum javaType {
   Enum = 'enum',
   String = 'text',
@@ -219,6 +221,7 @@ enum filterType {
   List = 'string',
   Boolean = 'string',
   Map = 'string',
+  int = 'number'
 }
 
 
@@ -371,24 +374,16 @@ const syncData = async () => {
   }
   const changeFunctionData = asyncDataBind()
   if(!props.asyncData) { 
-    handleChange([...props.dataSource, ...asyncDataBind().map(item => {
-      return {
-        id: item.alias,
-        name: item.comment,
-        type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
-      }
-    })])
+    handleChange([...props.dataSource, ...asyncDataBind()])
     emit('update:asyncData', true)
+    emit('updateBind', cloneDeep([...props.dataSource, ...asyncDataBind()]))
     return
   }
   tempData.value = [];
   changeFunctionData.forEach((item) => {
-    let find = props.bindData?.find((i) => i.alias === item.alias)
-    if(!find) tempData.value.push({
-      id: item.alias,
-      name: item.comment,
-      type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
-    })
+    let find = props.bindData?.find((i) => i.id === item.id)
+    console.log(item, props.bindData);
+    if(!find) tempData.value.push(item)
   })
   if (tempData.value.length) {
     openModel(props.modelActiveKey)
@@ -399,8 +394,7 @@ const syncData = async () => {
 
 const productStore = useProduct()
 const asyncDataBind = () => {
-  const functionId = props.bindFunctionId.split('.')
-  return productStore.getById(functionId[functionId.length - 1])?.configuration?.columns || []
+  return dataBinds.data.dataSource || []
 }
 //打开弹窗
 const openModel = (value: any) => {
@@ -410,13 +404,7 @@ const openModel = (value: any) => {
 //处理方式弹窗
 const handleOk = async () => {
   const newBind = asyncDataBind()
-  const dataSource = activeKey.value?.[0] === '1' ? newBind.map((item) => {
-    return {
-      id: item.alias,
-      name: item.comment,
-      type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
-    }
-  }) : tempData.value
+  const dataSource = activeKey.value?.[0] === '1' ? newBind.map((item) => item) : tempData.value
   emit('updateBind', cloneDeep(newBind))
   tableRef.value.cleanEditStatus()
   emit('handleOk', activeKey.value?.[0], dataSource)

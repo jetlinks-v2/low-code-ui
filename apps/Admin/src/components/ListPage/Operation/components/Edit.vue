@@ -19,7 +19,7 @@
         </div>
         <!-- <UploadIcon v-model:modelValue="form.icon" v-else /> -->
         <div class="custom-upload" v-else>
-          <Upload v-model:value="form.icon" accept=".jpg,.jpeg,.png" :borderStyle="{border: 'none'}">
+          <Upload v-model:value="form.icon" accept=".jpg,.jpeg,.png" :borderStyle="{border: 'none'}" cropperTitle="自定义图标">
             <template #content="{imageUrl}">
               <template v-if="imageUrl">
                 <div class="default-btn">
@@ -51,7 +51,8 @@
                   v-for="item in functionOptions"
                   :value="item.fullId"
                   :key="item.id"
-                  >{{ item.name }}</j-select-option
+                  :title="functionName(item.title, item.moduleId)"
+                  >{{ functionName(item.title, item.moduleId) }}</j-select-option
                 >
               </j-select>
               </ErrorItem>
@@ -142,6 +143,17 @@ const errorList = inject(errorListKey)
 const productStore = useProduct();
 const { info } = productStore
 const { functionOptions, commandOptions, handleFunction } = useFunctions()
+
+const functionName = computed(() => {
+  return (title: string, moduleId: string) => {
+    if(moduleId) {
+      const moduleIdArr = moduleId.split('.')
+      return `${moduleIdArr[moduleIdArr.length - 1]}-${title}`
+    } else {
+      return title
+    }
+  }
+})
 const errorMessage = computed(() => {
   let data = {}
   let result = errorList!.value?.filter(
@@ -183,7 +195,10 @@ const form = reactive({
       ? ''
       : props.data.functions,
   pages: props.data.pages,
-  command: props.data.command,
+  command: functionOptions!.value.find((item) => item.fullId === props.data.functions)
+      ?.provider === providerEnum.Function
+      ? null
+      : props.data.command,
   style: props.data.style,
   resource: props.data.resource
 })
@@ -257,8 +272,8 @@ defineExpose({
     width: 48px;
     height: 48px;
     .upload-image {
-      width: 24px;
-      height: 24px;
+      width: 48px;
+      height: 48px;
     }
   }
 }

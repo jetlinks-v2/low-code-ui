@@ -7,7 +7,7 @@
         <p>{{ description }}</p>
       </div>
     </div>
-    <div style="">
+    <div class="step-button">
       <j-space size="large">
         <p @click.stop="steps--" v-if="steps != 1">查看上一步</p>
         <p v-if="steps !== stepList.length">点击任意位置查看下一步</p>
@@ -163,9 +163,9 @@ function position(el: HTMLElement, position?: string) {
       result = [
         el.getBoundingClientRect().top -
           el.offsetHeight -
-          maskRef.value?.getBoundingClientRect().top - 50 +
+          maskRef.value?.getBoundingClientRect().top - 80 +
           'px',
-        el.getBoundingClientRect().left + 'px',
+        el.getBoundingClientRect().left - 180 + 'px',
       ]
       break
     case 'right':
@@ -226,6 +226,10 @@ watch(
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  .step-button {
+    position: absolute;
+    bottom: 40%;
+  }
   .stop {
     position: absolute;
     right: 20px;

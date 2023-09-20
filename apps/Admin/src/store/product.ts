@@ -226,11 +226,11 @@ export const useProduct = defineStore('product', () => {
     published.value = extra.state?.value === 'published'
   }
 
-  const add = (record: any, parentId: string) => {
+  const add = (record: any, parentId: string,open?:any) => {
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
     updateDataCache()
-    engine.updateFile(record, 'add')
+    engine.updateFile(record,'add',open)
     updateProductReq(data.value, (result) => {
       handleProjectData(result)
     })
