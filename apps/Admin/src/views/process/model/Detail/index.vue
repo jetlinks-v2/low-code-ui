@@ -14,7 +14,7 @@
         <div class="btn">
           <j-button v-if="current > 0" @click="current--">上一步</j-button>
           <j-button v-if="current < 2" @click="current++">下一步</j-button>
-          <j-button type="primary" @click="save">
+          <j-button type="primary" @click="save" :loading="saveLoading">
             保存
             <template #icon>
               <j-tooltip placement="right">
@@ -50,31 +50,49 @@ import FlowDesign from './FlowDesign/index.vue'
 import ShowCopy from './ShowCopy/index.vue'
 import { detail_api, update_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
+import { onlyMessage } from '@jetlinks/utils'
 
 const flowStore = useFlowStore()
+const route = useRoute()
+const router = useRouter()
+
 const current = ref(0)
 const componentsMap = {
   0: BasicInfo,
   1: FlowDesign,
   2: ShowCopy,
 }
-const route = useRoute()
 
 /**
  * 获取模型详情
  */
 const getFlowDetail = async () => {
   const { result } = await detail_api(route.query.id as string)
-
   const model = JSON.parse(result.model || '{}')
-  console.log('model: ', model)
+
+  flowStore.setModel(model)
 }
 
 /**
  * 保存模型数据
  */
+const saveLoading = ref(false)
 const save = () => {
-  console.log('save: ', flowStore.model)
+  const params = {
+    id: route.query.id,
+    state: 'undeployed',
+    model: JSON.stringify(flowStore.model),
+  }
+
+  saveLoading.value = true
+  update_api(params)
+    .then(() => {
+      onlyMessage('保存成功', 'success')
+      router.go(-1)
+    })
+    .finally(() => {
+      saveLoading.value = false
+    })
 }
 
 onMounted(() => {

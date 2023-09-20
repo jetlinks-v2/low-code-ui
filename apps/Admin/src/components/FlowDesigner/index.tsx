@@ -33,10 +33,10 @@ const componentsMap = {
 const FlowDesigner = defineComponent({
   name: 'FlowDesigner',
   props: {
-    // 树结构数据
-    treeData: {
+    // 由父级传入的节点数据
+    nodesData: {
       type: Object,
-      default: () => ({}),
+      default: () => null,
     },
     // 只读模式
     readOnly: {
@@ -44,19 +44,17 @@ const FlowDesigner = defineComponent({
       default: false,
     },
   },
-  setup(props, { slots, emit, expose }) {
-    console.log('props: ', props)
-    const { readOnly } = props
+  setup(props, { emit }) {
+    const { nodesData, readOnly } = props
     const { proxy } = getCurrentInstance() as ComponentInternalInstance
 
     const flowStore = useFlowStore()
     const valid = ref(true)
 
     const nodeMap = computed(() => flowStore.nodeMap)
-    const dom = computed(() => flowStore.model.nodes)
+    const dom = computed(() => nodesData || flowStore.model.nodes)
 
     const getDomTree = (h, node) => {
-      // console.log('node: ', node);
       toMapping(node)
       if (isPrimaryNode(node)) {
         //普通业务节点
@@ -402,7 +400,6 @@ const FlowDesigner = defineComponent({
 
     // 选中分支
     const openConfig = (node) => {
-      //   console.log('选中分支', node)
       flowStore.setSelectedNode(node)
       emit('selectNode', node)
     }
@@ -524,7 +521,6 @@ const FlowDesigner = defineComponent({
 
     // 渲染组件
     return () => {
-      console.log('渲染流程树')
       nodeMap.value.clear()
       let processTrees = getDomTree(h, dom.value)
 
@@ -537,9 +533,8 @@ const FlowDesigner = defineComponent({
           }),
         ]),
       )
-      console.log('dom.value: ', dom.value)
-      //   console.log('nodeMap.value: ', nodeMap.value)
-      //   console.log('processTrees: ', processTrees)
+      //   console.log('dom.value: ', dom.value)
+
       return h(
         'div',
         {
