@@ -510,6 +510,7 @@ defineExpose({
         resolve(r)
       }).catch(e => {
         const errorMsg = {}
+        console.log('table-validates',e)
         e.forEach(item => {
           if(item.errorFields) {
             Object.assign(errorMsg, formErrorFieldsToObj(item.errorFields))

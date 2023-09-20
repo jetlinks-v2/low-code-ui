@@ -162,6 +162,7 @@ const validate = async () => {
     await dataTableRef.value.validates()
     errorTips.dataTable = {}
   } catch (e) {
+    console.log('dataTableRef', e)
     errorTips.dataTable = e || {}
   }
 
@@ -175,6 +176,7 @@ defineExpose({
       const err = []
 
       if(Object.keys(errorTips.relation).length) {
+        console.log('errorTips.relation', errorTips.relation)
         Object.values(errorTips.relation).forEach(a => {
           err.push({ message: a})
         })
@@ -182,6 +184,7 @@ defineExpose({
 
       if(Object.keys(errorTips.dataTable).length) {
         Object.values(errorTips.dataTable).forEach(a => {
+          console.log('errorTips.dataTable', a)
           err.push(a[0])
         })
       }

@@ -296,10 +296,11 @@ const themeChange = (e) =>{
   product.update(item)
 }
 
-const cancel = () => {
+const cancel = async () => {
   visible.value = false
   status[modelData.id] = 0
-  validateAll(modelData.id)
+  await validateDraftFn() // 重新查询错误信息
+  await validateAll(modelData.id)
 }
 
 const showModal = (id) => {
