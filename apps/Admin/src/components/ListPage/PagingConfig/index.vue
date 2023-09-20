@@ -21,7 +21,7 @@
               v-model:value="item.pageSize"
               :min="1"
               :precision="0"
-              :max="9999"
+              :max="99"
               :step="1"
               :controls="false"
               @blur="blur()"

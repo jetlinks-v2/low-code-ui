@@ -368,7 +368,7 @@ const bindShow = ref(false)
 //是否同步数据绑定
 //同步数据绑定
 const syncData = async () => {
-  if (!props.dataBind) {
+  if (dataBinds.data.dataSource.length === 0) {
     bindShow.value = false
     return onlyMessage('请先完成数据绑定', 'error')
   }

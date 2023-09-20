@@ -22,6 +22,9 @@
           v-model:btn-list="columnsTree"
           :draggable="type === 'columns' ? false : true"
         >
+          <template #title="{ data }">
+            <span :class="{ error: errorList!.find((item) => item.key == data.key) }">{{ data.title }}</span>
+          </template>
           <template #config="{ data }">
             <j-space size="middle">
               <AIcon
@@ -33,12 +36,13 @@
                 type="PlusOutlined"
                 @click="handleAddBtn(data.key)"
               />
-              <AIcon
-                type="EditOutlined"
-                @click="handleEditBtn(data)"
-                :class="{ error: errorList!.find((item) => item.key == data.key) }"
-              />
-              <AIcon type="DeleteOutlined" @click="handleDel(data.key)" />
+                <AIcon
+                  type="EditOutlined"
+                  :class="{ error: errorList!.find((item) => item.key == data.key) }"
+                  class="primary"
+                  @click="handleEditBtn(data)"
+                />
+              <AIcon type="DeleteOutlined" @click="handleDel(data.key)" class="danger"/>
             </j-space>
           </template>
         </BtnTree>
@@ -52,6 +56,7 @@
 <script setup lang="ts" name="BtnsList">
 import BtnTree from './BtnTree.vue'
 import { OperationConfigTreeItem } from '../type'
+import { ErrorItem } from '../..';
 import {
   columnsTreeKey,
   activeBtnKey,
@@ -112,6 +117,12 @@ const handleDel = (key: string) => {
   .add-btn {
     width: 100%;
   }
+  .danger {
+    color: #E50012;
+  }
+  .primary {
+    color: @primary-color;
+  }
 }
 .title {
   border-left: 1px solid;
@@ -119,7 +130,7 @@ const handleDel = (key: string) => {
   border-bottom: 1px solid;
 }
 .error {
-  color: red;
+  color: #E50012 !important;
 }
 :deep(.ant-tree-switcher-noop) {
   opacity: 0;
