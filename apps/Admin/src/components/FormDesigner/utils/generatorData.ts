@@ -96,6 +96,10 @@ const handleProps = (node: any) => {
                 code: ''
             }
             break
+        case 'space':
+            result.align = 'center'
+            result.direction = 'vertical'
+            break
     }
 
     return result

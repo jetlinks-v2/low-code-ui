@@ -50,9 +50,10 @@ const onBtn = () => {
 }
 
 const handleOk = () => {
-  emits('update:value', _value.value)
-  emits('change', _value.value)
-  visible.value = false
+  console.log(_value.value)
+  // emits('update:value', _value.value)
+  // emits('change', _value.value)
+  // visible.value = false
 }
 
 watch(

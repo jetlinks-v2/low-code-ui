@@ -34,23 +34,25 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
                 }
             }
         }
-        if (!node?.formItemProps?.name) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
-        } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
-        } else {
-            const arr = getBrotherList(node?.key || '', allData)
-            const flag = arr.filter((item) => item.key !== node.key).find((i) => i?.formItemProps?.name === node?.formItemProps?.name)
-            if (flag) { // `标识${value}已被占用`
+        if (!['space-item', 'card-item', 'grid-item'].includes(_type)) {
+            if (!node?.formItemProps?.name) {
                 return {
                     key: node?.key,
                     message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
+            } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
+                return {
+                    key: node?.key,
+                    message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
+            } else {
+                const arr = getBrotherList(node?.key || '', allData)
+                const flag = arr.filter((item) => item.key !== node.key).find((i) => i?.formItemProps?.name === node?.formItemProps?.name)
+                if (flag) { // `标识${value}已被占用`
+                    return {
+                        key: node?.key,
+                        message: (node.formItemProps?.label || node.name) + '配置错误'
+                    }
                 }
             }
         }
@@ -102,6 +104,12 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
             }
         }
         if (['card'].includes(_type) && !(node?.componentProps?.title)) {
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.label || node.name) + '配置错误'
+            }
+        }
+        if (node?.formItemProps?.isLayout && !node.formItemProps?.label) {
             return {
                 key: node?.key,
                 message: (node.formItemProps?.label || node.name) + '配置错误'
