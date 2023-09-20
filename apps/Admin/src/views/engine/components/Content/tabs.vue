@@ -59,10 +59,11 @@ const select = (key) => {
 }
 
 watch(
-  () => activeFile.value,
+  () => [activeFile.value,product.data],
   (val) => {
+    // console.log('val',val)
     if (val) {
-      activeData.value = product.getById(val)
+      activeData.value = product.getById(val[0])
       path.value = product.getParent(activeData.value).map((item) => ({
         title: item.title,
         type: item.type
@@ -139,8 +140,8 @@ watch(
     height: calc(100% - 100px);
     background-color: rgb(255, 255, 255);
     position: absolute;
-    top: 57px;
-    width: calc(100% - 320px);
+    top: 0;
+    width: 100%;
     z-index: 2;
     overflow: hidden;
   }

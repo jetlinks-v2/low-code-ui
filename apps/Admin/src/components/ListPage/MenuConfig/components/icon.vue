@@ -28,18 +28,26 @@
 
 <script setup lang="ts">
 import iconKeys from './fields'
-const emits = defineEmits(['confirm', 'update:visible'])
+const emits = defineEmits(['confirm', 'update:visible', 'update:type'])
 const props = defineProps<{
   visible: boolean,
   refs: any
+  type: string,
 }>()
 
+const selected = computed({
+  get() {
+    console.log(`output->props.type`,props.type)
+    return props.type
+  },
+  set(val) {
+    emits('update:type', val)
+  }
+})
 const confirm = () => {
-  emits('confirm', selected.value)
   emits('update:visible', false)
 }
 
-const selected = ref<string>('')
 
 watch(() => props.refs, () => {
   console.log(`output->props.refs`,props.refs)

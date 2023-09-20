@@ -16,7 +16,7 @@
             :rules="[
               {
                 required: true,
-                message: '建议设置2-16个字符',
+                message: '',
                 trigger: 'change',
               },
             ]"
@@ -35,7 +35,7 @@
               </span>
             </template>
             <ErrorItem :error-data="errorData('name')">
-              <j-input v-model:value="form!.name" />
+              <j-input v-model:value="form!.name" :maxLength="16"/>
             </ErrorItem>
           </j-form-item>
           <j-form-item
@@ -76,13 +76,13 @@
   <ChooseIconDialog
     v-model:visible="dialogVisible"
     @confirm="(typeStr:string)=>form!.icon = typeStr"
+    v-model:type="form!.icon"
     :refs="$refs.menuConfig"
   />
 </template>
 <script setup lang="ts">
 import ChooseIconDialog from '@/components/ListPage/MenuConfig/components/icon.vue'
-import { BASE_INFO, MENU_CONFIG } from '../../keys'
-import { useAllListDataStore } from '@/store/listForm'
+import { MENU_CONFIG } from '../../keys'
 import { ErrorItem } from '../..'
 
 const props = defineProps({
@@ -96,10 +96,8 @@ const props = defineProps({
 })
 
 const dialogVisible = ref<boolean>(false)
-const baseInfo = inject(BASE_INFO)
 const form = inject(MENU_CONFIG)
 const emits = defineEmits(['change', 'update:open', 'confirm'])
-const configurationStore = useAllListDataStore()
 
 const errorData = computed(() => {
   return (val: string): any => {
@@ -107,9 +105,6 @@ const errorData = computed(() => {
   }
 })
 
-watchEffect(() => {
-  configurationStore.setALLlistDataInfo('menu', form, baseInfo.id)
-})
 const basicFormRef = ref()
 
 const onCheck = async () => {

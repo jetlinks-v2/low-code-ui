@@ -82,7 +82,7 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
     return ;
   }
   if(info.dragNode.children?.length && (dropPosition === 0 || info.node.level === 1)) {
-    onlyMessage('该按钮下存在2级按钮', 'error');
+    onlyMessage('仅支持2级按钮', 'error');
     return
   }
   // Find dragObject

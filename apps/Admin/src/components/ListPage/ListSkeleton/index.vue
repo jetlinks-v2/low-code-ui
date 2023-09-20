@@ -2,9 +2,9 @@
   <div class="list-skeleton">
     <div class="right-skeleton">
       <div class="skeleton-content">
-        <div class="search-skeleton">
+        <CardBox>
           <j-row justify="space-between">
-            <j-col :span="8">
+            <j-col>
               <j-space>
                 <j-badge :count="errorCount?.filterModule">
                   <j-skeleton-button
@@ -20,22 +20,22 @@
                   />
                 </j-badge>
                 <j-skeleton-button size="large" />
-                <j-skeleton-input style="width: 200px;" size="large" />
+                <j-skeleton-input style="width: 200px" size="large" />
               </j-space>
             </j-col>
-            <j-col :span="8">
+            <j-col>
               <j-space>
                 <j-skeleton-button size="large" />
                 <j-skeleton-button size="large" />
                 <j-skeleton-button size="large" />
-                <j-skeleton-input style="width: 136px;" size="large" />
+                <j-skeleton-input style="width: 136px" size="large" />
               </j-space>
             </j-col>
           </j-row>
-        </div>
-        <div class="table-skeleton">
+        </CardBox>
+        <CardBox class="table-skeleton">
           <j-row justify="space-between" align="middle">
-            <j-col :span="4">
+            <j-col>
               <j-badge :count="errorCount?.btn">
                 <j-skeleton-button
                   class="config-item btn"
@@ -49,31 +49,40 @@
                 />
               </j-badge>
             </j-col>
-            <j-col :span="2">
+            <j-col>
               <j-badge :count="errorCount?.listForm">
-                <j-space
-                  @click="handleVisible('ListFormVisible')"
-                >
-                  <j-skeleton-input ref="ref6" class="width-32 config-item type" :class="{
-                    'config-done': configDone?.ListForm,
-                    animation: !configDone?.ListForm && !visibles.GuideVisible,
-                  }"/>
-                  <j-skeleton-input ref="ref7" class="width-32 config-item type" :class="{
-                    'config-done': configDone?.ListForm,
-                    animation: !configDone?.ListForm && !visibles.GuideVisible,
-                  }"/>
+                <j-space @click="handleVisible('ListFormVisible')">
+                  <j-skeleton-input
+                    ref="ref6"
+                    class="width-32 config-item type"
+                    :class="{
+                      'config-done': configDone?.ListForm,
+                      animation:
+                        !configDone?.ListForm && !visibles.GuideVisible,
+                    }"
+                  />
+                  <j-skeleton-input
+                    ref="ref7"
+                    class="width-32 config-item type"
+                    :class="{
+                      'config-done': configDone?.ListForm,
+                      animation:
+                        !configDone?.ListForm && !visibles.GuideVisible,
+                    }"
+                  />
                 </j-space>
               </j-badge>
             </j-col>
           </j-row>
-          <j-row
-            :gutter="20"
-            class="table-skeleton-row"
-          >
+          <j-row :gutter="20" class="table-skeleton-row">
             <j-col :span="20">
-              <j-badge :count="errorCount?.listData" style="width: 100%" :numberStyle="{
+              <j-badge
+                :count="errorCount?.listData"
+                style="width: 100%"
+                :numberStyle="{
                   width: 'auto',
-                }">
+                }"
+              >
                 <j-skeleton-input
                   size="large"
                   ref="ref3"
@@ -127,25 +136,26 @@
                 }"
               >
                 <j-skeleton-input
-                  style="width: 100%; height: 40px;"
+                  style="width: 100%; height: 40px"
                   size="large"
                   ref="ref5"
                   class="config-item pagination"
                   :class="{
                     'config-done': configDone?.pagination,
-                    animation: !configDone?.pagination && !visibles.GuideVisible,
+                    animation:
+                      !configDone?.pagination && !visibles.GuideVisible,
                   }"
                   @click="handleVisible('PagingConfigVisible')"
                 />
               </j-badge>
             </j-col>
           </j-row>
-        </div>
+        </CardBox>
       </div>
     </div>
     <div class="left-menu">
       <div class="menus" ref="previewRef" @click="emits('goPreview')">
-        <AIcon type="CaretRightOutlined" style="font-size: 20px;" />
+        <AIcon type="CaretRightOutlined" style="font-size: 20px" />
       </div>
       <j-badge :count="errorCount?.menuConfig" :offset="[-32, 0]">
         <div
@@ -153,7 +163,7 @@
           ref="menuRef"
           @click="handleVisible('MenuConfigVisible')"
         >
-          <AIcon type="MenuUnfoldOutlined" style="font-size: 20px;" />
+          <AIcon type="MenuUnfoldOutlined" style="font-size: 20px" />
         </div>
       </j-badge>
     </div>
@@ -275,12 +285,12 @@ watchEffect(() => {
 </script>
 
 <style scoped lang="less">
-@filterBg: #C3D1FF;
-@btnBg: #C3D1FF;
-@typeBg: #C3D1FF;
-@columnDataBg: #C3D1FF;
-@columnOperationBg: #C3D1FF;
-@paginationBg: #C3D1FF;
+@filterBg: #c3d1ff;
+@btnBg: #c3d1ff;
+@typeBg: #c3d1ff;
+@columnDataBg: #c3d1ff;
+@columnOperationBg: #c3d1ff;
+@paginationBg: #c3d1ff;
 
 .list-skeleton {
   height: calc(100% - 70px);
@@ -309,7 +319,7 @@ watchEffect(() => {
       height: 28px;
       width: 28px;
       height: 28px;
-      background-color: #F6F7F9;
+      background-color: #f6f7f9;
       margin-bottom: 10px;
       display: flex;
       align-items: center;
@@ -336,15 +346,13 @@ watchEffect(() => {
       border-radius: 8px;
     }
     .table-skeleton {
-      padding: 20px;
       margin-top: 20px;
       background-color: #ffffff;
       height: 85%;
-      border-radius: 8px;
       display: flex;
       flex-direction: column;
       .table-skeleton-row {
-        overflow: hidden; 
+        overflow: hidden;
         padding: 20px 0;
         flex: 1;
       }
