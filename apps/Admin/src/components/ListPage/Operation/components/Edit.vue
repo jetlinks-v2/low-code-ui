@@ -19,7 +19,7 @@
         </div>
         <!-- <UploadIcon v-model:modelValue="form.icon" v-else /> -->
         <div class="custom-upload" v-else>
-          <Upload v-model:value="form.icon" accept=".jpg,.jpeg,.png" :borderStyle="{border: 'none'}">
+          <Upload v-model:value="form.icon" accept=".jpg,.jpeg,.png" :borderStyle="{border: 'none'}" cropperTitle="自定义图标">
             <template #content="{imageUrl}">
               <template v-if="imageUrl">
                 <div class="default-btn">
@@ -195,7 +195,10 @@ const form = reactive({
       ? ''
       : props.data.functions,
   pages: props.data.pages,
-  command: props.data.command,
+  command: functionOptions!.value.find((item) => item.fullId === props.data.functions)
+      ?.provider === providerEnum.Function
+      ? null
+      : props.data.command,
   style: props.data.style,
   resource: props.data.resource
 })
@@ -269,8 +272,8 @@ defineExpose({
     width: 48px;
     height: 48px;
     .upload-image {
-      width: 24px;
-      height: 24px;
+      width: 48px;
+      height: 48px;
     }
   }
 }
