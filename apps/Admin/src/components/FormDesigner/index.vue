@@ -35,6 +35,7 @@ import {
   computed,
   reactive,
   onMounted,
+  watchEffect,
 } from 'vue'
 import { debounce, map } from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
