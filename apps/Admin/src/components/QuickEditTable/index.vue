@@ -96,5 +96,7 @@ const onResize = debounce((e) => {
 </script>
 
 <style scoped lang="less">
-
+.quick-table-container {
+  height: 100%;
+}
 </style>

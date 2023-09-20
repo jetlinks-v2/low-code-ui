@@ -205,6 +205,10 @@ const editorFocus = () => {
   }
 }
 
+const errorChange = (e) => {
+  console.log('errorChange', e)
+}
+
 watch(() => props.data?.title, () => {
   menuFormData.value = {
     ...props.data.others.menu,
@@ -219,12 +223,12 @@ defineExpose({
 
 <template>
   <div class="jetlinks-repl" ref="replRef">
-    <SplitPane class="split-pane">
+    <SplitPane class="split-pane" @click="editorFocus">
       <template #editor>
         <EditorContainer @dbClick="handleDbCLickEditor">
           <MonacoEditor
             @change="onChange"
-            @focus="editorFocus"
+            @errorChange="errorChange"
             :filename="store.state.activeFile.filename"
             :value="store.state.activeFile.code"
           />
@@ -286,11 +290,12 @@ defineExpose({
       </div>
       <div class="drawer-body">
         <Preview v-if="activeOper === OperType.View" ref="previewRef" :code="data?.configuration?.code" />
-        <MenuList
-          v-show="activeOper === OperType.Menu"
-          ref="menuListRef"
-          @change="updateMenuFormData"
-        />
+        <div v-show="activeOper === OperType.Menu">
+          <MenuList
+            ref="menuListRef"
+            @change="updateMenuFormData"
+          />
+        </div>
       </div>
 <!--      <div class="drawer-footer" v-show="activeOper === OperType.Menu">-->
 <!--        <j-button @click="cancel">取消</j-button>-->

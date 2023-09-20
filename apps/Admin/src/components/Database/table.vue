@@ -7,107 +7,108 @@
         </j-form-item>
       </j-form>
     </div>
-    <QuickEditTable
-      serial
-      validate
-      ref="tableRef"
-      :data="dataSource"
-      :columns="myColumns"
-      :height="500"
-      :scroll="{x: 1300, y: 500}"
-    >
-      <template #serial="{record, index}">
-        <div class="serial">
-          <AIcon type="KeyOutlined" :class="{primary: index === 1}" />
-          <span>{{ index }}</span>
-        </div>
-      </template>
-      <template #name="{record, index, valueChange}" >
-        <span v-if="index <= maxLen">{{ record.name }}</span>
-        <j-input v-else v-model:value="record.name" @change="() => { valueChange(record.name); alias(record.name, record) }" />
-      </template>
-      <template #comment="{record, index}">
-        <span v-if="index <= maxLen">{{ record.comment }}</span>
-        <j-input v-else v-model:value="record.comment" :maxLength="16" @change="emitUpdateDataSource"/>
-      </template>
-      <template #javaType="{record, index, valueChange}">
-        <span v-if="index <= maxLen">{{record.javaType}}</span>
-        <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => { valueChange(record.javaType); JavaTypeChange(record)}" />
-      </template>
-      <template #jdbcType="{record, index, valueChange}">
-        <span v-if="index <= maxLen">{{record.jdbcType}}</span>
-        <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="() => { valueChange(record.jdbcType);emitUpdateDataSource()}" />
-      </template>
-      <template #length="{ record, index }">
-        <span v-if="index <= maxLen">{{record.length}}</span>
-        <span v-else-if="!['DECIMAL','VARCHAR','LONGVARCHAR'].includes(record.jdbcType)"></span>
-        <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
-      </template>
-      <template #scale="{ record, index }">
-        <span v-if="index <= maxLen || !['DECIMAL'].includes(record.jdbcType)">{{record.scale}}</span>
-        <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
-      </template>
-      <template #updatable="{ record, index }">
-        <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" :disabled="index <= maxLen" />
-      </template>
-      <template #setting="{ record, index }">
-        <span v-if="index <= maxLen"></span>
-        <template v-else>
-          <j-tooltip
-            v-if="!record.javaType || ['Boolean', 'DateTime'].includes(record.javaType)"
-            :title=" ['Boolean', 'DateTime'].includes(record.javaType) ? '该javaType不支持配置' : '请先选择javaType'"
-          >
-            <j-button disabled>
+    <div style="height: calc(100% - 60px)">
+      <QuickEditTable
+        serial
+        validate
+        ref="tableRef"
+        :data="dataSource"
+        :columns="myColumns"
+        :height="500"
+        :scroll="{x: 1600, y: 500}"
+      >
+        <template #serial="{record, index}">
+          <div class="serial">
+            <AIcon type="KeyOutlined" :class="{primary: index === 1}" />
+            <span>{{ index }}</span>
+          </div>
+        </template>
+        <template #name="{record, index, valueChange}" >
+          <span v-if="index <= maxLen">{{ record.name }}</span>
+          <j-input v-else v-model:value="record.name" @change="() => { valueChange(record.name); alias(record.name, record) }" />
+        </template>
+        <template #comment="{record, index}">
+          <span v-if="index <= maxLen">{{ record.comment }}</span>
+          <j-input v-else v-model:value="record.comment" :maxLength="16" @change="emitUpdateDataSource"/>
+        </template>
+        <template #javaType="{record, index, valueChange}">
+          <span v-if="index <= maxLen">{{record.javaType}}</span>
+          <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => { valueChange(record.javaType); JavaTypeChange(record)}" />
+        </template>
+        <template #jdbcType="{record, index, valueChange}">
+          <span v-if="index <= maxLen">{{record.jdbcType}}</span>
+          <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="() => { valueChange(record.jdbcType);emitUpdateDataSource()}" />
+        </template>
+        <template #length="{ record, index }">
+          <span v-if="index <= maxLen">{{record.length}}</span>
+          <span v-else-if="!['DECIMAL','VARCHAR','LONGVARCHAR'].includes(record.jdbcType)"></span>
+          <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
+        </template>
+        <template #scale="{ record, index }">
+          <span v-if="index <= maxLen || !['DECIMAL'].includes(record.jdbcType)">{{record.scale}}</span>
+          <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
+        </template>
+        <template #updatable="{ record, index }">
+          <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" :disabled="index <= maxLen" />
+        </template>
+        <template #setting="{ record, index }">
+          <span v-if="index <= maxLen"></span>
+          <template v-else>
+            <j-tooltip
+              v-if="!record.javaType || ['Boolean', 'DateTime'].includes(record.javaType)"
+              :title=" ['Boolean', 'DateTime'].includes(record.javaType) ? '该javaType不支持配置' : '请先选择javaType'"
+            >
+              <j-button disabled>
+                配置
+              </j-button>
+            </j-tooltip>
+            <j-button v-else @click="() => settingClick(record, index)">
               配置
             </j-button>
-          </j-tooltip>
-          <j-button v-else @click="() => settingClick(record, index)">
-            配置
-          </j-button>
+          </template>
+
         </template>
-
-      </template>
-      <template #action="{ record, index }">
-        <j-space>
-          <PermissionButton
-            v-if="index > (maxLen ? maxLen - 1 : maxLen)"
-            type="link"
-            class="action-btn"
-            :hasPermission="true"
-            :tooltip="{ title: '新增'}"
-            @click="() => add(index)"
-          >
-            <AIcon type="PlusCircleOutlined" />
-          </PermissionButton>
-          <PermissionButton
-            v-if="index > maxLen"
-            type="link"
-            class="action-btn"
-            :hasPermission="true"
-            :tooltip="{ title: '复制'}"
-            @click="() => copy(record, index)"
-          >
-            <AIcon type="CopyOutlined" />
-          </PermissionButton>
-          <PermissionButton
-            v-if="index > maxLen"
-            danger
-            type="link"
-            class="action-btn"
-            placement="topRight"
-            :hasPermission="true"
-            :tooltip="{ title: '删除'}"
-            :popConfirm="{
-              title: '确认删除？',
-              onConfirm: () => deleteFn(index)
-            }"
-          >
-            <AIcon type="DeleteOutlined" />
-          </PermissionButton>
-        </j-space>
-      </template>
-    </QuickEditTable>
-
+        <template #action="{ record, index }">
+          <j-space>
+            <PermissionButton
+              v-if="index > (maxLen ? maxLen - 1 : maxLen)"
+              type="link"
+              class="action-btn"
+              :hasPermission="true"
+              :tooltip="{ title: '新增'}"
+              @click="() => add(index)"
+            >
+              <AIcon type="PlusCircleOutlined" />
+            </PermissionButton>
+            <PermissionButton
+              v-if="index > maxLen"
+              type="link"
+              class="action-btn"
+              :hasPermission="true"
+              :tooltip="{ title: '复制'}"
+              @click="() => copy(record, index)"
+            >
+              <AIcon type="CopyOutlined" />
+            </PermissionButton>
+            <PermissionButton
+              v-if="index > maxLen"
+              danger
+              type="link"
+              class="action-btn"
+              placement="topRight"
+              :hasPermission="true"
+              :tooltip="{ title: '删除'}"
+              :popConfirm="{
+                title: '确认删除？',
+                onConfirm: () => deleteFn(index)
+              }"
+            >
+              <AIcon type="DeleteOutlined" />
+            </PermissionButton>
+          </j-space>
+        </template>
+      </QuickEditTable>
+    </div>
   </div>
   <SettingModal
     v-if="setting.visible"
@@ -529,6 +530,11 @@ dataSourceChange()
 
 <style scoped lang="less">
 .crud-table {
+  height: 100%;
+
+  :deep(.quick-table-warp) {
+    height: 100%;
+  }
   .crud-query {
     width: 400px;
   }

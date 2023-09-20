@@ -106,7 +106,8 @@ const scroll = ({scrollTop, scrollLeft}) => {
 
 const bodyStyle = computed(() => {
   return {
-    height: props.scroll?.y !== undefined ? props.scroll.y + 'px' : undefined
+    maxHeight: props.scroll?.y !== undefined ? props.scroll.y + 'px' : undefined,
+    height: 'calc(100% - 56px)'
   }
 })
 
