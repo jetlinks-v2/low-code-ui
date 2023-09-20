@@ -15,7 +15,7 @@
       <j-form :model="dataBind" layout="vertical">
         <j-row :gutter="20">
           <j-col :span="20">
-            <j-space>
+            <j-space style="align-items: start;">
               <j-form-item>
                 <ErrorItem :errorData="errorData('function')">
                   <j-select
@@ -260,5 +260,8 @@ watch(
   background-color: #f7f8f9;
   border: 1px solid #f0f2f5;
   padding: 16px;
+}
+.text {
+  text-align: center;
 }
 </style>
