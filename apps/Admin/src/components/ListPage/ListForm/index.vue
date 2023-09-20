@@ -26,20 +26,20 @@
             </div>
           </div>
         </j-form-item>
-        <j-form-item label="卡片配置" v-if="showType!.configured.includes('card')" :rules="{
+        <j-form-item label="卡片配置" v-if="showType.configured?.includes('card')" :rules="{
           required: true,
         }">
           <j-badge :count="errorList.length">
-            <j-button :style="{width: '300px', border: errorList.length ? '1px solid red' : ''}" @click="showType!.configurationShow = true" :class="{ 'error-boder': errorList.length }"
+            <j-button :style="{width: '300px', border: errorList.length ? '1px solid red' : ''}" @click="showType.configurationShow = true" :class="{ 'error-boder': errorList.length }"
               >配置</j-button
             >
           </j-badge>
         </j-form-item>
 
-        <j-form-item label="默认形态" v-if="showType!.configured?.length === 2" :rules="{
+        <j-form-item label="默认形态" v-if="showType.configured?.length === 2" :rules="{
           required: true,
         }">
-          <j-radio-group v-model:value="showType!.defaultForm" button-style="solid">
+          <j-radio-group v-model:value="showType.defaultForm" button-style="solid">
             <j-radio-button value="list" class="check-btn">
               数据列表
             </j-radio-button>
@@ -125,20 +125,23 @@ const open = computed({
 const classCard = computed(() => {
   return {
     'j-check-btn-item': true,
-    selected: showType!.configured.includes('card'),
+    selected: showType.configured?.includes('card'),
   }
 })
 const classList = computed(() => {
   return {
     'j-check-btn-item': true,
-    selected: showType!.configured.includes('list'),
+    selected: showType.configured?.includes('list'),
   }
 })
 
 const cardRef = ref()
 //数组展示方式，卡片配置显示隐藏
 
-const showType = inject(SHOW_TYPE_KEY)
+const showTypeInject = inject(SHOW_TYPE_KEY)
+const showType = reactive({
+  ...cloneDeep(showTypeInject)
+})
 //卡片配置返回
 const back = () => {
   showType!.configurationShow = false
@@ -161,14 +164,14 @@ const cancel = () => {
 //提交
 const submit = async () => {
   let data: any = {}
-  const vaildate = await cardRef.value?.vaildate()
-  if (vaildate && showType!.configurationShow) {
-    valid()
+  const validate = await cardRef.value?.validate()
+  if (validate && showType!.configurationShow) {
     showType!.configurationShow = false
   } else if (!showType!.configurationShow) {
     open.value = false
-    Object.assign(showType!, showType!)
-    Object.assign(listFormInfo.value, vaildate)
+    Object.assign(showTypeInject!, showType)
+    console.log(showTypeInject);
+    Object.assign(listFormInfo.value, validate)
   }
 }
 //已配置数据展示方式，默认数据列表
@@ -176,10 +179,10 @@ const configuredChange = (value: string) => {
   if (showType!.configured?.length === 1 && showType!.configured[0] === value) {
     showType!.configured[0] = 'list'
   } else {
-    const index = showType!.configured.findIndex((item: any) => item === value)
-    showType!.configured.includes(value)
-      ? showType!.configured.splice(index, 1)
-      : showType!.configured.push(value)
+    const index = showType.configured?.findIndex((item: any) => item === value)
+    showType.configured?.includes(value)
+      ? showType.configured?.splice(<number>index, 1)
+      : showType.configured?.push(value)
   }
   showType!.defaultForm =
     showType!.configured?.length === 1 ? showType!.configured[0] : 'list'

@@ -226,10 +226,7 @@ const handlePages = (val: string) => {
   form.resource.parentId = `${form.resource.projectId}.${form.resource.parentId}`
 }
 const submit = async () => {
-  const valid = await formRef.value?.validate()
-  return valid
-    ? { ...form, children: activeBtn?.value.children || [] }
-    : undefined
+  return { ...form, children: activeBtn?.value.children || [] }
 }
 
 const language = ref('javascript')
