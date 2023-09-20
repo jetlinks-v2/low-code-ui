@@ -19,7 +19,7 @@ export const generateOptions = (len: number) => {
     return result
 }
 
-const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'card', 'geo', 'product', 'device', 'org', 'user', 'role']
+const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo', 'product', 'device', 'org', 'user', 'role']
 
 const checkedConfigItem = (node: ISchema, allData: any[]) => {
     const _type = node.type || 'root'
@@ -78,10 +78,6 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
         }
         if (['select', 'tree-select', 'select-card'].includes(_type)) {
             // 数据源
-            // if (node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
-            //     return node?.key
-            // }
-            // if (node?.componentProps?.source?.type === 'end' && (!node?.componentProps.source?.commandId || !node?.componentProps.source?.functionId || !node?.componentProps.source?.label || !node?.componentProps.source?.value)) {
             if (node?.componentProps.source?.functionId && !node?.componentProps.source?.commandId) {
                 return {
                     key: node?.key,
@@ -89,7 +85,6 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
                 }
             }
         }
-        // !node?.componentProps?.accept || 
         if ('upload' === _type && (!node?.componentProps?.maxCount || !node?.componentProps?.fileSize)) {
             // 个数和单位
             return {
