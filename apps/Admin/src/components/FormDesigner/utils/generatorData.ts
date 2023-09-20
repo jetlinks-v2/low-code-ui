@@ -86,7 +86,7 @@ const handleProps = (node: any) => {
             result.geoType = 'country'
             break
         case 'grid':
-            result.inlineMax = 10
+            result.inlineMax = 4
             result.rowSpan = 5
             result.colSpan = 10
             break
@@ -95,6 +95,10 @@ const handleProps = (node: any) => {
                 value: undefined,
                 code: ''
             }
+            break
+        case 'space':
+            result.align = 'center'
+            result.direction = 'vertical'
             break
     }
 

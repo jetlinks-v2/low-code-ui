@@ -1,7 +1,7 @@
 <template>
   <j-spin :spinning="spinning">
     <div class="container">
-      <Header @save="onSave" :data="data" @validate="onValidate" />
+      <Header @save="onSave" :data="data" @validate="onValid" />
       <div class="box">
         <div class="left" v-if="model !== 'preview'"><Filed /></div>
         <div
@@ -16,43 +16,7 @@
           <Config ref="configRef" />
         </div>
       </div>
-      <div
-        class="check"
-        :style="{ height: _height }"
-        v-if="model === 'preview' && !mode"
-      >
-        <div class="check-btn">
-          <j-button
-            v-if="!checkVisible"
-            type="primary"
-            @click="checkVisible = true"
-            >数据校验</j-button
-          >
-          <j-space v-else>
-            <j-button
-              class="btn"
-              @click="
-                checkVisible = false;editData = ''
-              "
-              >取消</j-button
-            >
-            <j-button class="btn" @click="onInput('get')"
-              >获取数据<j-tooltip title="将表单中填写的所有数据获取到代码框中">
-                <AIcon type="QuestionCircleOutlined" /> </j-tooltip
-            ></j-button>
-            <j-button class="btn" @click="onInput('set')"
-              >加载数据<j-tooltip title="将代码框输入的模拟数据反显到表单">
-                <AIcon type="QuestionCircleOutlined" /> </j-tooltip
-            ></j-button>
-          </j-space>
-        </div>
-        <div class="check-editor" v-if="checkVisible">
-          <j-monaco-editor
-            v-model="editData"
-            :language="'json'"
-          />
-        </div>
-      </div>
+      <Check v-if="model === 'preview' && !mode" />
     </div>
   </j-spin>
 </template>
@@ -71,6 +35,7 @@ import {
   computed,
   reactive,
   onMounted,
+  watchEffect,
 } from 'vue'
 import { debounce, map } from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
@@ -85,6 +50,8 @@ import {
   handleCopyData,
 } from './utils/utils'
 import { uid } from './utils/uid'
+import Check from './components/Check/index.vue'
+import { onlyMessage } from '@jetlinks/utils'
 
 const props = defineProps({
   value: {
@@ -110,14 +77,12 @@ const configRef = ref<any>()
 const refList = ref<any>({})
 const formRef = ref<any>()
 const formState = reactive({})
-
 const collectVisible = ref<boolean>(false)
 const collectData = ref<any[]>([])
 const delVisible = ref<boolean>(false)
 const spinning = ref<boolean>(false)
-const checkVisible = ref<boolean>(false)
-const editData = ref<string>()
 const _ctrl = ref<boolean>(false)
+const _other = ref<boolean>(false)
 const focus = ref<boolean>(false)
 const focused = ref<boolean>(false)
 
@@ -136,17 +101,13 @@ const _width = computed(() => {
     : 'calc(100% - 584px)'
 })
 
-const _height = computed(() => {
-  return !unref(checkVisible) ? '40px' : '248px'
-})
-
 // 设置数据被选中
 const setSelection = (node: any) => {
-  if (['card-item', 'space-item'].includes(node.type)) {
+  if (['card-item'].includes(node.type)) {
     onSaveData()
     return
   }
-  if (_ctrl.value && model.value === 'edit') {
+  if (_ctrl.value && model.value === 'edit' && !_other.value) {
     if (node === 'root') {
       onSaveData()
       return
@@ -166,7 +127,7 @@ const setSelection = (node: any) => {
       selected.value.push(node)
     }
   }
-  isShowConfig.value = !(selected.value?.length > 1)
+  isShowConfig.value = !(selected.value?.length > 1) && !map(selected.value, 'type').includes('space-item')
   onSaveData()
 }
 
@@ -198,18 +159,18 @@ const onDelete = debounce(() => {
 // 复制
 const onCopy = () => {
   const list = selected.value.filter((item) => {
-    return !['collapse-item', 'tabs-item', 'grid-item', 'table-item'].includes(
+    return !['collapse-item', 'tabs-item', 'grid-item', 'table-item', 'space-item'].includes(
       item.type,
     )
   })
   if (unref(isSelectedRoot) || focused.value) return
-  formDesigner.setCopyData(list || [])
+  formDesigner.setCopyData(props.data?.id, list || [])
 }
 
 // 剪切
 const onShear = debounce(() => {
   if (unref(isSelectedRoot) || focused.value) return
-  formDesigner.setCopyData(selected.value || [])
+  formDesigner.setCopyData(props.data?.id, selected.value || [])
   const _data: any = deleteDataByKey(formData.value.children, selected.value)
   formData.value = {
     ...formData.value,
@@ -221,13 +182,14 @@ const onShear = debounce(() => {
 // 粘贴
 const onPaste = () => {
   if (!selected.value?.length || focused.value) return
-  const _data = formDesigner.getCopyData()
-  const list = (_data || []).map((item) => {
+  const obj = formDesigner.getCopyData()
+  const list = (obj?.list || []).map((item) => {
     return {
       ...item,
       formItemProps: {
         ...item?.formItemProps,
-        name: item.formItemProps?.name + 'copy',
+        label: obj.key === props.data?.id ? 'copy_' + item.formItemProps?.label : item.formItemProps?.label,
+        name: obj.key === props.data?.id ? 'copy_' + item.formItemProps?.name : item.formItemProps?.name,
       },
       key: item.key + '_' + uid(),
       children: handleCopyData(item?.children || []),
@@ -286,6 +248,21 @@ const setModel = (_type: 'preview' | 'edit') => {
   model.value = _type
 }
 
+const onSave = () => {
+  if (model.value === 'preview') {
+    return new Promise((resolve, inject) => {
+      formRef.value
+        .validate()
+        .then((_data: any) => {
+          resolve(_data)
+        })
+        .catch((err: any) => {
+          inject(err)
+        })
+    })
+  }
+}
+
 provide('FormDesigner', {
   tabsId: props.data?.id,
   model,
@@ -301,6 +278,7 @@ provide('FormDesigner', {
   collectData,
   delVisible,
   _ctrl,
+  _other,
   focus,
   focused, // 其他组件
   setSelection,
@@ -312,22 +290,8 @@ provide('FormDesigner', {
   onShear,
   onCollect,
   onAddChild,
+  onSave
 })
-
-const onSave = () => {
-  if (model.value === 'preview') {
-    return new Promise((resolve, inject) => {
-      formRef.value
-        .validate()
-        .then((_data: any) => {
-          resolve(_data)
-        })
-        .catch((err: any) => {
-          inject(err)
-        })
-    })
-  }
-}
 
 watch(
   () => model.value,
@@ -381,16 +345,10 @@ const onValidate = () => {
   })
 }
 
-// 获取数据
-const onInput = async (type: 'get' | 'set') => {
-  if (type === 'set') {
-    const obj = JSON.parse(editData?.value || '{}')
-    Object.assign(formState, obj)
-  } else {
-    const obj = await onSave().catch(() => {})
-    if (obj) {
-      editData.value = JSON.stringify(obj)
-    }
+const onValid = async () => {
+  const _val = await onValidate()
+  if(_val) {
+    onlyMessage('校验成功！')
   }
 }
 
@@ -420,30 +378,6 @@ defineExpose({ onSave, validate: onValidate })
 
     .config {
       width: 384px;
-    }
-  }
-
-  .check {
-    background-color: #1b1f29;
-    width: 100%;
-    .check-btn {
-      display: flex;
-      align-items: center;
-      height: 40px;
-      justify-content: flex-end;
-      padding-right: 24px;
-
-      .btn {
-        background-color: #404756;
-        box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, 0.02);
-        border: none;
-        color: #cfcfd0;
-      }
-    }
-
-    .check-editor {
-      height: 200px;
-      overflow: hidden;
     }
   }
 }

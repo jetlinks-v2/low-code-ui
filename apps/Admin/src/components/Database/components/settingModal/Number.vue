@@ -51,7 +51,7 @@
     v-if="model.validator.provider === 'max'"
     label="最大值"
     :name="['validator', 'configuration', 'value']"
-    :rules="model.javaType === 'Int' ? [intMax] : undefined"
+    :rules="model.javaType === 'Integer' ? [intMax] : undefined"
   >
     <j-input-number v-model:value="model.validator.configuration.value" :stringMode="openStringMode" :precision="precision" style="width: 100%;" />
   </j-form-item>
@@ -59,7 +59,7 @@
     v-if="model.validator.provider === 'min'"
     label="最小值"
     :name="['validator', 'configuration', 'value']"
-    :rules="model.javaType === 'Int' ? [intMin] : undefined"
+    :rules="model.javaType === 'Integer' ? [intMin] : undefined"
   >
     <j-input-number v-model:value="model.validator.configuration.value" :stringMode="openStringMode" :precision="precision" style="width: 100%;" />
   </j-form-item>
@@ -97,7 +97,7 @@ const rulesOptions = [
 ]
 
 const precision = computed(() => {
-  return model.value.javaType === 'Int' ? 0 : undefined
+  return model.value.javaType === 'Integer' ? 0 : undefined
 })
 
 const openStringMode = computed(() => {
@@ -115,7 +115,7 @@ const InterValidatorFn = (value) => {
 
 const intMax = {
   validator(_, value) {
-    if (model.value.javaType === 'Int') {
+    if (model.value.javaType === 'Integer') {
       return InterValidatorFn(value)
     }
     return Promise.resolve()
@@ -124,7 +124,7 @@ const intMax = {
 
 const intMin = {
   validator(_, value) {
-    if (model.value.javaType === 'Int') {
+    if (model.value.javaType === 'Integer') {
       return InterValidatorFn(value)
     }
     return Promise.resolve()
@@ -145,7 +145,7 @@ const rules = {
         if (!value) {
           return Promise.reject('请输入最小值')
         }
-        if (model.value.javaType === 'Int') {
+        if (model.value.javaType === 'Integer') {
           return InterValidatorFn(value)
         }
         if (value > model.value.validator.configuration.max) {
@@ -164,7 +164,7 @@ const rules = {
 
         formRef.value.validateFields([['validator', 'configuration', 'min']])
 
-        if (model.value.javaType === 'Int') {
+        if (model.value.javaType === 'Integer') {
           return InterValidatorFn(value)
         }
         return Promise.resolve()

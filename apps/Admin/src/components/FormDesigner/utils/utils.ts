@@ -19,7 +19,7 @@ export const generateOptions = (len: number) => {
     return result
 }
 
-const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'card', 'geo', 'product', 'device', 'org', 'user', 'role']
+const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo', 'product', 'device', 'org', 'user', 'role']
 
 const checkedConfigItem = (node: ISchema, allData: any[]) => {
     const _type = node.type || 'root'
@@ -34,23 +34,25 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
                 }
             }
         }
-        if (!node?.formItemProps?.name) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
-        } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
-        } else {
-            const arr = getBrotherList(node?.key || '', allData)
-            const flag = arr.filter((item) => item.key !== node.key).find((i) => i?.formItemProps?.name === node?.formItemProps?.name)
-            if (flag) { // `标识${value}已被占用`
+        if (!['space-item', 'card-item', 'grid-item'].includes(_type)) {
+            if (!node?.formItemProps?.name) {
                 return {
                     key: node?.key,
                     message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
+            } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
+                return {
+                    key: node?.key,
+                    message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
+            } else {
+                const arr = getBrotherList(node?.key || '', allData)
+                const flag = arr.filter((item) => item.key !== node.key).find((i) => i?.formItemProps?.name === node?.formItemProps?.name)
+                if (flag) { // `标识${value}已被占用`
+                    return {
+                        key: node?.key,
+                        message: (node.formItemProps?.label || node.name) + '配置错误'
+                    }
                 }
             }
         }
@@ -76,10 +78,6 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
         }
         if (['select', 'tree-select', 'select-card'].includes(_type)) {
             // 数据源
-            // if (node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
-            //     return node?.key
-            // }
-            // if (node?.componentProps?.source?.type === 'end' && (!node?.componentProps.source?.commandId || !node?.componentProps.source?.functionId || !node?.componentProps.source?.label || !node?.componentProps.source?.value)) {
             if (node?.componentProps.source?.functionId && !node?.componentProps.source?.commandId) {
                 return {
                     key: node?.key,
@@ -87,7 +85,6 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
                 }
             }
         }
-        // !node?.componentProps?.accept || 
         if ('upload' === _type && (!node?.componentProps?.maxCount || !node?.componentProps?.fileSize)) {
             // 个数和单位
             return {
@@ -102,6 +99,12 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
             }
         }
         if (['card'].includes(_type) && !(node?.componentProps?.title)) {
+            return {
+                key: node?.key,
+                message: (node.formItemProps?.label || node.name) + '配置错误'
+            }
+        }
+        if (node?.formItemProps?.isLayout && !node.formItemProps?.label) {
             return {
                 key: node?.key,
                 message: (node.formItemProps?.label || node.name) + '配置错误'

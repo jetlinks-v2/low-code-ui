@@ -19,7 +19,8 @@
         showSearch
         :options="dataOptions"
         :field-names="{ label: 'name', value: 'id' }"
-      />
+      >
+      </j-select>
     </div>
     <div v-else>
       <p class="tips">能力配置</p>
@@ -29,16 +30,23 @@
           style="width: 200px"
           v-model:value="state.abilityValue"
           showSearch
-          :options="functionOptions"
-          :field-names="{label: 'name', value: 'fullId'}"
-        />
+        >
+          <j-select-option
+            v-for="item in functionOptions"
+            :key="item.fullId"
+            :value="item.fullId"
+          >
+            <img :src="getImages(item.type)" class="options-img">
+            {{ item.title }}
+          </j-select-option>
+        </j-select>
         <!--选中功能类型为SQL/函数时，下拉框后方展示指令下拉框-->
         <j-select
           style="width: 200px"
           v-model:value="state.instructValue"
           showSearch
           :options="commandOptions"
-          :field-names="{label: 'name', value: 'id'}"
+          :field-names="{ label: 'name', value: 'id' }"
         />
       </j-space>
     </div>
@@ -46,8 +54,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useFunctions } from '@/hooks/useFunctions';
+import { useFunctions } from '@/hooks/useFunctions'
 import { queryDictionary } from '@/api/form'
+import { useImages } from '../../hooks/useImages';
 interface Emit {
   (e: 'update:state', value: any): void
 }
@@ -62,6 +71,7 @@ const props = defineProps({
 })
 
 const { functionOptions, commandOptions, handleFunction } = useFunctions()
+const { getImages } = useImages()
 const emits = defineEmits<Emit>()
 const data = props.data?.config || null
 
@@ -81,9 +91,13 @@ const queryData = () => {
 }
 queryData()
 
-watch(() => state.abilityValue, () => {
-  handleFunction(state.abilityValue)
-}, { immediate: true })
+watch(
+  () => state.abilityValue,
+  () => {
+    handleFunction(state.abilityValue)
+  },
+  { immediate: true },
+)
 
 watch(
   () => state,

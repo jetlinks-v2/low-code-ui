@@ -101,6 +101,7 @@ import type { PropType } from 'vue'
 import { useProduct } from '@/store';
 import { getImage } from '@jetlinks/utils';
 import { cloneDeep } from 'lodash-es';
+import { DATA_BIND } from '../../keys';
 const props = defineProps({
   title: {
     type: String,
@@ -191,34 +192,38 @@ const props = defineProps({
   }
 })
 
+const dataBinds = inject(DATA_BIND)
 enum javaType {
-  Enum = 'enum',
-  String = 'text',
-  Double = 'double',
-  Int = 'int',
-  BigDecimal = 'text',
-  DateTime = 'date',
-  Float = 'float',
-  Byte = 'int',
-  Long = 'long',
-  List = 'array',
-  Boolean = 'boolean',
-  Map = 'object',
+  enum = 'enum',
+  string = 'text',
+  double = 'double',
+  int = 'int',
+  bigDecimal = 'text',
+  dateTime = 'date',
+  date = 'date',
+  float = 'float',
+  byte = 'int',
+  long = 'long',
+  list = 'array',
+  boolean = 'boolean',
+  object = 'object',
 }
 
 enum filterType {
-  Enum = 'enum',
-  String = 'string',
-  Double = 'number',
-  Int = 'number',
-  BigDecimal = 'string',
-  DateTime = 'date',
-  Float = 'number',
-  Byte = 'number',
-  Long = 'string',
-  List = 'string',
-  Boolean = 'string',
-  Map = 'string',
+  enum = 'enum',
+  string = 'string',
+  double = 'number',
+  int = 'number',
+  bigDecimal = 'string',
+  dateTime = 'date',
+  date = 'date',
+  float = 'number',
+  byte = 'number',
+  long = 'string',
+  list = 'string',
+  boolean = 'string',
+  map = 'string',
+  object = 'enum',
 }
 
 
@@ -365,30 +370,22 @@ const bindShow = ref(false)
 //是否同步数据绑定
 //同步数据绑定
 const syncData = async () => {
-  if (!props.dataBind) {
+  if (dataBinds.data.dataSource.length === 0) {
     bindShow.value = false
     return onlyMessage('请先完成数据绑定', 'error')
   }
   const changeFunctionData = asyncDataBind()
   if(!props.asyncData) { 
-    handleChange([...props.dataSource, ...asyncDataBind().map(item => {
-      return {
-        id: item.alias,
-        name: item.comment,
-        type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
-      }
-    })])
+    handleChange([...props.dataSource, ...asyncDataBind()])
     emit('update:asyncData', true)
+    emit('updateBind', cloneDeep([...props.dataSource, ...asyncDataBind()]))
     return
   }
   tempData.value = [];
   changeFunctionData.forEach((item) => {
-    let find = props.bindData?.find((i) => i.alias === item.alias)
-    if(!find) tempData.value.push({
-      id: item.alias,
-      name: item.comment,
-      type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
-    })
+    let find = props.bindData?.find((i) => i.id === item.id)
+    console.log(item, props.bindData);
+    if(!find) tempData.value.push(item)
   })
   if (tempData.value.length) {
     openModel(props.modelActiveKey)
@@ -399,8 +396,12 @@ const syncData = async () => {
 
 const productStore = useProduct()
 const asyncDataBind = () => {
-  const functionId = props.bindFunctionId.split('.')
-  return productStore.getById(functionId[functionId.length - 1])?.configuration?.columns || []
+  return dataBinds.data.dataSource.map(item => {
+    return {
+      ...item,
+      type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type]
+    }
+  }) || []
 }
 //打开弹窗
 const openModel = (value: any) => {
@@ -410,13 +411,7 @@ const openModel = (value: any) => {
 //处理方式弹窗
 const handleOk = async () => {
   const newBind = asyncDataBind()
-  const dataSource = activeKey.value?.[0] === '1' ? newBind.map((item) => {
-    return {
-      id: item.alias,
-      name: item.comment,
-      type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
-    }
-  }) : tempData.value
+  const dataSource = activeKey.value?.[0] === '1' ? newBind.map((item) => item) : tempData.value
   emit('updateBind', cloneDeep(newBind))
   tableRef.value.cleanEditStatus()
   emit('handleOk', activeKey.value?.[0], dataSource)

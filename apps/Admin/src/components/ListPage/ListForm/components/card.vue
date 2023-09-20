@@ -36,7 +36,7 @@
           >
             <ErrorItem :errorData="errorData('field1')">
               <h3>
-                {{ formState.field1 || '字段1' }}
+                {{ formState.field1 || '字段1内容' }}
               </h3>
             </ErrorItem>
           </j-col>
@@ -57,7 +57,7 @@
           >
             <div>{{ formState.field2Title || '展示字段2' }}</div>
             <div>
-              {{ formState.field2 || '字段2' }}
+              {{ formState.field2 || '字段2内容' }}
             </div>
           </j-col>
           <j-col
@@ -67,7 +67,7 @@
           >
             <div>{{ formState.field3Title || '展示字段3' }}</div>
             <div>
-              {{ formState.field3 || '字段3' }}
+              {{ formState.field3 || '字段3内容' }}
             </div>
           </j-col>
         </j-row>
@@ -94,7 +94,7 @@
       >
         <div v-if="cardState.type === 'customIcon'">
           <j-form-item label="自定义图标" name="customIcon" class="upload-icon">
-            <Upload v-model:value="formState.customIcon" :accept="accept" />
+            <Upload v-model:value="formState.customIcon" :accept="accept" cropperTitle="自定义图标"/>
           </j-form-item>
 
           <j-form-item label="动态图标" name="dynamicIcon">
@@ -176,7 +176,7 @@
           <j-form-item label="特殊样式" name="specialStyle">
             <EditorModal
               v-model:value="formState.specialStyle"
-              language="css"
+              language="json"
             />
           </j-form-item>
         </div>
@@ -208,7 +208,10 @@ const cardState = reactive({
   type: 'customIcon', //customIcon,field1,field2,field3,emphasisField
 })
 //卡片展示内容form
-const formState = inject(LIST_FORM_INFO)
+const listForm = inject(LIST_FORM_INFO)
+const formState = reactive({
+  ...listForm
+})
 const dataBind = inject(DATA_BIND)
 const dataSource = inject(DATA_SOURCE)
 
@@ -300,15 +303,8 @@ const validateValue = () => {
   statusColor.value = JSON.parse(formState.specialStyle || '{}')
 }
 const onCheck = async () => {
-  const valid = await formRef.value.validate()
-  if(valid) {
-    validateValue()
-    if (formState.field1 !== '') {
-      return true
-    }
-  } else {
-    return false
-  }
+  Object.assign(listForm, formState)
+  return true
 }
 const field2Change = (value: any, options: any) => {
   formState.field2Title = options.name
@@ -327,7 +323,7 @@ const titleOptions = computed(() => {
 })
 
 defineExpose({
-  vaildate: onCheck,
+  validate: onCheck,
 })
 </script>
 

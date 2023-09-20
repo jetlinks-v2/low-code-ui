@@ -155,7 +155,7 @@
           ]"
         >
           <j-switch
-            v-model:checked="target.formItemProps.isLayout"
+            :checked="target.formItemProps.isLayout"
             @change="onSwitch"
           />
         </j-form-item>
@@ -391,6 +391,7 @@
             v-model:value="target.componentProps.size"
             style="width: 100%"
             :precision="0"
+            :min="0"
             @change="onDataChange"
           />
         </j-form-item>
@@ -448,7 +449,7 @@ const emits = defineEmits(['refresh'])
 
 const onSwitch = (_checked: boolean) => {
   target.value.formItemProps.label = _checked ? target.value.name : undefined
-  // target.value.formItemProps.name = undefined
+  target.value.formItemProps.isLayout = _checked
   emits('refresh', target.value)
 }
 

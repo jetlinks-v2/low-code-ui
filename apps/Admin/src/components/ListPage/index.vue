@@ -206,6 +206,7 @@ const validate = async () => {
     if (errorList.length) {
       reject(errorList)
     } else {
+      onlyMessage('校验成功')
       resolve([])
     }
     // Promise.all(promiseArr)
@@ -230,6 +231,7 @@ const errorCount = computed(() => {
     filterModule: filterModuleRef.value?.errorList.length,
     listData: listDataRef.value?.errorList.length,
     menuConfig: menuConfigRef.value?.errorList.length,
+    dataBind: dataBindRef.value?.errorList.length,
   }
 })
 
@@ -248,6 +250,7 @@ const dataBind = reactive({
   data: {
     function: null,
     command: null,
+    dataSource: [],
   },
   filterBind: [],
   columnBind: [],
@@ -391,10 +394,13 @@ defineExpose({
 })
 </script>
 
-<style scoped lang="less">
+<style lang="less">
 .list-page {
   height: 100%;
   position: relative;
   background-color: #e9e9e9;
+}
+.options-img {
+  width: 20px;
 }
 </style>
