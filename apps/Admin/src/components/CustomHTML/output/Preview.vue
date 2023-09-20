@@ -14,7 +14,7 @@ import { Store } from '../types'
 import { ReplStore } from '../store'
 
 const props = defineProps<{ code?: string }>()
-const useVueMode = <Ref<Boolean>>inject('useVueMode')
+// const useVueMode = <Ref<Boolean>>inject('useVueMode')
 let store = inject('store') as Store
 if (props.code) {
   store = new ReplStore(props.code)
@@ -36,9 +36,9 @@ watch(
   },
 )
 
-watch(useVueMode, () => {
-  createSandBox()
-})
+// watch(useVueMode, () => {
+//   createSandBox()
+// })
 
 onMounted(() => {
   createSandBox()
@@ -88,7 +88,7 @@ function createSandBox() {
 }
 
 function updatePreview() {
-  if (!useVueMode.value) return
+  // if (!useVueMode?.value) return
   if (import.meta.env.PROD) {
     console.clear()
   }
