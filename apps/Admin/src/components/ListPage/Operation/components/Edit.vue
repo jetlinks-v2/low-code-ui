@@ -14,7 +14,7 @@
         <div class="default-btn" v-if="iconType">
             <AIcon
             :type="activeBtn?.icon"
-            class="default-icon"
+            class="default-icon custom"
           />
         </div>
         <!-- <UploadIcon v-model:modelValue="form.icon" v-else /> -->
@@ -226,10 +226,7 @@ const handlePages = (val: string) => {
   form.resource.parentId = `${form.resource.projectId}.${form.resource.parentId}`
 }
 const submit = async () => {
-  const valid = await formRef.value?.validate()
-  return valid
-    ? { ...form, children: activeBtn?.value.children || [] }
-    : undefined
+  return { ...form, children: activeBtn?.value.children || [] }
 }
 
 const language = ref('javascript')
@@ -260,6 +257,9 @@ defineExpose({
     justify-content: center;
     align-items: center;
     border-radius: 4px;
+    .custom {
+      cursor: not-allowed;
+    }
     .default-icon {
       border: 1px dashed #d9d9d9;
       padding: 5px;

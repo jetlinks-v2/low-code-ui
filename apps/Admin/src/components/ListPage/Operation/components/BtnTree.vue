@@ -14,8 +14,9 @@
         <AIcon type="CaretDownOutlined" :class="switcherCls"></AIcon>
       </template>
       <template #title="{ dataRef, title }">
-        <div class="title-config">
-          <span class="title">{{ title }}</span>
+        <div class="title-config" >
+          <slot name="title" :data="dataRef"></slot>
+          <span class="title" v-if="!slotsName.includes('title')">{{ slotsName }}</span>
           <slot name="config" :data="dataRef"></slot>
         </div>
       </template>
@@ -29,8 +30,10 @@ import type {
   TreeProps,
 } from 'ant-design-vue/es/tree';
 import { onlyMessage } from '@jetlinks/utils';
+import { useSlots } from 'vue';
 
-
+const slots = useSlots();
+const slotsName = Object.keys(slots)
 interface Emit {
   (e: 'update:btnList', value: any): void;
 }
@@ -42,7 +45,7 @@ const props = defineProps({
   draggable: {
     type: Boolean,
     default: true,
-  }
+  },
 })
 
 const btnTree = computed({
