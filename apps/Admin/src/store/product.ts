@@ -131,10 +131,10 @@ export const useProduct = defineStore('product', () => {
         const add = {
           ...record,
           others:{
-            ...record.others,
             createTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
             modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
-            useList:[]
+            useList:[],
+            ...record.others,
           },
         }
         return {
