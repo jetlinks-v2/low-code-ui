@@ -197,10 +197,10 @@ const form = reactive({
     editType!.value === 'add' &&
     functionOptions!.value.find((item) => item.fullId === props.data.functions)
       ?.provider === providerEnum.Function
-      ? ''
+      ? null
       : props.data.functions,
   pages: props.data.pages,
-  command: functionOptions!.value.find((item) => item.fullId === props.data.functions)
+  command: !props.data.functions || functionOptions!.value.find((item) => item.fullId === props.data.functions)
       ?.provider === providerEnum.Function
       ? null
       : props.data.command,
@@ -226,7 +226,7 @@ const rules = {
 
 const handlePages = (val: string) => {
   const data = pagesOptions.value.find(item => item.id === val)
-  console.log(data);
+  console.log(pagesOptions);
   form.resource = {...pick(data, ['id', 'parentId', 'type']), projectId: info.id}
   form.resource.parentId = `${form.resource.projectId}.${form.resource.parentId}`
 }
