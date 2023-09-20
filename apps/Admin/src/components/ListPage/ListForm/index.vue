@@ -36,9 +36,7 @@
           </j-badge>
         </j-form-item>
 
-        <j-form-item label="默认形态" v-if="showType.configured?.length === 2" :rules="{
-          required: true,
-        }">
+        <j-form-item label="默认形态" v-if="showType.configured?.length === 2">
           <j-radio-group v-model:value="showType.defaultForm" button-style="solid">
             <j-radio-button value="list" class="check-btn">
               数据列表

@@ -59,6 +59,7 @@ watch(() => props.value, () => {
 <style scoped lang="less">
 .editor-modal-warp {
   position: relative;
+  height: 300px;
 
   .open-modal {
     position: absolute;

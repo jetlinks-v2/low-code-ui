@@ -94,7 +94,7 @@ export default defineComponent({
                             </FormItem>
                             : renderContent()
                     }
-
+                    <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{props.data?.componentProps?.description}</div>
                 </Selection>
             )
         }
