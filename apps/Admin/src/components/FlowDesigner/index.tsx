@@ -94,7 +94,9 @@ const FlowDesigner = defineComponent({
                   class: { 'add-branch-btn-el': true },
                   size: 'small',
                   round: true,
-                  text: isConditionNode(node) ? '条件分支' : '并行分支',
+                  text: isConditionNode(node)
+                    ? `条件分支-${node.id}`
+                    : `并行分支-${node.id}`,
                   isConditionNode: isConditionNode(node),
                   onAddBranchNode: (type) => addBranchNode(node, type),
                   onOpenConfig: () => openConfig(node),
@@ -278,17 +280,23 @@ const FlowDesigner = defineComponent({
         {
           id: getRandomId(),
           parentId: parentNode.children.id,
-          type: 'CONDITION',
-          props: cloneDeep(DefaultProps.CONDITION_PROPS),
           name: '条件1',
+          type: 'CONDITION',
+          props: {
+            ...cloneDeep(DefaultProps.CONDITION_PROPS),
+            branchBy: parentNode.children.id,
+          },
           children: {},
         },
         {
           id: getRandomId(),
           parentId: parentNode.children.id,
-          type: 'CONDITION',
-          props: cloneDeep(DefaultProps.CONDITION_PROPS),
           name: '条件2',
+          type: 'CONDITION',
+          props: {
+            ...cloneDeep(DefaultProps.CONDITION_PROPS),
+            branchBy: parentNode.children.id,
+          },
           children: {},
         },
       ]
@@ -309,6 +317,7 @@ const FlowDesigner = defineComponent({
           type: 'APPROVAL',
           props: {
             ...cloneDeep(DefaultProps.APPROVAL_PROPS),
+            branchBy: parentNode.children.id,
             style: {
               margin: '30px',
             },
@@ -323,6 +332,7 @@ const FlowDesigner = defineComponent({
           type: 'DEAL',
           props: {
             ...cloneDeep(DefaultProps.DEAL_PROPS),
+            branchBy: parentNode.children.id,
             style: {
               margin: '30px',
             },
