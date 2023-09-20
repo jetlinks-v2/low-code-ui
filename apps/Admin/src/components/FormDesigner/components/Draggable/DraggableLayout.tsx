@@ -118,6 +118,7 @@ const DraggableLayout = defineComponent({
                             watch(
                                 () => myValue.value, 
                                 (newValue) => {
+                                    console.log(newValue, '123')
                                     set(designer.formState, _path, newValue)
                                 }, 
                                 {
