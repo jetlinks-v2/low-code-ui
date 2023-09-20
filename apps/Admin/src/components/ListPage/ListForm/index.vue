@@ -12,28 +12,33 @@
       :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
       @close="emits('update:open', false)"
     >
-      <div v-if="!showType!.configurationShow">
-        <p>数据展示方式</p>
-        <div class="j-check-btn">
-          <div :class="classList" @click="configuredChange('list')">
-            数据列表
-          </div>
+      <j-form v-if="!showType!.configurationShow" layout="vertical">
+        <j-form-item label="数据展示方式" :rules="{
+          required: true,
+        }">
+          <div class="j-check-btn">
+            <div :class="classList" @click="configuredChange('list')">
+              数据列表
+            </div>
 
-          <div :class="classCard" @click="configuredChange('card')">
-            卡片列表
+            <div :class="classCard" @click="configuredChange('card')">
+              卡片列表
+            </div>
           </div>
-        </div>
-        <div v-if="showType!.configured.includes('card')">
-          <p class="title">卡片配置</p>
+        </j-form-item>
+        <j-form-item label="卡片配置" v-if="showType!.configured.includes('card')" :rules="{
+          required: true,
+        }">
           <j-badge :count="errorList.length">
             <j-button :style="{width: '300px', border: errorList.length ? '1px solid red' : ''}" @click="showType!.configurationShow = true" :class="{ 'error-boder': errorList.length }"
               >配置</j-button
             >
           </j-badge>
-        </div>
+        </j-form-item>
 
-        <div v-if="showType!.configured?.length === 2">
-          <p class="title">默认形态</p>
+        <j-form-item label="默认形态" v-if="showType!.configured?.length === 2" :rules="{
+          required: true,
+        }">
           <j-radio-group v-model:value="showType!.defaultForm" button-style="solid">
             <j-radio-button value="list" class="check-btn">
               数据列表
@@ -43,8 +48,8 @@
               卡片列表
             </j-radio-button>
           </j-radio-group>
-        </div>
-      </div>
+        </j-form-item>
+      </j-form>
 
       <div v-if="showType!.configurationShow" class="card-type">
         <a-page-header @back="back" title=" ">

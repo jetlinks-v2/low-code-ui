@@ -206,6 +206,7 @@ const validate = async () => {
     if (errorList.length) {
       reject(errorList)
     } else {
+      onlyMessage('校验成功')
       resolve([])
     }
     // Promise.all(promiseArr)

@@ -35,10 +35,11 @@
               />
               <AIcon
                 type="EditOutlined"
-                @click="handleEditBtn(data)"
                 :class="{ error: errorList!.find((item) => item.key == data.key) }"
+                class="primary"
+                @click="handleEditBtn(data)"
               />
-              <AIcon type="DeleteOutlined" @click="handleDel(data.key)" />
+              <AIcon type="DeleteOutlined" @click="handleDel(data.key)" class="danger"/>
             </j-space>
           </template>
         </BtnTree>
@@ -111,6 +112,12 @@ const handleDel = (key: string) => {
   width: 320px;
   .add-btn {
     width: 100%;
+  }
+  .danger {
+    color: #E50012;
+  }
+  .primary {
+    color: @primary-color;
   }
 }
 .title {

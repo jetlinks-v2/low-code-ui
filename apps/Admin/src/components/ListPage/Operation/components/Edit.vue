@@ -14,7 +14,7 @@
         <div class="default-btn" v-if="iconType">
             <AIcon
             :type="activeBtn?.icon"
-            class="default-icon"
+            class="default-icon custom"
           />
         </div>
         <!-- <UploadIcon v-model:modelValue="form.icon" v-else /> -->
@@ -260,6 +260,9 @@ defineExpose({
     justify-content: center;
     align-items: center;
     border-radius: 4px;
+    .custom {
+      cursor: not-allowed;
+    }
     .default-icon {
       border: 1px dashed #d9d9d9;
       padding: 5px;

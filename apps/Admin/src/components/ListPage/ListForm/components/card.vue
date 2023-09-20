@@ -176,7 +176,7 @@
           <j-form-item label="特殊样式" name="specialStyle">
             <EditorModal
               v-model:value="formState.specialStyle"
-              language="css"
+              language="json"
             />
           </j-form-item>
         </div>
