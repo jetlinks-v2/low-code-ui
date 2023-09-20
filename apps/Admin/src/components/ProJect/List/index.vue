@@ -165,6 +165,9 @@ const onSave = (data?: any) => {
   if (data) {
     visible.value = false
     type.value === 'Add' ? product.add(data,data.parentId,true) : product.update(data)
+    setTimeout(()=>{
+      selectKey.value = data.id
+    },300)
   }
 }
 
@@ -179,7 +182,9 @@ const onPaste = (parentId?: string) => {
   current.value = {
     title: `copy_${copyItem.name}`,
     children: copyItem.children ? restId(copyItem.children) : undefined,
-    parentId: parentId ? parentId : undefined
+    parentId: parentId ? parentId : undefined,
+    configuration:copyItem.configuration?copyItem.configuration:undefined,
+    others:copyItem.others?copyItem.others:undefined
   }
   visible.value = true
 }
