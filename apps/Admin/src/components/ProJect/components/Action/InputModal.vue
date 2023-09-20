@@ -10,7 +10,7 @@
                 <template #label>
                     {{ `${titleType} ${props.provider ? providerMap[props.provider] : ''}` }}
                 </template>
-                <j-input v-model:value="modelRef.title" placeholder="请输入" ref="inputRef"/>
+                <j-input v-model:value="modelRef.title" placeholder="请输入" ref="inputRef" />
             </j-form-item>
         </j-form>
     </j-modal>
