@@ -291,6 +291,7 @@ watchEffect(() => {
 @columnDataBg: #c3d1ff;
 @columnOperationBg: #c3d1ff;
 @paginationBg: #c3d1ff;
+@bg: #c3d1ff;
 
 .list-skeleton {
   height: calc(100% - 70px);
@@ -366,66 +367,79 @@ watchEffect(() => {
   .config-item {
     cursor: pointer;
     border-radius: 4px;
+    position: relative;
     &.animation {
       animation: blink 1s infinite;
       &.filter {
-        background-color: @filterBg;
+        background-color: @bg;
       }
       &.btn {
-        background-color: @btnBg;
+        background-color: @bg;
       }
       &.type {
-        background-color: @typeBg;
+        background-color: @bg;
       }
       &.column-data {
-        background-color: @columnDataBg;
+        background-color: @bg;
       }
       &.column-operation {
-        background-color: @columnOperationBg;
+        background-color: @bg;
       }
       &.pagination {
-        background-color: @paginationBg;
+        background-color: @bg;
       }
     }
-    &.filter:hover {
-      background-color: @filterBg !important;
+    &:hover {
+      background-color: @primary-color !important;
+      &::after{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        left: 0;
+        top: 0;
+        color: #FFFFFF;
+      }
+      &.filter::after {
+        content: '筛选项';
+      }
+      &.btn::after {
+        content: '操作按钮';
+      }
+      &.type::after {
+        content: '展示格式';
+      }
+      &.column-data::after {
+        content: '数据列表头';
+      }
+      &.column-operation::after {
+        content: '操作列';
+      }
+      &.pagination::after {
+        content: '分页器';
+      }
     }
-    &.btn:hover {
-      background-color: @btnBg !important;
-    }
-    &.type:hover {
-      background-color: @typeBg !important;
-    }
-    &.column-data:hover {
-      background-color: @columnDataBg !important;
-    }
-    &.column-operation:hover {
-      background-color: @columnOperationBg !important;
-    }
-    &.pagination:hover {
-      background-color: @paginationBg !important;
-    }
+    // &.btn:hover {
+    //   background-color: @btnBg !important;
+    // }
+    // &.type:hover {
+    //   background-color: @typeBg !important;
+    // }
+    // &.column-data:hover {
+    //   background-color: @columnDataBg !important;
+    // }
+    // &.column-operation:hover {
+    //   background-color: @columnOperationBg !important;
+    // }
+    // &.pagination:hover {
+    //   background-color: @paginationBg !important;
+    // }
   }
 }
 .config-done {
-  &.filter {
-    background-color: @filterBg;
-  }
-  &.btn {
-    background-color: @btnBg;
-  }
-  &.type {
-    background-color: @typeBg;
-  }
-  &.column-data {
-    background-color: @columnDataBg;
-  }
-  &.column-operation {
-    background-color: @columnOperationBg;
-  }
-  &.pagination {
-    background-color: @paginationBg;
-  }
+  background-color: @bg;
 }
 
 @keyframes blink {
