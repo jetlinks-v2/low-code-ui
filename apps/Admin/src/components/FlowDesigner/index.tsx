@@ -53,7 +53,7 @@ const FlowDesigner = defineComponent({
     const valid = ref(true)
 
     const nodeMap = computed(() => flowStore.nodeMap)
-    const dom = computed(() => flowStore.design?.process)
+    const dom = computed(() => flowStore.model.nodes)
 
     const getDomTree = (h, node) => {
       // console.log('node: ', node);

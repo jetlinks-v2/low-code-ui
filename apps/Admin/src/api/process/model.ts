@@ -4,13 +4,13 @@ import { request } from '@jetlinks/core'
  * 条件查询流程模型
  * @returns 
  */
-export const getProcess_api = (data: any) => request.post(`/process/definition/_query`,data);
+export const getProcess_api = (data: any) => request.post(`/process/definition/_query`, data);
 
 /**
  * 保存模型
  * @returns 
  */
-export const saveProcess_api = (data: any) => request.patch(`/process/definition`,data);
+export const saveProcess_api = (data: any) => request.patch(`/process/definition`, data);
 /**
  * 获取模型类型
  * @returns 
@@ -25,3 +25,11 @@ export const deploy_api = (id: string) => request.post(`/process/definition/${id
  * 删除模型
  */
 export const del_api = (id: string) => request.remove(`/process/definition/${id}`)
+/**
+ * 获取模型详情
+ */
+export const detail_api = (id: string) => request.get(`/process/definition/${id}`)
+/**
+ * 更新模型
+ */
+export const update_api = (data: any) => request.put(`/process/definition/${data.id}`, data)

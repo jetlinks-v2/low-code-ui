@@ -81,7 +81,7 @@ const content = computed(() => {
 })
 
 const getFormItemById = (id) => {
-  return flowStore.design.formItems.find((item) => item.id === id)
+  return flowStore.model.formItems.find((item) => item.id === id)
 }
 
 //校验数据配置的合法性

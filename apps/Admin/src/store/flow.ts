@@ -1,34 +1,24 @@
 import { defineStore } from 'pinia'
+import type { INode, IConfig } from '@/views/process/model/Detail/typings.d.ts'
+interface IModel {
+    config: Partial<IConfig>;
+    nodes: Partial<INode>;
+}
 
 export const useFlowStore = defineStore('flow', () => {
     const nodeMap = new Map()
-    const isEdit = ref(null)
+    // const isEdit = ref(null)
     const selectedNode = ref({})
-    const selectFormItem = ref(null)
-    const design = ref({
-        // formId: null,
-        // formName: "未命名表单",
-        // logo: {
-        //     icon: "el-icon-eleme",
-        //     background: "#1e90ff"
-        // },
-        // settings: {
-        //     commiter: [],
-        //     admin: [],
-        //     sign: false,
-        //     notify: {
-        //         types: ["APP"],
-        //         title: "消息通知标题"
-        //     }
-        // },
-        // groupId: undefined,
-        // formItems: [],
-        process: {
+    // const selectFormItem = ref(null)
+    // 流程模型数据
+    const model = ref<IModel>({
+        config: {},
+        nodes: {
             id: 'root',
             parentId: null,
             type: 'ROOT',
             name: '发起人',
-            desc: '任何人',
+            // desc: '任何人',
             active: false,
             props: { assignedUser: [], formPerms: [] },
             children: {
@@ -82,7 +72,6 @@ export const useFlowStore = defineStore('flow', () => {
                             },
                             type: 'APPROVAL',
                             name: '审批人',
-                            children: {},
                             active: false,
                         },
                     },
@@ -109,7 +98,6 @@ export const useFlowStore = defineStore('flow', () => {
                                 id: 'node_889251733649',
                                 parentId: 'node_889251728116',
                                 type: 'EMPTY',
-                                children: {},
                                 active: false,
                             },
                             branches: [
@@ -141,7 +129,6 @@ export const useFlowStore = defineStore('flow', () => {
                                         style: { margin: '30px' },
                                         isBranchNode: true,
                                     },
-                                    children: {},
                                     active: false,
                                 },
                                 {
@@ -156,7 +143,6 @@ export const useFlowStore = defineStore('flow', () => {
                                         style: { margin: '30px' },
                                         isBranchNode: true,
                                     },
-                                    children: {},
                                     active: false,
                                 },
                             ],
@@ -165,7 +151,6 @@ export const useFlowStore = defineStore('flow', () => {
                 ],
             },
         }
-        // remark: "备注说明"
     })
 
     /**
@@ -176,26 +161,26 @@ export const useFlowStore = defineStore('flow', () => {
         selectedNode.value = data
     }
 
-    const loadForm = (data: any) => {
-        design.value = data
-    }
+    // const loadForm = (data: any) => {
+    //     model.value = data
+    // }
 
     /**
      * 是否可编辑
      * @param data 
      */
-    const setIsEdit = (data: any) => {
-        isEdit.value = data
-    }
+    // const setIsEdit = (data: any) => {
+    //     isEdit.value = data
+    // }
 
     return {
         selectedNode,
-        isEdit,
+        // isEdit,
         nodeMap,
-        design,
-        selectFormItem,
-        loadForm,
-        setIsEdit,
+        model,
+        // selectFormItem,
+        // loadForm,
+        // setIsEdit,
         setSelectedNode
     }
 })
