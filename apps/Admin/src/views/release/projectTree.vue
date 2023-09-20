@@ -18,9 +18,10 @@ const getTree = () => {
   list.value = copyData.filter(item => {
     return item.others && item.others?.menu && item.others?.menu.main
   }).map(item => {
-    item.parentFullId = maps.get(item.parentId).fullId
+    item.parentFullId = maps.get(item.parentId).fullId || item.parentId
     return item
   })
+  console.log(list.value)
 }
 
 const change = (data) => {
