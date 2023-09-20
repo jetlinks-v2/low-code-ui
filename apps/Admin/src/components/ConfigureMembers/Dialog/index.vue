@@ -91,6 +91,7 @@ const handleClick = (key) => {
 }
 const selectRef = ref()
 const confirm = () => {
+  if(!selectKey.value) return
   if (!count.value) {
     show.value = true
   } else {

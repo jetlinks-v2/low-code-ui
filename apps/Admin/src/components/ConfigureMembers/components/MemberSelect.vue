@@ -130,9 +130,9 @@ const members: any = inject('members')
 
 const columns = computed(() => {
   if (props.isNode) {
-    return defaultColumns
+    return defaultColumns(props.selectKey)
   } else {
-    return defaultColumns.filter((item) => item.key !== 'weights')
+    return defaultColumns(props.selectKey).filter((item) => item.key !== 'weights')
   }
 })
 
@@ -157,6 +157,11 @@ const treeData = ref<any[]>([])
 // 选中的树节点
 const selectedKeys = ref<string[]>([])
 const onSelect = (keys: string[], { node }) => {
+  // 按关系
+  if(active.value === '2'){
+
+    return
+  }
   const index = dataSource.value
     .map((i) => i.key)
     .findIndex((i) => i === node.id)
@@ -295,7 +300,7 @@ watch(
   () => {
     if (!props.isNode) {
       // 基础信息
-      // getTreeData
+      getTreeData()
     } else {
       // 设计流程
       getTreeData()

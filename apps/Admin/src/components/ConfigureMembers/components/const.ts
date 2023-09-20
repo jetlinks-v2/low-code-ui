@@ -1,25 +1,27 @@
-export const defaultColumns = [
-  {
-    title: '组织',
-    // dataIndex: 'organization',
-    dataIndex: 'title',
-    key: 'title',
-    ellipsis: true,
-  },
-  {
-    title: '权重',
-    dataIndex: 'weights',
-    key: 'weights',
-    ellipsis: true,
-  },
-  {
-    title: '操作',
-    dataIndex: 'action',
-    key: 'action',
-    ellipsis: true,
-    scopedSlots: true,
-  },
-]
+export const defaultColumns = (key: string) => {
+  return [
+    {
+      title: key === 'organization' ? '组织' : key === 'user' ? '用户' : '角色',
+      // dataIndex: 'organization',
+      dataIndex: 'title',
+      key: 'title',
+      ellipsis: true,
+    },
+    {
+      title: '权重',
+      dataIndex: 'weights',
+      key: 'weights',
+      ellipsis: true,
+    },
+    {
+      title: '操作',
+      dataIndex: 'action',
+      key: 'action',
+      ellipsis: true,
+      scopedSlots: true,
+    },
+  ]
+}
 
 /**
  * 将树形结构数据扁平化
