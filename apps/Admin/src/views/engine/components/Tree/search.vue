@@ -1,7 +1,7 @@
 <template>
   <div class="tree-search">
     <div class="search-text">
-      <j-input placeholder="搜索" :bordered="false" class="search-input">
+      <j-input placeholder="搜索" :bordered="false" class="search-input" @change="search">
         <template #prefix>
           <AIcon type="SearchOutlined" style="color: rgba(0, 0, 0, 0.45)" />
         </template>
@@ -30,10 +30,12 @@
 </template>
 
 <script setup name="TreeSearch">
-import { useEngine } from '@/store'
-import { getImage } from '@jetlinks/utils';
+import { useEngine, useProduct } from '@/store'
+import {filterTreeNodes, getImage} from '@jetlinks/utils';
+import { debounce } from 'lodash-es'
 
 const engine = useEngine()
+const product = useProduct()
 
 const emit = defineEmits(['collapsed'])
 const isExpand = ref(false)
@@ -51,6 +53,11 @@ const collapsedClass = computed(() => {
     'collapsed': props.collapsed
   }
 })
+
+const search = debounce((v) => {
+  console.log(v.target.value)
+  product.filterTree(v.target.value)
+}, 300)
 
 const collapsedChange = () => {
   emit('collapsed', !props.collapsed)

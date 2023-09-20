@@ -3,9 +3,10 @@
     <j-button type="primary" @click="visible=true" :disabled="disabled">{{ type === 'product' ? '产品选择' : '设备选择' }}</j-button>
     <SelectModal v-if="visible" @close="closeModal" @update-data="updateData" :select="selectData"></SelectModal>
     <div class="select">
-      <j-tag v-for="(item) in selectData" :key="item.id" closable @close="cancelSelect(item.id)" class="selectItem">
-        {{ item.name }}
-      </j-tag>
+      <div v-for="(item) in selectData" :key="item.id" class="selectItem">
+        <div>{{ '哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈' || item.name }}</div>
+        <div @click="cancelSelect(item.id)"><AIcon type="CloseOutlined" class="selectItemIcon" /></div>
+      </div>
     </div>
   </div>
 </template>
@@ -25,7 +26,7 @@ const props = defineProps({
 
 const type = inject('type')
 const emit = defineEmits(['updateValue'])
-const selectData = ref()
+const selectData = ref([])
 const visible =ref(false)
 const closeModal = () =>{
   visible.value = false
@@ -34,8 +35,8 @@ const updateData = (data:any) =>{
   visible.value = false
   emit('updateValue',data)
 }
-const cancelSelect = (id:string)=>{
-  const index = selectData.value.includes(id)
+const cancelSelect = (id: string)=>{
+  const index = selectData.value.findIndex((item: any) => item?.id === id)
   selectData.value.splice(index,1)
 } 
 watch(()=>props.value,()=>{
@@ -44,16 +45,25 @@ watch(()=>props.value,()=>{
 </script>
 <style lang="less" scoped>
 .select{
-  margin-top: 8px;
+  margin-bottom: 8px;
   width: 100%;
+  display: flex;
+  flex-wrap: wrap;
   .selectItem{
     background-color: #F3F3F3;
     border: none;
     margin-bottom: 6px;
     border-radius: 8px;
     padding: 2px 8px;
+    margin-right: 10px;
     color: #333333;
     font-size: 12px;
+    display: flex;
+    gap: 10px;
+    .selectItemIcon {
+      color: #333333;
+      font-size: 10px;
+    }
   }
 }
 </style>

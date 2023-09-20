@@ -2,7 +2,11 @@
   <Scrollbar>
     <div class="header">组件配置</div>
     <div class="config-container" id="config-container">
-      <j-form ref="formRef" :model="formState" layout="vertical" :validateFirst="true">
+      <j-form
+        ref="formRef"
+        :model="formState"
+        layout="vertical"
+      >
         <j-collapse
           v-model:activeKey="activeKey"
           :expand-icon-position="'right'"
@@ -34,8 +38,10 @@ import { map } from 'lodash-es'
 import { getConfigList } from './utils'
 import { useTarget } from '../../../hooks'
 import { updateData } from '../../../utils/utils'
+import { useFocusWithin } from '@vueuse/core'
 
 const formRef = ref<any>()
+const { focused } = useFocusWithin(formRef)
 
 const { target } = useTarget()
 const formState = reactive({ ...unref(target) })
@@ -117,6 +123,17 @@ watch(
         onSave()
       })
     }
+  },
+  {
+    immediate: true,
+    deep: true,
+  },
+)
+
+watch(
+  () => focused.value,
+  (newValue) => {
+    designer.focused.value = newValue
   },
   {
     immediate: true,

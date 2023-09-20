@@ -137,7 +137,7 @@ watch(
       item.el.style.backgroundColor = <string>item.backgroundColor
       item.el.style.pointerEvents = 'none'
       item.el.style.position = 'relative'
-      item.el.style.zIndex = '1001'
+      item.el.style.zIndex = '3'
       item.el.style.top = steps.value === 1 ? '10px' : '0px';
       const node = document.createElement('div')
       node.setAttribute('class', `temp-element`)
@@ -157,7 +157,6 @@ const handleJump = () => {
   steps.value = 0;
 }
 function position(el: HTMLElement, position?: string) {
-  console.log(el);
   let result: string[] = ['0px', '0px']
   switch (position) {
     case 'top':
@@ -222,7 +221,7 @@ watch(
   top: 0;
   left: 0;
   color: #ffffff;
-  z-index: 1000;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -230,8 +229,8 @@ watch(
   .stop {
     position: absolute;
     right: 20px;
-    top: 72px;
-    z-index: 1001;
+    top: 92px;
+    z-index: 3;
   }
   .message {
     white-space: nowrap;

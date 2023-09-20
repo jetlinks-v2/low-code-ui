@@ -116,6 +116,7 @@ const rules = {
     }
   ],
   message: [
+    { required: true, message: '请输入校验不通过时提示语' },
     { max: 64, message: '最多输入64位字符'}
   ],
   group: [

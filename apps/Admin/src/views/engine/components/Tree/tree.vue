@@ -138,11 +138,11 @@ const menuClick = (record) => {
 
 <style scoped lang="less">
 .tree-content-warp {
-  height: calc(100% - 44px);
+  height: calc(100% - 54px);
 
   .tree-content-body {
     height: 100%;
-    padding: 0 12px;
+
     :deep(.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected){
       background-color: #F6F7F9;
       color: #315EFB;
@@ -159,6 +159,7 @@ const menuClick = (record) => {
       height: 40px;
       line-height: 40px;
       font-size: 16px;
+      white-space: nowrap;
     
       .icon{
         margin-right: 10px;
