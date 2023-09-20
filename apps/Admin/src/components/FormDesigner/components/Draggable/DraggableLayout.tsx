@@ -96,29 +96,28 @@ const DraggableLayout = defineComponent({
                     case 'table': 
                         return (<TableLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></TableLayout>)
                     default:
-                        if (unref(isEditModel) || componentMap?.[element?.type]) {
                             const TypeComponent = componentMap?.[element?.type] || 'div'
                             const _props = useProps(element, unref(designer.formData), unref(isEditModel), unref(designer.mode))
-
                             const selectRef = ref<any>(null)
-
                             const params = {
                                 data: element,
                                 parent: props.data
                             }
-
                             if (element?.formItemProps?.name) {
                                 _path[_index] = element?.formItemProps?.name
                             }
+                        if (unref(isEditModel) || componentMap?.[element?.type]) {
+                            const myValue = ref<any>()
+                            const checked = ref<any>()
 
-                            const myValue = ref<any>(get(designer.formState, _path))
-                            const checked = ref<any>(get(designer.formState, _path))
-                            
+                            if(!isEditModel.value){
+                                myValue.value = get(designer.formState, _path)
+                                checked.value = get(designer.formState, _path)
+                            }      
 
                             watch(
                                 () => myValue.value, 
                                 (newValue) => {
-                                    console.log(newValue, '123')
                                     set(designer.formState, _path, newValue)
                                 }, 
                                 {
