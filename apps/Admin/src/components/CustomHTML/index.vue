@@ -198,6 +198,13 @@ const submit = () => {
   cancel()
 }
 
+const editorFocus = () => {
+  if (activeOper.value === OperType.Menu) {
+    drawerVisible.value = false
+    activeOper.value = ''
+  }
+}
+
 watch(() => props.data?.title, () => {
   menuFormData.value = {
     ...props.data.others.menu,
@@ -217,6 +224,7 @@ defineExpose({
         <EditorContainer @dbClick="handleDbCLickEditor">
           <MonacoEditor
             @change="onChange"
+            @focus="editorFocus"
             :filename="store.state.activeFile.filename"
             :value="store.state.activeFile.code"
           />
@@ -284,10 +292,10 @@ defineExpose({
           @change="updateMenuFormData"
         />
       </div>
-      <div class="drawer-footer" v-show="activeOper === OperType.Menu">
-        <j-button @click="cancel">取消</j-button>
-        <j-button type="primary"  @click="submit">确认</j-button>
-      </div>
+<!--      <div class="drawer-footer" v-show="activeOper === OperType.Menu">-->
+<!--        <j-button @click="cancel">取消</j-button>-->
+<!--        <j-button type="primary"  @click="submit">确认</j-button>-->
+<!--      </div>-->
     </div>
   </div>
 </template>
