@@ -164,7 +164,7 @@ const onShow = (val) => {
 const onSave = (data?: any) => {
   if (data) {
     visible.value = false
-    type.value === 'Add' ? product.add(data, data.parentId) : product.update(data)
+    type.value === 'Add' ? product.add(data,data.parentId,true) : product.update(data)
   }
 }
 

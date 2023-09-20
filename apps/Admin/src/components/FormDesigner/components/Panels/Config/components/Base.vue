@@ -391,6 +391,7 @@
             v-model:value="target.componentProps.size"
             style="width: 100%"
             :precision="0"
+            :min="0"
             @change="onDataChange"
           />
         </j-form-item>
