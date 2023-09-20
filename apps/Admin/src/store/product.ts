@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { queryProjectDraft, updateDraft} from "@/api/project";
 import { useEngine } from './engine'
 import dayjs from 'dayjs';
-import {throttle, cloneDeep, omit, result} from 'lodash-es'
+import {throttle, cloneDeep, omit} from 'lodash-es'
 import { Integrate } from '@/utils/project'
 import { providerEnum } from  '@/components/ProJect/index'
 import { filterTreeNodes } from '@jetlinks/utils'
@@ -236,7 +236,6 @@ export const useProduct = defineStore('product', () => {
     updateDataCache()
     engine.updateFile(record,'add',open)
     updateProductReq(data.value, (result) => {
-      console.log(result)
       handleProjectData(result)
     })
   }
