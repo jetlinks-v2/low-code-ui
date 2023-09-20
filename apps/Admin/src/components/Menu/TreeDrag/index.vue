@@ -45,7 +45,7 @@
             onVisibleChange: setVisible,
         }" 
         :src="getImage('/menu/menu.png')" />
-    <Save v-if="visible" @close="visible = false" :data="treeItem" @ok="onOk" />
+    <Save v-if="visible" @close="visible = false" :data="treeItem" @ok="onOk" :projectId="projectId"/>
     <DelModal v-if="visibleDel" @close="visibleDel = false" @ok="onDel" :data="treeItem" />
 </template>
 
