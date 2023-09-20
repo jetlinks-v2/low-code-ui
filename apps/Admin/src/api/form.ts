@@ -24,6 +24,15 @@ export const queryProductList = (data: any) => request.post('/device-product/_qu
 export const queryDeviceList = (data: any) => request.post('/device-instance/_query', data)
 
 /**
+ * 查询产品列表(不分页)
+ */
+export const queryProductNoPage = (data:any) => request.post('/device-product/_query/no-paging',data)
+
+/**
+ * 查询设备列表(不分页)
+ */
+export const queryDeviceNoPage = (data:any) => request.post('/device-instance/_query/no-paging',data)
+/**
  * 查询字典列表
  */
 export const queryDictionary = () => request.post('/dictionary/_query/no-paging', { paging: false })

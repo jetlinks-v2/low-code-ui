@@ -7,8 +7,8 @@ import Iot from './iotComponents/index.vue'
 import {  provide } from 'vue'
 const props =  defineProps({
   value:{
-    type:Array,
-    default:[]
+    type:Array || String,
+    default:[] || ''
   },
   mode:{
     type:String,
@@ -29,6 +29,10 @@ provide('mode',props.mode)
 watch(()=>props.value,()=>{
   _value.value = props.value
 },{deep:true,immediate:true})
+
+watch(()=>props.mode,()=>{
+  props.mode ? _value.value = [] : _value.value = ''
+},{immediate:true})
 </script>
 <style lang="less" scoped>
 </style>
