@@ -209,16 +209,16 @@ const validate = async () => {
     ...menuConfigRef.value?.valid(),
     ...dataBindRef.value?.valid(),
   ]
-  console.log(errorList)
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (errorList.length) {
+        reject(errorList)
       } else {
         onlyMessage('校验通过')
         resolve([])
       }
       spinning.value = false
-    }, 1000)
+    }, 500)
     
     // Promise.all(promiseArr)
     //   .then((res) => {
