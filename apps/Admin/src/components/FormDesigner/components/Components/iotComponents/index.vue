@@ -101,7 +101,7 @@ watch(()=>props.value,()=>{
 </script>
 <style lang="less" scoped>
 .select{
-  margin-bottom: 8px;
+  margin: 8px 0;
   width: 100%;
   display: flex;
   flex-wrap: wrap;

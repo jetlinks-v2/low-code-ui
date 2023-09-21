@@ -17,8 +17,8 @@
 // }
 
 export const onEnd = (e: any, _data: any) => {
-    // console.log(e)  && !e.items?.length
+    // console.log(e)  && !e.items?.length e.item?._underlying_vm_ || 
     if(e.to?.dataset?.layoutType !== 'filed-item'){
-        _data.setSelection(e.item?._underlying_vm_ || 'root')
+        _data.setSelection('root')
     }
 }
