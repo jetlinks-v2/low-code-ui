@@ -46,9 +46,12 @@
                 width: '300px',
                 border: errorList.length ? '1px solid red' : '',
               }"
-              :class="{ 'config-done': listFormInfo.field1?.length > 0 ? 'config-done' : ''}"
               @click="showType.configurationShow = true"
-              >配置</j-button
+              >
+              <div class="config-done" v-if="listFormInfo.field1?.length > 0">
+                <AIcon type="CheckOutlined"/>
+              </div>
+              配置</j-button
             >
           </j-badge>
         </j-form-item>
@@ -269,18 +272,19 @@ defineExpose({
   }
 }
 .config-done{
-  &::after{
-    content: '';
-    background-color: @primary-color;
-    clip-path: polygon(100% 100%, 0 0, 100% 0%, 100% 100%);
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 20px;
-    height: 20px;
-    color: #fff;
-    border-radius: 0 4px 0 0;
-  }
+  background-color: @primary-color;
+  clip-path: polygon(100% 100%, 0 0, 100% 0%, 100% 100%);
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 22px;
+  height: 22px;
+  color: #fff;
+  border-radius: 0 4px 0 0;
+  padding: 2px 0px 0 0;
+  display: flex;
+  justify-content: flex-end;
+  font-size: 12px;
 }
 .title {
   margin-top: 20px;

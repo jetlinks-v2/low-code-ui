@@ -88,20 +88,21 @@
 
               <!--object类型-->
 
-              <j-radio-group
-                v-if="configState.type === 'object'"
-                v-model:value="configState.demonstrations"
-                button-style="solid"
-              >
-                <j-space size="large">
-                  <j-radio-button value="json" class="check-btn">
-                    json展示
-                  </j-radio-button>
-                  <j-radio-button value="page" class="check-btn">
-                    页面展示
-                  </j-radio-button>
-                </j-space>
-              </j-radio-group>
+              <ErrorItem v-if="configState.type === 'object'" :error-data="errorData('demonstrations')">
+                <j-radio-group
+                  v-model:value="configState.demonstrations"
+                  button-style="solid"
+                >
+                  <j-space size="large">
+                    <j-radio-button value="json" class="check-btn">
+                      json展示
+                    </j-radio-button>
+                    <j-radio-button value="page" class="check-btn">
+                      页面展示
+                    </j-radio-button>
+                  </j-space>
+                </j-radio-group>
+              </ErrorItem>
 
               <!--date类型-->
 
@@ -140,19 +141,21 @@
               </div>
 
               <!--file/enum/array类型-->
-              <j-select
-                v-else-if="
-                  configState.type === 'file' ||
-                  configState.type === 'enum' ||
-                  configState.type === 'array'
-                "
-                v-model:value="configState.fileValue"
-                :options="
-                  configState.type === 'file' ? fileOptions : enumOptions
-                "
-                pLaceholder="请选择时间格式"
-                style="width: 500px"
-              />
+              <ErrorItem v-else-if="
+                    configState.type === 'file' ||
+                    configState.type === 'enum' ||
+                    configState.type === 'array'
+                  " :errorData="errorData('fileValue')">
+                <j-select
+                  
+                  v-model:value="configState.fileValue"
+                  :options="
+                    configState.type === 'file' ? fileOptions : enumOptions
+                  "
+                  placeholder="请选择展示方式"
+                  style="width: 100%"
+                />
+              </ErrorItem>
 
               <!--int/long/text/float/double类型-->
               <j-input
@@ -166,12 +169,14 @@
       </div>
 
       <template #footer v-if="configState.type !== ''">
-        <j-button style="float: right" type="primary" @click="submit">
-          确定
-        </j-button>
-        <j-button style="float: right; margin-right: 8px" @click="goBack">
-          取消
-        </j-button>
+        <j-space>
+          <j-button @click="goBack">
+            取消
+          </j-button>
+          <j-button type="primary" @click="submit">
+            确定
+          </j-button>
+        </j-space>
       </template>
     </j-drawer>
   </div>
@@ -184,11 +189,23 @@ import { DATA_BIND } from '../keys'
 import { validListData } from './utils/valid'
 import { PropType } from 'vue'
 import { getImage } from '@jetlinks/utils';
+import { ErrorItem } from '..'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
   (e: 'update:dataSource', value: any): void
 }
+
+
+const errorData = computed(() => {
+  return (val: string): any => {
+    const _index = dataSource.value?.findIndex(
+    (item: any) => item?.id === configRow.value?.id,
+  )
+  console.log(errorList.value, val);
+    return errorList.value?.find((item: any) => item.childKey === val + _index)
+  }
+})
 
 const emits = defineEmits<Emit>()
 const props = defineProps({

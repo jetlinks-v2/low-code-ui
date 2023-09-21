@@ -405,7 +405,8 @@ const asyncDataBind = () => {
   return dataBinds.data.dataSource.map(item => {
     return {
       ...item,
-      type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type]
+      type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type],
+      config: {}
     }
   }) || []
 }
@@ -439,6 +440,7 @@ watch(() => props.bindFunctionId, () => {
         id: item.alias,
         name: item.comment,
         type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
+        config: {}
       }
     },
   )

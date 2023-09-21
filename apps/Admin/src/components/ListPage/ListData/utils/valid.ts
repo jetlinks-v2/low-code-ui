@@ -1,6 +1,7 @@
 export const validListData = (list: any[]) => {
   let errorList: any = [];
   list?.forEach((item, index) => {
+    console.log(item);
     if(!item.name.length) {
       errorList.push({
         key: 'name' + index,
@@ -28,6 +29,20 @@ export const validListData = (list: any[]) => {
         })
       }
     }
+    if(['file', 'array', 'enum'].includes(item.type) && !item?.config?.fileValue) {
+      errorList.push({
+        key: 'config' + index,
+        childKey: 'fileValue' + index,
+        message: '请配置'
+      })
+    }
+    // if(['object'].includes(item.type) && !item?.config?.demonstrations) {
+    //   errorList.push({
+    //     key: 'config' + index,
+    //     childKey: 'demonstrations' + index,
+    //     message: '请配置'
+    //   })
+    // }
   })
   console.log(errorList);
   return errorList
