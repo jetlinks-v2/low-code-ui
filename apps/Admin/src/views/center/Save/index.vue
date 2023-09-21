@@ -5,7 +5,7 @@
         <j-form :layout="'vertical'" ref="formRef" :model="modelRef">
             <j-form-item label="项目标识" name="id" validateFirst :rules="[
                 { required: true, message: '请输入项目标识' },
-                { max: 256, message: '最多输入256个字符' },
+                { max: 64, message: '最多输入64个字符' },
                 { pattern: regular.inputReg, message: '要求以小写字母开头，由字母+数字+下划线构成' },
                 { validator: vailId, trigger: 'blur' },
             ]">

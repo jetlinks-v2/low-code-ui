@@ -1,5 +1,5 @@
 <template>
-  <div class="preview">
+  <div class="list-page-output">
     <CardBox :padding="0">
       <pro-search
       :columns="searchColumns"
@@ -291,7 +291,7 @@ const actionsBtnFormat = (data: any) => {
 const handleActions = (data: Record<string, any>, config: Record<string, any>) => {
   console.log(config);
   if(config.type === 'Add' || config.type === 'Update' || config.type === 'Detail') {
-    if(config.resource.type === providerEnum.FormPage) {
+    // if(config.resource.type === providerEnum.FormPage) {
       addVisible.value = true
       popResource.value = {
         callPage: config.resource || [],
@@ -300,9 +300,9 @@ const handleActions = (data: Record<string, any>, config: Record<string, any>) =
       }
       popData.value = config?.type === 'Update' ? data : undefined
       commandType.value = config.command
-    } else if(config.resource.type === providerEnum.HtmlPage) {
-      router.push(`/preview/${config.resource.projectId}/${config.resource.parentId}/${config.resource.id}/html/${randomString(8)}`)
-    }
+    // } else if(config.resource.type === providerEnum.HtmlPage) {
+    //   router.push(`/preview/${config.resource.projectId}/${config.resource.parentId}/${config.resource.id}/html/${randomString(8)}`)
+    // }
   }
   if(config.command === 'Import') {
     importVisible.value = data?.command === 'Import'
@@ -353,22 +353,26 @@ watch(() => JSON.stringify(allData.value), () => {
 </script>
 
 <style lang="less" scoped>
-.ant-page-header {
-  padding: 2px 20px 2px 20px;
-}
-.header {
-  .sub-title {
-    color: #f5f5f5;
-    font-size: 20px;
+.list-page-output{
+  height: 100%;
+  .ant-page-header {
+    padding: 2px 20px 2px 20px;
+  }
+  .header {
+    .sub-title {
+      color: #f5f5f5;
+      font-size: 20px;
+    }
+  }
+  .right-button {
+    padding: 16px 24px 0px;
+    width: 100%;
+    display: flex;
+    justify-content: end;
+    .right-button-icon {
+      font-size: 16px;
+    }
   }
 }
-.right-button {
-  padding: 16px 24px 0px;
-  width: 100%;
-  display: flex;
-  justify-content: end;
-  .right-button-icon {
-    font-size: 16px;
-  }
-}
+
 </style>

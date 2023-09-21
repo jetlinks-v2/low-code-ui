@@ -6,7 +6,9 @@
       }">
       <div class="title">
          <div class="left"></div>
-         <div>{{ props.data.name }} 简介</div>
+         <div>
+            <j-ellipsis>{{ props.data.name }}简介</j-ellipsis>
+         </div>
       </div>
       <div class="content">
          <div class="content-title">添加时间：</div>
@@ -17,7 +19,7 @@
          <div class="right">{{ props.data.others.modifyTime }}</div>
       </div>
       <div class="content">
-         <div class="content-title" >类&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;型:</div>
+         <div class="content-title">类&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;型:</div>
          <div class="right">{{ type }} - {{ providerMap[props.data.type] }}</div>
       </div>
       <div class="content">
@@ -110,8 +112,7 @@ onMounted(() => {
 
 </script>
 
-<style scoped lang='less'> 
-.title {
+<style scoped lang='less'> .title {
     font-size: 22px;
     margin-bottom: 10px;
     display: flex;
@@ -119,11 +120,12 @@ onMounted(() => {
     font-size: 16px;
     line-height: 22px;
     font-size: 16px;
-      font-weight: 500;
-      color: #333333;
+    font-weight: 500;
+    color: #333333;
 
     .left {
        width: 4px;
+       min-width: 4px;
        height: 14px;
        border-radius: 1px;
        opacity: 1;
@@ -131,18 +133,20 @@ onMounted(() => {
        margin-right: 5px;
     }
  }
-.content{
-   display: flex;
-   font-size: 14px;
-   .content-title{
-      width: 70px;
-      text-align: justify;
-   }
-   .right{
-      color: #777777;
-      width: 260px;
-      text-align: justify;
-   }
-}
 
+ .content {
+    display: flex;
+    font-size: 14px;
+
+    .content-title {
+       width: 70px;
+       text-align: justify;
+    }
+
+    .right {
+       color: #777777;
+       width: 260px;
+       word-break: break-all;
+    }
+ }
 </style>

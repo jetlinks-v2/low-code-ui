@@ -60,7 +60,6 @@
                   <img :src="item.icon" alt="" v-if="item.icon.includes('http')" class="image-icon">
                   <AIcon v-else :type="item?.icon" />
                 </template>
-                <span>{{ item?.text }}</span>
             </PermissionButton>
           </j-space>
         </div>

@@ -21,6 +21,7 @@
           :src="formState.customIcon"
           @click="cardState.type = 'customIcon'"
           class="card-icon"
+          :class="{ active: cardState.type === 'customIcon' }"
         >
           <template #icon>
             <pro-image src="https://www.antdv.com/#error" />
@@ -32,6 +33,7 @@
           <j-col
             :span="12"
             class="card-field"
+            :class="{ active: cardState.type === 'field1' }"
             @click="cardState.type = 'field1'"
           >
             <ErrorItem :errorData="errorData('field1')">
@@ -43,6 +45,7 @@
           <j-col
             :span="12"
             class="emphasisField-bg"
+            :class="{ active: cardState.type === 'emphasisField' }"
             @click="cardState.type = 'emphasisField'"
           >
             <div class="emphasisField-text"></div>
@@ -53,6 +56,7 @@
           <j-col
             :span="12"
             class="card-field"
+            :class="{ active: cardState.type === 'field2' }"
             @click="cardState.type = 'field2'"
           >
             <div>{{ formState.field2Title || '展示字段2' }}</div>
@@ -63,6 +67,7 @@
           <j-col
             :span="12"
             class="card-field"
+            :class="{ active: cardState.type === 'field3' }"
             @click="cardState.type = 'field3'"
           >
             <div>{{ formState.field3Title || '展示字段3' }}</div>
@@ -98,7 +103,16 @@
               v-model:value="formState.customIcon"
               :accept="accept"
               cropperTitle="自定义图标"
-            />
+            >
+              <template #content="{ imageUrl }">
+                <div v-if="imageUrl">
+                  <img :src="imageUrl" class="upload-image">
+                </div>
+                <div v-else>
+                  <pro-image src="https://www.antdv.com/#error" />
+                </div>
+              </template>
+            </Upload>
           </j-form-item>
 
           <j-form-item label="动态图标" name="dynamicIcon">
@@ -334,11 +348,17 @@ defineExpose({
 .upload-icon {
   ::v-deep(.upload-image-border) {
     position: relative;
-    width: 100px !important;
-    height: 100px !important;
+    width: 48px !important;
+    height: 48px !important;
     overflow: hidden;
     transition: all 0.3s;
     border: none !important;
+  }
+  :deep(.upload-image-content) {
+    padding: 0 !important;
+  }
+  .upload-image{
+    width: 100%;
   }
 }
 .card-icon {
@@ -346,14 +366,25 @@ defineExpose({
   width: 88px !important;
   cursor: pointer;
   &:hover {
-    background: rgba(255, 190, 105, 0.5);
-    border: dashed 2px #ff9100;
+    background-color: rgba(49, 94, 251, 0.2);
+    border: dashed 1px @primary-color;
+  }
+  &.active {
+    background-color: rgba(49, 94, 251, 0.2);
+    border: dashed 1px @primary-color;
+    color: @primary-color !important;
   }
 }
 .card-field {
   cursor: pointer;
   &:hover {
-    border: dashed 2px #ff9100;
+    background-color: rgba(49, 94, 251, 0.1);
+    border: dashed 1px @primary-color;
+  }
+  &.active {
+    background-color: rgba(49, 94, 251, 0.2);
+    border: dashed 1px @primary-color;
+    color: @primary-color !important;
   }
 }
 .emphasisField-bg {
@@ -368,7 +399,12 @@ defineExpose({
   z-index: 99999999;
   cursor: pointer;
   &:hover {
-    border: dashed 2px #ff9100;
+    border: dashed 1px @primary-color;
+  }
+  &.active {
+    background-color: rgba(49, 94, 251, 0.2);
+    border: dashed 1px @primary-color;
+    color: @primary-color !important;
   }
   .emphasisField-text {
     transform: skewX(-45deg);

@@ -27,27 +27,21 @@ export const validFilterModule = (list: any[]) => {
       })
     } else if(item.id) {
       const result = list.filter(val => val.id == item.id)
-      if(result.length > 1) {
+      if(result.length > 1 || item.id.length > 64) {
         errorList.push({
           key: 'id' + index,
-          message: '标识重复'
-        })
-      }
-      if(item.id.length > 64) {
-        errorList.push({
-          key: 'id' + index,
-          message: '最多可输入64个字符'
+          message: result.length > 1 ? '标识重复' : '最多可输入64个字符'
         })
       }
     }
-    if(item.config?.value == 'data' && item.config?.dataValue?.length === 0) {
+    if(item.config?.value == 'data' && !item.config?.dataValue?.length) {
       errorList.push({
         key: 'config' + index,
         childKey: 'dataValue' + index,
         message: '请配置数据字典'
       })
     } else if(item.config?.value === 'rearEnd') {
-      if(!item.config?.abilityValue || item.config?.abilityValue?.length === 0) {
+      if(!item.config?.abilityValue || !item.config?.abilityValue?.length) {
         errorList.push({
           key: 'config' + index,
           childKey: 'abilityValue' + index,
@@ -63,7 +57,7 @@ export const validFilterModule = (list: any[]) => {
           })
         }
       }
-      if(!item.config?.instructValue || item.config?.instructValue?.length === 0) {
+      if(!item.config?.instructValue || !item.config?.instructValue?.length) {
         errorList.push({
           key: 'config' + index,
           childKey: 'instructValue' + index,
