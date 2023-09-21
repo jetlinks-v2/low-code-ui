@@ -54,12 +54,12 @@
             ]"
             style="flex: 0 0 186px"
           >
+          <ErrorItem :border="false" :error-data="errorData('icon')">
             <div class="icon-upload has-icon" v-if="form!.icon">
               <AIcon :type="form!.icon" style="font-size: 20px" />
               <span class="mark" @click="dialogVisible = true"></span>
             </div>
-            <ErrorItem :border="false" :error-data="errorData('icon')" v-else>
-              <div class="icon-upload no-icon">
+              <div class="icon-upload no-icon" v-else @click="dialogVisible = true">
                 <span>
                   <AIcon type="PlusOutlined" style="font-size: 20px" />
                 </span>

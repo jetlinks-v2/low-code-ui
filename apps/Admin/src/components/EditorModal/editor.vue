@@ -4,6 +4,7 @@
       v-model="myValue"
       :language="language"
       @change="valueChange"
+      @errorChange="errorChange"
     />
     <div class="open-modal" @click="visible = true">
       <div class="icon">
@@ -31,7 +32,11 @@ const props = defineProps({
   ...defaultProps()
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value', 'errorChange'])
+
+const errorChange = (v) => {
+  emit('errorChange', v)
+}
 
 const myValue = ref()
 const visible = ref(false)

@@ -110,8 +110,8 @@
             <j-select-option value="javascript">JS</j-select-option>
             <j-select-option value="css">CSS</j-select-option>
         </j-select>
-        <EditorModal v-if="language==='javascript'" v-model:value="form.script" language="javascript"/>
-        <EditorModal v-else v-model:value="form.style" language="css"/>
+        <EditorModal v-if="language==='javascript'" v-model:value="form.script" language="javascript" @errorChange="errorChangeJs"/>
+        <EditorModal v-else v-model:value="form.style" language="css" @errorChange="errorChangeCss"/>
       </j-form-item>
     </j-form>
   </div>
@@ -191,7 +191,7 @@ const form = reactive({
   title: props.data.title,
   icon: props.data.icon,
   type: props.data.type,
-  script: props.data.script,
+  script: props.data.script || ``,
   key: props.data.key,
   functions:
     editType!.value === 'add' &&
@@ -204,7 +204,9 @@ const form = reactive({
       ?.provider === providerEnum.Function
       ? null
       : props.data.command,
-  style: props.data.style,
+  style: props.data.style || `/* .test {
+  color: red;
+} */`,
   resource: props.data.resource
 })
 
@@ -230,9 +232,18 @@ const handlePages = (val: string) => {
   form.resource.parentId = `${form.resource.projectId == form.resource.parentId ? form.resource.parentId : form.resource.projectId + '.' + form.resource.parentId}`
 }
 const submit = async () => {
-  return { ...form, children: activeBtn?.value.children || [] }
+  return { ...form, children: activeBtn?.value.children || [], jsError: jsError.value, cssError: cssError.value }
 }
 
+const jsError = ref()
+const errorChangeJs = (v) => {
+  jsError.value = v
+}
+
+const cssError = ref()
+const errorChangeCss =  (v) => {
+  cssError.value = v
+}
 const language = ref('javascript')
 watch(
   () => form.functions,
