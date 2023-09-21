@@ -47,6 +47,7 @@ const emit = defineEmits<Emits>();
 
   .item-title{
     width: 200px;
+    text-align: center;
   }
   .item-btn {
     margin-top: 20px;

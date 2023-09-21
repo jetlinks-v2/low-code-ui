@@ -106,7 +106,7 @@ export const useEngine = defineStore('engine', () => {
    * 新增打开的文件
    * @param record
    */
-  const addFile = (record: FileItemType, open?: any) => {
+  const addFile = (record: FileItemType, open?: any) => { 
     // console.log('------open',open)
     if (!open) {
       activeFile.value = record.id
@@ -186,7 +186,7 @@ export const useEngine = defineStore('engine', () => {
         if (files.value.length === 0) {
           activeFile.value =product.data[0].id
         } else {
-          activeFile.value = files.value[index].id
+          activeFile.value = files.value[index]?.id
         }
 
       } else {

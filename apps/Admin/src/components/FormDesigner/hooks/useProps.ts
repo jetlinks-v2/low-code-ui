@@ -2,8 +2,8 @@ import { omit } from "lodash-es"
 
 const useProps = (element: any, _data: any, mode?: string) => {
   // formItemProps
-  let rules: any[] = (element.formItemProps?.rules || []).map(item => {
-    const trigger = item.trigger?.length > 1 ? item.trigger : item.trigger.join('')
+  let rules: any[] = (element?.formItemProps?.rules || []).map(item => {
+    const trigger = item.trigger?.length > 1 ? item?.trigger : item.trigger?.join('')
     if (item?.validator) { // 处理自定义校验函数
       return {
         ...omit(item, ['validator', 'key']),
@@ -30,7 +30,7 @@ const useProps = (element: any, _data: any, mode?: string) => {
     // console.log(trigger)
     return { ...omit(item, 'key'), trigger }
   })
-  if (element?.formItemProps.required) {
+  if (element?.formItemProps?.required) {
     if (['org', 'user', 'role', 'device', 'product', 'select-card', 'switch', 'tree-select', 'select', 'date-picker', 'time-picker'].includes(element.type)) {
       rules = [{
         required: true,
