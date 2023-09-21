@@ -37,7 +37,7 @@
           :parentId="props.fullId"
         />
       </CardBox>
-      <div v-show="activeKey === 'adv'">
+      <div style="height: 100%;" v-show="activeKey === 'adv'">
         <j-scrollbar>
           <Advanced
 

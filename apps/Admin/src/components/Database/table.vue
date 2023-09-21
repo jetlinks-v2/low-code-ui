@@ -128,7 +128,8 @@ import {
   CRUD_COLUMNS,
   WARP_REF,
   proAll,
-  formErrorFieldsToObj
+  formErrorFieldsToObj,
+  settingValidate
 } from "@/components/Database/util";
 import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly } from './components'
 import { provide } from 'vue'
@@ -250,7 +251,14 @@ const myColumns = [
   {
     title: '其它配置',
     dataIndex: 'setting',
-    width: 100
+    width: 100,
+    form: {
+      rules: {
+        asyncValidator: (rule, value, cb, source) => {
+          return settingValidate(source.record)
+        }
+      }
+    }
   },
   {
     title: '操作',
@@ -382,7 +390,7 @@ const JavaTypeChange = (record) => {
         validator: {
           provider: undefined,
           configuration: {
-            message: undefined,
+            message: '数据格式错误',
             group: ['save', 'update', 'insert']
           }
         },
