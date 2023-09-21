@@ -1,11 +1,12 @@
 import Selection from '../Selection/index'
 import './index.less'
 import { withModifiers } from 'vue'
-import { Table, AIcon, Input, Button, TableColumn, FormItem, Select } from 'jetlinks-ui-components'
+import { Table, AIcon, Button, TableColumn, FormItem } from 'jetlinks-ui-components'
 import { cloneDeep, get, omit, set } from 'lodash-es'
 import { useTool } from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import { uid } from '../../utils/uid'
+import componentMap from '../../utils/componentMap'
 
 export default defineComponent({
     name: 'TableLayout',
@@ -33,7 +34,7 @@ export default defineComponent({
         const designer: any = inject('FormDesigner')
 
         const { isEditModel, isDragArea, layoutPadStyle } = useTool()
-        
+
         const _data = computed(() => {
             return props.data
         })
@@ -64,7 +65,8 @@ export default defineComponent({
                 componentProps: {
                     name: '列名' + uid(6),
                     colSpan: 1,
-                    align: 'left'
+                    align: 'left',
+                    type: 'input'
                 },
                 formItemProps: {
                     name: uid(6),
@@ -120,6 +122,17 @@ export default defineComponent({
                 designer.onAddChild(_item, props.data)
             }
         }
+        const componentRender = (_path: string[], __data: any) => {
+            const TypeComponent = componentMap[__data?.type || 'input']
+
+            return <TypeComponent
+                data={__data}
+                style={__data?.type !== 'switch' && '100%'}
+                {...__data?.componentProps}
+                value={get(designer.formState, _path)}
+                onUpdate:value={(newValue) => set(designer.formState, _path, newValue)}
+            />
+        }
 
         const renderContent = (element: any, dt: any) => {
             if (element?.formItemProps?.name === 'index') {
@@ -130,22 +143,9 @@ export default defineComponent({
                 }} type="link" danger><AIcon type="DeleteOutlined" /></Button>
             } else {
                 const _path1 = [...unref(__path), dt?.index, element.formItemProps.name]
-                const _value = ref<any>(get(designer.formState, _path1))
-                watch(
-                    () => _value.value, 
-                    (newValue) => {
-                        set(designer.formState, _path1, newValue)
-                    }, 
-                    {
-                        deep: true
-                    }
-                )
+
                 return <FormItem class="table-item" {...omit(element?.formItemProps, 'label')} name={[unref(_formItemProps)?.name, dt.index, element?.formItemProps?.name]}>
-                    {
-                        element?.componentProps.type === 'select' ? 
-                        <Select v-model:value={_value.value}></Select> : 
-                        <Input v-model:value={_value.value} />
-                    }
+                    {componentRender(_path1, element?.children?.[0])}
                 </FormItem>
             }
         }
@@ -173,7 +173,7 @@ export default defineComponent({
                         <FormItem {...unref(_formItemProps)} validateFirst={true}>
                             <Table
                                 pagination={false}
-                                dataSource={isEditModel.value ? [{}] : data.value} 
+                                dataSource={isEditModel.value ? [{}] : data.value}
                                 scroll={{ y: props.data.componentProps?.height, x: 'max-content' }}
                             >
                                 {
@@ -185,21 +185,9 @@ export default defineComponent({
                                             v-slots={{
                                                 title: () => {
                                                     return element.componentProps?.name
-                                                    // <Selection
-                                                    //     class={
-                                                    //         unref(isDragArea) && 'drag-area'
-                                                    //     }
-                                                    //     data={element}
-                                                    //     tag="div"
-                                                    //     hasCopy={!['actions', 'index'].includes(element?.formItemProps?.name)}
-                                                    //     hasDel={true}
-                                                    //     parent={unref(list)}
-                                                    // >
-                                                        // {element.componentProps?.name}
-                                                    // </Selection>
                                                 },
                                                 default: (dt: any) => {
-                                                    return editContent(element, dt) // unref(isEditModel) ? editContent(element, dt) : renderContent(element, dt)
+                                                    return editContent(element, dt)
                                                 }
                                             }}
                                         />
