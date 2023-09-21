@@ -1,11 +1,12 @@
 <template>
   <div class="btns-list">
-    <j-space v-if="type == 'columns'">
-      <span>展示</span>
-      <j-switch v-model:checked="showColumns"></j-switch>
-    </j-space>
+    <j-form layout="vertical">
+      <j-form-item label="展示">
+        <j-switch v-model:checked="showColumns"></j-switch>
+      </j-form-item>
+    </j-form>
     <template v-if="showColumns || type !== 'columns'">
-      <div v-if="!columnsTree?.length">
+      <div >
         <p>
           {{
             type == 'columns'
@@ -13,11 +14,11 @@
               : '请配置当前页面需要的操作按钮'
           }}
         </p>
-        <j-button class="add-btn" @click="handleAddBtn()" type="dashed">{{
+        <j-button v-if="!columnsTree?.length" class="add-btn" @click="handleAddBtn()" type="dashed">{{
           type == 'columns' ? '添加操作' : '添加按钮'
         }}</j-button>
       </div>
-      <div v-else>
+      <div v-if="columnsTree?.length">
         <BtnTree
           v-model:btn-list="columnsTree"
           :draggable="type === 'columns' ? false : true"

@@ -6,6 +6,7 @@
     :width="width || 600"
     @ok="save"
     @cancel="cancel"
+    :maskClosable="false"
   >
     <div :style="{height: height + 'px'}">
       <j-monaco-editor
