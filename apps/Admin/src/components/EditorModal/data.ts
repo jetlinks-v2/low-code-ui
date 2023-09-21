@@ -18,5 +18,9 @@ export const defaultProps = () => ({
   width: {
     type: Number,
     default: 600
+  },
+  options: {
+    type: Array,
+    default: []
   }
 })
