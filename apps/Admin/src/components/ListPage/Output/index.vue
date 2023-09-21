@@ -69,9 +69,9 @@ const props = defineProps({
     type: String,
     default: '{}'
   },
-  info: {
-    type: Object as PropType<Record<string, any>>,
-    default: () => {}
+  projectId: {
+    type: String,
+    default: ''
   }
 })
 
@@ -269,7 +269,7 @@ const actionsBtnFormat = (data: any) => {
             ? {
                 title: data?.status === 'error' ? '禁用' : '确认删除？',
                 onConfirm: async () => {
-                  const res = await queryRuntime(props.info.id, item.functions, item.command, {terms: [{column: 'id', termType: 'eq', value: data.id}]})
+                  const res = await queryRuntime(props.projectId, item.functions, item.command, {terms: [{column: 'id', termType: 'eq', value: data.id}]})
                   if(res.success) {
                     tableRef.value?.reload?.();
                   }
@@ -310,7 +310,7 @@ const handleRowActions = () => {
 }
 //table数据
 const query = (_params: Record<string, any>) => {
-  return queryRuntime(props.info.id, allData.value?.dataBind.data.function, allData.value?.dataBind.data.command, _params)
+  return queryRuntime(props.projectId, allData.value?.dataBind.data.function, allData.value?.dataBind.data.command, _params)
 }
 const params = ref()
 const handleSearch = (data: any) => {
