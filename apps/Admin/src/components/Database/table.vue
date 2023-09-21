@@ -305,6 +305,7 @@ provide(TYPE_PROVIDE, typesOptions)
 
 const dataSourceChange = () => {
   CrudColumns.value = dataSource.value.filter(item => item.name && item.javaType && item.jdbcType).map(item => ({
+    alias: item.alias,
     dataIndex: item.name,
     title: item.comment
   }))
