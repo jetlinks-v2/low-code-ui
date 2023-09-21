@@ -88,6 +88,32 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
                     title: '流程实例',
                 },
             },
+            {
+              path: '/flow-engine/monitor',
+              name: 'Monitor',
+              component: () => import('@/views/process/monitor/index.vue'),
+              meta: {
+                  title: '流程监控',
+              },
+            },
+            {
+              path: '/flow-engine/initiate',
+              name: 'Initiate',
+              component: () => import('@/views/process/initiate/index.vue'),
+              meta: {
+                  title: '发起流程',
+              },
+              children: [
+                {
+                    path: 'initiate-detail',
+                    name: 'initiate-detail',
+                    component: () => import('@/views/process/initiate/Detail/index.vue'),
+                    meta: {
+                        title: '流程详情'
+                    }
+                },
+              ]
+            },
         ]
     },
     {
