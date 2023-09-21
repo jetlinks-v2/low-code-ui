@@ -7,7 +7,7 @@
         <p>{{ description }}</p>
       </div>
     </div>
-    <div class="step-button">
+    <div class="step-button" :style="{ bottom: steps == 2 ? '20%' : '40%' }">
       <j-space size="large">
         <p @click.stop="steps--" v-if="steps != 1">查看上一步</p>
         <p v-if="steps !== stepList.length">点击任意位置查看下一步</p>
