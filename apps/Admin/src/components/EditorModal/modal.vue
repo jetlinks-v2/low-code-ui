@@ -7,11 +7,12 @@
     @ok="save"
     @cancel="cancel"
   >
-    <j-monaco-editor
-      v-model="myValue"
-      :language="language"
-    />
-
+    <div :style="{height: height + 'px'}">
+      <j-monaco-editor
+        v-model="myValue"
+        :language="language"
+      />
+    </div>
   </j-modal>
 </template>
 
