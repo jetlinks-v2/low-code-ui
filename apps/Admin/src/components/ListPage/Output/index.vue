@@ -1,6 +1,6 @@
 <template>
   <div class="preview">
-    <div style="padding: 30px; background-color: #f2f2f2">
+    <div>
       <pro-search
         :columns="searchColumns"
         target="code"
@@ -62,20 +62,22 @@ import Export from '../Preview/components/Export.vue'
 import CallPage from './components/CallPages.vue'
 import JsonPreview from '../Preview/components/JsonPreview.vue'
 import { queryRuntime } from '@/api/form'
-import { useProduct } from '@/store';
+import { PropType } from 'vue'
 
 const props = defineProps({
   data: {
     type: String,
     default: '{}'
+  },
+  projectId: {
+    type: String,
+    default: ''
   }
 })
 
 const importVisible = ref<boolean>(false)
 const exportVisible = ref<boolean>(false)
 const addVisible = ref<boolean>(false)
-const productStore = useProduct();
-const { info } = productStore
 
 const allData = computed(() => {
   return JSON.parse(props.data || '{}')
@@ -119,7 +121,6 @@ const dataColumns: any = computed(() => {
   return arr
 })
 const searchColumns: any = ref([])
-const typeChangeShow = ref(false)
 //操作按钮
 const actions = ref([])
 //table头部按钮
@@ -247,7 +248,6 @@ const searchType = (type_: string) => {
   }
   return type;
 }
-const router = useRouter()
 
 const actionsBtnFormat = (data: any) => {
   const finalData = data?.map((item: any) => {
@@ -269,7 +269,7 @@ const actionsBtnFormat = (data: any) => {
             ? {
                 title: data?.status === 'error' ? '禁用' : '确认删除？',
                 onConfirm: async () => {
-                  const res = await queryRuntime(info.id, item.functions, item.command, {terms: [{column: 'id', termType: 'eq', value: data.id}]})
+                  const res = await queryRuntime(props.projectId, item.functions, item.command, {terms: [{column: 'id', termType: 'eq', value: data.id}]})
                   if(res.success) {
                     tableRef.value?.reload?.();
                   }
@@ -301,7 +301,6 @@ const actionsBtnFormat = (data: any) => {
 //表头按钮
 const handleHeaderActions = () => {
   const btnData = allData.value?.addButton || []
-  console.log(`output->btnData`,btnData)
   headerActions.value = actionsBtnFormat(btnData)
 }
 //table操作按钮
@@ -311,7 +310,7 @@ const handleRowActions = () => {
 }
 //table数据
 const query = (_params: Record<string, any>) => {
-  return queryRuntime(info.id, allData.value?.dataBind.data.function, allData.value?.dataBind.data.command, _params)
+  return queryRuntime(props.projectId, allData.value?.dataBind.data.function, allData.value?.dataBind.data.command, _params)
 }
 const params = ref()
 const handleSearch = (data: any) => {
@@ -345,7 +344,6 @@ watch(() => JSON.stringify(allData.value), () => {
   padding: 2px 20px 2px 20px;
 }
 .header {
-  background-color: #808080;
   .sub-title {
     color: #f5f5f5;
     font-size: 20px;
