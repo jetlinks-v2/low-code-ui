@@ -72,7 +72,7 @@
 
 <script lang="ts" setup>
 import Card from '@/components/ListPage/ListForm/components/card.vue'
-import { cloneDeep } from 'lodash-es'
+import { clone, cloneDeep } from 'lodash-es'
 import { validListForm } from './utils/valid'
 import { LIST_FORM_INFO, SHOW_TYPE_KEY } from '../keys';
 import { PropType } from 'vue';
@@ -109,10 +109,7 @@ const listFormInfo = computed({
 const open = computed({
   get() {
     if (props.open) {
-      const data = showType!
-      showType!.type = data.type
-      showType!.configured = data.configured
-      showType!.defaultForm = data.defaultForm
+      Object.assign(showType, cloneDeep(showTypeInject))
     }
     return props.open
   },
@@ -138,7 +135,10 @@ const cardRef = ref()
 
 const showTypeInject = inject(SHOW_TYPE_KEY)
 const showType = reactive({
-  ...cloneDeep(showTypeInject)
+  type: 'list',
+  configured: ['list'],
+  configurationShow: false,
+  defaultForm: 'list',
 })
 //卡片配置返回
 const back = () => {
@@ -149,26 +149,17 @@ const cancel = () => {
   if (showType!.configurationShow) {
     back()
   } else {
-    if (props.open) {
-      const data = cloneDeep(showType!)
-      showType!.configurationShow = false
-      showType!.type = data.type
-      showType!.configured = data.configured
-      showType!.defaultForm = data.defaultForm
-    }
     open.value = false
   }
 }
 //提交
 const submit = async () => {
-  let data: any = {}
   const validate = await cardRef.value?.validate()
   if (validate && showType!.configurationShow) {
     showType!.configurationShow = false
   } else if (!showType!.configurationShow) {
     open.value = false
     Object.assign(showTypeInject!, showType)
-    console.log(showTypeInject);
     Object.assign(listFormInfo.value, validate)
   }
 }

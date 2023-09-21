@@ -21,7 +21,7 @@
                   <a-select
                     style="width: 200px;"
                     v-model:value="dataBind.data.function"
-                    :disabled="functionDisabled"
+                    :disabled="commandDisabled"
                     placeholder="请选择功能"
                     optionFilterProp="title"
                     show-search
@@ -170,20 +170,9 @@ const findItem = (arr: any[], value: string) => {
     }
   }
 }
-const functionDisabled = computed(() => {
-  return dataBind.data.function && dataBind.data.function !== ''
-})
 
 const commandDisabled = computed(() => {
   return dataBind.data.command && dataBind.data.command !== ''
-})
-
-const showCommand = computed(() => {
-  return ['rdb-sql-query', 'rdb-crud'].includes(
-    functionOptions!.value.find(
-      (item) => item.fullId === dataBind.data.function,
-    )?.provider || '',
-  )
 })
 
 const handleModify = () => {

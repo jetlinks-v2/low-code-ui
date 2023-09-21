@@ -116,22 +116,22 @@
 
               <!--boolean类型-->
               <div v-else-if="configState.type === 'boolean'">
-                <j-row type="flex">
-                  <j-col flex="50px">true</j-col>
-                  <j-col flex="auto">
+                <j-row align="middle">
+                  <j-col :span="2">true</j-col>
+                  <j-col :span="20">
                     <j-input
-                      style="width: 450px"
+                      style="width: 350px"
                       v-model:value="configState.trueValue"
                       maxLength="16"
                     />
                   </j-col>
                 </j-row>
                 <br />
-                <j-row type="flex">
-                  <j-col flex="50px">false</j-col>
-                  <j-col flex="auto">
+                <j-row align="middle">
+                  <j-col :span="2">false</j-col>
+                  <j-col :span="20">
                     <j-input
-                      style="width: 450px"
+                      style="width: 350px"
                       v-model:value="configState.falseValue"
                       maxLength="16"
                     />
