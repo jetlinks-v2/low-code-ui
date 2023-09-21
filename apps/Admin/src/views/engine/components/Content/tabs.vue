@@ -26,7 +26,7 @@
       <j-scrollbar>
         <div class="items">
           <div v-for="(item, index) in path" class="item">
-              <div class="icon"><img :src="providerImages[item.type]"></div>
+              <div class="icon"><img :src="typeImages[item.type]"></div>
               <div class="title" @click="onClick(item)">{{ item.title }}</div>
               <div v-if="path.length !== index + 1" class="path"> > </div>
           </div>
@@ -171,6 +171,12 @@ watch(
         white-space: nowrap;
         .icon{
           margin: 0 5px;
+          width: 22px;
+          height: 22px;
+          img{
+            width: 100%;
+            height: 100%;
+          }
         }
         .title{
           cursor: pointer;

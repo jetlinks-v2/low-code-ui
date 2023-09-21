@@ -303,13 +303,14 @@
         <j-form-item
           label="表头跨列"
           :name="['componentProps', 'colSpan']"
-          required
           :validateFirst="true"
         >
           <j-input-number
             placeholder="请输入表头跨列"
             @change="onDataChange"
             style="width: 100%"
+            :precision="0"
+            :min="0"
             v-model:value="target.componentProps.colSpan"
           />
         </j-form-item>

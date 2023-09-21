@@ -211,7 +211,7 @@ const form = reactive({
 const rules = {
   title: [{ required: true, trigger: 'blur',validator: (_rule, value: string) => {
     if(!value || !value.length) {
-      return Promise.reject('请输入按钮名称')
+      return Promise.reject('')
     }
     if(value.length > 8 || value.length < 2) {
       return Promise.reject('请输入2-8个字符')
@@ -219,16 +219,15 @@ const rules = {
     return Promise.resolve()
   }}],
   icon: [{ required: true, message: '请选择图标', trigger: 'blur' }],
-  functions: [{ required: true, message: '请选择功能', trigger: 'blur' }],
-  command: [{ required: true, message: '请选择调用指令', trigger: 'blur' }],
-  pages: [{ required: true, message: '请选择调用页面', trigger: 'blur' }],
+  functions: [{ required: true, message: '', trigger: 'change' }],
+  command: [{ required: true, message: '', trigger: 'change' }],
+  pages: [{ required: true, message: '', trigger: 'change' }],
 }
 
 const handlePages = (val: string) => {
   const data = pagesOptions.value.find(item => item.id === val)
-  console.log(pagesOptions);
   form.resource = {...pick(data, ['id', 'parentId', 'type']), projectId: info.id}
-  form.resource.parentId = `${form.resource.projectId}.${form.resource.parentId}`
+  form.resource.parentId = `${form.resource.projectId == form.resource.parentId ? form.resource.parentId : form.resource.projectId + '.' + form.resource.parentId}`
 }
 const submit = async () => {
   return { ...form, children: activeBtn?.value.children || [] }

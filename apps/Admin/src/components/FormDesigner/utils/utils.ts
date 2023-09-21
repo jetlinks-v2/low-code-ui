@@ -85,14 +85,14 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
                 }
             }
         }
-        if ('upload' === _type && (!node?.componentProps?.maxCount || !node?.componentProps?.fileSize)) {
+        if ('upload' === _type && ((node?.componentProps?.maxCount !== 0 && !node?.componentProps?.maxCount) || (node?.componentProps?.fileSize !== 0 && !node?.componentProps?.fileSize))) {
             // 个数和单位
             return {
                 key: node?.key,
                 message: (node.formItemProps?.label || node.name) + '配置错误'
             }
         }
-        if ('space' === _type && !node?.componentProps?.size) {
+        if ('space' === _type && (node?.componentProps?.size !== 0 && !node?.componentProps?.size)) {
             return {
                 key: node?.key,
                 message: (node.formItemProps?.label || node.name) + '配置错误'

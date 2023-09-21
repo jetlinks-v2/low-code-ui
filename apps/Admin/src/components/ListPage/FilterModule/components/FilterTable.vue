@@ -29,6 +29,7 @@
               <j-popover trigger="hover">
                 <template #content>
                   <div class="hover-tips">
+                    <div>配置不同于列自身的数据类型，筛选组件提供string、enum、<br>date、number四种数据类型，用于控制运算符和筛选值样式</div>
                     <j-table
                       :columns="tipsColumns"
                       :data-source="data"
@@ -55,7 +56,6 @@
         </template>
         <template #action="{ data }">
           <j-space>
-            {{ errorData('config' + data.record?._sortIndex) }}
             <j-button type="link" @click="configuration(data)" :style="{ color: errorData('config' + data.record?._sortIndex) ? 'red' : '' }">配置</j-button>
             <JPopconfirm
               @confirm="confirm(data)"
@@ -244,6 +244,13 @@ const emit = defineEmits([
 ])
 
 const handleChange = (data) => {
+  data = data.map((item) => {
+    if(props.dataSource.find(val => val.id === item.id)?.type !== item.type) {
+      console.log(item);
+      item.config = null
+    }
+    return item
+  })
   emit('handleChange', data)
 }
 
@@ -394,7 +401,6 @@ const syncData = async () => {
   }
 }
 
-const productStore = useProduct()
 const asyncDataBind = () => {
   return dataBinds.data.dataSource.map(item => {
     return {
@@ -413,8 +419,9 @@ const handleOk = async () => {
   const newBind = asyncDataBind()
   const dataSource = activeKey.value?.[0] === '1' ? newBind.map((item) => item) : tempData.value
   emit('updateBind', cloneDeep(newBind))
+  const changeData = [...new Set([...dataSource, ...tempData.value].map(item => JSON.stringify(item)))].map(item => JSON.parse(item))
   tableRef.value.cleanEditStatus()
-  emit('handleOk', activeKey.value?.[0], [...dataSource, ...tempData.value])
+  emit('handleOk', activeKey.value?.[0], changeData)
   visible.value = false
 }
 const handleCancel = () => {
@@ -443,6 +450,9 @@ watch(() => props.bindFunctionId, () => {
 .filter-table {
   .tips {
     padding-bottom: 8px;
+    .hover-tips {
+      width: 400px;
+    }
   }
   .table {
     padding-top: 18px;
