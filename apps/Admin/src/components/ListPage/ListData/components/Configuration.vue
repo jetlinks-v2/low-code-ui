@@ -1,10 +1,12 @@
 <template>
   <div class="config-center">
     <div class="content" v-if="props.showSwitch">
-      <div class="title">开启表头排序 用于控制该列数据置顶/置底展示</div>
-      <j-switch v-model:checked="state.checked" />
+      开启表头排序
+      <j-tooltip title="用于控制该列数据置顶">
+        <AIcon type="QuestionCircleOutlined" />
+      </j-tooltip>
     </div>
-
+    <j-switch v-model:checked="state.checked" />
     <div class="content">
       <slot name="demonstrations"></slot>
     </div>
@@ -72,6 +74,7 @@ watch(
   }
   .content {
     padding-top: 5px;
+    margin-bottom: 8px;
   }
 }
 </style>

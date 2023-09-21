@@ -145,14 +145,15 @@ onKeyStroke('Enter', async () => {
             ...modelRef,
             name: modelRef.title,
             configuration:props.data.configuration?props.data.configuration: getConfiguration(modelRef.type),
-            others: handleOthers(modelRef.type, modelRef.title)
+            others:props.data.others?props.data.others: handleOthers(modelRef.type, modelRef.title)
         })
     }
 })
 
 onMounted(()=>{
-    inputRef.value?.focus()
-    window.navigator.clipboard.writeText('')
+    setTimeout(()=>{
+      inputRef.value?.focus()
+    },300)
 })
 
 

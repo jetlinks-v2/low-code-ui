@@ -1,19 +1,34 @@
 
 <template>
-   <j-drawer visible :closable="false" @close="emit('close')" :get-container="getContainer" :style="{ position: 'absolute' }" :maskStyle="{
-      'background-color': '#ffffff00'
-   }">
-      <div class="title">{{ props.data.name }} 简介</div>
-      <div>
-         添加时间：{{ props.data.others.createTime }}
+   <j-drawer visible :closable="false" @close="emit('close')" :get-container="getContainer"
+      :style="{ position: 'absolute' }" :maskStyle="{
+         'background-color': '#ffffff00'
+      }">
+      <div class="title">
+         <div class="left"></div>
+         <div>{{ props.data.name }} 简介</div>
       </div>
-      <div>
-         修改时间：{{ props.data.others.modifyTime }}
+      <div class="content">
+         <div class="content-title">添加时间：</div>
+         <div class="right">{{ props.data.others.createTime }}</div>
       </div>
-      <div>类型：{{ type }} - {{  providerMap[props.data.type] }}</div>
-      <div>位置：{{ location }}</div>
+      <div class="content">
+         <div class="content-title">修改时间：</div>
+         <div class="right">{{ props.data.others.modifyTime }}</div>
+      </div>
+      <div class="content">
+         <div class="content-title" >类&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;型:</div>
+         <div class="right">{{ type }} - {{ providerMap[props.data.type] }}</div>
+      </div>
+      <div class="content">
+         <div class="content-title">位&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;置:</div>
+         <div class="right"> {{ location }}</div>
+      </div>
       <j-divider></j-divider>
-      <div class="title">引用关系：</div>
+      <div class="title">
+         <div class="left"></div>
+         <div>引用关系</div>
+      </div>
       <div v-for="item in relation">{{ item }}</div>
    </j-drawer>
 </template>
@@ -30,9 +45,9 @@ const props = defineProps({
       type: Object,
       default: {}
    },
-   getContainer:{
-      type:Boolean,
-      default:false
+   getContainer: {
+      type: Boolean,
+      default: false
    }
 })
 const emit = defineEmits(['close'])
@@ -89,7 +104,7 @@ const getRelation = () => {
 
 onMounted(() => {
    // console.log('----------',props.data)
-   location.value = product.getParent(props.data).map((item: any) => item.title).join(' -> ')
+   location.value = product.getParent(props.data).map((item: any) => item.title).join(' > ')
    getRelation()
 })
 
@@ -99,5 +114,35 @@ onMounted(() => {
 .title {
     font-size: 22px;
     margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    line-height: 22px;
+    font-size: 16px;
+      font-weight: 500;
+      color: #333333;
+
+    .left {
+       width: 4px;
+       height: 14px;
+       border-radius: 1px;
+       opacity: 1;
+       background: #315EFB;
+       margin-right: 5px;
+    }
  }
+.content{
+   display: flex;
+   font-size: 14px;
+   .content-title{
+      width: 70px;
+      text-align: justify;
+   }
+   .right{
+      color: #777777;
+      width: 260px;
+      text-align: justify;
+   }
+}
+
 </style>

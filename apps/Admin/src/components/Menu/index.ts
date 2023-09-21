@@ -63,16 +63,17 @@ export const handleTreeModal = (data, record) => {
 }
 
 //sortIndex
-export const handleSort = (tree) => {
+export const handleSort = (tree,parentId=null) => {
   return tree.map((item, index) => {
     if (item) {
       return {
         ...item,
-        sortIndex: index
+        sortIndex: index,
+        parentId:parentId?parentId:undefined,
       }
     }
     if (item.children) {
-      item.children = handleSort(item.children)
+      item.children = handleSort(item.children,item.id)
     }
     return item
   })

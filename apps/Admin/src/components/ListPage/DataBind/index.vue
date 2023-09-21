@@ -87,10 +87,7 @@ defineExpose({
   }
 }
 .is-guide {
-    margin: 0 20px;
-    border-radius: 4px;
-  }
-.text {
-  text-align: center;
+  margin: 0 20px;
+  border-radius: 4px;
 }
 </style>

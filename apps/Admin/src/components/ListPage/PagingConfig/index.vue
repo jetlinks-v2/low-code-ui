@@ -1,6 +1,10 @@
 <template>
   <div class="paging-config" ref="pagingConfig">
-    <img class="modal-config-img" :src="getImage('/list-page/pagination.png')" v-if="open">
+    <img
+      class="modal-config-img"
+      :src="getImage('/list-page/pagination.png')"
+      v-if="open"
+    />
     <j-drawer
       title="分页器配置"
       placement="right"
@@ -14,7 +18,7 @@
     >
       <p>请配置分页器支持的单页数据量</p>
       <ErrorItem :errorData="errorData('pageList')">
-        <div style="display: flex; flex-flow: wrap;align-items: center;">
+        <div style="display: flex; flex-flow: wrap; align-items: center">
           <div v-for="(item, index) in pagingData" :key="index">
             <j-input-number
               class="input-number"
@@ -28,12 +32,11 @@
               @pressEnter="blur()"
             />
             <span v-if="index < pagingData.length - 1">,</span>
-            
           </div>
-          <span
-              v-if="pagingData.length < 99"
+          <span v-if="pagingData.length < 99">
+            <j-button type="text" @click="onAdd" class="add-pagination"
+              >+</j-button
             >
-              <j-button type="text" @click="onAdd" class="add-pagination">+</j-button>
           </span>
         </div>
       </ErrorItem>
@@ -42,15 +45,15 @@
 </template>
 <script setup lang="ts">
 import { ErrorItem } from '../index'
-import { PropType } from 'vue';
-import { getImage } from '@jetlinks/utils';
+import { PropType } from 'vue'
+import { getImage } from '@jetlinks/utils'
 const pagingData = computed({
   get() {
     return props.pagingData
   },
   set(val) {
     emits('update:pagingData', val)
-  }
+  },
 })
 
 interface Emit {
@@ -70,8 +73,8 @@ const props = defineProps({
 
   pagingData: {
     type: Array as PropType<Record<string, any>[]>,
-    default: () => []
-  }
+    default: () => [],
+  },
 })
 
 const errorData = computed(() => {
@@ -104,12 +107,14 @@ const deWeightThree = () => {
       map.set(item.pageSize, item)
     }
   }
+  if ([...map.values()].length === 0) {
+    return [{ pageSize: 12 }]
+  }
   return [...map.values()]
 }
 
 const blur = () => {
-  pagingData.value = deWeightThree()
-  pagingData.value?.sort((a, b) => {
+  pagingData.value = deWeightThree()?.sort((a, b) => {
     return a.pageSize - b.pageSize
   })
 }
@@ -119,7 +124,9 @@ const blur = () => {
  */
 const errorList = ref<any[]>([])
 const valid = () => {
-  errorList.value =  pagingData.value.length ? [] : [{key: 'pageList', message: '请配置分页器支持的单页数据量'}]
+  errorList.value = pagingData.value.length
+    ? []
+    : [{ key: 'pageList', message: '请配置分页器支持的单页数据量' }]
   return errorList.value
   // return new Promise((resolve, reject) => {
   //   errorList.value = pagingData.value.length ? [] : [{key: 'pageList', message: '请配置分页器支持的单页数据量'}]
@@ -130,7 +137,7 @@ const valid = () => {
 
 defineExpose({
   valid,
-  errorList
+  errorList,
 })
 </script>
 <style lang="less" scoped>
@@ -138,7 +145,7 @@ defineExpose({
   margin: 10px;
   width: 56px;
 }
-.add-pagination{
+.add-pagination {
   width: 24px;
   height: 24px;
   border: 1px dashed #dcdcdc;

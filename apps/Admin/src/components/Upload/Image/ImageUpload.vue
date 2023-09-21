@@ -112,11 +112,11 @@ const beforeUpload = (file: any) => {
   const isMaxSize = (file.size / 1024 / 1024) < maxSize
 
   if (!inType) {
-    onlyMessage('请上传正确格式的图片', 'error')
+    onlyMessage(`仅支持${types.join(',')}格式文件`, 'error')
   }
 
   if (!isMaxSize) {
-    onlyMessage(`图片大小必须小于${maxSize}M`, 'error');
+    onlyMessage(`请上传${maxSize}M以内的图片`, 'error');
   }
   getBase64ByImg(file, base64Url => {
     cropper.img = base64Url

@@ -5,8 +5,7 @@
       @click="syncData"
       myIcon="SyncOutlined"
       size="small"
-      :type="props.dataBind ? 'primary' : 'stroke'"
-      ghost
+      :type="dataBinds.data.dataSource.length ? 'primary' : 'default'"
     >
       同步数据绑定
     </j-button>
@@ -45,18 +44,19 @@
           </template>
         </template>
         <template #name="{ data }">
-          <ErrorItem :border="false" :errorData="errorData(data.record.name)">
-            <span>{{ data.record?.name }}</span>
+          <ErrorItem :border="false" :errorData="errorData('name' + data.record?._sortIndex)">
+            <span class="data-column">{{ data.record?.name }}</span>
           </ErrorItem>
         </template>
         <template #id="{ data }">
-          <ErrorItem :border="false" :errorData="errorData(data.record.id)">
-            <span>{{ data.record?.id }}</span>
+          <ErrorItem :border="false" :errorData="errorData('id' + data.record?._sortIndex)">
+            <span class="data-column">{{ data.record?.id }}</span>
           </ErrorItem>
         </template>
         <template #action="{ data }">
           <j-space>
-            <j-button type="link" @click="configuration(data)">配置</j-button>
+            {{ errorData('config' + data.record?._sortIndex) }}
+            <j-button type="link" @click="configuration(data)" :style="{ color: errorData('config' + data.record?._sortIndex) ? 'red' : '' }">配置</j-button>
             <JPopconfirm
               @confirm="confirm(data)"
               :loading="loading"
@@ -194,34 +194,36 @@ const props = defineProps({
 
 const dataBinds = inject(DATA_BIND)
 enum javaType {
-  Enum = 'enum',
-  String = 'text',
-  Double = 'double',
-  Int = 'int',
-  BigDecimal = 'text',
-  DateTime = 'date',
-  Float = 'float',
-  Byte = 'int',
-  Long = 'long',
-  List = 'array',
-  Boolean = 'boolean',
-  Map = 'object',
+  enum = 'enum',
+  string = 'text',
+  double = 'double',
+  int = 'int',
+  bigDecimal = 'text',
+  dateTime = 'date',
+  date = 'date',
+  float = 'float',
+  byte = 'int',
+  long = 'long',
+  list = 'array',
+  boolean = 'boolean',
+  object = 'object',
 }
 
 enum filterType {
-  Enum = 'enum',
-  String = 'string',
-  Double = 'number',
-  Int = 'number',
-  BigDecimal = 'string',
-  DateTime = 'date',
-  Float = 'number',
-  Byte = 'number',
-  Long = 'string',
-  List = 'string',
-  Boolean = 'string',
-  Map = 'string',
-  int = 'number'
+  enum = 'enum',
+  string = 'string',
+  double = 'number',
+  int = 'number',
+  bigDecimal = 'string',
+  dateTime = 'date',
+  date = 'date',
+  float = 'number',
+  byte = 'number',
+  long = 'string',
+  list = 'string',
+  boolean = 'string',
+  map = 'string',
+  object = 'enum',
 }
 
 
@@ -258,6 +260,7 @@ const tipsColumns: any = [
   {
     title: '筛选项类型',
     dataIndex: 'type',
+    width: '120px',
     customCell: (_, index) => {
       if (index === 1) {
         return { rowSpan: 2 }
@@ -382,10 +385,9 @@ const syncData = async () => {
   tempData.value = [];
   changeFunctionData.forEach((item) => {
     let find = props.bindData?.find((i) => i.id === item.id)
-    console.log(item, props.bindData);
     if(!find) tempData.value.push(item)
   })
-  if (tempData.value.length) {
+  if (tempData.value.length || changeFunctionData.length !== props.bindData.length) {
     openModel(props.modelActiveKey)
   } else {
     onlyMessage('已是最新数据', 'success')
@@ -394,7 +396,12 @@ const syncData = async () => {
 
 const productStore = useProduct()
 const asyncDataBind = () => {
-  return dataBinds.data.dataSource || []
+  return dataBinds.data.dataSource.map(item => {
+    return {
+      ...item,
+      type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type]
+    }
+  }) || []
 }
 //打开弹窗
 const openModel = (value: any) => {
@@ -407,7 +414,7 @@ const handleOk = async () => {
   const dataSource = activeKey.value?.[0] === '1' ? newBind.map((item) => item) : tempData.value
   emit('updateBind', cloneDeep(newBind))
   tableRef.value.cleanEditStatus()
-  emit('handleOk', activeKey.value?.[0], dataSource)
+  emit('handleOk', activeKey.value?.[0], [...dataSource, ...tempData.value])
   visible.value = false
 }
 const handleCancel = () => {
@@ -439,6 +446,12 @@ watch(() => props.bindFunctionId, () => {
   }
   .table {
     padding-top: 18px;
+    .data-column{
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
   .editable-add-btn{
     width: 100%;
