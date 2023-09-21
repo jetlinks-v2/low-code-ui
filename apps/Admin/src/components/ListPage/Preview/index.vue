@@ -3,7 +3,6 @@
     <div class="header">
       <j-page-header>
         <template #title>
-        <template #title>
           <span class="sub-title">正在预览</span>
         </template>
         <template #extra>
@@ -12,8 +11,7 @@
         </template>
       </j-page-header>
     </div>
-    <!-- <Preview :data="data"/> -->
-    <Output :data="data"/>
+    <Preview :data="data"/>
   </div>
 </template>
 <script setup lang="ts" name="ListPagePreview">
@@ -49,9 +47,6 @@ const back = () => {
   height: 100vh;
   width: 100vw;
   overflow: auto;
-  .header {
-    background-color: #FFFFFF;
-  }
   .header {
     background-color: #FFFFFF;
   }
