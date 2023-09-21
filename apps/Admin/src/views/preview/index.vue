@@ -1,6 +1,6 @@
 <template>
   <template v-if="!isEmpty">
-    <ListPage v-if="showList" :data="data" :show="true" />
+    <ListPage v-if="showList" :data="data" :show="true" :projectId="route.params.project" />
     <HtmlPage v-else-if="showHtml" :code="data" />
   </template>
   <template>
@@ -19,11 +19,11 @@ const isEmpty = ref(false)
 
 
 const showList = computed(() => {
-  return route.params.type === 'list' && data.value
+  return route.params?.type === 'list' && data.value
 })
 
 const showHtml = computed(() => {
-  return route.params.type === 'html' && data.value
+  return route.params?.type === 'html' && data.value
 })
 
 const getInfo = async () => {

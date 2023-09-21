@@ -6,7 +6,7 @@ import Preview from './output/Preview.vue'
 import MenuList from '@/components/ListPage/MenuConfig/components/menu.vue'
 import { debounce } from './utils'
 import MonacoEditor from './editor/MonacoEditor.vue'
-import { ReplStore } from './store'
+import {defaultMainFile, ReplStore} from './store'
 import 'splitpanes/dist/splitpanes.css'
 import { useProduct } from '@/store/product'
 import { storeToRefs } from 'pinia'
@@ -32,6 +32,7 @@ enum OperType {
 }
 
 const onChange = debounce((code: string) => {
+  store.state.activeFile.code = code
   productStore.update({
     ...props.data,
     configuration: {
@@ -39,7 +40,6 @@ const onChange = debounce((code: string) => {
       code
     }
   })
-
 }, 250)
 
 // const onBlur = debounce(() => updateStoreCode(), 250)
@@ -85,7 +85,6 @@ const handleOperClick = (type: OperType) => {
   } else if (type === OperType.Menu) {
     drawerTitle.value = '菜单配置'
   }
-  console.log(drawerVisible.value)
   !drawerVisible.value && (activeOper.value = '')
 }
 
@@ -105,7 +104,7 @@ const runCode = () => {
   previewRef.value.updatePreview()
   window.addEventListener('message', (ac) => {
     runLoading.value = false
-    if (ac.data.action === 'error') {
+    if (ac.data.action === 'error' && ac.data.error) {
       store.state.errors = [ac.data.error]
     }
   })
@@ -129,7 +128,6 @@ provide(MENU_CONFIG, menuFormData)
 
 const validateMenu = async () => {
   const resp = await menuListRef.value?.vaildate()
-  console.log(resp)
   if (resp.errorFields) {
     menuError.value = resp.errorFields.length
     return true
@@ -178,7 +176,7 @@ const errorValidate = async () => {
   if (!store.state.activeFile.code) {
     err.push({message: '页面代码为空'})
   }
-  console.log('errorValidate',err)
+
   return new Promise((resolve, reject) => {
     if (err.length) {
       reject(err)
@@ -289,7 +287,7 @@ defineExpose({
         </div>
       </div>
       <div class="drawer-body">
-        <Preview v-if="activeOper === OperType.View" ref="previewRef" :code="data?.configuration?.code" />
+        <Preview v-if="activeOper === OperType.View" ref="previewRef" />
         <div v-show="activeOper === OperType.Menu">
           <MenuList
             ref="menuListRef"
