@@ -39,41 +39,41 @@ const draggable = defineComponent({
     props: {
         list: {
             type: Array,
-            required: false,
+            required: false, // 传入的数据
             default: null
         },
         modelValue: {
             type: Array,
-            required: false,
+            required: false, // 双向绑定
             default: null
         },
         itemKey: {
             type: [String, Function],
-            required: true
+            required: true // item的key
         },
         clone: {
-            type: Function,
+            type: Function, // 复制后的数据
             default: original => {
                 return original;
             }
         },
         tag: {
-            type: String,
+            type: String, // Sortable的tag
             default: "div"
         },
         move: {
-            type: Function,
+            type: Function, // 
             default: null
         },
-        componentData: {
+        componentData: { // 
             type: Object,
             required: false,
             default: null
         }
     },
     emits: [
-        "update:modelValue",
-        "change",
+        "update:modelValue", // 双向绑定
+        "change", // 
         ...[...events.manageAndEmit, ...events.emit].map(evt => evt.toLowerCase())
     ],
     data() {
@@ -82,6 +82,7 @@ const draggable = defineComponent({
         };
     },
     created() {
+        // list和modelValue只能传入一个人
         if (this.list !== null && this.modelValue !== null) {
             console.error(
                 "modelValue and list props are mutually exclusive! Please set one or another."
@@ -92,8 +93,10 @@ const draggable = defineComponent({
         if (this.error) {
             return;
         }
+        // $attrs: 一个包含了组件所有透传 attributes 的对象。
+        // attributes: 是指由父组件传入，且没有被子组件声明为 props 或是组件自定义事件的 attributes 和事件处理函数。
         const { $attrs, $el, componentStructure } = this;
-        // console.log($attrs, $el)
+        // $el: 该组件实例管理的 DOM 根节点。
         componentStructure?.updated();
 
         const sortableOptions = createSortableOption({
@@ -104,13 +107,15 @@ const draggable = defineComponent({
                 manage: event => manage.call(this, event)
             }
         });
+        // console.log($el)
+        // console.log(sortableOptions)
         const targetDomElement = $el.nodeType === 1 ? $el : $el.parentElement;
         this._sortable = new Sortable(targetDomElement, sortableOptions);
         // console.log(this._sortable)
         this.targetDomElement = targetDomElement;
         targetDomElement.__draggable_component__ = this;
     },
-    updated() {
+    updated() { // 在组件因为一个响应式状态变更而更新其 DOM 树之后调用
         this.componentStructure?.updated();
     },
     beforeUnmount() {

@@ -3,7 +3,7 @@
     <j-tree
       :tree-data="btnTree"
       :show-icon="false"
-      :draggable="draggable"
+      :draggable="true"
       show-line
       block-node
       :selectable="false"
@@ -65,6 +65,10 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
   const dragKey = info.dragNode.key;
   const dropPos = info.node.pos?.split('-');
   const dropPosition = info.dropPosition - Number(dropPos?.[dropPos?.length - 1]);
+  if(!props.draggable && dropPosition === 0) {
+    onlyMessage('操作列支持1级按钮', 'error')
+    return
+  }
   if(info.node.type !== 'customer' && dropPosition === 0) {
     onlyMessage('常用按钮下方不可以添加2级按钮', 'error');
     return ;
