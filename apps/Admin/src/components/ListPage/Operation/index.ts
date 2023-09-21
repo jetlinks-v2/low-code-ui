@@ -9,7 +9,7 @@ export const commonUseBtn = [
   { title: '删除', type: 'Delete', icon: 'DeleteOutlined' },
 ]
 
-export const validOperationsBtn = (tree: OperationConfigTreeItem[], functionOptions: any[]) => {
+export const validOperationsBtn = (tree: OperationConfigTreeItem[], functionOptions: any[], pages: any[]) => {
   const errorItems: any[] = [];
   const commonUseBtnNames = commonUseBtn.map((item) => item.title);
 
@@ -47,6 +47,15 @@ export const validOperationsBtn = (tree: OperationConfigTreeItem[], functionOpti
             errorKey: 'pages',
             message: '配置调用页面',
           });
+        } else if(item.pages) {
+          const result = pages.find(val => val.id == item.pages)
+          if(!result) {
+            errorItems.push({
+              key: item.key,
+              errorKey: 'pages',
+              message: '绑定页面已被删除，请重新选择',
+            });
+          }
         }
       } else {
         if (commonUseBtnNames.includes(item.title)) {

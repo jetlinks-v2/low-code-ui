@@ -37,8 +37,8 @@ const emits = defineEmits<Emit>()
 const data = props.data?.config || null
 
 const state = reactive({
-  max: data?.max || null,
-  min: data?.min || null,
+  max: data?.max || 1,
+  min: data?.min || 1,
 })
 
 watch(

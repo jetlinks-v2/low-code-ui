@@ -2,7 +2,7 @@
   <div className="filter-module-center" ref="listDataRef">
     <img class="modal-config-img" :src="getImage('/list-page/data.png')" v-if="open">
     <j-drawer
-      title=""
+      title="列表数据配置"
       placement="right"
       width="560px"
       :closable="true"
@@ -36,7 +36,7 @@
         @update-bind="(data) => dataBinds.columnBind = data"
       />
       <div v-else>
-        <a-page-header title="表头配置" sub-title="" @back="goBack">
+        <a-page-header title=" " sub-title="" @back="goBack">
           <template #backIcon>
             <AIcon type="LeftOutlined" />
             返回
@@ -413,7 +413,7 @@ const handleAdd = async (table: any) => {
   table?.addItem({
     id: '',
     name: '',
-    type: 'string',
+    type: 'object',
     mark: 'add',
   })
 }
