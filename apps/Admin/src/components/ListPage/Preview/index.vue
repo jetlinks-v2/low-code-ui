@@ -10,13 +10,11 @@
         </template>
       </j-page-header>
     </div>
-    <!-- <Preview :data="data"/> -->
-    <Output :data="data"/>
+    <Preview :data="data"/>
   </div>
 </template>
 <script setup lang="ts" name="ListPagePreview">
 import Preview from './components/Preview.vue'
-import Output from '../Output/index.vue'
 
 const props = defineProps({
   show: {

@@ -226,9 +226,8 @@ const rules = {
 
 const handlePages = (val: string) => {
   const data = pagesOptions.value.find(item => item.id === val)
-  console.log(pagesOptions);
   form.resource = {...pick(data, ['id', 'parentId', 'type']), projectId: info.id}
-  form.resource.parentId = `${form.resource.projectId}.${form.resource.parentId}`
+  form.resource.parentId = `${form.resource.projectId == form.resource.parentId ? form.resource.parentId : form.resource.projectId + '.' + form.resource.parentId}`
 }
 const submit = async () => {
   return { ...form, children: activeBtn?.value.children || [] }
