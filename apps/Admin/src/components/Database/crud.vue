@@ -34,7 +34,7 @@
         <DataSetting
 
           :id="props.id"
-          :parentId="props.parentId"
+          :parentId="props.fullId"
         />
       </CardBox>
       <div v-show="activeKey === 'adv'">
@@ -82,6 +82,10 @@ const props = defineProps({
     default: undefined
   },
   parentId: {
+    type: String,
+    default: undefined
+  },
+  fullId: {
     type: String,
     default: undefined
   },

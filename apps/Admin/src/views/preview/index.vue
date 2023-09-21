@@ -1,6 +1,11 @@
 <template>
-  <ListPage v-if="showList" :data="data" :show="true" />
-  <HtmlPage v-else-if="showHtml" :code="data" />
+  <template v-if="!isEmpty">
+    <ListPage v-if="showList" :data="data" :show="true" />
+    <HtmlPage v-else-if="showHtml" :code="data" />
+  </template>
+  <template>
+
+  </template>
 </template>
 
 <script setup name="Preview">
@@ -10,6 +15,8 @@ import HtmlPage from '@/components/CustomHTML/output/Preview.vue'
 
 const route = useRoute()
 const data = ref()
+const isEmpty = ref(false)
+
 
 const showList = computed(() => {
   return route.params.type === 'list' && data.value
