@@ -7,7 +7,6 @@
         </template>
         <template #extra>
           <j-button type="primary" key="1" @click="back">退出预览</j-button>
-          <j-button type="primary" key="1" @click="back">退出预览</j-button>
         </template>
       </j-page-header>
     </div>
