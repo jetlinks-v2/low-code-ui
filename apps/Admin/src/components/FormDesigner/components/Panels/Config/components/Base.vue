@@ -109,7 +109,11 @@
           ].includes(type)
         "
       >
-        <j-form-item :validateFirst="true" label="占位提示" :name="['componentProps', 'placeholder']">
+        <j-form-item
+          :validateFirst="true"
+          label="占位提示"
+          :name="['componentProps', 'placeholder']"
+        >
           <j-input
             placeholder="请输入"
             v-model:value="target.componentProps.placeholder"
@@ -314,7 +318,11 @@
             v-model:value="target.componentProps.colSpan"
           />
         </j-form-item>
-        <j-form-item :validateFirst="true" label="内容对齐" :name="['componentProps', 'align']">
+        <j-form-item
+          :validateFirst="true"
+          label="内容对齐"
+          :name="['componentProps', 'align']"
+        >
           <j-select
             v-model:value="target.componentProps.align"
             placeholder="请选择"
@@ -324,6 +332,18 @@
             <j-select-option :value="'right'">右</j-select-option>
             <j-select-option :value="'center'">中</j-select-option>
           </j-select>
+        </j-form-item>
+        <j-form-item
+          :validateFirst="true"
+          label="组件类型"
+          :name="['componentProps', 'type']"
+        >
+          <j-select
+            v-model:value="target.componentProps.type"
+            placeholder="请选择"
+            @change="onDataChange"
+            :options="typeList"
+          />
         </j-form-item>
       </template>
       <template v-if="['grid', 'space'].includes(type)">
@@ -343,7 +363,11 @@
         </j-form-item>
       </template>
       <template v-if="['tabs'].includes(type)">
-        <j-form-item :validateFirst="true" :name="['componentProps', 'type']" label="切卡样式">
+        <j-form-item
+          :validateFirst="true"
+          :name="['componentProps', 'type']"
+          label="切卡样式"
+        >
           <j-radio-group
             v-model:value="target.componentProps.type"
             button-style="solid"
@@ -355,7 +379,11 @@
         </j-form-item>
       </template>
       <template v-if="['space'].includes(type)">
-        <j-form-item :validateFirst="true" :name="['componentProps', 'align']" label="对齐">
+        <j-form-item
+          :validateFirst="true"
+          :name="['componentProps', 'align']"
+          label="对齐"
+        >
           <j-select
             v-model:value="target.componentProps.align"
             placeholder="请选择"
@@ -412,7 +440,10 @@
 
     <!-- 说明 -->
     <template v-if="descVisible">
-      <j-form-item :validateFirst="true" :name="['componentProps', 'description']">
+      <j-form-item
+        :validateFirst="true"
+        :name="['componentProps', 'description']"
+      >
         <template #label>
           说明内容<j-tooltip title="配置后会在该配置项名称后方展示">
             <AIcon type="QuestionCircleOutlined" />
@@ -477,6 +508,45 @@ const descVisible = computed(() => {
     'geo',
   ].includes(unref(type))
 })
+
+const typeList = [
+  {
+    label: '文本框',
+    value: 'input',
+  },
+  {
+    label: '文本域',
+    value: 'textarea',
+  },
+  {
+    label: '数字输入',
+    value: 'input-number',
+  },
+  {
+    label: '密码框',
+    value: 'input-password',
+  },
+  {
+    label: '下拉框',
+    value: 'select',
+  },
+  {
+    label: '开关',
+    value: 'switch',
+  },
+  {
+    label: '树选择',
+    value: 'tree-select',
+  },
+  {
+    label: '日期选择',
+    value: 'date-picker',
+  },
+  {
+    label: '时间选择',
+    value: 'time-picker',
+  },
+]
 
 const rulesVisible = computed(() => {
   return [
