@@ -1,7 +1,7 @@
 
 <template>
   <div class="title">
-    <a-radio-group v-model:value="viewType">
+    <a-radio-group v-model:value="viewType" @change="handleSorts">
       <a-radio-button value="table">
         <AIcon type="UnorderedListOutlined" />
       </a-radio-button>
@@ -56,14 +56,13 @@
     </a-drawer>
     <FileDrawer v-if="visibleFile" @close="visibleFile = false" :data="current" />
   </div>
-  
+
   <div v-else>
     <j-pro-table :columns="columns" :dataSource="list" model="TABLE" :noPagination="true" :childrenColumnName="'list'"
-      :scroll="{ y: 'calc(100vh - 300px)' }"
-      :customRow="(record) => ({ 
+      :scroll="{ y: 'calc(100vh - 300px)' }" :customRow="(record) => ({
         onContextmenu: (e) => onContextmenu(e, record),
-        onDblclick:()=>onDbClick(record)
-       })">
+        onDblclick: () => onDbClick(record)
+      })">
       <template #type="{ type }">
         {{ providerMap[type] }}
       </template>
@@ -80,7 +79,7 @@
       </j-menu>
     </div>
   </div>
-  
+
   <InputModal v-if="visible" @close="visible = false" @save="onSave" :provider="provider" :data="current" :type="type"
     :name-list="nameList" />
   <ToastModal v-if="visibleToast" @close="visibleToast = false" @save="onSave" :data="current" />
@@ -164,10 +163,10 @@ const onShow = (val) => {
 const onSave = (data?: any) => {
   if (data) {
     visible.value = false
-    type.value === 'Add' ? product.add(data,data.parentId,true) : product.update(data)
-    setTimeout(()=>{
+    type.value === 'Add' ? product.add(data, data.parentId, true) : product.update(data)
+    setTimeout(() => {
       selectKey.value = data.id
-    },300)
+    }, 300)
   }
 }
 
@@ -183,8 +182,8 @@ const onPaste = (parentId?: string) => {
     title: `copy_${copyItem.name}`,
     children: copyItem.children ? restId(copyItem.children) : undefined,
     parentId: parentId ? parentId : undefined,
-    configuration:copyItem.configuration?copyItem.configuration:undefined,
-    others:copyItem.others?copyItem.others:undefined
+    configuration: copyItem.configuration ? copyItem.configuration : undefined,
+    others: copyItem.others ? copyItem.others : undefined
   }
   visible.value = true
 }
@@ -196,7 +195,7 @@ const onContextmenu = (e, record) => {
   menuData.style = {
     position: 'absolute',
     left: e.clientX - 300 + "px",
-    top: e.clientY -210  + "px",
+    top: e.clientY - 210 + "px",
   }
   menuData.data = record
   //点击取消菜单
@@ -254,14 +253,15 @@ const onDbClick = (data: any) => {
   engine.addFile(data)
 }
 
-//排序方式
+//排序方式-table切换
 const handleSorts = () => {
   const data = product.getById(engine.activeFile)
   product.update({
     ...data,
     others: {
       ...data.others,
-      sorts: sorts.value
+      sorts: sorts.value,
+      viewType: viewType.value
     }
   })
 }
@@ -318,8 +318,17 @@ watchEffect(() => {
       return item
     })
   }
-  sorts.value = product.getById(engine.activeFile)?.others?.sorts || 'default'
 })
+
+watch(
+  () => props.data,
+  () => {
+    const item = product.getById(engine.activeFile)
+    sorts.value = item.others?.sorts || 'default'
+    viewType.value = item.others?.viewType || 'card'
+  },
+  {deep:true,immediate:true}
+)
 
 
 
@@ -344,54 +353,55 @@ watchEffect(() => {
   // background-color: #f5f5f5;
   height: calc(100vh - 140px);
   padding: 12px;
-  
+
   :deep(.ant-drawer-wrapper-body) {
+    background-color: #FAFAFA;
+
+    .ant-drawer-header {
       background-color: #FAFAFA;
+    }
+  }
 
-      .ant-drawer-header {
-         background-color: #FAFAFA;
-      }
-   }
-   .drawer {
+  .drawer {
 
-.drawer-title {
-   font-size: 14px;
-   font-weight: 500;
-   line-height: 24px;
-   margin: 10px 0;
-}
+    .drawer-title {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 24px;
+      margin: 10px 0;
+    }
 
-.drawer-items {
-   height: 64px;
-   display: flex;
-   background-color: #FFF;
-   align-items: center;
-   padding: 0 12px;
+    .drawer-items {
+      height: 64px;
+      display: flex;
+      background-color: #FFF;
+      align-items: center;
+      padding: 0 12px;
 
-   .items-img {
-      height: 24px;
-      width: 24px;
+      .items-img {
+        height: 24px;
+        width: 24px;
 
-      img {
-         width: 100%;
-         height: 100%;
-      }
-   }
-
-   .items-text {
-      margin-left: 10px;
-
-      .text {
-         font-size: 14px;
-         line-height: 14px;
+        img {
+          width: 100%;
+          height: 100%;
+        }
       }
 
-      span {
-         color: #666666;
+      .items-text {
+        margin-left: 10px;
+
+        .text {
+          font-size: 14px;
+          line-height: 14px;
+        }
+
+        span {
+          color: #666666;
+        }
       }
-   }
-}
-}
+    }
+  }
 
   .content-col {
     display: flex;

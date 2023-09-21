@@ -7,6 +7,7 @@
       </j-tooltip>
     </div>
     <j-switch v-model:checked="state.checked" />
+    <j-switch v-model:checked="state.checked" />
     <div class="content">
       <slot name="demonstrations"></slot>
     </div>
@@ -74,6 +75,7 @@ watch(
   }
   .content {
     padding-top: 5px;
+    margin-bottom: 8px;
     margin-bottom: 8px;
   }
 }
