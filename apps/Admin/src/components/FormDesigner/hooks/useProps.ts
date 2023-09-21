@@ -1,11 +1,13 @@
 import { omit } from "lodash-es"
 
-const useProps = (element: any, _data: any, isEditModel: boolean, mode?: string) => {
+const useProps = (element: any, _data: any, mode?: string) => {
   // formItemProps
   let rules: any[] = (element.formItemProps?.rules || []).map(item => {
+    const trigger = item.trigger?.length > 1 ? item.trigger : item.trigger.join('')
     if (item?.validator) { // 处理自定义校验函数
       return {
         ...omit(item, ['validator', 'key']),
+        trigger,
         validator(rule, value, callback) {
           let customFn = new Function('rule', 'value', 'callback', item?.validator)
           return customFn(rule, value, callback)
@@ -21,10 +23,12 @@ const useProps = (element: any, _data: any, isEditModel: boolean, mode?: string)
 
       return {
         ...omit(item, ['pattern', 'key']),
+        trigger,
         pattern: _pattern
       }
     }
-    return { ...omit(item, 'key') }
+    // console.log(trigger)
+    return { ...omit(item, 'key'), trigger }
   })
   if (element?.formItemProps.required) {
     if (['org', 'user', 'role', 'device', 'product', 'select-card', 'switch', 'tree-select', 'select', 'date-picker', 'time-picker'].includes(element.type)) {

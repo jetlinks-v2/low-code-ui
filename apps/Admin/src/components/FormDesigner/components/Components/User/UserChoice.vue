@@ -42,6 +42,7 @@
               v-if="treeData.length > 0"
               :tree-data="treeData"
               @select="selectGroup"
+              :height="400"
               v-model:selectedKeys="selectedKeys"
               v-model:expandedKeys="expandedKeys"
             > 
@@ -293,10 +294,14 @@ const queryTree = (searchValue?: any) => {
       (res: any) => {
         if (res.status === 200 && res.result) {
           treeData.value = dealTreeData(res.result)
-          selectId.value = res.result[0]?.roles[0]?.id
-          selectedKeys.value = [res.result[0]?.roles[0]?.id]
-          expandedKeys.value = [res.result[0]?.groupId]
-          loading.value = false
+          selectId.value = res.result[0]?.roles?.[0]?.id
+          selectedKeys.value = [res.result?.[0]?.roles?.[0]?.id]
+          if(searchValue){
+            const list = res.result.filter(item => item.roles?.length).map(i => i?.groupId)
+            expandedKeys.value = [...list]
+          } else {
+            expandedKeys.value = [res.result?.[0]?.groupId]
+          }
         }
       },
     ).finally(()=>{
@@ -387,7 +392,7 @@ watch(
 <style lang="less" scoped>
 .leftTree {
   width: 300px;
-  border-right: 1px solid #d9d9d9;
+  border-right: 1px solid #f0f0f0;
   padding: 18px 10px;
   .tree{
     margin-top: 10px;

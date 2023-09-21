@@ -67,7 +67,7 @@
             />
           </j-form-item>
           <j-form-item name="json" label="复制json">
-            <Editor language="json" v-model:value="modelRef.json" />
+            <Editor :height="300" language="json" v-model:value="modelRef.json" />
           </j-form-item>
           <j-form-item label="复制表单" placeholder="请选择" name="formCopy">
             <j-select
@@ -108,6 +108,7 @@ import { onlyMessage } from '@jetlinks/utils'
 import { providerEnum } from '@/components/ProJect'
 import generatorData from '../../utils/generatorData'
 import { map, uniqBy } from 'lodash-es'
+import { uid } from '../../utils/uid'
 
 const product = useProduct()
 const designer: any = inject('FormDesigner')
@@ -173,20 +174,20 @@ const commandList = computed(() => {
   )
 })
 
-const getArray = (arr: any[], parentId: string) => {
+const getArray = (arr: any[]) => {
   return (arr || []).map((i) => {
     let children: any[] = []
     if (i.valueType.type === 'array') {
-      children = getArray(i.valueType?.elementType?.properties || [], i.id)
+      children = getArray(i.valueType?.elementType?.properties || [])
     }
     if (i.valueType.type === 'object') {
-      children = getArray(i.valueType?.properties || [], i.id)
+      children = getArray(i.valueType?.properties || [])
     }
     return {
       ...i,
-      parentId,
+      value: uid(8),
       label: `${i.id}${i?.name ? '(' + i?.name + ')' : ''}`,
-      value: `${i.id}_${parentId}`,
+      // value: `${i.id}`,
       children,
     }
   })
@@ -202,7 +203,7 @@ const sourceList = computed(() => {
       label: '输入',
       value: 'inputs',
       disabled: true,
-      children: getArray(_item?.inputs || [], 'inputs'),
+      children: getArray(_item?.inputs || []),
     })
   }
   if (_item?.output && _item?.output?.properties?.length) {
@@ -210,7 +211,7 @@ const sourceList = computed(() => {
       label: '输出',
       value: 'output',
       disabled: true,
-      children: getArray(_item?.output?.properties || [], 'output'),
+      children: getArray(_item?.output?.properties || []),
     })
   }
   return arr
@@ -341,7 +342,6 @@ const handleSource = (arr: any[]) => {
 
 const onSave = async () => {
   const valid = await formRef.value?.validate()
-  console.log(valid)
   if (!valid) return
   const obj: any = {
     json: undefined,

@@ -8,11 +8,12 @@
     @cancel="cancel"
     :maskClosable="false"
   >
-    <j-monaco-editor
-      v-model="myValue"
-      :language="language"
-    />
-
+    <div :style="{height: height + 'px'}">
+      <j-monaco-editor
+        v-model="myValue"
+        :language="language"
+      />
+    </div>
   </j-modal>
 </template>
 
