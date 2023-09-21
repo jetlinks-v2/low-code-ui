@@ -2,7 +2,7 @@
   <div class="config-center">
     <div class="content" v-if="props.showSwitch">
       开启表头排序
-      <j-tooltip title="用于控制该列数据置顶">
+      <j-tooltip title="用于控制该列数据置顶/置底展示">
         <AIcon type="QuestionCircleOutlined" />
       </j-tooltip>
     </div>
@@ -48,7 +48,7 @@ interface Emit {
 }
 const emits = defineEmits<Emit>()
 const state = reactive({
-  checked: props.config?.type === 'object' ? false : true,
+  checked: false,
   colLayout: props.config?.config?.colLayout || 'left',
   specialStyle: props.config?.config?.specialStyle || '',
 })

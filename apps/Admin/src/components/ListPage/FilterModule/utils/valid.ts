@@ -1,4 +1,10 @@
+import { useProduct } from "@/store";
+import { providerEnum } from "@/components/ProJect";
 export const validFilterModule = (list: any[]) => {
+  const productStore = useProduct();
+  const functionList = [...productStore.getDataMap().values()].filter(item => {
+    return [providerEnum.CRUD, providerEnum.Function, providerEnum.SQL].includes(item.type)
+  })
   let errorList: any = [];
   list?.forEach((item, index) => {
     if(!item.name || item.name === '') {
@@ -34,27 +40,38 @@ export const validFilterModule = (list: any[]) => {
         })
       }
     }
-    if(item.config) {
-      if(item.config.value == 'data' && item.config.instructValue.length === 0) {
+    if(item.config?.value == 'data' && item.config?.dataValue?.length === 0) {
+      errorList.push({
+        key: 'config' + index,
+        childKey: 'dataValue' + index,
+        message: '请配置数据字典'
+      })
+    } else if(item.config?.value === 'rearEnd') {
+      if(!item.config?.abilityValue || item.config?.abilityValue?.length === 0) {
         errorList.push({
           key: 'config' + index,
-          message: '请配置数据字典'
+          childKey: 'abilityValue' + index,
+          message: '请配置后端功能'
         })
-      } else if(item.config.value === 'rearEnd') {
-        if(item.config.abilityValue.length === 0) {
+      } else {
+        const result = functionList.filter(val => val.fullId === item.config?.abilityValue)
+        if(result.length === 0) {
           errorList.push({
             key: 'config' + index,
-            message: '请配置后端功能'
-          })
-        }
-        if(item.config.dataValue.length === 0) {
-          errorList.push({
-            key: 'config' + index,
-            message: '请配置后端指令'
+            childKey: 'abilityValue' + index,
+            message: '后端功能不存在'
           })
         }
       }
+      if(!item.config?.instructValue || item.config?.instructValue?.length === 0) {
+        errorList.push({
+          key: 'config' + index,
+          childKey: 'instructValue' + index,
+          message: '请配置后端指令'
+        })
+      }
     }
   })
+  console.log(errorList);
   return errorList
 };
