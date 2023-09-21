@@ -32,13 +32,10 @@ import { PropType } from 'vue'
 import { getResource } from '@/api/basis'
 import { providerEnum } from '@/components/ProJect'
 import { ReplStore } from '@/components/CustomHTML/store'
-import { useProduct } from '@/store'
 import { queryRuntime } from '@/api/form'
-import { values } from 'lodash-es'
 
 const data = ref<any>()
 
-const productStore = useProduct()
 const vueMode = ref(true)
 const store = new ReplStore(JSON.stringify(data.value))
 const formPage = ref()
