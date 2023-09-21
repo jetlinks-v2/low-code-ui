@@ -29,7 +29,7 @@
               <j-popover trigger="hover">
                 <template #content>
                   <div class="hover-tips">
-                    <div>配置不同于列自身的数据类型，筛选组件提供string、enum、<br>date、number四种数据类型，用于控制运算符和筛选值样式</div>
+                    <div>不同于列自身的数据类型，筛选组件提供string、enum、<br>date、number四种数据类型，用于控制运算符和筛选值样式</div>
                     <j-table
                       :columns="tipsColumns"
                       :data-source="data"

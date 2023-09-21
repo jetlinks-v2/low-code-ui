@@ -41,7 +41,7 @@ export const validOperationsBtn = (tree: OperationConfigTreeItem[], functionOpti
             });
           }
         }
-        if (!item.pages && (item.type === 'Add' || item.type === 'Detail')) {
+        if (!item.pages && (item.type === 'Add' || item.type === 'Detail' || item.type === 'Update')) {
           errorItems.push({
             key: item.key,
             errorKey: 'pages',

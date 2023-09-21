@@ -1,5 +1,5 @@
 <template>
-  <div class="preview">
+  <div class="list-page-output">
     <CardBox :padding="0">
       <pro-search
       :columns="searchColumns"
@@ -353,22 +353,25 @@ watch(() => JSON.stringify(allData.value), () => {
 </script>
 
 <style lang="less" scoped>
-.ant-page-header {
-  padding: 2px 20px 2px 20px;
-}
-.header {
-  .sub-title {
-    color: #f5f5f5;
-    font-size: 20px;
+.list-page-output{
+  .ant-page-header {
+    padding: 2px 20px 2px 20px;
+  }
+  .header {
+    .sub-title {
+      color: #f5f5f5;
+      font-size: 20px;
+    }
+  }
+  .right-button {
+    padding: 16px 24px 0px;
+    width: 100%;
+    display: flex;
+    justify-content: end;
+    .right-button-icon {
+      font-size: 16px;
+    }
   }
 }
-.right-button {
-  padding: 16px 24px 0px;
-  width: 100%;
-  display: flex;
-  justify-content: end;
-  .right-button-icon {
-    font-size: 16px;
-  }
-}
+
 </style>

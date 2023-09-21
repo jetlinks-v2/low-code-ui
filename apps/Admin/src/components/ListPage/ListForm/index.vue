@@ -1,6 +1,10 @@
 <template>
   <div class="list-form-center" ref="listFormRef">
-    <img class="modal-config-img" :src="getImage('/list-page/form.png')" v-if="open">
+    <img
+      class="modal-config-img"
+      :src="getImage('/list-page/form.png')"
+      v-if="open"
+    />
     <j-drawer
       title="列表形态配置"
       placement="right"
@@ -13,9 +17,12 @@
       @close="emits('update:open', false)"
     >
       <j-form v-if="!showType!.configurationShow" layout="vertical">
-        <j-form-item label="数据展示方式" :rules="{
-          required: true,
-        }">
+        <j-form-item
+          label="数据展示方式"
+          :rules="{
+            required: true,
+          }"
+        >
           <div class="j-check-btn">
             <div :class="classList" @click="configuredChange('list')">
               数据列表
@@ -26,18 +33,31 @@
             </div>
           </div>
         </j-form-item>
-        <j-form-item label="卡片配置" v-if="showType.configured?.includes('card')" :rules="{
-          required: true,
-        }">
+        <j-form-item
+          label="卡片配置"
+          v-if="showType.configured?.includes('card')"
+          :rules="{
+            required: true,
+          }"
+        >
           <j-badge :count="errorList.length">
-            <j-button :style="{width: '300px', border: errorList.length ? '1px solid red' : ''}" @click="showType.configurationShow = true" :class="{ 'error-boder': errorList.length }"
+            <j-button
+              :style="{
+                width: '300px',
+                border: errorList.length ? '1px solid red' : '',
+              }"
+              :class="{ 'config-done': listFormInfo.field1?.length > 0 ? 'config-done' : ''}"
+              @click="showType.configurationShow = true"
               >配置</j-button
             >
           </j-badge>
         </j-form-item>
 
         <j-form-item label="默认形态" v-if="showType.configured?.length === 2">
-          <j-radio-group v-model:value="showType.defaultForm" button-style="solid">
+          <j-radio-group
+            v-model:value="showType.defaultForm"
+            button-style="solid"
+          >
             <j-radio-button value="list" class="check-btn">
               数据列表
             </j-radio-button>
@@ -56,7 +76,7 @@
             返回
           </template>
         </a-page-header>
-        <Card ref="cardRef" :id="props.id" :errorList="errorList"/>
+        <Card ref="cardRef" :id="props.id" :errorList="errorList" />
       </div>
       <template #footer>
         <j-space size="large">
@@ -74,9 +94,9 @@
 import Card from '@/components/ListPage/ListForm/components/card.vue'
 import { clone, cloneDeep } from 'lodash-es'
 import { validListForm } from './utils/valid'
-import { LIST_FORM_INFO, SHOW_TYPE_KEY } from '../keys';
-import { PropType } from 'vue';
-import { getImage } from '@jetlinks/utils';
+import { LIST_FORM_INFO, SHOW_TYPE_KEY } from '../keys'
+import { PropType } from 'vue'
+import { getImage } from '@jetlinks/utils'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -94,8 +114,8 @@ const props = defineProps({
   },
   listFormInfo: {
     type: Object as PropType<Record<string, any>>,
-    default: () => {}
-  }
+    default: () => {},
+  },
 })
 
 const listFormInfo = computed({
@@ -104,7 +124,7 @@ const listFormInfo = computed({
   },
   set(val) {
     emits('update:listFormInfo', val)
-  }
+  },
 })
 const open = computed({
   get() {
@@ -179,8 +199,8 @@ const configuredChange = (value: string) => {
 
 const errorList = ref<any[]>([])
 const valid = () => {
-  errorList.value = validListForm(showType!,listFormInfo.value)
-  return errorList.value.length ? [{message: '列表形态配置错误'}] : []
+  errorList.value = validListForm(showType!, listFormInfo.value)
+  return errorList.value.length ? [{ message: '列表形态配置错误' }] : []
   // return new Promise((resolve, reject) => {
   //   errorList.value = validListForm(showType!,listFormInfo.value)
   //   if(errorList.value.length) reject([{message: '列表形态配置错误'}])
@@ -190,7 +210,7 @@ const valid = () => {
 
 defineExpose({
   valid,
-  errorList
+  errorList,
 })
 </script>
 
@@ -248,14 +268,28 @@ defineExpose({
     }
   }
 }
+.config-done{
+  &::after{
+    content: '';
+    background-color: @primary-color;
+    clip-path: polygon(100% 100%, 0 0, 100% 0%, 100% 100%);
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    color: #fff;
+    border-radius: 0 4px 0 0;
+  }
+}
 .title {
   margin-top: 20px;
 }
 :deep(.ant-radio-group) {
-  .ant-radio-button-wrapper:first-child{
+  .ant-radio-button-wrapper:first-child {
     border-radius: 6px 0px 0px 6px !important;
   }
-  .ant-radio-button-wrapper:last-child{
+  .ant-radio-button-wrapper:last-child {
     border-radius: 0px 6px 6px 0px !important;
   }
 }

@@ -7,7 +7,6 @@
       </j-tooltip>
     </div>
     <j-switch v-model:checked="state.checked" />
-    <j-switch v-model:checked="state.checked" />
     <div class="content">
       <slot name="demonstrations"></slot>
     </div>
@@ -51,7 +50,9 @@ const emits = defineEmits<Emit>()
 const state = reactive({
   checked: false,
   colLayout: props.config?.config?.colLayout || 'left',
-  specialStyle: props.config?.config?.specialStyle || '',
+  specialStyle: props.config?.config?.specialStyle || `/* .test {
+    color: red;
+  } */`,
 })
 
 watch(

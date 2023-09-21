@@ -191,7 +191,7 @@ const form = reactive({
   title: props.data.title,
   icon: props.data.icon,
   type: props.data.type,
-  script: props.data.script,
+  script: props.data.script || ``,
   key: props.data.key,
   functions:
     editType!.value === 'add' &&
@@ -204,7 +204,9 @@ const form = reactive({
       ?.provider === providerEnum.Function
       ? null
       : props.data.command,
-  style: props.data.style,
+  style: props.data.style || `/* .test {
+  color: red;
+} */`,
   resource: props.data.resource
 })
 
