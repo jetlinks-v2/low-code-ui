@@ -253,6 +253,7 @@ const myColumns = [
     dataIndex: 'setting',
     width: 100,
     form: {
+      watch: ['other', 'dictionary'],
       rules: {
         asyncValidator: (rule, value, cb, source) => {
           return settingValidate(source.record)
@@ -458,10 +459,24 @@ const settingCancel = () => {
   setting.visible = false
 }
 
+const getKey = (type) => {
+  switch (type) {
+    case 'Enum':
+      return 'dictionary'
+    case 'List':
+    case 'Map':
+      return 'others'
+  }
+}
+
 const settingSave = (data) => {
   dataSource.value.splice(data.index - 1, 1, data)
+  const key = getKey(data.javaType)
   settingCancel()
   emitUpdateDataSource()
+  if (key) {
+    tableRef.value?.validateItem([data.index - 1, key])
+  }
 }
 
 const tableNameChange = debounce((e) => {

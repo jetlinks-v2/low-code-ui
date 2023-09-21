@@ -45,19 +45,6 @@ const bodyRef = ref()
 
 provide(SCROLL_LEFT, left)
 
-defineExpose({
-  validates: () => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const v = await bodyRef.value?.validates()
-        resolve(v)
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
-})
-
 const onResize = debounce((e) => {
   const { width } = e
 
@@ -95,6 +82,24 @@ const onResize = debounce((e) => {
 
 onMounted(() => {
   onResize({ width: 0 })
+})
+
+const validateItem = (path) => {
+  bodyRef.value?.validateItem(path)
+}
+
+defineExpose({
+  validates: () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const v = await bodyRef.value?.validates()
+        resolve(v)
+      } catch (e) {
+        reject(e)
+      }
+    })
+  },
+  validateItem: validateItem
 })
 
 </script>

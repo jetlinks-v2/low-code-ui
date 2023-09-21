@@ -60,6 +60,7 @@
 import { BodyProps, SCROLL_LEFT } from "../data";
 import { dataAddID, useValidate } from "../util";
 import { useSlots, defineExpose } from 'vue'
+import { get } from 'lodash-es'
 
 const props = defineProps({
   ...BodyProps()
@@ -130,6 +131,13 @@ const getPopupContainer = (e) => {
   return bodyRef.value || e.parentNode
 }
 
+const validateItem = (path) => {
+  const [ dataIndex, name ] = path
+  const value = get(props.data, path)
+  console.log(name, value, props.data[dataIndex])
+  validate(name, value, props.data[dataIndex])
+}
+
 watch(() => JSON.stringify(props.columns),  () => {
   createValidate(props.columns)
 }, { immediate: true })
@@ -151,7 +159,8 @@ defineExpose({
         reject(e)
       }
     })
-  }
+  },
+  validateItem: validateItem
 })
 
 </script>

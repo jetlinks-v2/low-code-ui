@@ -168,27 +168,20 @@ export const settingValidate = (record: any) => {
         return Promise.reject('请选择数据字典')
       }
       break;
-    case 'String':
-    case 'Byte':
-    case 'Long':
-      if (!record.dictionary.dictionaryId) {
-        return Promise.reject('请选择数据字典')
+    case 'List':
+      if (!record.others.valueJavaType) {
+        return Promise.reject('请选择元素类型')
       }
       break;
-    case 'Double':
-    case 'Int':
-    case 'Float':
-    case 'BigDecimal':
-    case 'BigInteger':
-
-      break;
-    case 'List':
-
-      break;
     case 'Map':
-
+      if (!record.others.valueJavaType) {
+        return Promise.reject('请选择value')
+      }
+      if (!record.others.keyJavaType) {
+        return Promise.reject('请选择key')
+      }
       break;
   }
-  console.log('setting 校验通过')
+
   return Promise.resolve()
 }
