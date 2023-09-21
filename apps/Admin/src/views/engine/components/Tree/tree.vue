@@ -107,7 +107,7 @@ const save = (data) => {
       configuration: data.configuration,
       parentId: parentId,
       children:data.children
-    }, parentId,true)
+    }, parentId)
   }
   close()
 }

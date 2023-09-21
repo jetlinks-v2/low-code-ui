@@ -39,7 +39,7 @@
         </a-row>
       </j-scrollbar>
     </ContextMenu>
-    <a-drawer title="添加项目说明" :closable="false" :visible="showMenu" :style="{ position: 'absolute' }" :getContainer="false"
+    <!-- <a-drawer title="添加项目说明" :closable="false" :visible="showMenu" :style="{ position: 'absolute' }" :getContainer="false"
       @close="showMenu = false" :mask="false">
       <div class="drawer" v-for="items in projectList">
         <div class="drawer-title">{{ items.title }}</div>
@@ -53,7 +53,7 @@
           </div>
         </div>
       </div>
-    </a-drawer>
+    </a-drawer> -->
     <FileDrawer v-if="visibleFile" @close="visibleFile = false" :data="current" />
   </div>
 
@@ -116,7 +116,7 @@ const visibleMenu = ref<boolean>(false)
 const provider = ref<string>('')
 const current = ref<any>({})
 const type = ref<string>('Add')
-const selectKey = ref<string>('')
+const selectKey = ref<string>(props.data[0].id)
 const selectSort = ref<number>(0)
 const list = ref<any>([])
 const nameList = ref<any>([])
@@ -163,7 +163,7 @@ const onShow = (val) => {
 const onSave = (data?: any) => {
   if (data) {
     visible.value = false
-    type.value === 'Add' ? product.add(data, data.parentId, true) : product.update(data)
+    type.value === 'Add' ? product.add(data, data.parentId,data.type==='module') : product.update(data)
     setTimeout(() => {
       selectKey.value = data.id
     }, 300)
@@ -310,7 +310,6 @@ watchEffect(() => {
 watchEffect(() => {
   if (props.data.length !== 0) {
     // console.log(props.data)
-    selectKey.value = props.data[0].id
     selectSort.value = 0
     nameList.value = props.data.map(item => item.name)
     list.value = props.data.map((item, index) => {

@@ -9,7 +9,7 @@
             <div class="item-text">暂无项目</div>
             <div class="item-bottom">你可以点击鼠标右键添加项目能力，快速完成项目搭建</div>
          </div>
-         <a-drawer title="添加项目说明" :closable="false" :visible="showMenu" :style="{ position: 'absolute' }"
+         <!-- <a-drawer title="添加项目说明" :closable="false" :visible="showMenu" :style="{ position: 'absolute' }"
             :getContainer="false" @close="showMenu = false" :mask="false">
             <div class="drawer" v-for="items in projectList">
                <div class="drawer-title">{{ items.title }}</div>
@@ -23,7 +23,7 @@
                   </div>
                </div>
             </div>
-         </a-drawer>
+         </a-drawer> -->
       </div>
    </ContextMenu>
 
