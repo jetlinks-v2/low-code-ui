@@ -12,7 +12,7 @@
 import { getResource } from '@/api/basis'
 import ListPage from '@/components/ListPage/Output/index.vue'
 import HtmlPage from '@/components/CustomHTML/output/Preview.vue'
-import {queryProjectDraft} from "@/api/project";
+import { queryProject } from "@/api/project";
 import { Result } from 'jetlinks-ui-components'
 
 const route = useRoute()
@@ -30,8 +30,8 @@ const showHtml = computed(() => {
 
 const getInfo = async () => {
   const { project, module, id } = route.params
-  queryProjectDraft(project).then(resp => {
-    if (resp.result.state) {
+  queryProject({ terms: [{ value: project, termType: 'eq', column: 'id'}]}).then(resp => {
+    if (resp.result && resp.result.data?.length && resp.result.data[0].runningState?.value === 'enabled') {
       isEmpty.value = false
       getResource(project, module, id).then(resp => {
         data.value = typeof resp === 'string' ? resp : JSON.stringify(resp)
