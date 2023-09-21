@@ -45,6 +45,7 @@
           v-if="type === 'enum'"
           :id="props.id"
           :data="configRow"
+          :errorList="errorList"
           @update:state="(newValue) => (subValue = newValue)"
         />
         <StringType

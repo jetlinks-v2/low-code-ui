@@ -11,7 +11,7 @@
         offline: 'error',
         notActive: 'warning',
       }"
-      :warpStyle="{width: '385px'}"
+      :warpStyle="{ width: '385px' }"
       :statusColor="statusColor"
     >
       <template #img>
@@ -78,7 +78,7 @@
       请选择卡片展示内容
       <j-tooltip placement="top" :get-popup-container="getPopupContainer">
         <template #title>
-          <p>字段1仅展示所选字段的值，适合展示“名称</p>
+          <p>字段1仅展示所选字段的值，适合展示“名称”</p>
           <p>字段2、3会展示所选字段名称和所选字段的值</p>
           <p>强调字段展示方式较明显，适合展示“状态”</p>
         </template>
@@ -94,18 +94,30 @@
       >
         <div v-if="cardState.type === 'customIcon'">
           <j-form-item label="自定义图标" name="customIcon" class="upload-icon">
-            <Upload v-model:value="formState.customIcon" :accept="accept" cropperTitle="自定义图标"/>
+            <Upload
+              v-model:value="formState.customIcon"
+              :accept="accept"
+              cropperTitle="自定义图标"
+            />
           </j-form-item>
 
           <j-form-item label="动态图标" name="dynamicIcon">
-            <j-select
+            <a-select
               width="200px"
               placeholder="请先配置列表数据"
               v-model:value="formState.dynamicIcon"
               showSearch
               :options="titleOptions"
               :field-names="{ label: 'name', value: 'id' }"
-            />
+            >
+              <template #notFoundContent>
+                <j-empty>
+                  <template #description>
+                    <span>请先配置列表数据</span>
+                  </template>
+                </j-empty>
+              </template>
+            </a-select>
           </j-form-item>
         </div>
         <div v-if="cardState.type === 'field1'">
@@ -120,7 +132,7 @@
                 },
               ]"
             >
-              <j-select
+              <a-select
                 width="200px"
                 placeholder="请先配置列表数据"
                 v-model:value="formState.field1"
@@ -128,13 +140,21 @@
                 allowClear
                 :options="titleOptions"
                 :field-names="{ label: 'name', value: 'id' }"
-              />
+              >
+                <template #notFoundContent>
+                  <j-empty>
+                    <template #description>
+                      <span>请先配置列表数据</span>
+                    </template>
+                  </j-empty>
+                </template>
+              </a-select>
             </j-form-item>
           </ErrorItem>
         </div>
         <div v-if="cardState.type === 'field2'">
           <j-form-item label="字段2" name="field2">
-            <j-select
+            <a-select
               width="200px"
               placeholder="请先配置列表数据"
               v-model:value="formState.field2"
@@ -143,12 +163,20 @@
               :options="titleOptions"
               :field-names="{ label: 'name', value: 'id' }"
               @change="field2Change"
-            />
+            >
+              <template #notFoundContent>
+                <j-empty>
+                  <template #description>
+                    <span>请先配置列表数据</span>
+                  </template>
+                </j-empty>
+              </template>
+            </a-select>
           </j-form-item>
         </div>
         <div v-if="cardState.type === 'field3'">
           <j-form-item label="字段3" name="field3">
-            <j-select
+            <a-select
               width="200px"
               placeholder="请先配置列表数据"
               v-model:value="formState.field3"
@@ -156,13 +184,21 @@
               :options="titleOptions"
               :field-names="{ label: 'name', value: 'id' }"
               @change="field3Change"
-            />
+            >
+              <template #notFoundContent>
+                <j-empty>
+                  <template #description>
+                    <span>请先配置列表数据</span>
+                  </template>
+                </j-empty>
+              </template>
+            </a-select>
           </j-form-item>
         </div>
         <div v-if="cardState.type === 'emphasisField'">
           <ErrorItem :errorData="errorData('emphasisField')">
             <j-form-item label="强调字段" name="emphasisField">
-              <j-select
+              <a-select
                 width="200px"
                 placeholder="请先配置列表数据"
                 v-model:value="formState.emphasisField"
@@ -170,7 +206,15 @@
                 allowClear
                 :options="titleOptions"
                 :field-names="{ label: 'name', value: 'id' }"
-              />
+              >
+                <template #notFoundContent>
+                  <j-empty>
+                    <template #description>
+                      <span>请先配置列表数据</span>
+                    </template>
+                  </j-empty>
+                </template>
+              </a-select>
             </j-form-item>
           </ErrorItem>
           <j-form-item label="特殊样式" name="specialStyle">
@@ -190,17 +234,22 @@
 
 <script lang="ts" setup>
 import Upload from '@/components/Upload/Image/ImageUpload.vue'
-import { ErrorItem } from '../..';
+import { ErrorItem } from '../..'
 import EditorModal from '@/components/EditorModal'
-import { LIST_FORM_INFO, ACTION_CONFIG_KEY, DATA_BIND, DATA_SOURCE } from '../../keys';
+import {
+  LIST_FORM_INFO,
+  ACTION_CONFIG_KEY,
+  DATA_BIND,
+  DATA_SOURCE,
+} from '../../keys'
 const props = defineProps({
   id: {
     type: null,
   },
   errorList: {
     type: Array,
-    default: () => []
-  }
+    default: () => [],
+  },
 })
 const formRef = ref()
 //卡片样式点击类型
@@ -210,7 +259,7 @@ const cardState = reactive({
 //卡片展示内容form
 const listForm = inject(LIST_FORM_INFO)
 const formState = reactive({
-  ...listForm
+  ...listForm,
 })
 const dataBind = inject(DATA_BIND)
 const dataSource = inject(DATA_SOURCE)
@@ -227,70 +276,21 @@ const getPopupContainer = (trigger: HTMLElement) => {
   return trigger.parentElement
 }
 //卡片
-const actionsConfig = inject(ACTION_CONFIG_KEY)
-const actions = computed(() => {
-  return actionsConfig.value.map((item) => {
-    return {
-      key: item?.key,
-      text: item?.title,
-      icon: item?.icon,
-      permissionProps: (data: any) => ({
-        tooltip: {
-          title: item?.title,
-        },
-      }),
-    }
-  })
-})
 
-//  [
-//   {
-//     key: 'view',
-//     text: '查看',
-//     permissionProps: (data) => ({
-//       tooltip: {
-//         title: '查看',
-//       },
-//       hasPermission: false,
-//       icon: 'EyeOutlined',
-//       onClick: (e) => {},
-//     }),
-//   },
-//   {
-//     key: 'view1',
-//     text: '查看1',
-//     permissionProps: {
-//       tooltip: {
-//         title: '查看1',
-//       },
-//       hasPermission: false,
-//       icon: 'EyeOutlined',
-//     },
-//   },
-//   {
-//     key: 'view2',
-//     text: '查看2',
-//   },
-
-//   {
-//     key: 'delete',
-//     text: '删除',
-//     permissionProps: (data) => ({
-//       tooltip: {
-//         title: '删除',
-//       },
-//       popConfirm: {
-//         title: data.status === 'error' ? '禁用' : '确认删除？',
-//         onConfirm: () => {
-//           console.log(data)
-//         },
-//       },
-//       hasPermission: true,
-//       icon: 'EyeOutlined',
-//       onClick: () => {},
-//     }),
-//   },
-// ]
+const actions = [
+  {
+    key: 'view',
+    text: '按钮',
+  },
+  {
+    key: 'view1',
+    text: '按钮',
+  },
+  {
+    key: 'view2',
+    text: '按钮',
+  },
+]
 
 const validateValue = () => {
   const value = ['field1']

@@ -5,8 +5,7 @@
       @click="syncData"
       myIcon="SyncOutlined"
       size="small"
-      :type="props.dataBind ? 'primary' : 'stroke'"
-      ghost
+      :type="dataBinds.data.dataSource.length ? 'primary' : 'default'"
     >
       同步数据绑定
     </j-button>
@@ -45,18 +44,19 @@
           </template>
         </template>
         <template #name="{ data }">
-          <ErrorItem :border="false" :errorData="errorData(data.record.name)">
-            <span>{{ data.record?.name }}</span>
+          <ErrorItem :border="false" :errorData="errorData('name' + data.record?._sortIndex)">
+            <span class="data-column">{{ data.record?.name }}</span>
           </ErrorItem>
         </template>
         <template #id="{ data }">
-          <ErrorItem :border="false" :errorData="errorData(data.record.id)">
-            <span>{{ data.record?.id }}</span>
+          <ErrorItem :border="false" :errorData="errorData('id' + data.record?._sortIndex)">
+            <span class="data-column">{{ data.record?.id }}</span>
           </ErrorItem>
         </template>
         <template #action="{ data }">
           <j-space>
-            <j-button type="link" @click="configuration(data)">配置</j-button>
+            {{ errorData('config' + data.record?._sortIndex) }}
+            <j-button type="link" @click="configuration(data)" :style="{ color: errorData('config' + data.record?._sortIndex) ? 'red' : '' }">配置</j-button>
             <JPopconfirm
               @confirm="confirm(data)"
               :loading="loading"
@@ -260,6 +260,7 @@ const tipsColumns: any = [
   {
     title: '筛选项类型',
     dataIndex: 'type',
+    width: '120px',
     customCell: (_, index) => {
       if (index === 1) {
         return { rowSpan: 2 }
@@ -384,10 +385,9 @@ const syncData = async () => {
   tempData.value = [];
   changeFunctionData.forEach((item) => {
     let find = props.bindData?.find((i) => i.id === item.id)
-    console.log(item, props.bindData);
     if(!find) tempData.value.push(item)
   })
-  if (tempData.value.length) {
+  if (tempData.value.length || changeFunctionData.length !== props.bindData.length) {
     openModel(props.modelActiveKey)
   } else {
     onlyMessage('已是最新数据', 'success')
@@ -414,7 +414,7 @@ const handleOk = async () => {
   const dataSource = activeKey.value?.[0] === '1' ? newBind.map((item) => item) : tempData.value
   emit('updateBind', cloneDeep(newBind))
   tableRef.value.cleanEditStatus()
-  emit('handleOk', activeKey.value?.[0], dataSource)
+  emit('handleOk', activeKey.value?.[0], [...dataSource, ...tempData.value])
   visible.value = false
 }
 const handleCancel = () => {
@@ -446,6 +446,12 @@ watch(() => props.bindFunctionId, () => {
   }
   .table {
     padding-top: 18px;
+    .data-column{
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
   .editable-add-btn{
     width: 100%;
