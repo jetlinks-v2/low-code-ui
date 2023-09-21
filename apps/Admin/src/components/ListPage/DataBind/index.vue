@@ -2,14 +2,14 @@
   <div class="data-bind" :class="{ 'is-guide': open }" ref="dataBindRef">
     <div class="bind-button">
       <j-badge :count="errorList.length">
-        <j-button type="primary" @click="visible = true">数据绑定</j-button>
+        <j-button type="primary" @click="visible = true" :disabled="open">数据绑定</j-button>
       </j-badge>
       <j-space>
         <j-form-item-rest>
-          <j-button type="primary" @click="handleValid">校验</j-button>
+          <j-button type="primary" @click="handleValid" :disabled="open">校验</j-button>
         </j-form-item-rest>
         <j-form-item-rest v-if="!open">
-          <j-button type="primary" @click="emits('update:open', true)">操作向导</j-button>
+          <j-button type="primary" @click="emits('update:open', true)" :disabled="open">操作向导</j-button>
         </j-form-item-rest>
       </j-space>
     </div>
@@ -87,10 +87,7 @@ defineExpose({
   }
 }
 .is-guide {
-    margin: 0 20px;
-    border-radius: 4px;
-  }
-.text {
-  text-align: center;
+  margin: 0 20px;
+  border-radius: 4px;
 }
 </style>

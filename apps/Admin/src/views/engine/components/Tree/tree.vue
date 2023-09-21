@@ -2,30 +2,28 @@
   <div class="tree-content-warp">
     <div class="tree-content-body">
       <j-scrollbar>
-        <div class="tree-box">
-          <j-tree
-            v-model:expandedKeys="expandedKeys"
-            :selectedKeys="[activeFile]"
-            :treeData="treeData"
-            block-node
-            :fieldNames="{
-              key: 'id'
-            }"
-            @select="select"
-          >
-            <template #title="node">
-              <j-dropdown :trigger="['contextmenu']">
-                <span class="title">
-                  <div class="icon"><img :src="typeImages[node.type]"></div>
-                  {{ node.title }}
-                </span>
-                <template #overlay>
-                  <RightMenu :node="node" @click="menuClick" />
-                </template>
-              </j-dropdown>
-            </template>
-          </j-tree>
-        </div>
+        <j-tree
+          v-model:expandedKeys="expandedKeys"
+          :selectedKeys="[activeFile]"
+          :treeData="treeData"
+          block-node
+          :fieldNames="{
+            key: 'id'
+          }"
+          @select="select"
+        >
+          <template #title="node">
+            <j-dropdown :trigger="['contextmenu']">
+              <span class="title">
+                <div class="icon"><img :src="typeImages[node.type]"></div>
+                {{ node.title }}
+              </span>
+              <template #overlay>
+                <RightMenu :node="node" @click="menuClick" />
+              </template>
+            </j-dropdown>
+          </template>
+        </j-tree>
       </j-scrollbar>
     </div>
     <InputModal
@@ -109,7 +107,7 @@ const save = (data) => {
       configuration: data.configuration,
       parentId: parentId,
       children:data.children
-    }, parentId)
+    }, parentId,true)
   }
   close()
 }

@@ -386,7 +386,7 @@ watch(
 </script>
 <style lang="less" scoped>
 .leftTree {
-  flex: 1;
+  width: 300px;
   border-right: 1px solid #d9d9d9;
   padding: 18px 10px;
   .tree{
@@ -400,7 +400,7 @@ watch(
 }
 
 .rightTable {
-  flex: 2;
+  flex: 1;
 }
 
 .table {

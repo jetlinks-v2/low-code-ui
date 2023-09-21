@@ -15,42 +15,49 @@
       <j-form :model="dataBind" layout="vertical">
         <j-row :gutter="20">
           <j-col :span="20">
-            <j-space>
+            <j-space style="align-items: start;">
               <j-form-item>
                 <ErrorItem :errorData="errorData('function')">
-                  <j-select
+                  <a-select
                     style="width: 200px;"
                     v-model:value="dataBind.data.function"
                     :disabled="functionDisabled"
                     placeholder="请选择功能"
+                    optionFilterProp="title"
+                    show-search
                   >
-                    <j-select-option
+                    <a-select-option
                       v-for="item in functionOptions"
                       :value="item.fullId"
                       :key="item.id"
-                      :title="item.title + '.' + item.id "
+                      :title="item.title"
                     >
-                      {{ item.title + '.' + item.id }}
-                    </j-select-option>
-                  </j-select>
+                      <img class="options-img" :src="getImages(item.type)">
+                      {{ item.title }}
+                    </a-select-option>
+                  </a-select>
                 </ErrorItem>
               </j-form-item>
               <j-form-item>
                 <ErrorItem :errorData="errorData('command')">
-                  <j-select
+                  <a-select
                     style="width: 200px;"
                     v-model:value="dataBind.data.command"
                     :disabled="commandDisabled"
                     placeholder="请选择指令"
+                    optionFilterProp="label"
+                    show-search
                   >
-                    <j-select-option
+                    <a-select-option
                       v-for="item in commandOptions"
                       :value="item.id"
                       :key="item.id"
+                      :title="item.name"
+                      :label="item.name"
                     >
-                      {{ item.name }}
-                    </j-select-option>
-                  </j-select>
+                      {{ item.name }}({{ item.id }})
+                    </a-select-option>
+                  </a-select>
                 </ErrorItem>
               </j-form-item>
             </j-space>
@@ -87,11 +94,14 @@
 </template>
 
 <script setup lang="ts">
+import { providerEnum } from '@/components/ProJect';
 import { ErrorItem } from '../../index'
 import { DATA_BIND } from '../../keys'
 import { useFunctions } from '@/hooks/useFunctions'
+import { useImages } from '@/components/ListPage/hooks/useImages'
 
 const { functionOptions, commandOptions, handleFunction } = useFunctions()
+const { getImages } = useImages()
 
 const visible = ref(false)
 
@@ -256,5 +266,8 @@ watch(
   background-color: #f7f8f9;
   border: 1px solid #f0f2f5;
   padding: 16px;
+}
+.text {
+  text-align: center;
 }
 </style>

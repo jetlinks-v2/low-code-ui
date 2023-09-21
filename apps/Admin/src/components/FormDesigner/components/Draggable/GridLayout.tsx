@@ -53,7 +53,7 @@ export default defineComponent({
             if (props.data?.formItemProps?.name) {
                 _path[_index] = props.data.formItemProps.name || ''
             }
-            const _span = (props.data.componentProps?.inlineMax || 1)
+            const _span = (props.data.componentProps?.inlineMax || 4)
             return (
                 <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
                     <div
@@ -62,14 +62,14 @@ export default defineComponent({
                         style={{
                             display: 'grid',
                             gap: `${props.data.componentProps?.rowSpan}px ${props.data.componentProps?.colSpan}px`,
-                            gridTemplateColumns: `repeat(${_span}, 1fr)`
+                            gridTemplateColumns: `repeat(${_span}, 1fr)`,
                         }}
                     >
                         {
                             unref(list).map((element) => {
                                 const a = (element.componentProps?.span || 1)
                                 return (
-                                    <div key={element.key} {...omit(element.componentProps, 'span')} style={{ gridColumn: `span ${a} / auto` }}>
+                                    <div key={element.key} {...omit(element.componentProps, 'span')} style={{ gridColumn: `span ${a > _span ? _span : a} / auto` }}>
                                         <Selection
                                             class={unref(isDragArea) && 'drag-area'}
                                             hasDel={unref(list).length > 1}

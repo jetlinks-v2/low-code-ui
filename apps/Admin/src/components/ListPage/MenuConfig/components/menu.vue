@@ -16,7 +16,7 @@
             :rules="[
               {
                 required: true,
-                message: '',
+                message: errorData('name') ? '' : '请输入2-16个字符',
                 trigger: 'change',
               },
             ]"
@@ -35,7 +35,7 @@
               </span>
             </template>
             <ErrorItem :error-data="errorData('name')">
-              <j-input v-model:value="form!.name" :maxLength="16"/>
+              <j-input v-model:value="form!.name" :maxLength="16" placeholder="请输入菜单名称"/>
             </ErrorItem>
           </j-form-item>
           <j-form-item
@@ -44,7 +44,7 @@
             :rules="[
               {
                 required: true,
-                message: '请上传图标',
+                message: errorData('name') ? '' : '请配置图标',
                 trigger: 'change',
               },
             ]"

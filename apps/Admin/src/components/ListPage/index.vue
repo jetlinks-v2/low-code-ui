@@ -206,6 +206,7 @@ const validate = async () => {
     if (errorList.length) {
       reject(errorList)
     } else {
+      onlyMessage('校验成功')
       resolve([])
     }
     // Promise.all(promiseArr)
@@ -393,10 +394,13 @@ defineExpose({
 })
 </script>
 
-<style scoped lang="less">
+<style lang="less">
 .list-page {
   height: 100%;
   position: relative;
   background-color: #e9e9e9;
+}
+.options-img {
+  width: 20px;
 }
 </style>

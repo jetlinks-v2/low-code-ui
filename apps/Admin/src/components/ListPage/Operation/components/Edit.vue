@@ -14,7 +14,7 @@
         <div class="default-btn" v-if="iconType">
             <AIcon
             :type="activeBtn?.icon"
-            class="default-icon"
+            class="default-icon custom"
           />
         </div>
         <!-- <UploadIcon v-model:modelValue="form.icon" v-else /> -->
@@ -51,9 +51,11 @@
                   v-for="item in functionOptions"
                   :value="item.fullId"
                   :key="item.id"
-                  :title="functionName(item.title, item.moduleId)"
-                  >{{ functionName(item.title, item.moduleId) }}</j-select-option
+                  :title="item.title"
                 >
+                  <img :src="getImages(item.type)" class="options-img">
+                  {{ item.title }}
+                </j-select-option>
               </j-select>
               </ErrorItem>
             </j-form-item>
@@ -96,6 +98,7 @@
                 :value="item.id"
                 :key="item.id"
               >
+                <img :src="getImages(item.type)" class="options-img">
                 {{ item.name }}
               </j-select-option>
             </j-select>
@@ -124,6 +127,7 @@ import { activeBtnKey, errorListKey, editTypeKey } from '../keys'
 import { providerEnum } from '@/components/ProJect'
 import { ErrorItem } from '../..'
 import { useFunctions } from '@/hooks/useFunctions'
+import { useImages } from '../../hooks/useImages'
 import { pick } from 'lodash-es'
 
 const props = defineProps({
@@ -143,6 +147,7 @@ const errorList = inject(errorListKey)
 const productStore = useProduct();
 const { info } = productStore
 const { functionOptions, commandOptions, handleFunction } = useFunctions()
+const { getImages } = useImages();
 
 const functionName = computed(() => {
   return (title: string, moduleId: string) => {
@@ -192,10 +197,10 @@ const form = reactive({
     editType!.value === 'add' &&
     functionOptions!.value.find((item) => item.fullId === props.data.functions)
       ?.provider === providerEnum.Function
-      ? ''
+      ? null
       : props.data.functions,
   pages: props.data.pages,
-  command: functionOptions!.value.find((item) => item.fullId === props.data.functions)
+  command: !props.data.functions || functionOptions!.value.find((item) => item.fullId === props.data.functions)
       ?.provider === providerEnum.Function
       ? null
       : props.data.command,
@@ -221,15 +226,12 @@ const rules = {
 
 const handlePages = (val: string) => {
   const data = pagesOptions.value.find(item => item.id === val)
-  console.log(data);
+  console.log(pagesOptions);
   form.resource = {...pick(data, ['id', 'parentId', 'type']), projectId: info.id}
   form.resource.parentId = `${form.resource.projectId}.${form.resource.parentId}`
 }
 const submit = async () => {
-  const valid = await formRef.value?.validate()
-  return valid
-    ? { ...form, children: activeBtn?.value.children || [] }
-    : undefined
+  return { ...form, children: activeBtn?.value.children || [] }
 }
 
 const language = ref('javascript')
@@ -260,6 +262,9 @@ defineExpose({
     justify-content: center;
     align-items: center;
     border-radius: 4px;
+    .custom {
+      cursor: not-allowed;
+    }
     .default-icon {
       border: 1px dashed #d9d9d9;
       padding: 5px;
