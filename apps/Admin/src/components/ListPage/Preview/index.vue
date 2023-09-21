@@ -12,8 +12,7 @@
         </template>
       </j-page-header>
     </div>
-    <!-- <Preview :data="data"/> -->
-    <Output :data="data"/>
+    <Preview :data="data"/>
   </div>
 </template>
 <script setup lang="ts" name="ListPagePreview">
