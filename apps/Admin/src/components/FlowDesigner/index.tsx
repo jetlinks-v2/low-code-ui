@@ -1,10 +1,11 @@
-import { cloneDeep } from 'lodash-es'
 import {
   defineComponent,
   h,
   getCurrentInstance,
   ComponentInternalInstance,
+  PropType,
 } from 'vue'
+import { cloneDeep } from 'lodash-es'
 import { useFlowStore } from '@/store/flow'
 import './index.less'
 
@@ -20,6 +21,7 @@ import BranchButton from './components/BranchButton.vue'
 import DefaultProps from './DefaultNodeProps'
 import { onlyMessage } from '@jetlinks/utils'
 import { useMouseEvent } from './hooks/useMouseEvent'
+import type { INode } from '@/views/process/model/Detail/typings.d.ts'
 
 const componentsMap = {
   NODE: Node,
@@ -35,7 +37,7 @@ const FlowDesigner = defineComponent({
   props: {
     // 由父级传入的节点数据
     nodesData: {
-      type: Object,
+      type: Object as PropType<INode>,
       default: () => null,
     },
     // 只读模式
@@ -49,7 +51,7 @@ const FlowDesigner = defineComponent({
     const { proxy } = getCurrentInstance() as ComponentInternalInstance
 
     const flowStore = useFlowStore()
-    const valid = ref(true)
+    // const valid = ref(true)
 
     const nodeMap = computed(() => flowStore.nodeMap)
     const dom = computed(() => nodesData || flowStore.model.nodes)
@@ -286,7 +288,7 @@ const FlowDesigner = defineComponent({
      * @param parentNode
      */
     const insertApprovalNode = (parentNode) => {
-      parentNode.children.name = '审批人'
+      parentNode.children.name = '审批节点'
       parentNode.children.props = {
         ...cloneDeep(DefaultProps.APPROVAL_PROPS),
         branchBy: parentNode.props.branchBy || null,
@@ -298,7 +300,7 @@ const FlowDesigner = defineComponent({
      * @param parentNode
      */
     const insertDealNode = (parentNode) => {
-      parentNode.children.name = '办理人'
+      parentNode.children.name = '办理节点'
       parentNode.children.props = {
         ...cloneDeep(DefaultProps.DEAL_PROPS),
         branchBy: parentNode.props.branchBy || null,
@@ -529,12 +531,12 @@ const FlowDesigner = defineComponent({
       }
     }
 
-    const validateProcess = () => {
-      valid.value = true
-      let err = []
-      validate(err, dom.value)
-      return err
-    }
+    // const validateProcess = () => {
+    //   valid.value = true
+    //   let err = []
+    //   validate(err, dom.value)
+    //   return err
+    // }
     const validateNode = (err, node) => {
       //   if (proxy?.$refs[node.id].validate) {
       //     valid.value = proxy?.$refs[node.id].validate(err)

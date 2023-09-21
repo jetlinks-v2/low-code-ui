@@ -4,7 +4,7 @@ export interface INode {
     type: string;
     name?: string;
     active: boolean;
-    props?: Record<string, any>;
+    props?: Partial<INodeProps>;
     children?: INode;
     branches?: INode[];
 }
@@ -16,16 +16,57 @@ export interface IConfig {
     forms: { formId: string; multiple: boolean }[];
 }
 
+export interface INodeProps {
+    // type === ROOT
+    assignedUser: IIdentity[];
+    // type === APPROVAL || type === DEAL
+    candidates: ICandidate;
+    gotoWhenReject: string[];
+    completeWeight: number;
+    rejectWeight: number;
+    autoClaim: boolean;
+    
+    branchBy: string | null;
+
+    // 以下字段前端使用
+    isBranchNode: boolean;
+    style: Record<string, any>;
+}
+
 // 通用类型
-export interface IDentity {
+export interface IIdentity {
     id: string;
     name: string;
     type: string;
 }
 export interface ICandidate {
-    user: any[];
-    org: any[];
-    role: any[];
-    var: any[];
-    relation: any[];
+    user?: IBasic[];
+    org?: IBasic[];
+    role?: IBasic[];
+    var: IVar[];
+    relation: IRelation[];
+}
+
+// user/org/role
+export interface IBasic {
+    id: string;
+    weight?: number;
+}
+
+export interface IVar {
+
+}
+export interface IRelation {
+    weight: number;
+    objectSource: {
+        source: string;
+        value: string;
+        upperKey: string;
+    };
+    objectType: string;
+    objectId: string;
+    related: {
+        objectType: string;
+        relation: string;
+    }
 }
