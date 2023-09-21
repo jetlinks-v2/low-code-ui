@@ -1,28 +1,27 @@
 <template>
   <div class="preview">
-    <div>
+    <CardBox :padding="0">
       <pro-search
-        :columns="searchColumns"
-        target="code"
-        @search="handleSearch"
+      :columns="searchColumns"
+      target="code"
+      @search="handleSearch"
+    />
+    </CardBox>
+    <CardBox style="margin-top: 24px;" :padding="0">
+      <ProTable
+        :query="query"
+        :pagination="pagination"
+        :model="tableForm"
+        :cardConfig="cardConfig"
+        :dataColumns="dataColumns"
+        :headerActions="headerActions"
+        :defaultFormType="defaultFormType"
+        :params='params'
+        :tableActions="actions"
+        @openJson="(newValue) => (jsonData = newValue)"
+        ref="tableRef"
       />
-
-      <div style="background-color: #ffffff">
-        <ProTable
-          :query="query"
-          :pagination="pagination"
-          :model="tableForm"
-          :cardConfig="cardConfig"
-          :dataColumns="dataColumns"
-          :headerActions="headerActions"
-          :defaultFormType="defaultFormType"
-          :params='params'
-          :tableActions="actions"
-          @openJson="(newValue) => (jsonData = newValue)"
-          ref="tableRef"
-        />
-      </div>
-    </div>
+      </CardBox>
   </div>
   <!-- 批量导入 -->
   <Import
@@ -62,7 +61,9 @@ import Export from '../Preview/components/Export.vue'
 import CallPage from './components/CallPages.vue'
 import JsonPreview from '../Preview/components/JsonPreview.vue'
 import { queryRuntime } from '@/api/form'
-import { PropType } from 'vue'
+import { providerEnum } from '@/components/ProJect'
+import { router } from '@jetlinks/router'
+import { randomString } from '@jetlinks/utils'
 
 const props = defineProps({
   data: {
@@ -277,26 +278,38 @@ const actionsBtnFormat = (data: any) => {
               }
             : false,
         onClick: () => {
-          if(item.script) {
-            eval(item.script)
-          }
-          console.log(data, item);
-          importVisible.value = data?.command === 'Import'
-          exportVisible.value = data?.command === 'Export'
-          addVisible.value = !!item.pages
-          popResource.value = {
-            callPage: item.resource || [],
-            function: item.functions,
-            command: item.command
-          }
-          popData.value = item?.command === 'Update' ? data : undefined
-          commandType.value = item.command
+          handleActions(data, item);
         },
       }),
       children: actionsBtnFormat(item?.children || []),
     }
   })
   return finalData
+}
+
+//按钮操作
+const handleActions = (data: Record<string, any>, config: Record<string, any>) => {
+  console.log(config);
+  if(config.type === 'Add' || config.type === 'Update' || config.type === 'Detail') {
+    if(config.resource.type === providerEnum.FormPage) {
+      addVisible.value = true
+      popResource.value = {
+        callPage: config.resource || [],
+        function: config.functions,
+        command: config.command
+      }
+      popData.value = config?.type === 'Update' ? data : undefined
+      commandType.value = config.command
+    } else if(config.resource.type === providerEnum.HtmlPage) {
+      router.push(`/preview/${config.resource.projectId}/${config.resource.parentId}/${config.resource.id}/html/${randomString(8)}`)
+    }
+  }
+  if(config.command === 'Import') {
+    importVisible.value = data?.command === 'Import'
+  }
+  if(config.command === 'Export') {
+    exportVisible.value = data?.command === 'Export'
+  }
 }
 //表头按钮
 const handleHeaderActions = () => {

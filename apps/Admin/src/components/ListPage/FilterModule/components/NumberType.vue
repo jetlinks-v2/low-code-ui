@@ -14,6 +14,7 @@
       v-model:value="state.min"
       class="input"
       :precision="0"
+      :min="1"
       :max="state.max"
       :step="1"
     />

@@ -2,10 +2,11 @@
   <div class="config-center">
     <div class="content" v-if="props.showSwitch">
       开启表头排序
-      <j-tooltip title="用于控制该列数据置顶">
+      <j-tooltip title="用于控制该列数据置顶/置底展示">
         <AIcon type="QuestionCircleOutlined" />
       </j-tooltip>
     </div>
+    <j-switch v-model:checked="state.checked" />
     <j-switch v-model:checked="state.checked" />
     <div class="content">
       <slot name="demonstrations"></slot>
@@ -48,7 +49,7 @@ interface Emit {
 }
 const emits = defineEmits<Emit>()
 const state = reactive({
-  checked: props.config?.type === 'object' ? false : true,
+  checked: false,
   colLayout: props.config?.config?.colLayout || 'left',
   specialStyle: props.config?.config?.specialStyle || '',
 })
@@ -74,6 +75,7 @@ watch(
   }
   .content {
     padding-top: 5px;
+    margin-bottom: 8px;
     margin-bottom: 8px;
   }
 }

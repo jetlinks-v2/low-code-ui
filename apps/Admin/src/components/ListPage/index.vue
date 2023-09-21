@@ -64,6 +64,12 @@
       :data="props.data"
       ref="menuConfigRef"
     />
+    <div class="spinning" v-if="spinning">
+      <div class="content">
+        <img src="/images/list-page/loading-blue.png" class="loading-img">
+        <p>校验中</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -90,7 +96,7 @@ import {
   ACTION_CONFIG_KEY,
 } from './keys'
 import { useProduct } from '@/store'
-import { omit, debounce } from 'lodash-es'
+import { omit, throttle } from 'lodash-es'
 import { onlyMessage } from '@jetlinks/utils'
 
 const spinning = ref(false)
@@ -139,9 +145,7 @@ const menuConfig = reactive({
     get() {
       return props.data.title
     },
-    set(val) {
-      
-    }
+    set(val) {},
   }),
   main: true,
   name: '',
@@ -156,7 +160,11 @@ const listFormInfo = reactive({
   field2: '',
   field3: '',
   emphasisField: '',
-  specialStyle: ``,
+  specialStyle: `{
+      "error": "#ff0000",
+      "offline": "#999999",
+      "warning": "#13c2c2"
+    }`,
 })
 const showType = reactive({
   type: 'list',
@@ -203,12 +211,15 @@ const validate = async () => {
   ]
   console.log(errorList)
   return new Promise((resolve, reject) => {
-    if (errorList.length) {
-      reject(errorList)
-    } else {
-      onlyMessage('校验成功')
-      resolve([])
-    }
+    setTimeout(() => {
+      if (errorList.length) {
+      } else {
+        onlyMessage('校验通过')
+        resolve([])
+      }
+      spinning.value = false
+    }, 1000)
+    
     // Promise.all(promiseArr)
     //   .then((res) => {
     //     resolve(res)
@@ -320,7 +331,7 @@ onMounted(() => {
     actionsConfig.value = initData?.actionsButton || []
     searchData.value = initData?.searchData || []
     dataSource.value = initData?.dataSource || []
-    showColumns.value = initData?.showColumns
+    showColumns.value = initData?.showColumns !== undefined ? initData?.showColumns : showColumns.value
   }
   setTimeout(() => {
     watch(
@@ -385,7 +396,7 @@ onMounted(() => {
 //   productStore.update(record)
 // })
 
-const onSave = debounce((record) => {
+const onSave = throttle((record) => {
   productStore.update(record)
 }, 1000)
 
@@ -399,6 +410,37 @@ defineExpose({
   height: 100%;
   position: relative;
   background-color: #e9e9e9;
+  .spinning {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    div{
+      display: flex;
+      align-items: center;
+      p{
+        color: @primary-color;
+        margin: 0;
+      }
+    }
+  }
+  .loading-img {
+    
+    animation: circle 1s linear infinite;
+    @keyframes circle {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  }
 }
 .options-img {
   width: 20px;

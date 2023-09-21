@@ -35,7 +35,11 @@
               </span>
             </template>
             <ErrorItem :error-data="errorData('name')">
-              <j-input v-model:value="form!.name" :maxLength="16" placeholder="请输入菜单名称"/>
+              <j-input
+                v-model:value="form!.name"
+                :maxLength="16"
+                placeholder="请输入菜单名称"
+              />
             </ErrorItem>
           </j-form-item>
           <j-form-item
@@ -54,19 +58,13 @@
               <AIcon :type="form!.icon" style="font-size: 20px" />
               <span class="mark" @click="dialogVisible = true"></span>
             </div>
-
-            <div class="icon-upload no-icon" v-else>
-              <ErrorItem :error-data="errorData('icon')">
-                <div
-                  @click="dialogVisible = true"
-                  class="choose-icon"
-                >
-                  <span>
-                    <AIcon type="PlusOutlined" style="font-size: 20px" />
-                  </span>
-                </div>
-              </ErrorItem>
-            </div>
+            <ErrorItem :border="false" :error-data="errorData('icon')" v-else>
+              <div class="icon-upload no-icon">
+                <span>
+                  <AIcon type="PlusOutlined" style="font-size: 20px" />
+                </span>
+              </div>
+            </ErrorItem>
           </j-form-item>
         </template>
       </j-form>
@@ -92,7 +90,7 @@ const props = defineProps({
   },
   refs: {
     type: Object,
-  }
+  },
 })
 
 const dialogVisible = ref<boolean>(false)

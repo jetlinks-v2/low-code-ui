@@ -3,20 +3,20 @@
     <div class="header">
       <j-page-header>
         <template #title>
+        <template #title>
           <span class="sub-title">正在预览</span>
         </template>
         <template #extra>
           <j-button type="primary" key="1" @click="back">退出预览</j-button>
+          <j-button type="primary" key="1" @click="back">退出预览</j-button>
         </template>
       </j-page-header>
     </div>
-    <!-- <Preview :data="data"/> -->
-    <Output :data="data"/>
+    <Preview :data="data"/>
   </div>
 </template>
 <script setup lang="ts" name="ListPagePreview">
 import Preview from './components/Preview.vue'
-import Output from '../Output/index.vue'
 
 const props = defineProps({
   show: {
@@ -48,6 +48,9 @@ const back = () => {
   height: 100vh;
   width: 100vw;
   overflow: auto;
+  .header {
+    background-color: #FFFFFF;
+  }
   .header {
     background-color: #FFFFFF;
   }
