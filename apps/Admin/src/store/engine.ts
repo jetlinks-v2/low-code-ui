@@ -58,6 +58,9 @@ export const useEngine = defineStore('engine', () => {
     const arr = [...files.value]
     handleActiveKey(key)
     files.value = arr.filter(item => item.id !== key)
+    if(files.value.length === 0){
+      activeFile.value = product.data[0].id
+    }
   }
 
   const getExpandsKeys = (id: string, type?: string) => {
@@ -103,9 +106,9 @@ export const useEngine = defineStore('engine', () => {
    * 新增打开的文件
    * @param record
    */
-  const addFile = (record: FileItemType,open?:any) => {
+  const addFile = (record: FileItemType, open?: any) => {
     // console.log('------open',open)
-    if(!open){
+    if (!open) {
       activeFile.value = record.id
     }
     const type = record.type
@@ -114,7 +117,7 @@ export const useEngine = defineStore('engine', () => {
       if (type === 'project') {
         delete cloneRecord.children
       }
-      if(type!=='module'&& type!=='project'){
+      if (type !== 'module' && type !== 'project') {
         files.value.unshift(cloneRecord)
       }
       // files.value.push(cloneRecord)
@@ -124,18 +127,18 @@ export const useEngine = defineStore('engine', () => {
 
 
   const updateTree = (data: any[], record: any) => {
-    const arr  = cloneDeep(data)
+    const arr = cloneDeep(data)
     return arr.map(item => {
       if (item.id === record.id) {
-        return { 
-          ...item, 
+        return {
+          ...item,
           ...record,
-          others:{
+          others: {
             ...item.others,
             ...record.others,
-            modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss')
+            modifyTime: dayjs().format('YYYY-MM-DD HH:mm:ss')
           }
-         }
+        }
       } else if (item.children) {
         item.children = updateTree(item.children, record)
       }
@@ -144,14 +147,14 @@ export const useEngine = defineStore('engine', () => {
   }
 
   const addTree = (data: any[], record: any) => {
-   return  data.map(item => {
+    return data.map(item => {
       if (item.id === record.parentId) {
         const add = {
           ...record,
-          others:{
-            createTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
-            modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
-            useList:[]
+          others: {
+            createTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            modifyTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            useList: []
           },
         }
         return {
@@ -159,7 +162,7 @@ export const useEngine = defineStore('engine', () => {
           children: item.children?.length ? [...item.children, add] : [add]
         }
       } else if (item.children) {
-       item.children= addTree(item.children, record)
+        item.children = addTree(item.children, record)
       }
       return item
     })
@@ -170,7 +173,7 @@ export const useEngine = defineStore('engine', () => {
    * @param record
    * @param type
    */
-  const updateFile = (record: any, type: string,open?:any) => {
+  const updateFile = (record: any, type: string, open?: any) => {
     const index = files.value.findIndex(item => item.id === record.id)
 
     files.value = files.value.map(item => {
@@ -178,14 +181,19 @@ export const useEngine = defineStore('engine', () => {
     })
 
     if (['del', 'edit'].includes(type)) {
-      if( type === 'del'){
-        files.value.splice(index,1)
-        activeFile.value = record.id ===activeFile.value? product.data[0].id : activeFile.value
-      }else{
+      if (type === 'del') {
+        files.value.splice(index, 1)
+        if (files.value.length === 0) {
+          activeFile.value =product.data[0].id
+        } else {
+          activeFile.value = files.value[index].id
+        }
+
+      } else {
         files.value[index] = record
       }
     } else if (type === 'add') {
-      addFile(record,open)
+      addFile(record, open)
     }
   }
 

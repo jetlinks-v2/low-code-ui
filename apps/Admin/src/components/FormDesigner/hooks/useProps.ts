@@ -1,6 +1,6 @@
 import { omit } from "lodash-es"
 
-const useProps = (element: any, _data: any, isEditModel: boolean, mode?: string) => {
+const useProps = (element: any, _data: any, mode?: string) => {
   // formItemProps
   let rules: any[] = (element.formItemProps?.rules || []).map(item => {
     const trigger = item.trigger?.length > 1 ? item.trigger : item.trigger.join('')

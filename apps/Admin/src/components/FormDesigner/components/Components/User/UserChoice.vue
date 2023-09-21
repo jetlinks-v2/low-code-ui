@@ -36,7 +36,7 @@
             </template>
           </j-input>
         </div>
-        <div style="margin-top: 10px">
+        <div  class="tree">
           <j-spin :spinning="loading" :delay="300">
             <j-tree
               v-if="treeData.length > 0"
@@ -45,7 +45,15 @@
               :height="400"
               v-model:selectedKeys="selectedKeys"
               v-model:expandedKeys="expandedKeys"
-            ></j-tree>
+            > 
+              <template #title="{ title }">
+                <div class="treeItem">
+                  <j-ellipsis>
+                    {{ title }}
+                  </j-ellipsis>
+                </div>
+              </template>
+            </j-tree>
             <j-empty v-else description="暂无数据" />
           </j-spin>
         </div>
@@ -247,11 +255,9 @@ const queryTree = (searchValue?: any) => {
   let params
   if (searchValue) {
     params = {
+      paging:false,
       sorts: [
-        {
-          name: 'createTime',
-          order: 'desc',
-        },
+        {name: "sortIndex", order: "asc"}
       ],
       terms: [
         {
@@ -267,12 +273,9 @@ const queryTree = (searchValue?: any) => {
     }
   } else {
     params = {
-      paging: false,
+      paging:false,
       sorts: [
-        {
-          name: 'createTime',
-          order: 'desc',
-        },
+        {name: "sortIndex", order: "asc"}
       ],
     }
   }
@@ -283,6 +286,8 @@ const queryTree = (searchValue?: any) => {
         selectId.value = res.result[0]?.id
         selectedKeys.value = [res.result[0]?.id]
       }
+    }).finally(()=>{
+      loading.value = false
     })
   } else if (sourceType.value === 'role') {
     getRoleList(params, searchType.value === 'name' ? true : false).then(
@@ -299,9 +304,11 @@ const queryTree = (searchValue?: any) => {
           }
         }
       },
-    )
+    ).finally(()=>{
+      loading.value = false
+    })
   }
-  loading.value = false
+
 }
 
 const queryUser = async (params: any) => {
@@ -315,7 +322,7 @@ const queryUser = async (params: any) => {
             {
               column:
                 sourceType.value === 'tissue'
-                  ? 'id$in-dimension$org$not'
+                  ? 'id$in-dimension$org'
                   : 'id$in-dimension$role',
               value: selectId.value,
             },
@@ -387,7 +394,14 @@ watch(
   width: 300px;
   border-right: 1px solid #f0f0f0;
   padding: 18px 10px;
-  overflow-x: auto;
+  .tree{
+    margin-top: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+    .treeItem{
+      max-width: 316px;
+    }
+  }
 }
 
 .rightTable {
