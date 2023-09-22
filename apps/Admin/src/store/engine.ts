@@ -174,7 +174,7 @@ export const useEngine = defineStore('engine', () => {
    * @param type
    */
   const updateFile = (record: any, type: string, open?: any) => {
-    const index = files.value.findIndex(item => item.id === record.id)
+    const index = files.value?.findIndex(item => item.id === record.id)
 
     files.value = files.value.map(item => {
       return product.getById(item.id)
@@ -209,6 +209,10 @@ export const useEngine = defineStore('engine', () => {
     activeFile.value = v
   }
 
+  const selectFiles = (v)=>{
+    files.value = v
+  }
+
   // watch(() => activeFile.value, () => {
   //   console.log(activeFile.value)
   // }, { immediate: true })
@@ -229,6 +233,7 @@ export const useEngine = defineStore('engine', () => {
     setCopyFile,
     updateFile,
     initEngineState,
-    setActiveFile
+    setActiveFile,
+    selectFiles
   }
 })

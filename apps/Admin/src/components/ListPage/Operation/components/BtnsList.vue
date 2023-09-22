@@ -1,6 +1,6 @@
 <template>
   <div class="btns-list">
-    <j-form layout="vertical">
+    <j-form layout="vertical" v-if="type === 'columns'">
       <j-form-item label="展示">
         <j-switch v-model:checked="showColumns"></j-switch>
       </j-form-item>

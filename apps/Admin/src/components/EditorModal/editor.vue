@@ -1,15 +1,12 @@
 <template>
   <div class="editor-modal-warp">
-    <j-monaco-editor
-      v-model="myValue"
-      :language="language"
-      @change="valueChange"
-      @errorChange="errorChange"
-    />
-    <div class="open-modal" @click="visible = true">
+    <!-- <div class="open-modal" @click="visible = true">
       <div class="icon">
         <AIcon type="ArrowsAltOutlined" />
       </div>
+    </div> -->
+    <div @click="visible=true">
+      <slot></slot>
     </div>
   </div>
   <Modal
@@ -63,9 +60,7 @@ watch(() => props.value, () => {
 
 <style scoped lang="less">
 .editor-modal-warp {
-  position: relative;
-  height: 300px;
-
+  position: relative;a
   .open-modal {
     position: absolute;
     right: 14px;

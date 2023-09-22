@@ -21,13 +21,13 @@
                 <div class="title-tag"><j-tag :color="record.runningState.value === 'enabled' ? 'blue' : 'red'">{{
                   record.runningState.text }}</j-tag></div>
               </div>
-              <div style="display: flex;">
+              <div style="display: flex;position: relative;">
                 <span>项目名称：</span>
                 <j-ellipsis style="width: 200px;">
                   {{ record.name }}
                 </j-ellipsis>
               </div>
-              <div>创建时间：{{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}</div>
+              <div style="position: relative;">创建时间：{{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}</div>
               <div class="bottom">
                 <div>最近发布：{{ record.deployTime ? dayjs(record.deployTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}</div>
                 <div v-if="record.changed && record.state.value === 'published'" class="bottom-icon">
@@ -242,35 +242,36 @@ const _view = (id: string) => {
   router.replace(`/engine/${id}`)
 }
 
-// const _del = async (data) => {
-//   const res = await delProject(data.id)
-//   if (res.status === 200) {
-//     const resp = await delMenu({
-//       "paging": false,
-//       "terms": [{
-//         "terms": [{
-//           "type": "or",
-//           "value": `%projectId:${data.id}%`,
-//           "termType": "like",
-//           "column": "options"
-//         }]
-//       }]
-
-//     })
-//     if(resp.status === 200){
-//       onlyMessage('操作成功')
-//       tableRef.value?.reload()
-//     }
-//   }
-// }
-
 const _del = async (data) => {
   const res = await delProject(data.id)
   if (res.status === 200) {
-    onlyMessage('操作成功')
-    tableRef.value?.reload()
+    const resp = await delMenu({
+      "paging": false,
+      "terms": [{
+        "terms": [{
+          "type": "or",
+          "value":`%projectId":"${data.id}%`,
+          
+          "termType": "like",
+          "column": "options"
+        }]
+      }]
+
+    })
+    if(resp.status === 200){
+      onlyMessage('操作成功')
+      tableRef.value?.reload()
+    }
   }
 }
+
+// const _del = async (data) => {
+//   const res = await delProject(data.id)
+//   if (res.status === 200) {
+//     onlyMessage('操作成功')
+//     tableRef.value?.reload()
+//   }
+// }
 
 const _action = async (id: string, type: string) => {
   const res = type === 'enabled' ? await disabledProject(id) : await enableProject(id)
@@ -301,6 +302,7 @@ const _action = async (id: string, type: string) => {
 
   .bottom {
     display: flex;
+    position: absolute;
 
     .bottom-icon {
       margin-left: 5px;

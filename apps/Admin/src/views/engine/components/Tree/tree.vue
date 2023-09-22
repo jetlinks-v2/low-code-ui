@@ -2,16 +2,10 @@
   <div class="tree-content-warp">
     <div class="tree-content-body">
       <j-scrollbar>
-        <j-tree
-          v-model:expandedKeys="expandedKeys"
-          :selectedKeys="[activeFile]"
-          :treeData="treeData"
-          block-node
+        <j-tree v-model:expandedKeys="expandedKeys" :selectedKeys="[activeFile]" :treeData="treeData" block-node
           :fieldNames="{
             key: 'id'
-          }"
-          @select="select"
-        >
+          }" draggable @dragenter="onDragEnter" @drop="onDrop" @select="select">
           <template #title="node">
             <j-dropdown :trigger="['contextmenu']">
               <span class="title">
@@ -26,13 +20,8 @@
         </j-tree>
       </j-scrollbar>
     </div>
-    <InputModal
-      v-if="menuState.visible"
-      v-bind="menuState"
-      @save="save"
-      @close="close"
-    />
-    <FileDrawer :data="menuState.data" v-if="menuState.fileVisible"  @close="close" :getContainer="true"/>
+    <InputModal v-if="menuState.visible" v-bind="menuState" @save="save" @close="close" />
+    <FileDrawer :data="menuState.data" v-if="menuState.fileVisible" @close="close" :getContainer="true" />
     <DelModal v-if="menuState.visibleDel" @close="close" @save="onDel" :data="menuState.data" />
   </div>
 </template>
@@ -49,6 +38,7 @@ import { randomString } from '@jetlinks/utils'
 import { defaultSetting as CrudBaseData } from '@/components/Database/setting'
 import { onlyMessage } from '@jetlinks/utils';
 import { typeImages } from '@/components/ProJect/index'
+import { loop } from './tree'
 
 const engine = useEngine()
 const product = useProduct()
@@ -64,8 +54,8 @@ const props = defineProps({
 
 const menuState = reactive({
   visible: false,
-  fileVisible:false,
-  visibleDel:false,
+  fileVisible: false,
+  visibleDel: false,
   provider: '',
   cacheData: undefined,
   data: undefined,
@@ -94,18 +84,18 @@ const save = (data) => {
   const node = menuState.cacheData
   // console.log('---data',data,menuState.type)
   const parentId = node.type === providerEnum.Module ? node.id : node.parentId
-  if(menuState.type !== 'Add'){
+  if (menuState.type !== 'Add') {
     product.update(data)
-  }else{
+  } else {
     product.add({
-      name:data.name,
-      others:data.others,
+      name: data.name,
+      others: data.others,
       id: randomString(16),
       title: data.name,
       type: data.others.type,
       configuration: data.configuration,
       parentId: parentId,
-      children:data.children
+      children: data.children
     }, parentId)
   }
   close()
@@ -117,19 +107,39 @@ const onDel = (data) => {
 }
 
 const menuClick = (record) => {
-  if(record.menuKey  === 'Copy'){
+  if (record.menuKey === 'Copy') {
     engine.setCopyFile(record.data)
     onlyMessage('复制成功')
-  }else if(record.menuKey === 'Profile'){
+  } else if (record.menuKey === 'Profile') {
     Object.assign(menuState, record)
     menuState.fileVisible = true
-  }else if(record.menuKey === 'Delete'){
+  } else if (record.menuKey === 'Delete') {
     Object.assign(menuState, record)
     menuState.visibleDel = true
-  }else{
+  } else {
     Object.assign(menuState, record)
     menuState.visible = true
   }
+}
+
+const onDrop = (info) => {
+  console.log('info--', info)
+}
+
+const onDragEnter = (info) => {
+  console.log('info--end', info)
+
+  // const dropKey = info.node.key;
+  // const dragKey = info.dragNode.key;
+  // const dropPos = info.node.pos?.split('-');
+  // const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
+
+  // let dragObj;
+  // const data = cloneDeep([...treeData.value]);
+  // loop(data, dragKey, (item, index, arr) => {
+  //   arr?.splice(index, 1);
+  //   dragObj = item;
+  // });
 }
 
 </script>
@@ -141,7 +151,7 @@ const menuClick = (record) => {
   .tree-content-body {
     height: 100%;
 
-    :deep(.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected){
+    :deep(.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected) {
       background-color: #F6F7F9;
       color: #315EFB;
       // img{
@@ -149,27 +159,31 @@ const menuClick = (record) => {
       //   filter: drop-shadow(-100px 0px 0px #315EFB);
       // }
     }
-    :deep(.ant-tree-switcher){
+
+    :deep(.ant-tree-switcher) {
       line-height: 40px;
     }
-    .title{
+
+    .title {
       display: flex;
       height: 40px;
       line-height: 40px;
       font-size: 16px;
       white-space: nowrap;
-    
-      .icon{
+
+      .icon {
         margin-right: 10px;
         width: 20px;
         height: 20px;
-        img{
+
+        img {
           width: 100%;
           height: 100%;
         }
       }
     }
   }
+
   //:deep(.ant-tree) {
   //  background-color: transparent;
   //  color: #f8f8f8;

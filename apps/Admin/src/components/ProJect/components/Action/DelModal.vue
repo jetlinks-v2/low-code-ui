@@ -5,7 +5,7 @@
       <div class="item-text">确定删除</div>
       <div class="item-title">
         <j-ellipsis>
-          {{ props.data.name }}
+         "{{ props.data.name }}"?
         </j-ellipsis>
       </div>
       <div class="item-btn">
