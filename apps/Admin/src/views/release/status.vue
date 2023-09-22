@@ -84,8 +84,8 @@
       </div>
       <div class="update-modal-body">
         <FormDesigner v-if="modelData.type === providerEnum.FormPage" :key="modelData.data.id" :data="modelData.data" ref="modelRef"/>
-        <CustomHTML v-else-if="modelData.type === providerEnum.HtmlPage" :key="modelData.data.id" :data="modelData.data" ref="modelRef" :noTip="true"/>
-        <CRUD v-else-if="modelData.type === providerEnum.CRUD" v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
+        <CustomHTML v-else-if="modelData.type === providerEnum.HtmlPage" :key="modelData.data.id" :data="modelData.data" ref="modelRef" :showTip="false"/>
+        <CRUD v-else-if="modelData.type === providerEnum.CRUD" v-bind="modelData.data" :key="modelData.data.id" ref="modelRef" :showTip="false"/>
         <ListPage v-else-if="modelData.type === providerEnum.ListPage" :data="modelData.data" :key="modelData.data.id" ref="modelRef"/>
         <SQLCode v-else-if="modelData.type === providerEnum.SQL"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
         <FunctionCode v-else-if="modelData.type === providerEnum.Function"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>

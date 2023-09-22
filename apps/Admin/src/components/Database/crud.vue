@@ -65,6 +65,7 @@ import DataSetting from './data.vue'
 import Advanced from './advanced.vue'
 import { useProduct } from '@/store'
 import { defaultSetting } from './setting'
+import {onlyMessage} from "@/utils/comm";
 
 const props = defineProps({
   configuration: {
@@ -98,6 +99,10 @@ const props = defineProps({
   others: {
     type: Object,
     default: () => ({})
+  },
+  showTip: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -175,6 +180,10 @@ const validate = async () => {
   }
 
   loading.value = false
+
+  if (props.showTip) {
+    onlyMessage('校验通过')
+  }
 }
 
 defineExpose({

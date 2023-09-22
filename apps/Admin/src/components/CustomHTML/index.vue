@@ -15,9 +15,9 @@ import { BASE_INFO, MENU_CONFIG } from "@/components/ListPage/keys";
 
 const props = defineProps({
   data: Object,
-  noTip: {
+  showTip: {
     type: Boolean,
-    default: false
+    default: true
   }
 })
 
@@ -116,7 +116,7 @@ const runCode = () => {
 
 const handleValidate = async () => {
   const menuStatus = await validateMenu()
-  if (!props.noTip) {
+  if (props.showTip) {
     if (menuStatus) {
       // onlyMessage(errors.value[0].errors[0], 'error')
     } else if(!store.state.activeFile.code){
@@ -124,7 +124,7 @@ const handleValidate = async () => {
     } else if(store.state.errors?.length > 0) {
       onlyMessage('运行日志报错', 'error');
     } else {
-      onlyMessage('校验成功', 'success')
+      onlyMessage('校验通过', 'success')
     }
   }
 }
