@@ -93,7 +93,7 @@ const open = computed({
 
 const onAdd = () => {
   const value = pagingData.value[pagingData.value.length - 1]?.pageSize
-
+  if(value >= 99) return
   pagingData.value.push({
     pageSize: value ? value + 1 : 12,
   })

@@ -1,6 +1,10 @@
 <template>
   <div className="filter-module-center" ref="listDataRef">
-    <img class="modal-config-img" :src="getImage('/list-page/data.png')" v-if="open">
+    <img
+      class="modal-config-img"
+      :src="getImage('/list-page/data.png')"
+      v-if="open"
+    />
     <j-drawer
       title="列表数据配置"
       placement="right"
@@ -32,8 +36,8 @@
         @configuration="configuration"
         @handleOk="handleOk"
         @bindData="bindData"
-        @handleChange="(data) => dataSource = data"
-        @update-bind="(data) => dataBinds.columnBind = data"
+        @handleChange="(data) => (dataSource = data)"
+        @update-bind="(data) => (dataBinds.columnBind = data)"
       />
       <div v-else>
         <a-page-header title=" " sub-title="" @back="goBack">
@@ -55,114 +59,125 @@
           <template #demonstrations v-if="configState.type !== 'geoPoint'">
             <div class="content">
               <div class="title">
-                <span
-                  v-if="
-                    configState.type === 'object' ||
-                    configState.type === 'boolean' ||
-                    configState.type === 'file' ||
-                    configState.type === 'enum' ||
-                    configState.type === 'array'
-                  "
-                  >展示方式</span
-                >
-                <span v-else-if="configState.type === 'date'"
-                  >数据展示格式</span
-                >
-                <span v-else>
-                  自定义展示格式
+                <j-form layout="vertical">
+                  <j-form-item :required="['object', 'boolean', 'file', 'enum', 'array'].includes(configState.type)">
+                    <template #label>
+                      <span
+                        v-if="
+                          configState.type === 'object' ||
+                          configState.type === 'boolean' ||
+                          configState.type === 'file' ||
+                          configState.type === 'enum' ||
+                          configState.type === 'array'
+                        "
+                        >展示方式</span
+                      >
+                      <span v-else-if="configState.type === 'date'"
+                        >数据展示格式</span
+                      >
+                      <span v-else>
+                        自定义展示格式
 
-                  <j-tooltip
-                    placement="top"
-                    :get-popup-container="getPopupContainer"
-                  >
-                    <template #title>
-                      <p>在数据后方展示%: x%</p>
-                      <p>在数据前方展示%: %x</p>
-                      <p>在数据4个字符后展示%: xxxx%xxxx</p>
-                      <p>为空时仅展示数据</p>
+                        <j-tooltip
+                          placement="top"
+                        >
+                          <template #title>
+                            <p>在数据后方展示%: x%</p>
+                            <p>在数据前方展示%: %x</p>
+                            <p>在数据4个字符后展示%: xxxx%xxxx</p>
+                            <p>为空时仅展示数据</p>
+                          </template>
+                          <AIcon type="QuestionCircleOutlined" />
+                        </j-tooltip>
+                      </span>
                     </template>
-                    <AIcon type="QuestionCircleOutlined" />
-                  </j-tooltip>
-                </span>
-              </div>
+                    <!--object类型-->
 
-              <!--object类型-->
+                    <ErrorItem
+                      v-if="configState.type === 'object'"
+                      :error-data="errorData('demonstrations')"
+                    >
+                      <j-radio-group
+                        v-model:value="configState.demonstrations"
+                        button-style="solid"
+                      >
+                        <j-space size="large">
+                          <j-radio-button value="json" class="check-btn">
+                            json展示
+                          </j-radio-button>
+                          <j-radio-button value="page" class="check-btn">
+                            页面展示
+                          </j-radio-button>
+                        </j-space>
+                      </j-radio-group>
+                    </ErrorItem>
 
-              <ErrorItem v-if="configState.type === 'object'" :error-data="errorData('demonstrations')">
-                <j-radio-group
-                  v-model:value="configState.demonstrations"
-                  button-style="solid"
-                >
-                  <j-space size="large">
-                    <j-radio-button value="json" class="check-btn">
-                      json展示
-                    </j-radio-button>
-                    <j-radio-button value="page" class="check-btn">
-                      页面展示
-                    </j-radio-button>
-                  </j-space>
-                </j-radio-group>
-              </ErrorItem>
+                    <!--date类型-->
 
-              <!--date类型-->
-
-              <j-autoComplete
-                v-else-if="configState.type === 'date'"
-                v-model:value="configState.dateValue"
-                :options="dateOptions"
-                mode="tags"
-                pLaceholder="请选择时间格式"
-                style="width: 500px"
-              />
-
-              <!--boolean类型-->
-              <div v-else-if="configState.type === 'boolean'">
-                <j-row align="middle">
-                  <j-col :span="2">true</j-col>
-                  <j-col :span="20">
-                    <j-input
-                      style="width: 350px"
-                      v-model:value="configState.trueValue"
-                      maxLength="16"
+                    <j-autoComplete
+                      v-else-if="configState.type === 'date'"
+                      v-model:value="configState.dateValue"
+                      :options="dateOptions"
+                      mode="tags"
+                      pLaceholder="请选择时间格式"
+                      style="width: 500px"
                     />
-                  </j-col>
-                </j-row>
-                <br />
-                <j-row align="middle">
-                  <j-col :span="2">false</j-col>
-                  <j-col :span="20">
+
+                    <!--boolean类型-->
+                    <div v-else-if="configState.type === 'boolean'">
+                      <j-row align="middle">
+                        <j-col :span="2">true</j-col>
+                        <j-col :span="20">
+                          <j-input
+                            style="width: 350px"
+                            v-model:value="configState.trueValue"
+                            maxLength="16"
+                          />
+                        </j-col>
+                      </j-row>
+                      <br />
+                      <j-row align="middle">
+                        <j-col :span="2">false</j-col>
+                        <j-col :span="20">
+                          <j-input
+                            style="width: 350px"
+                            v-model:value="configState.falseValue"
+                            maxLength="16"
+                          />
+                        </j-col>
+                      </j-row>
+                    </div>
+
+                    <!--file/enum/array类型-->
+                    <ErrorItem
+                      v-else-if="
+                        configState.type === 'file' ||
+                        configState.type === 'enum' ||
+                        configState.type === 'array'
+                      "
+                      :errorData="errorData('fileValue')"
+                    >
+                      <j-select
+                        v-model:value="configState.fileValue"
+                        :options="
+                          configState.type === 'file'
+                            ? fileOptions
+                            : enumOptions
+                        "
+                        placeholder="请选择展示方式"
+                        style="width: 100%"
+                      />
+                    </ErrorItem>
+
+                    <!--int/long/text/float/double类型-->
                     <j-input
-                      style="width: 350px"
-                      v-model:value="configState.falseValue"
-                      maxLength="16"
+                      v-else
+                      style="width: 500px"
+                      v-model:value="configState.inputValue"
                     />
-                  </j-col>
-                </j-row>
+                  </j-form-item>
+                </j-form>
               </div>
-
-              <!--file/enum/array类型-->
-              <ErrorItem v-else-if="
-                    configState.type === 'file' ||
-                    configState.type === 'enum' ||
-                    configState.type === 'array'
-                  " :errorData="errorData('fileValue')">
-                <j-select
-                  
-                  v-model:value="configState.fileValue"
-                  :options="
-                    configState.type === 'file' ? fileOptions : enumOptions
-                  "
-                  placeholder="请选择展示方式"
-                  style="width: 100%"
-                />
-              </ErrorItem>
-
-              <!--int/long/text/float/double类型-->
-              <j-input
-                v-else
-                style="width: 500px"
-                v-model:value="configState.inputValue"
-              />
             </div>
           </template>
         </Config>
@@ -170,12 +185,8 @@
 
       <template #footer v-if="configState.type !== ''">
         <j-space>
-          <j-button @click="goBack">
-            取消
-          </j-button>
-          <j-button type="primary" @click="submit">
-            确定
-          </j-button>
+          <j-button @click="goBack"> 取消 </j-button>
+          <j-button type="primary" @click="submit"> 确定 </j-button>
         </j-space>
       </template>
     </j-drawer>
@@ -188,7 +199,7 @@ import Config from '@/components/ListPage/ListData/components/Configuration.vue'
 import { DATA_BIND } from '../keys'
 import { validListData } from './utils/valid'
 import { PropType } from 'vue'
-import { getImage } from '@jetlinks/utils';
+import { getImage } from '@jetlinks/utils'
 import { ErrorItem } from '..'
 
 interface Emit {
@@ -196,13 +207,12 @@ interface Emit {
   (e: 'update:dataSource', value: any): void
 }
 
-
 const errorData = computed(() => {
   return (val: string): any => {
     const _index = dataSource.value?.findIndex(
-    (item: any) => item?.id === configRow.value?.id,
-  )
-  console.log(errorList.value, val);
+      (item: any) => item?.id === configRow.value?.id,
+    )
+    console.log(errorList.value, val)
     return errorList.value?.find((item: any) => item.childKey === val + _index)
   }
 })
@@ -218,8 +228,8 @@ const props = defineProps({
   },
   dataSource: {
     type: Array as PropType<Record<string, any>[]>,
-    default: () => {}
-  }
+    default: () => {},
+  },
 })
 
 const open = computed({
@@ -390,7 +400,7 @@ const dataSource = computed({
   },
   set(val) {
     emits('update:dataSource', val)
-  }
+  },
 })
 //新增一列table
 const handleAdd = async (table: any) => {
@@ -510,16 +520,15 @@ watch(
     if (dataBinds.data.function) {
       dataBind.value = true
     } else {
-      dataSource.value = [];
+      dataSource.value = []
     }
   },
   { immediate: true, deep: true },
 )
 
-
 const valid = () => {
   errorList.value = validListData(dataSource.value)
-  return errorList.value.length ? [{message: '列表数据配置错误'}] : []
+  return errorList.value.length ? [{ message: '列表数据配置错误' }] : []
   // return new Promise((resolve) => {
   //   errorList.value = validListData(dataSource.value);
   //   if(errorList.value.length) throw [{message: '列表数据配置错误'}]
@@ -528,7 +537,7 @@ const valid = () => {
 }
 defineExpose({
   errorList,
-  valid
+  valid,
 })
 </script>
 
@@ -542,5 +551,8 @@ defineExpose({
 .check-btn {
   width: 238px;
   text-align: center;
+}
+:deep(.ant-form-item) {
+  margin-bottom: 0;
 }
 </style>

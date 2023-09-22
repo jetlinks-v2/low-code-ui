@@ -106,12 +106,14 @@
         </j-form-item>
       </template>
       <j-form-item label="自定义脚本">
-        <j-select style="width: 100%;" v-model:value="language">
-            <j-select-option value="javascript">JS</j-select-option>
-            <j-select-option value="css">CSS</j-select-option>
-        </j-select>
-        <EditorModal v-if="language==='javascript'" v-model:value="form.script" language="javascript" @errorChange="errorChangeJs"/>
-        <EditorModal v-else v-model:value="form.style" language="css" @errorChange="errorChangeCss"/>
+        <EditorModal v-model:value="form.script" language="javascript" @errorChange="errorChangeJs">
+          <j-button type="dashed" shape="round">编写脚本</j-button>
+        </EditorModal>
+      </j-form-item>
+      <j-form-item label="自定义样式">
+        <EditorModal v-model:value="form.style" language="css" @errorChange="errorChangeCss">
+          <j-button type="dashed" shape="round">编写css</j-button>
+        </EditorModal>
       </j-form-item>
     </j-form>
   </div>
@@ -191,7 +193,7 @@ const form = reactive({
   title: props.data.title,
   icon: props.data.icon,
   type: props.data.type,
-  script: props.data.script || ``,
+  script: props.data.script || `//console.log('hello world')`,
   key: props.data.key,
   functions:
     editType!.value === 'add' &&

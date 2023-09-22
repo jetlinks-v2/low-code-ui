@@ -62,6 +62,7 @@ onMounted(() => {
       engine.selectFile(data?.others?.activeFile)
     } else {
       engine.setActiveFile(data?.id)
+      engine.selectFile(data.id)
     }
   },300)
 })
