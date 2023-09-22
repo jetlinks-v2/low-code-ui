@@ -9,7 +9,7 @@
       @change="providerChange"
     />
   </j-form-item>
-  <j-form-item v-if="model.validator.provider" label="校验生效" :name="['validator', 'configuration', 'group']">
+  <j-form-item v-if="model.validator.provider" label="校验生效" :name="['validator', 'configuration', 'group']" :rules="[{ required: true, message: '请选择校验生效'}]">
     <j-card-select
       :options="[
         {
