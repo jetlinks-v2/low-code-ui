@@ -229,13 +229,13 @@ export const useProduct = defineStore('product', () => {
     info.value = extra
     published.value = extra.state?.value === 'published'
     console.log('treeData-----------',treeData[0]?.others)
-    if(extra.state?.value !== 'published'){
-      engine.setActiveFile(treeData[0]?.others?.activeFile || treeData[0]?.id)
-      engine.files = treeData[0]?.others?.files || []
-      engine.selectFile(treeData[0]?.others?.activeFile)
-    }else{
-      engine.setActiveFile(treeData[0]?.id)
-    }
+    // if(extra.state?.value !== 'published'){
+    //   engine.setActiveFile(treeData[0]?.others?.activeFile || treeData[0]?.id)
+    //   engine.files = treeData[0]?.others?.files || []
+    //   engine.selectFile(treeData[0]?.others?.activeFile)
+    // }else{
+    //   engine.setActiveFile(treeData[0]?.id)
+    // }
   
   }
 

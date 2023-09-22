@@ -20,7 +20,7 @@
 </template>
 
 <script setup name="EngineHeader">
-import { useProduct,useEngine } from '@/store'
+import { useProduct, useEngine } from '@/store'
 import { getImage } from '@jetlinks/utils';
 
 const product = useProduct()
@@ -37,22 +37,34 @@ const onRelease = () => {
   })
 }
 
-const quit = async() => {
-  console.log('product.data',product.data)
+const quit = async () => {
+  console.log('product.data', product.data)
   const item = product.data[0]
-    await product.update({
-      ...item,
-      others:{
-        ...item?.others,
-        activeFile:engine.activeFile,
-        files:engine.files
-      }
-    },false,false)
+  await product.update({
+    ...item,
+    others: {
+      ...item?.others,
+      activeFile: engine.activeFile,
+      files: engine.files
+    }
+  })
 
-    router.push('/delivery/center')
-    // product.initProjectState()
-    
+  router.push('/delivery/center')
 }
+
+onMounted(() => {
+  setTimeout(() => {
+    const data = product.data[0]
+    // console.log('data',data)
+    if (data.state?.value !== 'published') {
+      engine.selectFiles(data?.others?.files)
+      engine.setActiveFile(data.others?.activeFile || data?.id)
+      engine.selectFile(data?.others?.activeFile)
+    } else {
+      engine.setActiveFile(data?.id)
+    }
+  },300)
+})
 
 </script>
 
@@ -75,6 +87,7 @@ const quit = async() => {
     .btn {
       display: flex;
       color: #333333;
+
       .out {
         width: 18px;
         height: 15px;
@@ -84,13 +97,15 @@ const quit = async() => {
           height: 100%;
         }
       }
-      p{
+
+      p {
         line-height: 22px;
         font-size: 16px;
         margin-left: 10px;
       }
     }
-    .title{
+
+    .title {
       font-size: 18px;
       line-height: 22px;
       display: flex;
@@ -98,5 +113,4 @@ const quit = async() => {
   }
 
   .release {}
-}
-</style>
+}</style>
