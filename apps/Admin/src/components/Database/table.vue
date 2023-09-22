@@ -418,7 +418,7 @@ const JavaTypeChange = (record) => {
           provider: undefined,
           configuration: {
             message: '数据格式错误',
-            group: [],
+            group: ['save', 'update', 'insert'],
             classType: record.javaType,
             regexp: undefined,
             min: undefined,

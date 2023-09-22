@@ -14,7 +14,7 @@
       :options="[
         {
           label: '新增/保存',
-          value: 'add'
+          value: 'insert'
         },
         {
           label: '修改',
@@ -24,6 +24,7 @@
       :column="2"
       :showImage="false"
       :multiple="true"
+      @change="groupChange"
       v-model:value="model.validator.configuration.group"
     />
   </j-form-item>
@@ -105,6 +106,16 @@ const precision = computed(() => {
 const openStringMode = computed(() => {
   return ['Float','Double'].includes(model.value.javaType)
 })
+
+const groupChange = (v) => {
+  const groupSet = new Set(v)
+  if (groupSet.has('insert')) {
+    groupSet.add('save')
+  } else {
+    groupSet.delete('save')
+  }
+  model.value.validator.configuration.group = [...groupSet.values()]
+}
 
 const InterValidatorFn = (value) => {
   if (value > 2147483647) {
