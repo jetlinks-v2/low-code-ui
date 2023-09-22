@@ -10,7 +10,11 @@
             width: _width,
           }"
         >
-          <Canvas></Canvas>
+          <div class="canvas-box">
+            <div class="container">
+              <Canvas></Canvas>
+            </div>
+          </div>
         </div>
         <div class="config" v-if="isShowConfig && model !== 'preview'">
           <Config ref="configRef" />
@@ -127,7 +131,9 @@ const setSelection = (node: any) => {
       selected.value.push(node)
     }
   }
-  isShowConfig.value = !(selected.value?.length > 1) && !map(selected.value, 'type').includes('space-item')
+  isShowConfig.value =
+    !(selected.value?.length > 1) &&
+    !map(selected.value, 'type').includes('space-item')
   onSaveData()
 }
 
@@ -159,9 +165,13 @@ const onDelete = debounce(() => {
 // 复制
 const onCopy = () => {
   const list = selected.value.filter((item) => {
-    return !['collapse-item', 'tabs-item', 'grid-item', 'table-item', 'space-item'].includes(
-      item.type,
-    )
+    return ![
+      'collapse-item',
+      'tabs-item',
+      'grid-item',
+      'table-item',
+      'space-item',
+    ].includes(item.type)
   })
   if (unref(isSelectedRoot) || focused.value) return
   formDesigner.setCopyData(props.data?.id, list || [])
@@ -188,8 +198,14 @@ const onPaste = () => {
       ...item,
       formItemProps: {
         ...item?.formItemProps,
-        label: obj.key === props.data?.id ? 'copy_' + item.formItemProps?.label : item.formItemProps?.label,
-        name: obj.key === props.data?.id ? 'copy_' + item.formItemProps?.name : item.formItemProps?.name,
+        label:
+          obj.key === props.data?.id
+            ? 'copy_' + item.formItemProps?.label
+            : item.formItemProps?.label,
+        name:
+          obj.key === props.data?.id
+            ? 'copy_' + item.formItemProps?.name
+            : item.formItemProps?.name,
       },
       key: item.key + '_' + uid(),
       children: handleCopyData(item?.children || []),
@@ -290,7 +306,7 @@ provide('FormDesigner', {
   onShear,
   onCollect,
   onAddChild,
-  onSave
+  onSave,
 })
 
 watch(
@@ -347,7 +363,7 @@ const onValidate = () => {
 
 const onValid = async () => {
   const _val = await onValidate()
-  if(_val) {
+  if (_val) {
     onlyMessage('校验成功！')
   }
 }
@@ -374,6 +390,19 @@ defineExpose({ onSave, validate: onValidate })
 
     .right {
       width: 100%;
+      .canvas-box {
+        width: 100%;
+        height: 100%;
+        padding: 24px;
+        background-color: #f6f6f6;
+
+        .container {
+          height: 100%;
+          background-color: #fff;
+          border-radius: 8px;
+          padding: 12px 0;
+        }
+      }
     }
 
     .config {

@@ -34,7 +34,7 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
                 }
             }
         }
-        if (!['space-item', 'card-item', 'grid-item'].includes(_type)) {
+        if (!['space-item', 'card-item', 'grid-item', 'table-item'].includes(_type)) {
             if (!node?.formItemProps?.name) {
                 return {
                     key: node?.key,
@@ -251,8 +251,8 @@ export const queryOptions = async (source: any, id: string) => {
         if (resp.success) {
             return resp.result.map(item => {
                 return {
-                    label: item.name,
-                    value: item.id
+                    label: item.text,
+                    value: item.value
                 }
             })
         }

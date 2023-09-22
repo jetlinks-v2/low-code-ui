@@ -2,7 +2,12 @@
 <template>
   <div>
     <template v-if="['input-number'].includes(type)">
-      <j-form-item :validateFirst="true" :rules="maxRules" label="最大值" :name="['componentProps', 'max']">
+      <j-form-item
+        :validateFirst="true"
+        :rules="maxRules"
+        label="最大值"
+        :name="['componentProps', 'max']"
+      >
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.max"
@@ -11,7 +16,12 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item :validateFirst="true" :rules="minRules" label="最小值" :name="['componentProps', 'min']">
+      <j-form-item
+        :validateFirst="true"
+        :rules="minRules"
+        label="最小值"
+        :name="['componentProps', 'min']"
+      >
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.min"
@@ -50,7 +60,11 @@
         ].includes(type)
       "
     >
-      <j-form-item :validateFirst="true" label="类型" :name="['componentProps', 'mode']">
+      <j-form-item
+        :validateFirst="true"
+        label="类型"
+        :name="['componentProps', 'mode']"
+      >
         <j-radio-group
           v-model:value="target.componentProps.mode"
           button-style="solid"
@@ -97,7 +111,11 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item :validateFirst="true" :name="['componentProps', 'accept']" label="格式">
+      <j-form-item
+        :validateFirst="true"
+        :name="['componentProps', 'accept']"
+        label="格式"
+      >
         <j-select
           mode="multiple"
           placeholder="请选择"
@@ -136,7 +154,11 @@
       </j-form-item>
     </template>
     <template v-if="['tree-select'].includes(type)">
-      <j-form-item :validateFirst="true" label="类型" :name="['componentProps', 'multiple']">
+      <j-form-item
+        :validateFirst="true"
+        label="类型"
+        :name="['componentProps', 'multiple']"
+      >
         <j-radio-group
           v-model:value="target.componentProps.multiple"
           button-style="solid"
@@ -187,7 +209,11 @@
       </j-form-item>
     </template>
     <template v-if="['table'].includes(type)">
-      <j-form-item :validateFirst="true" label="内容对齐" :name="['componentProps', 'align']">
+      <j-form-item
+        :validateFirst="true"
+        label="内容对齐"
+        :name="['componentProps', 'align']"
+      >
         <j-select
           v-model:value="target.componentProps.align"
           placeholder="请选择"
@@ -198,7 +224,11 @@
           <j-select-option :value="'center'">中</j-select-option>
         </j-select>
       </j-form-item>
-      <j-form-item :validateFirst="true" label="表格高度" :name="['componentProps', 'height']">
+      <j-form-item
+        :validateFirst="true"
+        label="表格高度"
+        :name="['componentProps', 'height']"
+      >
         <j-input-number
           v-model:value="target.componentProps.height"
           placeholder="请输入"
@@ -286,14 +316,52 @@
         </j-radio-group>
       </j-form-item>
     </template>
+    <template
+      v-if="
+        [
+          'input',
+          'textarea',
+          'input-number',
+          'input-password',
+          'tree-select',
+          'select',
+          'date-picker',
+          'time-picker',
+        ].includes(type)
+      "
+    >
+      <j-form-item
+        :validateFirst="true"
+        label="占位提示"
+        :name="['componentProps', 'placeholder']"
+      >
+        <j-input
+          placeholder="请输入"
+          v-model:value="target.componentProps.placeholder"
+          :maxlength="32"
+          @change="onDataChange"
+        />
+      </j-form-item>
+    </template>
+    <!-- 规则校验 -->
+    <template v-if="rulesVisible">
+      <j-form-item :name="['formItemProps', 'rules']" :validateFirst="true">
+        <Rule
+          :type="type"
+          v-model:value="target.formItemProps.rules"
+          @change="onChange"
+        />
+      </j-form-item>
+    </template>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { useTarget } from '../../../../hooks'
-import { computed, watchEffect } from 'vue'
+import { computed, unref, watchEffect } from 'vue'
 import { useRequest } from '@jetlinks/hooks'
 import { getGeoType } from '@/api/form'
+import Rule from './Rules/Rule.vue'
 
 const { target } = useTarget()
 
@@ -319,6 +387,16 @@ const { data: options, run } = useRequest(getGeoType, {
   immediate: false,
 })
 
+const rulesVisible = computed(() => {
+  return [
+    'input',
+    'textarea',
+    'input-password',
+    'date-picker',
+    'time-picker'
+  ].includes(unref(type))
+})
+
 const rules = [
   {
     required: true,
@@ -326,7 +404,7 @@ const rules = [
   },
   {
     validator(_: any, value: number) {
-      if(value === null || value === undefined) return Promise.resolve()
+      if (value === null || value === undefined) return Promise.resolve()
       if (value === 0) return Promise.reject(`单个大小应该大于0`)
       return Promise.resolve()
     },
@@ -341,8 +419,9 @@ const maxRules = [
   },
   {
     validator(_: any, value: number) {
-      if(value === null || value === undefined) return Promise.resolve()
-      if (value < target.value.componentProps.min) return Promise.reject(`最大值必须大于最小值`)
+      if (value === null || value === undefined) return Promise.resolve()
+      if (value < target.value.componentProps.min)
+        return Promise.reject(`最大值必须大于最小值`)
       return Promise.resolve()
     },
     trigger: 'change',
@@ -356,8 +435,9 @@ const minRules = [
   },
   {
     validator(_: any, value: number) {
-      if(value === null || value === undefined) return Promise.resolve()
-      if (value > target.value.componentProps.max) return Promise.reject(`最大值必须大于最小值`)
+      if (value === null || value === undefined) return Promise.resolve()
+      if (value > target.value.componentProps.max)
+        return Promise.reject(`最大值必须大于最小值`)
       return Promise.resolve()
     },
     trigger: 'change',

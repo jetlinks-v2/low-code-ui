@@ -154,8 +154,6 @@ const DraggableLayout = defineComponent({
                                     _props.componentProps.options = resp
                                 })
                             }
-                            // v-model:value={myValue.value}
-                            // v-model:checked={checked.value}
 
                             const renderContent = () => {
                                 if (unref(isEditModel)) {
