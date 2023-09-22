@@ -250,7 +250,8 @@ const _del = async (data) => {
       "terms": [{
         "terms": [{
           "type": "or",
-          "value": `%projectId:${data.id}%`,
+          "value":`%projectId":"${data.id}%`,
+          
           "termType": "like",
           "column": "options"
         }]
