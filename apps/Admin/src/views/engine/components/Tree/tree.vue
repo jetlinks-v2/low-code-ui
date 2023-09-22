@@ -91,7 +91,6 @@ const close = () => {
 }
 
 const save = (data) => {
-  console.log(data)
   const node = menuState.cacheData
   // console.log('---data',data,menuState.type)
   const parentId = node.type === providerEnum.Module ? node.id : node.parentId
@@ -118,7 +117,6 @@ const onDel = (data) => {
 }
 
 const menuClick = (record) => {
-  console.log('record',record)
   if(record.menuKey  === 'Copy'){
     engine.setCopyFile(record.data)
     onlyMessage('复制成功')

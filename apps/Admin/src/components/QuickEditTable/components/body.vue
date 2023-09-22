@@ -60,6 +60,7 @@
 import { BodyProps, SCROLL_LEFT } from "../data";
 import { dataAddID, useValidate } from "../util";
 import { useSlots, defineExpose } from 'vue'
+import { get } from 'lodash-es'
 
 const props = defineProps({
   ...BodyProps()
@@ -74,7 +75,7 @@ const maxLen = ref(10)
 const updateList = ref([])
 const left = inject(SCROLL_LEFT)
 
-const { errorMap, validate, createValidate, validates } = useValidate(props.data)
+const { errorMap, validate, createValidate, validates: validatesFn } = useValidate(props.data)
 
 const slots = useSlots()
 
@@ -106,7 +107,8 @@ const scroll = ({scrollTop, scrollLeft}) => {
 
 const bodyStyle = computed(() => {
   return {
-    height: props.scroll?.y !== undefined ? props.scroll.y + 'px' : undefined
+    maxHeight: props.scroll?.y !== undefined ? props.scroll.y + 'px' : undefined,
+    height: 'calc(100% - 56px)'
   }
 })
 
@@ -129,6 +131,13 @@ const getPopupContainer = (e) => {
   return bodyRef.value || e.parentNode
 }
 
+const validateItem = (path) => {
+  const [ dataIndex, name ] = path
+  const value = get(props.data, path)
+  console.log(name, value, props.data[dataIndex])
+  validate(name, value, props.data[dataIndex])
+}
+
 watch(() => JSON.stringify(props.columns),  () => {
   createValidate(props.columns)
 }, { immediate: true })
@@ -138,24 +147,20 @@ maxLength()
 watch(() => JSON.stringify(props.data), (newValue, oldValue) => {
   myData.value = dataAddID(props.data, cellHeight)
   update()
-  // console.log(newValue)
-  // console.log(oldValue)
-  // console.log(isValidate.value)
-  // console.log(JSON.parse(newValue || '[]').length)
-  // console.log(JSON.parse(oldValue || '[]').length)
 }, { immediate: true })
 
 defineExpose({
   validates: () => {
     return new Promise(async (resolve, reject) => {
       try {
-        const v = await validates()
+        const v = await validatesFn()
         resolve(v)
       } catch (e) {
         reject(e)
       }
     })
-  }
+  },
+  validateItem: validateItem
 })
 
 </script>

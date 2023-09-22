@@ -108,6 +108,7 @@ export class Axios {
           break;
         case 401:
           this.showNotification('用户未登录', status)
+          console.log('jumpLogin', jumpLogin)
           jumpLogin()
           break;
         case 404:
