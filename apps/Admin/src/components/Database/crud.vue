@@ -1,6 +1,6 @@
 <template>
   <div class="crud-warp" ref="warpRef">
-    <j-spin :spinning="loading" wrapperClassName="loading">
+
       <div class="crud-header">
         <div class="crud-tabs">
           <j-badge :count="errorDataTableLength" >
@@ -54,7 +54,7 @@
         </div>
 
       </div>
-    </j-spin>
+    <CheckSpin :spinning="loading" />
   </div>
 </template>
 

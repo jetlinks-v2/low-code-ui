@@ -82,7 +82,7 @@ const formRef = inject(SETTING_FORM_REF)
 const rulesOptions = [
   {
     label: '非空',
-    value: 'noEmpty'
+    value: 'notEmpty'
   },
   {
     label: '范围',
@@ -178,7 +178,7 @@ const rules = {
 const providerChange = (key) => {
   const configuration = model.value.validator.configuration
   switch (key) {
-    case 'noEmpty':
+    case 'notEmpty':
       model.value.validator.configuration = {
         message: configuration.message,
         group: configuration.group
