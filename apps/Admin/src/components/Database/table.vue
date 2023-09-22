@@ -37,7 +37,7 @@
         </template>
         <template #jdbcType="{record, index, valueChange}">
           <span v-if="index <= maxLen">{{record.jdbcType}}</span>
-          <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="() => { valueChange(record.jdbcType);emitUpdateDataSource()}" />
+          <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="() => { valueChange(record.jdbcType);emitUpdateDataSource()}" :disabled="publishColumns.includes(record.name)" />
         </template>
         <template #length="{ record, index }">
           <span v-if="index <= maxLen">{{record.length}}</span>
@@ -135,6 +135,7 @@ import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly } from './compon
 import { provide } from 'vue'
 import { defaultSetting, defaultTreeSetting } from './setting'
 import { regular } from '@jetlinks/utils'
+import { useProduct } from '@/store'
 
 const props = defineProps({
   tree: {
@@ -142,6 +143,10 @@ const props = defineProps({
     default: false
   },
   columns: {
+    type: Array,
+    default: () => []
+  },
+  publishColumns: {
     type: Array,
     default: () => []
   },
@@ -156,6 +161,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update', 'update:columns'])
+
+const product = useProduct()
 
 const myColumns = [
   {

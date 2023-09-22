@@ -28,6 +28,7 @@
             v-model:columns="columns"
             :tree="tree"
             :ownerId="ownerId"
+            :publishColumns="publishColumns"
             @update="update"
           />
         </CardBox>
@@ -107,6 +108,7 @@ const props = defineProps({
 })
 
 const tableColumns = ref([])
+const publishColumns = ref(props.others?.columns || [])
 const dataTableRef = ref()
 const advancedRef = ref()
 const warpRef = ref()
