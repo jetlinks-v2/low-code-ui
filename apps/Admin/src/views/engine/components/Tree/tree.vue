@@ -10,6 +10,7 @@
           :fieldNames="{
             key: 'id'
           }"
+          draggable
           @select="select"
         >
           <template #title="node">

@@ -147,7 +147,7 @@ const setVisible = (value) => {
 
 //拖拽
 const onDrop = (info: AntTreeNodeDropEvent) => {
-    // console.log('info-----------', info.dropToGap,info)
+    console.log('info-----------', info.dropToGap,info)
     const dropKey = info.node.key;
     const dragKey = info.dragNode.key;
     const dropPos: any = info.node.pos?.split('-');
