@@ -34,6 +34,8 @@ import SourceForm from './components/SourceForm.vue'
 import Form from './components/Form.vue'
 import Grid from './components/Grid.vue'
 import Config from './components/Config.vue'
+import Table from './components/Table.vue'
+import TableSource from './components/TableSource.vue'
 import { map } from 'lodash-es'
 import { getConfigList } from './utils'
 import { useTarget } from '../../../hooks'
@@ -60,10 +62,12 @@ const Panels = {
   Source,
   Grid,
   SourceForm,
+  Table,
+  TableSource
 }
 
 const panelsList = computed(() => {
-  return getConfigList(_type.value)
+  return getConfigList(_type.value, target.value)
 })
 
 const activeKey = ref<string[]>(map(panelsList.value, 'key'))

@@ -1,4 +1,4 @@
-export const getConfigList = (_type: string) => {
+export const getConfigList = (_type: string, obj: any) => {
     const arr: any[] = []
     if (['root'].includes(unref(_type))) {
         arr.push({
@@ -95,6 +95,18 @@ export const getConfigList = (_type: string) => {
             key: 'Status',
             header: '高级配置',
         })
+    }
+    if(_type === 'table-item') {
+        arr.push({
+            key: 'Table',
+            header: '组件属性',
+        })
+        if(['select', 'select-card', 'tree-select'].includes(obj?.children?.[0]?.type)) {
+            arr.push({
+                key: 'TableSource',
+                header: '数据来源',
+            })
+        }
     }
 
     return [...arr]
