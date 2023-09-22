@@ -42,7 +42,7 @@ import { useEngine, useProduct } from '@/store'
 // import Tabs from '../Tabs/tabs.vue'
 import Content from './content.vue'
 import ProjectEmpty from '@/components/ProJect/Empty/index.vue'
-import { providerImages, typeImages } from '@/components/ProJect/index'
+import {  typeImages } from '@/components/ProJect/index'
 
 
 const engine = useEngine()
@@ -72,7 +72,6 @@ watch(
     if (val) {
       activeData.value = product.getById(val[0])
       path.value = product.getParent(activeData.value)
-      console.log('path',path.value)
     }
   },
   { deep: true, immediate: true }

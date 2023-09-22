@@ -58,7 +58,7 @@ export const handleTreeModal = (data, record) => {
   if (isIdInTree(arr, record.id)) {
     return arr
   } else {
-    return [...arr, record]
+    return [ record,...arr]
   }
 }
 

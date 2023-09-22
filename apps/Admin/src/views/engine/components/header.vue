@@ -20,10 +20,11 @@
 </template>
 
 <script setup name="EngineHeader">
-import { useProduct } from '@/store'
+import { useProduct,useEngine } from '@/store'
 import { getImage } from '@jetlinks/utils';
 
 const product = useProduct()
+const engine = useEngine()
 
 const router = useRouter()
 const route = useRoute()
@@ -36,10 +37,23 @@ const onRelease = () => {
   })
 }
 
-const quit = () => {
-  router.push('/delivery/center')
-  product.initProjectState()
+const quit = async() => {
+  console.log('product.data',product.data)
+  const item = product.data[0]
+    await product.update({
+      ...item,
+      others:{
+        ...item?.others,
+        activeFile:engine.activeFile,
+        files:engine.files
+      }
+    },false,false)
+
+    router.push('/delivery/center')
+    // product.initProjectState()
+    
 }
+
 </script>
 
 <style scoped lang="less">
