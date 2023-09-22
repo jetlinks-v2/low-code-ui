@@ -364,7 +364,7 @@ const onValidate = () => {
 const onValid = async () => {
   const _val = await onValidate()
   if (_val) {
-    onlyMessage('校验成功！')
+    onlyMessage('校验通过')
   }
 }
 
