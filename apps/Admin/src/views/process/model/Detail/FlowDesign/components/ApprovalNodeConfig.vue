@@ -1,3 +1,4 @@
+<!-- 审批节点配置 -->
 <template>
   <j-tabs v-model:activeKey="activeKey" type="card">
     <j-tab-pane key="basic" tab="基础配置">

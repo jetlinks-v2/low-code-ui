@@ -1,49 +1,61 @@
 //审批节点默认属性
 export const APPROVAL_PROPS = {
-    assignedType: "ASSIGN_USER",
-    mode: "AND",
-    sign: false,
-    nobody: {
-        handler: "TO_PASS",
-        assignedUser: []
+    candidates: {
+        user: [],
+        org: [],
+        role: [],
+        var: [],
+        relation: []
     },
-    timeLimit: {
-        timeout: {
-            unit: "H",
-            value: 0
-        },
-        handler: {
-            type: "REFUSE",
-            notify: {
-                once: true,
-                hour: 1
-            }
-        }
-    },
-    assignedUser: [],
-    formPerms: [],
-    selfSelect: {
-        multiple: false
-    },
-    leaderTop: {
-        endCondition: "TOP",
-        endLevel: 1,
-    },
-    leader: {
-        level: 1
-    },
-    role: [],
-    refuse: {
-        type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
-        target: '' //驳回到指定ID的节点
-    },
-    formUser: ''
+    gotoWhenReject: [],
+    completeWeight: 1,
+    rejectWeight: 1,
+    autoClaim: false,
+    // assignedType: "ASSIGN_USER",
+    // mode: "AND",
+    // sign: false,
+    // nobody: {
+    //     handler: "TO_PASS",
+    //     assignedUser: []
+    // },
+    // timeLimit: {
+    //     timeout: {
+    //         unit: "H",
+    //         value: 0
+    //     },
+    //     handler: {
+    //         type: "REFUSE",
+    //         notify: {
+    //             once: true,
+    //             hour: 1
+    //         }
+    //     }
+    // },
+    // assignedUser: [],
+    // formPerms: [],
+    // selfSelect: {
+    //     multiple: false
+    // },
+    // leaderTop: {
+    //     endCondition: "TOP",
+    //     endLevel: 1,
+    // },
+    // leader: {
+    //     level: 1
+    // },
+    // role: [],
+    // refuse: {
+    //     type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
+    //     target: '' //驳回到指定ID的节点
+    // },
+    // formUser: ''
 }
 
 //根节点默认属性
 export const ROOT_PROPS = {
     assignedUser: [],
-    formPerms: []
+    // assignedUser: [],
+    // formPerms: []
 }
 
 //条件节点默认属性
@@ -61,9 +73,20 @@ export const CONDITION_PROPS = {
 
 //抄送节点默认属性
 export const DEAL_PROPS = {
-    shouldAdd: false,
-    assignedUser: [],
-    formPerms: []
+    candidates: {
+        user: [],
+        org: [],
+        role: [],
+        var: [],
+        relation: []
+    },
+    gotoWhenReject: [],
+    completeWeight: 1,
+    rejectWeight: 1,
+    autoClaim: false,
+    // shouldAdd: false,
+    // assignedUser: [],
+    // formPerms: []
 }
 
 //触发器节点默认属性

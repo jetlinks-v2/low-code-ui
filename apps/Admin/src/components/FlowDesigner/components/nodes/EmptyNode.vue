@@ -1,3 +1,4 @@
+<!-- 空节点 -->
 <template>
   <node :show="false" @insertNode="(type) => emits('insertNode', type)" />
 </template>

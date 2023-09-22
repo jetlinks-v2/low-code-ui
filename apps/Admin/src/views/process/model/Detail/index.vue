@@ -1,7 +1,7 @@
 <!-- 流程详情 -->
 <template>
   <page-container>
-    <j-card style="margin-bottom: 10px;">
+    <j-card style="margin-bottom: 10px">
       <div class="step-box">
         <div class="step">
           <j-steps v-model:current="current">
@@ -14,7 +14,7 @@
         <div class="btn">
           <j-button v-if="current > 0" @click="current--">上一步</j-button>
           <j-button v-if="current < 2" @click="current++">下一步</j-button>
-          <j-button type="primary">
+          <j-button type="primary" @click="save" :loading="saveLoading">
             保存
             <template #icon>
               <j-tooltip placement="right">
@@ -48,6 +48,13 @@ import { ref } from 'vue'
 import BasicInfo from './BasicInfo/index.vue'
 import FlowDesign from './FlowDesign/index.vue'
 import ShowCopy from './ShowCopy/index.vue'
+import { detail_api, update_api } from '@/api/process/model'
+import { useFlowStore } from '@/store/flow'
+import { onlyMessage } from '@jetlinks/utils'
+
+const flowStore = useFlowStore()
+const route = useRoute()
+const router = useRouter()
 
 const current = ref(0)
 const componentsMap = {
@@ -55,6 +62,43 @@ const componentsMap = {
   1: FlowDesign,
   2: ShowCopy,
 }
+
+/**
+ * 获取模型详情
+ */
+const getFlowDetail = async () => {
+  const { result } = await detail_api(route.query.id as string)
+  const model = JSON.parse(result.model || '{}')
+  console.log('model: ', model);
+
+  flowStore.setModel(model)
+}
+
+/**
+ * 保存模型数据
+ */
+const saveLoading = ref(false)
+const save = () => {
+  const params = {
+    id: route.query.id,
+    state: 'undeployed',
+    model: JSON.stringify(flowStore.model),
+  }
+
+  saveLoading.value = true
+  update_api(params)
+    .then(() => {
+      onlyMessage('保存成功', 'success')
+      router.go(-1)
+    })
+    .finally(() => {
+      saveLoading.value = false
+    })
+}
+
+onMounted(() => {
+  getFlowDetail()
+})
 </script>
 
 <style lang="less" scoped>

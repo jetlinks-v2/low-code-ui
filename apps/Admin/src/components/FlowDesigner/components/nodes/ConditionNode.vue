@@ -1,3 +1,4 @@
+<!-- 条件节点 -->
 <template>
   <div :class="{ node: true, 'node-error-state': showError, active }">
     <div :class="{ 'node-body': true, error: showError }">

@@ -4,7 +4,7 @@
 
   <j-drawer
     :width="500"
-    :title="selectedNode?.name"
+    :title="title"
     placement="right"
     :visible="showConfig"
     @close="showConfig = false"
@@ -27,6 +27,12 @@ import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
+
+const title = computed(() => {
+  return ['CONDITIONS', 'CONCURRENTS'].includes(selectedNode.value?.type)
+    ? '高级配置'
+    : selectedNode.value?.name
+})
 
 const showConfig = ref(false)
 const nodeSelected = (node) => {
