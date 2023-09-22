@@ -91,7 +91,7 @@
               class="card-icon"
             >
               <template #icon>
-                <pro-image src="https://www.antdv.com/#error" />
+                <j-image src="/images/list-page/table-card-default.png" :preview="false" />
               </template>
             </j-avatar>
           </template>
@@ -436,5 +436,8 @@ defineExpose({
 .image-icon {
   width: 14px;
   height: 14px;
+}
+.card-icon {
+  background-color: rgba(49, 94, 251, 0.2);;
 }
 </style>
