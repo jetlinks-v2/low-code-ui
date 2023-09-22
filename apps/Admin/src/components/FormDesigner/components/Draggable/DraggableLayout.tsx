@@ -100,6 +100,7 @@ const DraggableLayout = defineComponent({
                             const TypeComponent = componentMap?.[element?.type] || 'div'
                             const _props = useProps(element, unref(designer.formData), unref(designer.mode))
                             const selectRef = ref<any>(null)
+                            const options = ref<any[]>(_props.componentProps.options)
                             const params = {
                                 data: element,
                                 parent: props.data
@@ -148,10 +149,9 @@ const DraggableLayout = defineComponent({
                             watchEffect(() => {
                                 registerToRefList(_path, selectRef.value)
                             })
-
                             if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
                                 queryOptions(element.componentProps.source, product.info?.id).then(resp => {
-                                    _props.componentProps.options = resp
+                                    options.value = resp
                                 })
                             }
 
@@ -180,6 +180,7 @@ const DraggableLayout = defineComponent({
                                         onUpdate:value={(newValue) => {
                                             set(designer.formState, _path, newValue)
                                         }}
+                                        options={unref(options)}
                                         onChange={onChange}
                                     ></TypeComponent>
                                 }
