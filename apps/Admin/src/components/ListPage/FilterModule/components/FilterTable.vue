@@ -9,65 +9,64 @@
     >
       同步数据绑定
     </j-button>
-    <div class="table">
-      <j-data-table
-        class="ant-table-striped table-striped"
-        rowKey="code"
-        bordered
-        ref="tableRef"
-        size="small"
-        :columns="props.columns"
-        :data-source="props.dataSource"
-        :showTool="false"
-        :height="900"
-        @change="(data) => handleChange(data)"
-      >
-        <template #headerCell="{ column }">
-          <template v-if="column.tips">
-            <span>
-              {{ column.title }}
-              <j-popover trigger="hover">
-                <template #content>
-                  <div class="hover-tips">
-                    <div>不同于列自身的数据类型，筛选组件提供string、enum、<br>date、number四种数据类型，用于控制运算符和筛选值样式</div>
-                    <j-table
-                      :columns="tipsColumns"
-                      :data-source="data"
-                      :pagination="false"
-                      bordered
-                      size="small"
-                    />
-                  </div>
-                </template>
-                <AIcon type="QuestionCircleOutlined" />
-              </j-popover>
-            </span>
-          </template>
+    <j-data-table
+      columnDrag
+      class="ant-table-striped table-striped"
+      rowKey="code"
+      bordered
+      ref="tableRef"
+      size="small"
+      :columns="props.columns"
+      :data-source="props.dataSource"
+      :showTool="false"
+      :height="900"
+      @change="(data) => handleChange(data)"
+    >
+      <template #headerCell="{ column }">
+        <template v-if="column.tips">
+          <span>
+            {{ column.title }}
+            <j-popover trigger="hover">
+              <template #content>
+                <div class="hover-tips">
+                  <div>不同于列自身的数据类型，筛选组件提供string、enum、<br>date、number四种数据类型，用于控制运算符和筛选值样式</div>
+                  <j-table
+                    :columns="tipsColumns"
+                    :data-source="data"
+                    :pagination="false"
+                    bordered
+                    size="small"
+                  />
+                </div>
+              </template>
+              <AIcon type="QuestionCircleOutlined" />
+            </j-popover>
+          </span>
         </template>
-        <template #name="{ data }">
-          <ErrorItem :border="false" :errorData="errorData('name' + data.record?._sortIndex)">
-            <span class="data-column">{{ data.record?.name }}</span>
-          </ErrorItem>
-        </template>
-        <template #id="{ data }">
-          <ErrorItem :border="false" :errorData="errorData('id' + data.record?._sortIndex)">
-            <span class="data-column">{{ data.record?.id }}</span>
-          </ErrorItem>
-        </template>
-        <template #action="{ data }">
-          <j-space>
-            <j-button type="link" @click="configuration(data)" :style="{ color: errorData('config' + data.record?._sortIndex) ? 'red' : '' }">配置</j-button>
-            <JPopconfirm
-              @confirm="confirm(data)"
-              :loading="loading"
-              title="确定删除此数据？"
-            >
-              <j-button type="text" danger>删除</j-button>
-            </JPopconfirm>
-          </j-space>
-        </template>
-      </j-data-table>
-    </div>
+      </template>
+      <template #name="{ data }">
+        <ErrorItem :border="false" :errorData="errorData('name' + data.record?._sortIndex)">
+          <span class="data-column">{{ data.record?.name }}</span>
+        </ErrorItem>
+      </template>
+      <template #id="{ data }">
+        <ErrorItem :border="false" :errorData="errorData('id' + data.record?._sortIndex)">
+          <span class="data-column">{{ data.record?.id }}</span>
+        </ErrorItem>
+      </template>
+      <template #action="{ data }">
+        <j-space>
+          <j-button type="link" @click="configuration(data)" :style="{ color: errorData('config' + data.record?._sortIndex) ? 'red' : '' }">配置</j-button>
+          <JPopconfirm
+            @confirm="confirm(data)"
+            :loading="loading"
+            title="确定删除此数据？"
+          >
+            <j-button type="text" danger>删除</j-button>
+          </JPopconfirm>
+        </j-space>
+      </template>
+    </j-data-table>
     <br />
     <j-button
       class="editable-add-btn"
@@ -406,7 +405,6 @@ const asyncDataBind = () => {
     return {
       ...item,
       type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type],
-      config: {}
     }
   }) || []
 }
@@ -440,7 +438,6 @@ watch(() => props.bindFunctionId, () => {
         id: item.alias,
         name: item.comment,
         type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
-        config: {}
       }
     },
   )

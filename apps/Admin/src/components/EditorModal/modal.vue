@@ -12,12 +12,14 @@
       <j-monaco-editor
         v-model="myValue"
         :language="language"
+        @errorChange="errorChange"
       />
     </div>
   </j-modal>
 </template>
 
 <script setup name="EditorModal">
+import { onlyMessage } from '@jetlinks/utils';
 import { defaultProps } from './data'
 
 const props = defineProps({
@@ -30,11 +32,20 @@ const myValue = ref(props.value)
 
 const title = computed(()=>props.language==='javascript'?'交互事件':'样式配置')
 
+const errorMessage = ref([])
+const errorChange = (v) => {
+  console.log(v);
+  errorMessage.value = v
+}
 const cancel = () => {
   emit('cancel')
 }
 
 const save = () => {
+  if(errorMessage.value.length){
+    onlyMessage('代码存在错误', 'error')
+    return
+  }
   emit('save', myValue.value)
 }
 

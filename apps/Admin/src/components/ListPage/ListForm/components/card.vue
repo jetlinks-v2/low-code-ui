@@ -24,7 +24,8 @@
           :class="{ active: cardState.type === 'customIcon' }"
         >
           <template #icon>
-            <pro-image src="https://www.antdv.com/#error" />
+            <!-- <pro-image src="https://www.antdv.com/#error" /> -->
+            <j-image src="/images/list-page/table-card-default.png" :preview="false" />
           </template>
         </j-avatar>
       </template>
@@ -109,7 +110,8 @@
                   <img :src="imageUrl" class="upload-image">
                 </div>
                 <div v-else>
-                  <pro-image src="https://www.antdv.com/#error" />
+                  <!-- <pro-image src="https://www.antdv.com/#error" /> -->
+                  <j-image src="/images/list-page/table-card-default.png" :preview="false" />
                 </div>
               </template>
             </Upload>
@@ -235,7 +237,9 @@
             <EditorModal
               v-model:value="formState.specialStyle"
               language="json"
-            />
+            >
+              <j-button type="dashed" shape="round">编写特殊样式</j-button>
+            </EditorModal>
           </j-form-item>
         </div>
         <j-form-item v-show="false">
@@ -364,6 +368,7 @@ defineExpose({
 .card-icon {
   height: 88px !important;
   width: 88px !important;
+  background-color: rgba(49, 94, 251, 0.2);;
   cursor: pointer;
   &:hover {
     background-color: rgba(49, 94, 251, 0.2);
