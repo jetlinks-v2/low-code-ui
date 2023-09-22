@@ -31,7 +31,9 @@
          <div class="left"></div>
          <div>引用关系</div>
       </div>
-      <div v-for="item in relation">{{ item }}</div>
+      <div v-for="item in relation">
+         <j-ellipsis>{{ item }}</j-ellipsis>
+      </div>
    </j-drawer>
 </template>
 
@@ -94,11 +96,11 @@ const getRelation = () => {
    const arr = [...dataMap.values()]
    relation.value = arr.filter(item => item?.others?.useList?.includes(props.data.id))?.map(it => {
       if (it.type === 'module') {
-         return `通用能力-${it.title}`
+         return `通用能力 - ${it.title}`
       } else if (web.includes(it.type)) {
-         return `前端资源-${it.title}`
+         return `前端资源 - ${it.title}`
       } else {
-         return `后端能力-${it.title}`
+         return `后端能力 - ${it.title}`
       }
    })
    // console.log('arr----',arr,relation.value)
