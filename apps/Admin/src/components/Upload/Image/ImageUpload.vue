@@ -112,7 +112,11 @@ const beforeUpload = (file: any) => {
   const isMaxSize = (file.size / 1024 / 1024) < maxSize
 
   if (!inType) {
-    onlyMessage(`仅支持${types.join(',')}格式文件`, 'error')
+    const _type = types.map(item => item.replace(/image\//, '.'))
+    if (_type.includes('.jpeg')) {
+      _type.unshift('.jpg')
+    }
+    onlyMessage(`仅支持${_type.join(' ')}格式文件`, 'error')
     return false
   }
 
