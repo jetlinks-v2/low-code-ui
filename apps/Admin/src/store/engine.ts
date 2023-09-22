@@ -209,6 +209,10 @@ export const useEngine = defineStore('engine', () => {
     activeFile.value = v
   }
 
+  const selectFiles = (v)=>{
+    files.value = v
+  }
+
   // watch(() => activeFile.value, () => {
   //   console.log(activeFile.value)
   // }, { immediate: true })
@@ -229,6 +233,7 @@ export const useEngine = defineStore('engine', () => {
     setCopyFile,
     updateFile,
     initEngineState,
-    setActiveFile
+    setActiveFile,
+    selectFiles
   }
 })

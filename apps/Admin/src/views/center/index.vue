@@ -242,51 +242,35 @@ const _view = (id: string) => {
   router.replace(`/engine/${id}`)
 }
 
-// const _del = async (data) => {
-//   // const res = await delProject(data.id)
-//   // if (res.status === 200) {
-//   //   const resp = await delMenu({
-//   //     "paging": false,
-//   //     "terms": [{
-//   //       "terms": [{
-//   //         "type": "or",
-//   //         "value": `%projectId:${data.id}%`,
-//   //         "termType": "like",
-//   //         "column": "options"
-//   //       }]
-//   //     }]
-
-//   //   })
-//   //   if(resp.status === 200){
-//   //     onlyMessage('操作成功')
-//   //     tableRef.value?.reload()
-//   //   }
-//   // }
-//   const resp = await delMenu({
-//       "paging": false,
-//       "terms": [{
-//         "terms": [{
-//           "type": "or",
-//           "value": `%projectId:${data.id}%`,
-//           "termType": "like",
-//           "column": "options"
-//         }]
-//       }]
-
-//     })
-//     if(resp.status === 200){
-//       onlyMessage('操作成功')
-//       tableRef.value?.reload()
-//     }
-// }
-
 const _del = async (data) => {
   const res = await delProject(data.id)
   if (res.status === 200) {
-    onlyMessage('操作成功')
-    tableRef.value?.reload()
+    const resp = await delMenu({
+      "paging": false,
+      "terms": [{
+        "terms": [{
+          "type": "or",
+          "value": `%projectId:${data.id}%`,
+          "termType": "like",
+          "column": "options"
+        }]
+      }]
+
+    })
+    if(resp.status === 200){
+      onlyMessage('操作成功')
+      tableRef.value?.reload()
+    }
   }
 }
+
+// const _del = async (data) => {
+//   const res = await delProject(data.id)
+//   if (res.status === 200) {
+//     onlyMessage('操作成功')
+//     tableRef.value?.reload()
+//   }
+// }
 
 const _action = async (id: string, type: string) => {
   const res = type === 'enabled' ? await disabledProject(id) : await enableProject(id)
