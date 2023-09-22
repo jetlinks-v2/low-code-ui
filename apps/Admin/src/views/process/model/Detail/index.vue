@@ -69,6 +69,7 @@ const componentsMap = {
 const getFlowDetail = async () => {
   const { result } = await detail_api(route.query.id as string)
   const model = JSON.parse(result.model || '{}')
+  console.log('model: ', model);
 
   flowStore.setModel(model)
 }

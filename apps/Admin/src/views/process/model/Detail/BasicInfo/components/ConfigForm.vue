@@ -3,7 +3,7 @@
     <j-button @click="handleClick" style="width: 200px">表单配置</j-button>
     <ul>
       <li v-for="item of selectedRow">
-        {{ item }}
+        {{ item.formName || '-' }}
       </li>
     </ul>
     <j-drawer
@@ -38,7 +38,7 @@
             :showHeader="false"
             :columns="columns"
             :params="params"
-            :request="query"
+            :request="queryForm_api"
             :gridColumn="3"
             :defaultParams="{
               sorts: [{ name: 'createTime', order: 'desc' }],
@@ -69,18 +69,18 @@
           >
             <template #item="{ element }">
               <div>
-                <div>{{ element.name }}</div>
+                <div>{{ element.formName }}</div>
                 <j-space>
                   <j-radio-group
-                    v-model:value="element.value1"
+                    v-model:value="element.multiple"
                     button-style="solid"
                   >
                     <j-space>
-                      <j-radio-button value="form">
+                      <j-radio-button :value="false">
                         <AIcon type="FormOutlined" />
                         表单
                       </j-radio-button>
-                      <j-radio-button value="list">
+                      <j-radio-button :value="true">
                         <AIcon type="OrderedListOutlined" />
                         列表
                       </j-radio-button>
@@ -116,6 +116,7 @@
 <script setup lang="ts">
 import { onlyMessage } from '@jetlinks/utils'
 import draggable from 'vuedraggable'
+import { queryForm_api } from '@/api/process/model'
 
 const props = defineProps<{
   modelValue: any
@@ -224,8 +225,13 @@ const onSelectChange = (row: any) => {
       (item: any) => item.id !== row.id,
     )
   } else {
-    selectedRow.value.push(row)
+    selectedRow.value.push({
+      formId: row.id,
+      formName: row.name,
+      multiple: false,
+    })
   }
+  console.log('selectedRow.value: ', selectedRow.value)
 }
 
 watch(

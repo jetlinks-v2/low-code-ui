@@ -33,3 +33,11 @@ export const detail_api = (id: string) => request.get(`/process/definition/${id}
  * 更新模型
  */
 export const update_api = (data: any) => request.put(`/process/definition/${data.id}`, data)
+/**
+ * 查询表单列表
+ */
+export const queryForm_api = (data: any) => request.post(`/process/form/_query`, data)
+/**
+ * 根据定义解析支持的变量
+ */
+export const queryVariables_api = (data: any) => request.post(`/process/definition/parse-variables/${data.nodeId}`, data)

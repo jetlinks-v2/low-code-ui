@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import type { INode, IConfig } from '@/views/process/model/Detail/typings.d.ts'
 interface IModel {
-    config: Partial<IConfig>;
-    nodes: Partial<INode>;
+    config: IConfig;
+    nodes: INode;
 }
 
 const defaultModel = {
