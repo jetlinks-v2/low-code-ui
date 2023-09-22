@@ -143,6 +143,9 @@ const Canvas = defineComponent({
               customFn.call({ getWidgetRef: getWidgetRef }, name, status, errorMsgs)
             }
           }}
+          style={{
+            height: "100%"
+          }}
         >
           {Layout}
         </Form>
