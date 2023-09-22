@@ -23,6 +23,7 @@
 import { CRUD_COLUMNS } from "@/components/Database/util";
 import { queryRuntime } from '@/api/form'
 import { useProduct } from '@/store'
+import {isArray, isBoolean, isObject} from "lodash-es";
 
 const props = defineProps({
   id: {
@@ -56,7 +57,20 @@ const myColumns = computed(() => {
 const getData = async (params) => {
   const resp = await queryRuntime(project.info.id, props.parentId, 'QueryPager', params)
   total.value = resp.result?.total || 0
-  console.log(resp)
+  if (resp?.result?.data && resp?.result?.data?.length) {
+    resp.result.data = resp.result.data.map(item => {
+      Object.keys(item).forEach(k => {
+        const v = item[k]
+        if (isArray(v) || isObject(v)) {
+          item[k] = JSON.stringify(v)
+        }
+        if(isBoolean(v)) {
+          item[k] = `${v}`
+        }
+      })
+      return item
+    })
+  }
   return {
     ...resp
   }
