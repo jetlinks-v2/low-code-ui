@@ -127,10 +127,10 @@ const handleEditBtn = (type: string, title: string, icon: string) => {
     padding: 10px 20px 0px 20px;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
   }
   .btns {
     margin-bottom: 16px;
+    margin-right: 16px;
   }
   h2 {
     margin: 0;

@@ -121,6 +121,11 @@ const valid = () => {
   })
   errorList.value = validOperationsBtn(columnsTree.value, functionOptions.value, pages)
   return errorList.value.length ? [{message: props.type === 'columns' ? '操作列配置错误': '操作按钮配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validOperationsBtn(columnsTree.value)
+  //   if(errorList.value.length) reject([{message: '操作按钮配置错误'}])
+  //   else resolve([])
+  // })
 }
 
 

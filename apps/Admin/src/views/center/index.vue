@@ -9,17 +9,11 @@
         <j-button type="primary" @click="handleSave('add')">新增</j-button>
       </template>
       <template #card="record">
-        <Card
-          :actions="getActions(record)"
-          :record="record"
-          :status="record.state.value"
-          :statusText="record.state.text"
+        <Card :actions="getActions(record)" :record="record" :status="record.state.value" :statusText="record.state.text"
           :statusNames="{
             unpublished: 'error',
             published: 'success',
-          }"
-          @click="_view(record.draftId)"
-        >
+          }" @click="_view(record.draftId)">
           <template #content>
             <div class="card-item">
               <div class="title">
@@ -36,7 +30,7 @@
               <div>创建时间：{{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}</div>
               <div class="bottom">
                 <div>最近发布：{{ record.deployTime ? dayjs(record.deployTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}</div>
-                <div v-if="record.changed && record.state.value==='published'" class="bottom-icon">
+                <div v-if="record.changed && record.state.value === 'published'" class="bottom-icon">
                   <j-tooltip>
                     <template #title>存在未发布的草稿，点击任意位置继续编辑</template>
                     <AIcon type="FormOutlined" style="color: black;" />
@@ -61,6 +55,7 @@ import { queryProject, delProject, enableProject, disabledProject } from '@/api/
 import { onlyMessage } from '@/utils/comm';
 import { router } from '@jetlinks/router';
 import Menu from './Menu/index.vue'
+import { delMenu } from '@/api/menu';
 
 const params = ref<any>({})
 const tableRef = ref<Record<string, any>>({});
@@ -214,7 +209,7 @@ const getActions = (record) => {
         popConfirm: {
           title: '项目菜单及其子菜单均会被删除',
           onConfirm: () => {
-            _del(data.id)
+            _del(data)
           }
         },
         hasPermission: true,
@@ -237,18 +232,40 @@ const handleSave = (type: string, data?: any) => {
 
 const handleClose = (val) => {
   visible.value = false
-  if(!val){
+  if (!val) {
     tableRef.value?.reload()
   }
-  
+
 }
 
 const _view = (id: string) => {
   router.replace(`/engine/${id}`)
 }
 
-const _del = async (id: string) => {
-  const res = await delProject(id)
+// const _del = async (data) => {
+//   const res = await delProject(data.id)
+//   if (res.status === 200) {
+//     const resp = await delMenu({
+//       "paging": false,
+//       "terms": [{
+//         "terms": [{
+//           "type": "or",
+//           "value": `%projectId:${data.id}%`,
+//           "termType": "like",
+//           "column": "options"
+//         }]
+//       }]
+
+//     })
+//     if(resp.status === 200){
+//       onlyMessage('操作成功')
+//       tableRef.value?.reload()
+//     }
+//   }
+// }
+
+const _del = async (data) => {
+  const res = await delProject(data.id)
   if (res.status === 200) {
     onlyMessage('操作成功')
     tableRef.value?.reload()

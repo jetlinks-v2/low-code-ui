@@ -15,6 +15,20 @@ export const validOperationsBtn = (tree: OperationConfigTreeItem[], functionOpti
 
   function validate(data: OperationConfigTreeItem[]) {
     data.forEach((item) => {
+      if(item.jsError?.length) {
+        errorItems.push({
+          key: item.key,
+          errorKey: 'script',
+          message: item.jsError
+        })
+      }
+      if(item.cssError?.length) {
+        errorItems.push({
+          key: item.key,
+          errorKey: 'style',
+          message: item.cssError
+        })
+      }
       if (item.type !== 'customer') {
         if (item.type !== 'Detail') {
           if (!item.functions) {
@@ -41,7 +55,7 @@ export const validOperationsBtn = (tree: OperationConfigTreeItem[], functionOpti
             });
           }
         }
-        if (!item.pages && (item.type === 'Add' || item.type === 'Detail')) {
+        if (!item.pages && (item.type === 'Add' || item.type === 'Detail' || item.type === 'Update')) {
           errorItems.push({
             key: item.key,
             errorKey: 'pages',
