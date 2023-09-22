@@ -74,7 +74,10 @@
     </div>
     <div class="update-modal" v-show="visible">
       <div class="update-modal-header">
-        <span>快速修改</span>
+        <span>
+          快速修改
+          <span style="padding: 24px;color: #777;font-size: 14px; font-weight: 400;">修改完成后，请点击校验</span>
+        </span>
         <div class="update-modal-header-close" @click="cancel">
           <AIcon type="CloseOutlined" />
         </div>
@@ -296,10 +299,11 @@ const themeChange = (e) =>{
   product.update(item)
 }
 
-const cancel = () => {
+const cancel = async () => {
   visible.value = false
   status[modelData.id] = 0
-  validateAll(modelData.id)
+  await validateDraftFn() // 重新查询错误信息
+  await validateAll(modelData.id)
 }
 
 const showModal = (id) => {

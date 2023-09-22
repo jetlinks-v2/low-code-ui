@@ -47,6 +47,7 @@ const myColumns = computed(() => {
     }
     return {
       ...item,
+      dataIndex: item.alias,
       width: 140,
       ellipsis: true,
     }

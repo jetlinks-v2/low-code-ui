@@ -67,7 +67,11 @@
             />
           </j-form-item>
           <j-form-item name="json" label="复制json">
-            <Editor :height="300" language="json" v-model:value="modelRef.json" />
+            <Editor
+              :height="300"
+              language="json"
+              v-model:value="modelRef.json"
+            />
           </j-form-item>
           <j-form-item label="复制表单" placeholder="请选择" name="formCopy">
             <j-select
@@ -276,6 +280,41 @@ const findItem = (arr: any[], value: string) => {
   }
 }
 
+const generatorTableSource = (_item: any) => {
+  const _type = _item.valueType.type || 'string'
+  let type: string = 'input'
+  switch (_type) {
+    case 'long':
+    case 'int':
+    case 'float':
+    case 'double':
+      type = 'input-number'
+      break
+    case 'boolean':
+      type = 'switch'
+      break
+    case 'date':
+      type = 'date-picker'
+      break
+    default:
+      type = 'input'
+      break
+  }
+  const obj = generatorData({
+    type: type,
+    name: _item?.name,
+  })
+  let children: any = []
+  return {
+    ...obj,
+    children,
+    formItemProps: {
+      ...obj.formItemProps,
+      name: _item.id,
+    },
+  }
+}
+
 const generatorSource = (_item: any) => {
   const _type = _item.valueType.type || 'string'
   let type: string = 'input'
@@ -307,7 +346,7 @@ const generatorSource = (_item: any) => {
     name: _item?.name,
   })
   let children: any = []
-  if (_type === 'array' || _type === 'object') {
+  if (_type === 'object') {
     children = _item.children?.map((i) => {
       const _data = generatorSource(i)
       return {
@@ -316,6 +355,29 @@ const generatorSource = (_item: any) => {
           ..._data.componentProps,
           name: i.name,
         },
+      }
+    })
+  }
+  if (_type === 'array') {
+    children = _item.children?.map((i) => {
+      const _data = generatorTableSource(i)
+      return {
+        type: 'table-item',
+        key: `table-item_${uid()}`,
+        componentProps: {
+          name: '列名' + uid(6),
+          colSpan: 1,
+          align: 'left',
+        },
+        children: [
+          {
+            ..._data,
+            componentProps: {
+              ..._data.componentProps,
+              name: i.name,
+            },
+          },
+        ],
       }
     })
   }

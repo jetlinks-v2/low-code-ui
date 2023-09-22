@@ -1,55 +1,60 @@
 <template>
   <div class="crud-warp" ref="warpRef">
-    <div class="crud-header">
-      <div class="crud-tabs">
-        <j-badge :count="errorDataTableLength" >
-          <div :class="{'crud-tabs-item': true, 'active': activeKey === 'table'}" @click=" activeKey = 'table'">
-            表结构
+    <j-spin :spinning="loading" wrapperClassName="loading">
+      <div class="crud-header">
+        <div class="crud-tabs">
+          <j-badge :count="errorDataTableLength" >
+            <div :class="{'crud-tabs-item': true, 'active': activeKey === 'table'}" @click=" activeKey = 'table'">
+              表结构
+            </div>
+          </j-badge>
+          <div :class="{'crud-tabs-item': true, 'active': activeKey === 'data'}" @click=" activeKey = 'data'">
+            数据
           </div>
-        </j-badge>
-        <div :class="{'crud-tabs-item': true, 'active': activeKey === 'data'}" @click=" activeKey = 'data'">
-          数据
+          <j-badge :count="errorRelationLength" >
+            <div :class="{'crud-tabs-item': true, 'active': activeKey === 'adv'}" @click=" activeKey = 'adv'">
+              高级配置
+            </div>
+          </j-badge>
         </div>
-        <j-badge :count="errorRelationLength" >
-          <div :class="{'crud-tabs-item': true, 'active': activeKey === 'adv'}" @click=" activeKey = 'adv'">
-            高级配置
-          </div>
-        </j-badge>
+        <j-button class="extra-check" type="primary" @click="validate">校验</j-button>
       </div>
-      <j-button class="extra-check" type="primary" @click="validate">校验</j-button>
-    </div>
-    <div class="crud-body">
-      <CardBox  v-show="activeKey === 'table'" style="height: 100%">
-        <DataTable
+      <div class="crud-body">
+        <CardBox v-show="activeKey === 'table'" style="height: 100%">
+          <DataTable
 
-          ref="dataTableRef"
-          v-model:tableName="tableName"
-          v-model:columns="columns"
-          :tree="tree"
-          :ownerId="ownerId"
-          @update="update"
-        />
-      </CardBox>
-      <CardBox v-show="activeKey === 'data'" style="height: 100%">
-        <DataSetting
-
-          :id="props.id"
-          :parentId="props.parentId"
-        />
-      </CardBox>
-        <j-scrollbar>
-          <Advanced
-            v-show="activeKey === 'adv'"
-            ref="advancedRef"
-            v-model:tree="tree"
-            v-model:asset="asset"
-            v-model:relation="relation"
-            :id="props.id"
-            :parentId="props.parentId"
+            ref="dataTableRef"
+            v-model:tableName="tableName"
+            v-model:columns="columns"
+            :tree="tree"
+            :ownerId="ownerId"
             @update="update"
           />
-        </j-scrollbar>
-    </div>
+        </CardBox>
+        <CardBox v-show="activeKey === 'data'" style="height: 100%">
+          <DataSetting
+
+            :id="props.id"
+            :parentId="props.fullId"
+          />
+        </CardBox>
+        <div style="height: 100%;" v-show="activeKey === 'adv'">
+          <j-scrollbar>
+            <Advanced
+
+              ref="advancedRef"
+              v-model:tree="tree"
+              v-model:asset="asset"
+              v-model:relation="relation"
+              :id="props.id"
+              :parentId="props.parentId"
+              @update="update"
+            />
+          </j-scrollbar>
+        </div>
+
+      </div>
+    </j-spin>
   </div>
 </template>
 
@@ -79,6 +84,10 @@ const props = defineProps({
     default: undefined
   },
   parentId: {
+    type: String,
+    default: undefined
+  },
+  fullId: {
     type: String,
     default: undefined
   },
@@ -148,7 +157,7 @@ const errorRelationLength = computed(() =>{
 })
 
 const validate = async () => {
-  loading.value = ref(true)
+  loading.value = true
   errorTips.relation = {}
 
   try {
@@ -171,6 +180,7 @@ const validate = async () => {
 defineExpose({
   validate: () => {
     return new Promise(async (resolve, reject) => {
+
       await validate()
       const err = []
 
@@ -185,7 +195,6 @@ defineExpose({
           err.push(a[0])
         })
       }
-
       !err.length ? resolve() : reject(err)
     })
   }
@@ -198,6 +207,13 @@ defineExpose({
   height: 100%;
   position: relative;
   width: 100% !important;
+
+  .loading {
+    height: 100%;
+    :deep(.ant-spin-container) {
+      height: 100%;
+    }
+  }
 
   .crud-header {
     padding: 4px 24px;

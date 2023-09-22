@@ -127,6 +127,11 @@ const myActions = ref([])
 const widthCount = ref(0)
 const max = ref(0)
 
+const deleteWidth = computed(() => {
+  const hasDelete = props.actions.some(item => item.key === 'delete')
+  return hasDelete ? 60 : 0
+})
+
 const bodyClass = computed(() => {
   return {
     'card-body': true,
@@ -137,8 +142,8 @@ const bodyClass = computed(() => {
 
 const actionsList = computed(() => {
   const maxLength = parseInt(String(max.value / 100))
-  console.log(maxLength)
-  if (widthCount.value && widthCount.value > max.value && maxLength > 1) {
+  console.log('card',maxLength, widthCount.value, max.value )
+  if (widthCount.value && widthCount.value > (max.value + deleteWidth.value) && maxLength > 1) {
     const cloneActions = cloneDeep(props.actions)
     const newActions = cloneActions.splice(0, maxLength - 1)
     newActions.push({
@@ -175,14 +180,10 @@ const handleFunction = (item) => {
   return undefined
 }
 
-
-
 const onResize = debounce((e) => {
   const len = props.actions?.length || 0
-  const hasDelete = props.actions.some(item => item.key === 'delete')
-  const deleteWidth = hasDelete ? 60 : 0
   max.value = e.width
-  widthCount.value = 100 * len + deleteWidth
+  widthCount.value = 100 * len + deleteWidth.value
 }, 100)
 
 </script>

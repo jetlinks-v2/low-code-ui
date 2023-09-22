@@ -1,5 +1,5 @@
 <template>
-  <j-form-item label="key" :name="['others', 'keyJavaType']" required>
+  <j-form-item label="key" :name="['others', 'keyJavaType']" required :rules="[{ required: true, message: '请选择key'}]">
     <j-select
       :options="[
         {
@@ -14,7 +14,7 @@
       v-model:value="model.others.keyJavaType"
     />
   </j-form-item>
-  <j-form-item label="value" :name="['others', 'valueJavaType']" required>
+  <j-form-item label="value" :name="['others', 'valueJavaType']" required :rules="[{ required: true, message: '请选择value'}]">
     <j-select
       :options="options"
       :fieldNames="{

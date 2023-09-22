@@ -174,7 +174,7 @@ export const useEngine = defineStore('engine', () => {
    * @param type
    */
   const updateFile = (record: any, type: string, open?: any) => {
-    const index = files.value.findIndex(item => item.id === record.id)
+    const index = files.value?.findIndex(item => item.id === record.id)
 
     files.value = files.value.map(item => {
       return product.getById(item.id)

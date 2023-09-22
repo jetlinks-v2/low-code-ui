@@ -51,7 +51,8 @@
     v-if="model.validator.provider === 'max'"
     label="最大值"
     :name="['validator', 'configuration', 'value']"
-    :rules="model.javaType === 'Integer' ? [intMax] : undefined"
+    :validateFirst="true"
+    :rules="model.javaType === 'Integer' ? [intMax, { required: true, message: '请输入最大值'}] : [{ required: true, message: '请输入最大值'}]"
   >
     <j-input-number v-model:value="model.validator.configuration.value" :stringMode="openStringMode" :precision="precision" style="width: 100%;" />
   </j-form-item>
@@ -59,7 +60,8 @@
     v-if="model.validator.provider === 'min'"
     label="最小值"
     :name="['validator', 'configuration', 'value']"
-    :rules="model.javaType === 'Integer' ? [intMin] : undefined"
+    :validateFirst="true"
+    :rules="model.javaType === 'Integer' ? [intMin, { required: true, message: '请输入最小值'}] : [{ required: true, message: '请输入最小值'}]"
   >
     <j-input-number v-model:value="model.validator.configuration.value" :stringMode="openStringMode" :precision="precision" style="width: 100%;" />
   </j-form-item>

@@ -99,9 +99,11 @@ export class ReplStore implements Store {
 
   init() {
     watchEffect(() =>
-      compileFile(this, this.state.activeFile).then(
-        (errs) => (this.state.errors = errs),
-      ),
+      {
+        compileFile(this, this.state.activeFile).then(
+          (errs) => (this.state.errors = errs),
+        )
+      }
     )
 
     this.state.errors = []
@@ -130,6 +132,10 @@ export class ReplStore implements Store {
 
   updateCompiledFile(compiled: File['compiled'], fileName: string) {
     this.state.files[fileName]!.compiled = compiled
+  }
+
+  updateCompiledCode(code: string, fileName: string) {
+    this.state.files[fileName]!.code = code
   }
 
   setJetlinksPluginVersion(version: string) {

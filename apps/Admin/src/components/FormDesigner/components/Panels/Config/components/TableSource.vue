@@ -1,5 +1,5 @@
 <template>
-  <SourceData :value="target.componentProps.source" @change="onChange" />
+  <SourceData :value="target?.children?.[0]?.componentProps?.source" @change="onChange" />
 </template>
     
 <script lang="ts" setup>
@@ -12,7 +12,7 @@ const emits = defineEmits(['refresh'])
 const { target } = useTarget()
 
 const onChange = (obj: any) => {
-  target.value.componentProps.source = obj
+  target.value.children[0].componentProps.source = obj
   emits('refresh', target.value)
 }
 </script>

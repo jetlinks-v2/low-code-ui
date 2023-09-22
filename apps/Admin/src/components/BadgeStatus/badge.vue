@@ -44,7 +44,7 @@ const _color = computed(() => {
   const code = props.statusNames[props.status] || props.status
   const c = hexToRgb(badgeColor[code]) || badgeColor[code]
 
-  console.log(c)
+  // console.log(c)
   return `rgb(${c})`
 })
 </script>

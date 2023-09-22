@@ -111,7 +111,7 @@ export const useProduct = defineStore('product', () => {
 
   const findParent=(data, target, result) =>{
     for (let item of data) {
-      if (item.id === target.id) {
+      if (item.id === target?.id) {
         //将查找到的目标数据加入结果数组中
         result.unshift(item)
         return true
@@ -228,6 +228,15 @@ export const useProduct = defineStore('product', () => {
     }
     info.value = extra
     published.value = extra.state?.value === 'published'
+    console.log('treeData-----------',treeData[0]?.others)
+    if(extra.state?.value !== 'published'){
+      engine.setActiveFile(treeData[0]?.others?.activeFile || treeData[0]?.id)
+      engine.files = treeData[0]?.others?.files || []
+      engine.selectFile(treeData[0]?.others?.activeFile)
+    }else{
+      engine.setActiveFile(treeData[0]?.id)
+    }
+  
   }
 
   const add = (record: any, parentId: string,open?:any) => {
@@ -287,6 +296,7 @@ export const useProduct = defineStore('product', () => {
   const queryProduct = async (id?: string, cb?: () => void) => {
     if (!id) return
     dataMap.clear()
+    initProjectState()
     const resp = await queryProjectDraft(id)
     if (resp.success) {
       handleProjectData(resp.result, true)
