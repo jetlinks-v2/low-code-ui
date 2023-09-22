@@ -95,33 +95,6 @@
           />
         </j-form-item>
       </template>
-      <template
-        v-if="
-          [
-            'input',
-            'textarea',
-            'input-number',
-            'input-password',
-            'tree-select',
-            'select',
-            'date-picker',
-            'time-picker',
-          ].includes(type)
-        "
-      >
-        <j-form-item
-          :validateFirst="true"
-          label="占位提示"
-          :name="['componentProps', 'placeholder']"
-        >
-          <j-input
-            placeholder="请输入"
-            v-model:value="target.componentProps.placeholder"
-            :maxlength="32"
-            @change="onDataChange"
-          />
-        </j-form-item>
-      </template>
     </template>
     <template v-else>
       <template v-if="type === 'card'">
@@ -292,7 +265,7 @@
         </j-form-item>
         <j-form-item
           label="标识"
-          :name="['formItemProps', 'name']"
+          :name="['children', 0, 'formItemProps', 'name']"
           required
           :validateFirst="true"
           :rules="rules"
@@ -301,7 +274,7 @@
             placeholder="请输入"
             :maxlength="64"
             @change="onDataChange"
-            v-model:value="target.formItemProps.name"
+            v-model:value="target.children[0].formItemProps.name"
           />
         </j-form-item>
         <j-form-item
@@ -336,12 +309,12 @@
         <j-form-item
           :validateFirst="true"
           label="组件类型"
-          :name="['componentProps', 'type']"
+          :name="['children', 0, 'type']"
         >
           <j-select
-            v-model:value="target.componentProps.type"
+            v-model:value="target.children[0].type"
             placeholder="请选择"
-            @change="onDataChange"
+            @change="onTypesChange"
             :options="typeList"
           />
         </j-form-item>
@@ -427,17 +400,6 @@
       </template>
     </template>
 
-    <!-- 规则校验 -->
-    <template v-if="rulesVisible">
-      <j-form-item :name="['formItemProps', 'rules']" :validateFirst="true">
-        <Rule
-          :type="type"
-          v-model:value="target.formItemProps.rules"
-          @change="onChange"
-        />
-      </j-form-item>
-    </template>
-
     <!-- 说明 -->
     <template v-if="descVisible">
       <j-form-item
@@ -463,7 +425,6 @@
 <script lang="ts" setup>
 import { computed, inject, unref } from 'vue'
 import { useTarget } from '../../../../hooks'
-import Rule from './Rules/Rule.vue'
 import { basic } from '@/components/FormDesigner/utils/defaultData'
 import { omit } from 'lodash-es'
 import generatorData from '@/components/FormDesigner/utils/generatorData'
@@ -548,17 +509,6 @@ const typeList = [
   },
 ]
 
-const rulesVisible = computed(() => {
-  return [
-    'input',
-    'textarea',
-    'input-password',
-    'date-picker',
-    'time-picker',
-    'table',
-  ].includes(unref(type))
-})
-
 const rules = [
   {
     required: true,
@@ -607,6 +557,22 @@ const onTypeChange = (val: string) => {
     children: arr,
   }
   designer.setSelection(obj)
+}
+
+const onTypesChange = (val: string) => {
+  const obj = {
+    ...generatorData({
+      type: val,
+      name: '列名',
+      children: [],
+    }),
+    key: target.value.children[0]?.key,
+  }
+  const arr = updateData(unref(designer.formData)?.children, obj)
+  designer.formData.value = {
+    ...designer.formData.value,
+    children: arr,
+  }
 }
 
 const onChange = (arr: any[]) => {
