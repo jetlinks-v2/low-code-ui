@@ -182,7 +182,7 @@ const form = ref<Partial<FormType>>({
   key: randomString(),
   // icon: `EyeOutlined`,
   model: '',
-  provider: 'bpmn',
+  provider: 'wflow',
   classificationText: '分类1'
 })
 

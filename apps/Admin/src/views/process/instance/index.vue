@@ -106,6 +106,7 @@ import Dialog from './Dialog/index.vue'
 import Drawer from './Drawer/index.vue'
 import { isFunction, isObject, pick } from 'lodash-es'
 import { getList_api, copy_api, del_api } from '@/api/process/instance'
+import { saveProcess_api } from '@/api/process/model'
 
 const tableRef = ref()
 const columns = [
@@ -207,14 +208,6 @@ const getActions = computed(() => (record, type = 'card') => {
         hasPermission: false,
         onClick: () => {
           copyAsModel(data)
-          // const param = pick(data, ['id', 'name', 'icon', 'classifiedId'])
-          // copy_api(param).then((res) => {
-          //   if (res.success) {
-          //     onlyMessage('操作成功')
-          //   } else {
-          //     onlyMessage('操作失败', 'error')
-          //   }
-          // })
         },
       }),
     },
@@ -233,13 +226,18 @@ const getActions = computed(() => (record, type = 'card') => {
         popConfirm: {
           title: `确认${record.state?.value !== 'disabled' ? '禁用' : '启用'}`,
           onConfirm: () => {
-            // del_api(data.id).then((res) => {
-            //   if (res.success) {
-            //     onlyMessage('操作成功')
-            //   } else {
-            //     onlyMessage('操作失败', 'error')
-            //   }
-            // })
+            saveProcess_api({
+              ...data,
+              state:
+                record.state?.value !== 'disabled' ? 'disabled' : 'enabled',
+            }).then((res) => {
+              if (res.success) {
+                onlyMessage('操作成功')
+                refresh()
+              } else {
+                onlyMessage('操作失败', 'error')
+              }
+            })
           },
         },
       }),
@@ -259,6 +257,7 @@ const getActions = computed(() => (record, type = 'card') => {
             del_api(data.id).then((res) => {
               if (res.success) {
                 onlyMessage('操作成功')
+                refresh()
               } else {
                 onlyMessage('操作失败', 'error')
               }

@@ -1,16 +1,16 @@
 export const defaultColumns = (key: string) => {
   return [
     {
-      title: key === 'organization' ? '组织' : key === 'user' ? '用户' : '角色',
+      title: key === 'org' ? '组织' : key === 'user' ? '用户' : '角色',
       // dataIndex: 'organization',
-      dataIndex: 'title',
-      key: 'title',
+      dataIndex: 'name',
+      key: 'name',
       ellipsis: true,
     },
     {
       title: '权重',
-      dataIndex: 'weights',
-      key: 'weights',
+      dataIndex: 'weight',
+      key: 'weight',
       ellipsis: true,
     },
     {

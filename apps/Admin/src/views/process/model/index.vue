@@ -240,6 +240,7 @@ const getActions = computed(() => (record, type = 'card') => {
           deploy_api(data.id).then((res) => {
             if (res.success) {
               onlyMessage('操作成功')
+              refresh()
             } else {
               onlyMessage('操作失败', 'error')
             }
@@ -262,6 +263,7 @@ const getActions = computed(() => (record, type = 'card') => {
             del_api(data.id).then((res) => {
               if (res.success) {
                 onlyMessage('操作成功')
+                refresh()
               } else {
                 onlyMessage('操作失败', 'error')
               }

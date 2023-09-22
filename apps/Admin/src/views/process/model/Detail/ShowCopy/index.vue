@@ -91,7 +91,7 @@
       </j-form-item>
       <TitleComponent data="抄送配置" />
       <j-form-item name="members" label="配置该流程需要抄送的成员">
-        <ConfigureMembers v-model:members="form.members" />
+        <ConfigureMembers :hasWeight="false" v-model:members="form.members" />
       </j-form-item>
     </j-form>
 

@@ -12,7 +12,7 @@
       <j-space v-for="item of dimensions" :key="item.id">
         <div
           class="dimension-item"
-          :class="{ active: selectKey === item.value }"
+          :class="{ active: type === item.value }"
           @click="handleClick(item.value)"
         >
           <span class="dimension-item-title-icon">
@@ -29,9 +29,10 @@
     <MemberSelect
       ref="selectRef"
       v-show="show"
-      :selectKey="selectKey"
-      :showSearch="selectKey === 'user' || selectKey === 'role'"
+      :type="type"
+      :showSearch="type === 'user' || type === 'role'"
       :isNode="isNode"
+      :hasWeight="hasWeight"
       @back="back"
     ></MemberSelect>
   </j-modal>
@@ -43,6 +44,7 @@ import { DataSourceProps } from '../types'
 const props = defineProps<{
   // id: string
   isNode: boolean
+  hasWeight: boolean
   visible: boolean
 }>()
 const emits = defineEmits<{
@@ -54,7 +56,7 @@ const dimensions = reactive([
   {
     id: '1',
     name: '组织',
-    value: 'organization',
+    value: 'org',
     description: '从组织维度划分候选人范围',
     checked: true,
     icon: 'ClusterOutlined',
@@ -78,7 +80,7 @@ const dimensions = reactive([
 ])
 // console.log(`output->a`,dimensions)
 // 选中的维度
-const selectKey = ref('')
+const type = ref('')
 const show = ref(false)
 // 点击次数
 const count = ref(0)
@@ -87,15 +89,15 @@ const count = ref(0)
  * @string key 维度值
  */
 const handleClick = (key) => {
-  selectKey.value = key
+  type.value = key
 }
 const selectRef = ref()
 const confirm = () => {
-  if(!selectKey.value) return
+  if(!type.value) return
   if (!count.value) {
     show.value = true
   } else {
-    emits('get-data', selectRef.value?.dataSource, selectKey.value)
+    emits('get-data', selectRef.value?.dataSource, type.value)
     emits('update:visible', false)
   }
   count.value++

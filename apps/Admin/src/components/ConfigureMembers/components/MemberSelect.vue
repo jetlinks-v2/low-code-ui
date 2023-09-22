@@ -29,13 +29,13 @@
         </j-col>
         <j-col span="10">
           <div class="content-center">
-            <div class="center-tree">
-              <div v-if="active === '2'">主体</div>
+            <div class="center-tree" v-if="active !== 'relation'">
+              <div v-if="active === 'relation'">主体</div>
               <!-- 搜索 -->
               <j-input
                 v-model:value="searchText"
                 placeholder="请输入"
-                v-show="showSearch && active === '0'"
+                v-show="showSearch && active === type"
               />
               <j-tree
                 multiple
@@ -54,15 +54,18 @@
               </j-tree>
             </div>
             <!-- 主体的关系 -->
-            <div class="center-relation" v-if="active === '2'">
-              <div>主体的关系</div>
-            </div>
+            <Relational
+              v-else
+              :dataSource="dataSource"
+              :treeData="treeDataCom"
+              @relSubmit="relSubmit"
+            />
           </div>
         </j-col>
         <j-col span="10">
           <div class="content-right">
             <div class="right-top">
-              <div class="selected">已选择：{{ selectedKeys.length }}</div>
+              <div class="selected">已选择：{{ dataSource.length }}</div>
               <j-button type="primary" @click="clear">清空</j-button>
             </div>
             <j-table
@@ -76,7 +79,7 @@
               childrenColumnName="no_children"
             >
               <template #bodyCell="{ column, text, record }">
-                <template v-if="column.key === 'weights'">
+                <template v-if="column.key === 'weight'">
                   <j-input-number
                     :min="1"
                     :max="99"
@@ -92,7 +95,7 @@
                     type="link"
                     :popConfirm="{
                       title: `确认删除？`,
-                      onConfirm: () => handleDel(record.key),
+                      onConfirm: () => handleDel(record.id),
                     }"
                   >
                     删除
@@ -107,6 +110,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import Relational from './Relational.vue'
 import { treeFilter } from 'jetlinks-ui-components/es/Tree'
 import { defaultColumns, flattenTree } from './const'
 import { DataSourceProps } from '../types'
@@ -118,9 +122,10 @@ import {
 
 const props = defineProps<{
   //组织/用户/角色
-  selectKey: string
+  type: string
   showSearch: boolean
   isNode: boolean
+  hasWeight: boolean
 }>()
 const emits = defineEmits<{
   (e: 'back'): void
@@ -129,10 +134,10 @@ const emits = defineEmits<{
 const members: any = inject('members')
 
 const columns = computed(() => {
-  if (props.isNode) {
-    return defaultColumns(props.selectKey)
+  if (props.hasWeight) {
+    return defaultColumns(props.type)
   } else {
-    return defaultColumns(props.selectKey).filter((item) => item.key !== 'weights')
+    return defaultColumns(props.type).filter((item) => item.key !== 'weight')
   }
 })
 
@@ -144,7 +149,7 @@ const treeDataCom = computed(() => {
     : treeData.value
 })
 
-const active = ref('0')
+const active = ref()
 const itemClick = (key) => {
   // 树形数据
   // treeData.value = leftList[key].treeData
@@ -156,25 +161,43 @@ const treeData = ref<any[]>([])
 
 // 选中的树节点
 const selectedKeys = ref<string[]>([])
-const onSelect = (keys: string[], { node }) => {
+const onSelect = (keys: string[], { selected, node }) => {
   // 按关系
-  if(active.value === '2'){
-
+  if (active.value === 'relation') {
     return
   }
   const index = dataSource.value
-    .map((i) => i.key)
+    .map((i) => i.id)
     .findIndex((i) => i === node.id)
   if (index === -1) {
     dataSource.value.push({
-      key: node.id,
-      title: node.name,
-      weights: 1,
-      selectKey: props.selectKey,
+      id: node.id,
+      name: node.name,
+      weight: props.hasWeight ? 1 : undefined,
+      type: props.type,
+      other: active.value,
     })
   } else {
     dataSource.value.splice(index, 1)
   }
+}
+
+// 判断key是否已添加到dataSource中
+// const isExist = (key: string) => {
+//   return dataSource.value.some((i) => i.id === key)
+// }
+
+// 确定
+const relSubmit = (data: any[]) => {
+  data.forEach((i) => {
+    dataSource.value.push({
+      id: i.id,
+      name: i.name,
+      weight: props.hasWeight ? 1 : undefined,
+      type: props.type,
+      other: active.value,
+    })
+  })
 }
 
 /**
@@ -185,110 +208,51 @@ const clear = () => {
   dataSource.value = []
 }
 
-const leftList = [
-  {
-    key: '0',
-    title: '固定组织',
-    description: '固定组织下的所有成员均可以作为候选人',
-    // treeData: [
-    //   {
-    //     title: '组织名称1',
-    //     key: '0-0-1701120627122417664',
-    //     selectable: false,
-    //     children: [
-    //       {
-    //         title: '组织名称',
-    //         key: '0-0-1701120627122417665',
-    //       },
-    //       {
-    //         title: '组织名称',
-    //         key: '0-0-1701120627122417666',
-    //       },
-    //     ],
-    //   },
-    // ],
-  },
-  {
-    key: '1',
-    title: '按变量',
-    description:
-      '指定流程表单中的组织选择组件作为组织变量来源，其下方的所有成员均可作为候选人',
-    // treeData: [
-    //   {
-    //     title: '字段变量',
-    //     key: '0-0-1701120627',
-    //     children: [
-    //       {
-    //         title: '流程表单名称',
-    //         key: '0-0-17011206270',
-    //       },
-    //       {
-    //         title: '组织选择',
-    //         key: '0-0-17011206271',
-    //       },
-    //     ],
-    //   },
-    // ],
-  },
-  {
-    key: '2',
-    title: '按关系',
-    description:
-      '指定流程表单或流程节点中的变量，其所属组织下的所有成员均可作为候选人',
-    // treeData: [
-    //   {
-    //     title: '流程模型',
-    //     key: '0-0',
-    //     children: [
-    //       {
-    //         title: '流程模型名称',
-    //         key: '0-0-0',
-    //         children: [
-    //           {
-    //             title: '结点名称',
-    //             key: '0-0-0-0',
-    //             children: [
-    //               {
-    //                 title: '办理人',
-    //                 key: '0-0-0-0-0',
-    //               },
-    //             ],
-    //           },
-    //         ],
-    //       },
-    //       {
-    //         title: '流程表单',
-    //         key: '0-0-1',
-    //       },
-    //     ],
-    //   },
-    // ],
-  },
-]
-
+const leftList = computed(() => {
+  active.value = props.type
+  return [
+    {
+      key: props.type,
+      title: '固定组织',
+      description: '固定组织下的所有成员均可以作为候选人',
+    },
+    {
+      key: 'var',
+      title: '按变量',
+      description:
+        '指定流程表单中的组织选择组件作为组织变量来源，其下方的所有成员均可作为候选人',
+    },
+    {
+      key: 'relation',
+      title: '按关系',
+      description:
+        '指定流程表单或流程节点中的变量，其所属组织下的所有成员均可作为候选人',
+    },
+  ]
+})
 const dataSource = ref<DataSourceProps[]>([])
 
 /**
  * 删除已选择
- * @param key 删除的数据key
+ * @param id 删除的数据id
  */
-const handleDel = (key: string) => {
-  selectedKeys.value = selectedKeys.value.filter((item) => item !== key)
-  dataSource.value = dataSource.value.filter((item) => item.key !== key)
+const handleDel = (id: string) => {
+  selectedKeys.value = selectedKeys.value.filter((item) => item !== id)
+  dataSource.value = dataSource.value.filter((item) => item.id !== id)
 }
 
-itemClick('0')
+// itemClick('0')
 
 const getTreeData = () => {
-  if (props.selectKey === 'organization') {
+  if (props.type === 'org') {
     getDepartmentList_api().then((res) => {
       treeData.value = res.result
     })
-  } else if (props.selectKey === 'user') {
+  } else if (props.type === 'user') {
     getUserList_api({ paging: false }).then((res) => {
       treeData.value = res.result.data
     })
-  } else if (props.selectKey === 'role') {
+  } else if (props.type === 'role') {
     getRoleList_api().then((res) => {
       treeData.value = res.result
     })
@@ -296,7 +260,7 @@ const getTreeData = () => {
 }
 
 watch(
-  () => [props.selectKey, props.isNode],
+  () => [props.type, props.isNode],
   () => {
     if (!props.isNode) {
       // 基础信息
@@ -310,12 +274,10 @@ watch(
 )
 
 watch(
-  () => [props.selectKey, members],
+  () => [props.type, members],
   () => {
-    dataSource.value = members.value.filter(
-      (i) => i.selectKey === props.selectKey,
-    )
-    selectedKeys.value = dataSource.value.map((item) => item.key)
+    dataSource.value = members.value.filter((i) => i.type === props.type)
+    selectedKeys.value = dataSource.value.map((item) => item.id)
   },
   { immediate: true },
 )
@@ -343,7 +305,7 @@ defineExpose({
   }
 
   .content-center {
-    display: flex;
+    // display: flex;
     height: 100%;
     // padding: 0 2px;
     border-right: 1px solid #7cb305;

@@ -1,6 +1,7 @@
 export interface DataSourceProps {
-  key: string
-  title: string
-  weights: number
-  selectKey: string
+  id: string
+  name: string
+  weight?: number
+  type: string
+  other: string
 }
