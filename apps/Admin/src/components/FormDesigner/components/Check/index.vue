@@ -49,7 +49,7 @@ const onInput = async (type: 'get' | 'set') => {
   } else {
     const obj = await designer.onSave()?.catch(() => {})
     if (obj) {
-      editData.value = JSON.stringify(obj)
+      editData.value = JSON.stringify(obj, (key, value) => typeof value === 'undefined' ? null : value)
     }
   }
 }

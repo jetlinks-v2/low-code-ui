@@ -113,10 +113,12 @@ const beforeUpload = (file: any) => {
 
   if (!inType) {
     onlyMessage(`仅支持${types.join(',')}格式文件`, 'error')
+    return false
   }
 
   if (!isMaxSize) {
     onlyMessage(`请上传${maxSize}M以内的图片`, 'error');
+    return false
   }
   getBase64ByImg(file, base64Url => {
     cropper.img = base64Url

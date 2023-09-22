@@ -29,7 +29,7 @@
               <j-popover trigger="hover">
                 <template #content>
                   <div class="hover-tips">
-                    <div>配置不同于列自身的数据类型，筛选组件提供string、enum、<br>date、number四种数据类型，用于控制运算符和筛选值样式</div>
+                    <div>不同于列自身的数据类型，筛选组件提供string、enum、<br>date、number四种数据类型，用于控制运算符和筛选值样式</div>
                     <j-table
                       :columns="tipsColumns"
                       :data-source="data"
@@ -405,7 +405,8 @@ const asyncDataBind = () => {
   return dataBinds.data.dataSource.map(item => {
     return {
       ...item,
-      type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type]
+      type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type],
+      config: {}
     }
   }) || []
 }
@@ -439,6 +440,7 @@ watch(() => props.bindFunctionId, () => {
         id: item.alias,
         name: item.comment,
         type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
+        config: {}
       }
     },
   )

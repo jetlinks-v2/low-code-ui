@@ -3,7 +3,7 @@
     visible
     title="配置"
     placement="right"
-    :style="{ position: 'absolute' }"
+    :style="{ position: 'absolute', zIndex: 1030 }"
     :closable="false"
     :width="500"
     :get-container="warp"

@@ -4,7 +4,7 @@
     :maskClosable="false"
     :visible="visible"
     :confirm-loading="confirmLoading"
-    title=""
+    :title="title"
     okText="确定"
     cancelText="取消"
     width="630px"
@@ -65,6 +65,14 @@ const mode = computed(() => {
     return 'add'
   } else if (props.type === 'Update') {
     return 'edit'
+  }
+})
+
+const title = computed(() => {
+  if (mode.value === 'add') {
+    return '新增'
+  } else if (mode.value === 'edit') {
+    return '编辑'
   }
 })
 

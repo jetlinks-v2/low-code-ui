@@ -159,3 +159,29 @@ export const formErrorFieldsToObj = (errorFields: ErrorField[]) => {
   })
   return obj
 }
+
+export const settingValidate = (record: any) => {
+  const type = record.javaType
+  switch (type) {
+    case 'Enum':
+      if (!record.dictionary.dictionaryId) {
+        return Promise.reject('请选择数据字典')
+      }
+      break;
+    case 'List':
+      if (!record.others.valueJavaType) {
+        return Promise.reject('请选择元素类型')
+      }
+      break;
+    case 'Map':
+      if (!record.others.valueJavaType) {
+        return Promise.reject('请选择value')
+      }
+      if (!record.others.keyJavaType) {
+        return Promise.reject('请选择key')
+      }
+      break;
+  }
+
+  return Promise.resolve()
+}
