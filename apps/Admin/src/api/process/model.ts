@@ -40,4 +40,4 @@ export const queryForm_api = (data: any) => request.post(`/process/form/_query`,
 /**
  * 根据定义解析支持的变量
  */
-export const queryVariables_api = (data: any) => request.post(`/process/definition/parse-variables/${data.nodeId}`, data)
+export const queryVariables_api = (data: any) => request.post(`/process/definition/parse-variables`, data)

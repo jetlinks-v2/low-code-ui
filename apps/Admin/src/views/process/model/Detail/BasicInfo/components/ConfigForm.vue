@@ -69,7 +69,7 @@
           >
             <template #item="{ element }">
               <div>
-                <div>{{ element.formName }}</div>
+                <div>{{ element.formName || '-' }}</div>
                 <j-space>
                   <j-radio-group
                     v-model:value="element.multiple"
