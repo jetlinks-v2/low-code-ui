@@ -40,15 +40,6 @@ const handleProps = (node: any) => {
     }
 
     switch (node.type) {
-        // case 'input':
-        //     result.maxLength = result?.maxLength || 64
-        //     break
-        // case 'textarea':
-        //     result.maxLength = result?.maxLength || 200
-        //     break
-        // case 'input-password':
-        //     result.maxLength = result?.maxLength || 64
-        //     break
         case 'input-number':
             result.max = undefined
             result.min = undefined
@@ -120,7 +111,7 @@ const generatorData = (node: any) => {
     if (!result.key) {
         result.key = `${result.type}_${uid()}`
     }
-    if (checkIsField(result) || result.type === 'table' || result.type === 'card') {
+    if ((checkIsField(result) || result.type === 'card') && result.type !== 'table-item') {
         result.formItemProps = handleFormItemProps(result)
     }
 

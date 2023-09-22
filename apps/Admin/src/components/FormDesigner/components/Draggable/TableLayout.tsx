@@ -3,10 +3,12 @@ import './index.less'
 import { withModifiers } from 'vue'
 import { Table, AIcon, Button, TableColumn, FormItem } from 'jetlinks-ui-components'
 import { cloneDeep, get, omit, set } from 'lodash-es'
-import { useTool } from '../../hooks'
+import { useProps, useTool } from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import { uid } from '../../utils/uid'
 import componentMap from '../../utils/componentMap'
+import { queryOptions } from '../../utils/utils'
+import { useProduct } from '@/store'
 
 export default defineComponent({
     name: 'TableLayout',
@@ -32,6 +34,7 @@ export default defineComponent({
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
+        const product = useProduct()
 
         const { isEditModel, isDragArea, layoutPadStyle } = useTool()
 
@@ -61,18 +64,19 @@ export default defineComponent({
         const handleAdd = () => {
             const _item = generatorData({
                 type: props.data?.type + '-item',
-                children: [],
+                key: `table-item_${uid()}`,
                 componentProps: {
                     name: '列名' + uid(6),
                     colSpan: 1,
                     align: 'left',
-                    type: 'input'
                 },
-                formItemProps: {
-                    name: uid(6),
-                    required: false,
-                    rules: []
-                }
+                children: [
+                    generatorData({
+                        type: 'input',
+                        name: '列名',
+                        children: [],
+                    })
+                ]
             })
             designer.onAddChild(_item, props.data, false)
         }
@@ -122,16 +126,34 @@ export default defineComponent({
                 designer.onAddChild(_item, props.data)
             }
         }
-        const componentRender = (_path: string[], __data: any) => {
-            const TypeComponent = componentMap[__data?.type || 'input']
 
-            return <TypeComponent
-                data={__data}
-                style={__data?.type !== 'switch' && '100%'}
-                {...__data?.componentProps}
-                value={get(designer.formState, _path)}
-                onUpdate:value={(newValue) => set(designer.formState, _path, newValue)}
-            />
+        const componentRender = (dt: any, __data: any) => {
+            const _path1 = [...unref(__path), dt?.index, __data?.formItemProps.name]
+            const TypeComponent = componentMap[__data?.type || 'input']
+            const _props = useProps(__data, unref(designer.formData), unref(designer.mode))
+
+            if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(__data.type)) {
+                queryOptions(__data.componentProps.source, product.info?.id).then(resp => {
+                    _props.componentProps.options = resp
+                })
+            }
+
+            return <FormItem class="table-item" {...omit(__data?.formItemProps, 'label')} name={[unref(_formItemProps)?.name, dt.index, __data?.formItemProps?.name]}>
+                {
+                    __data?.type === 'switch' ?
+                        <TypeComponent
+                            data={__data}
+                            {..._props?.componentProps}
+                            checked={get(designer.formState, _path1)}
+                            onUpdate:checked={(newValue) => set(designer.formState, _path1, newValue)}
+                        /> : <TypeComponent
+                            data={__data}
+                            {..._props?.componentProps}
+                            value={get(designer.formState, _path1)}
+                            onUpdate:value={(newValue) => set(designer.formState, _path1, newValue)}
+                        />
+                }
+            </FormItem>
         }
 
         const renderContent = (element: any, dt: any) => {
@@ -142,11 +164,7 @@ export default defineComponent({
                     data.value.splice(dt?.index, 1)
                 }} type="link" danger><AIcon type="DeleteOutlined" /></Button>
             } else {
-                const _path1 = [...unref(__path), dt?.index, element.formItemProps.name]
-
-                return <FormItem class="table-item" {...omit(element?.formItemProps, 'label')} name={[unref(_formItemProps)?.name, dt.index, element?.formItemProps?.name]}>
-                    {componentRender(_path1, element?.children?.[0])}
-                </FormItem>
+                return componentRender(dt, element?.children?.[0])
             }
         }
 

@@ -143,6 +143,9 @@ const Canvas = defineComponent({
               customFn.call({ getWidgetRef: getWidgetRef }, name, status, errorMsgs)
             }
           }}
+          style={{
+            height: "100%"
+          }}
         >
           {Layout}
         </Form>
@@ -174,12 +177,8 @@ const Canvas = defineComponent({
 
     return () => {
       return (
-        <div ref={canvasRef} class={['canvas-box', unref(isEditModel) && 'editModel']}>
-          <div class="container">
-            <div class="subject">
-              {unref(isEditModel) ? renderChildren() : renderContent()}
-            </div>
-          </div>
+        <div class="subject" ref={canvasRef}>
+          {unref(isEditModel) ? renderChildren() : renderContent()}
           {unref(designer.collectVisible) && unref(isEditModel) && <CollectModal
             onSave={(name: string) => {
               const obj = {
