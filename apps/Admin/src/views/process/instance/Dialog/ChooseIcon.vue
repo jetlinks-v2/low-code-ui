@@ -12,14 +12,17 @@
     </j-radio-group>
   </div>
 </template>
-<script setup lang="ts">
+<script setup>
 import iconKeys from './fields'
-const props = defineProps<{
-  modelValue: string
-}>()
+const props = defineProps({
+  modelValue: {
+    type: String,
+    default: '',
+  },
+})
 const emit = defineEmits(['update:modelValue'])
-const selected = ref<string>('')
-const change = (e: any) => {
+const selected = ref()
+const change = (e) => {
   emit('update:modelValue', e.target.value)
 }
 </script>

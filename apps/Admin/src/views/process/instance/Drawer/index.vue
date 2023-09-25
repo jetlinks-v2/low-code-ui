@@ -15,12 +15,20 @@
   </j-drawer>
 </template>
 <script setup lang="ts">
-const props = defineProps<{
-  data: any
-  visible: boolean
+const props = defineProps({
+  data: {
+    type: Object as PropType<any>,
+    default: () => ({}),
+  },
+  visible: {
+    type: Boolean,
+    default: () => false,
+  },
+})
+const emits = defineEmits<{
+  (e: 'update:visible', flag: boolean): void
 }>()
-const emits = defineEmits(['refresh', 'update:visible'])
 
-const activeKey = ref('form')
+const activeKey = ref<string>('form')
 </script>
 <style scoped lang="less"></style>

@@ -8,7 +8,6 @@
       :columns="columns"
       :params="params"
       :request="getList_api"
-      :gridColumn="3"
       :defaultParams="{
         sorts: [{ name: 'createTime', order: 'desc' }],
       }"
@@ -50,7 +49,7 @@
     />
   </page-container>
 </template>
-<script setup lang="ts">
+<script setup>
 import Drawer from './Drawer/index.vue'
 import { getList_api } from '@/api/process/instance'
 import dayjs from 'dayjs'
@@ -157,24 +156,25 @@ const columns = [
   },
 ]
 
-const params = ref<any>({})
-const handleSearch = (data: any) => {
-  params.value = data
-}
-
-// 关闭
-const handleDel = (id: string) => {}
-
-// 详情
-const handleDetail = (row: any) => {
-  drawer.selectItem = { ...row }
-  drawer.visible = true
-}
+const params = ref({})
 
 // 抽屉
 const drawer = reactive({
   selectItem: {},
   visible: false,
 })
+
+const handleSearch = (data) => {
+  params.value = data
+}
+
+// 关闭
+const handleDel = (id) => {}
+
+// 详情
+const handleDetail = (row) => {
+  drawer.selectItem = { ...row }
+  drawer.visible = true
+}
 </script>
 <style scoped lang="less"></style>

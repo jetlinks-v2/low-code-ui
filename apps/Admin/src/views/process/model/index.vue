@@ -18,7 +18,6 @@
         >
       </template>
       <template #state="{ state }">
-        <!-- {{ state.text }} -->
         <BadgeStatus
           :status="state.value"
           :text="state.text"
@@ -99,16 +98,17 @@
     ></Drawer>
   </page-container>
 </template>
-<script setup lang="ts">
+<script setup>
 import { onlyMessage } from '@jetlinks/utils'
 import dayjs from 'dayjs'
 import Dialog from './Dialog/index.vue'
 import Drawer from './Drawer/index.vue'
-import { isFunction, isObject, debounce, cloneDeep } from 'lodash-es'
+import { isFunction, isObject } from 'lodash-es'
 import { getProcess_api, deploy_api, del_api } from '@/api/process/model'
 
 const router = useRouter()
 const tableRef = ref()
+const params = ref({})
 const columns = [
   {
     title: '流程图标',
@@ -183,7 +183,19 @@ const columns = [
   },
 ]
 
-const getActions = computed(() => (record, type = 'card') => {
+// 弹窗
+const dialog = reactive({
+  selectItem: {},
+  visible: false,
+})
+
+// 抽屉
+const drawer = reactive({
+  selectItem: {},
+  visible: false,
+})
+
+const getActions = (record, type = 'card') => {
   const actions = [
     {
       key: 'edit',
@@ -279,7 +291,7 @@ const getActions = computed(() => (record, type = 'card') => {
   } else {
     return actions
   }
-})
+}
 
 const handleFunction = (item, record) => {
   if (isFunction(item)) {
@@ -290,33 +302,19 @@ const handleFunction = (item, record) => {
   return undefined
 }
 
-const params = ref<any>({})
-
 /**
  * 搜索
  * @param data
  */
-const handleSearch = (data: any) => {
+const handleSearch = (data) => {
   params.value = data
 }
-
-// 弹窗
-const dialog = reactive({
-  selectItem: {},
-  visible: false,
-})
-
-// 抽屉
-const drawer = reactive({
-  selectItem: {},
-  visible: false,
-})
 
 /**
  * 新增/修改
  * @param data
  */
-const handleSave = (data: any) => {
+const handleSave = (data) => {
   dialog.selectItem = { ...data }
   dialog.visible = true
 }
@@ -325,15 +323,15 @@ const handleSave = (data: any) => {
  * 展示流程详情抽屉页
  * @param id
  */
-const _view = (data: any) => {
+const _view = (data) => {
   drawer.selectItem = { ...data }
   drawer.visible = true
 }
 /**
  * 查看
- * @param data 
+ * @param data
  */
-const handleView = (data: any) => {
+const handleView = (data) => {
   router.push({
     path: '/flow-engine/model/detail',
     query: {
@@ -352,10 +350,8 @@ const refresh = () => {
 <style scoped lang="less">
 .table-action {
   display: flex;
-  // margin-top: 8px;
   gap: 8px;
   flex-wrap: wrap;
-  // flex布局，一行两个
 }
 </style>
 @/api/process/model

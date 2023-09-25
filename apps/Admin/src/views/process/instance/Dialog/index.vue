@@ -69,6 +69,7 @@ import { onlyMessage } from '@jetlinks/utils'
 import ChooseIcon from './ChooseIcon.vue'
 import { copy_api } from '@/api/process/instance'
 import { useRequest } from '@jetlinks/hooks'
+import { providerEnum } from '@/api/process/model'
 
 type FormType = {
   id: string
@@ -77,11 +78,32 @@ type FormType = {
   icon: string
 }
 
-const props = defineProps<{
-  data: any
-  visible: boolean
+const props = defineProps({
+  data: {
+    type: Object as PropType<any>,
+    default: () => ({}),
+  },
+  visible: {
+    type: Boolean,
+    default: () => false,
+  },
+})
+
+const emits = defineEmits<{
+  (e: 'update:visible', flag: boolean): void
+  (e: 'refresh'): void
 }>()
-const emits = defineEmits(['refresh', 'update:visible'])
+
+const title = ref<string>('复制为模型')
+const showIcon = ref<boolean>(false)
+const formRef = ref<any>()
+const form = reactive({
+  id: props.data.id,
+  name: `copy_${props.data.name}`,
+  classificationText: props.data.classificationText,
+} as FormType)
+
+const { data: providerOptions } = useRequest(providerEnum)
 
 const { loading, run } = useRequest(copy_api, {
   immediate: false,
@@ -94,15 +116,6 @@ const { loading, run } = useRequest(copy_api, {
   },
 })
 
-const title = ref('复制为模型')
-const showIcon = ref(false)
-const formRef = ref()
-const form = ref<Partial<FormType>>({
-  id: props.data.id,
-  name: `copy_${props.data.name}`,
-  classificationText: props.data.classificationText,
-})
-
 const chooseIcon = () => {
   title.value = '选择图标'
   showIcon.value = true
@@ -111,12 +124,10 @@ const chooseIcon = () => {
 const confirm = () => {
   if (showIcon.value) {
     // 选择图标
-    form.value.icon
-      ? (showIcon.value = false)
-      : onlyMessage('请选择图标', 'error')
+    form.icon ? (showIcon.value = false) : onlyMessage('请选择图标', 'error')
   } else {
-    formRef.value?.validate().then(async (_data: any) => {
-      run(form.value)
+    formRef.value?.validate().then((_data: any) => {
+      run(form)
     })
   }
 }

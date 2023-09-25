@@ -12,12 +12,6 @@
         sorts: [{ name: 'createTime', order: 'desc' }],
       }"
     >
-      <!-- <template #headerTitle>
-        <PermissionButton type="primary" @click="handleSave(undefined)">
-          <AIcon type="PlusOutlined" />
-          新增</PermissionButton
-        >
-      </template> -->
       <template #state="{ state }">
         <BadgeStatus
           :status="state.value"
@@ -40,9 +34,9 @@
             <template #icon v-if="item.icon || item.key === 'delete'">
               <AIcon :type="item.icon ? item.icon : 'DeleteOutlined'" />
             </template>
-            <span v-if="item.key !== 'delete'">
-              <!-- {{ item.text }} -->
-            </span>
+            <!-- <span v-if="item.key !== 'delete'">
+              {{ item.text }}
+            </span> -->
           </PermissionButton>
         </div>
       </template>
@@ -53,8 +47,8 @@
           :status="record.state.value"
           :statusText="record.state.text"
           :statusNames="{
-            undeployed: 'error',
-            deployed: 'success',
+            disabled: 'error',
+            enabled: 'success',
           }"
           @click="_view(record)"
         >
@@ -99,13 +93,13 @@
     />
   </page-container>
 </template>
-<script setup lang="ts">
+<script setup>
 import { onlyMessage } from '@jetlinks/utils'
 import dayjs from 'dayjs'
 import Dialog from './Dialog/index.vue'
 import Drawer from './Drawer/index.vue'
-import { isFunction, isObject, pick } from 'lodash-es'
-import { getList_api, copy_api, del_api } from '@/api/process/instance'
+import { isFunction, isObject } from 'lodash-es'
+import { getList_api, del_api } from '@/api/process/instance'
 import { saveProcess_api } from '@/api/process/model'
 
 const tableRef = ref()
@@ -194,8 +188,20 @@ const columns = [
     width: 300,
   },
 ]
+const params = ref({})
+// 复制为模型弹窗
+const dialog = reactive({
+  selectItem: {},
+  visible: false,
+})
 
-const getActions = computed(() => (record, type = 'card') => {
+// 抽屉
+const drawer = reactive({
+  selectItem: {},
+  visible: false,
+})
+
+const getActions = (record, type = 'card') => {
   const actions = [
     {
       key: 'edit',
@@ -284,7 +290,7 @@ const getActions = computed(() => (record, type = 'card') => {
     })
   }
   return actions
-})
+}
 
 const handleFunction = (item, record) => {
   if (isFunction(item)) {
@@ -295,33 +301,19 @@ const handleFunction = (item, record) => {
   return undefined
 }
 
-const params = ref<any>({})
-
 /**
  * 搜索
  * @param data
  */
-const handleSearch = (data: any) => {
+const handleSearch = (data) => {
   params.value = data
 }
-
-// 复制为模型弹窗
-const dialog = reactive({
-  selectItem: {},
-  visible: false,
-})
-
-// 抽屉
-const drawer = reactive({
-  selectItem: {},
-  visible: false,
-})
 
 /**
  * 复制为模型
  * @param data
  */
-const copyAsModel = (data: any) => {
+const copyAsModel = (data) => {
   dialog.selectItem = { ...data }
   dialog.visible = true
 }
@@ -330,7 +322,7 @@ const copyAsModel = (data: any) => {
  * 展示流程详情抽屉页
  * @param id
  */
-const _view = (data: any) => {
+const _view = (data) => {
   drawer.selectItem = { ...data }
   drawer.visible = true
 }
@@ -345,10 +337,7 @@ const refresh = () => {
 <style scoped lang="less">
 .table-action {
   display: flex;
-  // margin-top: 8px;
   gap: 8px;
   flex-wrap: wrap;
-  // flex布局，一行两个
 }
 </style>
-@/api/process/model
