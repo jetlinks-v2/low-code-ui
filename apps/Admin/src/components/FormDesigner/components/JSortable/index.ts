@@ -1,4 +1,4 @@
-import { insertNodeAt, removeNode } from "./util/htmlHelper";
+import { insertNodeAt, insertNodesAt, removeNode, removeNodes } from "./util/htmlHelper";
 import {
     getComponentAttributes,
     createSortableOption,
@@ -31,7 +31,7 @@ function manageAndEmit(evtName) {
     };
 }
 
-let draggingElement = null;
+let draggingElement: any[] = [];
 
 const draggable = defineComponent({
     name: "draggable",
@@ -78,7 +78,8 @@ const draggable = defineComponent({
     ],
     data() {
         return {
-            error: false
+            error: false,
+            context: []
         };
     },
     created() {
@@ -108,7 +109,7 @@ const draggable = defineComponent({
             }
         });
         const targetDomElement = $el.nodeType === 1 ? $el : $el.parentElement;
-        this._sortable = new Sortable(targetDomElement, sortableOptions);
+        this._sortable = new Sortable(targetDomElement, sortableOptions); // 初始化
         this.targetDomElement = targetDomElement; // 挂载的dom
         targetDomElement.__draggable_component__ = this;
     },
@@ -170,9 +171,8 @@ const draggable = defineComponent({
         },
 
         spliceList() {
-            // @ts-ignore
-            const spliceList = list => list.splice(...arguments);
-            this.alterList(spliceList);
+            const _list = list => list.splice(...arguments);
+            this.alterList(_list);
         },
 
         updatePosition(oldIndex, newIndex) {
@@ -203,22 +203,24 @@ const draggable = defineComponent({
         },
 
         onDragStart(evt) { // 开始拖拽
-            // console.log(evt)
-            // if (evt.items?.length) { // 多选
-            //     this.context = []
-            //     evt.items.forEach(item => {
-            //         this.context.push(this.getUnderlyingVm(item.item))
-            //     })
-            // } else { // 单选
-                this.context = this.getUnderlyingVm(evt.item); // 获取真实值和下标
-                evt.item._underlying_vm_ = this.clone(this.context.element); // 真实值，用clone进行转换
-                draggingElement = evt.item; // 拖拽的element
-            // }
-            // console.log(this.context)
+            this.context = []
+            const _items = evt.items?.length ? evt.items : [evt.item]
+            const _data = _items.map(item => {
+                const _context: any = this.getUnderlyingVm(item)
+                this.context.push(_context)
+                item._underlying_vm_ = this.clone(_context.element);
+                return item
+            })
+            if (evt.items?.length) {
+                evt.items = _data
+            } else {
+                evt.item = _data?.[0]
+            }
+            draggingElement = _items
         },
 
         onDragAdd(evt) { // 元素从另一个列表中拖放到列表中
-            const element = evt.item._underlying_vm_;
+            const element = evt.item?._underlying_vm_;
             if (element === undefined) {
                 return;
             }
@@ -236,7 +238,7 @@ const draggable = defineComponent({
                 removeNode(evt.clone); // 删除拖拽过来的那个element
                 return;
             }
-            const { index: oldIndex, element } = this.context;
+            const { index: oldIndex, element } = this.context?.[0];
             // @ts-ignore
             this.spliceList(oldIndex, 1);
             const removed = { element, oldIndex };
@@ -244,13 +246,26 @@ const draggable = defineComponent({
         },
 
         onDragUpdate(evt) { // 更改列表内的排序
-            removeNode(evt.item);
-            insertNodeAt(evt.from, evt.item, evt.oldIndex);
-            const oldIndex = this.context.index;
-            const newIndex = this.getVmIndexFromDomIndex(evt.newIndex);
-            this.updatePosition(oldIndex, newIndex);
-            const moved = { element: this.context.element, oldIndex, newIndex };
-            this.emitChanges({ moved });
+            if (evt.items?.length) { // 多选
+                // 删除原来的节点
+                removeNodes(evt.items)
+                insertNodesAt(evt.from, evt.items, evt.oldIndex); // 插入到新位置
+                evt.items.forEach((_, _index) => {
+                    const oldIndex = this.context?.[_index]?.index;
+                    const newIndex = this.getVmIndexFromDomIndex(evt.newIndicies?.[_index]?.index);
+                    this.updatePosition(oldIndex, newIndex);
+                    const moved = { element: this.context?.[_index]?.element, oldIndex, newIndex };
+                    this.emitChanges({ moved });
+                })
+            } else {
+                removeNode(evt.item); // 删除原来的节点
+                insertNodeAt(evt.from, evt.item, evt.oldIndex); // 插入到新位置
+                const oldIndex = this.context?.[0].index;
+                const newIndex = this.getVmIndexFromDomIndex(evt.newIndex);
+                this.updatePosition(oldIndex, newIndex);
+                const moved = { element: this.context?.[0]?.element, oldIndex, newIndex };
+                this.emitChanges({ moved });
+            }
         },
 
         computeFutureIndex(relatedContext, evt) {
@@ -291,7 +306,7 @@ const draggable = defineComponent({
         },
 
         onDragEnd() {
-            draggingElement = null;
+            draggingElement = [];
         }
     },
     render() {
