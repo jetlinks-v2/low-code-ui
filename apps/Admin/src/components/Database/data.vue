@@ -14,7 +14,8 @@
         :columns="myColumns"
         :request="getData"
         :scroll="{x: 1300, y: 500}"
-      />
+      >
+      </j-pro-table>
     </div>
   </div>
 </template>
@@ -24,6 +25,7 @@ import { CRUD_COLUMNS } from "@/components/Database/util";
 import { queryRuntime } from '@/api/form'
 import { useProduct } from '@/store'
 import {isArray, isBoolean, isObject} from "lodash-es";
+import dayjs from "dayjs";
 
 const props = defineProps({
   id: {
@@ -41,8 +43,15 @@ const columns = inject(CRUD_COLUMNS)
 const project = useProduct()
 const total = ref(0)
 
+const timeFormat = (t) => {
+  console.log(t)
+  return dayjs(t).format('YYYY-MM-DD HH:mm:ss')
+}
+
 const myColumns = computed(() => {
   return columns.value.map(item => {
+    item.dataIndex = item.alias
+
     if (item.width) {
       return item
     }
@@ -66,6 +75,9 @@ const getData = async (params) => {
         }
         if(isBoolean(v)) {
           item[k] = `${v}`
+        }
+        if (['createTime', 'modifyTime'].includes(k)) {
+          item[k] = dayjs(item[k]).format('YYYY-MM-DD HH:mm:ss')
         }
       })
       return item
