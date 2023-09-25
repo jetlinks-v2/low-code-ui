@@ -318,6 +318,9 @@ const props = defineProps({
 const headerButton = ref()
 
 const isCheck = computed(() => {
+  if(!headerButton.value?.isCheck) {
+    _selectedRowKeys.value = []
+  }
   return headerButton.value?.isCheck
 })
 const _selectedRowKeys = ref<string[]>([])
