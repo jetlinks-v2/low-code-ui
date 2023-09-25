@@ -27,16 +27,15 @@
     <div class="content">
       <div class="title">特殊样式</div>
       <div style="width: 500px">
-        <EditorModal v-model:value="state.specialStyle" language="css" >
-          <j-button type="dashed" shape="round">编写特殊样式</j-button>
-        </EditorModal>
+        <EditorButton v-model:value="state.specialStyle" language="css" text="编写特殊样式">
+        </EditorButton>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import EditorModal from '@/components/EditorModal'
+import EditorButton from '@/components/EditorModal/EditorButton.vue'
 const props = defineProps({
   showSwitch: {
     type: Boolean,

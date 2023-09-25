@@ -13,12 +13,25 @@ type CommandType = {
 export const useFunctions = () => {
   const functionOptions = ref<any[]>([])
   const commandOptions = ref<CommandType[]>()
+  const pagesOptions = ref<any[]>([])
   const productStore = useProduct();
   const { data, info } = storeToRefs(productStore)
   watch(() => JSON.stringify(data.value), () => {
-    const newFunction = [...productStore.getDataMap().values()].filter(item => {
+    const maps = [...productStore.getDataMap().values()]
+    const newFunction = maps.filter(item => {
       return [providerEnum.CRUD, providerEnum.Function, providerEnum.SQL].includes(item.type)
     })
+    const newPages = maps.filter(item => {
+      return [providerEnum.FormPage, providerEnum.HtmlPage].includes(item.type)
+    })
+    if(JSON.stringify(newPages) !== JSON.stringify(pagesOptions.value)) {
+      pagesOptions.value = newPages.map(item => {
+        return {
+          ...item,
+          ...productStore.getById(item.id)
+        }
+      })
+    }
     if(JSON.stringify(newFunction) !== JSON.stringify(functionOptions.value)) {
       functionOptions.value = newFunction.map(item => {
         return {
@@ -40,6 +53,7 @@ export const useFunctions = () => {
   return {
     functionOptions,
     commandOptions,
+    pagesOptions,
     handleFunction,
   }
 }
