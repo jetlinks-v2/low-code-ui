@@ -94,6 +94,7 @@ import { getImage } from '@jetlinks/utils';
 
 import { validFilterModule } from './utils/valid'
 import { DATA_BIND } from '../keys'
+import { cloneDeep } from 'lodash-es';
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -296,9 +297,17 @@ const goBack = () => {
  * 校验筛选模块配置
  */
 const errorList: any = ref([])
-const valid = () => {
-  errorList.value = validFilterModule(dataSource.value)
-  return errorList.value.length ? [{message: '数据绑定配置错误'}] : []
+const valid = async () => {
+  return new Promise((resolve) => {
+    validFilterModule(dataSource.value).then(res => {
+      errorList.value = res;
+      if(errorList.value.length) {
+        resolve([{message: '筛选项配置错误'}])
+      } else {
+        resolve([])
+      }
+    })
+  })
   // return new Promise((resolve, reject) => {
   //   errorList.value = validFilterModule(dataSource.value)
   //   if (errorList.value.length) reject([{message: '数据绑定配置错误'}])

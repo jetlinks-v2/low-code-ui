@@ -100,6 +100,10 @@ watchEffect(() => {
     insertCustomCssToHead(item.style, item.key)
   })
 })
+
+defineExpose({
+  isCheck
+})
 </script>
 <style lang="less" scoped>
 .headerBtn {
