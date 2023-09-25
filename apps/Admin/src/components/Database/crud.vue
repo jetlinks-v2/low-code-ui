@@ -1,6 +1,6 @@
 <template>
   <div class="crud-warp" ref="warpRef">
-    <j-spin :spinning="loading" wrapperClassName="loading">
+
       <div class="crud-header">
         <div class="crud-tabs">
           <j-badge :count="errorDataTableLength" >
@@ -28,6 +28,7 @@
             v-model:columns="columns"
             :tree="tree"
             :ownerId="ownerId"
+            :publishColumns="publishColumns"
             @update="update"
           />
         </CardBox>
@@ -54,7 +55,7 @@
         </div>
 
       </div>
-    </j-spin>
+    <CheckSpin :spinning="loading" />
   </div>
 </template>
 
@@ -65,6 +66,7 @@ import DataSetting from './data.vue'
 import Advanced from './advanced.vue'
 import { useProduct } from '@/store'
 import { defaultSetting } from './setting'
+import {onlyMessage} from "@/utils/comm";
 
 const props = defineProps({
   configuration: {
@@ -98,10 +100,15 @@ const props = defineProps({
   others: {
     type: Object,
     default: () => ({})
+  },
+  showTip: {
+    type: Boolean,
+    default: true
   }
 })
 
 const tableColumns = ref([])
+const publishColumns = ref(props.others?.columns || [])
 const dataTableRef = ref()
 const advancedRef = ref()
 const warpRef = ref()
@@ -175,6 +182,10 @@ const validate = async () => {
   }
 
   loading.value = false
+
+  if (props.showTip) {
+    onlyMessage('校验通过')
+  }
 }
 
 defineExpose({

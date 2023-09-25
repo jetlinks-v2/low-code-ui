@@ -1,6 +1,6 @@
 <template>
   <template v-if="!isEmpty">
-    <ListPage v-if="showList" :data="data" :show="true" :projectId="route.params.project" />
+    <ListPage v-if="showList" :data="data" :show="true" :projectId="route.params.project" :pageId="route.params.id" />
     <HtmlPage v-else-if="showHtml" :code="data" />
   </template>
   <template v-else>
@@ -19,7 +19,6 @@ const route = useRoute()
 const data = ref()
 const isEmpty = ref(false)
 
-
 const showList = computed(() => {
   return route.params?.type === 'list' && data.value
 })
@@ -29,6 +28,8 @@ const showHtml = computed(() => {
 })
 
 const getInfo = async () => {
+  data.value = undefined
+  isEmpty.value = false
   const { project, module, id } = route.params
   queryProject({ terms: [{ value: project, termType: 'eq', column: 'id'}]}).then(resp => {
     if (resp.result && resp.result.data?.length && resp.result.data[0].runningState?.value === 'enabled') {

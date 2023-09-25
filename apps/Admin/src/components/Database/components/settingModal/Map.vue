@@ -4,7 +4,7 @@
       :options="[
         {
           label: 'String',
-          value: 'string'
+          value: 'String'
         },
         {
           label: 'Integer',
