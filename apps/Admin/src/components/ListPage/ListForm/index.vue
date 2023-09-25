@@ -202,7 +202,7 @@ const configuredChange = (value: string) => {
 
 const errorList = ref<any[]>([])
 const valid = () => {
-  errorList.value = validListForm(showType!, listFormInfo.value)
+  errorList.value = validListForm(showTypeInject!, listFormInfo.value)
   return errorList.value.length ? [{ message: '列表形态配置错误' }] : []
   // return new Promise((resolve, reject) => {
   //   errorList.value = validListForm(showType!,listFormInfo.value)
