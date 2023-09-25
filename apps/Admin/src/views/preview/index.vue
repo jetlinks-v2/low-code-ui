@@ -1,6 +1,6 @@
 <template>
   <template v-if="!isEmpty">
-    <ListPage v-if="showList" :data="data" :show="true" :projectId="route.params.project" />
+    <ListPage v-if="showList" :data="data" :show="true" :projectId="route.params.project" :pageId="route.params.id" />
     <HtmlPage v-else-if="showHtml" :code="data" />
   </template>
   <template v-else>
