@@ -1,14 +1,15 @@
 <template>
   <div>
       <j-space v-if="_item.key && visible">
-          <PermissionButton
-              :type="'primary'"
-              :ghost="true"
-              :hasPermission="_item.permission ? _item.permission : true"
-          >
-              <template #icon><AIcon :type="_item.icon" /></template>
-              {{ _item.text }}
-          </PermissionButton>
+          <j-popconfirm :title="_item.selected?.popConfirm?.title" @confirm="_item.selected?.popConfirm?.onConfirm">
+            <j-button
+                type="primary"
+                ghost
+            >
+              <template #icon><AIcon :type="_item.icon"/></template>
+                {{ _item.text }}
+            </j-button>
+          </j-popconfirm>
           <j-button type="link" @click="reload"
               ><AIcon type="RedoOutlined" />重选</j-button
           >
@@ -19,6 +20,8 @@
               <j-menu @click="handleMenuClick">
                   <j-menu-item v-for="item in actions" :key="item.key">
                       <PermissionButton
+                        :type="item.type === 'Delete' ? 'danger' : 'primary'"
+                        ghost
                           :popConfirm="
                               item.popConfirm
                                   ? {
@@ -33,9 +36,10 @@
                                   : undefined
                           "
                       >
-                          <template #icon
-                              ><AIcon :type="item.icon"
-                          /></template>
+                          <template #icon>
+                            <img v-if="item.icon?.includes('http')" :src="item.icon" class="image-icon">
+                            <AIcon v-else :type="item.icon"/>
+                          </template>
                           {{ item.text }}
                       </PermissionButton>
                   </j-menu-item>
@@ -73,6 +77,7 @@ const handleMenuClick = (e: any) => {
       visible.value = true;
   } else {
       visible.value = false;
+      val?.onClick?.(val)
   }
   _item.value = (val || {}) as any;
 };
@@ -93,6 +98,12 @@ const onPopConfirm = (e: any, fun: any) => {
 const onPopCancel = () => {
   visible.value = false;
 };
+
+const batchClick = (v) => {
+  if(v.selected?.popConfirm) {
+
+  }
+}
 </script>
 
 <style lang="less" scoped>

@@ -19,7 +19,12 @@
             type="link"
           >
             <template #icon v-if="item.icon || item.key === 'delete'">
-              <AIcon :type="item.icon ? item.icon : 'DeleteOutlined'" />
+              <img
+                :src="item.icon"
+                v-if="item.icon?.includes('http')"
+                class="image-icon"
+              />
+              <AIcon v-else :type="item.icon ? item.icon : 'DeleteOutlined'" />
             </template>
             <span>{{ item.text }}</span>
           </PermissionButton>
@@ -59,5 +64,9 @@ const handleFunction = (item) => {
 </script>
 
 <style scoped>
-
+.image-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 10px;
+}
 </style>

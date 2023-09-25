@@ -24,6 +24,11 @@ class ComponentStructure {
     render(h, attributes) {
         const { tag, children, _isRootComponent } = this;
         const option = !_isRootComponent ? children : { default: () => children };
+        // function h(
+        //     type: string | Component,
+        //     props?: object | null,
+        //     children?: Children | Slot | Slots
+        //   ): VNode
         return h(tag, attributes, option);
     }
 
