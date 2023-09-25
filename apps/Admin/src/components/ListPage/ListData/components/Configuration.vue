@@ -27,7 +27,9 @@
     <div class="content">
       <div class="title">特殊样式</div>
       <div style="width: 500px">
-        <EditorModal v-model:value="state.specialStyle" language="css" />
+        <EditorModal v-model:value="state.specialStyle" language="css" >
+          <j-button type="dashed" shape="round">编写特殊样式</j-button>
+        </EditorModal>
       </div>
     </div>
   </div>
@@ -50,7 +52,7 @@ interface Emit {
 }
 const emits = defineEmits<Emit>()
 const state = reactive({
-  checked: false,
+  checked: props.config?.config?.checked,
   colLayout: props.config?.config?.colLayout || 'left',
   specialStyle: props.config?.config?.specialStyle || `/* .test {
     color: red;

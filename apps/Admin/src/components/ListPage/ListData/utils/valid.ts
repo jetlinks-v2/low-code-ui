@@ -1,7 +1,6 @@
 export const validListData = (list: any[]) => {
   let errorList: any = [];
   list?.forEach((item, index) => {
-    console.log(item);
     if(!item.name.length) {
       errorList.push({
         key: 'name' + index,
@@ -44,6 +43,5 @@ export const validListData = (list: any[]) => {
     //   })
     // }
   })
-  console.log(errorList);
   return errorList
 };

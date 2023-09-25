@@ -64,12 +64,7 @@
       :data="props.data"
       ref="menuConfigRef"
     />
-    <div class="spinning" v-if="spinning">
-      <div class="content">
-        <img src="/images/list-page/loading-blue.png" class="loading-img">
-        <p>校验中</p>
-      </div>
-    </div>
+    <CheckSpin :spinning="spinning" />
   </div>
 </template>
 
@@ -96,7 +91,7 @@ import {
   ACTION_CONFIG_KEY,
 } from './keys'
 import { useProduct } from '@/store'
-import { omit, throttle } from 'lodash-es'
+import { filter, omit, throttle } from 'lodash-es'
 import { onlyMessage } from '@jetlinks/utils'
 
 const spinning = ref(false)
@@ -105,6 +100,10 @@ const props = defineProps({
     type: Object,
     default: () => {},
   },
+  showTip: {
+    type: Boolean,
+    default: true
+  }
 })
 const productStore = useProduct()
 
@@ -202,24 +201,27 @@ const validate = async () => {
   const errorList = [
     ...btnTreeRef.value?.valid(),
     ...columnsRef.value?.valid(),
-    ...filterModuleRef.value?.valid(),
     ...pagingConfigRef.value?.valid(),
     ...listFormRef.value?.valid(),
     ...listDataRef.value?.valid(),
     ...menuConfigRef.value?.valid(),
     ...dataBindRef.value?.valid(),
   ]
+  
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
+    filterModuleRef.value?.valid()
+    .then(res => {
+      errorList.push(...res)
       if (errorList.length) {
         reject(errorList)
       } else {
-        onlyMessage('校验通过')
+        if(props.showTip) {
+          onlyMessage('校验通过')
+        }
         resolve([])
       }
       spinning.value = false
-    }, 500)
-    
+    })
     // Promise.all(promiseArr)
     //   .then((res) => {
     //     resolve(res)
@@ -410,37 +412,7 @@ defineExpose({
   height: 100%;
   position: relative;
   background-color: #e9e9e9;
-  .spinning {
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    div{
-      display: flex;
-      align-items: center;
-      p{
-        color: @primary-color;
-        margin: 0;
-      }
-    }
-  }
-  .loading-img {
-    
-    animation: circle 1s linear infinite;
-    @keyframes circle {
-      0% {
-        transform: rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-  }
+  
 }
 .options-img {
   width: 20px;

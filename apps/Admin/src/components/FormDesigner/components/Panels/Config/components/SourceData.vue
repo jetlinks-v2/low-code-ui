@@ -177,8 +177,8 @@ const end = ref<any[]>([])
 
 const getDictionary = () => {
   queryDictionary().then((resp) => {
-    if (resp.success) {
-      dic.value = resp.result || []
+    if (resp.success) { // 过滤掉没有启用的数据
+      dic.value = resp.result?.filter(item => item?.status) || []
     }
   })
 }

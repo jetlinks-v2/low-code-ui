@@ -60,7 +60,12 @@
             style="width: 100%"
           >
             <template #icon v-if="item.icon || item.key === 'delete'">
-              <AIcon :type="item.icon ? item.icon : 'DeleteOutlined'" />
+              <img
+                :src="item.icon"
+                v-if="item.icon?.includes('http')"
+                class="image-icon"
+              />
+              <AIcon v-else :type="item.icon ? item.icon : 'DeleteOutlined'" />
             </template>
             <span v-if="item.key !== 'delete'">
               {{ item.text }}
@@ -367,6 +372,11 @@ const onResize = debounce((e) => {
             color: #fff !important;
           }
         }
+      }
+      .image-icon {
+        width: 14px;
+        height: 14px;
+        margin-right: 10px;
       }
     }
   }
