@@ -2,7 +2,7 @@
   <div class="enum-type">
     <j-form layout="vertical">
       <j-form-item label="配置数据来源">
-        <j-radio-group v-model:value="state.value" button-style="solid">
+        <j-radio-group v-model:value="state.value" button-style="solid" @change="handleChangeType">
           <j-space size="large">
             <j-radio-button value="data" class="check-btn">
               数据字典
@@ -134,6 +134,15 @@ const queryData = () => {
   })
 }
 queryData()
+
+const handleChangeType = () => {
+  if(state.value === 'data') {
+    state.abilityValue = null,
+    state.instructValue = null
+  } else {
+    state.dataValue = null
+  }
+}
 
 watch(
   () => state.abilityValue,

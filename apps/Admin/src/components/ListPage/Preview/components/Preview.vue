@@ -105,6 +105,7 @@ const dataColumns: any = computed(() => {
       key: 'action',
       scopedSlots: true,
       width: actions.value?.length * 80 + `px`,
+      fixed: 'right',
     })
   }
   return arr
@@ -164,7 +165,7 @@ const tableHeader = () => {
       title: '操作',
       key: 'action',
       scopedSlots: true,
-      width: actions.value?.length * 80 + `px`,
+      width: actions.value?.length * 80,
     })
   }
 }
