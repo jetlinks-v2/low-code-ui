@@ -33,7 +33,7 @@
         </template>
         <template #javaType="{record, index, valueChange}">
           <span v-if="index <= maxLen">{{record.javaType}}</span>
-          <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => { valueChange(record.javaType); JavaTypeChange(record)}" />
+          <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => { valueChange(record.javaType); JavaTypeChange(record)}" :disabled="publishColumns.includes(record.name)"/>
         </template>
         <template #jdbcType="{record, index, valueChange}">
           <span v-if="index <= maxLen">{{record.jdbcType}}</span>
@@ -42,11 +42,11 @@
         <template #length="{ record, index }">
           <span v-if="index <= maxLen">{{record.length}}</span>
           <span v-else-if="!['DECIMAL','VARCHAR','LONGVARCHAR'].includes(record.jdbcType)"></span>
-          <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
+          <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" :disabled="publishColumns.includes(record.name)" />
         </template>
         <template #scale="{ record, index }">
           <span v-if="index <= maxLen || !['DECIMAL'].includes(record.jdbcType)">{{record.scale}}</span>
-          <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
+          <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" :disabled="publishColumns.includes(record.name)" />
         </template>
         <template #updatable="{ record, index }">
           <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" :disabled="index <= maxLen" />
@@ -114,6 +114,7 @@
     v-if="setting.visible"
     :data="setting.data"
     :warp="WarpRef"
+    :publish="setting.data ? publishColumns.includes(setting.data.name) : false"
     @cancel="settingCancel"
     @save="settingSave"
   />
@@ -371,8 +372,10 @@ const copy = (record, index) => {
 }
 
 const deleteFn = async (index) => {
+  const _value = dataSource.value[index-1]
   dataSource.value.splice(index-1, 1)
   // dataSourceChange()
+  // 删除
   emitUpdateDataSource()
 }
 
