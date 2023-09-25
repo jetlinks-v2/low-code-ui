@@ -5,8 +5,12 @@
             <j-button
                 type="primary"
                 ghost
+                :data-id="_item.key"
+                :class="extractCssClass(_item.style)"
             >
-              <template #icon><AIcon :type="_item.icon"/></template>
+              <img v-if="_item.icon?.includes('http')" :src="_item.icon" class="image-icon">
+              <AIcon v-else :type="_item.icon"/>
+              <!-- <template #icon><AIcon :type="_item.icon"/></template> -->
                 {{ _item.text }}
             </j-button>
           </j-popconfirm>
@@ -35,6 +39,8 @@
                                     }
                                   : undefined
                           "
+                          ref="secondLevelBtn"
+                          :class="extractCssClass(item.style)"
                       >
                           <template #icon>
                             <img v-if="item.icon?.includes('http')" :src="item.icon" class="image-icon">
@@ -52,6 +58,7 @@
 <script lang="ts" setup>
 import { PropType } from 'vue';
 import { BatchActionsType } from './types';
+import { extractCssClass, insertCustomCssToHead } from '@/components/FormDesigner/utils/utils';
 
 const props = defineProps({
   actions: {
@@ -68,6 +75,7 @@ const emits = defineEmits(['update:isCheck', 'change']);
 
 const visible = ref<boolean>(false);
 const _item = ref<Partial<BatchActionsType>>({});
+const secondLevelBtn = ref()
 
 const handleMenuClick = (e: any) => {
   const val = props.actions.find((item) => item.key === e.key);
@@ -104,6 +112,15 @@ const batchClick = (v) => {
 
   }
 }
+
+watchEffect(() => {
+  props.actions.forEach((item) => {
+    insertCustomCssToHead(item.style, item.key)
+  })
+  secondLevelBtn.value?.forEach((item, index) => {
+    item.$el.parentElement.children[0].setAttribute('data-id', props.actions[index]?.key)
+  })
+})
 </script>
 
 <style lang="less" scoped>

@@ -1,4 +1,4 @@
-import { insertNodeAt, removeNode } from "./util/htmlHelper";
+import { insertNodeAt, insertNodesAt, removeNode, removeNodes } from "./util/htmlHelper";
 import {
     getComponentAttributes,
     createSortableOption,
@@ -31,7 +31,7 @@ function manageAndEmit(evtName) {
     };
 }
 
-let draggingElement = null;
+let draggingElement: any[] = [];
 
 const draggable = defineComponent({
     name: "draggable",
@@ -78,7 +78,8 @@ const draggable = defineComponent({
     ],
     data() {
         return {
-            error: false
+            error: false,
+            context: []
         };
     },
     created() {
@@ -107,12 +108,9 @@ const draggable = defineComponent({
                 manage: event => manage.call(this, event)
             }
         });
-        // console.log($el)
-        // console.log(sortableOptions)
         const targetDomElement = $el.nodeType === 1 ? $el : $el.parentElement;
-        this._sortable = new Sortable(targetDomElement, sortableOptions);
-        // console.log(this._sortable)
-        this.targetDomElement = targetDomElement;
+        this._sortable = new Sortable(targetDomElement, sortableOptions); // 初始化
+        this.targetDomElement = targetDomElement; // 挂载的dom
         targetDomElement.__draggable_component__ = this;
     },
     updated() { // 在组件因为一个响应式状态变更而更新其 DOM 树之后调用
@@ -122,12 +120,11 @@ const draggable = defineComponent({
         if (this._sortable !== undefined) this._sortable.destroy();
     },
     computed: {
-        realList() {
+        realList() { // 实际的list
             const { list } = this;
             return list ? list : this.modelValue;
         },
-
-        getKey() {
+        getKey() { // 获取key
             const { itemKey } = this;
             if (typeof itemKey === "function") {
                 return itemKey;
@@ -150,8 +147,8 @@ const draggable = defineComponent({
     },
 
     methods: {
-        getUnderlyingVm(domElement) {
-            return this.componentStructure.getUnderlyingVm(domElement) || null;
+        getUnderlyingVm(domElement) { // 获取真实值和下标
+            return this?.componentStructure?.getUnderlyingVm(domElement) || null;
         },
 
         getUnderlyingPotencialDraggableComponent(htmElement) {
@@ -163,19 +160,19 @@ const draggable = defineComponent({
         },
 
         alterList(onList) {
-            if (this.list) {
+            if (this.list) { // 处理list
                 onList(this.list);
                 return;
             }
+            // 处理modelValue
             const newList = [...this.modelValue];
             onList(newList);
             this.$emit("update:modelValue", newList);
         },
 
         spliceList() {
-            // @ts-ignore
-            const spliceList = list => list.splice(...arguments);
-            this.alterList(spliceList);
+            const _list = list => list.splice(...arguments);
+            this.alterList(_list);
         },
 
         updatePosition(oldIndex, newIndex) {
@@ -205,46 +202,70 @@ const draggable = defineComponent({
             );
         },
 
-        onDragStart(evt) {
-            this.context = this.getUnderlyingVm(evt.item);
-            evt.item._underlying_vm_ = this.clone(this.context.element);
-            draggingElement = evt.item;
+        onDragStart(evt) { // 开始拖拽
+            this.context = []
+            const _items = evt.items?.length ? evt.items : [evt.item]
+            const _data = _items.map(item => {
+                const _context: any = this.getUnderlyingVm(item)
+                this.context.push(_context)
+                item._underlying_vm_ = this.clone(_context.element);
+                return item
+            })
+            if (evt.items?.length) {
+                evt.items = _data
+            } else {
+                evt.item = _data?.[0]
+            }
+            draggingElement = _items
         },
 
-        onDragAdd(evt) {
-            const element = evt.item._underlying_vm_;
+        onDragAdd(evt) { // 元素从另一个列表中拖放到列表中
+            const element = evt.item?._underlying_vm_;
             if (element === undefined) {
                 return;
             }
-            removeNode(evt.item);
+            removeNode(evt.item); // 删除该节点
             const newIndex = this.getVmIndexFromDomIndex(evt.newIndex);
             // @ts-ignore
-            this.spliceList(newIndex, 0, element);
+            this.spliceList(newIndex, 0, element); // 添加数据
             const added = { element, newIndex };
-            this.emitChanges({ added });
+            this.emitChanges({ added }); // 抛出数据
         },
 
-        onDragRemove(evt) {
+        onDragRemove(evt) { // 元素从列表中移除到另一个列表中：clone不移除
             insertNodeAt(this.$el, evt.item, evt.oldIndex);
             if (evt.pullMode === "clone") {
-                removeNode(evt.clone);
+                removeNode(evt.clone); // 删除拖拽过来的那个element
                 return;
             }
-            const { index: oldIndex, element } = this.context;
+            const { index: oldIndex, element } = this.context?.[0];
             // @ts-ignore
             this.spliceList(oldIndex, 1);
             const removed = { element, oldIndex };
             this.emitChanges({ removed });
         },
 
-        onDragUpdate(evt) {
-            removeNode(evt.item);
-            insertNodeAt(evt.from, evt.item, evt.oldIndex);
-            const oldIndex = this.context.index;
-            const newIndex = this.getVmIndexFromDomIndex(evt.newIndex);
-            this.updatePosition(oldIndex, newIndex);
-            const moved = { element: this.context.element, oldIndex, newIndex };
-            this.emitChanges({ moved });
+        onDragUpdate(evt) { // 更改列表内的排序
+            if (evt.items?.length) { // 多选
+                // 删除原来的节点
+                removeNodes(evt.items)
+                insertNodesAt(evt.from, evt.items, evt.oldIndex); // 插入到新位置
+                evt.items.forEach((_, _index) => {
+                    const oldIndex = this.context?.[_index]?.index;
+                    const newIndex = this.getVmIndexFromDomIndex(evt.newIndicies?.[_index]?.index);
+                    this.updatePosition(oldIndex, newIndex);
+                    const moved = { element: this.context?.[_index]?.element, oldIndex, newIndex };
+                    this.emitChanges({ moved });
+                })
+            } else {
+                removeNode(evt.item); // 删除原来的节点
+                insertNodeAt(evt.from, evt.item, evt.oldIndex); // 插入到新位置
+                const oldIndex = this.context?.[0].index;
+                const newIndex = this.getVmIndexFromDomIndex(evt.newIndex);
+                this.updatePosition(oldIndex, newIndex);
+                const moved = { element: this.context?.[0]?.element, oldIndex, newIndex };
+                this.emitChanges({ moved });
+            }
         },
 
         computeFutureIndex(relatedContext, evt) {
@@ -285,12 +306,13 @@ const draggable = defineComponent({
         },
 
         onDragEnd() {
-            draggingElement = null;
+            draggingElement = [];
         }
     },
     render() {
         try {
             this.error = false;
+            //  $slots: 一个表示父组件所传入插槽的对象。
             const { $slots, $attrs, tag, componentData, realList, getKey } = this;
             const componentStructure = computeComponentStructure({
                 $slots,

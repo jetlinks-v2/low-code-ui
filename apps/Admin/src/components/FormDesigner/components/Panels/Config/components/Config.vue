@@ -50,7 +50,6 @@
     <template
       v-if="
         [
-          'select-card',
           'select',
           'org',
           'role',
@@ -153,7 +152,7 @@
         </j-input-group>
       </j-form-item>
     </template>
-    <template v-if="['tree-select'].includes(type)">
+    <template v-if="['tree-select', 'select-card'].includes(type)">
       <j-form-item
         :validateFirst="true"
         label="类型"

@@ -2,10 +2,9 @@
   <div class="tree-content-warp">
     <div class="tree-content-body">
       <j-scrollbar>
-        <j-tree v-model:expandedKeys="expandedKeys" :selectedKeys="[activeFile]" :treeData="treeData" block-node
-          :fieldNames="{
-            key: 'id'
-          }" draggable @dragenter="onDragEnter" @drop="onDrop" @select="select">
+        <j-tree v-model:expandedKeys="expandedKeys" :selectedKeys="[activeFile]" :treeData="list" block-node :fieldNames="{
+          key: 'id'
+        }" draggable @drop="onDrop" @select="select">
           <template #title="node">
             <j-dropdown :trigger="['contextmenu']">
               <span class="title">
@@ -38,7 +37,8 @@ import { randomString } from '@jetlinks/utils'
 import { defaultSetting as CrudBaseData } from '@/components/Database/setting'
 import { onlyMessage } from '@jetlinks/utils';
 import { typeImages } from '@/components/ProJect/index'
-import { loop } from './tree'
+import { restParentId } from './tree'
+import { cloneDeep } from 'lodash-es';
 
 const engine = useEngine()
 const product = useProduct()
@@ -62,6 +62,8 @@ const menuState = reactive({
   type: undefined,
   nameList: []
 })
+
+const list = ref(props.treeData)
 
 const select = (key, e) => {
   engine.addFile({
@@ -122,25 +124,73 @@ const menuClick = (record) => {
   }
 }
 
+const loop = (data, key, callback) => {
+  data.forEach((item, index) => {
+    if (item.id === key) {
+      return callback(item, index, data);
+    }
+    if (item.children) {
+      return loop(item.children, key, callback);
+    }
+  });
+};
+
 const onDrop = (info) => {
   console.log('info--', info)
+  const dropKey = info.node.key; //目标元素
+  const dragKey = info.dragNode.key; //拖拽元素
+  const dropPos = info.node.pos?.split('-');
+  const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
+
+  const mayType = ['module', 'project']
+
+
+
+  const data = cloneDeep([...list.value])
+
+
+  let dragObj;
+  //平级
+  if (!info.dropToGap && mayType.includes(info.node.type)) {
+    loop(data, dragKey, (item, index, arr) => {
+      dragObj = item;
+      arr?.splice(index, 1);
+    })
+    loop(data, dropKey, (item) => {
+      console.log('item', item)
+      item.children = item.children || [];
+      item.children.unshift(dragObj);
+    })
+  }
+
+  if (info.dropToGap && info.node.type !== 'project') {
+    loop(data, dragKey, (item, index, arr) => {
+      dragObj = item;
+      arr?.splice(index, 1);
+    })
+    let ar = [];
+    let i = 0;
+    loop(data, dropKey, (_item, index, arr) => {
+      ar = arr;
+      i = index;
+    });
+    if (dropPosition === -1) {
+      ar.splice(i, 0, dragObj);
+    } else {
+      ar.splice(i + 1, 0, dragObj);
+    }
+  }
+  // console.log('data---', restParentId(data))
+  product.update(restParentId(data)?.[0])
+  list.value = data
 }
 
-const onDragEnter = (info) => {
-  console.log('info--end', info)
-
-  // const dropKey = info.node.key;
-  // const dragKey = info.dragNode.key;
-  // const dropPos = info.node.pos?.split('-');
-  // const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
-
-  // let dragObj;
-  // const data = cloneDeep([...treeData.value]);
-  // loop(data, dragKey, (item, index, arr) => {
-  //   arr?.splice(index, 1);
-  //   dragObj = item;
-  // });
-}
+watch(
+  () => props.treeData,
+  (val) => {
+    list.value = val
+  }
+)
 
 </script>
 

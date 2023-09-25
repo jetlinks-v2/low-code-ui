@@ -47,7 +47,7 @@ const handleProps = (node: any) => {
             break
         case 'select-card':
             result.options = generateOptions(3)
-            result.mode = undefined
+            result.multiple = false
             break
         case 'select':
             result.options = generateOptions(3)
