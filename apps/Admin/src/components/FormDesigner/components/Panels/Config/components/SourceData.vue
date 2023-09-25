@@ -18,6 +18,7 @@
       :validateFirst="true"
       :name="['componentProps', 'source', 'dictionary']"
       v-if="data?.type === 'dic'"
+      :rules="rules"
     >
       <j-select
         placeholder="请选择"
@@ -131,13 +132,14 @@
 </template>
     
 <script lang="ts" setup>
-import { ref, watch, computed, reactive } from 'vue'
+import { ref, watch, computed, reactive, inject } from 'vue'
 import { queryDictionary, queryEndCommands } from '@/api/form'
 import { useProduct } from '@/store'
 import { omit } from 'lodash-es'
 import { cloneDeep } from 'lodash-es'
 
 const product = useProduct()
+const designer: any = inject('FormDesigner')
 
 const props = defineProps({
   value: {
@@ -175,10 +177,24 @@ watch(
 const dic = ref<any[]>([])
 const end = ref<any[]>([])
 
+const rules = [
+  {
+    validator(_rule: any, value: string) {
+      const item = dic.value.find(i => i?.id === value)
+      if(!item) {
+        return Promise.reject(`数字字典已被删除或禁用`)
+      }
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
 const getDictionary = () => {
   queryDictionary().then((resp) => {
     if (resp.success) { // 过滤掉没有启用的数据
-      dic.value = resp.result?.filter(item => item?.status) || []
+      dic.value = resp.result?.filter(item => item?.status) || [];
+      designer.dictionary.value = dic.value
     }
   })
 }
