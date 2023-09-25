@@ -56,9 +56,9 @@ onMounted(() => {
   setTimeout(() => {
     const data = product.data[0]
     // console.log('data',data)
-    if (data.state?.value !== 'published') {
+    if (data?.state?.value !== 'published') {
       engine.selectFiles(data?.others?.files || [])
-      engine.setActiveFile(data.others?.activeFile || data?.id)
+      engine.setActiveFile(data?.others?.activeFile || data?.id)
       engine.selectFile(data?.others?.activeFile)
     } else {
       engine.setActiveFile(data?.id)
