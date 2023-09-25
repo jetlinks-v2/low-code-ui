@@ -63,7 +63,7 @@ const props = defineProps({
 const mode = computed(() => {
   if (props.type === 'Add') {
     return 'add'
-  } else if (props.type === 'Update') {
+  } else if (props.type === 'Update' || props.type === 'Detail') {
     return 'edit'
   }
 })
@@ -88,6 +88,10 @@ const getInfo = async () => {
 }
 
 const handleSubmit = async () => {
+  if(!['Add', 'Update'].includes(props.type)) {
+    emit('close', true)
+    return
+  }
   const data = await formPage.value.onSave()
   confirmLoading.value = true;
   const params = {

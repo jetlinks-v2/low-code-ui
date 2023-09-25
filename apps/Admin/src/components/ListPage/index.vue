@@ -91,7 +91,7 @@ import {
   ACTION_CONFIG_KEY,
 } from './keys'
 import { useProduct } from '@/store'
-import { omit, throttle } from 'lodash-es'
+import { filter, omit, throttle } from 'lodash-es'
 import { onlyMessage } from '@jetlinks/utils'
 
 const spinning = ref(false)
@@ -100,6 +100,10 @@ const props = defineProps({
     type: Object,
     default: () => {},
   },
+  showTip: {
+    type: Boolean,
+    default: true
+  }
 })
 const productStore = useProduct()
 
@@ -197,24 +201,27 @@ const validate = async () => {
   const errorList = [
     ...btnTreeRef.value?.valid(),
     ...columnsRef.value?.valid(),
-    ...filterModuleRef.value?.valid(),
     ...pagingConfigRef.value?.valid(),
     ...listFormRef.value?.valid(),
     ...listDataRef.value?.valid(),
     ...menuConfigRef.value?.valid(),
     ...dataBindRef.value?.valid(),
   ]
+  
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
+    filterModuleRef.value?.valid()
+    .then(res => {
+      errorList.push(...res)
       if (errorList.length) {
         reject(errorList)
       } else {
-        onlyMessage('校验通过')
+        if(props.showTip) {
+          onlyMessage('校验通过')
+        }
         resolve([])
       }
       spinning.value = false
-    }, 500)
-    
+    })
     // Promise.all(promiseArr)
     //   .then((res) => {
     //     resolve(res)

@@ -493,10 +493,12 @@ const submit = () => {
   )
   if (dataRow) {
     const typeData = typeDataFilter(dataRow?.type)
+    console.log(typeData);
     const data = {
       ...typeData,
       ...subValue.value,
     }
+    console.log(data);
     dataRow['config'] = { ...data }
   }
 

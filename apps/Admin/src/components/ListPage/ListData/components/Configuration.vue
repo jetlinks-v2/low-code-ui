@@ -52,7 +52,7 @@ interface Emit {
 }
 const emits = defineEmits<Emit>()
 const state = reactive({
-  checked: false,
+  checked: props.config?.config?.checked,
   colLayout: props.config?.config?.colLayout || 'left',
   specialStyle: props.config?.config?.specialStyle || `/* .test {
     color: red;
