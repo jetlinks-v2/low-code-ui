@@ -117,6 +117,10 @@ const groupChange = (v) => {
   model.value.validator.configuration.group = [...groupSet.values()]
 }
 
+const InterMinMax = (value) => {
+  return value > 2147483647 || value < -2147483648
+}
+
 const InterValidatorFn = (value) => {
   if (value > 2147483647) {
     return Promise.reject('不能大于2147483647')
@@ -158,11 +162,11 @@ const rules = {
         if (!value) {
           return Promise.reject('请输入最小值')
         }
-        if (model.value.javaType === 'Integer') {
+        if (model.value.javaType === 'Integer' && InterMinMax(value)) {
           return InterValidatorFn(value)
         }
-        if (value > model.value.validator.configuration.max) {
-          return Promise.reject('最小值不能大于最大值')
+        if (value && model.value.validator.configuration.max && (BigInt(value) >= BigInt(model.value.validator.configuration.max))) {
+          return Promise.reject('最小值不能大于等于最大值')
         }
         return Promise.resolve()
       }
