@@ -210,6 +210,16 @@ const myColumns = [
   {
     title: '注释',
     dataIndex: 'comment',
+    form: {
+      rules: {
+        asyncValidator: (rule, value) => {
+          if (!value) {
+            return Promise.reject('请输入注释')
+          }
+          return Promise.resolve()
+        }
+      }
+    }
   },
   {
     title: 'javaType',
