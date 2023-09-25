@@ -1,12 +1,16 @@
 //找对应节点
-export const loop = (data: any[], key: string | number, callback: any) => {
-    data.forEach((item, index) => {
-        if (item.key === key) {
-            return callback(item, index, data);
+export const restParentId = (tree, parentId=null) => {
+    return tree.map(item => {
+        if (item) {
+            item = {
+                ...item,
+                parentId:parentId
+            }
         }
-        if (item.children) {
-            return loop(item.children, key, callback);
+        if(item.children){
+            item.children = restParentId(item.children,item.id)
         }
-    });
+        return item
+    })
 };
 
