@@ -76,6 +76,21 @@
             />
           </ErrorItem>
         </j-space>
+        <j-row style="margin-top: 16px;">
+            <j-col :span="21">
+              <j-form-item>
+                <j-tree-select
+                  showSearch
+                  placeholder="请选择"
+                  v-model:value="state.output"
+                  :treeData="commandSourceTree(state.instructValue)"
+                  :treeDefaultExpandedKeys="['output', 'inputs']"
+                  :treeCheckStrictly="false"
+                  @select="handleChangeData"
+                />
+              </j-form-item>
+            </j-col>
+          </j-row>
       </j-form-item>
     </j-form>
   </div>
@@ -104,7 +119,7 @@ const props = defineProps({
   },
 })
 
-const { functionOptions, commandOptions, handleFunction } = useFunctions()
+const { functionOptions, commandOptions, commandSourceTree, handleFunction } = useFunctions()
 const errorData = computed(() => {
   return (val: string): any => {
     return props.errorList?.find((item: any) => item.childKey === val)
@@ -115,12 +130,30 @@ const emits = defineEmits<Emit>()
 const data = props.data?.config || null
 
 const state = reactive({
-  value: data?.value || '',
-  dataValue: data?.dataValue || '',
-  abilityValue: data?.abilityValue || '',
-  instructValue: data?.instructValue || '',
+  value: data?.value || null,
+  dataValue: data?.dataValue || null,
+  abilityValue: data?.abilityValue || null,
+  instructValue: data?.instructValue || null,
+  output: data?.output || null,
+  outputKey: data?.outputKey || null,
 })
 const dataOptions = ref([])
+
+const handleChangeData = (selectKey: string, e) => {
+  state.outputKey = e.id;
+  // let arr: any[] = []
+  // e.forEach((item) => {
+  //   arr.push(findItem(sourceList.value, item))
+  // })
+  // dataBind.data.dataSource = arr.map((item) => {
+  //   return {
+  //     id: item.id,
+  //     name: item.name,
+  //     type: item.valueType?.type,
+  //     value: item.value,
+  //   }
+  // })
+}
 
 /**查询数据字典列表 */
 const queryData = () => {

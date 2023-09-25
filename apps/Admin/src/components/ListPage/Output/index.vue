@@ -18,6 +18,8 @@
         :defaultFormType="defaultFormType"
         :params="params"
         :tableActions="actions"
+        :projectId="projectId"
+        :pageId="pageId"
         @openJson="(newValue) => (jsonData = newValue)"
         ref="tableRef"
       />
@@ -38,7 +40,7 @@
     :projectId="projectId"
     :selectedRowKeys="$refs.tableRef?._selectedRowKeys"
     @close="exportVisible = false"
-    @save="exportVisible = false"
+    @save="handleExportOk()"
   />
   <!-- 新增 -->
   <CallPage
@@ -127,6 +129,13 @@ const dataColumns: any = computed(() => {
       align: item?.config?.colLayout,
       config: item.config,
       width: 200,
+      sorter: item.config?.checked ? (a: any, b: any) => {
+        if(typeof a?.[item.id] === 'number') {
+          return a?.[item.id] - b?.[item.id]
+        } else {
+          return a?.[item.id]?.localeCompare(b?.[item.id], 'zh')
+        }
+      } : false
     }
   })
   if (actions.value?.length !== 0 && allData.value?.showColumns) {
@@ -165,6 +174,11 @@ const popData = ref<Record<string, any>>({})
 const handleImportOk = () => {
   importVisible.value = false
   tableRef.value?.reload()
+}
+
+const handleExportOk = () => {
+  exportVisible.value = false
+  tableRef.value._selectedRowKeys = []
 }
 
 //分页
@@ -214,7 +228,7 @@ const componentPropsSwitch = (item: any) => {
   switch (type) {
     case 'date':
       const format =
-        item?.config?.accuracy === 'hour' ? 'HH:mm:ss' : 'YYYY-MM-DD'
+        item?.config?.accuracy === 'hour' ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD'
       const type = item?.config?.accuracy === 'hour' ? 'time' : 'date'
       const defaultValue =
         item?.config?.defaultValue === 'not'
@@ -226,6 +240,7 @@ const componentPropsSwitch = (item: any) => {
         format: format,
         type: type,
         defaultValue: defaultValue,
+        showTime: item?.config?.accuracy === 'hour'
       }
       break
     case 'enum':
@@ -277,7 +292,16 @@ const searchData = () => {
           } else if(item.config?.value == 'rearEnd') {
             return new Promise((resolve) => {
               queryRuntime(props.projectId, item.config?.abilityValue, item.config?.instructValue, {}).then((resp: any) => {
-                resolve(resp.result?.data || resp.result)
+                let result = (resp.result?.data || resp.result)
+                .filter((val) => val[item.config?.outputKey])
+                .map(val => {
+                  console.log(item.config);
+                  return {
+                    label: val[item.config?.outputKey],
+                    value: val[item.config?.outputKey]
+                  }
+                })
+                resolve(result)
               })
             })
           }
@@ -285,6 +309,7 @@ const searchData = () => {
       },
     }
   })
+  console.log(searchColumns.value);
 }
 
 const searchType = (type_: string) => {

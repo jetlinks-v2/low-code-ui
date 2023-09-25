@@ -50,10 +50,74 @@ export const useFunctions = () => {
       commandOptions.value = res.result?.find(item => item.moduleId + '.' + item.id === functionId_)?.command || []
     })
   }
+
+  const commandSourceTree = computed(() => {
+    return (command: string) => {
+      const _item = commandOptions.value?.find(
+        (item) => item.id === command,
+      )
+      const arr: any[] = []
+      if (_item?.inputs) {
+        arr.push({
+          label: '输入',
+          value: 'inputs',
+          disabled: true,
+          children: getArray(_item?.inputs || [], 'inputs'),
+        })
+      }
+      if (_item?.output && _item?.output?.properties?.length) {
+        arr.push({
+          label: '输出',
+          value: 'output',
+          disabled: true,
+          children: getArray(_item?.output?.properties || [], 'output'),
+        })
+      }
+      return arr
+    }
+  })
+
+  const getArray = (arr: any[], parentId: string) => {
+    return (arr || []).map((i) => {
+      let children: any[] = []
+      if (i.valueType.type === 'array') {
+        children = getArray(i.valueType?.elementType?.properties || [], i.id)
+      }
+      if (i.valueType.type === 'object') {
+        children = getArray(i.valueType?.properties || [], i.id)
+      }
+      return {
+        ...i,
+        parentId,
+        label: `${i.id}${i?.name ? '(' + i?.name + ')' : ''}`,
+        value: `${i.id}_${parentId}`,
+        disabled: children.length !== 0,
+        children,
+      }
+    })
+  }
+
+  const findItem = (arr: any[], value: string) => {
+    for (let index = 0; index < arr.length; index++) {
+      const element = arr[index]
+      if (element.value === value) {
+        return element
+      }
+      let _value = undefined
+      if (element.children?.length) {
+        _value = findItem(element.children, value)
+      }
+      if (_value) {
+        return _value
+      }
+    }
+  }
+  
   return {
     functionOptions,
     commandOptions,
     pagesOptions,
+    commandSourceTree,
     handleFunction,
   }
 }

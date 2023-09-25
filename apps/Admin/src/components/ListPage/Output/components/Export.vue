@@ -22,6 +22,10 @@
         </j-radio-group>
       </j-space>
     </div>
+    <template #footer>
+      <j-button key="back" @click="handleCancel">取消</j-button>
+      <j-button key="submit" type="primary" :loading="loading" @click="handleOk">确定</j-button>
+    </template>
   </j-modal>
 </template>
 
@@ -29,7 +33,7 @@
 import { _export } from '@/api/list'
 import { downloadFileByUrl, onlyMessage } from '@jetlinks/utils'
 import { PropType } from 'vue'
-const emit = defineEmits(['close', 'ok'])
+const emit = defineEmits(['close', 'save'])
 
 const props = defineProps({
   data: {
@@ -53,11 +57,12 @@ const props = defineProps({
     default: () => [],
   },
 })
+
+const loading = ref(false)
 const type = ref<string>('xlsx')
 const visible = ref(false)
 const handleOk = () => {
   handleExport(type.value)
-  emit('ok', type.value)
 }
 
 const handleExport = async (type: string) => {
@@ -65,6 +70,7 @@ const handleExport = async (type: string) => {
     onlyMessage('请选择导出项', 'error')
     return
   }
+  loading.value = true;
   const params = {
     format: type,
     template: false,
@@ -95,13 +101,17 @@ const handleExport = async (type: string) => {
     props.popData.functions,
     props.popData.command,
     params,
-  ).then((res: any) => {
+  )
+  .then((res: any) => {
     if (res) {
       const blob = new Blob([res.data], { type })
       const url = URL.createObjectURL(blob)
       downloadFileByUrl(url, `文件`, type)
-      emit('close')
+      emit('save')
     }
+  })
+  .finally(() => {
+      loading.value = false;
   })
 }
 const handleCancel = () => {

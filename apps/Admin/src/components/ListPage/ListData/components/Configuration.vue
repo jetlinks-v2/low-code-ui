@@ -3,7 +3,7 @@
     <div class="content" v-if="props.showSwitch">
       <p>
         开启表头排序
-        <j-tooltip title="用于控制该列数据置顶/置底展示">
+        <j-tooltip title="用于控制该列数据展示顺序">
           <AIcon type="QuestionCircleOutlined" />
         </j-tooltip>
       </p>

@@ -34,6 +34,11 @@
           @click="handleEditBtn('Detail', '查看详情', 'EyeOutlined')"
           >查看详情</j-button
         >
+        <!-- <j-button
+          class="btns"
+          @click="handleEditBtn('Detail', '关系配置', 'EyeOutlined')"
+          >关系配置</j-button
+        > -->
         <j-button
           class="btns"
           @click="handleEditBtn('Update', '编辑', 'EditOutlined')"
