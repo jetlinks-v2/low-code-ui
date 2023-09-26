@@ -249,7 +249,7 @@ const draggable = defineComponent({
             if (evt.items?.length) { // 多选
                 // 删除原来的节点
                 removeNodes(evt.items)
-                insertNodesAt(evt.from, evt.items, evt.oldIndex); // 插入到新位置
+                insertNodesAt(evt.from, evt.oldIndicies, evt.newIndicies); // 插入到新位置
                 evt.items.forEach((_, _index) => {
                     const oldIndex = this.context?.[_index]?.index;
                     const newIndex = this.getVmIndexFromDomIndex(evt.newIndicies?.[_index]?.index);
