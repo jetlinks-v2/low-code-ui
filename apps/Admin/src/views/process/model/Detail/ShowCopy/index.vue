@@ -144,9 +144,9 @@ const formData = reactive({
     },
   }),
   nameGenerator: computed({
-    get: () => flowStore.model.config.nameGenerator,
+    get: () => formatToName(flowStore.model.config.nameGenerator),
     set: (val) => {
-      flowStore.model.config.nameGenerator = val
+      flowStore.model.config.nameGenerator = formatToVariable(val)
     },
   }),
   summaryGenerator: computed({
@@ -162,6 +162,51 @@ const formData = reactive({
     },
   }),
 })
+
+/**
+ * 接收时格式转换, 用于展示:
+ * {var:发起人fullId:发起人name}的{var:流程名称fullId:流程名称name}
+ * -> {发起人name}的{流程名称name}
+ */
+const formatToName = (val: string = '') => {
+  return val
+    .replace(/-/g, '')
+    .replace(/\n/g, '<br/>')
+    .replace(/\{(.*?)\}/g, ($1, $2) => {
+      const _$2 = $2.split(':')
+      return `{${_$2[_$2.length - 1]}}`
+    })
+}
+
+/**
+ * 输入时格式转换, 用于保存至接口:
+ * {发起人name}的{流程名称name}
+ * -> {var:发起人fullId:发起人name}的{var:流程名称fullId:流程名称name}
+ */
+const formatToVariable = (val: string = '') => {
+  //   console.log('formatToVariable1: ', val)
+  const result = val.replace(/{/g, '-{').replace(/\{(.*?)\}/g, ($1, $2) => {
+    console.log('$2: ', $2)
+    const variable = formData.variables.filter((item) => item.label === $2)[0]
+    return variable ? `{var:${variable.value}:${$2}}` : `{var:${$2}}`
+  })
+  //   console.log('formatToVariable2: ', result)
+  return result
+}
+watch(
+  () => formData.nameGenerator,
+  (val) => {
+    console.log('formData.nameGenerator: ', val)
+  },
+  { deep: true },
+)
+watch(
+  () => flowStore.model.config.nameGenerator,
+  (val) => {
+    console.log('flowStore.model.config.nameGenerator->>: ', val)
+  },
+  { deep: true },
+)
 
 /**
  * 选中变量
