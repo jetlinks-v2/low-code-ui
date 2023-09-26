@@ -56,20 +56,27 @@
       <div style="margin-bottom: 4px">
         主题色
       </div>
-      <a-select
-        v-model:value="theme"
-        option-label-prop="label"
-        :options="options"
-        style="width: 100%"
-        @change="themeChange"
-      >
-        <template #option="{ value, label }">
-          <div style="display: flex;gap: 24px;" >
-            <div :style="{ width: '24px', height: '24px', backgroundColor: value}"></div>
-            {{ label }}
-          </div>
-        </template>
-      </a-select>
+      <div class="theme-select">
+        <div class="color" :style="{ backgroundColor: theme }">
+
+        </div>
+        <div style="flex: 1;">
+          <a-select
+            v-model:value="theme"
+            option-label-prop="label"
+            :options="options"
+            style="width: 100%"
+            @change="themeChange"
+          >
+            <template #option="{ value, label }">
+              <div style="display: flex;gap: 24px;" >
+                <div :style="{ width: '24px', height: '24px', backgroundColor: value}"></div>
+                {{ label }}
+              </div>
+            </template>
+          </a-select>
+        </div>
+      </div>
     </div>
     <div class="update-modal" v-show="visible">
       <div class="update-modal-header">
@@ -412,6 +419,16 @@ watch( () => JSON.stringify(status), () => {
     min-width: 300px;
     padding-left: 24px;
     border-left: 1px solid #e9e9e9;
+
+    .theme-select {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      .color {
+        width: 30px;
+        height: 30px;
+      }
+    }
   }
 }
 

@@ -49,7 +49,7 @@ const emit = defineEmits(['update:value', 'statusChange'])
 
 useNetwork({
   onLine() {
-    if (status.value !== 'success') { // 网络重连，并且状态不是成功时
+    if (status.value !== 'success' && width.value !== 100) { // 网络重连，并且状态不是成功时
       restart()
     }
   }
