@@ -114,7 +114,6 @@ const saveMenuFn = (id) => {
     loading.value = true
     status.value = 'success'
     const arr = updateCrudOther(product.data)
-    console.log(arr[0])
     product.update(arr[0])
     pause()
   }).catch((e) => {

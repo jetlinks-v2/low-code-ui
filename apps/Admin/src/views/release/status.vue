@@ -68,7 +68,6 @@
             <div :style="{ width: '24px', height: '24px', backgroundColor: value}"></div>
             {{ label }}
           </div>
-
         </template>
       </a-select>
     </div>
@@ -106,6 +105,16 @@ import { providerEnum } from '@/components/ProJect/index'
 import { validateDraft } from "@/api/project";
 import { regular } from '@jetlinks/utils'
 
+const props = defineProps({
+  status: {
+    type: Number,
+  },
+  theme: {
+    type: String,
+    default: '#1677ff'
+  }
+})
+
 const emit = defineEmits(['update:status'])
 
 const engine = useEngine()
@@ -130,7 +139,7 @@ const options = [
   { label: '海棠', value: '#eb2f96' },
 ]
 
-const theme = ref('#1677ff')
+const theme = ref(props.theme)
 
 const check = reactive({
   success: 0,
