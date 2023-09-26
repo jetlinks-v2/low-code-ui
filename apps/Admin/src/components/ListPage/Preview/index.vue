@@ -10,7 +10,7 @@
         </template>
       </j-page-header>
     </div>
-    <Preview :data="data"/>
+    <Preview :data="data" :projectId="projectId" :pageId="pageId"/>
   </div>
 </template>
 <script setup lang="ts" name="ListPagePreview">
@@ -21,8 +21,13 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  id: {
-    type: null,
+  pageId: {
+    type: String,
+    default: ''
+  },
+  projectId: {
+    type: String,
+    default: ''
   },
   data: {
     type: String,

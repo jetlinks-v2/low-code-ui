@@ -483,6 +483,9 @@ const typeDataFilter = (value: string) => {
     case 'fileSource':
       data = { fileValue: configState.fileValue, type: value }
       break
+    case 'geoPoint':
+      data = { type: value }
+      break
   }
   return data
 }

@@ -94,7 +94,6 @@
 </template>
 
 <script setup lang="ts">
-import { providerEnum } from '@/components/ProJect';
 import { ErrorItem } from '../../index'
 import { DATA_BIND } from '../../keys'
 import { useFunctions } from '@/hooks/useFunctions'
@@ -199,14 +198,6 @@ const sourceList = computed(() => {
     (item) => item.id === dataBind.data.command,
   )
   const arr: any[] = []
-  if (_item?.inputs) {
-    arr.push({
-      label: '输入',
-      value: 'inputs',
-      disabled: true,
-      children: getArray(_item?.inputs || [], 'inputs'),
-    })
-  }
   if (_item?.output && _item?.output?.properties?.length) {
     arr.push({
       label: '输出',
