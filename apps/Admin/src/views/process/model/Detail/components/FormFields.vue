@@ -30,7 +30,7 @@
           defaultExpandAll
           :tree-data="treeDataFilter"
           :field-names="{ key: 'fullId', title: 'name' }"
-          :checkedKeys="checkedKeys"
+          v-model:checkedKeys="checkedKeys"
           v-if="treeDataFilter.length"
           @check="handleCheck"
         >
@@ -90,7 +90,7 @@ const _visible = computed({
 })
 
 // 选中的节点id, 仅用于回显
-const checkedKeys = computed(() => props.variables?.map((m) => m.value))
+const checkedKeys = ref<any[]>([])
 // 选中的叶子节点
 const checkedLeafNode = ref<any[]>([])
 
@@ -155,6 +155,12 @@ watch(
   () => _visible.value,
   (val) => {
     if (val) getFormFields()
+  },
+)
+watch(
+  () => props.variables,
+  (val) => {
+    checkedKeys.value = val.map((m) => m.value)
   },
 )
 </script>
