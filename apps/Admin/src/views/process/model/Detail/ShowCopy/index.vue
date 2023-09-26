@@ -18,10 +18,18 @@
         <j-space>
           <div
             class="variable-item"
-            :style="{ background: randomColor() || item.color }"
-            v-for="item of formData.variables"
+            :style="{ background: item.color }"
+            v-for="(item, index) of formData.variables"
           >
             <span>{{ item.label }}</span>
+            <AIcon
+              class="close"
+              type="CloseOutlined"
+              v-if="
+                item.value !== '1' && item.value !== '2' && item.value !== '3'
+              "
+              @click="formData.variables.splice(index, 1)"
+            />
           </div>
         </j-space>
         <FormFields
@@ -178,30 +186,6 @@ const getColor = (str: string) => {
   return formData.variables?.filter((item) => item.label === str)[0]?.color
 }
 
-// 生成随机背景色，并且保证黑色文字可读性
-const randomColor = () => {
-  // const color = '#' + Math.floor(Math.random() * 0xffffff).toString(16)
-  // return color
-  const letters = '0123456789ABCDEF'
-  let color = '#'
-  do {
-    color = '#'
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)]
-    }
-  } while (isDarkColor(color))
-
-  return color
-}
-// 判断是否是深色
-const isDarkColor = (hexColor) => {
-  const r = parseInt(hexColor.slice(1, 3), 16)
-  const g = parseInt(hexColor.slice(3, 5), 16)
-  const b = parseInt(hexColor.slice(5, 7), 16)
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000
-  return brightness < 128
-}
-
 // 标题
 const titleHtml = computed(() => {
   return replace(formData.nameGenerator || '')
@@ -231,6 +215,13 @@ defineExpose({ submit })
 .variable-item {
   margin-top: 10px;
   padding: 2px 10px;
+  position: relative;
+  .close {
+    position: absolute;
+    right: -6px;
+    top: -8px;
+    color: #919180;
+  }
 }
 .title-template {
   padding: 10px;
