@@ -12,7 +12,7 @@
     <j-data-table
       columnDrag
       class="ant-table-striped table-striped"
-      rowKey="code"
+      rowKey="id"
       bordered
       ref="tableRef"
       size="small"
