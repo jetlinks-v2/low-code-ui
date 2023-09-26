@@ -150,9 +150,9 @@ const formData = reactive({
     },
   }),
   summaryGenerator: computed({
-    get: () => flowStore.model.config.summaryGenerator,
+    get: () => formatToName(flowStore.model.config.summaryGenerator),
     set: (val) => {
-      flowStore.model.config.summaryGenerator = val
+      flowStore.model.config.summaryGenerator = formatToVariable(val)
     },
   }),
   ccMember: computed({
@@ -184,39 +184,26 @@ const formatToName = (val: string = '') => {
  * -> {var:发起人fullId:发起人name}的{var:流程名称fullId:流程名称name}
  */
 const formatToVariable = (val: string = '') => {
-  //   console.log('formatToVariable1: ', val)
-  const result = val.replace(/{/g, '-{').replace(/\{(.*?)\}/g, ($1, $2) => {
-    console.log('$2: ', $2)
-    const variable = formData.variables.filter((item) => item.label === $2)[0]
-    return variable ? `{var:${variable.value}:${$2}}` : `{var:${$2}}`
-  })
-  //   console.log('formatToVariable2: ', result)
-  return result
+  return val
+    .replace(/\{(.*?)\}/g, ($1, $2) => {
+      const variable = formData.variables.filter((item) => item.label === $2)[0]
+      return variable ? `{var:${variable.value}:${$2}}` : `{var:${$2}}`
+    })
+    .replace(/\}(.*?)\{/g, ($1, $2) => {
+      // 查找}{中间的内容, 并添加中划线
+      return `}-${$2}-{`
+    })
 }
-watch(
-  () => formData.nameGenerator,
-  (val) => {
-    console.log('formData.nameGenerator: ', val)
-  },
-  { deep: true },
-)
-watch(
-  () => flowStore.model.config.nameGenerator,
-  (val) => {
-    console.log('flowStore.model.config.nameGenerator->>: ', val)
-  },
-  { deep: true },
-)
 
 /**
  * 选中变量
  * @param value
  */
-const selectVariable = (value: string, option) => {
-  formData.nameGenerator += `{${option.label}}`
+const selectVariable = (_, { label }) => {
+  formData.nameGenerator += `{${label}}`
 }
-const selectSummary = (value: string, option) => {
-  formData.summaryGenerator += `{${option.label}}`
+const selectSummary = (_, { label }) => {
+  formData.summaryGenerator += `{${label}}`
 }
 
 // 正则匹配{}中间内容，并替换成<span style="color: 随机颜色"></span>

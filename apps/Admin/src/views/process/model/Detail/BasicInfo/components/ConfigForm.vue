@@ -212,7 +212,7 @@ const query = (params) => {
 
 // 是否选中
 const isActive = computed(() => (key) => {
-  return selectedRow.value.map((i) => i.id).includes(key)
+  return selectedRow.value?.map((i) => i.id).includes(key)
 })
 // 选中项
 const selectedRow = ref<any>([])
