@@ -45,6 +45,7 @@ watch(
 watch(
   () => props.value,
   () => {
+    console.log(props.value, 'props.value')
     Object.assign(formState, props.value)
   },
   {

@@ -55,6 +55,7 @@ import {
 import { uid } from './utils/uid'
 import Check from './components/Check/index.vue'
 import { onlyMessage } from '@jetlinks/utils'
+import { queryDictionary } from '@/api/form'
 
 const props = defineProps({
   value: {
@@ -347,12 +348,15 @@ onUnmounted(() => {
 })
 
 // 校验
-const onValidate = () => {
-  spinning.value = true
+const onValidate = async () => {
+  if (!dictionary.value?.length) {
+    const resp = await queryDictionary()
+    if (resp.success) {
+      // 过滤掉没有启用的数据
+      dictionary.value = resp.result?.filter((item) => item?.status) || []
+    }
+  }
   errorKey.value = checkedConfig(unref(formData), dictionary.value)
-  setTimeout(() => {
-    spinning.value = false
-  }, 100)
   return new Promise((resolve, reject) => {
     if (errorKey.value?.length) {
       reject(errorKey.value)
@@ -363,7 +367,11 @@ const onValidate = () => {
 }
 
 const onValid = async () => {
-  const _val = await onValidate()
+  spinning.value = true
+  const _val = await onValidate().catch(() => {
+    spinning.value = false
+  })
+  spinning.value = false
   if (_val) {
     onlyMessage('校验通过')
   }
