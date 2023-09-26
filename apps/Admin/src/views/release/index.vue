@@ -23,7 +23,7 @@
 
       <CardBox class="release-content"  v-if="loading">
         <div class="release-step-content">
-          <Status v-show="step === 0" v-model:status="status" :theme="theme" />
+          <Status v-show="step === 0" v-model:status="status" :theme="themeColor" />
           <Tree v-show="step === 1" ref="treeRef" @change="treeChange" />
           <Finish v-show="step === 2" ref="finishRef"  v-model:value="finishStatus" :tree="tree" @statusChange="e => releaseStatus = e" />
         </div>
@@ -65,7 +65,7 @@ const router = useRouter()
 
 const status = ref(true)
 const finishStatus = ref(false)
-const theme = ref('#1677ff')
+const themeColor = ref('#1677ff')
 
 const releaseStatus = ref('')
 
@@ -85,9 +85,6 @@ const treeChange = (data) => {
 }
 
 const cancel = () => {
-  // 清空engine中的状态
-  engine.initEngineState()
-
   router.replace({
     name: 'Engine',
     params: {
@@ -98,12 +95,13 @@ const cancel = () => {
 
 const release = () => {
   step.value += 1
+  console.log('release----releaseStart')
   finishRef.value?.releaseStart()
 }
 
 product.queryProduct(route.params.id, () => {
   console.log('product.info', product.info)
-  theme.value = product.info.others?.theme
+  themeColor.value = product.info.others?.theme
   loading.value = true
 })
 
