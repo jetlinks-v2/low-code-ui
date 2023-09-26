@@ -376,6 +376,7 @@ const copy = (record, index) => {
   const cloneRecord = cloneDeep(record)
   if (cloneRecord.name) {
     cloneRecord.name = `copy_${cloneRecord.name}`
+    cloneRecord.alias = upperCase(cloneRecord.name)
   }
 
   updateDataSource(cloneRecord, index)
