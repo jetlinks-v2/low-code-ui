@@ -18,6 +18,9 @@
 
             <j-menu v-else @click="handleClick" :selectedKeys="['']">
                <j-sub-menu :key="actionMap['Add'].key" :title="actionMap['Add'].value" style="width: 150px; ">
+                  <template #icon>
+                     <img :src="getImage('/project/add.png')" style="width: 18px; height: 21px;margin-right: 6px;">
+                  </template>
                   <div v-for="item in projectListMenu">
                      <j-menu-item :key="item.type" style="line-height: 26px;height: 26px;font-size: 16px;">
                         <template #icon>
@@ -75,8 +78,12 @@
                      {{ providerMap[providerEnum.Function] }}
                   </j-menu-item>
                </j-sub-menu> -->
-               <j-menu-item :key="actionMap['Paste'].key" :disabled="disabled" v-if="type !== 'project'">{{
-                  actionMap['Paste'].value }}</j-menu-item>
+               <j-menu-item :key="actionMap['Paste'].key" :disabled="disabled" v-if="type !== 'project'">
+                  <template #icon>
+                     <img :src="getImage('/project/paste.png')" style="width: 24px; height: 24px;">
+                  </template>
+                  {{actionMap['Paste'].value }}
+               </j-menu-item>
             </j-menu>
          </div>
       </Teleport>

@@ -84,8 +84,8 @@
       </div>
       <div class="update-modal-body">
         <FormDesigner v-if="modelData.type === providerEnum.FormPage" :key="modelData.data.id" :data="modelData.data" ref="modelRef"/>
-        <CustomHTML v-else-if="modelData.type === providerEnum.HtmlPage" :key="modelData.data.id" :data="modelData.data" ref="modelRef"/>
-        <CRUD v-else-if="modelData.type === providerEnum.CRUD" v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
+        <CustomHTML v-else-if="modelData.type === providerEnum.HtmlPage" :key="modelData.data.id" :data="modelData.data" ref="modelRef" />
+        <CRUD v-else-if="modelData.type === providerEnum.CRUD" v-bind="modelData.data" :key="modelData.data.id" ref="modelRef" />
         <ListPage v-else-if="modelData.type === providerEnum.ListPage" :data="modelData.data" :key="modelData.data.id" ref="modelRef"/>
         <SQLCode v-else-if="modelData.type === providerEnum.SQL"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
         <FunctionCode v-else-if="modelData.type === providerEnum.Function"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
@@ -93,9 +93,9 @@
     </div>
     <div class="release-validate-box">
       <FormDesigner v-if="validateContent.type === providerEnum.FormPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef"/>
-      <CustomHTML v-else-if="validateContent.type === providerEnum.HtmlPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef"/>
-      <CRUD v-else-if="validateContent.type === providerEnum.CRUD" :key="validateContent.key" v-bind="validateContent.data" ref="validateRef"/>
-      <ListPage v-else-if="validateContent.type === providerEnum.ListPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef"/>
+      <CustomHTML v-else-if="validateContent.type === providerEnum.HtmlPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef" :showTip="false"/>
+      <CRUD v-else-if="validateContent.type === providerEnum.CRUD" :key="validateContent.key" v-bind="validateContent.data" ref="validateRef" :showTip="false"/>
+      <ListPage v-else-if="validateContent.type === providerEnum.ListPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef" :showTip="false"/>
     </div>
   </div>
 </template>

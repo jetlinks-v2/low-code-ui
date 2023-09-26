@@ -3,12 +3,13 @@
     <j-space>
       <div v-for="item in props.headerActions" :key="item.key">
         <PermissionButton
+          v-if="item?.children?.length === 0"
           type="primary"
           :class="className(item.style)"
           v-bind:="handleFunction(item.permissionProps, item, item)"
           :danger="item.command === 'Delete'"
           :popConfirm="handleFunction(item.permissionProps)?.popConfirm"
-          v-if="item?.children?.length === 0"
+          ref="firstLevelRef"
         >
           <j-space>
             <template v-if="item.icon">
@@ -26,7 +27,12 @@
             @change="onCheckChange"
             v-else
         >
-          <j-button>{{ item.title }} <AIcon type="DownOutlined" /></j-button>
+          <j-button :data-id="item.key" :class="className(item.style)">
+            <template #icon>
+              <img v-if="item.icon?.includes('http')" :src="item.icon" class="image-icon">
+              <AIcon v-else :type="item.icon"/>
+            </template>
+            {{ item.title }} <AIcon type="DownOutlined" /></j-button>
         </BatchDropdown>
         <!-- <j-dropdown
           :trigger="['click']"
@@ -68,11 +74,7 @@ import { extractCssClass, insertCustomCssToHead } from '@/components/FormDesigne
 import BatchDropdown from './BatchDropdown/index.vue'
 
 const isCheck = ref(false)
-const onCheckChange = () => {
-
-  
-}
-
+const firstLevelRef = ref()
 const props = defineProps({
   headerActions: {
     type: Array as PropType<Record<string, any>[]>,
@@ -85,6 +87,7 @@ const className = computed(() => {
     return extractCssClass(val)
   }
 })
+
 const handleFunction = (item: any, data?: any) => {
   if (isFunction(item)) {
     return item(data)
@@ -98,6 +101,9 @@ const handleFunction = (item: any, data?: any) => {
 watchEffect(() => {
   props.headerActions.forEach((item) => {
     insertCustomCssToHead(item.style, item.key)
+  })
+  firstLevelRef.value?.forEach((item, index) => {
+    item.$el.parentElement.children[0].setAttribute('data-id', props.headerActions[index]?.key)
   })
 })
 

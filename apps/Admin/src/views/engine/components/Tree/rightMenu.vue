@@ -4,43 +4,43 @@
     <j-sub-menu :key="actionMap['Add'].key" :title="actionMap['Add'].value" style="width: 160px">
       <j-menu-item :key="providerEnum.Module">
         <template #icon>
-          <img :src="getImage('/project/module.png')" style="width: 24px; height: 24px;">
+          <img :src="getImage('/project/module.svg')" style="width: 24px; height: 24px;">
         </template>
         {{ providerMap[providerEnum.Module] }}
       </j-menu-item>
       <j-menu-item :key="providerEnum.HtmlPage">
         <template #icon>
-          <img :src="getImage('/project/html.png')" style="width: 24px; height: 24px;">
+          <img :src="getImage('/project/html.svg')" style="width: 24px; height: 24px;">
         </template>
         {{ providerMap[providerEnum.HtmlPage] }}
       </j-menu-item>
       <j-menu-item :key="providerEnum.ListPage">
         <template #icon>
-          <img :src="getImage('/project/list.png')" style="width: 24px; height: 24px;">
+          <img :src="getImage('/project/list.svg')" style="width: 24px; height: 24px;">
         </template>
         {{ providerMap[providerEnum.ListPage] }}
       </j-menu-item>
       <j-menu-item :key="providerEnum.FormPage">
         <template #icon>
-          <img :src="getImage('/project/form.png')" style="width: 24px; height: 24px;">
+          <img :src="getImage('/project/form.svg')" style="width: 24px; height: 24px;">
         </template>
         {{ providerMap[providerEnum.FormPage] }}
       </j-menu-item>
       <j-menu-item :key="providerEnum.CRUD">
         <template #icon>
-          <img :src="getImage('/project/curd.png')" style="width: 24px; height: 24px;">
+          <img :src="getImage('/project/curd.svg')" style="width: 24px; height: 24px;">
         </template>
         {{ providerMap[providerEnum.CRUD] }}
       </j-menu-item>
       <j-menu-item :key="providerEnum.SQL">
         <template #icon>
-          <img :src="getImage('/project/sql.png')" style="width: 24px; height: 24px;">
+          <img :src="getImage('/project/sql.svg')" style="width: 24px; height: 24px;">
         </template>
         {{ providerMap[providerEnum.SQL] }}
       </j-menu-item>
       <j-menu-item :key="providerEnum.Function">
         <template #icon>
-          <img :src="getImage('/project/function.png')" style="width: 24px; height: 24px;">
+          <img :src="getImage('/project/function.svg')" style="width: 24px; height: 24px;">
         </template>
         {{ providerMap[providerEnum.Function] }}
       </j-menu-item>

@@ -69,7 +69,7 @@ const showGroup = computed(() => {
 const rulesOptions = [
   {
     label: '非空',
-    value: 'noEmpty'
+    value: 'notEmpty'
   },
   {
     label: '正则表达式',
@@ -128,7 +128,7 @@ const providerChange = (key) => {
   const configuration = model.value.validator.configuration
   const _group = configuration.group || ['save', 'update', 'insert']
   switch (key) {
-    case 'noEmpty':
+    case 'notEmpty':
       model.value.validator.configuration = {
         message: configuration.message,
         group: _group

@@ -14,7 +14,11 @@ import { onlyMessage } from '@jetlinks/utils'
 import { BASE_INFO, MENU_CONFIG } from "@/components/ListPage/keys";
 
 const props = defineProps({
-  data: Object
+  data: Object,
+  showTip: {
+    type: Boolean,
+    default: true
+  }
 })
 
 
@@ -112,14 +116,16 @@ const runCode = () => {
 
 const handleValidate = async () => {
   const menuStatus = await validateMenu()
-  if (menuStatus) {
-    // onlyMessage(errors.value[0].errors[0], 'error')
-  } else if(!store.state.activeFile.code){
-    onlyMessage('页面代码为空', 'error')
-  } else if(store.state.errors?.length > 0) {
-    onlyMessage('运行日志报错', 'error');
-  } else {
-    onlyMessage('校验成功', 'success')
+  if (props.showTip) {
+    if (menuStatus) {
+      // onlyMessage(errors.value[0].errors[0], 'error')
+    } else if(!store.state.activeFile.code){
+      onlyMessage('页面代码为空', 'error')
+    } else if(store.state.errors?.length > 0) {
+      onlyMessage('运行日志报错', 'error');
+    } else {
+      onlyMessage('校验通过', 'success')
+    }
   }
 }
 

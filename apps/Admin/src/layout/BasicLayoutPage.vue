@@ -61,6 +61,7 @@ const components = computed(() => {
 
 const config = computed(() => ({
   ...layout.value,
+  title: 'Jetlinks Code',
   theme: theme.value,
   menuData: menuStore.siderMenus,
   splitMenus: layout.value.layout === 'mix'

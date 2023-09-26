@@ -30,6 +30,15 @@ export const validOperationsBtn = (tree: OperationConfigTreeItem[], functionOpti
         })
       }
       if (item.type !== 'customer') {
+        if(['批量导入', '批量导出', '批量删除'].includes(item.title) && ['Delete', 'Export', 'Import'].includes(item.type)) {
+           if(item.level == 0) {
+            errorItems.push({
+              key: item.key,
+              errorKey: 'level',
+              message: '该按钮不可以作为1级按钮使用',
+            });
+           }
+        }
         if (item.type !== 'Detail') {
           if (!item.functions) {
             errorItems.push({

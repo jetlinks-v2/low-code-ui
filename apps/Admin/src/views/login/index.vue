@@ -2,7 +2,7 @@
   <j-spin :spinning='loading' :delay='300'>
     <div class='container'>
       <div class='left'>
-        <img :src='systemInfo?.backgroud || bgImage' alt=''>
+        <img :src='systemInfo?.backgroud || "/login/login.png"' alt=''>
         <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank" rel="noopener noreferrer" class="records">
           备案：渝ICP备19017719号-1
         </a>
@@ -42,8 +42,6 @@ const { loading, run } = useRequest(login, {
 })
 
 const { data: encryption } = useRequest(encryptionConfig)
-
-const bgImage = getImage('/login/login.png')
 
 const submit = (data: any) => {
   const copyData = cloneDeep(data)

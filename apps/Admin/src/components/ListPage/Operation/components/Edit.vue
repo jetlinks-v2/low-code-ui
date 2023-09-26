@@ -106,14 +106,12 @@
         </j-form-item>
       </template>
       <j-form-item label="自定义脚本">
-        <EditorModal v-model:value="form.script" language="javascript" @errorChange="errorChangeJs">
-          <j-button type="dashed" shape="round">编写脚本</j-button>
-        </EditorModal>
+        <EditorButton v-model:value="form.script" language="javascript" @errorChange="errorChangeJs" text="编写脚本">
+        </EditorButton>
       </j-form-item>
       <j-form-item label="自定义样式">
-        <EditorModal v-model:value="form.style" language="css" @errorChange="errorChangeCss">
-          <j-button type="dashed" shape="round">编写css</j-button>
-        </EditorModal>
+        <EditorButton v-model:value="form.style" language="css" @errorChange="errorChangeCss" text="编写css">
+        </EditorButton>
       </j-form-item>
     </j-form>
   </div>
@@ -124,7 +122,7 @@ import Upload from '@/components/Upload/Image/ImageUpload.vue'
 
 import { FormInstance } from 'jetlinks-ui-components'
 import { useProduct } from '@/store'
-import EditorModal from '@/components/EditorModal'
+import EditorButton from '@/components/EditorModal/EditorButton.vue'
 import { activeBtnKey, errorListKey, editTypeKey } from '../keys'
 import { providerEnum } from '@/components/ProJect'
 import { ErrorItem } from '../..'
@@ -148,19 +146,9 @@ const errorList = inject(errorListKey)
 
 const productStore = useProduct();
 const { info } = productStore
-const { functionOptions, commandOptions, handleFunction } = useFunctions()
+const { functionOptions, commandOptions, pagesOptions, handleFunction } = useFunctions()
 const { getImages } = useImages();
 
-const functionName = computed(() => {
-  return (title: string, moduleId: string) => {
-    if(moduleId) {
-      const moduleIdArr = moduleId.split('.')
-      return `${moduleIdArr[moduleIdArr.length - 1]}-${title}`
-    } else {
-      return title
-    }
-  }
-})
 const errorMessage = computed(() => {
   let data = {}
   let result = errorList!.value?.filter(
@@ -174,15 +162,6 @@ const errorMessage = computed(() => {
   return data
 })
 
-const pagesOptions = computed(() => {
-  let arr: any[] = [];
-  productStore.getDataMap()?.forEach((value) => {
-    if(value.type === providerEnum.HtmlPage || value.type === providerEnum.FormPage) {
-      arr.push(value)
-    }
-  })
-  return arr;
-})
 
 const iconType = computed(() => {
   return activeBtn?.value.icon && activeBtn?.value.type !== 'customer'

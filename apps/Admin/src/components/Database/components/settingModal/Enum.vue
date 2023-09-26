@@ -11,6 +11,7 @@
       falseText="单选"
       trueText="多选"
       v-model:value="model.dictionary.multiple"
+      :disabled="publish"
       @change="change"
     />
   </j-form-item>
@@ -21,6 +22,10 @@
     :visible="visible"
     okText="修改为BIGINT类型"
     cancelText="忽略"
+    :centered="true"
+    :zIndex="1040"
+    :getContainer="warp"
+    :maskStyle="{opacity: 0}"
     @ok="save"
     @cancel="visible = false"
   >
@@ -39,6 +44,15 @@ import Spec from './Spec.vue'
 import { inject } from "vue";
 import { useRequest } from '@jetlinks/hooks'
 import { dictionaryList } from "@/api/dictionary";
+
+const props = defineProps({
+  warp: {
+    type: Object
+  },
+  publish: {
+    type: Boolean
+  }
+})
 
 const { data: options } = useRequest(dictionaryList, {
   onSuccess(res) {
