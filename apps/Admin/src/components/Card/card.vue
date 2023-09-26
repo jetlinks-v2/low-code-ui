@@ -372,6 +372,14 @@ const onResize = debounce((e) => {
             color: #fff !important;
           }
         }
+        :deep(.ant-btn[disabled]) {
+          background: #f5f5f5;
+          border-color: #00000040;
+          color: #00000040!important;
+            svg{
+              color: #00000040;
+            }
+        }
       }
       .image-icon {
         width: 14px;

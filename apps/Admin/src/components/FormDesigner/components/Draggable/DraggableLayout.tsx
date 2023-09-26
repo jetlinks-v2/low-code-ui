@@ -10,11 +10,12 @@ import CardLayout from './CardLayout';
 import SpaceLayout from './SpaceLayout';
 import CollapseLayout from './CollapseLayout';
 import TableLayout from './TableLayout'
-import { watch, PropType } from 'vue';
+import { PropType } from 'vue';
 import { queryOptions } from '../../utils/utils';
 import { useProduct } from '@/store';
 import { onEnd } from './ControlInsertionPlugin';
 import { useProps } from '../../hooks';
+import './index.less'
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -222,6 +223,7 @@ const DraggableLayout = defineComponent({
             animation: 150,
             multiDrag: true,
             itemKey: 'key',
+            // dragClass: 'dragClass',
             // selectedClass: "sortable-selected",
             multiDragKey: platform.includes('mac') ? "Meta" : "Ctrl",
             group: { name: "j-canvas" },
