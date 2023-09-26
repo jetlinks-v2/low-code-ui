@@ -36,11 +36,11 @@ const getInfo = async () => {
     if (resp.result && resp.result.data?.length && resp.result.data[0].runningState?.value === 'enabled') {
       isEmpty.value = false
       console.log('getInfo',resp)
-      ConfigProvider.config({
-        theme: {
-          primaryColor: "#a0d911"
-        }
-      })
+      // ConfigProvider.config({
+      //   theme: {
+      //     primaryColor: "#a0d911"
+      //   }
+      // })
       if (resp.result.data[0].others) {
 
       }
