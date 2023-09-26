@@ -72,6 +72,7 @@ const getFlowDetail = async () => {
   console.log('model: ', model);
 
   flowStore.setModel(model)
+  flowStore.setModelBaseInfo(result)
 }
 
 /**

@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
-import type { INode, IConfig } from '@/views/process/model/Detail/typings.d.ts'
+import type { INode, IConfig, IModelBaseInfo } from '@/views/process/model/Detail/typings.d.ts'
 interface IModel {
-    config: IConfig;
-    nodes: INode;
+    config: Partial<IConfig>;
+    nodes: Partial<INode>;
 }
 
 const defaultModel = {
@@ -27,6 +27,8 @@ export const useFlowStore = defineStore('flow', () => {
         config: {},
         nodes: {}
     })
+    // 流程模型基础信息
+    const modelBaseInfo = ref<Partial<IModelBaseInfo>>({})
 
     /**
      * 设置节点信息
@@ -36,8 +38,19 @@ export const useFlowStore = defineStore('flow', () => {
         selectedNode.value = data
     }
 
+    /**
+     * 设置模型数据
+     * @param data 
+     */
     const setModel = (data: any) => {
         model.value = !Object.keys(data).length ? defaultModel : data
+    }
+    /**
+     * 设置模型基础信息
+     * @param data 
+     */
+    const setModelBaseInfo = (data: any) => {
+        modelBaseInfo.value = data
     }
 
     /**
@@ -53,9 +66,11 @@ export const useFlowStore = defineStore('flow', () => {
         // isEdit,
         nodeMap,
         model,
+        modelBaseInfo,
         // selectFormItem,
         setModel,
         // setIsEdit,
-        setSelectedNode
+        setSelectedNode,
+        setModelBaseInfo
     }
 })

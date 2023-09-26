@@ -1,26 +1,36 @@
 <!-- 展示及抄送 -->
 <template>
   <div>
-    <j-form ref="formRef" :model="form" autocomplete="off" layout="vertical">
+    <j-form
+      ref="formRef"
+      :model="formData"
+      autocomplete="off"
+      layout="vertical"
+    >
       <TitleComponent data="展示配置" />
-      <j-form-item name="variable" label="可用变量">
-        <j-button>
-          <AIcon type="PlusOutlined" />
-          <span>表单字段</span>
-        </j-button>
-        <div></div>
+      <j-form-item name="variables" label="可用变量">
+        <div>
+          <j-button @click="visible = true">
+            <AIcon type="PlusOutlined" />
+            <span>表单字段</span>
+          </j-button>
+        </div>
         <j-space>
           <div
             class="variable-item"
             :style="{ background: randomColor() || item.color }"
-            v-for="item of form.variable"
+            v-for="item of formData.variables"
           >
             <span>{{ item.label }}</span>
           </div>
         </j-space>
+        <FormFields
+          v-model:visible="visible"
+          v-model:variables="formData.variables"
+        />
       </j-form-item>
       <j-form-item
-        name="title"
+        name="nameGenerator"
         :rules="[{ required: true, trigger: 'change' }]"
       >
         <template #label>
@@ -36,7 +46,7 @@
         </template>
         <div class="title-template">
           <j-textarea
-            v-model:value="form.title"
+            v-model:value="formData.nameGenerator"
             placeholder="{发起人}的{流程名称}"
             :auto-size="{ minRows: 4 }"
             :bordered="false"
@@ -49,7 +59,7 @@
               <j-select
                 style="width: 120px; text-align: left"
                 placeholder="添加变量"
-                :options="form.variable"
+                :options="formData.variables"
                 @select="selectVariable"
               >
               </j-select>
@@ -58,7 +68,7 @@
         </div>
       </j-form-item>
       <j-form-item
-        name="summary"
+        name="summaryGenerator"
         :rules="[{ required: true, trigger: 'change' }]"
       >
         <template #label>
@@ -68,7 +78,7 @@
         </template>
         <div class="title-template">
           <j-textarea
-            v-model:value="form.summary"
+            v-model:value="formData.summaryGenerator"
             placeholder="{请假人}的{请假类型}"
             :auto-size="{ minRows: 4 }"
             :bordered="false"
@@ -81,7 +91,7 @@
               <j-select
                 style="width: 120px; text-align: left"
                 placeholder="添加变量"
-                :options="form.variable"
+                :options="formData.variables"
                 @select="selectSummary"
               >
               </j-select>
@@ -90,28 +100,59 @@
         </div>
       </j-form-item>
       <TitleComponent data="抄送配置" />
-      <j-form-item name="members" label="配置该流程需要抄送的成员">
-        <ConfigureMembers :hasWeight="false" v-model:members="form.members" />
+      <j-form-item name="ccMember" label="配置该流程需要抄送的成员">
+        <ConfigureMembers
+          :hasWeight="false"
+          v-model:members="formData.ccMember"
+        />
       </j-form-item>
     </j-form>
-
-    <!-- <j-button @click="submit1"> 提交 </j-button> -->
   </div>
 </template>
 
 <script setup lang="ts">
+import FormFields from '../components/FormFields.vue'
+import { useFlowStore } from '@/store/flow'
+
+const flowStore = useFlowStore()
+
+// 固定变量
+const fixedVariables = [
+  { label: '流程名称', value: '1', color: '#d7faa1' },
+  { label: '发起人', value: '2', color: '#fce3c1' },
+  { label: '发起人所属组织', value: '3', color: '#ddb8ff' },
+  //   { label: '111', value: 'process.var', color: '#ddb8ff' },
+]
+const visible = ref(false)
 const formRef = ref()
-const form = reactive({
-  // variable: [], // 可用变量
-  variable: [
-    { label: '流程名称', value: '1', color: '#d7faa1' },
-    { label: '发起人', value: '2', color: '#fce3c1' },
-    { label: '发起人所属组织', value: '3', color: '#ddb8ff' },
-    { label: '请假类型', value: '4', color: '#ffffb8' },
-  ],
-  title: '', // 标题模板
-  summary: '', // 摘要模板
-  members: [], // 成员
+const formData = reactive({
+  variables: computed({
+    get: () =>
+      flowStore.model.config.variables?.length
+        ? flowStore.model.config.variables
+        : fixedVariables,
+    set: (val) => {
+      flowStore.model.config.variables = [...fixedVariables, ...val]
+    },
+  }),
+  nameGenerator: computed({
+    get: () => flowStore.model.config.nameGenerator,
+    set: (val) => {
+      flowStore.model.config.nameGenerator = val
+    },
+  }),
+  summaryGenerator: computed({
+    get: () => flowStore.model.config.summaryGenerator,
+    set: (val) => {
+      flowStore.model.config.summaryGenerator = val
+    },
+  }),
+  ccMember: computed({
+    get: () => flowStore.model.config.ccMember,
+    set: (val) => {
+      flowStore.model.config.ccMember = val
+    },
+  }),
 })
 
 /**
@@ -119,10 +160,10 @@ const form = reactive({
  * @param value
  */
 const selectVariable = (value: string, option) => {
-  form.title += `{${option.label}}`
+  formData.nameGenerator += `{${option.label}}`
 }
 const selectSummary = (value: string, option) => {
-  form.summary += `{${option.label}}`
+  formData.summaryGenerator += `{${option.label}}`
 }
 
 // 正则匹配{}中间内容，并替换成<span style="color: 随机颜色"></span>
@@ -134,7 +175,7 @@ const replace = (str: string) => {
 
 // 根据选择的变量找出颜色
 const getColor = (str: string) => {
-  return form.variable.filter((item) => item.label === str)[0]?.color
+  return formData.variables?.filter((item) => item.label === str)[0]?.color
 }
 
 // 生成随机背景色，并且保证黑色文字可读性
@@ -163,11 +204,11 @@ const isDarkColor = (hexColor) => {
 
 // 标题
 const titleHtml = computed(() => {
-  return replace(form.title)
+  return replace(formData.nameGenerator || '')
 })
 // 摘要
 const summaryHtml = computed(() => {
-  return replace(form.summary)
+  return replace(formData.summaryGenerator || '')
 })
 
 /**
@@ -180,7 +221,7 @@ const submit = async (type = 'save') => {
   if (type !== 'save') {
     await formRef.value.validate()
   }
-  return form
+  return formData
 }
 
 defineExpose({ submit })
