@@ -411,6 +411,7 @@ const JavaTypeChange = (record) => {
         },
         validator: {
           provider: undefined,
+          providerType: undefined,
           configuration: {
             message: '数据格式错误',
             group: ['save', 'update', 'insert']
