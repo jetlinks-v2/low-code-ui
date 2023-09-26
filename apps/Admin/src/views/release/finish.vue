@@ -35,6 +35,8 @@ import { releaseDraft } from '@/api/project'
 import { saveMenu } from '@/api/menu'
 import { useIntervalFn } from '@vueuse/core'
 import { useNetwork } from '@jetlinks/hooks'
+import { useProduct } from '@/store'
+import { providerEnum } from '@/components/ProJect/index'
 
 const props = defineProps({
   tree: {
@@ -58,6 +60,8 @@ const status = ref('')
 const loading = ref(true)
 const errorMsg = ref('')
 const route = useRoute()
+const product = useProduct()
+
 let count = 0
 
 const { pause, resume } = useIntervalFn(() => {
@@ -81,6 +85,27 @@ const releaseDraftFn = (id) => {
     pause()
   })
 }
+
+/**
+ * 更新crud中发的列
+ */
+const updateCrudOther = (data) => {
+  return data.map(item => {
+    if (item.others.type === providerEnum.CRUD) {
+      const columnsKeys = item.configuration.columns?.map(item => item.name)
+      item.others = {
+        ...item.others,
+        columns: columnsKeys
+      }
+    }
+
+    if (item.children) {
+      item.children = updateCrudOther(item.children)
+    }
+
+    return item
+  })
+}
 const saveMenuFn = (id) => {
   count = 90
   saveMenu(props.tree).then(resp => {
@@ -88,6 +113,9 @@ const saveMenuFn = (id) => {
     count = 100
     loading.value = true
     status.value = 'success'
+    const arr = updateCrudOther(product.data)
+    console.log(arr[0])
+    product.update(arr[0])
     pause()
   }).catch((e) => {
     width.value = 90

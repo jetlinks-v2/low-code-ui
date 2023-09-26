@@ -12,7 +12,7 @@
     <j-data-table
       columnDrag
       class="ant-table-striped table-striped"
-      rowKey="code"
+      rowKey="id"
       bordered
       ref="tableRef"
       size="small"
@@ -218,9 +218,9 @@ enum filterType {
   date = 'date',
   float = 'number',
   byte = 'number',
-  long = 'string',
+  long = 'number',
   list = 'string',
-  boolean = 'string',
+  boolean = 'enum',
   map = 'string',
   object = 'enum',
 }

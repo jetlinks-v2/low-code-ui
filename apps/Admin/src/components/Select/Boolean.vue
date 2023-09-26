@@ -1,5 +1,5 @@
 <template>
-  <j-select v-model:value="myValue" @change="change">
+  <j-select v-model:value="myValue" @change="change" :disabled="disabled">
     <j-select-option key="false" >{{ falseText }}</j-select-option>
     <j-select-option key="true" >{{ trueText }}</j-select-option>
   </j-select>
@@ -27,6 +27,10 @@ const props = defineProps({
   trueValue: {
     type: [String, Number],
     default: true
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 

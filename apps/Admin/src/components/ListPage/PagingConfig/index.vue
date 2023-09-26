@@ -30,6 +30,7 @@
               :controls="false"
               @blur="blur()"
               @pressEnter="blur()"
+              ref="pageSizeRef"
             />
             <span v-if="index < pagingData.length - 1">,</span>
           </div>
@@ -60,6 +61,8 @@ interface Emit {
   (e: 'update:open', value: boolean): void
   (e: 'update:pagingData', value: any): void
 }
+
+const pageSizeRef = ref()
 
 const emits = defineEmits<Emit>()
 const props = defineProps({
@@ -92,12 +95,13 @@ const open = computed({
 })
 
 const onAdd = () => {
-  const value = pagingData.value[pagingData.value.length - 1]?.pageSize
-  if(value >= 99) return
+  if(pagingData.value.length >= 99) return
   pagingData.value.push({
-    pageSize: value ? value + 1 : 12,
+    pageSize: null,
   })
-  blur()
+  nextTick(() => {
+    pageSizeRef.value?.[pageSizeRef.value?.length - 1].focus()
+  })
 }
 //去重
 const deWeightThree = () => {

@@ -234,12 +234,12 @@
             </j-form-item>
           </ErrorItem>
           <j-form-item label="特殊样式" name="specialStyle">
-            <EditorModal
+            <EditorButton
               v-model:value="formState.specialStyle"
               language="json"
+              text="编写特殊样式"
             >
-              <j-button type="dashed" shape="round">编写特殊样式</j-button>
-            </EditorModal>
+            </EditorButton>
           </j-form-item>
         </div>
         <j-form-item v-show="false">
@@ -253,7 +253,7 @@
 <script lang="ts" setup>
 import Upload from '@/components/Upload/Image/ImageUpload.vue'
 import { ErrorItem } from '../..'
-import EditorModal from '@/components/EditorModal'
+import EditorButton from '@/components/EditorModal/EditorButton.vue'
 import {
   LIST_FORM_INFO,
   ACTION_CONFIG_KEY,

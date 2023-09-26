@@ -30,6 +30,7 @@
                 <j-popover
                   v-if="errorMap?.[`${b.dataIndex}__${a._quick_id}`]"
                   visible
+                  overlayClassName="form-error-popover"
                   :content="errorMap?.[`${b.dataIndex}__${a._quick_id}`]"
                   :getPopupContainer="getPopupContainer"
                 >
@@ -203,10 +204,18 @@ defineExpose({
     }
   }
 
+  :deep(.form-error-popover) {
+    .ant-popover-inner-content {
+      white-space: nowrap;
+    }
+  }
+
   .form-error {
     width: 100%;
     position: absolute;
     height: 100%;
+    left: 0;
+    top: 0;
   }
 }
 </style>

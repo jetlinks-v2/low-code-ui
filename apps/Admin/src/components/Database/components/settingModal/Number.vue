@@ -9,12 +9,12 @@
       @change="providerChange"
     />
   </j-form-item>
-  <j-form-item v-if="model.validator.provider" label="校验生效" :name="['validator', 'configuration', 'group']">
+  <j-form-item v-if="model.validator.provider" label="校验生效" :name="['validator', 'configuration', 'group']" :rules="[{ required: true, message: '请选择校验生效'}]">
     <j-card-select
       :options="[
         {
           label: '新增/保存',
-          value: 'add'
+          value: 'insert'
         },
         {
           label: '修改',
@@ -24,6 +24,7 @@
       :column="2"
       :showImage="false"
       :multiple="true"
+      @change="groupChange"
       v-model:value="model.validator.configuration.group"
     />
   </j-form-item>
@@ -82,7 +83,7 @@ const formRef = inject(SETTING_FORM_REF)
 const rulesOptions = [
   {
     label: '非空',
-    value: 'noEmpty'
+    value: 'notEmpty'
   },
   {
     label: '范围',
@@ -105,6 +106,20 @@ const precision = computed(() => {
 const openStringMode = computed(() => {
   return ['Float','Double'].includes(model.value.javaType)
 })
+
+const groupChange = (v) => {
+  const groupSet = new Set(v)
+  if (groupSet.has('insert')) {
+    groupSet.add('save')
+  } else {
+    groupSet.delete('save')
+  }
+  model.value.validator.configuration.group = [...groupSet.values()]
+}
+
+const InterMinMax = (value) => {
+  return value > 2147483647 || value < -2147483648
+}
 
 const InterValidatorFn = (value) => {
   if (value > 2147483647) {
@@ -147,11 +162,11 @@ const rules = {
         if (!value) {
           return Promise.reject('请输入最小值')
         }
-        if (model.value.javaType === 'Integer') {
+        if (model.value.javaType === 'Integer' && InterMinMax(value)) {
           return InterValidatorFn(value)
         }
-        if (value > model.value.validator.configuration.max) {
-          return Promise.reject('最小值不能大于最大值')
+        if (value && model.value.validator.configuration.max && (BigInt(value) >= BigInt(model.value.validator.configuration.max))) {
+          return Promise.reject('最小值不能大于等于最大值')
         }
         return Promise.resolve()
       }
@@ -178,7 +193,7 @@ const rules = {
 const providerChange = (key) => {
   const configuration = model.value.validator.configuration
   switch (key) {
-    case 'noEmpty':
+    case 'notEmpty':
       model.value.validator.configuration = {
         message: configuration.message,
         group: configuration.group

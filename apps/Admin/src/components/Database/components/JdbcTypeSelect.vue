@@ -4,6 +4,7 @@
     v-model:value="myValue"
     style="width: 100%"
     :options="options"
+    :disabled="disabled"
     @change="change"
   >
   </j-select>
@@ -21,6 +22,10 @@ const props = defineProps({
   javaType: {
     type: String,
     default: undefined
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 

@@ -27,7 +27,7 @@
         :key="item.key"
         #[item.key]="slotProps"
       >
-        <j-ellipsis v-if="item.key !== 'action'">
+        <j-ellipsis v-if="item.key !== 'action'" :data-id="`${projectId}-${pageId}-${item.dataIndex}`" :class="extractCssClass(item.config?.specialStyle)">
           <div v-if="item?.config">
             <span v-if="item?.config?.type === 'object' && isShowIcon">
               <AIcon
@@ -60,6 +60,7 @@
                 handleFunction(item.permissionProps, slotProps)?.popConfirm
               "
               :class="extractCssClass(item.style)"
+              ref="tableActionsRef"
             >
               <template v-if="item.icon">
                 <img
@@ -313,6 +314,14 @@ const props = defineProps({
     type: Object,
     default: () => {},
   },
+  projectId: {
+    type: String,
+    default: ''
+  },
+  pageId: {
+    type: String,
+    default: ''
+  },
 })
 
 const headerButton = ref()
@@ -324,6 +333,8 @@ const isCheck = computed(() => {
   return headerButton.value?.isCheck
 })
 const _selectedRowKeys = ref<string[]>([])
+
+const tableActionsRef = ref<any[]>([])
 
 const onSelectChange = (keys: string[]) => {
   _selectedRowKeys.value = [...keys]
@@ -467,6 +478,12 @@ const handleFunction = (item: any, data?: any) => {
 watchEffect(() => {
   props.tableActions.forEach((item) => {
     insertCustomCssToHead(item.style, item.key)
+  })
+  props.dataColumns.forEach((item) => {
+    insertCustomCssToHead(item.config?.specialStyle, `${props.projectId}-${props.pageId}-${item.dataIndex}`)
+  })
+  tableActionsRef.value?.forEach((item, index) => {
+    item.$el.parentElement.children[0].setAttribute('data-id', props.tableActions[index]?.key)
   })
 })
 

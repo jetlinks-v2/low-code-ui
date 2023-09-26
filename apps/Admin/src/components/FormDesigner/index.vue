@@ -1,28 +1,27 @@
 <template>
-  <j-spin :spinning="spinning">
-    <div class="container">
-      <Header @save="onSave" :data="data" @validate="onValid" />
-      <div class="box">
-        <div class="left" v-if="model !== 'preview'"><Filed /></div>
-        <div
-          class="right"
-          :style="{
-            width: _width,
-          }"
-        >
-          <div class="canvas-box">
-            <div class="container">
-              <Canvas></Canvas>
-            </div>
+  <div class="container">
+    <Header @save="onSave" :data="data" @validate="onValid" />
+    <div class="box">
+      <div class="left" v-if="model !== 'preview'"><Filed /></div>
+      <div
+        class="right"
+        :style="{
+          width: _width,
+        }"
+      >
+        <div class="canvas-box">
+          <div class="container">
+            <Canvas></Canvas>
           </div>
         </div>
-        <div class="config" v-if="isShowConfig && model !== 'preview'">
-          <Config ref="configRef" />
-        </div>
       </div>
-      <Check v-if="model === 'preview' && !mode" />
+      <div class="config" v-if="isShowConfig && model !== 'preview'">
+        <Config ref="configRef" />
+      </div>
     </div>
-  </j-spin>
+    <Check v-if="model === 'preview' && !mode" />
+    <CheckSpin :spinning="spinning" />
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -89,6 +88,7 @@ const _ctrl = ref<boolean>(false)
 const _other = ref<boolean>(false)
 const focus = ref<boolean>(false)
 const focused = ref<boolean>(false)
+const dictionary = ref<any[]>([])
 
 const product = useProduct()
 const formDesigner = useFormDesigner()
@@ -297,6 +297,7 @@ provide('FormDesigner', {
   _other,
   focus,
   focused, // 其他组件
+  dictionary,
   setSelection,
   setModel,
   onSaveData,
@@ -348,7 +349,7 @@ onUnmounted(() => {
 // 校验
 const onValidate = () => {
   spinning.value = true
-  errorKey.value = checkedConfig(unref(formData))
+  errorKey.value = checkedConfig(unref(formData), dictionary.value)
   setTimeout(() => {
     spinning.value = false
   }, 100)

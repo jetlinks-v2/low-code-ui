@@ -33,20 +33,20 @@
         </template>
         <template #javaType="{record, index, valueChange}">
           <span v-if="index <= maxLen">{{record.javaType}}</span>
-          <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => { valueChange(record.javaType); JavaTypeChange(record)}" />
+          <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => { valueChange(record.javaType); JavaTypeChange(record)}" :disabled="publishColumns.includes(record.name)"/>
         </template>
         <template #jdbcType="{record, index, valueChange}">
           <span v-if="index <= maxLen">{{record.jdbcType}}</span>
-          <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="() => { valueChange(record.jdbcType);emitUpdateDataSource()}" />
+          <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="() => { valueChange(record.jdbcType);emitUpdateDataSource()}" :disabled="publishColumns.includes(record.name)" />
         </template>
         <template #length="{ record, index }">
           <span v-if="index <= maxLen">{{record.length}}</span>
           <span v-else-if="!['DECIMAL','VARCHAR','LONGVARCHAR'].includes(record.jdbcType)"></span>
-          <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
+          <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" :disabled="publishColumns.includes(record.name)" />
         </template>
         <template #scale="{ record, index }">
           <span v-if="index <= maxLen || !['DECIMAL'].includes(record.jdbcType)">{{record.scale}}</span>
-          <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
+          <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" :disabled="publishColumns.includes(record.name)" />
         </template>
         <template #updatable="{ record, index }">
           <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" :disabled="index <= maxLen" />
@@ -114,6 +114,7 @@
     v-if="setting.visible"
     :data="setting.data"
     :warp="WarpRef"
+    :publish="setting.data ? publishColumns.includes(setting.data.name) : false"
     @cancel="settingCancel"
     @save="settingSave"
   />
@@ -135,6 +136,7 @@ import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly } from './compon
 import { provide } from 'vue'
 import { defaultSetting, defaultTreeSetting } from './setting'
 import { regular } from '@jetlinks/utils'
+import { useProduct } from '@/store'
 
 const props = defineProps({
   tree: {
@@ -142,6 +144,10 @@ const props = defineProps({
     default: false
   },
   columns: {
+    type: Array,
+    default: () => []
+  },
+  publishColumns: {
     type: Array,
     default: () => []
   },
@@ -156,6 +162,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update', 'update:columns'])
+
+const product = useProduct()
 
 const myColumns = [
   {
@@ -202,6 +210,16 @@ const myColumns = [
   {
     title: '注释',
     dataIndex: 'comment',
+    form: {
+      rules: {
+        asyncValidator: (rule, value) => {
+          if (!value) {
+            return Promise.reject('请输入注释')
+          }
+          return Promise.resolve()
+        }
+      }
+    }
   },
   {
     title: 'javaType',
@@ -364,8 +382,10 @@ const copy = (record, index) => {
 }
 
 const deleteFn = async (index) => {
+  const _value = dataSource.value[index-1]
   dataSource.value.splice(index-1, 1)
   // dataSourceChange()
+  // 删除
   emitUpdateDataSource()
 }
 
@@ -411,7 +431,7 @@ const JavaTypeChange = (record) => {
           provider: undefined,
           configuration: {
             message: '数据格式错误',
-            group: [],
+            group: ['save', 'update', 'insert'],
             classType: record.javaType,
             regexp: undefined,
             min: undefined,

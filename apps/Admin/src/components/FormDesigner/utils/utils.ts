@@ -21,7 +21,7 @@ export const generateOptions = (len: number) => {
 
 const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo', 'product', 'device', 'org', 'user', 'role']
 
-const checkedConfigItem = (node: ISchema, allData: any[]) => {
+const checkedConfigItem = (node: ISchema, allData: any[], dictionary: any[]) => {
     const _type = node.type || 'root'
     if (_type === 'root') {
         return false
@@ -84,6 +84,13 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
                     message: (node.formItemProps?.label || node.name) + '配置错误'
                 }
             }
+            const flag = dictionary.find(i => node?.componentProps.source?.dictionary === i.id)
+            if (node?.componentProps.source?.dictionary && !flag) {
+                return {
+                    key: node?.key,
+                    message: (node.formItemProps?.label || node.name) + '配置错误'
+                }
+            }
         }
         if ('upload' === _type && ((node?.componentProps?.maxCount !== 0 && !node?.componentProps?.maxCount) || (node?.componentProps?.fileSize !== 0 && !node?.componentProps?.fileSize))) {
             // 个数和单位
@@ -115,23 +122,23 @@ const checkedConfigItem = (node: ISchema, allData: any[]) => {
 }
 
 // 校验配置项必填
-const checkConfig = (node: ISchema, allData: any[]) => {
-    const _data: any = checkedConfigItem(node, allData);
+const checkConfig = (node: ISchema, allData: any[], dictionary: any[]) => {
+    const _data: any = checkedConfigItem(node, allData, dictionary);
     let _rules: any[] = []
     if (_data) {
         _rules.push(_data)
     }
     if (node.children && node.children?.length) {
         node?.children.map(item => {
-            const arr = checkConfig(item, allData)
+            const arr = checkConfig(item, allData, dictionary)
             _rules = [..._rules, ...arr]
         })
     }
     return _rules
 }
 
-export const checkedConfig = (node: ISchema) => {
-    return checkConfig(node, node?.children || [])
+export const checkedConfig = (node: ISchema, dictionary: any[]) => {
+    return checkConfig(node, node?.children || [], dictionary)
 }
 
 export const updateData = (list: ISchema[], item?: any) => {
