@@ -2,6 +2,8 @@ import { randomString } from '@jetlinks/utils'
 import Schema from 'async-validator';
 import {isArray} from "lodash-es";
 
+export const PathMark = '__'
+
 export const dataAddID = (data: any[], rowHeight: number) => {
   return data.map((item, index ) => {
     item.offsetTop = (index) * rowHeight
@@ -43,6 +45,8 @@ export const proAll = (array: Array<Promise<any>>) => {
   })
 }
 
+
+
 export const useValidate = (dataSource) => {
   const validateRef = ref()
   const errorMap = ref({})
@@ -50,8 +54,8 @@ export const useValidate = (dataSource) => {
 
   let ruleObj = {}
 
-  const createPath = (dataIndex, id): string => {
-    return `${dataIndex}__${id}`
+  const createPath = (dataIndex, id, index): string => {
+    return `${dataIndex}${PathMark}${id}${PathMark}${index}`
   }
 
   const handleColumns = (columns) => {
@@ -88,9 +92,8 @@ export const useValidate = (dataSource) => {
           { [name]: value, record },
           { firstFields: true },
           (err) => {
-
             const hasName = err?.find(item => item.field === name)
-            const path = createPath(name, record._quick_id)
+            const path = createPath(name, record._quick_id, record.index)
             if (err && hasName) { // 有错误
               if (!watch[hasName.field]) {
                 errorMap.value[path] = hasName.message
@@ -102,7 +105,7 @@ export const useValidate = (dataSource) => {
                 delete errorMap.value[path]
               }
               if (watch[name]) {
-                const watchPath = createPath(watch[name], record._quick_id)
+                const watchPath = createPath(watch[name], record._quick_id, record.index)
                 delete errorMap.value[watchPath]
               }
             }
