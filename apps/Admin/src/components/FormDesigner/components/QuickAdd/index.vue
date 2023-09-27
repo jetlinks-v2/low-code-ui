@@ -14,14 +14,27 @@
           <j-row :gutter="24">
             <j-col :span="12">
               <j-form-item label="后端功能" :name="['source', 'functionId']">
-                <j-select
+                <a-select
                   showSearch
                   placeholder="请选择"
-                  :options="functionList"
                   v-model:value="modelRef.source.functionId"
                   @change="onFunChange"
                   allowClear
-                />
+                >
+                  <a-select-option
+                    :key="item.value"
+                    v-for="item in functionList"
+                    :value="item.value"
+                  >
+                    <span>
+                      <img
+                        :src="typeImages[item.type]"
+                        style="width: 20px; height: 20px; margin-right: 5px"
+                      />
+                      {{ item.label }}
+                    </span>
+                  </a-select-option>
+                </a-select>
               </j-form-item>
             </j-col>
             <j-col :span="12">
@@ -46,23 +59,25 @@
               </j-form-item>
             </j-col>
           </j-row>
-          <j-form-item
-            :name="['source', 'sourceData']"
-            :rules="[
-              {
-                required: modelRef.source.functionId,
-                message: '请选择',
-              },
-            ]"
-          >
+          <j-form-item :name="['source', 'inputs']" label="输入">
             <j-tree-select
               showSearch
               placeholder="请选择"
-              v-model:value="modelRef.source.sourceData"
-              :treeData="sourceList"
+              v-model:value="modelRef.source.inputs"
+              :treeData="inputsList"
               multiple
               allowClear
-              :treeDefaultExpandedKeys="['output', 'inputs']"
+              :treeCheckStrictly="false"
+            />
+          </j-form-item>
+          <j-form-item :name="['source', 'output']" label="输出">
+            <j-tree-select
+              showSearch
+              placeholder="请选择"
+              v-model:value="modelRef.source.output"
+              :treeData="outputList"
+              multiple
+              allowClear
               :treeCheckStrictly="false"
             />
           </j-form-item>
@@ -113,6 +128,7 @@ import { providerEnum } from '@/components/ProJect'
 import generatorData from '../../utils/generatorData'
 import { map, uniqBy } from 'lodash-es'
 import { uid } from '../../utils/uid'
+import {  typeImages } from '@/components/ProJect/index'
 
 const product = useProduct()
 const designer: any = inject('FormDesigner')
@@ -138,7 +154,8 @@ const modelRef = reactive({
   source: {
     functionId: undefined,
     commandId: undefined,
-    sourceData: undefined,
+    inputs: undefined,
+    output: undefined,
   },
 })
 
@@ -148,7 +165,13 @@ const getEnd = () => {
   const id = product.info?.draftId
   queryEndCommands(id, []).then((resp) => {
     if (resp.success) {
-      end.value = resp.result || []
+      const _map = product.getDataMap()
+      end.value = (resp.result || []).map((item) => {
+        return {
+          ...item,
+          type: _map.get(item.id)?.type,
+        }
+      })
     }
   })
 }
@@ -157,6 +180,7 @@ const functionList = computed(() => {
   return (
     end.value.map((item) => {
       return {
+        ...item,
         label: item.name + '.' + item.id,
         value: item.id,
       }
@@ -168,7 +192,7 @@ const commandList = computed(() => {
   return (
     end.value
       .find((item) => modelRef.source?.functionId === item.id)
-      ?.command.map((i) => {
+      ?.command?.map((i) => {
         return {
           ...i,
           label: i.name,
@@ -178,76 +202,49 @@ const commandList = computed(() => {
   )
 })
 
-const getArray = (arr: any[]) => {
+const getArray = (arr: any[], _disabled: any[]) => {
   return (arr || []).map((i) => {
     let children: any[] = []
     if (i.valueType.type === 'array') {
-      children = getArray(i.valueType?.elementType?.properties || [])
+      children = getArray(i.valueType?.elementType?.properties || [], _disabled)
     }
     if (i.valueType.type === 'object') {
-      children = getArray(i.valueType?.properties || [])
+      children = getArray(i.valueType?.properties || [], _disabled)
     }
     return {
       ...i,
-      value: uid(8),
+      value: i.id,
       label: `${i.id}${i?.name ? '(' + i?.name + ')' : ''}`,
-      // value: `${i.id}`,
+      disabled: _disabled.includes(i.id),
       children,
     }
   })
 }
 
-const sourceList = computed(() => {
+const inputsList = computed(() => {
   const _item = commandList.value.find(
     (item) => item.id === modelRef?.source?.commandId,
   )
-  const arr: any[] = []
-  if (_item?.inputs) {
-    arr.push({
-      label: '输入',
-      value: 'inputs',
-      disabled: true,
-      children: getArray(_item?.inputs || []),
-    })
-  }
-  if (_item?.output && _item?.output?.properties?.length) {
-    arr.push({
-      label: '输出',
-      value: 'output',
-      disabled: true,
-      children: getArray(_item?.output?.properties || []),
-    })
-  }
-  return arr
+  return getArray(_item?.inputs || [], modelRef.source.output || [])
+})
+
+const outputList = computed(() => {
+  const _item = commandList.value.find(
+    (item) => item.id === modelRef?.source?.commandId,
+  )
+  return getArray(_item?.output?.properties || [], modelRef.source.inputs || [])
 })
 
 const onFunChange = () => {
   modelRef.source.commandId = undefined
-  modelRef.source.sourceData = undefined
+  modelRef.source.inputs = undefined
+  modelRef.source.output = undefined
 }
 
 const onCommChange = () => {
-  modelRef.source.sourceData = undefined
+  modelRef.source.inputs = undefined
+  modelRef.source.output = undefined
 }
-
-watch(
-  () => visible.value,
-  () => {
-    if (visible.value) {
-      modelRef.json = undefined
-      modelRef.formCopy = []
-      modelRef.source = {
-        functionId: undefined,
-        commandId: undefined,
-        sourceData: undefined,
-      }
-      getEnd()
-    }
-  },
-  {
-    immediate: true,
-  },
-)
 
 const formDataOptions = computed(() => {
   const arr = product.getDataMapByType(providerEnum.FormPage)
@@ -391,15 +388,26 @@ const generatorSource = (_item: any) => {
   }
 }
 
-const handleSource = (arr: any[]) => {
+const handleSource = (arr: any[], list: any[]) => {
   const _array = arr
     .map((item) => {
-      return findItem(sourceList.value, item)
+      return findItem(list, item)
     })
     .map((i) => {
       return generatorSource(i)
     })
   return _array
+}
+
+const onSaveData = (_data: any) => {
+  const obj = {
+    ...props.data,
+    others: {
+      ...props.data.others,
+      quickData: _data,
+    },
+  }
+  product.update(obj)
 }
 
 const onSave = async () => {
@@ -408,10 +416,12 @@ const onSave = async () => {
   const obj: any = {
     json: undefined,
     formCopy: undefined,
-    sourceData: undefined,
+    inputs: undefined,
+    output: undefined,
   }
   // 处理后端功能数据
-  obj.sourceData = handleSource(modelRef?.source?.sourceData || [])
+  obj.inputs = handleSource(modelRef?.source?.inputs || [], unref(inputsList))
+  obj.output = handleSource(modelRef?.source?.output || [], unref(outputList))
   // 处理json
   try {
     const _json = JSON.parse(modelRef?.json || '[]')
@@ -427,7 +437,8 @@ const onSave = async () => {
     })
   const arr: any[] = []
   ;[
-    ...(obj?.sourceData || []),
+    ...(obj?.inputs || []),
+    ...(obj?.output || []),
     ...(obj?.json || []),
     ...(obj?.formCopy || []),
   ].map((item) => {
@@ -451,6 +462,7 @@ const onSave = async () => {
       ...designer.formData.value,
       children: [...designer.formData.value.children, ...dataList.value],
     }
+    onSaveData(modelRef)
     visible.value = false
   }
 }
@@ -466,9 +478,44 @@ const onOk = () => {
     ...designer.formData.value,
     children: uniqBy(arr, 'formItemProps.name'),
   }
+  onSaveData(modelRef)
   modalVisible.value = false
   visible.value = false
 }
+
+watch(
+  () => visible.value,
+  () => {
+    if (visible.value) {
+      getEnd()
+    }
+  },
+  {
+    immediate: true,
+  },
+)
+
+watch(
+  () => props.data?.others?.quickData,
+  (newVal) => {
+    if (newVal) {
+      Object.assign(modelRef, newVal)
+    } else {
+      modelRef.json = undefined
+      modelRef.formCopy = []
+      modelRef.source = {
+        functionId: undefined,
+        commandId: undefined,
+        inputs: undefined,
+        output: undefined,
+      }
+    }
+  },
+  {
+    deep: true,
+    immediate: true,
+  },
+)
 </script>
 
 <style lang="less" scoped>

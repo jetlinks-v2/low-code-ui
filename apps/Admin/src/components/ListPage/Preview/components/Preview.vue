@@ -3,7 +3,7 @@
     <div style="padding: 30px; background-color: #f2f2f2">
       <pro-search
         :columns="searchColumns"
-        target="code"
+        :target="target"
         @search="handleSearch"
       />
 
@@ -18,6 +18,7 @@
           :defaultFormType="defaultFormType"
           :tableActions="actions"
           @openJson="(newValue) => (jsonData = newValue)"
+          ref="tableRef"
         />
       </div>
     </div>
@@ -61,13 +62,25 @@ const props = defineProps({
   data: {
     type: String,
     default: '{}'
-  }
+  },
+  projectId: {
+    type: String,
+    default: '',
+  },
+  pageId: {
+    type: String,
+    default: '',
+  },
 })
 
+const target = computed(() => {
+  return `${props.projectId}.${props.pageId}`
+})
 const emits = defineEmits()
 const importVisible = ref<boolean>(false)
 const exportVisible = ref<boolean>(false)
 const addVisible = ref<boolean>(false)
+const tableRef = ref()
 
 const allData = computed(() => {
   return JSON.parse(props.data || '{}')
@@ -93,10 +106,18 @@ const dataColumns: any = computed(() => {
       title: item.name,
       dataIndex: item.id,
       key: item.id,
-      ellipsis: true,
+      ellipsis: false,
       scopedSlots: true,
       align: item?.config?.colLayout,
       config: item.config,
+      width: 200,
+      sorter: item.config?.checked ? (a: any, b: any) => {
+        if(typeof a?.[item.id] === 'number') {
+          return a?.[item.id] - b?.[item.id]
+        } else {
+          return a?.[item.id]?.localeCompare(b?.[item.id], 'zh')
+        }
+      } : false
     }
   })
   if (actions.value?.length !== 0 && allData.value?.showColumns) {
@@ -104,7 +125,7 @@ const dataColumns: any = computed(() => {
       title: '操作',
       key: 'action',
       scopedSlots: true,
-      width: actions.value?.length * 80 + `px`,
+      width: actions.value?.length * 40 + `px`,
       fixed: 'right',
     })
   }
@@ -176,7 +197,7 @@ const componentPropsSwitch = (item: any) => {
   switch (type) {
     case 'date':
       const format =
-        item?.config?.accuracy === 'hour' ? 'HH:mm:ss' : 'YYYY-MM-DD'
+        item?.config?.accuracy === 'hour' ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD'
       const type = item?.config?.accuracy === 'hour' ? 'time' : 'date'
       const defaultValue =
         item?.config?.defaultValue === 'not'
@@ -188,6 +209,7 @@ const componentPropsSwitch = (item: any) => {
         format: format,
         type: type,
         defaultValue: defaultValue,
+        showTime: item?.config?.accuracy === 'hour'
       }
       break
     case 'enum':
@@ -238,8 +260,7 @@ const searchType = (type_: string) => {
 }
 const actionsBtnFormat = (data: any) => {
   const finalData = data?.map((item: any) => {
-    console.log(item);
-    return {
+    let result = {
       ...item,
       key: item?.key,
       text: item?.title,
@@ -253,30 +274,80 @@ const actionsBtnFormat = (data: any) => {
         },
         hasPermission: false,
         popConfirm:
-          item?.command === 'Delete'
+          item?.command === 'Delete' && item?.title !== '批量删除'
             ? {
                 title: data?.status === 'error' ? '禁用' : '确认删除？',
-                onConfirm: () => {
-                  console.log(data, 'onConfirm')
-                  item?.script
+                onConfirm: async () => {
+                  const res = await queryRuntime(
+                    props.projectId,
+                    item.functions,
+                    item.command,
+                    {
+                      terms: [{ column: 'id', termType: 'eq', value: data.id }],
+                    },
+                  )
+                  if (res.success) {
+                    tableRef.value?.reload?.()
+                  }
                 },
               }
             : false,
         onClick: () => {
-          // const fn = new Function(item.script)
-          // fn();
-          importVisible.value = data?.command === 'Import'
-          exportVisible.value = data?.command === 'Export'
-          addVisible.value = !!item.pages
-          item?.script
-          popResource.value = item?.resource || {}
-          // handleView(data.id)
+          handleActions(data, item)
         },
       }),
       children: actionsBtnFormat(item?.children || []),
     }
+    if (item.title == '批量删除') {
+      result['selected'] = {
+        popConfirm: {
+          title: '确认删除吗？',
+          onConfirm: async () => {}
+        },
+      }
+    } else if (item.title === '批量导出') {
+      result['selected'] = {
+        popConfirm: {
+          title: '确认导出吗？',
+          onConfirm: async () => {
+            handleActions(item, item)
+          },
+        },
+      }
+    } else {
+      result['onClick'] = (data_) => {
+        handleActions(data_, item)
+      }
+    }
+    return result
   })
   return finalData
+}
+
+//按钮操作
+const handleActions = (
+  data: Record<string, any>,
+  config: Record<string, any>,
+) => {
+  if (
+    config.type === 'Add' ||
+    config.type === 'Update' ||
+    config.type === 'Detail'
+  ) {
+    // if(config.resource.type === providerEnum.FormPage) {
+    addVisible.value = true
+    popResource.value = config.resource
+    // } else if(config.resource.type === providerEnum.HtmlPage) {
+    //   router.push(`/preview/${config.resource.projectId}/${config.resource.parentId}/${config.resource.id}/html/${randomString(8)}`)
+    // }
+  }
+  if (config.command === 'Import') {
+    importVisible.value = data?.command === 'Import'
+  }
+  if (config.command === 'Export') {
+    console.log(config, data)
+    exportVisible.value = data?.command === 'Export'
+  }
 }
 //表头按钮
 const handleHeaderActions = () => {

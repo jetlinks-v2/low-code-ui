@@ -69,7 +69,9 @@ const mode = computed(() => {
 })
 
 const title = computed(() => {
-  if (mode.value === 'add') {
+  if(props.type === 'Detail') {
+    return '查看详情'
+  } else if (mode.value === 'add') {
     return '新增'
   } else if (mode.value === 'edit') {
     return '编辑'

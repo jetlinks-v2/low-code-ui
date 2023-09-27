@@ -282,6 +282,12 @@ const searchData = () => {
                     column: 'dictId',
                     termType: 'eq',
                     value: item.config?.dataValue
+                  },
+                  {
+                    column: 'status',
+                    value: 1,
+                    termType: 'eq',
+                    type: 'and'
                   }
                 ]
               }
@@ -309,7 +315,6 @@ const searchData = () => {
       },
     }
   })
-  console.log(searchColumns.value);
 }
 
 const searchType = (type_: string) => {
@@ -446,7 +451,7 @@ const handleActions = (
       function: config.functions,
       command: config.command,
     }
-    commandType.value = config.command
+    commandType.value = config.type
     // } else if(config.resource.type === providerEnum.HtmlPage) {
     //   router.push(`/preview/${config.resource.projectId}/${config.resource.parentId}/${config.resource.id}/html/${randomString(8)}`)
     // }
