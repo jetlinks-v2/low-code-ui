@@ -6,6 +6,9 @@
 body {
   font-family: 'AliRegular' !important;
 }
+.ant-btn {
+  border-radius: 6px;
+}
 
 #app {
   width: 100%;

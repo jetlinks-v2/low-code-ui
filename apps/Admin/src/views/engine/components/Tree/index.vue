@@ -59,7 +59,12 @@ const productClass = computed(() => {
   }
 })
 
-product.queryProduct(route.params.id)
+watch(() => route.params.id, () => {
+  if (route.params.id !== undefined ) {
+    product.initProjectState()
+    product.queryProduct(route.params.id)
+  }
+}, { immediate: true })
 
 </script>
 

@@ -209,7 +209,7 @@ const providerChange = (key) => {
       }
       break;
     case 'max':
-    case 'main':
+    case 'min':
       model.value.validator.configuration = {
         message: configuration.message,
         group: configuration.group,
@@ -223,7 +223,7 @@ const providerChange = (key) => {
         min: undefined,
         max: undefined,
         message: '数据格式错误',
-        group: undefined,
+        group: ['save', 'update', 'insert'],
         classType: model.value.javaType
       }
       break

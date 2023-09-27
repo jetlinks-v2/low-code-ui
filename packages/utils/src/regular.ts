@@ -17,7 +17,7 @@ export const regular = {
   telephoneReg: /(0[0-9]{2,3})([2-9][0-9]{6,7})+([0-9]{8,11})?$/,
   isTelephone: (phone: string) => regular.telephoneReg.test(phone),
   /* 手机号码验证 */
-  cellphoneReg: /^(((\\+86)|(\\+86-))|((86)|(86\\-))|((0086)|(0086\\-)))?1[3|5|7|8|9]\\d{9}$/,
+  cellphoneReg: /^(((\+86)|(\+86-))|((86)|(86\-))|((0086)|(0086\-)))?1[3|5|7|8|9]\d{9}$/,
   isCellphone: (phone: string) => regular.cellphoneReg.test(phone),
   /* ip地址校验 */
   ipReg: /^([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.([0-9]|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])$/,

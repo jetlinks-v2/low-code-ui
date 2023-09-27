@@ -547,8 +547,14 @@ const typeOptions = computed(() => {
 
 const onTypeChange = (val: string) => {
   const item = basic.find((item) => item?.type === val)
+  const _data = generatorData(item)
   const obj = {
-    ...generatorData(omit(item, ['icon'])),
+    ..._data,
+    formItemProps: {
+      ..._data?.formItemProps,
+      label: target.value?.formItemProps?.label || _data?.formItemProps.label,
+      name: target.value?.formItemProps?.name || _data?.formItemProps.name,
+    },
     key: target.value?.key,
   }
   const arr = updateData(unref(designer.formData)?.children, obj)

@@ -243,18 +243,33 @@ function bubbleSort(arr: any[]) {
     return arr;
 }
 
+const _getData = (arr: any[]) => {
+    return arr.map(item => {
+        return {
+            ordinal: item?.ordinal,
+            label: item.text,
+            value: item.value,
+            children: _getData(item?.children || [])
+        }
+    })
+}
+
+const _getEndData = (arr: any[], source: any) => {
+    return arr.map(item => {
+        return {
+            label: item[source?.label],
+            value: item[source?.value],
+            children: _getData(item?.children || [])
+        }
+    })
+}
+
 // 获取options
 export const queryOptions = async (source: any, id: string) => {
     if (source?.type === 'dic' && source?.dictionary) {
         const resp = await queryDictionaryData(source?.dictionary)
         if (resp.success) {
-            const list = resp.result.map(item => {
-                return {
-                    ordinal: item?.ordinal,
-                    label: item.text,
-                    value: item.value
-                }
-            })
+            const list = _getData(resp.result || [])
             return bubbleSort(list)
         }
     }
@@ -263,12 +278,7 @@ export const queryOptions = async (source: any, id: string) => {
         if (resp.success) {
             const arr = getData(source?.source, resp?.result || {})
             if (Array.isArray(arr) && arr?.length) {
-                return arr.map(item => {
-                    return {
-                        label: item[source?.label],
-                        value: item[source?.value]
-                    }
-                })
+                return _getEndData(arr, source)
             } else {
                 return []
             }
@@ -371,7 +381,10 @@ export const getFieldData = (data: ISchema) => {
     if (data?.formItemProps?.name) {
         if (data.type === 'table') {
             _obj[data?.formItemProps?.name] = [omit(obj, ['actions', 'index'])]
-        } else {
+        } else if (data.type === 'switch' || data.type === 'boolean') {
+            _obj[data?.formItemProps?.name] = obj || false
+        }
+        else {
             _obj[data?.formItemProps?.name] = obj
         }
     } else {

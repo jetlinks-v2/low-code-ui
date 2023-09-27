@@ -56,21 +56,27 @@
       <div style="margin-bottom: 4px">
         主题色
       </div>
-      <a-select
-        v-model:value="theme"
-        option-label-prop="label"
-        :options="options"
-        style="width: 100%"
-        @change="themeChange"
-      >
-        <template #option="{ value, label }">
-          <div style="display: flex;gap: 24px;" >
-            <div :style="{ width: '24px', height: '24px', backgroundColor: value}"></div>
-            {{ label }}
-          </div>
+      <div class="theme-select">
+        <div class="color" :style="{ backgroundColor: theme }">
 
-        </template>
-      </a-select>
+        </div>
+        <div style="flex: 1;">
+          <a-select
+            v-model:value="theme"
+            option-label-prop="label"
+            :options="options"
+            style="width: 100%"
+            @change="themeChange"
+          >
+            <template #option="{ value, label }">
+              <div style="display: flex;gap: 24px;" >
+                <div :style="{ width: '24px', height: '24px', backgroundColor: value}"></div>
+                {{ label }}
+              </div>
+            </template>
+          </a-select>
+        </div>
+      </div>
     </div>
     <div class="update-modal" v-show="visible">
       <div class="update-modal-header">
@@ -106,6 +112,16 @@ import { providerEnum } from '@/components/ProJect/index'
 import { validateDraft } from "@/api/project";
 import { regular } from '@jetlinks/utils'
 
+const props = defineProps({
+  status: {
+    type: Number,
+  },
+  theme: {
+    type: String,
+    default: '#1677ff'
+  }
+})
+
 const emit = defineEmits(['update:status'])
 
 const engine = useEngine()
@@ -130,7 +146,7 @@ const options = [
   { label: '海棠', value: '#eb2f96' },
 ]
 
-const theme = ref('#1677ff')
+const theme = ref(props.theme)
 
 const check = reactive({
   success: 0,
@@ -403,6 +419,16 @@ watch( () => JSON.stringify(status), () => {
     min-width: 300px;
     padding-left: 24px;
     border-left: 1px solid #e9e9e9;
+
+    .theme-select {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      .color {
+        width: 30px;
+        height: 30px;
+      }
+    }
   }
 }
 
