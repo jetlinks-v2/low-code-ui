@@ -142,7 +142,10 @@ const handleChangeFunction = (val: string) => {
 const handleChangeData = (e: string[]) => {
   let arr: any[] = []
   e.forEach((item) => {
-    arr.push(findItem(sourceList.value, item))
+    const result = findItem(sourceList.value, item)
+    if(result) {
+      arr.push(result)
+    }
   })
   dataBind.data.dataSource = arr.map((item) => {
     return {

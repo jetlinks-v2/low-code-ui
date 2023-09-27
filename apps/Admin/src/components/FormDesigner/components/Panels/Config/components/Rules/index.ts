@@ -13,7 +13,7 @@ export const patternList = [
     },
     {
         text: '整数格式',
-        value: '^[1-9]\d*$'
+        value: '^-?\d+$'
     },
     {
         text: '身份证号格式',
