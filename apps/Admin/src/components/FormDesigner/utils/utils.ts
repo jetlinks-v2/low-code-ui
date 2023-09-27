@@ -381,10 +381,9 @@ export const getFieldData = (data: ISchema) => {
     if (data?.formItemProps?.name) {
         if (data.type === 'table') {
             _obj[data?.formItemProps?.name] = [omit(obj, ['actions', 'index'])]
-        } else if (data.type === 'switch' || data.type === 'boolean') {
+        } else if (data.type === 'switch') {
             _obj[data?.formItemProps?.name] = obj || false
-        }
-        else {
+        } else {
             _obj[data?.formItemProps?.name] = obj
         }
     } else {
