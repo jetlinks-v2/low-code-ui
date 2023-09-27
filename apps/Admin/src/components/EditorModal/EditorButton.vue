@@ -9,6 +9,7 @@
       @ok="handleOk"
       @cancel="handleCancel"
       :maskClosable="false"
+      destroyOnClose
     >
       <div ref="target" style="height: 300px;">
         <j-monaco-editor
@@ -74,7 +75,7 @@ const handleOk = () => {
 
 const handleCancel = () => {
   visible.value = false
-  // _value.value = ''
+  _value.value = props.value
 }
 
 watch(

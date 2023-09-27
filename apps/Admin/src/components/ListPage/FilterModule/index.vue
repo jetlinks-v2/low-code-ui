@@ -90,7 +90,7 @@ import {
   NumberType,
   DateType,
 } from '@/components/ListPage/FilterModule/components/index'
-import { getImage } from '@jetlinks/utils';
+import { getImage, randomString } from '@jetlinks/utils';
 
 import { validFilterModule } from './utils/valid'
 import { DATA_BIND } from '../keys'
@@ -225,6 +225,7 @@ const handleAdd = async (table: any) => {
     name: '',
     type: 'string',
     mark: 'add',
+    rowKey: randomString(8)
   })
 }
 

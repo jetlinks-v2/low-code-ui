@@ -1,11 +1,15 @@
 <template>
-  <span v-if="config?.fileValue === 'url'">{{ formatValue }}</span>
-  <j-image :src="formatValue.split(',')?.[0]" v-else-if="config?.fileValue === 'icon'"></j-image>
-  <span v-if="config?.fileValue === 'fileName'">{{ formatValue }}</span>
+  <template v-if="!isEmpty(value)">
+    <span v-if="config?.fileValue === 'url'">{{ formatValue }}</span>
+    <j-image :src="formatValue.split(',')?.[0]" v-else-if="config?.fileValue === 'icon'"></j-image>
+    <span v-if="config?.fileValue === 'fileName'">{{ formatValue }}</span>
+  </template>
+  <span v-else>--</span>
 </template>
 
 <script setup lang="ts">
 import { PropType } from 'vue';
+import { isEmpty } from '../../../utils';
 
 
 const props = defineProps({
@@ -23,6 +27,10 @@ const props = defineProps({
  * int, long, text, double, float, string格式化
  */
  const formatFn = (value) => {
+  console.log(value);
+  if(isEmpty(value)) {
+    return '--'
+  }
   try {
     let result = value
     value = typeof value == 'string' ? JSON.parse(value) : value

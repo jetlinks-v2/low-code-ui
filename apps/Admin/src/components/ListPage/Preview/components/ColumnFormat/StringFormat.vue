@@ -1,9 +1,11 @@
 <template>
   <span>{{ formatValue }}</span>
+  <span>{{ value }}</span>
 </template>
 
 <script setup lang="ts">
 import { PropType } from 'vue';
+import { isEmpty } from '../../../utils';
 
 
 const props = defineProps({
@@ -21,13 +23,13 @@ const props = defineProps({
  * int, long, text, double, float, string格式化
  */
  const normalFormat = (str: string, value: any) => {
-  if(!String(value).length) {
+  value = String(value)
+  if(isEmpty(value) && typeof value !== 'number') {
     return '--'
   }
   if(!str) {
     return value
   }
-  value = String(value)
   const last = str?.lastIndexOf('x')
   const first = str?.indexOf('x')
   let result = ''

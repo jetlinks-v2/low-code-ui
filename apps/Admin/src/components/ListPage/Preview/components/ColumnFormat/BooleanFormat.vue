@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { PropType } from 'vue';
-
+import { isEmpty } from '../../../utils';
 
 const props = defineProps({
   config: {
@@ -21,7 +21,7 @@ const props = defineProps({
  * int, long, text, double, float, string格式化
  */
  const formatFn = (value) => {
-  if(value === null || value === undefined || !value.length) {
+  if(isEmpty(value)) {
     return '--'
   }
   let result = value
