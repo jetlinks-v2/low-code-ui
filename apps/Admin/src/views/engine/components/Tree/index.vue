@@ -60,8 +60,10 @@ const productClass = computed(() => {
 })
 
 watch(() => route.params.id, () => {
-  product.initProjectState()
-  product.queryProduct(route.params.id)
+  if (route.params.id !== undefined ) {
+    product.initProjectState()
+    product.queryProduct(route.params.id)
+  }
 }, { immediate: true })
 
 </script>
