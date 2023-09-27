@@ -3,5 +3,6 @@ export interface DataSourceProps {
   name: string
   weight?: number
   type: string
-  other: string
+  groupField?: string
+  others?: any
 }

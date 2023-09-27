@@ -8,7 +8,7 @@
     @cancel="emits('update:visible', false)"
   >
     <!-- 组织维度 -->
-    <div class="dimensions" v-show="!show">
+    <div class="dimensions" v-if="!show">
       <j-space v-for="item of dimensions" :key="item.id">
         <div
           class="dimension-item"
@@ -26,33 +26,41 @@
       </j-space>
     </div>
     <!-- 配置 -->
-    <MemberSelect
+    <!-- <MemberSelect
       ref="selectRef"
-      v-show="show"
+      v-else
       :type="type"
       :showSearch="type === 'user' || type === 'role'"
       :isNode="isNode"
       :hasWeight="hasWeight"
       @back="back"
-    ></MemberSelect>
+    /> -->
+    <MemberSelect
+      ref="selectRef"
+      v-else
+      :type="type"
+      :showSearch="type === 'user' || type === 'role'"
+      @back="back"
+    />
   </j-modal>
 </template>
 <script setup lang="ts">
 import MemberSelect from '../components/MemberSelect.vue'
 import { DataSourceProps } from '../types'
 
-const props = defineProps<{
-  // id: string
-  isNode: boolean
-  hasWeight: boolean
-  visible: boolean
-}>()
+const props = defineProps({
+  visible: {
+    type: Boolean,
+    default: false,
+  },
+})
+
 const emits = defineEmits<{
   (e: 'update:visible', newVisible: boolean): void
   (e: 'get-data', data: DataSourceProps[], key: string): void
 }>()
 
-const dimensions = reactive([
+const dimensions = [
   {
     id: '1',
     name: '组织',
@@ -77,23 +85,22 @@ const dimensions = reactive([
     checked: false,
     icon: 'TeamOutlined',
   },
-])
-// console.log(`output->a`,dimensions)
+]
 // 选中的维度
-const type = ref('')
-const show = ref(false)
+const type = ref<string>('')
+const show = ref<boolean>(false)
 // 点击次数
-const count = ref(0)
+const count = ref<number>(0)
 /**
  *
  * @string key 维度值
  */
-const handleClick = (key) => {
+const handleClick = (key: string) => {
   type.value = key
 }
-const selectRef = ref()
+const selectRef = ref<any>()
 const confirm = () => {
-  if(!type.value) return
+  if (!type.value) return
   if (!count.value) {
     show.value = true
   } else {
