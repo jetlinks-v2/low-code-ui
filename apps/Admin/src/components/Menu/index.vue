@@ -120,6 +120,7 @@ const toRight = () => {
                 pageId: it.id,
                 projectId: props.projectId,
                 LowCode:true,
+                show:true
             }
         }
     })
