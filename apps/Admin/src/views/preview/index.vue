@@ -36,13 +36,13 @@ const getInfo = async () => {
     if (resp.result && resp.result.data?.length && resp.result.data[0].runningState?.value === 'enabled') {
       isEmpty.value = false
       console.log('getInfo',resp)
-      ConfigProvider.config({
-        theme: {
-          primaryColor: "#a0d911"
-        }
-      })
-      if (resp.result.data[0].others) {
 
+      if (resp.result.data[0].others?.theme) {
+        ConfigProvider.config({
+          theme: {
+            primaryColor: resp.result.data[0].others.theme || '#315efb'
+          }
+        })
       }
       getResource(project, module, id).then(resp => {
         data.value = typeof resp === 'string' ? resp : JSON.stringify(resp)
@@ -53,11 +53,9 @@ const getInfo = async () => {
   })
 }
 
-watch(() => {
-  if (route.name === 'Preview') {
-    getInfo()
-  }
-})
+if (route.name === 'Preview') {
+  getInfo()
+}
 
 </script>
 
