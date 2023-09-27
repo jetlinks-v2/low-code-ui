@@ -339,9 +339,9 @@ watch(
   },
 )
 
-onMounted(() => {
-  setSelection('root')
-})
+// onMounted(() => {
+//   // setSelection('root')
+// })
 
 onUnmounted(() => {
   onSaveData()

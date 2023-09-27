@@ -1,4 +1,4 @@
-import { ArrayTableSource, CardSource, CollapseSource, DatePickerSource, GridSource, InputSource, NumberPickerSource, ObjectSource, PasswordSource, RadioGroupSource, SelectSource, SpaceSource, SwitchSource, TabSource, TextAreaSource, TextSource, TimePickerSource, TreeSelectSource, UploadSource } from './source';
+import { ArrayTableSource, CardSource, CollapseSource, DatePickerSource, DeviceSource, GridSource, InputSource, NumberPickerSource, ObjectSource, PasswordSource, RadioGroupSource, SelectSource, SpaceSource, SwitchSource, TabSource, TextAreaSource, TextSource, TimePickerSource, TreeSelectSource, UploadSource } from './source';
 
 const getIcon = (type: string) => {
     switch (type) {
@@ -41,17 +41,17 @@ const getIcon = (type: string) => {
         case 'space':
             return SpaceSource
         case 'org':
-            return InputSource
+            return SelectSource
         case 'user':
-            return InputSource
+            return SelectSource
         case 'role':
-            return InputSource
+            return SelectSource
         case 'geo':
-            return InputSource
+            return SelectSource
         case 'product':
-            return InputSource
+            return DeviceSource
         case 'device':
-            return InputSource
+            return DeviceSource
         default:
             return InputSource
     }
