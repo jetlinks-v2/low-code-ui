@@ -18,7 +18,7 @@ import { queryProductNoPage , queryDeviceNoPage } from '@/api/form';
 import { cloneDeep } from 'lodash-es'
 const props = defineProps({
   value:{
-    type:Array || String,
+    type:[Array || String],
     default:[] || ''
   },
   disabled:{
@@ -38,7 +38,7 @@ const closeModal = () =>{
 }
 const updateData = (data:any) =>{
   visible.value = false
-  mode ? emit('updateValue',data) : emit('updateValue',data?.[0])
+  mode === 'multiple' ? emit('updateValue',data) : emit('updateValue',data?.[0])
 }
 const cancelSelect = (id: string)=>{
   const index = selectData.value.findIndex((item: any) => item?.id === id)
@@ -83,7 +83,7 @@ const queryName =async (data:any) =>{
     })
   }else{
     const array = cloneDeep(selectIds.value)
-    selectData.value =  array.map((item:any)=>{
+    selectData.value = array.map((item:any)=>{
       return {
         id:item
       }
@@ -92,7 +92,7 @@ const queryName =async (data:any) =>{
 }
 watch(()=>props.value,()=>{
   if(props.value?.length){
-    selectIds.value = mode ?  props.value : [props.value]
+    selectIds.value = mode === 'multiple' ? props.value : [props.value]
     queryName(props.value)
   }else{
     selectIds.value = []
