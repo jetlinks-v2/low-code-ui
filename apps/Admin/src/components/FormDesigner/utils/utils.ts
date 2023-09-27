@@ -22,100 +22,78 @@ export const generateOptions = (len: number) => {
 const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo', 'product', 'device', 'org', 'user', 'role']
 
 const checkedConfigItem = (node: ISchema, allData: any[], dictionary: any[]) => {
+    const obj = {
+        key: node?.key,
+        message: (node.formItemProps?.label || node.name) + '配置错误'
+    }
     const _type = node.type || 'root'
     if (_type === 'root') {
         return false
     } else {
         if (arr.includes(_type)) {
             if (!node?.formItemProps?.label) {
-                return {
-                    key: node?.key,
-                    message: (node.formItemProps?.label || node.name) + '配置错误'
-                }
+                return obj
             }
         }
         if (!['space-item', 'card-item', 'grid-item', 'table-item'].includes(_type)) {
             if (!node?.formItemProps?.name) {
-                return {
-                    key: node?.key,
-                    message: (node.formItemProps?.label || node.name) + '配置错误'
-                }
+                return obj
             } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
-                return {
-                    key: node?.key,
-                    message: (node.formItemProps?.label || node.name) + '配置错误'
-                }
+                return obj
             } else {
                 const arr = getBrotherList(node?.key || '', allData)
                 const flag = arr.filter((item) => item.key !== node.key).find((i) => i?.formItemProps?.name === node?.formItemProps?.name)
                 if (flag) { // `标识${value}已被占用`
-                    return {
-                        key: node?.key,
-                        message: (node.formItemProps?.label || node.name) + '配置错误'
-                    }
+                    return obj
                 }
             }
         }
         if (['text'].includes(_type) && !node?.componentProps?.value) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
+            return obj
         }
         if ('input-number' === _type && (node?.componentProps?.max === undefined || node?.componentProps?.min === undefined || node?.componentProps?.precision === undefined)) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
+            return obj
         }
         if ('input-number' === _type && (node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined)) {
             if (node?.componentProps?.max < node?.componentProps?.min) {
-                return {
-                    key: node?.key,
-                    message: (node.formItemProps?.label || node.name) + '配置错误'
-                }
+                return obj
             }
         }
         if (['select', 'tree-select', 'select-card'].includes(_type)) {
             // 数据源
-            if (node?.componentProps.source?.functionId && !node?.componentProps.source?.commandId) {
-                return {
-                    key: node?.key,
-                    message: (node.formItemProps?.label || node.name) + '配置错误'
-                }
-            }
-            const flag = dictionary.find(i => node?.componentProps.source?.dictionary === i.id)
-            if (node?.componentProps.source?.dictionary && !flag) {
-                return {
-                    key: node?.key,
-                    message: (node.formItemProps?.label || node.name) + '配置错误'
+            if (!node?.componentProps.source?.type) {
+                return obj
+            } else {
+                if (node?.componentProps.source?.type === 'dic') {
+                    if (!node?.componentProps.source?.dictionary) {
+                        return obj
+                    }
+                    const flag = dictionary.find(i => node?.componentProps.source?.dictionary === i.id)
+                    if (node?.componentProps.source?.dictionary && !flag) {
+                        return obj
+                    }
+                } else {
+                    if (!node?.componentProps.source?.functionId || !node?.componentProps.source?.commandId || !node?.componentProps.source?.label || !node?.componentProps.source?.value) {
+                        return obj
+                    }
+                    if(node?.componentProps.source?.isSource && !node?.componentProps.source?.source) {
+                        return obj
+                    }
                 }
             }
         }
         if ('upload' === _type && ((node?.componentProps?.maxCount !== 0 && !node?.componentProps?.maxCount) || (node?.componentProps?.fileSize !== 0 && !node?.componentProps?.fileSize))) {
             // 个数和单位
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
+            return obj
         }
         if ('space' === _type && (node?.componentProps?.size !== 0 && !node?.componentProps?.size)) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
+            return obj
         }
         if (['card'].includes(_type) && !(node?.componentProps?.title)) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
+            return obj
         }
         if (node?.formItemProps?.isLayout && !node.formItemProps?.label) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
+            return obj
         }
     }
     return false

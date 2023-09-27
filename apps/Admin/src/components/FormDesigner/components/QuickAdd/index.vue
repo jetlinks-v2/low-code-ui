@@ -14,14 +14,27 @@
           <j-row :gutter="24">
             <j-col :span="12">
               <j-form-item label="后端功能" :name="['source', 'functionId']">
-                <j-select
+                <a-select
                   showSearch
                   placeholder="请选择"
-                  :options="functionList"
                   v-model:value="modelRef.source.functionId"
                   @change="onFunChange"
                   allowClear
-                />
+                >
+                  <a-select-option
+                    :key="item.value"
+                    v-for="item in functionList"
+                    :value="item.value"
+                  >
+                    <span>
+                      <img
+                        :src="typeImages[item.type]"
+                        style="width: 20px; height: 20px; margin-right: 5px"
+                      />
+                      {{ item.label }}
+                    </span>
+                  </a-select-option>
+                </a-select>
               </j-form-item>
             </j-col>
             <j-col :span="12">
@@ -115,6 +128,7 @@ import { providerEnum } from '@/components/ProJect'
 import generatorData from '../../utils/generatorData'
 import { map, uniqBy } from 'lodash-es'
 import { uid } from '../../utils/uid'
+import {  typeImages } from '@/components/ProJect/index'
 
 const product = useProduct()
 const designer: any = inject('FormDesigner')
@@ -151,7 +165,13 @@ const getEnd = () => {
   const id = product.info?.draftId
   queryEndCommands(id, []).then((resp) => {
     if (resp.success) {
-      end.value = resp.result || []
+      const _map = product.getDataMap()
+      end.value = (resp.result || []).map((item) => {
+        return {
+          ...item,
+          type: _map.get(item.id)?.type,
+        }
+      })
     }
   })
 }
@@ -160,6 +180,7 @@ const functionList = computed(() => {
   return (
     end.value.map((item) => {
       return {
+        ...item,
         label: item.name + '.' + item.id,
         value: item.id,
       }
@@ -477,7 +498,6 @@ watch(
 watch(
   () => props.data?.others?.quickData,
   (newVal) => {
-    console.log(newVal)
     if (newVal) {
       Object.assign(modelRef, newVal)
     } else {
