@@ -7,19 +7,19 @@ export const useImages = () => {
       let image = ''
       switch(type) {
         case providerEnum.CRUD:
-          image = getImage(`/project/curd.png`)
+          image = getImage(`/project/curd.svg`)
         break;
         case providerEnum.Function:
-          image = getImage(`/project/function.png`)
+          image = getImage(`/project/function.svg`)
         break;
         case providerEnum.FormPage:
-          image = getImage(`/project/form.png`)
+          image = getImage(`/project/form.svg`)
         break;
         case providerEnum.SQL:
-          image = getImage(`/project/sql.png`)
+          image = getImage(`/project/sql.svg`)
         break;
         case providerEnum.HtmlPage: 
-          image = getImage('/project/html.png')  
+          image = getImage('/project/html.svg')  
         break
       }
       return image
