@@ -262,16 +262,16 @@ const onResize = debounce((e) => {
       .item-state {
         position: absolute;
         top: 30px;
-        right: -12px;
+        right: -20px;
         display: flex;
         justify-content: center;
-        width: 100px;
+        width: 110px;
         padding: 2px 0;
         background-color: rgba(#5995f5, 0.15);
         transform: skewX(45deg);
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+        // overflow: hidden;
+        // white-space: nowrap;
+        // text-overflow: ellipsis;
         &.success {
           background-color: @success-color-deprecated-bg;
         }
