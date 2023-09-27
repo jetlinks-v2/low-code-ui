@@ -2,7 +2,8 @@
   <div class="list-page">
     <Preview
       :show="showPreview"
-      :id="props.data.id"
+      :pageId="props.data.id"
+      :projectId="info.id"
       :data="props.data?.configuration?.code"
       @back="() => (showPreview = false)"
     />
@@ -91,8 +92,9 @@ import {
   ACTION_CONFIG_KEY,
 } from './keys'
 import { useProduct } from '@/store'
-import { filter, omit, throttle } from 'lodash-es'
+import { omit, throttle } from 'lodash-es'
 import { onlyMessage } from '@jetlinks/utils'
+import { storeToRefs } from 'pinia'
 
 const spinning = ref(false)
 const props = defineProps({
@@ -106,6 +108,7 @@ const props = defineProps({
   }
 })
 const productStore = useProduct()
+const { info } = storeToRefs(productStore)
 
 const showPreview = ref(false)
 const menuRef = ref()

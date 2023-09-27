@@ -8,6 +8,7 @@
       :title="text"
       @ok="handleOk"
       @cancel="handleCancel"
+      :maskClosable="false"
     >
       <div ref="target" style="height: 300px;">
         <j-monaco-editor
@@ -73,7 +74,7 @@ const handleOk = () => {
 
 const handleCancel = () => {
   visible.value = false
-  _value.value = ''
+  // _value.value = ''
 }
 
 watch(

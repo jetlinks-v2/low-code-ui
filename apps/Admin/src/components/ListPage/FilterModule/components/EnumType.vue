@@ -48,6 +48,7 @@
               showSearch
               allowClear
               optionFilterProp="title"
+              placeholder="请选择"
               @change="state.instructValue = null"
             >
               <a-select-option
@@ -71,6 +72,7 @@
               optionFilterProp="name"
               showSearch
               allowClear
+              placeholder="请选择"
               :options="commandOptions"
               :field-names="{ label: 'name', value: 'id' }"
             />
@@ -170,8 +172,9 @@ queryData()
 
 const handleChangeType = () => {
   if(state.value === 'data') {
-    state.abilityValue = null,
+    state.abilityValue = null
     state.instructValue = null
+    state.output = null
   } else {
     state.dataValue = null
   }

@@ -35,7 +35,10 @@ const props = defineProps({
     type: String,
     default: 'text',
   },
-  value:Array
+  value:{
+    type:String,
+    default:''
+  }
 })
 const _value:any = ref([])
 const emit = defineEmits(['update:value'])
@@ -47,13 +50,14 @@ const emit = defineEmits(['update:value'])
 watch(
   ()=>props.value,
   (val)=>{
-    _value.value = val
+    _value.value =JSON.parse(val)
+    console.log('val--------',JSON.parse(val),val)
   }
 )
 
 const onChange = (item:any)=>{
-  // console.log('item---',item)
-  emit('update:value',item)
+  console.log('item---',item,)
+  emit('update:value',JSON.stringify(item || ''))
 }
 
 const _componentProps = computed(() => {

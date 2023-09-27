@@ -4,7 +4,7 @@
     :maskClosable="false"
     :visible="visible"
     :confirm-loading="confirmLoading"
-    title=""
+    title="新增"
     okText="确定"
     cancelText="取消"
     width="630px"
@@ -19,7 +19,6 @@
 import { FormPreview } from '@/components/FormDesigner';
 import CustomHtml from '@/components/CustomHTML/output/Preview.vue'
 import { PropType } from 'vue';
-import { getResource } from '@/api/basis'
 import { providerEnum } from '@/components/ProJect';
 import { ReplStore } from '@/components/CustomHTML/store';
 import { useProduct } from '@/store';
@@ -51,10 +50,11 @@ const getInfo = async () => {
   // data.value = res
   const res = productStore.getById(id)
   data.value = res?.configuration?.code;
+  console.log(data.value);
 }
 
 watch(() => JSON.stringify(props.resource), () => {
-  console.log(data);
+  console.log(props.resource);
   getInfo()
 })
 
