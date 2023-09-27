@@ -5,7 +5,7 @@
   <j-form-item label="校验规则" :name="['validator', 'provider']">
     <SelectNull
       :options="rulesOptions"
-      v-model:value="model.validator.provider"
+      v-model:value="model.validator.providerType"
       @change="providerChange"
     />
   </j-form-item>
@@ -59,11 +59,11 @@ import SelectNull from './SelectNull.vue'
 const model = inject(SETTING_FORM_MODEL, {})
 
 const showRegexp = computed(() => {
-  return model.value.validator.provider === 'pattern'
+  return model.value.validator.providerType === 'pattern'
 })
 
 const showGroup = computed(() => {
-  return model.value.validator.provider
+  return model.value.validator.providerType
 })
 
 const rulesOptions = [
@@ -127,6 +127,10 @@ const rules = {
 const providerChange = (key) => {
   const configuration = model.value.validator.configuration
   const _group = configuration.group || ['save', 'update', 'insert']
+
+  if (['email', 'phone'].includes(key)) {
+    model.value.validator.provider = 'pattern'
+  }
   switch (key) {
     case 'notEmpty':
       model.value.validator.configuration = {
@@ -145,14 +149,14 @@ const providerChange = (key) => {
       model.value.validator.configuration = {
         message: configuration.message,
         group: _group,
-        regexp: regular.emailReg
+        regexp: '^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$'
       }
       break;
     case 'phone':
       model.value.validator.configuration = {
         message: configuration.message,
         group: _group,
-        regexp: regular.cellphoneReg
+        regexp: '^(((\\\\+86)|(\\\\+86-))|((86)|(86\\\\-))|((0086)|(0086\\\\-)))?1[3|5|7|8|9]\\\\d{9}$'
       }
       break;
     default:
