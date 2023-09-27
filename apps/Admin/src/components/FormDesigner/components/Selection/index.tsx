@@ -93,13 +93,17 @@ const Selection = defineComponent({
     }
 
     const setOptions = (arr: any[]) => {
-      const _list = updateData(unref(designer.formData)?.children, {
+      const obj = {
         ...props.data,
-        componentProps: {
+        componentProps: props.data.type === 'tree-select' ? {
           ...props.data.componentProps,
           options: arr
+        } : {
+          ...props.data.componentProps,
+          treeData: arr
         }
-      })
+      }
+      const _list = updateData(unref(designer.formData)?.children, obj)
       designer.formData.value = {
         ...designer.formData.value,
         children: _list || [],

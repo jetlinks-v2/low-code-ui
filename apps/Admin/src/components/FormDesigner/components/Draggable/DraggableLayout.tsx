@@ -16,6 +16,7 @@ import { useProduct } from '@/store';
 import { onEnd } from './ControlInsertionPlugin';
 import { useProps } from '../../hooks';
 import './index.less'
+import { request } from '@jetlinks/core';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -102,6 +103,8 @@ const DraggableLayout = defineComponent({
                             const _props = useProps(element, unref(designer.formData), unref(designer.mode))
                             const selectRef = ref<any>(null)
                             const options = ref<any[]>(_props.componentProps.options)
+                            const treeData = ref<any[]>(_props.componentProps.treeData)
+
                             const params = {
                                 data: element,
                                 parent: props.data
@@ -115,7 +118,8 @@ const DraggableLayout = defineComponent({
                                     getWidgetRef: (path) => {
                                         let foundRef = unref(designer.refList)?.[path]
                                         return foundRef
-                                    }
+                                    },
+                                    request: request
                                 }
                                 if (!element?.componentProps?.eventCode && !unref(isEditModel)) return
                                 if (['input', 'textarea', 'input-password'].includes(element.type)) {
@@ -152,7 +156,11 @@ const DraggableLayout = defineComponent({
                             })
                             if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
                                 queryOptions(element.componentProps.source, product.info?.id).then(resp => {
-                                    options.value = resp
+                                    if (['select', 'select-card'].includes(element.type)) {
+                                        options.value = resp
+                                    } else {
+                                        treeData.value = resp
+                                    }
                                 })
                             }
 
@@ -168,7 +176,7 @@ const DraggableLayout = defineComponent({
                                         data={element}
                                         {..._props.componentProps}
                                         checked={get(designer.formState, _path)}
-                                        onUpdate:checked={(newValue) => {
+                                        onUpdate: checked={(newValue) => {
                                             set(designer.formState, _path, newValue)
                                         }}
                                         onChange={onChange}
@@ -178,10 +186,11 @@ const DraggableLayout = defineComponent({
                                         data={element}
                                         {..._props.componentProps}
                                         value={get(designer.formState, _path)}
-                                        onUpdate:value={(newValue) => {
+                                        onUpdate: value={(newValue) => {
                                             set(designer.formState, _path, newValue)
                                         }}
                                         options={unref(options)}
+                                        treeData={unref(treeData)}
                                         onChange={onChange}
                                     ></TypeComponent>
                                 }
