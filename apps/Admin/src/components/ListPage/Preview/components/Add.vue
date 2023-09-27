@@ -4,7 +4,7 @@
     :maskClosable="false"
     :visible="visible"
     :confirm-loading="confirmLoading"
-    title="新增"
+    :title="popTitle"
     okText="确定"
     cancelText="取消"
     width="630px"
@@ -38,6 +38,10 @@ const props = defineProps({
   resource: {
     type: Object as PropType<Record<string, any>>,
     default: () => {}
+  },
+  popTitle: {
+    type: String,
+    default: '',
   }
 })
 const emit = defineEmits(['close', 'save'])

@@ -57,7 +57,7 @@
               <StringFormat :config="item?.config" :value="slotProps[item.key]"/>
             </span> -->
           </div>
-          <span v-else>{{ slotProps[item.key] || '--' }}</span>
+          <span v-else>{{ !isEmpty(slotProps[item.key]) ? slotProps[item.key] : '--' }}</span>
         </j-ellipsis>
         <div v-if="item?.key === 'action'">
           <j-space size="large">
@@ -124,16 +124,14 @@
           <template #content>
             <j-row>
               <j-col :span="12">
-                <j-ellipsis style="margin-bottom: 18px">
-                  <h3>
-                    <StringFormat v-if="['int', 'long', 'text', 'float', 'double', 'geoPoint'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
-                    <DateFormat v-else-if="['date'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
-                    <BooleanFormat v-else-if="['boolean'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
-                    <FileFormat v-else-if="['file'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
-                    <ArrayFormat v-else-if="['array', 'enum'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]" />
-                    <ObjectFormat v-else-if="['object'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]" />
-                    <StringFormat v-else :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
-                  </h3>
+                <j-ellipsis style="margin-bottom: 18px;font-weight: bold;font-size: 16px;">
+                  <StringFormat v-if="['int', 'long', 'text', 'float', 'double', 'geoPoint'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
+                  <DateFormat v-else-if="['date'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
+                  <BooleanFormat v-else-if="['boolean'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
+                  <FileFormat v-else-if="['file'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
+                  <ArrayFormat v-else-if="['array', 'enum'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]" />
+                  <ObjectFormat v-else-if="['object'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]" />
+                  <StringFormat v-else :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
                 </j-ellipsis>
               </j-col>
               <j-col :span="12">
@@ -190,6 +188,7 @@ import {
   insertCustomCssToHead,
 } from '@/components/FormDesigner/utils/utils'
 import { ArrayFormat, BooleanFormat, DateFormat, FileFormat, StringFormat, ObjectFormat} from './ColumnFormat'
+import { isEmpty } from '../../utils'
 const props = defineProps({
   model: {
     type: String,
