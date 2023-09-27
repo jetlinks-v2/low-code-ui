@@ -49,7 +49,7 @@
               allowClear
               optionFilterProp="title"
               placeholder="请选择"
-              @change="state.instructValue = null"
+              @change="state.instructValue = state.output = null"
             >
               <a-select-option
                 v-for="item in functionOptions"
