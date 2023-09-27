@@ -3,8 +3,8 @@
 </template>
 
 <script setup lang="ts">
-import { type } from 'os';
 import { PropType } from 'vue';
+import { isEmpty } from '../../../utils';
 
 
 const props = defineProps({
@@ -22,7 +22,7 @@ const props = defineProps({
  * int, long, text, double, float, string格式化
  */
  const formatFn = (value) => {
-  if(!value) {
+  if(isEmpty(value)) {
     return '--'
   }
   let result = value;

@@ -84,14 +84,19 @@ const handleExport = async (type: string) => {
     terms: [
       {
         terms: [
-          ...props.selectedRowKeys.map((item) => {
-            return {
-              value: item,
-              column: 'id',
-              termType: 'eq',
-              type: 'or',
-            }
-          }),
+          {
+            column: 'id',
+            termType: 'in',
+            value: props.selectedRowKeys
+          }
+          // ...props.selectedRowKeys.map((item) => {
+          //   return {
+          //     value: item,
+          //     column: 'id',
+          //     termType: 'eq',
+          //     type: 'or',
+          //   }
+          // }),
         ],
       },
     ],

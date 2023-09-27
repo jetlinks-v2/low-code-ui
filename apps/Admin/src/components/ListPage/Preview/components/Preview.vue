@@ -1,10 +1,9 @@
 <template>
   <div class="preview">
     <div style="padding: 30px; background-color: #f2f2f2">
-      <pro-search
+      <j-advanced-search
         :columns="searchColumns"
         :target="target"
-        @search="handleSearch"
       />
 
       <div style="background-color: #ffffff">
@@ -39,6 +38,7 @@
   <Add
     v-model:open="addVisible"
     :resource="popResource"
+    :popTitle="popTitle"
     @close="addVisible = false"
     @save="addVisible = false"
   />
@@ -132,7 +132,7 @@ const dataColumns: any = computed(() => {
   return arr
 })
 const searchColumns: any = ref([])
-const typeChangeShow = ref(false)
+const popTitle = ref('')
 //操作按钮
 const actions = ref([])
 //table头部按钮
@@ -329,6 +329,7 @@ const handleActions = (
   data: Record<string, any>,
   config: Record<string, any>,
 ) => {
+  popTitle.value = config?.title
   if (
     config.type === 'Add' ||
     config.type === 'Update' ||

@@ -1,9 +1,15 @@
 <template>
   <div>
-    <p>请配置可选项的数据来源</p>
     <j-form-item
       :validateFirst="true"
+      label="请配置可选项的数据来源"
       :name="['componentProps', 'source', 'type']"
+      :rules="[
+        {
+          message: '请选择',
+          required: true,
+        },
+      ]"
     >
       <j-radio-group
         v-model:value="data.type"
@@ -36,6 +42,12 @@
           <j-form-item
             :validateFirst="true"
             :name="['componentProps', 'source', 'functionId']"
+            :rules="[
+              {
+                message: '请选择',
+                required: true,
+              },
+            ]"
           >
             <j-select
               v-model:value="data.functionId"
@@ -52,9 +64,8 @@
             :validateFirst="true"
             :rules="[
               {
-                required: data?.functionId,
                 message: '请选择',
-                trigger: 'change',
+                required: true,
               },
             ]"
             :name="['componentProps', 'source', 'commandId']"
@@ -73,7 +84,14 @@
     <template v-if="data?.type === 'end'">
       <j-form-item
         :validateFirst="true"
+        v-if="isSource"
         :name="['componentProps', 'source', 'source']"
+        :rules="[
+          {
+            message: '请选择',
+            required: true,
+          },
+        ]"
       >
         <template #label>
           数据层级<j-tooltip title="选择树结构的数据在接口的哪一层">
@@ -94,6 +112,12 @@
       <j-form-item
         :validateFirst="true"
         :name="['componentProps', 'source', 'label']"
+        :rules="[
+          {
+            message: '请选择',
+            required: true,
+          },
+        ]"
       >
         <template #label>
           展示字段<j-tooltip title="选择树结构进行展示的数据">
@@ -112,6 +136,12 @@
       <j-form-item
         :validateFirst="true"
         :name="['componentProps', 'source', 'value']"
+        :rules="[
+          {
+            message: '请选择',
+            required: true,
+          },
+        ]"
       >
         <template #label>
           存入后端字段<j-tooltip title="选择树结构存入后端的数据">
@@ -150,7 +180,7 @@ const props = defineProps({
 
 const emits = defineEmits(['change'])
 
-const data = reactive({
+const data = reactive<any>({
   dictionary: undefined,
   type: 'dic',
   // type: 'end',
@@ -179,9 +209,13 @@ const end = ref<any[]>([])
 
 const rules = [
   {
+    required: true,
+    message: '请选择',
+  },
+  {
     validator(_rule: any, value: string) {
-      const item = dic.value.find(i => i?.id === value)
-      if(!item) {
+      const item = dic.value.find((i) => i?.id === value)
+      if (!item) {
         return Promise.reject(`数字字典已被删除或禁用`)
       }
       return Promise.resolve()
@@ -192,8 +226,9 @@ const rules = [
 
 const getDictionary = () => {
   queryDictionary().then((resp) => {
-    if (resp.success) { // 过滤掉没有启用的数据
-      dic.value = resp.result?.filter(item => item?.status) || [];
+    if (resp.success) {
+      // 过滤掉没有启用的数据
+      dic.value = resp.result?.filter((item) => item?.status) || []
       designer.dictionary.value = dic.value
     }
   })
@@ -214,6 +249,7 @@ const onRadioChange = (e) => {
       type: 'end',
       label: undefined,
       name: undefined,
+      isSource: false,
       functionId: undefined,
       commandId: undefined,
       source: undefined,
@@ -275,6 +311,10 @@ const sourceList = computed(() => {
   return getArray(properties)
 })
 
+const isSource = computed(() => {
+  return data.type === 'end' && sourceList.value.length
+})
+
 const searchTree = (arr: any[], _item: any) => {
   let _data: any = undefined
   arr?.map((item) => {
@@ -321,28 +361,26 @@ const onFunChange = (val: string) => {
     source: undefined,
     label: undefined,
     value: undefined,
+    isSource: isSource.value
   }
   emits('change', obj)
 }
 
 const onCommandChange = () => {
-  const obj = cloneDeep({ ...data })
   data.source = undefined
   data.label = undefined
   data.value = undefined
-  emits('change', obj)
+  emits('change', data)
 }
 
 const onSourceChange = () => {
-  const obj = cloneDeep({ ...data })
   data.label = undefined
   data.value = undefined
-  emits('change', obj)
+  emits('change', data)
 }
 
 const onDataChange = () => {
-  const obj = cloneDeep({ ...data })
-  emits('change', obj)
+  emits('change', data)
 }
 
 watch(

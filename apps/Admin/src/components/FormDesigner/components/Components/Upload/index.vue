@@ -1,17 +1,17 @@
 <template>
   <div>
     <template v-if="listType === 'text'">
-      <File v-bind="_componentProps" :value="_value" @change="onChange"/>
+      <File v-bind="_componentProps" :value="_value" @change="onChange" />
     </template>
     <template v-else>
-      <Picture v-bind="_componentProps" :value="_value" @change="onChange"/>
+      <Picture v-bind="_componentProps" :value="_value" @change="onChange" />
     </template>
   </div>
 </template>
   
   <script lang="ts" setup>
 import { omit } from 'lodash-es'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import File from './File.vue'
 import Picture from './Picture.vue'
 
@@ -35,29 +35,31 @@ const props = defineProps({
     type: String,
     default: 'text',
   },
-  value:{
-    type:String,
-    default:''
-  }
+  value: {
+    type: String,
+    default: '',
+  },
 })
-const _value:any = ref([])
+const _value: any = ref([])
 const emit = defineEmits(['update:value'])
 
-// const updateValue = (value:any) =>{
-//   emit('update:value',value)
-// }
-
 watch(
-  ()=>props.value,
-  (val)=>{
-    _value.value =JSON.parse(val)
-    console.log('val--------',JSON.parse(val),val)
+  () => props.value,
+  (val) => {
+    try {
+      _value.value = JSON.parse(val || '[]')
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  {
+    immediate: true,
+    deep: true
   }
 )
 
-const onChange = (item:any)=>{
-  console.log('item---',item,)
-  emit('update:value',JSON.stringify(item || ''))
+const onChange = (item: any) => {
+  emit('update:value', JSON.stringify(item || []))
 }
 
 const _componentProps = computed(() => {
