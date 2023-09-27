@@ -349,7 +349,6 @@ onUnmounted(() => {
 
 // 校验
 const onValidate = async () => {
-  spinning.value = true
   if (!dictionary.value?.length) {
     const resp = await queryDictionary()
     if (resp.success) {
@@ -358,7 +357,6 @@ const onValidate = async () => {
     }
   }
   errorKey.value = checkedConfig(unref(formData), dictionary.value)
-  spinning.value = false
   return new Promise((resolve, reject) => {
     if (errorKey.value?.length) {
       reject(errorKey.value)
@@ -369,7 +367,11 @@ const onValidate = async () => {
 }
 
 const onValid = async () => {
-  const _val = await onValidate()
+  spinning.value = true
+  const _val = await onValidate().catch(() => {
+    spinning.value = false
+  })
+  spinning.value = false
   if (_val) {
     onlyMessage('校验通过')
   }
