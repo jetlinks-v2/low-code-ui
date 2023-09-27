@@ -92,7 +92,7 @@ import {
   ACTION_CONFIG_KEY,
 } from './keys'
 import { useProduct } from '@/store'
-import { omit, throttle } from 'lodash-es'
+import { isEmpty, omit, throttle } from 'lodash-es'
 import { onlyMessage } from '@jetlinks/utils'
 import { storeToRefs } from 'pinia'
 
@@ -104,8 +104,8 @@ const props = defineProps({
   },
   showTip: {
     type: Boolean,
-    default: true
-  }
+    default: true,
+  },
 })
 const productStore = useProduct()
 const { info } = storeToRefs(productStore)
@@ -210,15 +210,14 @@ const validate = async () => {
     ...menuConfigRef.value?.valid(),
     ...dataBindRef.value?.valid(),
   ]
-  
+
   return new Promise((resolve, reject) => {
-    filterModuleRef.value?.valid()
-    .then(res => {
+    filterModuleRef.value?.valid().then((res) => {
       errorList.push(...res)
       if (errorList.length) {
         reject(errorList)
       } else {
-        if(props.showTip) {
+        if (props.showTip) {
           onlyMessage('校验通过')
         }
         resolve([])
@@ -336,12 +335,16 @@ onMounted(() => {
     actionsConfig.value = initData?.actionsButton || []
     searchData.value = initData?.searchData || []
     dataSource.value = initData?.dataSource || []
-    showColumns.value = initData?.showColumns !== undefined ? initData?.showColumns : showColumns.value
+    showColumns.value =
+      initData?.showColumns !== undefined
+        ? initData?.showColumns
+        : showColumns.value
   }
   setTimeout(() => {
     watch(
       () => JSON.stringify(listPageData.value),
       () => {
+        filterQuote()
         if (!listPageData.value.dataBind.data.function) {
           listFormInfo.field1 =
             listFormInfo.field2 =
@@ -368,12 +371,10 @@ onMounted(() => {
             },
             useList: Array.from(
               new Set([
-                ...actionsConfig.value
-                  .filter((item) => item.pages && item.pages !== '')
-                  ?.map((item) => item.pages),
-                ...buttonsConfig.value
-                  .filter((item) => item.pages && item.pages !== '')
-                  ?.map((item) => item.pages),
+                ...actionsQuote(actionsConfig.value),
+                ...actionsQuote(buttonsConfig.value),
+                  ...filterQuote(),
+                  dataBindQuote()
               ]),
             ),
           },
@@ -383,6 +384,36 @@ onMounted(() => {
     )
   })
 })
+
+const filterQuote = () => {
+  return searchData.value
+    .filter((item) => item.config?.abilityValue)
+    ?.map((item) => findFunctionId(item.config?.abilityValue)?.id)
+}
+
+const dataBindQuote = () => {
+  return findFunctionId(dataBind.data.function!)?.id
+}
+
+const actionsQuote = (arr: any[]) => {
+  let pages: string[] = [];
+  let functions: string[] = [];
+  arr.forEach((item) => {
+    if(!isEmpty(item.pages)) {
+      pages.push(item.pages)
+    }
+    if(!isEmpty(item.functions)) {
+      functions.push(findFunctionId(item.functions)?.id)
+    }
+  })
+  return [...pages, ...functions]
+}
+
+
+const findFunctionId = (fullId: string) => {
+  const functionArr = [...productStore.getDataMap().values()];
+  return functionArr.find(item => item.fullId === fullId)
+}
 
 // watch(() => JSON.stringify(allListData.value), () => {
 //   const record = {
@@ -415,7 +446,6 @@ defineExpose({
   height: 100%;
   position: relative;
   background-color: #e9e9e9;
-  
 }
 .options-img {
   width: 20px;

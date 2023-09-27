@@ -12,7 +12,7 @@
     <j-data-table
       columnDrag
       class="ant-table-striped table-striped"
-      rowKey="id"
+      rowKey="rowKey"
       bordered
       ref="tableRef"
       size="small"
@@ -98,7 +98,7 @@ import { onlyMessage } from '@/utils/comm'
 import { ErrorItem } from '../..'
 import type { PropType } from 'vue'
 import { useProduct } from '@/store';
-import { getImage } from '@jetlinks/utils';
+import { getImage, randomString } from '@jetlinks/utils';
 import { cloneDeep } from 'lodash-es';
 import { DATA_BIND } from '../../keys';
 const props = defineProps({
@@ -403,8 +403,9 @@ const syncData = async () => {
 const asyncDataBind = () => {
   return dataBinds.data.dataSource.map(item => {
     return {
-      ...item,
+      rowKey: randomString(8),
       type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type],
+      ...item,
     }
   }) || []
 }
@@ -438,6 +439,7 @@ watch(() => props.bindFunctionId, () => {
         id: item.alias,
         name: item.comment,
         type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
+        rowKey: randomString(8)
       }
     },
   )

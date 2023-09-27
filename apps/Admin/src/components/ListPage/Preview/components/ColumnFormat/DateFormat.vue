@@ -5,6 +5,7 @@
 <script setup lang="ts">
 import { PropType } from 'vue';
 import dayjs from 'dayjs'
+import { isEmpty } from '../../../utils';
 
 
 const props = defineProps({
@@ -22,7 +23,10 @@ const props = defineProps({
  * int, long, text, double, float, string格式化
  */
  const formatFn = (value) => {
-  return dayjs(value).format(props.config?.inputValue || 'YYYY-MM-DD')
+  if(isEmpty(String(value))) {
+    return '--'
+  }
+  return dayjs(value).format(props.config?.dateValue || 'YYYY-MM-DD')
 }
 
 const formatValue = computed(() => {

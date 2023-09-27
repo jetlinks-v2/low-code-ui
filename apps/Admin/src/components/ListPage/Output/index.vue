@@ -237,7 +237,7 @@ const componentPropsSwitch = (item: any) => {
           ? dayjs(new Date())
           : dayjs(new Date()).format(format)
       data = {
-        format: format,
+        valueFormat: format,
         type: type,
         defaultValue: defaultValue,
         showTime: item?.config?.accuracy === 'hour'
