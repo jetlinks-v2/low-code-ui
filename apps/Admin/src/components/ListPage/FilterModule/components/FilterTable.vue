@@ -223,6 +223,7 @@ enum filterType {
   boolean = 'enum',
   map = 'string',
   object = 'enum',
+  array = 'string'
 }
 
 
@@ -404,8 +405,8 @@ const asyncDataBind = () => {
   return dataBinds.data.dataSource.map(item => {
     return {
       rowKey: randomString(8),
-      type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type],
       ...item,
+      type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type],
     }
   }) || []
 }
