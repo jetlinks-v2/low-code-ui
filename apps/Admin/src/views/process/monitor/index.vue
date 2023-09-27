@@ -46,11 +46,12 @@
       v-if="drawer.visible"
       v-model:visible="drawer.visible"
       :data="drawer.selectItem"
+      :showRecords="true"
     />
   </page-container>
 </template>
 <script setup>
-import Drawer from './Drawer/index.vue'
+import Drawer from '../components/Drawer/index.vue'
 import { getList_api } from '@/api/process/instance'
 import dayjs from 'dayjs'
 

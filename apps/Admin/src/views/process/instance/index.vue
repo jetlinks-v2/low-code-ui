@@ -97,7 +97,7 @@
 import { onlyMessage } from '@jetlinks/utils'
 import dayjs from 'dayjs'
 import Dialog from './Dialog/index.vue'
-import Drawer from './Drawer/index.vue'
+import Drawer from '../components/Drawer/index.vue'
 import { isFunction, isObject } from 'lodash-es'
 import { getList_api, del_api } from '@/api/process/instance'
 import { saveProcess_api } from '@/api/process/model'

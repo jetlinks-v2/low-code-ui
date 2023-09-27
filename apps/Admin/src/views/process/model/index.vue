@@ -65,8 +65,12 @@
                 </j-ellipsis>
                 <div class="title-icon">
                   <!-- 流程图标 -->
-                  {{ record.icon }}
-                  <AIcon :type="record.icon ? record.icon : 'DeleteOutlined'" />
+                  <!-- <AIcon :type="record.icon ? record.icon : 'DeleteOutlined'" /> -->
+                  <j-image
+                    :width="80"
+                    :src="record.icon"
+                    :preview="false"
+                  />
                 </div>
               </div>
               <div style="display: flex">
@@ -90,19 +94,19 @@
       v-model:visible="dialog.visible"
       :data="dialog.selectItem"
       @refresh="refresh"
-    ></Dialog>
+    />
     <Drawer
       v-if="drawer.visible"
       v-model:visible="drawer.visible"
       :data="drawer.selectItem"
-    ></Drawer>
+    />
   </page-container>
 </template>
 <script setup>
 import { onlyMessage } from '@jetlinks/utils'
 import dayjs from 'dayjs'
 import Dialog from './Dialog/index.vue'
-import Drawer from './Drawer/index.vue'
+import Drawer from '../components/Drawer/index.vue'
 import { isFunction, isObject } from 'lodash-es'
 import { getProcess_api, deploy_api, del_api } from '@/api/process/model'
 
