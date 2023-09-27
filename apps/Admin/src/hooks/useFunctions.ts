@@ -57,14 +57,6 @@ export const useFunctions = () => {
         (item) => item.id === command,
       )
       const arr: any[] = []
-      if (_item?.inputs) {
-        arr.push({
-          label: '输入',
-          value: 'inputs',
-          disabled: true,
-          children: getArray(_item?.inputs || [], 'inputs'),
-        })
-      }
       if (_item?.output && _item?.output?.properties?.length) {
         arr.push({
           label: '输出',

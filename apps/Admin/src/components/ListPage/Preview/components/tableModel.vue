@@ -27,9 +27,20 @@
         :key="item.key"
         #[item.key]="slotProps"
       >
-        <j-ellipsis v-if="item.key !== 'action'" :data-id="`${projectId}-${pageId}-${item.dataIndex}`" :class="extractCssClass(item.config?.specialStyle)">
+        <j-ellipsis
+          v-if="item.key !== 'action'"
+          :data-id="`${projectId}-${pageId}-${item.dataIndex}`"
+          :class="extractCssClass(item.config?.specialStyle)"
+        >
           <div v-if="item?.config">
-            <span v-if="item?.config?.type === 'object' && isShowIcon">
+            <StringFormat v-if="['int', 'long', 'text', 'float', 'double', 'geoPoint'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]"/>
+            <DateFormat v-else-if="['date'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]"/>
+            <BooleanFormat v-else-if="['boolean'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]"/>
+            <FileFormat v-else-if="['file'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]"/>
+            <ArrayFormat v-else-if="['array', 'enum'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]" />
+            <ObjectFormat v-else-if="['object'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]" />
+            <StringFormat v-else :config="item?.config" :value="slotProps[item.key]"/>
+            <!-- <span v-if="item?.config?.type === 'object' && isShowIcon">
               <AIcon
                 type="SearchOutlined"
                 @click="jsonOpen(slotProps[item.key])"
@@ -43,9 +54,10 @@
             </span>
             <span v-else>
               {{ dataFormat(item?.config, slotProps[item.key]) }}
-            </span>
+              <StringFormat :config="item?.config" :value="slotProps[item.key]"/>
+            </span> -->
           </div>
-          <span v-else>{{ slotProps[item.key] }}</span>
+          <span v-else>{{ slotProps[item.key] || '--' }}</span>
         </j-ellipsis>
         <div v-if="item?.key === 'action'">
           <j-space size="large">
@@ -113,40 +125,14 @@
             <j-row>
               <j-col :span="12">
                 <j-ellipsis style="margin-bottom: 18px">
-                  <span
-                    v-if="
-                      valueFormat(props?.cardConfig?.field1)?.config?.type ===
-                        'object' && isShowIcon
-                    "
-                  >
-                    <AIcon
-                      type="SearchOutlined"
-                      @click="jsonOpen(slotProps[props?.cardConfig?.field1])"
-                    />
-                  </span>
-                  <span
-                    v-else-if="
-                      valueFormat(props?.cardConfig?.field1)?.config?.type ===
-                        'file' && isShowFileIcon
-                    "
-                  >
-                    <img
-                      style="width: 30px; height: 30px"
-                      :src="
-                        dataFormat(
-                          valueFormat(props?.cardConfig?.field1)?.config,
-                          slotProps[props?.cardConfig?.field1],
-                        )
-                      "
-                    />
-                  </span>
-                  <h3 v-else>
-                    {{
-                      dataFormat(
-                        valueFormat(props?.cardConfig?.field1)?.config,
-                        slotProps[props?.cardConfig?.field1],
-                      ) || slotProps[props?.cardConfig?.field1]
-                    }}
+                  <h3>
+                    <StringFormat v-if="['int', 'long', 'text', 'float', 'double', 'geoPoint'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
+                    <DateFormat v-else-if="['date'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
+                    <BooleanFormat v-else-if="['boolean'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
+                    <FileFormat v-else-if="['file'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
+                    <ArrayFormat v-else-if="['array', 'enum'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]" />
+                    <ObjectFormat v-else-if="['object'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]" />
+                    <StringFormat v-else :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
                   </h3>
                 </j-ellipsis>
               </j-col>
@@ -163,45 +149,13 @@
                   <div>{{ props?.cardConfig?.field2Title }}</div>
                 </j-ellipsis>
                 <j-ellipsis>
-                  <div>
-                    <span
-                      v-if="
-                        valueFormat(props?.cardConfig?.field2)?.config?.type ===
-                          'object' && isShowIcon
-                      "
-                    >
-                      <AIcon
-                        type="SearchOutlined"
-                        @click="jsonOpen(slotProps[props?.cardConfig?.field2])"
-                      />
-                    </span>
-                    <span
-                      v-else-if="
-                        valueFormat(props?.cardConfig?.field2)?.config?.type ===
-                          'file' && isShowFileIcon
-                      "
-                    >
-                      <img
-                        style="width: 30px; height: 30px"
-                        :src="
-                          dataFormat(
-                            valueFormat(props?.cardConfig?.field2)?.config,
-                            slotProps[props?.cardConfig?.field2],
-                          )
-                        "
-                      />
-                    </span>
-                    <span v-else>
-                      {{
-                        dataFormat(
-                          valueFormat(props?.cardConfig?.field2)?.config,
-                          slotProps[props?.cardConfig?.field2],
-                        ) || slotProps[props?.cardConfig?.field2]
-                      }}
-                    </span>
-
-                    <!-- {{ slotProps[props?.cardConfig?.field2] || '字段2' }} -->
-                  </div>
+                  <StringFormat v-if="['int', 'long', 'text', 'float', 'double', 'geoPoint'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
+                  <DateFormat v-else-if="['date'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]"/>
+                  <BooleanFormat v-else-if="['boolean'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]"/>
+                  <FileFormat v-else-if="['file'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]"/>
+                  <ArrayFormat v-else-if="['array', 'enum'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]" />
+                  <ObjectFormat v-else-if="['object'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]" />
+                  <StringFormat v-else :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]"/>
                 </j-ellipsis>
               </j-col>
               <j-col :span="12">
@@ -209,45 +163,13 @@
                   <div>{{ props?.cardConfig?.field3Title }}</div>
                 </j-ellipsis>
                 <j-ellipsis>
-                  <div>
-                    <span
-                      v-if="
-                        valueFormat(props?.cardConfig?.field3)?.config?.type ===
-                          'object' && isShowIcon
-                      "
-                    >
-                      <AIcon
-                        type="SearchOutlined"
-                        @click="jsonOpen(slotProps[props?.cardConfig?.field3])"
-                      />
-                    </span>
-                    <span
-                      v-else-if="
-                        valueFormat(props?.cardConfig?.field3)?.config?.type ===
-                          'file' && isShowFileIcon
-                      "
-                    >
-                      <img
-                        style="width: 30px; height: 30px"
-                        :src="
-                          dataFormat(
-                            valueFormat(props?.cardConfig?.field3)?.config,
-                            slotProps[props?.cardConfig?.field3],
-                          )
-                        "
-                      />
-                    </span>
-                    <span v-else>
-                      {{
-                        dataFormat(
-                          valueFormat(props?.cardConfig?.field3)?.config,
-                          slotProps[props?.cardConfig?.field3],
-                        ) || slotProps[props?.cardConfig?.field3]
-                      }}
-                    </span>
-
-                    <!-- {{ slotProps[props?.cardConfig?.field3] || '字段3' }} -->
-                  </div>
+                  <StringFormat v-if="['int', 'long', 'text', 'float', 'double', 'geoPoint'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
+                  <DateFormat v-else-if="['date'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]"/>
+                  <BooleanFormat v-else-if="['boolean'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]"/>
+                  <FileFormat v-else-if="['file'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]"/>
+                  <ArrayFormat v-else-if="['array', 'enum'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]" />
+                  <ObjectFormat v-else-if="['object'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]" />
+                  <StringFormat v-else :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]"/>
                 </j-ellipsis>
               </j-col>
             </j-row>
@@ -267,6 +189,7 @@ import {
   extractCssClass,
   insertCustomCssToHead,
 } from '@/components/FormDesigner/utils/utils'
+import { ArrayFormat, BooleanFormat, DateFormat, FileFormat, StringFormat, ObjectFormat} from './ColumnFormat'
 const props = defineProps({
   model: {
     type: String,
@@ -316,18 +239,18 @@ const props = defineProps({
   },
   projectId: {
     type: String,
-    default: ''
+    default: '',
   },
   pageId: {
     type: String,
-    default: ''
+    default: '',
   },
 })
 
 const headerButton = ref()
 
 const isCheck = computed(() => {
-  if(!headerButton.value?.isCheck) {
+  if (!headerButton.value?.isCheck) {
     _selectedRowKeys.value = []
   }
   return headerButton.value?.isCheck
@@ -355,117 +278,7 @@ const valueFormat = (val: any) => {
   return props.dataColumns.find((item) => item.dataIndex === val)
 }
 const tableRef = ref()
-const isShowIcon = ref(false)
-const isShowFileIcon = ref(false)
-const emit = defineEmits(['openJson'])
-const dataFormat = (data: any, value: any) => {
-  let format: any
-  let type = data?.type
-  if (
-    data?.type === 'int' ||
-    data?.type === 'long' ||
-    data?.type === 'text' ||
-    data?.type === 'double' ||
-    data?.type === 'float' ||
-    data?.type === 'string'
-  ) {
-    type = 'content'
-  } else if (
-    data?.type === 'file' ||
-    data?.type === 'enum' ||
-    data?.type === 'array'
-  ) {
-    type = 'fileSource'
-  }
-  switch (type) {
-    case 'object':
-      if (data?.demonstrations === 'json') {
-        isShowIcon.value = false
-        format = JSON.parse(JSON.stringify(value))
-      } else {
-        isShowIcon.value = true
-      }
-      break
 
-    case 'date':
-      format = dayjs(value).format(data?.dateValue || 'YYYY-MM-DD')
-      break
-    case 'content':
-      switch (data.inputValue) {
-        case 'x%':
-          format = value + '%' || ''
-          break
-        case '%x':
-          format = '%' + value || ''
-          break
-        case 'xxxx%xxxx':
-          format = value?.slice(0, 4) + '%' + value?.slice(4) || ''
-          break
-        case '':
-          format = value || ''
-          break
-      }
-      break
-
-    case 'boolean':
-      if (value) {
-        format = data?.trueValue || '是'
-      } else {
-        format = data?.falseValue || '否'
-      }
-      break
-    case 'fileSource':
-      switch (data.fileValue) {
-        case 'url':
-          format = value?.url || ''
-          break
-        case 'icon':
-          isShowFileIcon.value = true
-          format = value?.url || ''
-          break
-        case 'fileName':
-          format = value?.name + '.' + value.type || ''
-          break
-        case 'xxx ; xxx':
-          format = value?.slice(0, 3) + ';' + value?.slice(43) || ''
-          break
-
-        case 'xxx/xxx':
-          format = value?.slice(0, 3) + '/' + value?.slice(3) || ''
-          break
-        case 'xxx、xxx':
-          format = value?.slice(0, 3) + '、' + value?.slice(3) || ''
-          break
-      }
-
-      break
-    case 'geoPoint':
-      format = value || ''
-  }
-  return format
-}
-
-const getActions = (
-  data: Partial<Record<string, any>>,
-  type: 'card' | 'table',
-) => {
-  if (!data) return []
-  const actions = [
-    {
-      key: 'view',
-      text: '查看',
-      tooltip: {
-        title: '查看',
-      },
-      icon: 'EyeOutlined',
-    },
-  ]
-  return actions
-}
-
-const jsonOpen = (value: any) => {
-  emit('openJson', { previewVisible: true, value: value })
-}
 const handleFunction = (item: any, data?: any) => {
   if (isFunction(item)) {
     return item(data)
@@ -480,10 +293,16 @@ watchEffect(() => {
     insertCustomCssToHead(item.style, item.key)
   })
   props.dataColumns.forEach((item) => {
-    insertCustomCssToHead(item.config?.specialStyle, `${props.projectId}-${props.pageId}-${item.dataIndex}`)
+    insertCustomCssToHead(
+      item.config?.specialStyle,
+      `${props.projectId}-${props.pageId}-${item.dataIndex}`,
+    )
   })
   tableActionsRef.value?.forEach((item, index) => {
-    item.$el.parentElement.children[0].setAttribute('data-id', props.tableActions[index]?.key)
+    item.$el.parentElement.children[0].setAttribute(
+      'data-id',
+      props.tableActions[index]?.key,
+    )
   })
 })
 
@@ -491,7 +310,7 @@ defineExpose({
   reload: () => {
     tableRef.value?.reload()
   },
-  _selectedRowKeys
+  _selectedRowKeys,
 })
 </script>
 

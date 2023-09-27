@@ -453,15 +453,14 @@ watch(() => props.bindFunctionId, () => {
       width: 400px;
     }
   }
-  .table {
     padding-top: 18px;
     .data-column{
+      width: 100%;
       display: block;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-  }
   .editable-add-btn{
     width: 100%;
   }
