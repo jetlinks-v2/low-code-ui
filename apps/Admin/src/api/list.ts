@@ -4,4 +4,4 @@ export const _export = (projectId: string, functionId: string, commandId: string
 
 export const _import = (projectId: string, functionId: string, commandId: string, data?: any, ) => request.post(`/low-code/runtime/${projectId}/${functionId}/${commandId}`, data)
 
-export const dictionaryItemList = (data: Record<string, any>) => request.post(`/dictionary-item/_query`, data)
+export const dictionaryItemList = (id: string) => request.get(`/dictionary/${id}/items`)
