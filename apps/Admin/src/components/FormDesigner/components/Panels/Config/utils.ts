@@ -22,7 +22,7 @@ export const getConfigList = (_type: string, obj: any) => {
             'input-password',
             'select-card',
             'upload',
-            'switch',
+            // 'switch',
             'tree-select',
             'select',
             'date-picker',
