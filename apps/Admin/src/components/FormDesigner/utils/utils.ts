@@ -76,7 +76,7 @@ const checkedConfigItem = (node: ISchema, allData: any[], dictionary: any[]) => 
                     if (!node?.componentProps.source?.functionId || !node?.componentProps.source?.commandId || !node?.componentProps.source?.label || !node?.componentProps.source?.value) {
                         return obj
                     }
-                    if(node?.componentProps.source?.isSource && !node?.componentProps.source?.source) {
+                    if (node?.componentProps.source?.isSource && !node?.componentProps.source?.source) {
                         return obj
                     }
                 }
@@ -229,17 +229,33 @@ const getData = (key: string, obj: any) => {
     return obj
 }
 
+function bubbleSort(arr: any[]) {
+    const len = arr.length;
+    for (let i = 0; i < len; i++) {
+        for (let j = 0; j < len - 1 - i; j++) {
+            if (arr[j]?.ordinal > arr[j + 1]?.ordinal) {        //相邻元素两两对比
+                const temp = arr[j + 1];        //元素交换
+                arr[j + 1] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+    return arr;
+}
+
 // 获取options
 export const queryOptions = async (source: any, id: string) => {
     if (source?.type === 'dic' && source?.dictionary) {
         const resp = await queryDictionaryData(source?.dictionary)
         if (resp.success) {
-            return resp.result.map(item => {
+            const list = resp.result.map(item => {
                 return {
+                    ordinal: item?.ordinal,
                     label: item.text,
                     value: item.value
                 }
             })
+            return bubbleSort(list)
         }
     }
     if (id && source?.type === 'end' && source?.functionId && source?.commandId && source?.label && source?.value) {
