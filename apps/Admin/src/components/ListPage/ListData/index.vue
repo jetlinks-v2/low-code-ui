@@ -102,11 +102,11 @@
                         button-style="solid"
                       >
                         <j-space size="large">
-                          <j-radio-button value="json" class="check-btn">
-                            json展示
-                          </j-radio-button>
                           <j-radio-button value="page" class="check-btn">
-                            页面展示
+                            弹窗展示
+                          </j-radio-button>
+                          <j-radio-button value="json" class="check-btn">
+                            列表展示
                           </j-radio-button>
                         </j-space>
                       </j-radio-group>

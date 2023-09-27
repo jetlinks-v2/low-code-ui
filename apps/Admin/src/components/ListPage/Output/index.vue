@@ -286,6 +286,8 @@ const searchData = () => {
                   {
                     column: 'status',
                     value: 1,
+                    termType: 'eq',
+                    type: 'and'
                   }
                 ]
               }
