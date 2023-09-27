@@ -276,23 +276,15 @@ const searchData = () => {
         options: () => {
           if (item.config?.value === 'data') {
             return new Promise((resolve) => {
-              const params = {
-                terms: [
-                  {
-                    column: 'dictId',
-                    termType: 'eq',
-                    value: item.config?.dataValue
-                  },
-                  {
-                    column: 'status',
-                    value: 1,
-                    termType: 'eq',
-                    type: 'and'
-                  }
-                ]
-              }
-              dictionaryItemList(params).then((resp: any) => {
-                resolve(resp.result?.data)
+              dictionaryItemList(item.config?.dataValue).then((resp: any) => {
+                if(resp.success) {
+                  resolve(resp.result?.map(item => {
+                    return {
+                      value: item.value,
+                      label: item.text
+                    }
+                  }))
+                }
               })
             })
           } else if(item.config?.value == 'rearEnd') {
@@ -301,7 +293,6 @@ const searchData = () => {
                 let result = (resp.result?.data || resp.result)
                 .filter((val) => val[item.config?.outputKey])
                 .map(val => {
-                  console.log(item.config);
                   return {
                     label: val[item.config?.outputKey],
                     value: val[item.config?.outputKey]
