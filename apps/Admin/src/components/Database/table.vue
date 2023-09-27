@@ -27,9 +27,9 @@
           <span v-if="index <= maxLen">{{ record.name }}</span>
           <j-input v-else v-model:value="record.name" @change="() => { valueChange(record.name); alias(record.name, record) }" />
         </template>
-        <template #comment="{record, index}">
+        <template #comment="{record, index, valueChange}">
           <span v-if="index <= maxLen">{{ record.comment }}</span>
-          <j-input v-else v-model:value="record.comment" :maxLength="16" @change="emitUpdateDataSource"/>
+          <j-input v-else v-model:value="record.comment" :maxLength="16" @change="() => { valueChange(record.comment); emitUpdateDataSource()}"/>
         </template>
         <template #javaType="{record, index, valueChange}">
           <span v-if="index <= maxLen">{{record.javaType}}</span>
@@ -376,6 +376,7 @@ const copy = (record, index) => {
   const cloneRecord = cloneDeep(record)
   if (cloneRecord.name) {
     cloneRecord.name = `copy_${cloneRecord.name}`
+    cloneRecord.alias = upperCase(cloneRecord.name)
   }
 
   updateDataSource(cloneRecord, index)
@@ -410,6 +411,7 @@ const JavaTypeChange = (record) => {
         },
         validator: {
           provider: undefined,
+          providerType: undefined,
           configuration: {
             message: '数据格式错误',
             group: ['save', 'update', 'insert']

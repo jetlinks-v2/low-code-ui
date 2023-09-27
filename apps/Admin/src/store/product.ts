@@ -226,7 +226,10 @@ export const useProduct = defineStore('product', () => {
     if (isActive) {
       engine.setActiveFile(treeData[0]?.id)
     }
-    info.value = extra
+    info.value = {
+      ...extra,
+      others: modules ? modules[0]?.others : {}
+    }
     published.value = extra.state?.value === 'published'
     console.log('treeData-----------',treeData[0]?.others)
     // if(extra.state?.value !== 'published'){

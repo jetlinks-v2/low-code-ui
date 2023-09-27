@@ -14,6 +14,7 @@ export const Integrate = (data: any[]) => {
 
   return {
     ...project,
+    others,
     modules: arr
   }
 }
