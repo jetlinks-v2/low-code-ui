@@ -48,6 +48,10 @@ const useProps = (element: any, _data: any, mode?: string) => {
     _componentProps.options = element?.componentProps?.options || []
   }
 
+  if (element?.componentProps?.treeData) {
+    _componentProps.treeData = element?.componentProps?.treeData || []
+  }
+
   const result = {
     ...element,
     formItemProps: { ...element?.formItemProps, rules },
