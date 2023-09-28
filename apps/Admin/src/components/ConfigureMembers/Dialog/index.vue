@@ -26,15 +26,6 @@
       </j-space>
     </div>
     <!-- 配置 -->
-    <!-- <MemberSelect
-      ref="selectRef"
-      v-else
-      :type="type"
-      :showSearch="type === 'user' || type === 'role'"
-      :isNode="isNode"
-      :hasWeight="hasWeight"
-      @back="back"
-    /> -->
     <MemberSelect
       ref="selectRef"
       v-else

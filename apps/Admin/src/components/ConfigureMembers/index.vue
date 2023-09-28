@@ -4,7 +4,7 @@
     <!-- 列表 -->
     <ul>
       <li v-for="item in list" :key="item.id">
-        {{ item }}
+        {{ item.name }}
       </li>
     </ul>
     <Dialog

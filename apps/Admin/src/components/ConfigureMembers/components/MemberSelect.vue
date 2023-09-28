@@ -195,18 +195,29 @@ const getTree = (data: any) => {
   }
   getVar_api(param).then((res) => {
     if (res.success) {
-      varData.value = treeFilter(
-        setLevel(res.result, 'var'),
-        props.type,
-        'type',
-      )
-      relData.value = treeFilter(
-        setLevel(res.result, 'rel'),
-        props.type,
-        'type',
-      )
+      varData.value = treeFilter(setLevel(res.result), props.type, 'type')
+      relData.value = hasRelation(res.result)
     }
   })
+}
+
+/**
+ * 遍历树，如果当前结点对象不包含relation属性，删除当前结点
+ * @param data
+ */
+const hasRelation = (data: any) => {
+  const cloneData = cloneDeep(data)
+  function delTree(tree) {
+    tree.forEach((item, index) => {
+      if (item.children) {
+        delTree(item.children)
+      } else if (!item.others.relation) {
+        tree.splice(index, 1)
+      }
+    })
+  }
+  delTree(cloneData)
+  return cloneData
 }
 
 /**
@@ -225,28 +236,25 @@ const itemClick = (key: string) => {
 
 /**
  * 处理树结构
- * @param data 
+ * @param data
  * @param type 变量/关系
  */
-const setLevel = (data: any[], type: 'var' | 'rel') => {
+const setLevel = (data: any[]) => {
   const cloneData = cloneDeep(data)
-  function dealData(cloneData: any, key: string, level: number = 1) {
+  function dealData(cloneData: any, level: number = 1) {
     cloneData.forEach((item) => {
       item.level = level
       item.id = item.fullId
       item.type = item.others?.type || ''
-      if (level !== 3 && key === 'var') {
+      if (level !== 3) {
         item.disabled = true
       }
       if (item.children && item.children.length > 0) {
-        if (key === 'rel') {
-          item.disabled = true
-        }
-        dealData(item.children, key, level + 1)
+        dealData(item.children, level + 1)
       }
     })
   }
-  dealData(cloneData, type)
+  dealData(cloneData)
   return cloneData
 }
 
