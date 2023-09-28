@@ -2,7 +2,7 @@
   <j-spin :spinning='loading' :delay='300'>
     <div class='container'>
       <div class='left'>
-        <img :src='systemInfo?.backgroud || "/login/login.png"' alt=''>
+        <img :src='systemInfo?.backgroud || "/images/login.png"' alt=''>
         <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank" rel="noopener noreferrer" class="records">
           备案：渝ICP备19017719号-1
         </a>
@@ -85,7 +85,7 @@ systemStore.queryInfo()
   .right {
     min-width: 400px;
     width: 27%;
-    display: flex;  
+    display: flex;
     flex-direction: column;
     justify-content: space-between;
   }
