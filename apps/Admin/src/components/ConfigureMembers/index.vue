@@ -25,10 +25,12 @@ const props = withDefaults(
     hasWeight?: boolean
     members: DataSourceProps[] | DataSourceProps
     nodeId?: string // 节点id
+    supCancel?: boolean // 是否支持取消选中
   }>(),
   {
     isNode: true,
     hasWeight: true,
+    supCancel: true
   },
 )
 
@@ -72,6 +74,7 @@ provide('infoState', {
   nodeId: props.nodeId,
   isNode: props.isNode,
   hasWeight: props.hasWeight,
+  supCancel: props.supCancel,
 })
 
 watch(

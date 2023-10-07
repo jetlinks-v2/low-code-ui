@@ -41,7 +41,7 @@
                 multiple
                 block-node
                 :tree-data="treeDataCom"
-                v-model:selectedKeys="selectedKeys"
+                :selectedKeys="selectedKeys"
                 :fieldNames="{ children: 'children', title: 'name', key: 'id' }"
                 :height="368"
                 @select="onSelect"
@@ -70,7 +70,15 @@
           <div class="content-right">
             <div class="right-top">
               <div class="selected">已选择：{{ dataSource.length }}</div>
-              <j-button type="primary" @click="clear">清空</j-button>
+              <PermissionButton
+                type="primary"
+                :popConfirm="{
+                  title: `确认清空？`,
+                  onConfirm: () => clear(),
+                }"
+              >
+                清空
+              </PermissionButton>
             </div>
             <j-table
               size="small"
@@ -258,7 +266,9 @@ const setLevel = (data: any[]) => {
   return cloneData
 }
 
-const onSelect = (keys: string[], { node }) => {
+const onSelect = (keys: string[], { node, selected }) => {
+  if (!selected && !infoState.supCancel) return
+  selectedKeys.value = [...keys]
   const index = dataSource.value.findIndex(
     (i) => i.id === (active.value === 'var' ? node.fullId : node.id),
   )
@@ -401,9 +411,8 @@ defineExpose({
       margin-bottom: 10px;
 
       .selected {
-        // height: 100%;
         line-height: 32px;
-        flex: 0.9;
+        flex: 1;
         background-color: #f2f2f2;
       }
     }
