@@ -149,14 +149,14 @@ const providerChange = (key) => {
       model.value.validator.configuration = {
         message: configuration.message,
         group: _group,
-        regexp: '^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$'
+        regexp: `^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$`
       }
       break;
     case 'phone':
       model.value.validator.configuration = {
         message: configuration.message,
         group: _group,
-        regexp: '^(((\\\\+86)|(\\\\+86-))|((86)|(86\\\\-))|((0086)|(0086\\\\-)))?1[3|5|7|8|9]\\\\d{9}$'
+        regexp: `^(((\\+86)|(\\+86-))|((86)|(86\\-))|((0086)|(0086\\-)))?1[3|5|7|8|9]\\d{9}$`
       }
       break;
     default:
