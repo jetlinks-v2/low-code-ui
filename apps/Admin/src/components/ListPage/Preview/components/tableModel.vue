@@ -73,7 +73,7 @@
                 handleFunction(item.permissionProps, slotProps)?.popConfirm
               "
               :class="extractCssClass(item.style)"
-              ref="tableActionsRef"
+              :data-id="item.key"
             >
               <template v-if="item.icon">
                 <img
@@ -94,7 +94,7 @@
           :actions="tableActions"
           :record="slotProps"
           :active="_selectedRowKeys.includes(slotProps.id)"
-          :statusText="slotProps[props?.cardConfig?.emphasisField] || ''"
+          :statusText="statusText(slotProps[props?.cardConfig?.emphasisField] || '')"
           :showStatus="!!props?.cardConfig?.emphasisField?.length"
           :statusNames="{
             online: 'processing',
@@ -113,7 +113,6 @@
               shape="square"
               :size="100"
               :src="props?.cardConfig?.customIcon"
-              class="card-icon"
             >
               <template #icon>
                 <j-image
@@ -130,10 +129,7 @@
               class="card-icon"
             >
               <template #icon>
-                <j-image
-                  src="/images/list-page/table-card-default.png"
-                  :preview="false"
-                />
+                <img src="/images/list-page/no-image.svg" alt="">
               </template>
             </j-avatar>
           </template>
@@ -296,6 +292,16 @@ const valueFormat = (val: any) => {
   return props.dataColumns.find((item) => item.dataIndex === val)
 }
 
+const statusText = computed(() => {
+  return (val: any) => {
+    if(typeof val === 'string') {
+      return val
+    } else if(typeof val === 'object') {
+      return val?.text
+    }
+  }
+})
+
 const dynamicIconUrl = computed(() => {
   return (val: string) => {
     let result = null;
@@ -349,7 +355,7 @@ defineExpose({
   width: 14px;
   height: 14px;
 }
-.card-icon {
-  background-color: rgba(49, 94, 251, 0.2);
+:deep(.ant-avatar) {
+  background-color: transparent !important;
 }
 </style>

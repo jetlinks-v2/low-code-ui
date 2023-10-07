@@ -11,12 +11,11 @@
           <template #label>
             {{ `${titleType} ${props.provider ? providerMap[props.provider] : ''}` }}
           </template>
-          <j-input v-model:value="modelRef.title" placeholder="请输入" ref="inputRef">
+          <j-input v-model:value="modelRef.title" placeholder="名称需在当前模块下唯一" ref="inputRef">
             <template #prefix>
               <div class="input-img"><img :src="typeImages[provider]"></div>
             </template>
           </j-input>
-
         </j-form-item>
       </j-form>
     </div>
