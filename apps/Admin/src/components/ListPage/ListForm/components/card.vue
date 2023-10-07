@@ -235,7 +235,7 @@
           </ErrorItem>
           <j-form-item label="特殊样式" name="specialStyle">
             <EditorButton
-              :value="formState.specialStyle"
+              v-model:value="formState.specialStyle"
               language="json"
               text="编写特殊样式"
             >

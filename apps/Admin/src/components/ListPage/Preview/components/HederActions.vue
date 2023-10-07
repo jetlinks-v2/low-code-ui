@@ -33,35 +33,6 @@
             </template>
             {{ item.title }} <AIcon type="DownOutlined" /></j-button>
         </BatchDropdown>
-        <!-- <j-dropdown
-          :trigger="['click']"
-          placement="bottomLeft"
-          v-if="item?.children?.length !== 0"
-        >
-          <j-button class="childBtn">
-            {{ item.text }}
-            <AIcon type="DownOutlined" />
-          </j-button>
-          <template #overlay>
-            <j-menu>
-              <j-menu-item v-for="child in item?.children" :key="child.key">
-                <PermissionButton
-                  v-bind:="handleFunction(child.permissionProps, child)"
-                  :danger="child.command === 'Delete'"
-                  style="width: 100%"
-                  :popConfirm="
-                    
-                    handleFunction(child.permissionProps, child, child)?.popConfirm
-                  
-                  "
-                >
-                  <AIcon v-if="child.icon" :type="child?.icon" />
-                  {{ child?.text }}
-                </PermissionButton>
-              </j-menu-item>
-            </j-menu>
-          </template>
-        </j-dropdown> -->
       </div>
     </j-space>
   </div>
@@ -98,7 +69,7 @@ const handleFunction = (item: any, data?: any) => {
 
 watchEffect(() => {
   props.headerActions.forEach((item) => {
-    insertCustomCssToHead(item.style, item.key)
+    insertCustomCssToHead(item.style, item.key, 'dataid')
   })
 })
 
