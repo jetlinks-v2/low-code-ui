@@ -36,6 +36,7 @@
           <DataSetting
 
             :id="props.id"
+            :createTime="others?.createTime"
             :parentId="props.fullId"
           />
         </CardBox>
@@ -67,6 +68,8 @@ import Advanced from './advanced.vue'
 import { useProduct } from '@/store'
 import { defaultSetting } from './setting'
 import {onlyMessage} from "@/utils/comm";
+import { useRequest } from '@jetlinks/hooks'
+import {executeReq} from "@/api/basis";
 
 const props = defineProps({
   configuration: {
@@ -108,13 +111,19 @@ const props = defineProps({
 })
 
 const tableColumns = ref([])
-const publishColumns = ref(props.others?.columns || [])
 const dataTableRef = ref()
 const advancedRef = ref()
 const warpRef = ref()
 const activeKey = ref('table')
 
 const project = useProduct()
+
+const { data: publishColumns, run } = useRequest(executeReq, {
+  immediate: false,
+  onSuccess(resp) {
+    return resp.result.map?.(item => item.id) || []
+  }
+})
 
 provide(CRUD_COLUMNS, tableColumns)
 provide(WARP_REF, warpRef)
@@ -162,6 +171,10 @@ const errorDataTableLength = computed(() => {
 const errorRelationLength = computed(() =>{
   return errorTips.dataTable ? Object.keys(errorTips.relation).length : 0
 })
+
+if (props.configuration?.tableName) {
+  run('rdb-crud', 'GetColumns', { tableName: props.configuration?.tableName})
+}
 
 const validate = async () => {
   loading.value = true

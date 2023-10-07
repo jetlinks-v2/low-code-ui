@@ -216,6 +216,7 @@ const onResize = debounce((e) => {
     &.active {
       position: relative;
       border: 1px solid #2f54eb;
+      border-color: var(--ant-primary-color-active);
     }
 
     .card-type {
@@ -330,7 +331,7 @@ const onResize = debounce((e) => {
         border-radius: 0;
         background: #f6f6f6;
         border: 1px solid #e6e6e6;
-        color: #2f54eb;
+        color: var(--ant-primary-color);
       }
 
       :deep(.ant-tooltip-disabled-compatible-wrapper){
