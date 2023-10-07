@@ -19,7 +19,7 @@
       :columns="props.columns"
       :data-source="props.dataSource"
       :showTool="false"
-      :height="900"
+      :height="500"
       @change="(data) => handleChange(data)"
     >
       <template #headerCell="{ column }">
@@ -206,6 +206,7 @@ enum javaType {
   list = 'array',
   boolean = 'boolean',
   object = 'object',
+  array = 'array'
 }
 
 enum filterType {
@@ -361,7 +362,12 @@ const data = [
 //新增一列table
 const handleAdd = async () => {
   emit('handleAdd', tableRef.value)
+  setTimeout(() => {
+    //滚动到表格底部
+    tableRef.value.$el.getElementsByTagName('tbody')?.[0].scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
+  })
 }
+
 //配置
 const configuration = async (data: any) => {
   const dataSource = await tableRef.value.getData()

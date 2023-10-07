@@ -28,7 +28,8 @@
               </template>
               <template v-else>
                 <div class="default-btn">
-                  <AIcon type="PlusOutlined"  class="default-icon"/>
+                  <AIcon v-if="type === 'columns'" type="SettingOutlined" class="default-icon"/>
+                  <AIcon v-else type="PlusOutlined" class="default-icon"/>
                 </div>
               </template>
             </template>
@@ -123,7 +124,7 @@ import Upload from '@/components/Upload/Image/ImageUpload.vue'
 import { FormInstance } from 'jetlinks-ui-components'
 import { useProduct } from '@/store'
 import EditorButton from '@/components/EditorModal/EditorButton.vue'
-import { activeBtnKey, errorListKey, editTypeKey } from '../keys'
+import { activeBtnKey, errorListKey, editTypeKey, typeKey } from '../keys'
 import { providerEnum } from '@/components/ProJect'
 import { ErrorItem } from '../..'
 import { useFunctions } from '@/hooks/useFunctions'
@@ -143,6 +144,7 @@ const props = defineProps({
 const activeBtn = inject(activeBtnKey)
 const editType = inject(editTypeKey)
 const errorList = inject(errorListKey)
+const type = inject(typeKey)
 
 const productStore = useProduct();
 const { info } = productStore

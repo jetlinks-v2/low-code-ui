@@ -91,6 +91,7 @@ const onSave = async () => {
             pageId: id,
             projectId: props.projectId,
             LowCode: true,
+            show:true,
          }
       })
    }
