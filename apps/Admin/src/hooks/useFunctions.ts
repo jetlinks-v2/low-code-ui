@@ -110,6 +110,7 @@ export const useFunctions = () => {
     commandOptions,
     pagesOptions,
     commandSourceTree,
+    info,
     handleFunction,
   }
 }

@@ -1,14 +1,14 @@
 <template>
   <div className="filter-table">
     <div class="tips">{{ props.title }}</div>
-    <j-button
+    <!-- <j-button
       @click="syncData"
       myIcon="SyncOutlined"
       size="small"
       :type="dataBinds.data.dataSource.length ? 'primary' : 'default'"
     >
       同步数据绑定
-    </j-button>
+    </j-button> -->
     <j-data-table
       columnDrag
       class="ant-table-striped table-striped"
@@ -62,7 +62,7 @@
             :loading="loading"
             title="确定删除此数据？"
           >
-            <j-button type="text" danger>删除</j-button>
+            <j-button type="text" danger v-if="data.record?.mark === 'add'">删除</j-button>
           </JPopconfirm>
         </j-space>
       </template>

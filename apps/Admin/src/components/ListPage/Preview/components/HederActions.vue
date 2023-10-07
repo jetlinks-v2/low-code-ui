@@ -9,11 +9,11 @@
           v-bind:="handleFunction(item.permissionProps, item, item)"
           :danger="item.command === 'Delete'"
           :popConfirm="handleFunction(item.permissionProps)?.popConfirm"
-          ref="firstLevelRef"
+          :data-id="item.key"
         >
           <j-space>
             <template v-if="item.icon">
-              <img :src="item.icon" alt="" v-if="item.icon.includes('http')" style="width: 14px;height: 14px;">
+              <img :src="item.icon" alt="" v-if="item.icon.includes('http')" class="image-icon">
               <AIcon v-else :type="item?.icon" />
             </template>
             {{ item?.text }}
@@ -24,7 +24,6 @@
         <BatchDropdown
             v-model:isCheck="isCheck"
             :actions="item?.children"
-            @change="onCheckChange"
             v-else
         >
           <j-button :data-id="item.key" :class="className(item.style)">
@@ -74,7 +73,6 @@ import { extractCssClass, insertCustomCssToHead } from '@/components/FormDesigne
 import BatchDropdown from './BatchDropdown/index.vue'
 
 const isCheck = ref(false)
-const firstLevelRef = ref()
 const props = defineProps({
   headerActions: {
     type: Array as PropType<Record<string, any>[]>,
@@ -101,9 +99,6 @@ const handleFunction = (item: any, data?: any) => {
 watchEffect(() => {
   props.headerActions.forEach((item) => {
     insertCustomCssToHead(item.style, item.key)
-  })
-  firstLevelRef.value?.forEach((item, index) => {
-    item.$el.parentElement.children[0].setAttribute('data-id', props.headerActions[index]?.key)
   })
 })
 

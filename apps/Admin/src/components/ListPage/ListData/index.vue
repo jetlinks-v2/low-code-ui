@@ -519,17 +519,17 @@ const goBack = () => {
   configChange.value = false
 }
 const errorList = ref([])
-watch(
-  () => dataBinds,
-  () => {
-    if (dataBinds.data.function) {
-      dataBind.value = true
-    } else {
-      dataSource.value = []
-    }
-  },
-  { immediate: true, deep: true },
-)
+// watch(
+//   () => dataBinds,
+//   () => {
+//     if (dataBinds.data.function) {
+//       dataBind.value = true
+//     } else {
+//       dataSource.value = []
+//     }
+//   },
+//   { immediate: true, deep: true },
+// )
 
 const valid = () => {
   errorList.value = validListData(dataSource.value)
