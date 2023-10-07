@@ -7,7 +7,7 @@
             ref="previewRef"
             :value="{ select_hsvrpinwbtb: '131323232' }"
             :data="data"
-          ></preview>
+          />
         </div>
         <div class="btn-list">
           <j-button class="btn" @click="cancel">取消</j-button>

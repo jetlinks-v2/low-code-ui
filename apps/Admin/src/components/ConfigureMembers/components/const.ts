@@ -2,7 +2,6 @@ export const defaultColumns = (key: string) => {
   return [
     {
       title: key === 'org' ? '组织' : key === 'user' ? '用户' : '角色',
-      // dataIndex: 'organization',
       dataIndex: 'name',
       key: 'name',
       ellipsis: true,
@@ -22,17 +21,62 @@ export const defaultColumns = (key: string) => {
     },
   ]
 }
-
-/**
- * 将树形结构数据扁平化
- * @param tree
- */
-export const flattenTree = (tree: any[]) => {
-  return tree.reduce((pre: any[], cur: any) => {
-    pre.push(cur)
-    if (cur.children) {
-      pre = pre.concat(flattenTree(cur.children))
-    }
-    return pre
-  }, [])
+export const leftData = {
+  org: [
+    {
+      key: 'org',
+      title: '固定组织',
+      description: '固定组织下的所有成员均可以作为候选人',
+    },
+    {
+      key: 'var',
+      title: '按变量',
+      description:
+        '指定流程表单中的组织选择组件作为组织变量来源，其下方的所有成员均可作为候选人',
+    },
+    {
+      key: 'relation',
+      title: '按关系',
+      description:
+        '指定流程表单或流程节点中的变量，其所属组织下的所有成员均可作为候选人',
+    },
+  ],
+  user: [
+    {
+      key: 'user',
+      title: '固定用户',
+      description: '勾选的所有用户均可以作为候选人',
+    },
+    {
+      key: 'var',
+      title: '按变量',
+      description:
+        '指定流程表单中的用户选择组件，其获取到的用户变量均可作为候选人',
+    },
+    {
+      key: 'relation',
+      title: '按关系',
+      description:
+        '指定流程表单或流程节点中的变量，与变量间符合某种关系的成员可以作为候选人',
+    },
+  ],
+  role: [
+    {
+      key: 'role',
+      title: '固定角色',
+      description: '所有被分配了对应角色的用户均可以作为候选人',
+    },
+    {
+      key: 'var',
+      title: '按变量',
+      description:
+        '指定流程表单中的角色选择组件，其获取到的角色变量下的所有用户均可作为候选人',
+    },
+    {
+      key: 'relation',
+      title: '按关系',
+      description:
+        '指定流程表单或流程节点中的人员变量，与人员变量拥有相同角色的用户可以作为候选人',
+    },
+  ],
 }

@@ -7,30 +7,30 @@
     </div>
     <div class="content">
       <j-row>
-        <j-col span="4" v-if="isNode">
+        <j-col span="4" v-if="infoState.isNode">
           <div class="content-left">
-            <j-space direction="vertical">
-              <div
-                class="left-item"
-                :class="{ active: active === item.key }"
-                v-for="item of leftList"
-                :key="item.key"
-                @click="itemClick(item.key)"
-              >
-                <div class="left-item-title">
-                  {{ item.title }}
-                </div>
-                <span>
-                  {{ item.description }}
-                </span>
+            <!-- <j-space direction="vertical"> -->
+            <div
+              class="left-item"
+              :class="{ active: active === item.key }"
+              v-for="item of leftList"
+              :key="item.key"
+              @click="itemClick(item.key)"
+            >
+              <div class="left-item-title">
+                {{ item.title }}
               </div>
-            </j-space>
+              <span>
+                {{ item.description }}
+              </span>
+            </div>
+            <!-- </j-space> -->
           </div>
         </j-col>
         <j-col span="10">
           <div class="content-center">
             <div class="center-tree" v-if="active !== 'relation'">
-              <div v-if="active === 'relation'">主体</div>
+              <!-- <div v-if="active === 'relation'">主体</div> -->
               <!-- 搜索 -->
               <j-input
                 v-model:value="searchText"
@@ -41,24 +41,28 @@
                 multiple
                 block-node
                 :tree-data="treeDataCom"
-                v-model:selectedKeys="selectedKeys"
+                :selectedKeys="selectedKeys"
                 :fieldNames="{ children: 'children', title: 'name', key: 'id' }"
-                :height="400"
+                :height="368"
                 @select="onSelect"
               >
                 <template #title="data">
                   <j-ellipsis>
-                    {{ data.name }}
+                    <span>
+                      {{ data.name }}
+                    </span>
                   </j-ellipsis>
                 </template>
               </j-tree>
+              <j-empty v-if="treeDataCom.length < 1" />
             </div>
             <!-- 主体的关系 -->
             <Relational
               v-else
+              :type="type"
               :dataSource="dataSource"
-              :treeData="treeDataCom"
-              @relSubmit="relSubmit"
+              :treeData="relData"
+              @rel-submit="relSubmit"
             />
           </div>
         </j-col>
@@ -66,7 +70,15 @@
           <div class="content-right">
             <div class="right-top">
               <div class="selected">已选择：{{ dataSource.length }}</div>
-              <j-button type="primary" @click="clear">清空</j-button>
+              <PermissionButton
+                type="primary"
+                :popConfirm="{
+                  title: `确认清空？`,
+                  onConfirm: () => clear(),
+                }"
+              >
+                清空
+              </PermissionButton>
             </div>
             <j-table
               size="small"
@@ -112,91 +124,197 @@
 <script setup lang="ts">
 import Relational from './Relational.vue'
 import { treeFilter } from 'jetlinks-ui-components/es/Tree'
-import { defaultColumns, flattenTree } from './const'
+import { defaultColumns, leftData } from './const'
 import { DataSourceProps } from '../types'
 import {
   getDepartmentList_api,
   getUserList_api,
   getRoleList_api,
 } from '@/api/user'
+import { getVar_api } from '@/api/member'
+import { detail_api } from '@/api/process/model'
+import { cloneDeep } from 'lodash-es'
 
-const props = defineProps<{
-  //组织/用户/角色
-  type: string
-  showSearch: boolean
-  isNode: boolean
-  hasWeight: boolean
-}>()
+const props = defineProps({
+  type: {
+    type: String,
+    default: '',
+  },
+  showSearch: {
+    type: Boolean,
+    default: false,
+  },
+})
 const emits = defineEmits<{
   (e: 'back'): void
 }>()
-// 已选择的成员
-const members: any = inject('members')
+
+const route = useRoute()
+const infoState: any = inject('infoState')
+// 筛选关键字
+const searchText = ref<string>('')
+const active = ref<string>()
+// 树数据
+const treeData = ref<any[]>([])
+// 选中的树节点
+const selectedKeys = ref<string[]>([])
+// 表格数据
+const dataSource = ref<DataSourceProps[]>([])
+// 固定数据/变量/关系
+const fixedData = ref<any[]>([])
+const varData = ref<any[]>([])
+const relData = ref<any[]>([])
 
 const columns = computed(() => {
-  if (props.hasWeight) {
-    return defaultColumns(props.type)
-  } else {
-    return defaultColumns(props.type).filter((item) => item.key !== 'weight')
-  }
+  const _columns = defaultColumns(props.type)
+  return infoState.hasWeight
+    ? _columns
+    : _columns.filter((item) => item.key !== 'weight')
 })
 
-// 筛选关键字
-const searchText = ref('')
+const leftList = computed(() => {
+  active.value = props.type
+  return leftData[props.type]
+})
+
 const treeDataCom = computed(() => {
   return searchText.value
     ? treeFilter(treeData.value, searchText.value, 'name')
     : treeData.value
 })
 
-const active = ref()
-const itemClick = (key) => {
-  // 树形数据
-  // treeData.value = leftList[key].treeData
-  active.value = key
+detail_api(route.query.id as string).then((res) => {
+  if (res.success) {
+    getTree(res.result)
+  }
+})
+
+/**
+ * 获取变量，关系的树
+ */
+const getTree = (data: any) => {
+  const param = {
+    definition: {
+      ...data,
+    },
+    nodeId: infoState.nodeId,
+    // nodeId: 'ROOT_1',
+    containThisNode: true,
+  }
+  getVar_api(param).then((res) => {
+    if (res.success) {
+      varData.value = treeFilter(setLevel(res.result), props.type, 'type')
+      relData.value = hasRelation(res.result)
+    }
+  })
 }
 
-// 树数据
-const treeData = ref<any[]>([])
-
-// 选中的树节点
-const selectedKeys = ref<string[]>([])
-const onSelect = (keys: string[], { selected, node }) => {
-  // 按关系
-  if (active.value === 'relation') {
-    return
+/**
+ * 遍历树，如果当前结点对象不包含relation属性，删除当前结点
+ * @param data
+ */
+const hasRelation = (data: any) => {
+  const cloneData = cloneDeep(data)
+  function delTree(tree) {
+    tree.forEach((item, index) => {
+      if (item.children) {
+        delTree(item.children)
+      } else if (!item.others.relation) {
+        tree.splice(index, 1)
+      }
+    })
   }
-  const index = dataSource.value
-    .map((i) => i.id)
-    .findIndex((i) => i === node.id)
+  delTree(cloneData)
+  return cloneData
+}
+
+/**
+ * 固定数据/变量/关系选择
+ * @param key
+ */
+const itemClick = (key: string) => {
+  active.value = key
+  treeData.value =
+    key === 'var'
+      ? varData.value
+      : key === 'relation'
+      ? relData.value
+      : fixedData.value
+}
+
+/**
+ * 处理树结构
+ * @param data
+ * @param type 变量/关系
+ */
+const setLevel = (data: any[]) => {
+  const cloneData = cloneDeep(data)
+  function dealData(cloneData: any, level: number = 1) {
+    cloneData.forEach((item) => {
+      item.level = level
+      item.id = item.fullId
+      item.type = item.others?.type || ''
+      if (level !== 3) {
+        item.disabled = true
+      }
+      if (item.children && item.children.length > 0) {
+        dealData(item.children, level + 1)
+      }
+    })
+  }
+  dealData(cloneData)
+  return cloneData
+}
+
+const onSelect = (keys: string[], { node, selected }) => {
+  if (!selected && !infoState.supCancel) return
+  selectedKeys.value = [...keys]
+  const index = dataSource.value.findIndex(
+    (i) => i.id === (active.value === 'var' ? node.fullId : node.id),
+  )
   if (index === -1) {
     dataSource.value.push({
-      id: node.id,
-      name: node.name,
-      weight: props.hasWeight ? 1 : undefined,
+      id: active.value === 'var' ? node.fullId : node.id,
+      name: active.value === 'var' ? node.fullName : node.name,
+      weight: infoState.hasWeight ? 1 : undefined,
       type: props.type,
-      other: active.value,
+      groupField: active.value,
+      others:
+        active.value === 'var'
+          ? {
+              source: 'upper',
+              upperKey: node.fullId,
+            }
+          : undefined,
     })
   } else {
     dataSource.value.splice(index, 1)
   }
 }
 
-// 判断key是否已添加到dataSource中
-// const isExist = (key: string) => {
-//   return dataSource.value.some((i) => i.id === key)
-// }
-
 // 确定
-const relSubmit = (data: any[]) => {
-  data.forEach((i) => {
-    dataSource.value.push({
-      id: i.id,
-      name: i.name,
-      weight: props.hasWeight ? 1 : undefined,
-      type: props.type,
-      other: active.value,
-    })
+const relSubmit = (subject: any, data: any) => {
+  dataSource.value.push({
+    id: `${subject.fullId}-${data.id}`,
+    name: `${subject.fullName}-${data.name}`,
+    weight: infoState.hasWeight ? 1 : undefined,
+    type: props.type,
+    groupField: active.value,
+
+    others: {
+      objectSource: {
+        source: 'upper',
+        upperKey: subject.fullId,
+      },
+      objectType: subject.others?.relation,
+      related: {
+        objectType: props.type,
+        relation: data.relation,
+        options: {
+          reverse: data.reverse, //是否为反转关系
+        },
+      },
+    },
   })
 }
 
@@ -208,30 +326,6 @@ const clear = () => {
   dataSource.value = []
 }
 
-const leftList = computed(() => {
-  active.value = props.type
-  return [
-    {
-      key: props.type,
-      title: '固定组织',
-      description: '固定组织下的所有成员均可以作为候选人',
-    },
-    {
-      key: 'var',
-      title: '按变量',
-      description:
-        '指定流程表单中的组织选择组件作为组织变量来源，其下方的所有成员均可作为候选人',
-    },
-    {
-      key: 'relation',
-      title: '按关系',
-      description:
-        '指定流程表单或流程节点中的变量，其所属组织下的所有成员均可作为候选人',
-    },
-  ]
-})
-const dataSource = ref<DataSourceProps[]>([])
-
 /**
  * 删除已选择
  * @param id 删除的数据id
@@ -241,42 +335,27 @@ const handleDel = (id: string) => {
   dataSource.value = dataSource.value.filter((item) => item.id !== id)
 }
 
-// itemClick('0')
-
-const getTreeData = () => {
-  if (props.type === 'org') {
-    getDepartmentList_api().then((res) => {
-      treeData.value = res.result
-    })
-  } else if (props.type === 'user') {
-    getUserList_api({ paging: false }).then((res) => {
-      treeData.value = res.result.data
-    })
-  } else if (props.type === 'role') {
-    getRoleList_api().then((res) => {
-      treeData.value = res.result
-    })
-  }
+const apiType = {
+  org: getDepartmentList_api,
+  user: getUserList_api,
+  role: getRoleList_api,
 }
+const getTreeData = () => {
+  apiType[props.type](props.type === 'user' ? { paging: false } : {}).then(
+    (res) => {
+      fixedData.value = props.type === 'user' ? res.result.data : res.result
+      treeData.value = fixedData.value
+    },
+  )
+}
+getTreeData()
 
 watch(
-  () => [props.type, props.isNode],
+  () => [props.type, infoState.members],
   () => {
-    if (!props.isNode) {
-      // 基础信息
-      getTreeData()
-    } else {
-      // 设计流程
-      getTreeData()
-    }
-  },
-  { immediate: true },
-)
-
-watch(
-  () => [props.type, members],
-  () => {
-    dataSource.value = members.value.filter((i) => i.type === props.type)
+    dataSource.value = infoState.members.value.filter(
+      (i) => i.type === props.type,
+    )
     selectedKeys.value = dataSource.value.map((item) => item.id)
   },
   { immediate: true },
@@ -290,12 +369,17 @@ defineExpose({
 .content {
   min-height: 400px;
   .content-left {
-    height: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 400px;
+
+    height: 100%;
     padding: 0 10px;
     border-right: 1px solid #7cb305;
     .left-item {
-      width: 100%;
-      // height: 100px;
+      height: 100%;
+      padding: 10px;
       background-color: #f0f2f5;
     }
 
@@ -305,20 +389,11 @@ defineExpose({
   }
 
   .content-center {
-    // display: flex;
     height: 100%;
-    // padding: 0 2px;
-    border-right: 1px solid #7cb305;
 
     .center-tree {
       padding: 0 10px;
       flex: 1;
-    }
-    .center-relation {
-      flex: 1;
-      height: 100%;
-      padding: 0 10px;
-      border-left: 1px solid #7cb305;
     }
   }
 
@@ -336,9 +411,8 @@ defineExpose({
       margin-bottom: 10px;
 
       .selected {
-        // height: 100%;
         line-height: 32px;
-        flex: 0.9;
+        flex: 1;
         background-color: #f2f2f2;
       }
     }
