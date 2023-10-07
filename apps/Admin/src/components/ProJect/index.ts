@@ -23,8 +23,8 @@ export const providerMap = {
   [providerEnum.CRUD]: '增删改查',
   [providerEnum.Page]: '页面',
   [providerEnum.HtmlPage]: '自定义html',
-  [providerEnum.ListPage]: '列表页模版',
-  [providerEnum.FormPage]: '表单页模版',
+  [providerEnum.ListPage]: '列表页',
+  [providerEnum.FormPage]: '表单页',
   [providerEnum.Function]: '函数',
   'project': '项目'
 }
