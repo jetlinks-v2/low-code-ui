@@ -183,9 +183,13 @@ const treeDataCom = computed(() => {
     : treeData.value
 })
 
-detail_api(route.query.id as string).then((res) => {
-  if (res.success) {
-    getTree(res.result)
+onMounted(() => {
+  if (infoState.supCancel) {
+    detail_api(route.query.id as string).then((res) => {
+      if (res.success) {
+        getTree(res.result)
+      }
+    })
   }
 })
 
@@ -295,7 +299,7 @@ const onSelect = (keys: string[], { node, selected }) => {
 // 确定
 const relSubmit = (subject: any, data: any) => {
   dataSource.value.push({
-    id: `${subject.fullId}-${data.id}`,
+    id: `${subject.fullId}-${data.relation}`,
     name: `${subject.fullName}-${data.name}`,
     weight: infoState.hasWeight ? 1 : undefined,
     type: props.type,

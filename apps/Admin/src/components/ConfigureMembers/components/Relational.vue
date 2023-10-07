@@ -131,7 +131,7 @@ const onRelSelect = (
  */
 const relSubmit = () => {
   const flag = props.dataSource.some(
-    (i) => i.id === `${currentSub.value.fullId}-${intermediateData.value.id}`,
+    (i) => i.id === `${currentSub.value.fullId}-${intermediateData.value.relation}`,
   )
   if (flag) {
     onlyMessage('当前数据已添加', 'warning')

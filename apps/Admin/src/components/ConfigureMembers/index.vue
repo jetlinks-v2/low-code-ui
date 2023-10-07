@@ -85,7 +85,6 @@ watch(
     } else if (isObject(val)) {
       let arr = []
       Object.keys(val).forEach((i) => {
-        console.log('444', i, val[i])
         arr = arr.concat(
           val[i]?.map((j) => ({
             ...pick(j, ['id', 'name', 'weight']),
