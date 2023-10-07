@@ -131,9 +131,13 @@ const dataColumns: any = computed(() => {
       width: 200,
       sorter: item.config?.checked ? (a: any, b: any) => {
         if(typeof a?.[item.id] === 'number') {
-          return a?.[item.id] - b?.[item.id]
+          if(!a?.[item.id] || !b?.[item.id]) {
+            return -1
+          } else {
+            return a?.[item.id] - b?.[item.id]
+          }
         } else {
-          return a?.[item.id]?.localeCompare(b?.[item.id], 'zh')
+          return String(a?.[item.id])?.localeCompare(String(b?.[item.id]), 'zh')
         }
       } : false
     }

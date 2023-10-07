@@ -90,6 +90,7 @@ import {
   DATA_SOURCE,
   showColumnsKey,
   ACTION_CONFIG_KEY,
+  SEARCH_DATA,
 } from './keys'
 import { useProduct } from '@/store'
 import { isEmpty, omit, throttle } from 'lodash-es'
@@ -267,10 +268,8 @@ const dataBind = reactive({
     command: null,
     dataSource: [],
   },
-  filterBind: [],
-  columnBind: [],
-  filterAsync: false,
-  columnAsync: false,
+  dataFrom: null,
+  async: false,
 })
 
 provide(DATA_BIND, dataBind)
@@ -280,6 +279,7 @@ provide(MENU_CONFIG, menuConfig)
 provide(LIST_PAGE_DATA_KEY, listPageData)
 provide(LIST_FORM_INFO, listFormInfo)
 provide(DATA_SOURCE, dataSource)
+provide(SEARCH_DATA, searchData)
 provide(showColumnsKey, showColumns)
 provide(ACTION_CONFIG_KEY, actionsConfig)
 // watch(

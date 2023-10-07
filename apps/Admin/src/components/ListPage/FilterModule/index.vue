@@ -321,18 +321,18 @@ defineExpose({
   errorList,
 })
 
-watch(
-  () => dataBinds,
-  () => {
-    if (dataBinds.data.function) {
-      dataBind.value = true
-    } else {
-      dataBind.value = false
-      dataSource.value = [];
-    }
-  },
-  { immediate: true, deep: true },
-)
+// watch(
+//   () => dataBinds,
+//   () => {
+//     if (dataBinds.data.function) {
+//       dataBind.value = true
+//     } else {
+//       dataBind.value = false
+//       dataSource.value = [];
+//     }
+//   },
+//   { immediate: true, deep: true },
+// )
 
 </script>
 
