@@ -1,6 +1,5 @@
 <template>
   <span>{{ formatValue }}</span>
-  <span>{{ value }}</span>
 </template>
 
 <script setup lang="ts">
