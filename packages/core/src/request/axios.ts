@@ -1,6 +1,7 @@
 import { TOKEN_KEY } from '@jetlinks/constants'
 import { getToken } from '@jetlinks/utils'
 import { jumpLogin } from '@jetlinks/router'
+import { context } from './context'
 import axios from 'axios'
 import type {
   AxiosRequestConfig,
@@ -10,7 +11,7 @@ import type {
   InternalAxiosRequestConfig,
 } from 'axios'
 import { notification as Notification } from 'jetlinks-ui-components'
-import { isFunction } from 'lodash-es'
+import {isFunction, merge} from 'lodash-es'
 import type { AxiosResponseRewrite } from '@jetlinks/types'
 
 export interface ContextOptions {
@@ -20,6 +21,7 @@ export interface ContextOptions {
   ) => InternalAxiosRequestConfig
   handleResponse?: (response: AxiosResponse) => AxiosResponse
   errorHandler?: (error: AxiosError) => void
+  exit?: () => void
 }
 
 export interface CreateAxiosOptions extends AxiosRequestConfig, ContextOptions {}
@@ -28,10 +30,10 @@ const SUCCESS_CODE = 200 // 成功代码
 
 export class Axios {
   private axiosInstance: AxiosInstance
-  private readonly options: CreateAxiosOptions
+  private options: CreateAxiosOptions = {}
 
   constructor(options: CreateAxiosOptions) {
-    this.options = options
+    this.mergeOptions(options)
     const api = import.meta.env.VITE_APP_BASE_API
     this.axiosInstance = axios.create({
       withCredentials: false,
@@ -39,7 +41,7 @@ export class Axios {
       baseURL: api
     })
     this.axiosInstance.interceptors.request.use(
-      this.request.bind(this), 
+      this.request.bind(this),
       this.errorHandler.bind(this)
     )
     this.axiosInstance.interceptors.response.use(
@@ -48,13 +50,18 @@ export class Axios {
     )
   }
 
+  mergeOptions(options?: CreateAxiosOptions) {
+    this.options = merge(context, options || {} )
+  }
+
   request(config: InternalAxiosRequestConfig) {
+    this.mergeOptions()
     const token = getToken()
     const filterUrl = this.options.filterUrl // 不需要token校验接口
     // 没有token，并且该接口需要token校验
     if (!token && !filterUrl?.some((url) => config.url?.includes(url))) {
       // 跳转登录页
-      jumpLogin()
+      jumpLogin(this.options.exit)
       return config
     }
 
@@ -68,6 +75,7 @@ export class Axios {
   }
 
   response(response: AxiosResponse) {
+    this.mergeOptions()
     if (
       this.options.handleResponse &&
       isFunction(this.options.handleResponse)
@@ -93,6 +101,7 @@ export class Axios {
   }
 
   errorHandler(err: AxiosError<any>) {
+    this.mergeOptions()
     if (this.options.errorHandler && isFunction(this.options.errorHandler)) {
       this.options.errorHandler(err)
     }
@@ -108,12 +117,12 @@ export class Axios {
           break;
         case 401:
           this.showNotification('用户未登录', status)
-          console.log('jumpLogin', jumpLogin)
-          jumpLogin()
+          jumpLogin(this.options.exit)
           break;
         case 404:
           const message = data.message || `${data?.error} ${data?.path}`
           this.showNotification(message,status)
+          break;
         default:
           break;
       }
