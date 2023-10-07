@@ -111,6 +111,7 @@
       <j-form-item name="ccMember" label="配置该流程需要抄送的成员">
         <ConfigureMembers
           :hasWeight="false"
+          nodeId="ROOT_1"
           v-model:members="formData.ccMember"
         />
       </j-form-item>
@@ -162,6 +163,15 @@ const formData = reactive({
     },
   }),
 })
+watch(
+  () => formData.ccMember,
+  (val) => {
+    console.log('formData.ccMember: ', val)
+  },
+  {
+    deep: true,
+  },
+)
 
 /**
  * 接收时格式转换, 用于展示:

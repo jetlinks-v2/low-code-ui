@@ -25,6 +25,7 @@
         <ConfigureMembers
           :isNode="false"
           :hasWeight="false"
+          :supCancel="false"
           v-model:members="formData.assignedUser"
         />
       </j-form-item>
@@ -65,6 +66,15 @@ const formData = reactive({
     },
   }),
 })
+watch(
+  () => formData.forms,
+  (val) => {
+    console.log('formData.forms: ', val)
+  },
+  {
+    deep: true,
+  },
+)
 const rules = {
   checkFormList: async (_rule: any, value: string): Promise<any> => {
     if (formData.forms.length === 0) {

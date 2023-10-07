@@ -50,6 +50,7 @@
 
 <script setup lang="ts">
 import type { TreeProps } from 'ant-design-vue'
+import { queryForm_api } from '@/api/process/model'
 
 type Emits = {
   (e: 'update:value', data: any[]): void
@@ -131,6 +132,11 @@ const permissions = ref([
 ])
 const test = ref([])
 
+const getFormList = async () => {
+  const { result } = await queryForm_api({})
+  console.log('result: ', result)
+}
+getFormList()
 const handleOk = () => {}
 </script>
 

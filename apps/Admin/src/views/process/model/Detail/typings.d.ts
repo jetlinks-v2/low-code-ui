@@ -56,7 +56,9 @@ export interface IBasic {
 }
 
 export interface IVar {
-
+    source: string;
+    value: string;
+    upperKey: string;
 }
 export interface IRelation {
     weight: number;

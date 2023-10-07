@@ -8,7 +8,7 @@ interface IModel {
 const defaultModel = {
     config: {},
     nodes: {
-        id: 'root',
+        id: 'ROOT_1',
         parentId: null,
         type: 'ROOT',
         name: '发起人',
