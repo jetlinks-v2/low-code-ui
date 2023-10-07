@@ -38,7 +38,7 @@
       v-model:value="model.validator.configuration.group"
     />
   </j-form-item>
-  <j-form-item v-if="model.validator.provider" label="校验不通过时提示语" :name="['validator', 'configuration', 'message']" :rules="rules.message">
+  <j-form-item v-if="model.validator.providerType" label="校验不通过时提示语" :name="['validator', 'configuration', 'message']" :rules="rules.message">
     <j-input v-model:value="model.validator.configuration.message" />
   </j-form-item>
 <!--  <j-form-item label="最大长度" :name="['validator', 'configuration', 'message']">-->
@@ -127,6 +127,7 @@ const rules = {
 const providerChange = (key) => {
   const configuration = model.value.validator.configuration
   const _group = configuration.group || ['save', 'update', 'insert']
+  const message = configuration.message || '数据格式错误'
 
   if (['email', 'phone'].includes(key)) {
     model.value.validator.provider = 'pattern'
@@ -134,27 +135,27 @@ const providerChange = (key) => {
   switch (key) {
     case 'notEmpty':
       model.value.validator.configuration = {
-        message: configuration.message,
+        message: message,
         group: _group
       }
       break;
     case 'pattern':
       model.value.validator.configuration = {
-        message: configuration.message,
+        message: message,
         group: _group,
         regexp: undefined
       }
       break;
     case 'email':
       model.value.validator.configuration = {
-        message: configuration.message,
+        message: message,
         group: _group,
         regexp: `^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$`
       }
       break;
     case 'phone':
       model.value.validator.configuration = {
-        message: configuration.message,
+        message: message,
         group: _group,
         regexp: `^(((\\+86)|(\\+86-))|((86)|(86\\-))|((0086)|(0086\\-)))?1[3|5|7|8|9]\\d{9}$`
       }
