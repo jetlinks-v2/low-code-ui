@@ -79,17 +79,19 @@
         <j-row>
           <j-col :span="21">
             <j-form-item>
-              <j-tree-select
-                showSearch
-                placeholder="请选择"
-                multiple
-                :disabled="form.async && !reselect"
-                v-model:value="form.data.dataSource"
-                :treeData="sourceList"
-                :treeDefaultExpandedKeys="['output', 'inputs']"
-                :treeCheckStrictly="false"
-                @change="handleChangeData"
-              />
+              <ErrorItem :errorData="errorData('dataSource')">
+                <j-tree-select
+                  showSearch
+                  placeholder="请选择"
+                  multiple
+                  :disabled="form.async && !reselect"
+                  v-model:value="form.data.dataSource"
+                  :treeData="sourceList"
+                  :treeDefaultExpandedKeys="['output', 'inputs']"
+                  :treeCheckStrictly="false"
+                  @change="handleChangeData"
+                />
+              </ErrorItem>
             </j-form-item>
           </j-col>
         </j-row>
@@ -243,6 +245,7 @@ enum javaType {
   list = 'array',
   boolean = 'boolean',
   object = 'object',
+  array = 'array'
 }
 
 enum filterType {
