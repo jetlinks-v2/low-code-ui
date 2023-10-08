@@ -6,10 +6,10 @@
         <h3>表单配置</h3>
         <j-form-item
           label="请确认当前节点需要候选人办理的表单内容"
-          name="forms"
+          name="formBinds"
           :rules="[{ required: true, message: '请配置表单内容' }]"
         >
-          <ConfigureForm v-model:value="basicFormData.forms" />
+          <ConfigureForm v-model:value="basicFormData.formBinds" />
         </j-form-item>
       </j-form>
     </j-tab-pane>
@@ -18,10 +18,10 @@
         <h3>候选人配置</h3>
         <j-form-item
           label="请选择可参与办理的候选成员"
-          name="members"
+          name="candidates"
           :rules="[{ required: true, message: '请选择成员' }]"
         >
-          <ConfigureMembers v-model:members="memberFormData.members" />
+          <ConfigureMembers v-model:members="memberFormData.candidates" />
         </j-form-item>
 
         <h3 style="margin-top: 20px">成员权限</h3>
@@ -63,16 +63,24 @@ const props = defineProps({
 // 基础配置
 const basicFormRef = ref()
 const basicFormData = reactive({
-  forms: props.node?.props?.formBinds || {},
+  formBinds: props.node?.props?.formBinds || {},
 })
 
 // 成员配置
 const memberFormRef = ref()
 const memberFormData = reactive({
-  members: [],
+  candidates: [], // 候选人配置
   authButtons: [],
   allow: false,
 })
+
+watch(
+  () => memberFormData,
+  (val) => {
+    console.log('memberFormData: ', val)
+  },
+  { deep: true },
+)
 
 const allButtons = ref([{ label: '提交', value: 'submit' }])
 const nodeList = ref([
@@ -85,8 +93,11 @@ const nodeList = ref([
  */
 const saveConfigToPinia = () => {
   const result = findDataById(flowStore.model.nodes, flowStore.selectedNode.id)
-  result.props['formBinds'] = basicFormData.forms
-  //   console.log('result1: ', result)
+  //   result.props['formBinds'] = basicFormData.formBinds
+  //   result.props['candidates'] = memberFormData.candidates
+  result.props = { ...result.props, ...basicFormData, ...memberFormData }
+  console.log('deal: ', result)
+  console.log('flowStore.selectedNode: ', flowStore.selectedNode)
 }
 defineExpose({
   saveConfigToPinia,
