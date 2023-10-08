@@ -23,9 +23,9 @@
 
       <CardBox class="release-content"  v-if="loading">
         <div class="release-step-content">
-          <Status v-show="step === 0" v-model:status="status" :theme="themeColor" />
+          <Status v-show="step === 0" v-model:status="status" v-model:theme="themeColor" />
           <Tree v-show="step === 1" ref="treeRef" @change="treeChange" />
-          <Finish v-show="step === 2" ref="finishRef"  v-model:value="finishStatus" :tree="tree" @statusChange="e => releaseStatus = e" />
+          <Finish v-show="step === 2" ref="finishRef"  v-model:value="finishStatus" :theme="themeColor" :tree="tree" @statusChange="e => releaseStatus = e" />
         </div>
         <div class="release-footer">
           <j-button v-if="step === 0" @click="cancel">取消</j-button>
