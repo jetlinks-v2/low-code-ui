@@ -121,6 +121,10 @@
 
 <script setup lang="ts">
 import ConfigureForm from './ConfigureForm.vue'
+import { findDataById } from './utils'
+import { useFlowStore } from '@/store/flow'
+
+const flowStore = useFlowStore()
 
 const activeKey = ref('basic')
 const props = defineProps({
@@ -132,7 +136,7 @@ const props = defineProps({
 
 // 基础配置
 const basicFormRef = ref()
-const basicFormData = ref({
+const basicFormData = reactive({
   forms: props.node?.props?.formBinds || {},
   autoPass: false,
   dealRequired: false,
@@ -140,7 +144,7 @@ const basicFormData = ref({
 
 // 成员配置
 const memberFormRef = ref()
-const memberFormData = ref({
+const memberFormData = reactive({
   members: [],
   passWeight: 0,
   rejectWeight: 0,
@@ -156,6 +160,15 @@ const nodeList = ref([
   { label: '审批节点', value: 'approval' },
   { label: '处理节点', value: 'deal' },
 ])
+
+const saveConfigToPinia = () => {
+  const result = findDataById(flowStore.model.nodes, flowStore.selectedNode.id)
+  result.props['formBinds'] = basicFormData.forms
+  //   console.log('result2: ', result)
+}
+defineExpose({
+  saveConfigToPinia,
+})
 </script>
 
 <style lang="less" scoped></style>

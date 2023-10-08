@@ -16,7 +16,7 @@
       </j-space>
     </template>
 
-    <NodeConfig />
+    <NodeConfig ref="nodeConfigRef" />
   </j-drawer>
 </template>
 
@@ -34,6 +34,7 @@ const title = computed(() => {
     : selectedNode.value?.name
 })
 
+const nodeConfigRef = ref()
 const showConfig = ref(false)
 const nodeSelected = (node) => {
   console.log('配置节点', node)
@@ -41,6 +42,7 @@ const nodeSelected = (node) => {
 }
 
 const handleSubmit = () => {
+  nodeConfigRef.value.saveConfig()
   showConfig.value = false
 }
 </script>
