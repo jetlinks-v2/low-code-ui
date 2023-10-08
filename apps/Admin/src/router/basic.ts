@@ -114,6 +114,14 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
                 },
               ]
             },
+            {
+                path: '/flow-engine/me',
+                name: 'Me',
+                component: () => import('@/views/process/me/index.vue'),
+                meta: {
+                    title: '我的流程',
+                },
+              },
         ]
     },
     {
