@@ -8,36 +8,34 @@
     :getContainer="() => elContainer"
     :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
     :destroyOnClose="true"
-    @close="emits('update:open', false)"
+    @close="handleSubmit"
   >
     <div class="data-bind-modal">
       <j-form :model="form" layout="vertical">
         <j-form-item>
           <j-space>
-            <j-button type="link" @click="handleModify" :disabled="!form.async">变更</j-button>
+            <j-button @click="handleModify" :type="form.async ? 'link' : 'text'">变更</j-button>
             <j-button
               myIcon="SyncOutlined"
               size="small"
-              type="primary"
-              :disabled="!form.async"
+              :type="form.async ? 'primary' : 'default'"
               @click="handleFunctionChange"
             >
               同步功能变动
             </j-button>
           </j-space>
         </j-form-item>
-        <j-row :gutter="20">
-          <j-col :span="24">
-            <j-space style="align-items: start;">
+        <j-row :gutter="10">
+          <j-col :span="10">
               <j-form-item>
                 <ErrorItem :errorData="errorData('function')">
                   <a-select
-                    style="width: 200px;"
                     v-model:value="form.data.function"
-                    :disabled="form.async"
+                    :disabled="optionDisabled && form.async"
                     placeholder="请选择功能"
                     optionFilterProp="title"
                     show-search
+                    @change="form.data.command = null; form.data.dataSource = []"
                   >
                     <a-select-option
                       v-for="item in functionOptions"
@@ -51,15 +49,17 @@
                   </a-select>
                 </ErrorItem>
               </j-form-item>
-              <j-form-item>
+          </j-col>
+          <j-col :span="10">
+            <j-form-item>
                 <ErrorItem :errorData="errorData('command')">
                   <a-select
-                    style="width: 200px;"
                     v-model:value="form.data.command"
-                    :disabled="form.async"
+                    :disabled="optionDisabled && form.async"
                     placeholder="请选择指令"
                     optionFilterProp="label"
                     show-search
+                    @change="form.data.dataSource = []"
                   >
                     <a-select-option
                       v-for="item in commandOptions"
@@ -73,18 +73,20 @@
                   </a-select>
                 </ErrorItem>
               </j-form-item>
-            </j-space>
           </j-col>
         </j-row>
         <j-row>
-          <j-col :span="21">
+          <j-col :span="2">
+            <span>输出</span>
+          </j-col>
+          <j-col :span="18">
             <j-form-item>
               <ErrorItem :errorData="errorData('dataSource')">
                 <j-tree-select
                   showSearch
                   placeholder="请选择"
                   multiple
-                  :disabled="form.async && !reselect"
+                  :disabled="optionDisabled && !reselect && form.async"
                   v-model:value="form.data.dataSource"
                   :treeData="sourceList"
                   :treeDefaultExpandedKeys="['output', 'inputs']"
@@ -97,19 +99,12 @@
         </j-row>
       </j-form>
     </div>
-
-    <template #footer>
-      <j-space>
-        <j-button @click="emits('update:open', false)">取消</j-button>
-        <j-button type="primary" @click="handleSubmit">确定</j-button>
-      </j-space>
-    </template>
-    <j-modal v-model:visible="visible" title="提示" @ok="handleOk">
+    <j-modal v-model:visible="visible" title="提示" :maskClosable="false" @ok="handleOk">
       <p class="text">
         列表页中引用自当前功能的数据将同步变更
       </p>
     </j-modal>
-    <j-modal v-model:visible="changeModalVisible" title="提示" @ok="handleAsync">
+    <j-modal v-model:visible="changeModalVisible" title="提示" :maskClosable="false" @ok="handleAsync">
       <p class="text">
         已同步所有数据变动，请重新绑定
       </p>
@@ -129,9 +124,18 @@ import { queryCommand } from '@/api/project';
 const { functionOptions, commandOptions, info, handleFunction } = useFunctions()
 const { getImages } = useImages()
 
+const emits = defineEmits<Emit>()
+let dataBind = inject(DATA_BIND)
+const columnData = inject(DATA_SOURCE)
+const searchData = inject(SEARCH_DATA)
+const form = reactive(cloneDeep(dataBind))
+let newData = [];
 const visible = ref(false)
 const changeModalVisible = ref(false)
 const reselect = ref(false)
+const optionDisabled = computed(() => {
+  return form.data.function && form.data.command && form.data.dataSource.length
+})
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -145,12 +149,7 @@ const errorData = computed(() => {
     return errorList.value.find((item) => item.key === key)
   }
 })
-const emits = defineEmits<Emit>()
-let dataBind = inject(DATA_BIND)
-const columnData = inject(DATA_SOURCE)
-const searchData = inject(SEARCH_DATA)
-const form = reactive(cloneDeep(dataBind))
-let newData = [];
+
 const props = defineProps({
   open: {
     type: Boolean,
@@ -210,13 +209,17 @@ const findItem = (arr: any[], value: string) => {
 
 
 const handleModify = () => {
+  if(!form.async) {
+    onlyMessage('请先完成数据绑定', 'error')
+    return
+  }
   visible.value = form.data && form.data.function
 }
 
 const handleOk = () => {
-  form.data.command = form.data.function = dataBind.data.command = dataBind.data.function = null
+  // form.data.command = form.data.function = dataBind.data.command = dataBind.data.function = null
   form.async = dataBind.async = false
-  form.data.dataSource = dataBind.data.dataSource = []
+  // form.data.dataSource = dataBind.data.dataSource = []
   visible.value = false
 }
 
@@ -267,7 +270,9 @@ enum filterType {
 }
 
 const handleSubmit = () => {
-  form.async = true;
+  if(form.data.function && form.data.command && form.data.dataSource.length) {
+    form.async = true;
+  }
   form.dataFrom = commandOptions.value?.find(item => item.id === form.data.command)?.output
   dataBind = Object.assign(dataBind, form)
   columnData.value = [...columnData.value.filter(item => item.mark === 'add'), ...dataBind.data.dataSource.map(item => {
@@ -288,6 +293,10 @@ const handleSubmit = () => {
 }
 
 const handleFunctionChange = () => {
+  if(!form.async) {
+    onlyMessage('请先完成数据绑定', 'error')
+    return
+  }
   queryCommand(info.value.draftId, []).then(res => {
     const result = res.result?.find(item => item.moduleId + '.' + item.id === form.data.function)?.command || []
     newData = result.find(item => item.id === form.data.command)?.output

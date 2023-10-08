@@ -5,7 +5,7 @@
             <j-button
                 type="primary"
                 ghost
-                :data-id="_item.key"
+                :dataid="_item.key"
                 :class="extractCssClass(_item.style)"
             >
               <img v-if="_item.icon?.includes('http')" :src="_item.icon" class="image-icon">
@@ -41,6 +41,7 @@
                           "
                           ref="secondLevelBtn"
                           :class="extractCssClass(item.style)"
+                          :data-id="item.key"
                       >
                           <template #icon>
                             <img v-if="item.icon?.includes('http')" :src="item.icon" class="image-icon">

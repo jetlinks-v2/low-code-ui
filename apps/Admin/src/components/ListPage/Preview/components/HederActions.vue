@@ -26,7 +26,7 @@
             :actions="item?.children"
             v-else
         >
-          <j-button :data-id="item.key" :class="className(item.style)">
+          <j-button :dataid="item.key" :class="className(item.style)">
             <template #icon>
               <img v-if="item.icon?.includes('http')" :src="item.icon" class="image-icon">
               <AIcon v-else :type="item.icon"/>
