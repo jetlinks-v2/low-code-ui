@@ -9,7 +9,7 @@
       :params="params"
       :modelValue="defaultFormType"
       :scroll="{ x: dataColumns.length * 150 }"
-      :defaultParams="{ sorts: [{ name: 'createTime', order: 'desc' }] }"
+      :defaultParams="defaultParams"
       :rowSelection="
         isCheck
           ? {
@@ -18,6 +18,7 @@
             }
           : false
       "
+      @change="tableDataChange"
     >
       <template #headerTitle>
         <HeaderButton :headerActions="props.headerActions" ref="headerButton" />
@@ -41,22 +42,6 @@
             <ObjectFormat v-else-if="['object'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]" />
             <EnumFormat v-else-if="['enum'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]" />
             <StringFormat v-else :config="item?.config" :value="slotProps[item.key]"/>
-            <!-- <span v-if="item?.config?.type === 'object' && isShowIcon">
-              <AIcon
-                type="SearchOutlined"
-                @click="jsonOpen(slotProps[item.key])"
-              />
-            </span>
-            <span v-else-if="item?.config?.type === 'file' && isShowFileIcon">
-              <img
-                style="width: 30px; height: 30px"
-                :src="dataFormat(item?.config, slotProps[item.key])"
-              />
-            </span>
-            <span v-else>
-              {{ dataFormat(item?.config, slotProps[item.key]) }}
-              <StringFormat :config="item?.config" :value="slotProps[item.key]"/>
-            </span> -->
           </div>
           <span v-else>{{ !isEmpty(slotProps[item.key]) ? slotProps[item.key] : '--' }}</span>
         </j-ellipsis>
@@ -73,7 +58,7 @@
                 handleFunction(item.permissionProps, slotProps)?.popConfirm
               "
               :class="extractCssClass(item.style)"
-              ref="tableActionsRef"
+              :data-id="item.key"
             >
               <template v-if="item.icon">
                 <img
@@ -94,7 +79,7 @@
           :actions="tableActions"
           :record="slotProps"
           :active="_selectedRowKeys.includes(slotProps.id)"
-          :statusText="slotProps[props?.cardConfig?.emphasisField] || ''"
+          :statusText="statusText(slotProps[props?.cardConfig?.emphasisField] || '')"
           :showStatus="!!props?.cardConfig?.emphasisField?.length"
           :statusNames="{
             online: 'processing',
@@ -113,13 +98,9 @@
               shape="square"
               :size="100"
               :src="props?.cardConfig?.customIcon"
-              class="card-icon"
             >
               <template #icon>
-                <j-image
-                  src="/images/list-page/table-card-default.png"
-                  :preview="false"
-                />
+                <Image src="/images/list-page/table-card-default.png" :preview="false"/>
               </template>
             </j-avatar>
             <j-avatar
@@ -130,10 +111,7 @@
               class="card-icon"
             >
               <template #icon>
-                <j-image
-                  src="/images/list-page/table-card-default.png"
-                  :preview="false"
-                />
+                <Image :src="slotProps[props?.cardConfig?.dynamicIcon] || '/images/list-page/table-card-default.png'" :preview="false"/>
               </template>
             </j-avatar>
           </template>
@@ -171,7 +149,7 @@
                   <ArrayFormat v-else-if="['array'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]" />
                   <EnumFormat v-else-if="['enum'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]" />
                   <ObjectFormat v-else-if="['object'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]" />
-                  <StringFormat v-else :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]"/>
+                  <StringFormat v-else-if="props?.cardConfig?.field2" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]"/>
                 </j-ellipsis>
               </j-col>
               <j-col :span="12">
@@ -186,7 +164,7 @@
                   <ArrayFormat v-else-if="['array'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]" />
                   <EnumFormat v-else-if="['enum'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]" />
                   <ObjectFormat v-else-if="['object'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]" />
-                  <StringFormat v-else :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]"/>
+                  <StringFormat v-else-if="props?.cardConfig?.field3" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]"/>
                 </j-ellipsis>
               </j-col>
             </j-row>
@@ -200,7 +178,7 @@
 import Card from '@/components/Card'
 import HeaderButton from '@/components/ListPage/Preview/components/HederActions.vue'
 import { isFunction, isObject } from 'lodash-es'
-import dayjs from 'dayjs'
+import Image from '@/components/Image/index.vue'
 import { PropType } from 'vue'
 import {
   extractCssClass,
@@ -275,7 +253,7 @@ const isCheck = computed(() => {
 })
 const _selectedRowKeys = ref<string[]>([])
 
-const tableActionsRef = ref<any[]>([])
+const defaultParams = reactive({ sorts: [{ name: 'createTime', order: 'desc' }] })
 
 const onSelectChange = (keys: string[]) => {
   _selectedRowKeys.value = [...keys]
@@ -295,6 +273,20 @@ const handleClick = (dt: any) => {
 const valueFormat = (val: any) => {
   return props.dataColumns.find((item) => item.dataIndex === val)
 }
+
+const statusText = computed(() => {
+  try {
+    return (val: any) => {
+      if(typeof val === 'string') {
+        return val
+      } else if(typeof val === 'object') {
+        return val?.text
+      }
+    }
+  } catch (error) {
+    return {}
+  }
+})
 
 const dynamicIconUrl = computed(() => {
   return (val: string) => {
@@ -318,20 +310,29 @@ const handleFunction = (item: any, data?: any) => {
   return undefined
 }
 
+const tableDataChange = (pagination, filters, sorter) => {
+  switch(sorter.order) {
+    case 'ascend':
+      defaultParams.sorts = [{name: sorter.columnKey, order: 'asc'}]
+    break;
+    case 'descend':
+      defaultParams.sorts = [{name: sorter.columnKey, order: 'desc'}]
+    break;
+    default: 
+      defaultParams.sorts = [{ name: 'createTime', order: 'desc' }]
+    break
+  }
+  tableRef.value.reload?.();
+}
 watchEffect(() => {
   props.tableActions.forEach((item) => {
-    insertCustomCssToHead(item.style, item.key)
+    insertCustomCssToHead(item.style, item.key, 'dataid')
   })
   props.dataColumns.forEach((item) => {
     insertCustomCssToHead(
       item.config?.specialStyle,
       `${props.projectId}-${props.pageId}-${item.dataIndex}`,
-    )
-  })
-  tableActionsRef.value?.forEach((item, index) => {
-    item.$el.parentElement.children[0].setAttribute(
-      'data-id',
-      props.tableActions[index]?.key,
+      'dataid'
     )
   })
 })
@@ -349,7 +350,7 @@ defineExpose({
   width: 14px;
   height: 14px;
 }
-.card-icon {
-  background-color: rgba(49, 94, 251, 0.2);
+:deep(.ant-avatar) {
+  background-color: transparent !important;
 }
 </style>

@@ -33,20 +33,20 @@
         </template>
         <template #javaType="{record, index, valueChange}">
           <span v-if="index <= maxLen">{{record.javaType}}</span>
-          <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => { valueChange(record.javaType); JavaTypeChange(record)}" :disabled="publishColumns.includes(record.name)"/>
+          <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => { valueChange(record.javaType); JavaTypeChange(record)}" :disabled="publishColumns.includes(record.alias)"/>
         </template>
         <template #jdbcType="{record, index, valueChange}">
           <span v-if="index <= maxLen">{{record.jdbcType}}</span>
-          <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="() => { valueChange(record.jdbcType);emitUpdateDataSource()}" :disabled="publishColumns.includes(record.name)" />
+          <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="() => { valueChange(record.jdbcType);emitUpdateDataSource()}" :disabled="publishColumns.includes(record.alias)" />
         </template>
         <template #length="{ record, index }">
           <span v-if="index <= maxLen">{{record.length}}</span>
           <span v-else-if="!['DECIMAL','VARCHAR','LONGVARCHAR'].includes(record.jdbcType)"></span>
-          <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" :disabled="publishColumns.includes(record.name)" />
+          <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" :disabled="publishColumns.includes(record.alias)" />
         </template>
         <template #scale="{ record, index }">
           <span v-if="index <= maxLen || !['DECIMAL'].includes(record.jdbcType)">{{record.scale}}</span>
-          <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" :disabled="publishColumns.includes(record.name)" />
+          <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" :disabled="publishColumns.includes(record.alias)" />
         </template>
         <template #updatable="{ record, index }">
           <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" :disabled="index <= maxLen" />
@@ -519,7 +519,6 @@ watch(() => props.tree, () => {
   if (dataSource.value.length) {
     const isTreeNow = dataSource.value[1].name === 'parent_id'
     const arr = JSON.parse(JSON.stringify(dataSource.value))
-
     if (props.tree) {
       if (!isTreeNow) {
         const other = arr.slice(5, arr.length )
@@ -533,6 +532,7 @@ watch(() => props.tree, () => {
       }
     }
   } else { // 新增数据
+    maxLen.value = props.tree ? 9 : 5
     dataSource.value = props.tree ? [...defaultTreeSetting, ...props.columns] : [...defaultSetting, ...props.columns]
   }
 

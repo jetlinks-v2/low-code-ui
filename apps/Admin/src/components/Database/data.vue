@@ -1,14 +1,14 @@
 <template>
   <div class="data-warp">
     <div class="tips">
-      <span v-if="project.published">
-        正在查看 {{ project.info.version }} 发布版本下的 {{total}} 条数据
+      <span v-if="published">
+        正在查看 {{ deployTime }} 发布版本下的 {{total}} 条数据
       </span>
       <span v-else>
         暂无数据，请在项目发布后查看
       </span>
     </div>
-    <div class="table" v-if="project.published">
+    <div class="table" v-if="published">
       <j-pro-table
         model="TABLE"
         :columns="myColumns"
@@ -35,6 +35,10 @@ const props = defineProps({
   parentId: {
     type: String,
     default: undefined
+  },
+  createTime: {
+    type: String,
+    default: undefined
   }
 })
 
@@ -42,6 +46,13 @@ const columns = inject(CRUD_COLUMNS)
 
 const project = useProduct()
 const total = ref(0)
+const deployTime = computed(() => {
+  return timeFormat(project.info.deployTime)
+})
+
+const published = computed(() => {
+  return project.published ? new Date(props.createTime).getTime() < project.info.deployTime : false
+})
 
 const timeFormat = (t) => {
   console.log(t)

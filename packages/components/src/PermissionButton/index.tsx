@@ -25,6 +25,9 @@ const definedProps = {
   noPermissionTitle: {
     type: String
   },
+  dataId: {
+    type: String
+  },
   ...omit(buttonProps(), 'icon')
 }
 
