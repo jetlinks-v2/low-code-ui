@@ -14,7 +14,8 @@
         isCheck
           ? {
               selectedRowKeys: _selectedRowKeys,
-              onChange: onSelectChange,
+              onSelect,
+              onSelectAll
             }
           : false
       "
@@ -553,8 +554,28 @@ const defaultParams = reactive({
   sorts: [{ name: 'createTime', order: 'desc' }],
 })
 
-const onSelectChange = (keys: string[]) => {
-  _selectedRowKeys.value = [...keys]
+// const onSelectChange = (keys: string[]) => {
+//   console.log(keys);
+//   _selectedRowKeys.value = [...keys]
+// }
+
+const onSelect = (record, selected) => {
+  if (selected) {
+    _selectedRowKeys.value.push(record.id)
+  } else {
+    _selectedRowKeys.value = _selectedRowKeys.value.filter(el => el != record.id).map(el => el)
+  }
+  console.log(_selectedRowKeys.value);
+}
+
+const onSelectAll = (selected, selectedRows: Record<string, any>[], changeRows: any[]) => {
+  if(selected) {
+    _selectedRowKeys.value.push(...changeRows.map(item => item.id))
+  } else {
+    _selectedRowKeys.value = _selectedRowKeys.value.filter(el => {
+      return !changeRows.find(item => el === item.id)
+    }).map(el => el)
+  }
 }
 
 const handleClick = (dt: any) => {
