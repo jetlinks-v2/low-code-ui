@@ -264,6 +264,28 @@
         </j-select>
       </j-form-item>
     </template>
+    <template v-if="['date-picker'].includes(type)">
+      <j-form-item
+        label="精度"
+        :name="['componentProps', 'format']"
+        :validateFirst="true"
+        :rules="[
+          {
+            required: true,
+            message: '请选择',
+          },
+        ]"
+      >
+        <j-select
+          :defaultValue="'M'"
+          @change="onDateChange"
+          v-model:value="target.componentProps.format"
+        >
+          <j-select-option value="YYYY-MM-DD">年-月-日</j-select-option>
+          <j-select-option value="YYYY-MM-DD HH:mm:ss">时-分-秒</j-select-option>
+        </j-select>
+      </j-form-item>
+    </template>
     <template
       v-if="
         [
@@ -449,6 +471,12 @@ const onMultipleChange = (e) => {
     target.value.componentProps.treeCheckable = false
     target.value.componentProps.treeCheckStrictly = false
   }
+  emits('refresh', target.value)
+}
+
+const onDateChange = (e) => {
+  target.value.componentProps.format = e
+  target.value.componentProps.valueFormat = e
   emits('refresh', target.value)
 }
 

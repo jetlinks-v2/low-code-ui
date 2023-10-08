@@ -154,6 +154,7 @@ const DraggableLayout = defineComponent({
                             watchEffect(() => {
                                 registerToRefList(_path, selectRef.value)
                             })
+                            
                             if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
                                 queryOptions(element.componentProps.source, product.info?.id).then(resp => {
                                     if (['select', 'select-card'].includes(element.type)) {
