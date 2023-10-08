@@ -13,7 +13,7 @@ const props = defineProps({
   },
   value: {
     type: Object as PropType<Record<string, any>>,
-    default: ''
+    default: () => {}
   }
 })
 

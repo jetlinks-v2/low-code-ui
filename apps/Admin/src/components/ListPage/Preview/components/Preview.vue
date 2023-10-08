@@ -17,6 +17,7 @@
           :defaultFormType="defaultFormType"
           :tableActions="actions"
           @openJson="(newValue) => (jsonData = newValue)"
+          :showColumnOptions="allData.showType?.showColumns"
           ref="tableRef"
         />
       </div>
@@ -173,6 +174,7 @@ const tableHeader = () => {
       scopedSlots: true,
       align: item?.config?.colLayout,
       config: item.config,
+      width: 200,
     }
   })
   if (actions.value?.length !== 0) {
@@ -256,7 +258,7 @@ const actionsBtnFormat = (data: any, type: string) => {
   const finalData = data?.map((item: any) => {
     let result = {
       ...item,
-      key: item?.key,
+      key: item?.command === 'Delete' ? 'delete' : item?.key,
       text: item?.title,
       icon: type == 'actions' ? item?.icon || 'SettingOutlined' : item?.icon,
       type: item?.type,
