@@ -33,6 +33,9 @@
             </div>
           </div>
         </j-form-item>
+        <j-form-item v-if="showType.configured.includes('list')" label="数据列展示控制">
+          <j-switch v-model:checked="showType.showColumns"></j-switch>
+        </j-form-item>
         <j-form-item
           label="卡片配置"
           v-if="showType.configured?.includes('card')"
@@ -162,6 +165,7 @@ const showType = reactive({
   configured: ['list'],
   configurationShow: false,
   defaultForm: 'list',
+  showColumns: false,
 })
 //卡片配置返回
 const back = () => {
