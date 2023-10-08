@@ -35,7 +35,7 @@ export const queryDeviceNoPage = (data:any) => request.post('/device-instance/_q
 /**
  * 查询字典列表
  */
-export const queryDictionary = () => request.post('/dictionary/_query/no-paging', { paging: false })
+export const queryDictionary = () => request.post('/dictionary/_query/no-paging', { paging: false, sorts: [{ name: 'createTime', order: 'desc' }] })
 
 /**
 * 字典查询下拉数据

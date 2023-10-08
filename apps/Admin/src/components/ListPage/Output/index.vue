@@ -68,9 +68,7 @@ import Export from './components/Export.vue'
 import CallPage from './components/CallPages.vue'
 import JsonPreview from '../Preview/components/JsonPreview.vue'
 import { queryRuntime } from '@/api/form'
-import { providerEnum } from '@/components/ProJect'
-import { router } from '@jetlinks/router'
-import { onlyMessage, randomString } from '@jetlinks/utils'
+import { onlyMessage } from '@jetlinks/utils'
 import { dictionaryItemList } from '@/api/list'
 
 const props = defineProps({
@@ -129,13 +127,7 @@ const dataColumns: any = computed(() => {
       align: item?.config?.colLayout,
       config: item.config,
       width: 200,
-      sorter: item.config?.checked ? (a: any, b: any) => {
-        if(typeof a?.[item.id] === 'number') {
-          return a?.[item.id] - b?.[item.id]
-        } else {
-          return a?.[item.id]?.localeCompare(b?.[item.id], 'zh')
-        }
-      } : false
+      sorter: item.config?.checked
     }
   })
   if (actions.value?.length !== 0 && allData.value?.showColumns) {
@@ -321,13 +313,13 @@ const searchType = (type_: string) => {
   return type
 }
 
-const actionsBtnFormat = (data: any) => {
+const actionsBtnFormat = (data: any, type: string) => {
   const finalData = data?.map((item: any) => {
     let result = {
       ...item,
       key: item?.key,
       text: item?.title,
-      icon: item?.icon,
+      icon: type == 'actions' ? item?.icon || 'SettingOutlined' : item?.icon,
       type: item?.type,
       command: item?.command,
       pages: item?.pages,
@@ -359,7 +351,7 @@ const actionsBtnFormat = (data: any) => {
           handleActions(data, item)
         },
       }),
-      children: actionsBtnFormat(item?.children || []),
+      children: actionsBtnFormat(item?.children || [], type),
     }
     if (item.title == '批量删除') {
       result['selected'] = {
@@ -458,12 +450,12 @@ const handleActions = (
 //表头按钮
 const handleHeaderActions = () => {
   const btnData = allData.value?.addButton || []
-  headerActions.value = actionsBtnFormat(btnData)
+  headerActions.value = actionsBtnFormat(btnData, 'headerActions')
 }
 //table操作按钮
 const handleRowActions = () => {
   const btnData = allData.value?.actionsButton || []
-  actions.value = actionsBtnFormat(btnData)
+  actions.value = actionsBtnFormat(btnData, 'actions')
 }
 //table数据
 const query = (_params: Record<string, any>) => {

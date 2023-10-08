@@ -75,6 +75,7 @@
               placeholder="请选择"
               :options="commandOptions"
               :field-names="{ label: 'name', value: 'id' }"
+              @change="state.output = null"
             />
           </ErrorItem>
         </j-space>

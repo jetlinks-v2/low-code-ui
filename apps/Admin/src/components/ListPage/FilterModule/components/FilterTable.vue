@@ -1,14 +1,14 @@
 <template>
   <div className="filter-table">
     <div class="tips">{{ props.title }}</div>
-    <j-button
+    <!-- <j-button
       @click="syncData"
       myIcon="SyncOutlined"
       size="small"
       :type="dataBinds.data.dataSource.length ? 'primary' : 'default'"
     >
       同步数据绑定
-    </j-button>
+    </j-button> -->
     <j-data-table
       columnDrag
       class="ant-table-striped table-striped"
@@ -19,7 +19,7 @@
       :columns="props.columns"
       :data-source="props.dataSource"
       :showTool="false"
-      :height="900"
+      :height="500"
       @change="(data) => handleChange(data)"
     >
       <template #headerCell="{ column }">
@@ -62,7 +62,7 @@
             :loading="loading"
             title="确定删除此数据？"
           >
-            <j-button type="text" danger>删除</j-button>
+            <j-button type="text" danger v-if="data.record?.mark === 'add'">删除</j-button>
           </JPopconfirm>
         </j-space>
       </template>
@@ -206,6 +206,7 @@ enum javaType {
   list = 'array',
   boolean = 'boolean',
   object = 'object',
+  array = 'array'
 }
 
 enum filterType {
@@ -223,6 +224,7 @@ enum filterType {
   boolean = 'enum',
   map = 'string',
   object = 'enum',
+  array = 'string'
 }
 
 
@@ -360,7 +362,12 @@ const data = [
 //新增一列table
 const handleAdd = async () => {
   emit('handleAdd', tableRef.value)
+  setTimeout(() => {
+    //滚动到表格底部
+    tableRef.value.$el.getElementsByTagName('tbody')?.[0].scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
+  })
 }
+
 //配置
 const configuration = async (data: any) => {
   const dataSource = await tableRef.value.getData()
@@ -404,8 +411,8 @@ const asyncDataBind = () => {
   return dataBinds.data.dataSource.map(item => {
     return {
       rowKey: randomString(8),
-      type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type],
       ...item,
+      type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type],
     }
   }) || []
 }

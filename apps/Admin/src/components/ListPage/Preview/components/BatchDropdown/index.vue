@@ -115,10 +115,7 @@ const batchClick = (v) => {
 
 watchEffect(() => {
   props.actions.forEach((item) => {
-    insertCustomCssToHead(item.style, item.key)
-  })
-  secondLevelBtn.value?.forEach((item, index) => {
-    item.$el.parentElement.children[0].setAttribute('data-id', props.actions[index]?.key)
+    insertCustomCssToHead(item.style, item.key, 'dataid')
   })
 })
 </script>

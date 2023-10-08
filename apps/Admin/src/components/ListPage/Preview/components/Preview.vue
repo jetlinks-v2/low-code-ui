@@ -111,13 +111,7 @@ const dataColumns: any = computed(() => {
       align: item?.config?.colLayout,
       config: item.config,
       width: 200,
-      sorter: item.config?.checked ? (a: any, b: any) => {
-        if(typeof a?.[item.id] === 'number') {
-          return a?.[item.id] - b?.[item.id]
-        } else {
-          return a?.[item.id]?.localeCompare(b?.[item.id], 'zh')
-        }
-      } : false
+      sorter: item.config?.checked
     }
   })
   if (actions.value?.length !== 0 && allData.value?.showColumns) {
@@ -258,13 +252,13 @@ const searchType = (type_: string) => {
   }
   return type;
 }
-const actionsBtnFormat = (data: any) => {
+const actionsBtnFormat = (data: any, type: string) => {
   const finalData = data?.map((item: any) => {
     let result = {
       ...item,
       key: item?.key,
       text: item?.title,
-      icon: item?.icon,
+      icon: type == 'actions' ? item?.icon || 'SettingOutlined' : item?.icon,
       type: item?.type,
       command: item?.command,
       pages: item?.pages,
@@ -278,17 +272,7 @@ const actionsBtnFormat = (data: any) => {
             ? {
                 title: data?.status === 'error' ? '禁用' : '确认删除？',
                 onConfirm: async () => {
-                  const res = await queryRuntime(
-                    props.projectId,
-                    item.functions,
-                    item.command,
-                    {
-                      terms: [{ column: 'id', termType: 'eq', value: data.id }],
-                    },
-                  )
-                  if (res.success) {
-                    tableRef.value?.reload?.()
-                  }
+      
                 },
               }
             : false,
@@ -296,7 +280,7 @@ const actionsBtnFormat = (data: any) => {
           handleActions(data, item)
         },
       }),
-      children: actionsBtnFormat(item?.children || []),
+      children: actionsBtnFormat(item?.children || [], type),
     }
     if (item.title == '批量删除') {
       result['selected'] = {
@@ -354,12 +338,12 @@ const handleActions = (
 const handleHeaderActions = () => {
   const btnData = allData.value?.addButton || []
   console.log(`output->btnData`,btnData)
-  headerActions.value = actionsBtnFormat(btnData)
+  headerActions.value = actionsBtnFormat(btnData, 'headerActions')
 }
 //table操作按钮
 const handleRowActions = () => {
   const btnData = allData.value?.actionsButton || []
-  actions.value = actionsBtnFormat(btnData)
+  actions.value = actionsBtnFormat(btnData, 'actions')
 }
 //table数据
 const query = (_params: Record<string, any>) =>
