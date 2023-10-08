@@ -49,14 +49,7 @@
     </template>
     <template
       v-if="
-        [
-          'select',
-          'org',
-          'role',
-          'user',
-          'product',
-          'device',
-        ].includes(type)
+        ['select', 'org', 'role', 'user', 'product', 'device'].includes(type)
       "
     >
       <j-form-item
@@ -167,27 +160,29 @@
           <j-radio-button :value="true">多选项</j-radio-button>
         </j-radio-group>
       </j-form-item>
-      <j-form-item
-        label="可选节点"
-        v-if="target.componentProps.multiple"
-        :name="['componentProps', 'treeCheckStrictly']"
-        :validateFirst="true"
-        :rules="[
-          {
-            required: true,
-            message: '请选择',
-          },
-        ]"
-      >
-        <j-select
-          v-model:value="target.componentProps.treeCheckStrictly"
-          placeholder="请选择"
-          @change="onDataChange"
+      <template v-if="['tree-select'].includes(type)">
+        <j-form-item
+          label="可选节点"
+          v-if="target.componentProps.multiple"
+          :name="['componentProps', 'treeCheckStrictly']"
+          :validateFirst="true"
+          :rules="[
+            {
+              required: true,
+              message: '请选择',
+            },
+          ]"
         >
-          <j-select-option :value="false">联动选择</j-select-option>
-          <j-select-option :value="true">仅选子节点</j-select-option>
-        </j-select>
-      </j-form-item>
+          <j-select
+            v-model:value="target.componentProps.treeCheckStrictly"
+            placeholder="请选择"
+            @change="onDataChange"
+          >
+            <j-select-option :value="false">联动选择</j-select-option>
+            <j-select-option :value="true">仅选子节点</j-select-option>
+          </j-select>
+        </j-form-item>
+      </template>
     </template>
     <template v-if="['tree-select', 'select'].includes(type)">
       <j-form-item
@@ -266,6 +261,28 @@
           @change="onDataChange"
         >
           <!-- <j-select-option v-for="item in options" :value="item?.id">{{ item?.name }}</j-select-option> -->
+        </j-select>
+      </j-form-item>
+    </template>
+    <template v-if="['date-picker'].includes(type)">
+      <j-form-item
+        label="精度"
+        :name="['componentProps', 'format']"
+        :validateFirst="true"
+        :rules="[
+          {
+            required: true,
+            message: '请选择',
+          },
+        ]"
+      >
+        <j-select
+          :defaultValue="'M'"
+          @change="onDateChange"
+          v-model:value="target.componentProps.format"
+        >
+          <j-select-option value="YYYY-MM-DD">年-月-日</j-select-option>
+          <j-select-option value="YYYY-MM-DD HH:mm:ss">时-分-秒</j-select-option>
         </j-select>
       </j-form-item>
     </template>
@@ -392,7 +409,7 @@ const rulesVisible = computed(() => {
     'textarea',
     'input-password',
     'date-picker',
-    'time-picker'
+    'time-picker',
   ].includes(unref(type))
 })
 
@@ -454,6 +471,12 @@ const onMultipleChange = (e) => {
     target.value.componentProps.treeCheckable = false
     target.value.componentProps.treeCheckStrictly = false
   }
+  emits('refresh', target.value)
+}
+
+const onDateChange = (e) => {
+  target.value.componentProps.format = e
+  target.value.componentProps.valueFormat = e
   emits('refresh', target.value)
 }
 

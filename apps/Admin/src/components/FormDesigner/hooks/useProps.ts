@@ -15,6 +15,7 @@ const useProps = (element: any, _data: any, mode?: string) => {
       }
     }
     if (item?.pattern) {
+      console.log(item?.pattern)
       let _pattern: any;
       try {
         _pattern = new RegExp(item?.pattern)
@@ -51,6 +52,8 @@ const useProps = (element: any, _data: any, mode?: string) => {
   if (element?.componentProps?.treeData) {
     _componentProps.treeData = element?.componentProps?.treeData || []
   }
+
+  console.log(rules, 'rules')
 
   const result = {
     ...element,

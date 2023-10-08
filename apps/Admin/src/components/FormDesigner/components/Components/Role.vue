@@ -1,15 +1,17 @@
 <template>
-  <j-tree-select
-    :tree-data="data"
-    :value="_value"
-    @change="valueChange"
-    :multiple="mode === 'multiple'"
-    :disabled="disabled"
-    placeholder="请选择"
-    :size="size"
-    style="min-width: 230px;"
-  >
-  </j-tree-select>
+  <div>
+    <j-tree-select
+      :tree-data="options"
+      :value="_value"
+      @change="valueChange"
+      :multiple="mode === 'multiple'"
+      :disabled="disabled"
+      placeholder="请选择"
+      :size="size"
+      style="min-width: 230px"
+    >
+    </j-tree-select>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -18,8 +20,8 @@ import { useRequest } from '@jetlinks/hooks'
 import { ref, watch } from 'vue'
 const props = defineProps({
   value: {
-    type: Array,
-    default: [],
+    type: [Array, String],
+    // default: [],
   },
   mode: {
     type: String,
@@ -50,7 +52,7 @@ const dealTreeData = (tree: any) => {
       label: item.groupName,
       value: item.groupId,
       disabled: true,
-      children: item?.roles?.map((i: any) => {
+      children: (item?.roles || [])?.map((i: any) => {
         return {
           label: i.name,
           value: i.id,
@@ -59,12 +61,15 @@ const dealTreeData = (tree: any) => {
     }
   })
 }
-const { data, run } = useRequest(getRoleList, {
+const { data: options, run } = useRequest(getRoleList, {
   onSuccess(res) {
-    return dealTreeData(res.result)
+    const arr = dealTreeData(res.result)
+    console.log(arr)
+    return arr
   },
   immediate: false,
 })
+
 watch(
   () => props.value,
   () => {
