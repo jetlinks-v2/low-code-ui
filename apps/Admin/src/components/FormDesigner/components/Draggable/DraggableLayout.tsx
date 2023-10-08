@@ -176,8 +176,8 @@ const DraggableLayout = defineComponent({
                                         data={element}
                                         {..._props.componentProps}
                                         checked={get(designer.formState, _path)}
-                                        onUpdate: checked={(newValue) => {
-                                            set(designer.formState, _path, newValue)
+                                        onUpdate:checked={(newValue) => {
+                                            set(designer.formState, _path, newValue || false)
                                         }}
                                         onChange={onChange}
                                     ></TypeComponent>
@@ -186,7 +186,7 @@ const DraggableLayout = defineComponent({
                                         data={element}
                                         {..._props.componentProps}
                                         value={get(designer.formState, _path)}
-                                        onUpdate: value={(newValue) => {
+                                        onUpdate:value={(newValue) => {
                                             set(designer.formState, _path, newValue)
                                         }}
                                         options={unref(options)}
