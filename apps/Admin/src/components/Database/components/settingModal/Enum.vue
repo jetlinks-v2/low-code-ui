@@ -1,6 +1,7 @@
 <template>
   <j-form-item label="数据字典" :name="['dictionary', 'dictionaryId']" required :rules="[{ required: true, message: '请选择数据字典'}]">
     <j-select
+      showSearch
       :options="options"
       placeholder="请选择数据字典"
       v-model:value="model.dictionary.dictionaryId"
