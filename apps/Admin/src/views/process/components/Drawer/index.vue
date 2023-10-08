@@ -18,27 +18,6 @@
       <j-tab-pane key="flow" tab="流程图">
         <FlowDesigner readOnly :nodesData="nodesData" />
       </j-tab-pane>
-      <j-tab-pane v-if="showRecords" key="records" tab="流转记录">
-        <j-timeline>
-          <j-timeline-item>
-            <div>
-              <div>发起流程 2023年9月21日15:16:35</div>
-              <div><AIcon type="UserOutlined" />发起人名称</div>
-            </div>
-          </j-timeline-item>
-          <j-timeline-item>
-            <div>
-              <div>审批结点 2023年9月21日15:16:35</div>
-              <div><AIcon type="UserOutlined" />发起人名称</div>
-              <div>审批意见</div>
-            </div>
-          </j-timeline-item>
-          <j-timeline-item>Technical testing 2015-09-01</j-timeline-item>
-          <j-timeline-item
-            >Network problems being solved 2015-09-01</j-timeline-item
-          >
-        </j-timeline>
-      </j-tab-pane>
     </j-tabs>
   </j-drawer>
 </template>
@@ -62,10 +41,6 @@ const props = defineProps({
     default: () => ({}),
   },
   visible: {
-    type: Boolean,
-    default: () => false,
-  },
-  showRecords: {
     type: Boolean,
     default: () => false,
   },
@@ -109,4 +84,3 @@ const getFormData = (list: FormsProps[]) => {
 }
 init()
 </script>
-<style scoped lang="less"></style>

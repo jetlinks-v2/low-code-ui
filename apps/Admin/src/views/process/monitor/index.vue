@@ -51,7 +51,7 @@
   </page-container>
 </template>
 <script setup>
-import Drawer from '../components/Drawer/index.vue'
+import Drawer from './Drawer/index.vue'
 import { getList_api } from '@/api/process/instance'
 import dayjs from 'dayjs'
 
@@ -62,9 +62,9 @@ const columns = [
     key: 'provider',
     ellipsis: true,
     search: {
-      type: 'string',
+      type: 'select',
       componentProps: {
-        placeholder: '请输入流程分类',
+        placeholder: '请选择流程分类',
       },
     },
   },
@@ -111,6 +111,9 @@ const columns = [
     ellipsis: true,
     search: {
       type: 'select',
+      componentProps: {
+        placeholder: '请选择状态',
+      },
       options: [
         { label: '启用', value: 'enabled' },
         { label: '禁用', value: 'disabled' },
@@ -123,10 +126,11 @@ const columns = [
     key: 'creatorName',
     ellipsis: true,
     search: {
-      type: 'string',
+      type: 'select',
       componentProps: {
         placeholder: '请输入发起人',
       },
+      options: []
     },
   },
   {

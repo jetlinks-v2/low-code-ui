@@ -15,3 +15,9 @@ export const copy_api = (data: any) => request.post(`/process/deployment/${data.
  * 删除实例
  */
 export const del_api = (id: string) => request.remove(`/process/deployment/${id}`)
+
+/**
+ * 修改实例状态
+ * @returns 
+ */
+export const updateState_api = (data: any) => request.put(`/process/deployment/${data.id}`, data);
