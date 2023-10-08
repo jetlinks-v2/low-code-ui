@@ -21,6 +21,7 @@ const selectedNode = computed(() => flowStore.selectedNode)
 const componentsMap = {
   APPROVAL: ApprovalNodeConfig,
   DEAL: DealNodeConfig,
+  ROOT: DealNodeConfig, // 根节点配置同处理节点
   CONDITION: ConditionNodeConfig,
   CONDITIONS: ConditionsConfig,
   CONCURRENTS: ConcurrentsConfig,
