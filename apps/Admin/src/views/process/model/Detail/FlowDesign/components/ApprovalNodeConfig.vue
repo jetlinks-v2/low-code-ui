@@ -107,7 +107,7 @@
           label="请选择驳回至哪个节点"
           name="gotoWhenReject"
           :rules="[{ required: true, message: '请选择驳回至哪个节点' }]"
-          v-if="memberFormData.endProcessWhenReject"
+          v-if="!memberFormData.endProcessWhenReject"
         >
           <j-select
             v-model:value="memberFormData.gotoWhenReject"
