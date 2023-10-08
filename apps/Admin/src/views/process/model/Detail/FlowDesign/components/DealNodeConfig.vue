@@ -96,8 +96,7 @@ const saveConfigToPinia = () => {
   //   result.props['formBinds'] = basicFormData.formBinds
   //   result.props['candidates'] = memberFormData.candidates
   result.props = { ...result.props, ...basicFormData, ...memberFormData }
-  console.log('deal: ', result)
-  console.log('flowStore.selectedNode: ', flowStore.selectedNode)
+  //   console.log('deal: ', result)
 }
 defineExpose({
   saveConfigToPinia,

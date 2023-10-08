@@ -172,7 +172,7 @@ const saveConfigToPinia = () => {
   //   result.props['rejectWeight'] = memberFormData.rejectWeight
   //   result.props['gotoWhenReject'] = memberFormData.gotoWhenReject
   result.props = { ...result.props, ...basicFormData, ...memberFormData }
-  console.log('approval: ', result)
+  //   console.log('approval: ', result)
 }
 defineExpose({
   saveConfigToPinia,
