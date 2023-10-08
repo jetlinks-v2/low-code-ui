@@ -3,6 +3,7 @@ import { getToken } from '@jetlinks/utils'
 import { jumpLogin } from '@jetlinks/router'
 import { context } from './context'
 import axios from 'axios'
+import JSONBig from 'json-bigint'
 import type {
   AxiosRequestConfig,
   AxiosInstance,
@@ -35,6 +36,16 @@ export class Axios {
   constructor(options: CreateAxiosOptions) {
     this.mergeOptions(options)
     const api = import.meta.env.VITE_APP_BASE_API
+
+    //axios在这里默认把响应体从json字符串转成了js对象
+    axios.defaults.transformResponse = [function (data) {
+      try {
+        return JSONBig.parse(data)
+      } catch(err) {
+        console.warn('@jetlinks/core transformResponse error:', err)
+        return data;
+      }
+    }]
     this.axiosInstance = axios.create({
       withCredentials: false,
       timeout: 1000 * 15,

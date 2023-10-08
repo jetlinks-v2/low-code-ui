@@ -38,7 +38,7 @@ import {
   computed,
   reactive,
 } from 'vue'
-import { debounce, map } from 'lodash-es'
+import {cloneDeep, debounce, map} from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
 import { Modal } from 'jetlinks-ui-components'
 import {
@@ -328,8 +328,11 @@ watch(
   () => props.data,
   (newVal) => {
     try {
-      formData.value = JSON.parse(newVal?.configuration?.code) || initData
-    } catch (error) {}
+      const obj = JSON.parse(newVal?.configuration?.code)
+      formData.value = Object.keys(obj).length ? obj : cloneDeep(initData)
+    } catch (error) {
+      formData.value = cloneDeep(initData)
+    }
   },
   {
     deep: true,
