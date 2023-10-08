@@ -2,13 +2,13 @@
   <div>
     <JProTable
       ref="tableRef"
-      :columns="props?.dataColumns"
+      :columns="columns"
       :request="props?.query"
       :pagination="props?.pagination"
       :model="model"
       :params="params"
-      :modelValue="defaultFormType"
-      :scroll="{ x: dataColumns.length * 150 }"
+      v-model:modelValue="tableForm"
+      :scroll="{ x: `calc(${dataColumns.length * 150})` }"
       :defaultParams="defaultParams"
       :rowSelection="
         isCheck
@@ -23,6 +23,23 @@
       <template #headerTitle>
         <HeaderButton :headerActions="props.headerActions" ref="headerButton" />
       </template>
+      <template #rightExtraRender v-if="showColumnOptions && tableForm === 'TABLE'">
+        <j-space>
+          <label>展示控制</label>
+          <a-select
+            style="width: 240px;"
+            mode="multiple"
+            :max-tag-count="3"
+            v-model:value="showColumns"
+            :options="dataColumns"
+            :field-names="{ label: 'title', value: 'key' }"
+          >
+            <template #tagRender="{ label }">
+              <span class="select-tag" :title="label">{{ label.length > 2 ? label.substring(0, 2) + '...' : label }}</span>
+            </template>
+          </a-select>
+        </j-space>
+      </template>
       <template
         v-for="item in props?.dataColumns"
         :key="item.key"
@@ -30,20 +47,58 @@
       >
         <j-ellipsis
           v-if="item.key !== 'action'"
-          :data-id="`${projectId}-${pageId}-${item.dataIndex}`"
+          :dataid="`${projectId}-${pageId}-${item.dataIndex}`"
           :class="extractCssClass(item.config?.specialStyle)"
         >
           <div v-if="item?.config">
-            <StringFormat v-if="['int', 'long', 'text', 'float', 'double', 'geoPoint'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]"/>
-            <DateFormat v-else-if="['date'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]"/>
-            <BooleanFormat v-else-if="['boolean'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]"/>
-            <FileFormat v-else-if="['file'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]"/>
-            <ArrayFormat v-else-if="['array'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]" />
-            <ObjectFormat v-else-if="['object'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]" />
-            <EnumFormat v-else-if="['enum'].includes(item.config?.type)" :config="item?.config" :value="slotProps[item.key]" />
-            <StringFormat v-else :config="item?.config" :value="slotProps[item.key]"/>
+            <StringFormat
+              v-if="
+                ['int', 'long', 'text', 'float', 'double', 'geoPoint'].includes(
+                  item.config?.type,
+                )
+              "
+              :config="item?.config"
+              :value="slotProps[item.key]"
+            />
+            <DateFormat
+              v-else-if="['date'].includes(item.config?.type)"
+              :config="item?.config"
+              :value="slotProps[item.key]"
+            />
+            <BooleanFormat
+              v-else-if="['boolean'].includes(item.config?.type)"
+              :config="item?.config"
+              :value="slotProps[item.key]"
+            />
+            <FileFormat
+              v-else-if="['file'].includes(item.config?.type)"
+              :config="item?.config"
+              :value="slotProps[item.key]"
+            />
+            <ArrayFormat
+              v-else-if="['array'].includes(item.config?.type)"
+              :config="item?.config"
+              :value="slotProps[item.key]"
+            />
+            <ObjectFormat
+              v-else-if="['object'].includes(item.config?.type)"
+              :config="item?.config"
+              :value="slotProps[item.key]"
+            />
+            <EnumFormat
+              v-else-if="['enum'].includes(item.config?.type)"
+              :config="item?.config"
+              :value="slotProps[item.key]"
+            />
+            <StringFormat
+              v-else
+              :config="item?.config"
+              :value="slotProps[item.key]"
+            />
           </div>
-          <span v-else>{{ !isEmpty(slotProps[item.key]) ? slotProps[item.key] : '--' }}</span>
+          <span v-else>{{
+            !isEmpty(slotProps[item.key]) ? slotProps[item.key] : '--'
+          }}</span>
         </j-ellipsis>
         <div v-if="item?.key === 'action'">
           <j-space size="large">
@@ -79,7 +134,9 @@
           :actions="tableActions"
           :record="slotProps"
           :active="_selectedRowKeys.includes(slotProps.id)"
-          :statusText="statusText(slotProps[props?.cardConfig?.emphasisField] || '')"
+          :statusText="
+            statusText(slotProps[props?.cardConfig?.emphasisField] || '')
+          "
           :showStatus="!!props?.cardConfig?.emphasisField?.length"
           :statusNames="{
             online: 'processing',
@@ -100,7 +157,10 @@
               :src="props?.cardConfig?.customIcon"
             >
               <template #icon>
-                <Image src="/images/list-page/table-card-default.png" :preview="false"/>
+                <Image
+                  src="/images/list-page/table-card-default.png"
+                  :preview="false"
+                />
               </template>
             </j-avatar>
             <j-avatar
@@ -111,22 +171,101 @@
               class="card-icon"
             >
               <template #icon>
-                <Image :src="slotProps[props?.cardConfig?.dynamicIcon] || '/images/list-page/table-card-default.png'" :preview="false"/>
+                <Image
+                  :src="
+                    slotProps[props?.cardConfig?.dynamicIcon] ||
+                    '/images/list-page/table-card-default.png'
+                  "
+                  :preview="false"
+                />
               </template>
             </j-avatar>
           </template>
           <template #content>
             <j-row>
               <j-col :span="12">
-                <j-ellipsis style="margin-bottom: 18px;font-weight: bold;font-size: 16px;">
-                  <StringFormat v-if="['int', 'long', 'text', 'float', 'double', 'geoPoint'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
-                  <DateFormat v-else-if="['date'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
-                  <BooleanFormat v-else-if="['boolean'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
-                  <FileFormat v-else-if="['file'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
-                  <ArrayFormat v-else-if="['array'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]" />
-                  <EnumFormat v-else-if="['enum'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]" />
-                  <ObjectFormat v-else-if="['object'].includes(valueFormat(props?.cardConfig?.field1)?.config?.type)" :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]" />
-                  <StringFormat v-else :config="valueFormat(props?.cardConfig?.field1)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
+                <j-ellipsis
+                  style="
+                    margin-bottom: 18px;
+                    font-weight: bold;
+                    font-size: 16px;
+                  "
+                >
+                  <StringFormat
+                    v-if="
+                      [
+                        'int',
+                        'long',
+                        'text',
+                        'float',
+                        'double',
+                        'geoPoint',
+                      ].includes(
+                        valueFormat(props?.cardConfig?.field1)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field1)?.config"
+                    :value="slotProps[props?.cardConfig?.field1]"
+                  />
+                  <DateFormat
+                    v-else-if="
+                      ['date'].includes(
+                        valueFormat(props?.cardConfig?.field1)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field1)?.config"
+                    :value="slotProps[props?.cardConfig?.field1]"
+                  />
+                  <BooleanFormat
+                    v-else-if="
+                      ['boolean'].includes(
+                        valueFormat(props?.cardConfig?.field1)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field1)?.config"
+                    :value="slotProps[props?.cardConfig?.field1]"
+                  />
+                  <FileFormat
+                    v-else-if="
+                      ['file'].includes(
+                        valueFormat(props?.cardConfig?.field1)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field1)?.config"
+                    :value="slotProps[props?.cardConfig?.field1]"
+                  />
+                  <ArrayFormat
+                    v-else-if="
+                      ['array'].includes(
+                        valueFormat(props?.cardConfig?.field1)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field1)?.config"
+                    :value="slotProps[props?.cardConfig?.field1]"
+                  />
+                  <EnumFormat
+                    v-else-if="
+                      ['enum'].includes(
+                        valueFormat(props?.cardConfig?.field1)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field1)?.config"
+                    :value="slotProps[props?.cardConfig?.field1]"
+                  />
+                  <ObjectFormat
+                    v-else-if="
+                      ['object'].includes(
+                        valueFormat(props?.cardConfig?.field1)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field1)?.config"
+                    :value="slotProps[props?.cardConfig?.field1]"
+                  />
+                  <StringFormat
+                    v-else
+                    :config="valueFormat(props?.cardConfig?.field1)?.config"
+                    :value="slotProps[props?.cardConfig?.field1]"
+                  />
                 </j-ellipsis>
               </j-col>
               <j-col :span="12">
@@ -142,14 +281,81 @@
                   <div>{{ props?.cardConfig?.field2Title }}</div>
                 </j-ellipsis>
                 <j-ellipsis>
-                  <StringFormat v-if="['int', 'long', 'text', 'float', 'double', 'geoPoint'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
-                  <DateFormat v-else-if="['date'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]"/>
-                  <BooleanFormat v-else-if="['boolean'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]"/>
-                  <FileFormat v-else-if="['file'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]"/>
-                  <ArrayFormat v-else-if="['array'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]" />
-                  <EnumFormat v-else-if="['enum'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]" />
-                  <ObjectFormat v-else-if="['object'].includes(valueFormat(props?.cardConfig?.field2)?.config?.type)" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]" />
-                  <StringFormat v-else-if="props?.cardConfig?.field2" :config="valueFormat(props?.cardConfig?.field2)?.config" :value="slotProps[props?.cardConfig?.field2]"/>
+                  <StringFormat
+                    v-if="
+                      [
+                        'int',
+                        'long',
+                        'text',
+                        'float',
+                        'double',
+                        'geoPoint',
+                      ].includes(
+                        valueFormat(props?.cardConfig?.field2)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field2)?.config"
+                    :value="slotProps[props?.cardConfig?.field1]"
+                  />
+                  <DateFormat
+                    v-else-if="
+                      ['date'].includes(
+                        valueFormat(props?.cardConfig?.field2)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field2)?.config"
+                    :value="slotProps[props?.cardConfig?.field2]"
+                  />
+                  <BooleanFormat
+                    v-else-if="
+                      ['boolean'].includes(
+                        valueFormat(props?.cardConfig?.field2)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field2)?.config"
+                    :value="slotProps[props?.cardConfig?.field2]"
+                  />
+                  <FileFormat
+                    v-else-if="
+                      ['file'].includes(
+                        valueFormat(props?.cardConfig?.field2)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field2)?.config"
+                    :value="slotProps[props?.cardConfig?.field2]"
+                  />
+                  <ArrayFormat
+                    v-else-if="
+                      ['array'].includes(
+                        valueFormat(props?.cardConfig?.field2)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field2)?.config"
+                    :value="slotProps[props?.cardConfig?.field2]"
+                  />
+                  <EnumFormat
+                    v-else-if="
+                      ['enum'].includes(
+                        valueFormat(props?.cardConfig?.field2)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field2)?.config"
+                    :value="slotProps[props?.cardConfig?.field2]"
+                  />
+                  <ObjectFormat
+                    v-else-if="
+                      ['object'].includes(
+                        valueFormat(props?.cardConfig?.field2)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field2)?.config"
+                    :value="slotProps[props?.cardConfig?.field2]"
+                  />
+                  <StringFormat
+                    v-else-if="props?.cardConfig?.field2"
+                    :config="valueFormat(props?.cardConfig?.field2)?.config"
+                    :value="slotProps[props?.cardConfig?.field2]"
+                  />
                 </j-ellipsis>
               </j-col>
               <j-col :span="12">
@@ -157,14 +363,81 @@
                   <div>{{ props?.cardConfig?.field3Title }}</div>
                 </j-ellipsis>
                 <j-ellipsis>
-                  <StringFormat v-if="['int', 'long', 'text', 'float', 'double', 'geoPoint'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field1]"/>
-                  <DateFormat v-else-if="['date'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]"/>
-                  <BooleanFormat v-else-if="['boolean'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]"/>
-                  <FileFormat v-else-if="['file'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]"/>
-                  <ArrayFormat v-else-if="['array'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]" />
-                  <EnumFormat v-else-if="['enum'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]" />
-                  <ObjectFormat v-else-if="['object'].includes(valueFormat(props?.cardConfig?.field3)?.config?.type)" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]" />
-                  <StringFormat v-else-if="props?.cardConfig?.field3" :config="valueFormat(props?.cardConfig?.field3)?.config" :value="slotProps[props?.cardConfig?.field3]"/>
+                  <StringFormat
+                    v-if="
+                      [
+                        'int',
+                        'long',
+                        'text',
+                        'float',
+                        'double',
+                        'geoPoint',
+                      ].includes(
+                        valueFormat(props?.cardConfig?.field3)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field3)?.config"
+                    :value="slotProps[props?.cardConfig?.field1]"
+                  />
+                  <DateFormat
+                    v-else-if="
+                      ['date'].includes(
+                        valueFormat(props?.cardConfig?.field3)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field3)?.config"
+                    :value="slotProps[props?.cardConfig?.field3]"
+                  />
+                  <BooleanFormat
+                    v-else-if="
+                      ['boolean'].includes(
+                        valueFormat(props?.cardConfig?.field3)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field3)?.config"
+                    :value="slotProps[props?.cardConfig?.field3]"
+                  />
+                  <FileFormat
+                    v-else-if="
+                      ['file'].includes(
+                        valueFormat(props?.cardConfig?.field3)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field3)?.config"
+                    :value="slotProps[props?.cardConfig?.field3]"
+                  />
+                  <ArrayFormat
+                    v-else-if="
+                      ['array'].includes(
+                        valueFormat(props?.cardConfig?.field3)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field3)?.config"
+                    :value="slotProps[props?.cardConfig?.field3]"
+                  />
+                  <EnumFormat
+                    v-else-if="
+                      ['enum'].includes(
+                        valueFormat(props?.cardConfig?.field3)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field3)?.config"
+                    :value="slotProps[props?.cardConfig?.field3]"
+                  />
+                  <ObjectFormat
+                    v-else-if="
+                      ['object'].includes(
+                        valueFormat(props?.cardConfig?.field3)?.config?.type,
+                      )
+                    "
+                    :config="valueFormat(props?.cardConfig?.field3)?.config"
+                    :value="slotProps[props?.cardConfig?.field3]"
+                  />
+                  <StringFormat
+                    v-else-if="props?.cardConfig?.field3"
+                    :config="valueFormat(props?.cardConfig?.field3)?.config"
+                    :value="slotProps[props?.cardConfig?.field3]"
+                  />
                 </j-ellipsis>
               </j-col>
             </j-row>
@@ -184,7 +457,15 @@ import {
   extractCssClass,
   insertCustomCssToHead,
 } from '@/components/FormDesigner/utils/utils'
-import { ArrayFormat, BooleanFormat, DateFormat, FileFormat, StringFormat, ObjectFormat, EnumFormat} from './ColumnFormat'
+import {
+  ArrayFormat,
+  BooleanFormat,
+  DateFormat,
+  FileFormat,
+  StringFormat,
+  ObjectFormat,
+  EnumFormat,
+} from './ColumnFormat'
 import { isEmpty } from '../../utils'
 const props = defineProps({
   model: {
@@ -241,8 +522,23 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  showColumnOptions: {
+    type: Boolean,
+    default: false
+  }
 })
 
+const tableForm = ref(props.defaultFormType)
+const showColumns = ref<string[]>(props.dataColumns.map(item => {
+  return item.key
+}))
+const columns = computed(() => {
+  const result = props.dataColumns.filter((item) => {
+    console.log(item);
+    return showColumns.value.includes(item.key)
+  })
+  return result
+})
 const headerButton = ref()
 
 const isCheck = computed(() => {
@@ -253,7 +549,9 @@ const isCheck = computed(() => {
 })
 const _selectedRowKeys = ref<string[]>([])
 
-const defaultParams = reactive({ sorts: [{ name: 'createTime', order: 'desc' }] })
+const defaultParams = reactive({
+  sorts: [{ name: 'createTime', order: 'desc' }],
+})
 
 const onSelectChange = (keys: string[]) => {
   _selectedRowKeys.value = [...keys]
@@ -277,9 +575,9 @@ const valueFormat = (val: any) => {
 const statusText = computed(() => {
   try {
     return (val: any) => {
-      if(typeof val === 'string') {
+      if (typeof val === 'string') {
         return val
-      } else if(typeof val === 'object') {
+      } else if (typeof val === 'object') {
         return val?.text
       }
     }
@@ -290,7 +588,7 @@ const statusText = computed(() => {
 
 const dynamicIconUrl = computed(() => {
   return (val: string) => {
-    let result = null;
+    let result = null
     try {
       result = JSON.parse(val || '{}')?.[0]?.url || null
     } catch (error) {
@@ -311,18 +609,18 @@ const handleFunction = (item: any, data?: any) => {
 }
 
 const tableDataChange = (pagination, filters, sorter) => {
-  switch(sorter.order) {
+  switch (sorter.order) {
     case 'ascend':
-      defaultParams.sorts = [{name: sorter.columnKey, order: 'asc'}]
-    break;
+      defaultParams.sorts = [{ name: sorter.columnKey, order: 'asc' }]
+      break
     case 'descend':
-      defaultParams.sorts = [{name: sorter.columnKey, order: 'desc'}]
-    break;
-    default: 
+      defaultParams.sorts = [{ name: sorter.columnKey, order: 'desc' }]
+      break
+    default:
       defaultParams.sorts = [{ name: 'createTime', order: 'desc' }]
-    break
+      break
   }
-  tableRef.value.reload?.();
+  tableRef.value.reload?.()
 }
 watchEffect(() => {
   props.tableActions.forEach((item) => {
@@ -332,7 +630,7 @@ watchEffect(() => {
     insertCustomCssToHead(
       item.config?.specialStyle,
       `${props.projectId}-${props.pageId}-${item.dataIndex}`,
-      'dataid'
+      'dataid',
     )
   })
 })
@@ -349,8 +647,15 @@ defineExpose({
 .image-icon {
   width: 14px;
   height: 14px;
+  margin: 0;
 }
 :deep(.ant-avatar) {
   background-color: transparent !important;
+}
+.select-tag {
+  margin-right: 5px;
+  background-color: #f5f5f5;
+  padding: 0 2px;
+  border: 1px solid #f0f0f0;
 }
 </style>

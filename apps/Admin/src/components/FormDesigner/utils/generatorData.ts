@@ -34,9 +34,9 @@ const handleProps = (node: any) => {
     }
     if (/^(date-picker)$/.test(node.type)) {
         result.placeholder = '请选择日期'
-        result.format = "YYYY-MM-DD HH:mm:ss"
+        result.format = "YYYY-MM-DD"
         result.showTime = true
-        result.valueFormat = "YYYY-MM-DD HH:mm:ss"
+        result.valueFormat = "YYYY-MM-DD"
     }
     if (/^(time-picker)$/.test(node.type)) {
         result.placeholder = '请选择时间'

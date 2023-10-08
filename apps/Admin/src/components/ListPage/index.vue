@@ -174,6 +174,7 @@ const showType = reactive({
   configured: ['list'],
   configurationShow: false,
   defaultForm: 'list',
+  showColumns: false,
 })
 const listPageData = computed(() => {
   return {

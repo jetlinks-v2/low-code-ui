@@ -1,13 +1,13 @@
 <template>
   <div class="list-page-output">
-    <CardBox :padding="0">
+    <CardBox padding="0">
       <pro-search
         :columns="searchColumns"
         :target="target"
         @search="handleSearch"
       />
     </CardBox>
-    <CardBox style="margin-top: 24px" :padding="0">
+    <CardBox style="margin-top: 24px" padding="0">
       <ProTable
         :query="query"
         :pagination="pagination"
@@ -20,6 +20,7 @@
         :tableActions="actions"
         :projectId="projectId"
         :pageId="pageId"
+        :showColumnOptions="allData.showType?.showColumns"
         @openJson="(newValue) => (jsonData = newValue)"
         ref="tableRef"
       />
@@ -317,7 +318,7 @@ const actionsBtnFormat = (data: any, type: string) => {
   const finalData = data?.map((item: any) => {
     let result = {
       ...item,
-      key: item?.key,
+      key: item?.command === 'Delete' ? 'delete' : item?.key,
       text: item?.title,
       icon: type == 'actions' ? item?.icon || 'SettingOutlined' : item?.icon,
       type: item?.type,

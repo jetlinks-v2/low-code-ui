@@ -35,12 +35,12 @@ export const queryDeviceNoPage = (data:any) => request.post('/device-instance/_q
 /**
  * 查询字典列表
  */
-export const queryDictionary = () => request.post('/dictionary/_query/no-paging', { paging: false, sorts: [{ name: 'createTime', order: 'desc' }] })
+export const queryDictionary = () => request.post('/dictionary/_query/no-paging', { paging: false, sorts: [{ name: 'createTime', order: 'desc' }, { name: 'name', order: 'desc' }] })
 
 /**
 * 字典查询下拉数据
 */
-export const queryDictionaryData = (id: string) => request.get(`/dictionary/${id}/items`)
+export const queryDictionaryData = (id: string) => request.post(`/dictionary-item/_query/no-paging`, { paging: false, terms: [{ value: id, termType: 'eq', column: 'dictId' }] })
 
 /**
  * 获取功能预支持的指令

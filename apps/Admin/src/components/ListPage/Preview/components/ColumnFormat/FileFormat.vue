@@ -11,7 +11,7 @@
     />
     <div style="display: none;">
       <j-image-preview-group :preview="{ visible, onVisibleChange: vis => (visible = vis) }">
-        <j-image v-for="item in formatValue.split(',')" :src="item"/>
+        <Image v-for="item in formatValue.split(',')" :src="item"/>
       </j-image-preview-group>
     </div>
     <span v-if="config?.fileValue === 'fileName'">{{ formatValue }}</span>
