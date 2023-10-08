@@ -12,6 +12,9 @@
         sorts: [{ name: 'createTime', order: 'desc' }],
       }"
     >
+      <template #icon="{ icon }">
+        <j-image :width="50" :height="50" :src="icon" :preview="false" />
+      </template>
       <template #state="{ state }">
         <BadgeStatus
           :status="state.value"
@@ -28,7 +31,7 @@
           <PermissionButton
             type="link"
             v-for="item of getActions(slotProps, 'table')"
-            v-bind:="handleFunction(item.permissionProps, slotProps)"
+            v-bind="handleFunction(item.permissionProps, slotProps)"
             :danger="item.key === 'delete'"
           >
             <template #icon v-if="item.icon || item.key === 'delete'">
@@ -56,16 +59,23 @@
             <div class="card-item">
               <div class="title">
                 <j-ellipsis style="max-width: 200px">
-                  流程分类：{{ record.name }}
+                  流程分类：{{ record.classifiedId }}
                 </j-ellipsis>
                 <div class="title-icon">
                   <!-- 流程图标 -->
-                  {{ record.icon }}
-                  <AIcon :type="record.icon ? record.icon : 'DeleteOutlined'" />
+                  <j-space align="start">
+                    <j-image
+                      :width="80"
+                      :height="80"
+                      :src="record.icon"
+                      :preview="false"
+                    />
+                    <div>{{ record.name }}</div>
+                  </j-space>
                 </div>
               </div>
               <div style="display: flex">
-                <span>部署人</span>
+                <span>部署人：</span>
                 <j-ellipsis style="width: 200px">
                   {{ record.creatorName }}
                 </j-ellipsis>
@@ -99,8 +109,9 @@ import dayjs from 'dayjs'
 import Dialog from './Dialog/index.vue'
 import Drawer from '../components/Drawer/index.vue'
 import { isFunction, isObject } from 'lodash-es'
-import { getList_api, del_api } from '@/api/process/instance'
-import { saveProcess_api } from '@/api/process/model'
+import { getList_api, del_api, updateState_api } from '@/api/process/instance'
+import { providerEnum } from '@/api/process/model'
+import { useRequest } from '@jetlinks/hooks'
 
 const tableRef = ref()
 const columns = [
@@ -109,6 +120,7 @@ const columns = [
     dataIndex: 'icon',
     key: 'icon',
     ellipsis: true,
+    scopedSlots: true,
   },
   {
     title: '流程名称',
@@ -124,14 +136,15 @@ const columns = [
   },
   {
     title: '流程分类',
-    dataIndex: 'provider',
-    key: 'provider',
+    dataIndex: 'classifiedId',
+    key: 'classifiedId',
     ellipsis: true,
     search: {
-      type: 'string',
+      type: 'select',
       componentProps: {
-        placeholder: '请输入流程分类',
+        placeholder: '请选择流程分类',
       },
+      options: useRequest(providerEnum).data,
     },
   },
   {
@@ -166,10 +179,11 @@ const columns = [
     key: 'creatorName',
     ellipsis: true,
     search: {
-      type: 'string',
+      type: 'select',
       componentProps: {
-        placeholder: '请输入部署人',
+        placeholder: '请选择部署人',
       },
+      options: [],
     },
   },
   {
@@ -232,8 +246,8 @@ const getActions = (record, type = 'card') => {
         popConfirm: {
           title: `确认${record.state?.value !== 'disabled' ? '禁用' : '启用'}`,
           onConfirm: () => {
-            saveProcess_api({
-              ...data,
+            updateState_api({
+              id: data.id,
               state:
                 record.state?.value !== 'disabled' ? 'disabled' : 'enabled',
             }).then((res) => {
@@ -253,6 +267,8 @@ const getActions = (record, type = 'card') => {
       text: '删除',
       icon: 'DeleteOutlined',
       permissionProps: (data) => ({
+        // 实例下有发起过的流程时，删除按钮置灰
+        // disabled: record.state?.value !== 'enabled' || true,
         tooltip: {
           title: '删除',
         },
@@ -339,5 +355,10 @@ const refresh = () => {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+.card-item {
+  .title-icon {
+    height: 80px;
+  }
 }
 </style>

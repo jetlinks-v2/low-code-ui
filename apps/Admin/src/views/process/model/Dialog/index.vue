@@ -30,12 +30,12 @@
       </j-form-item>
 
       <j-form-item
-        name="classificationText"
+        name="classifiedId"
         label="流程分类"
         :rules="[{ required: true, message: '请选择流程分类' }]"
       >
         <a-select
-          v-model:value="form.classificationText"
+          v-model:value="form.classifiedId"
           placeholder="请选择流程分类"
           :options="providerOptions"
         >
@@ -54,7 +54,9 @@
         :rules="[{ required: true, message: '请上传流程图标' }]"
       >
         <j-space>
-          <div v-for="item of 4">图标{{ item }}</div>
+          <div class="upload-icon" v-for="item of baseIcon">
+            <AIcon :type="item" />
+          </div>
           <div class="upload-icon">
             <ImageUpload v-model:value="form.icon" :accept="accept" />
           </div>
@@ -74,10 +76,10 @@ type FormType = {
   id?: string
   key: string
   name: string
+  icon: string
+  classifiedId: string
   model: string
   provider: string
-  classificationText: string
-  icon: string
 }
 
 const props = defineProps({
@@ -88,15 +90,22 @@ const props = defineProps({
   visible: {
     type: Boolean,
     default: () => false,
-  }
+  },
 })
 
 const emits = defineEmits<{
-  (e: 'update:visible',flag: boolean ): void
+  (e: 'update:visible', flag: boolean): void
   (e: 'refresh'): void
 }>()
 
-//上传icon格式
+const baseIcon = [
+  'icon-shujumoni',
+  'icon-tongzhiguanli',
+  'icon-rizhifuwu',
+  'icon-keshihua',
+]
+
+// 上传icon格式
 const accept = '.jpg,.jpeg,.png'
 const title = ref<string>('新增')
 const formRef = ref<any>()
@@ -146,7 +155,12 @@ watch(
 
 <style lang="less" scoped>
 .upload-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100px;
   height: 100px;
+  font-size: 40px;
+  border: 1px dashed #ccc;
 }
 </style>

@@ -17,6 +17,9 @@
           新增</PermissionButton
         >
       </template>
+      <template #icon="{ icon }">
+        <j-image :width="50" :height="50" :src="icon" :preview="false" />
+      </template>
       <template #state="{ state }">
         <BadgeStatus
           :status="state.value"
@@ -27,21 +30,24 @@
           }"
         />
       </template>
+      <template #createTime="{ createTime }">
+        {{ dayjs(createTime).format('YYYY-MM-DD HH:mm:ss') }}
+      </template>
 
       <template #action="slotProps">
         <div class="table-action">
           <PermissionButton
             type="link"
             v-for="item of getActions(slotProps, 'table')"
-            v-bind:="handleFunction(item.permissionProps, slotProps)"
+            v-bind="handleFunction(item.permissionProps, slotProps)"
             :danger="item.key === 'delete'"
           >
             <template #icon v-if="item.icon || item.key === 'delete'">
               <AIcon :type="item.icon ? item.icon : 'DeleteOutlined'" />
             </template>
-            <span v-if="item.key !== 'delete'">
+            <!-- <span v-if="item.key !== 'delete'">
               {{ item.text }}
-            </span>
+            </span> -->
           </PermissionButton>
         </div>
       </template>
@@ -61,20 +67,24 @@
             <div class="card-item">
               <div class="title">
                 <j-ellipsis style="max-width: 200px">
-                  {{ record.name }}
+                  流程分类：{{ record.classifiedId }}
                 </j-ellipsis>
                 <div class="title-icon">
                   <!-- 流程图标 -->
                   <!-- <AIcon :type="record.icon ? record.icon : 'DeleteOutlined'" /> -->
-                  <j-image
-                    :width="80"
-                    :src="record.icon"
-                    :preview="false"
-                  />
+                  <j-space align="start">
+                    <j-image
+                      :width="80"
+                      :height="80"
+                      :src="record.icon"
+                      :preview="false"
+                    />
+                    <div>{{ record.name }}</div>
+                  </j-space>
                 </div>
               </div>
               <div style="display: flex">
-                <span>创建人</span>
+                <span>创建人：</span>
                 <j-ellipsis style="width: 200px">
                   {{ record.creatorName }}
                 </j-ellipsis>
@@ -108,7 +118,13 @@ import dayjs from 'dayjs'
 import Dialog from './Dialog/index.vue'
 import Drawer from '../components/Drawer/index.vue'
 import { isFunction, isObject } from 'lodash-es'
-import { getProcess_api, deploy_api, del_api } from '@/api/process/model'
+import {
+  getProcess_api,
+  deploy_api,
+  del_api,
+  providerEnum,
+} from '@/api/process/model'
+import { useRequest } from '@jetlinks/hooks'
 
 const router = useRouter()
 const tableRef = ref()
@@ -119,6 +135,7 @@ const columns = [
     dataIndex: 'icon',
     key: 'icon',
     ellipsis: true,
+    scopedSlots: true,
   },
   {
     title: '流程名称',
@@ -134,14 +151,16 @@ const columns = [
   },
   {
     title: '流程分类',
-    dataIndex: 'provider',
-    key: 'provider',
+    dataIndex: 'classifiedId',
+    key: 'classifiedId',
     ellipsis: true,
     search: {
-      type: 'string',
+      type: 'select',
+      rename: 'classifiedId',
       componentProps: {
-        placeholder: '请输入流程分类',
+        placeholder: '请选择流程分类',
       },
+      options: useRequest(providerEnum).data,
     },
   },
   {
@@ -152,6 +171,9 @@ const columns = [
     scopedSlots: true,
     search: {
       type: 'select',
+      componentProps: {
+        placeholder: '请选择状态',
+      },
       options: [
         { label: '已部署', value: 'deployed' },
         { label: '未部署', value: 'undeployed' },
@@ -164,9 +186,26 @@ const columns = [
     key: 'creatorName',
     ellipsis: true,
     search: {
-      type: 'string',
+      type: 'select',
+      rename: 'creatorId',
       componentProps: {
-        placeholder: '请输入创建人',
+        placeholder: '请选择创建人',
+      },
+      options: async () => {
+        const resp = await getProcess_api({
+          sorts: [{ name: 'createTime', order: 'desc' }],
+        })
+        const listMap = new Map()
+        if (resp.status === 200) {
+          resp.result.data.forEach((item) => {
+            listMap.set(item.creatorId, {
+              label: item.creatorName,
+              value: item.creatorId,
+            })
+          })
+          return [...listMap.values()]
+        }
+        return []
       },
     },
   },
@@ -174,6 +213,7 @@ const columns = [
     title: '创建时间',
     dataIndex: 'createTime',
     key: 'createTime',
+    scopedSlots: true,
     ellipsis: true,
     search: {
       type: 'date',
@@ -357,5 +397,9 @@ const refresh = () => {
   gap: 8px;
   flex-wrap: wrap;
 }
+.card-item {
+  .title-icon {
+    height: 80px;
+  }
+}
 </style>
-@/api/process/model
