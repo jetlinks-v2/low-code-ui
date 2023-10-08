@@ -1,9 +1,11 @@
 <template>
-  <span>{{ formatValue }}</span>
+  <ArrayFormat :config="config" :value="formatValue" v-if="isArray"/>
+  <span v-else>{{ formatValue }}</span>
 </template>
 
 <script setup lang="ts">
 import { PropType } from 'vue';
+import ArrayFormat from './ArrayFormat.vue';
 
 
 const props = defineProps({
@@ -17,11 +19,18 @@ const props = defineProps({
   }
 })
 
+const isArray = computed(() => {
+  return Array.isArray(props.value)
+})
 /**
- * int, long, text, double, float, string格式化
+ * 枚举类型格式化
  */
 
 const formatValue = computed(() => {
-  return props.value?.text || '--'
+  if(isArray.value) {
+    return props.value?.map(item => item.text)
+  } else {
+    return props.value?.text || '--'
+  }
 })
 </script>
