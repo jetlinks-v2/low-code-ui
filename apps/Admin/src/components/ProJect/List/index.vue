@@ -96,6 +96,7 @@ import { onlyMessage } from '@jetlinks/utils';
 import { providerMap, restId, actionMap, typeImages, projectList } from '../index'
 import { onKeyStroke, useMagicKeys } from '@vueuse/core'
 import { useProduct, useEngine } from '@/store'
+import { delMenu } from '@/api/menu'
 
 const product = useProduct()
 const engine = useEngine()
@@ -163,16 +164,29 @@ const onShow = (val) => {
 const onSave = (data?: any) => {
   if (data) {
     visible.value = false
-    type.value === 'Add' ? product.add(data, data.parentId,data.type==='module') : product.update(data)
+    type.value === 'Add' ? product.add(data, data.parentId, data.type === 'module') : product.update(data)
     setTimeout(() => {
       selectKey.value = data.id
     }, 300)
   }
 }
 
-const onDel = (data: any) => {
+const onDel = async (data: any) => {
   product.remove(data)
   visibleDel.value = false
+  await delMenu({
+    "paging": false,
+    "terms": [{
+      "terms": [{
+        "type": "or",
+        "value": `%pageId":"${data.id}%`,
+
+        "termType": "like",
+        "column": "options"
+      }]
+    }]
+
+  })
 }
 
 const onPaste = (parentId?: string) => {
@@ -326,7 +340,7 @@ watch(
     sorts.value = item.others?.sorts || 'default'
     viewType.value = item.others?.viewType || 'card'
   },
-  {deep:true,immediate:true}
+  { deep: true, immediate: true }
 )
 
 
