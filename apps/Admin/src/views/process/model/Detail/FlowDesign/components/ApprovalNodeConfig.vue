@@ -138,19 +138,19 @@ const props = defineProps({
 const basicFormRef = ref()
 const basicFormData = reactive({
   formBinds: props.node?.props?.formBinds || {},
-  autoPass: false,
-  dealRequired: false,
+  autoPass: props.node?.props?.autoPass,
+  dealRequired: props.node?.props?.dealRequired,
 })
 
 // 成员配置
 const memberFormRef = ref()
 const memberFormData = reactive({
-  candidates: [],
-  completeWeight: 0,
-  rejectWeight: 0,
-  authButtons: [],
-  endProcessWhenReject: false,
-  gotoWhenReject: '',
+  candidates: props.node?.props?.candidates,
+  completeWeight: props.node?.props?.completeWeight,
+  rejectWeight: props.node?.props?.rejectWeight,
+  authButtons: props.node?.props?.authButtons,
+  endProcessWhenReject: props.node?.props?.endProcessWhenReject,
+  gotoWhenReject: props.node?.props?.gotoWhenReject,
 })
 const allButtons = ref([
   { label: '通过', value: 'pass' },
