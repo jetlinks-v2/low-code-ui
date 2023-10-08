@@ -26,9 +26,9 @@
       <j-scrollbar>
         <div class="items">
           <div v-for="(item, index) in path" class="item">
-              <div class="icon"><img :src="typeImages[item.type]"></div>
-              <div class="title" @click="onClick(item)">{{ item.title }}</div>
-              <div v-if="path.length !== index + 1" class="path"> > </div>
+            <div class="icon"><img :src="typeImages[item.type]"></div>
+            <div class="title" @click="onClick(item)">{{ item.title }}</div>
+            <div v-if="path.length !== index + 1" class="path"> > </div>
           </div>
         </div>
       </j-scrollbar>
@@ -42,7 +42,7 @@ import { useEngine, useProduct } from '@/store'
 // import Tabs from '../Tabs/tabs.vue'
 import Content from './content.vue'
 import ProjectEmpty from '@/components/ProJect/Empty/index.vue'
-import {  typeImages } from '@/components/ProJect/index'
+import { typeImages } from '@/components/ProJect/index'
 
 
 const engine = useEngine()
@@ -54,6 +54,15 @@ const activeData = ref()
 
 const onEdit = (targetKey) => {
   engine.removeFile(targetKey)
+  const item = product.data[0]
+  product.update({
+    ...item,
+    others: {
+      ...item?.others,
+      activeFile: activeFile.value,
+      files: files.value
+    }
+  })
 }
 
 const select = (key) => {
@@ -168,16 +177,19 @@ watch(
       .item {
         display: flex;
         white-space: nowrap;
-        .icon{
+
+        .icon {
           margin: 0 5px;
           width: 22px;
           height: 22px;
-          img{
+
+          img {
             width: 100%;
             height: 100%;
           }
         }
-        .title{
+
+        .title {
           cursor: pointer;
           // &:hover{
           //   color: #7595f3;
@@ -192,5 +204,4 @@ watch(
 
 
   }
-}
-</style>
+}</style>
