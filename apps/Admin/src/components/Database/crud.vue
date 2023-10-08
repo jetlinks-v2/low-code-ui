@@ -179,12 +179,14 @@ if (props.configuration?.tableName) {
 const validate = async () => {
   loading.value = true
   errorTips.relation = {}
+  let validateStatus = false
 
   try {
     await advancedRef.value.validates()
     errorTips.relation = {}
   } catch (e) {
     errorTips.relation = e
+    validateStatus = true
   }
 
   try {
@@ -192,11 +194,12 @@ const validate = async () => {
     errorTips.dataTable = {}
   } catch (e) {
     errorTips.dataTable = e || {}
+    validateStatus = true
   }
 
   loading.value = false
 
-  if (props.showTip) {
+  if (props.showTip && !validateStatus) {
     onlyMessage('校验通过')
   }
 }
