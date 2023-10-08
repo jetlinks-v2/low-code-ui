@@ -60,7 +60,8 @@ const { data: options } = useRequest(dictionaryList, {
       return res.result.map(item => ({ ...item, label: item.name, value: item.id }))
     }
     return []
-  }
+  },
+  defaultParams: [{ sorts: [ { name: 'createTime', order: 'desc'},{ name: 'name', order: 'desc'} ]}]
 })
 
 const model = inject(SETTING_FORM_MODEL, {})
