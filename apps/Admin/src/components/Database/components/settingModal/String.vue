@@ -131,7 +131,10 @@ const providerChange = (key) => {
 
   if (['email', 'phone'].includes(key)) {
     model.value.validator.provider = 'pattern'
+  } else {
+    model.value.validator.provider = key
   }
+
   switch (key) {
     case 'notEmpty':
       model.value.validator.configuration = {
