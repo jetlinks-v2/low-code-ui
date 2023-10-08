@@ -38,6 +38,10 @@ export const update_api = (data: any) => request.put(`/process/definition/${data
  */
 export const queryForm_api = (data: any) => request.post(`/process/form/_query`, data)
 /**
+ * 查询表单列表不分页
+ */
+export const queryFormNoPage_api = (data: any) => request.post(`/process/form/_query/no-paging`, data)
+/**
  * 根据定义解析支持的变量
  */
 export const queryVariables_api = (data: any) => request.post(`/process/definition/parse-variables`, data)

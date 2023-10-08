@@ -1,8 +1,11 @@
+<!-- 配置表单内容 -->
 <template>
   <j-button type="primary" block size="small" ghost @click="visible = true">
     配置表单内容
   </j-button>
-  <div v-for="(item, index) in forms" :key="index"></div>
+  <div v-for="(fields, index) in forms" :key="index">
+    <div v-for="(field, idx) in fields">{{ field }}</div>
+  </div>
   <j-modal
     v-model:visible="visible"
     width="900px"
@@ -27,21 +30,39 @@
             <AIcon type="SearchOutlined" />
           </template>
         </j-input>
-        <j-tree
-          checkable
-          :tree-data="treeData"
-          v-model:expandedKeys="expandedKeys"
-        >
-          <template #title="node">
-            <div>
-              <span style="margin-right: 20px">{{ node.title }}</span>
-              <j-checkbox-group
-                v-model:value="node.permission"
-                :options="permissions"
-              />
+        <j-checkbox style="margin: 5px 0">全部内容</j-checkbox>
+        <div class="form-box">
+          <div
+            class="form-item"
+            v-for="(form, index) in formList"
+            :key="'form' + index"
+          >
+            <div class="form-title">
+              <div class="name">{{ form.name }}</div>
+              <div class="permission">
+                <j-checkbox-group
+                  v-model:value="form.accessModes"
+                  :options="permissions"
+                />
+              </div>
             </div>
-          </template>
-        </j-tree>
+            <div
+              class="form-fields"
+              v-for="(field, idx) in form.configuration.schema.properties"
+              :key="'field' + idx"
+            >
+              <div class="field-title">
+                <div class="name">{{ field.title }}</div>
+                <div class="permission">
+                  <j-checkbox-group
+                    v-model:value="field.accessModes"
+                    :options="permissions"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </j-col>
       <j-col :span="16"> 表单名称 </j-col>
     </j-row>
@@ -50,7 +71,10 @@
 
 <script setup lang="ts">
 import type { TreeProps } from 'ant-design-vue'
-import { queryForm_api } from '@/api/process/model'
+import { queryFormNoPage_api } from '@/api/process/model'
+import { useFlowStore } from '@/store/flow'
+
+const flowStore = useFlowStore()
 
 type Emits = {
   (e: 'update:value', data: any[]): void
@@ -70,74 +94,81 @@ const forms = computed({
   set: (val) => emits('update:value', val),
 })
 
-const treeData = ref([
-  {
-    title: '请假申请',
-    key: '0-0',
-    permission: ['read'],
-    read: false,
-    write: false,
-    children: [
-      {
-        title: '标识',
-        key: '0-0-0',
-        permission: [],
-        read: false,
-        write: false,
-      },
-      {
-        title: '名称',
-        key: '0-0-1',
-        permission: [],
-        read: false,
-        write: false,
-      },
-      {
-        title: '请假类型',
-        key: '0-0-2',
-        permission: [],
-        read: false,
-        write: false,
-      },
-    ],
-  },
-  {
-    title: '报销申请',
-    key: '0-1',
-    permission: [],
-    read: false,
-    write: false,
-    children: [
-      {
-        title: '标识',
-        key: '0-1-0',
-        permission: [],
-        read: false,
-        write: false,
-      },
-      {
-        title: '名称',
-        key: '0-1-1',
-        permission: [],
-        read: false,
-        write: false,
-      },
-    ],
-  },
-])
-const expandedKeys = ref(['0-0', '0-1'])
+const formList = ref([])
+
 const permissions = ref([
   { label: '读', value: 'read' },
   { label: '写', value: 'write' },
 ])
-const test = ref([])
 
 const getFormList = async () => {
-  const { result } = await queryForm_api({})
-  console.log('result: ', result)
+  const { result } = await queryFormNoPage_api({ paging: false })
+  formList.value = result.map((m) => {
+    const _properties = m.configuration.schema.properties
+    // 已经存在的字段
+    const _fields = forms.value[m.id]
+    if (_fields && _fields.length) {
+      Object.keys(_properties).forEach((key) => {
+        const _currentField = _fields.find((f) => f.id === key)
+        _properties[key]['accessModes'] = _currentField
+          ? _currentField.accessModes
+          : []
+      })
+      return { accessModes: [], ...m }
+    } else {
+      Object.keys(_properties).forEach((key) => {
+        _properties[key]['accessModes'] = []
+      })
+      return { accessModes: [], ...m }
+    }
+  })
 }
 getFormList()
-const handleOk = () => {}
+
+const handleOk = () => {
+  formList.value.forEach((item) => {
+    const _properties = item.configuration.schema.properties
+    forms.value[item.id] = []
+    Object.keys(_properties).forEach((key) => {
+      if (_properties[key]['accessModes'].length) {
+        forms.value[item.id].push({
+          id: key,
+          required: true,
+          accessModes: _properties[key]['accessModes'],
+        })
+      }
+    })
+  })
+  console.log('forms.value: ', forms.value)
+  visible.value = false
+}
+
+watch(
+  () => visible.value,
+  (val) => {
+    if (val) getFormList()
+  },
+)
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.form-box {
+  max-height: 500px;
+  overflow: auto;
+  .form-item {
+    .form-title {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    .form-fields {
+      padding-left: 30px;
+      .field-title {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+      }
+    }
+  }
+}
+</style>

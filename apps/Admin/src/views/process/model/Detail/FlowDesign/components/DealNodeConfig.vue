@@ -51,16 +51,15 @@ import ConfigureForm from './ConfigureForm.vue'
 
 const activeKey = ref('basic')
 const props = defineProps({
-  config: {
+  node: {
     type: Object,
     default: () => ({}),
   },
 })
-
 // 基础配置
 const basicFormRef = ref()
 const basicFormData = ref({
-  forms: [],
+  forms: props.node?.props?.formBinds || {},
 })
 
 // 成员配置
@@ -70,9 +69,7 @@ const memberFormData = ref({
   authButtons: [],
   allow: false,
 })
-watchEffect(() => {
-  console.log('memberFormData:', memberFormData.value)
-})
+
 const allButtons = ref([{ label: '提交', value: 'submit' }])
 const nodeList = ref([
   { label: '审批节点', value: 'approval' },

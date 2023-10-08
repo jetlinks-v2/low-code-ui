@@ -19,6 +19,9 @@ export interface IConfig {
 }
 
 export interface INodeProps {
+    formBinds: {
+        formId: IFormFields[]
+    };
     // type === ROOT
     assignedUser: IIdentity[];
     // type === APPROVAL || type === DEAL
@@ -33,6 +36,12 @@ export interface INodeProps {
     // 以下字段前端使用
     isBranchNode: boolean;
     style: Record<string, any>;
+}
+
+export interface IFormFields {
+    id: string;
+    required: boolean;
+    accessModes: string[];
 }
 
 // 通用类型

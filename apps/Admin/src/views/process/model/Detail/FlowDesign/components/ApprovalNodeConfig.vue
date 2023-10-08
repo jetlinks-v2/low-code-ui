@@ -124,7 +124,7 @@ import ConfigureForm from './ConfigureForm.vue'
 
 const activeKey = ref('basic')
 const props = defineProps({
-  config: {
+  node: {
     type: Object,
     default: () => ({}),
   },
@@ -133,7 +133,7 @@ const props = defineProps({
 // 基础配置
 const basicFormRef = ref()
 const basicFormData = ref({
-  forms: [],
+  forms: props.node?.props?.formBinds || {},
   autoPass: false,
   dealRequired: false,
 })
@@ -147,9 +147,6 @@ const memberFormData = ref({
   authButtons: [],
   rejectConfig: 'node',
   rejectToNode: '',
-})
-watchEffect(() => {
-  console.log('memberFormData:', memberFormData.value)
 })
 const allButtons = ref([
   { label: '通过', value: 'pass' },
