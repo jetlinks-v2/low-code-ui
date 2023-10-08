@@ -101,6 +101,9 @@ const permissions = ref([
   { label: '写', value: 'write' },
 ])
 
+/**
+ * 获取所有表单字段数据, 不分页, 并根据forms渲染已经存在的字段权限
+ */
 const getFormList = async () => {
   const { result } = await queryFormNoPage_api({ paging: false })
   formList.value = result.map((m) => {
@@ -125,6 +128,9 @@ const getFormList = async () => {
 }
 getFormList()
 
+/**
+ * 确认之后, 将数据同步至父组件的basicFormData.forms
+ */
 const handleOk = () => {
   formList.value.forEach((item) => {
     const _properties = item.configuration.schema.properties

@@ -3,9 +3,10 @@
   <FlowDesigner @selectNode="nodeSelected" />
 
   <j-drawer
+    destroyOnClose
+    placement="right"
     :width="500"
     :title="title"
-    placement="right"
     :visible="showConfig"
     @close="showConfig = false"
   >

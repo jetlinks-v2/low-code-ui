@@ -27,6 +27,10 @@ const componentsMap = {
 }
 
 const nodeConfigRef = ref()
+
+/**
+ * 保存配置
+ */
 const saveConfig = () => {
   nodeConfigRef.value.saveConfigToPinia()
 }

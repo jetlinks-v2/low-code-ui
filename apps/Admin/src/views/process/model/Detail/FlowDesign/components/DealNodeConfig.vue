@@ -80,6 +80,9 @@ const nodeList = ref([
   { label: '处理节点', value: 'deal' },
 ])
 
+/**
+ * 将数据保存至pinia
+ */
 const saveConfigToPinia = () => {
   const result = findDataById(flowStore.model.nodes, flowStore.selectedNode.id)
   result.props['formBinds'] = basicFormData.forms
