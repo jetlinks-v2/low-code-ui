@@ -69,9 +69,9 @@ const basicFormData = reactive({
 // 成员配置
 const memberFormRef = ref()
 const memberFormData = reactive({
-  candidates: [], // 候选人配置
-  authButtons: [],
-  allow: false,
+  candidates: props.node?.props?.candidates, // 候选人配置
+  authButtons: props.node?.props?.authButtons,
+  allow: props.node?.props?.allow,
 })
 
 watch(
