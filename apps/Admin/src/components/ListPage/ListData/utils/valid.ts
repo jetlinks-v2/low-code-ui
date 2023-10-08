@@ -1,7 +1,7 @@
 export const validListData = (list: any[]) => {
   let errorList: any = [];
   list?.forEach((item, index) => {
-    if(!item.name.length) {
+    if(!item.name?.length) {
       errorList.push({
         key: 'name' + index,
         message: '请配置'

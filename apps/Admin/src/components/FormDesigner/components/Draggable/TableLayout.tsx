@@ -131,10 +131,16 @@ export default defineComponent({
             const _path1 = [...unref(__path), dt?.index, __data?.formItemProps.name]
             const TypeComponent = componentMap[__data?.type || 'input']
             const _props = useProps(__data, unref(designer.formData), unref(designer.mode))
+            const options = ref<any[]>(_props.componentProps.options)
+            const treeData = ref<any[]>(_props.componentProps.treeData)
 
             if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(__data.type)) {
                 queryOptions(__data.componentProps.source, product.info?.id).then(resp => {
-                    _props.componentProps.options = resp
+                    if (['select', 'select-card'].includes(__data.type)) {
+                        options.value = resp
+                    } else {
+                        treeData.value = resp
+                    }
                 })
             }
 
@@ -149,6 +155,8 @@ export default defineComponent({
                         /> : <TypeComponent
                             data={__data}
                             {..._props?.componentProps}
+                            options={unref(options)}
+                            treeData={unref(treeData)}
                             value={get(designer.formState, _path1)}
                             onUpdate:value={(newValue) => set(designer.formState, _path1, newValue)}
                         />
