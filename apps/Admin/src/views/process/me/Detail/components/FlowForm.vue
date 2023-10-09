@@ -68,8 +68,8 @@
         </div>
         <div class="bottom">
             <j-button danger class="btn" @click="onClick('refuse')">驳回</j-button>
-            <j-button  type="primary" class="btn">通过</j-button>
-            <j-button  type="primary" class="btn">提交</j-button>
+            <j-button  type="primary" class="btn" @click="onClick('pass')">通过</j-button>
+            <j-button  type="primary" class="btn" @click="onClick('submit')">提交</j-button>
             <j-button  type="primary" class="btn">保存</j-button>
         </div>
     </div>
