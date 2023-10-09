@@ -54,6 +54,7 @@ import { uid } from './utils/uid'
 import Check from './components/Check/index.vue'
 import { onlyMessage } from '@jetlinks/utils'
 import { queryDictionary } from '@/api/form'
+import { providerEnum } from '@/components/ProJect'
 
 const props = defineProps({
   value: {
@@ -278,8 +279,20 @@ const onSave = () => {
   }
 }
 
+const getFormList = computed(() => {
+  const list = product.getDataMapByType(providerEnum.FormPage)
+  //   过滤掉自身
+  const filterList = list.filter((item) => item.id !== props.data?.id)
+  return filterList.map((item) => {
+    return {
+      label: item.title,
+      value: item.id,
+      code: item.configuration?.code,
+    }
+  })
+})
+
 provide('FormDesigner', {
-  tabsId: props.data?.id,
   model,
   formData,
   formState,
@@ -297,6 +310,7 @@ provide('FormDesigner', {
   focus,
   focused, // 其他组件
   dictionary,
+  formList: getFormList,
   setSelection,
   setModel,
   onSaveData,
@@ -354,7 +368,7 @@ const onValidate = async () => {
       dictionary.value = resp.result?.filter((item) => item?.status) || []
     }
   }
-  errorKey.value = checkedConfig(unref(formData), dictionary.value)
+  errorKey.value = checkedConfig(unref(formData), dictionary.value, getFormList.value)
   return new Promise((resolve, reject) => {
     if (errorKey.value?.length) {
       reject(errorKey.value)

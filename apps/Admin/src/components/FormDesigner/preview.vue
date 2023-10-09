@@ -25,7 +25,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['valueChange'])
+const emit = defineEmits(['valueChange', 'stateChange'])
 
 const formData = ref<ISchema>() // 表单数据
 const formState = reactive<any>({})
@@ -79,6 +79,16 @@ watch(
   () => {
     emit('valueChange', formData.value)
   },
+)
+
+watch(
+  () => formState,
+  (newVal) => {
+    emit('stateChange', newVal)
+  },
+  {
+    deep: true
+  }
 )
 
 defineExpose({ onSave })
