@@ -46,27 +46,28 @@
         />
       </j-form-item>
     </template>
-    <template
-      v-if="
-        [
-          'select-card',
-          'select',
-        ].includes(type)
-      "
-    >
+    <template v-if="['select-card', 'select'].includes(type)">
       <j-form-item
         :validateFirst="true"
         label="类型"
         :name="['children', 0, 'componentProps', 'mode']"
       >
-        <j-radio-group
+        <!-- <j-radio-group
           v-model:value="target.children[0].componentProps.mode"
           button-style="solid"
           @change="onChange"
         >
           <j-radio-button :value="undefined">单选项</j-radio-button>
           <j-radio-button :value="'multiple'">多选项</j-radio-button>
-        </j-radio-group>
+        </j-radio-group> -->
+        <CheckButton
+          :options="[
+            { label: '单选项', value: undefined },
+            { label: '多选项', value: 'multiple' },
+          ]"
+          @change="onChange"
+          v-model:value="target.children[0].componentProps.mode"
+        />
       </j-form-item>
     </template>
     <template v-if="['tree-select'].includes(type)">
@@ -75,14 +76,22 @@
         label="类型"
         :name="['children', 0, 'componentProps', 'multiple']"
       >
-        <j-radio-group
+        <!-- <j-radio-group
           v-model:value="target.children[0].componentProps.multiple"
           button-style="solid"
           @change="onChange"
         >
           <j-radio-button :value="false">单选项</j-radio-button>
           <j-radio-button :value="true">多选项</j-radio-button>
-        </j-radio-group>
+        </j-radio-group> -->
+        <CheckButton
+          :options="[
+            { label: '单选项', value: false },
+            { label: '多选项', value: true },
+          ]"
+          @change="onChange"
+          v-model:value="target.children[0].componentProps.multiple"
+        />
       </j-form-item>
       <j-form-item
         label="可选节点"
@@ -151,14 +160,22 @@
           },
         ]"
       >
-        <j-radio-group
+        <!-- <j-radio-group
           v-model:value="target.children[0].formItemProps.required"
           button-style="solid"
           @change="onChange"
         >
           <j-radio-button :value="true">必填</j-radio-button>
           <j-radio-button :value="false">非必填</j-radio-button>
-        </j-radio-group>
+        </j-radio-group> -->
+        <CheckButton
+          :options="[
+            { label: '必填', value: true },
+            { label: '非必填', value: false },
+          ]"
+          @change="onChange"
+          v-model:value="target.children[0].formItemProps.required"
+        />
       </j-form-item>
     </template>
     <template
@@ -190,7 +207,10 @@
     </template>
     <!-- 规则校验 -->
     <template v-if="rulesVisible">
-      <j-form-item :name="['children', 0, 'formItemProps', 'rules']" :validateFirst="true">
+      <j-form-item
+        :name="['children', 0, 'formItemProps', 'rules']"
+        :validateFirst="true"
+      >
         <Rule
           :type="type"
           v-model:value="target.children[0].formItemProps.rules"
@@ -251,7 +271,7 @@ const rulesVisible = computed(() => {
     'textarea',
     'input-password',
     'date-picker',
-    'time-picker'
+    'time-picker',
   ].includes(unref(type))
 })
 
