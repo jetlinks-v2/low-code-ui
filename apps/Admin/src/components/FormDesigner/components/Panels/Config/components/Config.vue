@@ -302,7 +302,7 @@
           'select',
           'date-picker',
           'time-picker',
-          'table',
+          // 'table',
           'org',
           'role',
           'user',

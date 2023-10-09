@@ -346,7 +346,7 @@ export const appendChildItem = (arr: any[], newData: any, parent: any, flag?: bo
                 child = [...child, newData]
             }
             if (flag === false) {
-                const _f = child.find(item => item?.formItemProps?.name === 'actions')
+                const _f = child.find(item => item?.children?.[0]?.type === 'table-item-actions')
                 if (_f) {
                     child.splice(child.length - 1, 0, newData)
                 } else {
