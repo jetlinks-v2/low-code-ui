@@ -8,12 +8,13 @@
       :model="model"
       :params="params"
       v-model:modelValue="tableForm"
-      :scroll="{ x: `calc(${dataColumns.length * 150})` }"
+      :scroll="{ x: '100%' }"
       :defaultParams="defaultParams"
       :rowSelection="
         isCheck
           ? {
               selectedRowKeys: _selectedRowKeys,
+              onChange: onSelectChange,
               onSelect,
               onSelectAll
             }
@@ -102,7 +103,8 @@
           }}</span>
         </j-ellipsis>
         <div v-if="item?.key === 'action'">
-          <j-space size="large">
+          <OtherActions :actions="tableActions" :record="slotProps"></OtherActions>
+          <!-- <j-space size="large">
             <PermissionButton
               v-for="item in tableActions"
               :key="item.key"
@@ -126,7 +128,7 @@
                 <AIcon v-else :type="item?.icon" />
               </template>
             </PermissionButton>
-          </j-space>
+          </j-space> -->
         </div>
       </template>
       <template #card="slotProps">
@@ -453,6 +455,7 @@ import Card from '@/components/Card'
 import HeaderButton from '@/components/ListPage/Preview/components/HederActions.vue'
 import { isFunction, isObject } from 'lodash-es'
 import Image from '@/components/Image/index.vue'
+import OtherActions from './OtherActions.vue'
 import { PropType } from 'vue'
 import {
   extractCssClass,
@@ -554,10 +557,11 @@ const defaultParams = reactive({
   sorts: [{ name: 'createTime', order: 'desc' }],
 })
 
-// const onSelectChange = (keys: string[]) => {
-//   console.log(keys);
-//   _selectedRowKeys.value = [...keys]
-// }
+const onSelectChange = (keys: string[], selectedRows) => {
+  if(!keys.length) {
+    _selectedRowKeys.value = []
+  }
+}
 
 const onSelect = (record, selected) => {
   if (selected) {
@@ -565,7 +569,6 @@ const onSelect = (record, selected) => {
   } else {
     _selectedRowKeys.value = _selectedRowKeys.value.filter(el => el != record.id).map(el => el)
   }
-  console.log(_selectedRowKeys.value);
 }
 
 const onSelectAll = (selected, selectedRows: Record<string, any>[], changeRows: any[]) => {
