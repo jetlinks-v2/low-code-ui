@@ -20,6 +20,7 @@ import { SQLCode, FunctionCode } from './SQL'
 import OppositeSelect from './OppositeSelect/index.vue'
 import CardBox from './CardBox/index.vue'
 import CheckSpin from './CheckSpin/index.vue'
+import CheckButton from './CheckButton/index.vue'
 
 export default  {
     install(app: App) {
@@ -45,5 +46,6 @@ export default  {
           .component('OppositeSelect',OppositeSelect)
           .component('CardBox',CardBox)
           .component('CheckSpin', CheckSpin)
+          .component('CheckButton', CheckButton)
     }
 }
