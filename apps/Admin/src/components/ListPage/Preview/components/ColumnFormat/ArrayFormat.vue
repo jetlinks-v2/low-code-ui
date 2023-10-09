@@ -26,7 +26,14 @@ const props = defineProps({
     return '--'
   }
   let result = value;
-  if(typeof value === 'object') {
+  if(Array.isArray(value)) {
+    value = value.map(item => {
+      if(typeof item === 'object') {
+        return JSON.stringify(item)
+      } else {
+        return item
+      }
+    })
     switch(true) {
       case props.config?.fileValue === 'xxx ; xxx':
         result = value.join(';')

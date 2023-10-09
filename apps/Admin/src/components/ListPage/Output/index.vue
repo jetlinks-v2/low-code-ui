@@ -49,6 +49,7 @@
     :resource="popResource"
     :type="commandType"
     :popData="popData"
+    :dataColumns="dataColumns"
     @close="addVisible = false"
     @save="addVisible = false"
     @reload="reloadTable"
@@ -146,6 +147,15 @@ const dataColumns: any = computed(() => {
       key: 'action',
       scopedSlots: true,
       width: actions.value.length > 3 ? '200px' : actions.value?.length * 40 + `px`,
+      customHeaderCell: column => {
+        return {
+          style: {
+            'max-width': "200px",
+            "white-space": "nowrap",
+            "text-overflow": "ellipsis"
+          }
+        };
+      },
       fixed: 'right',
     })
   }

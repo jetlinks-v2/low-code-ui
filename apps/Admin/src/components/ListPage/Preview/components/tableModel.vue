@@ -14,7 +14,7 @@
         isCheck
           ? {
               selectedRowKeys: _selectedRowKeys,
-              onChange: onSelectChange,
+              onSelectNone,
               onSelect,
               onSelectAll
             }
@@ -133,7 +133,7 @@
       </template>
       <template #card="slotProps">
         <Card
-          :status="slotProps[props?.cardConfig?.emphasisField]"
+          :status="slotProps[props?.cardConfig?.emphasisField]?.value || slotProps[props?.cardConfig?.emphasisField]"
           :actions="tableActions"
           :record="slotProps"
           :active="_selectedRowKeys.includes(slotProps.id)"
@@ -554,13 +554,11 @@ const isCheck = computed(() => {
 const _selectedRowKeys = ref<string[]>([])
 
 const defaultParams = reactive({
-  sorts: [{ name: 'createTime', order: 'desc' }],
+  sorts: [{ name: 'createTime', order: 'desc' }, { name: 'id', order: 'desc' }],
 })
 
-const onSelectChange = (keys: string[], selectedRows) => {
-  if(!keys.length) {
-    _selectedRowKeys.value = []
-  }
+const onSelectNone = () => {
+  _selectedRowKeys.value = []
 }
 
 const onSelect = (record, selected) => {
@@ -599,6 +597,9 @@ const valueFormat = (val: any) => {
 const statusText = computed(() => {
   try {
     return (val: any) => {
+      if(!val) {
+        return '--'
+      }
       if (typeof val === 'string') {
         return val
       } else if (typeof val === 'object') {
