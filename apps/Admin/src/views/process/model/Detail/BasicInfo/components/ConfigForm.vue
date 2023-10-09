@@ -234,7 +234,7 @@ const onSelectChange = (row: any) => {
       multiple: false,
     })
   }
-  console.log('selectedRow.value: ', selectedRow.value)
+  //   console.log('selectedRow.value: ', selectedRow.value)
 }
 
 watch(

@@ -30,7 +30,13 @@
             <AIcon type="SearchOutlined" />
           </template>
         </j-input>
-        <j-checkbox style="margin: 5px 0">全部内容</j-checkbox>
+        <j-checkbox
+          v-model:checked="checkAll"
+          @change="handleAllCheck"
+          style="margin: 5px 0"
+        >
+          全部内容
+        </j-checkbox>
         <div class="form-box">
           <div
             class="form-item"
@@ -43,6 +49,7 @@
                 <j-checkbox-group
                   v-model:value="form.accessModes"
                   :options="permissions"
+                  @change="handleFormCheck(form)"
                 />
               </div>
             </div>
@@ -127,6 +134,27 @@ const getFormList = async () => {
   })
 }
 getFormList()
+
+/**
+ * 全部内容勾选/取消勾选
+ */
+const checkAll = ref(false)
+const handleAllCheck = () => {
+  formList.value?.forEach((item) => {
+    item.accessModes = checkAll.value ? ['read', 'write'] : []
+    handleFormCheck(item)
+  })
+}
+
+/**
+ * 表单读写勾选/取消勾选
+ */
+const handleFormCheck = (form: any) => {
+  const _fields = form.configuration.schema.properties
+  Object.keys(_fields).forEach((key) => {
+    _fields[key].accessModes = form.accessModes
+  })
+}
 
 /**
  * 确认之后, 将数据同步至父组件的basicFormData.forms
