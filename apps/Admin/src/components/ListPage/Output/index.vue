@@ -128,7 +128,16 @@ const dataColumns: any = computed(() => {
       align: item?.config?.colLayout,
       config: item.config,
       width: 200,
-      sorter: item.config?.checked
+      sorter: item.config?.checked,
+      customHeaderCell: column => {
+        return {
+          style: {
+            'min-width': "200px",
+            "white-space": "nowrap",
+            "text-overflow": "ellipsis"
+          }
+        };
+      }
     }
   })
   if (actions.value?.length !== 0 && allData.value?.showColumns) {
@@ -136,7 +145,7 @@ const dataColumns: any = computed(() => {
       title: '操作',
       key: 'action',
       scopedSlots: true,
-      width: actions.value?.length * 40 + `px`,
+      width: actions.value.length > 3 ? '200px' : actions.value?.length * 40 + `px`,
       fixed: 'right',
     })
   }
