@@ -9,6 +9,8 @@ type FileItemType = {
   type: string
   parentName: string
   parentId: string
+  key: string,
+  parentKey: string,
   [key: string]: any
 }
 
@@ -58,13 +60,13 @@ export const useEngine = defineStore('engine', () => {
     const arr = [...files.value]
     handleActiveKey(key)
     files.value = arr.filter(item => item.id !== key)
-    if(files.value.length === 0){
+    if (files.value.length === 0) {
       activeFile.value = product.data[0].id
     }
   }
 
   const getExpandsKeys = (id: string, type?: string) => {
-    console.log(id)
+    // console.log(id)
     const arrSet: Set<string> = new Set([...expandedKeys.value])
     const map = product.getDataMap()
 
@@ -106,7 +108,7 @@ export const useEngine = defineStore('engine', () => {
    * 新增打开的文件
    * @param record
    */
-  const addFile = (record: FileItemType, open?: any) => { 
+  const addFile = (record: FileItemType, open?: any) => {
     // console.log('------open',open)
     if (!open) {
       activeFile.value = record.id
@@ -117,8 +119,26 @@ export const useEngine = defineStore('engine', () => {
       if (type === 'project') {
         delete cloneRecord.children
       }
+      const item = product.data[0]
       if (type !== 'module' && type !== 'project') {
         files.value.unshift(cloneRecord)
+        product.update({
+          ...item,
+          others: {
+            ...item?.others,
+            activeFile: activeFile.value,
+            files: files.value
+          }
+        })
+      }else{
+        product.update({
+          ...item,
+          others: {
+            ...item?.others,
+            activeFile: activeFile.value,
+            files: []
+          }
+        })
       }
       // files.value.push(cloneRecord)
     }
@@ -175,6 +195,7 @@ export const useEngine = defineStore('engine', () => {
    */
   const updateFile = (record: any, type: string, open?: any) => {
     const index = files.value?.findIndex(item => item.id === record.id)
+    
 
     files.value = files.value.map(item => {
       return product.getById(item.id)
@@ -184,16 +205,24 @@ export const useEngine = defineStore('engine', () => {
       if (type === 'del') {
         files.value.splice(index, 1)
         if (files.value.length === 0) {
-          activeFile.value =product.data[0].id
+          activeFile.value = product.data[0].id
         } else {
           activeFile.value = files.value[index]?.id
         }
-
+        const item = product.data[0]
+        product.update({
+          ...item,
+          others: {
+            ...item?.others,
+            activeFile: activeFile.value,
+            files: files.value
+          }
+        })
       } else {
         files.value[index] = record
       }
     } else if (type === 'add') {
-      addFile(record, open)
+      addFile(record, open) 
     }
   }
 
@@ -209,7 +238,7 @@ export const useEngine = defineStore('engine', () => {
     activeFile.value = v
   }
 
-  const selectFiles = (v)=>{
+  const selectFiles = (v) => {
     files.value = v
   }
 

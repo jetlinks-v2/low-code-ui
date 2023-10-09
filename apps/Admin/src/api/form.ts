@@ -40,7 +40,7 @@ export const queryDictionary = () => request.post('/dictionary/_query/no-paging'
 /**
 * 字典查询下拉数据
 */
-export const queryDictionaryData = (id: string) => request.get(`/dictionary/${id}/items`)
+export const queryDictionaryData = (id: string) => request.post(`/dictionary-item/_query/no-paging`, { paging: false, terms: [{ value: id, termType: 'eq', column: 'dictId' }] })
 
 /**
  * 获取功能预支持的指令

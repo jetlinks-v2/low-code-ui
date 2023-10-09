@@ -1,15 +1,17 @@
 <template>
-  <j-tree-select
-    :tree-data="data"
-    :value="_value"
-    @change="valueChange"
-    :multiple="mode === 'multiple'"
-    :disabled="disabled"
-    placeholder="请选择"
-   :size="size"
-   style="min-width: 230px;"
-  >
-  </j-tree-select>
+  <div>
+    <j-tree-select
+      :tree-data="data"
+      :value="_value"
+      @change="valueChange"
+      :multiple="mode === 'multiple'"
+      :disabled="disabled"
+      placeholder="请选择"
+      :size="size"
+      style="min-width: 230px"
+    >
+    </j-tree-select>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -18,8 +20,8 @@ import { useRequest } from '@jetlinks/hooks'
 import { ref, watch } from 'vue'
 const props = defineProps({
   value: {
-    type: Array,
-    default: [],
+    type: [Array, String],
+    // default: [],
   },
   mode: {
     type: String,

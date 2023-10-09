@@ -39,6 +39,7 @@ import { onlyMessage } from '@jetlinks/utils';
 import { typeImages } from '@/components/ProJect/index'
 import { restParentId } from './tree'
 import { cloneDeep } from 'lodash-es';
+import { delMenu } from '@/api/menu'
 
 const engine = useEngine()
 const product = useProduct()
@@ -103,9 +104,22 @@ const save = (data) => {
   close()
 }
 
-const onDel = (data) => {
+const onDel =async (data) => {
   product.remove(data)
   menuState.visibleDel = false
+  await delMenu({
+    "paging": false,
+    "terms": [{
+      "terms": [{
+        "type": "or",
+        "value": `%pageId":"${data.id}%`,
+
+        "termType": "like",
+        "column": "options"
+      }]
+    }]
+
+  })
 }
 
 const menuClick = (record) => {

@@ -426,7 +426,6 @@
 import { computed, inject, unref } from 'vue'
 import { useTarget } from '../../../../hooks'
 import { basic } from '@/components/FormDesigner/utils/defaultData'
-import { omit } from 'lodash-es'
 import generatorData from '@/components/FormDesigner/utils/generatorData'
 import { getBrotherList, updateData } from '../../../../utils/utils'
 
@@ -566,14 +565,21 @@ const onTypeChange = (val: string) => {
 }
 
 const onTypesChange = (val: string) => {
-  const obj = {
-    ...generatorData({
+  const _data = generatorData({
       type: val,
       name: '列名',
       children: [],
-    }),
+    })
+  const obj = {
+    ..._data,
+    formItemProps: {
+      ..._data?.formItemProps,
+      label: target.value.children[0]?.formItemProps?.label || _data?.formItemProps.label,
+      name: target.value.children[0]?.formItemProps?.name || _data?.formItemProps.name,
+    },
     key: target.value.children[0]?.key,
   }
+  
   const arr = updateData(unref(designer.formData)?.children, obj)
   designer.formData.value = {
     ...designer.formData.value,
@@ -581,10 +587,10 @@ const onTypesChange = (val: string) => {
   }
 }
 
-const onChange = (arr: any[]) => {
-  target.value.formItemProps.rules = arr
-  emits('refresh', target.value)
-}
+// const onChange = (arr: any[]) => {
+//   target.value.formItemProps.rules = arr
+//   emits('refresh', target.value)
+// }
 
 const onDataChange = () => {
   emits('refresh', target.value)

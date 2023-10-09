@@ -43,6 +43,7 @@ import { onlyMessage } from '@jetlinks/utils'
 import { _import } from '@/api/list'
 import { PropType } from 'vue'
 import { downloadFileByUrl } from '@jetlinks/utils'
+import { downloadFileByUrl } from '@jetlinks/utils'
 
 type Emits = {
   (e: 'update:modelValue', data: string[]): void

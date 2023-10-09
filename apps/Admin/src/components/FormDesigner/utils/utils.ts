@@ -273,6 +273,7 @@ export const queryOptions = async (source: any, id: string) => {
             return bubbleSort(list)
         }
     }
+    console.log(source)
     if (id && source?.type === 'end' && source?.functionId && source?.commandId && source?.label && source?.value) {
         const resp = await queryRuntime(id, source?.functionId, source?.commandId)
         if (resp.success) {

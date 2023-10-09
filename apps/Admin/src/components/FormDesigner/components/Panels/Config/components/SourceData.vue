@@ -29,9 +29,10 @@
       <j-select
         placeholder="请选择"
         v-model:value="data.dictionary"
+        showSearch
         @change="onDataChange"
       >
-        <j-select-option v-for="item in dic" :key="item.id" :value="item.id">
+        <j-select-option :label="item.name" v-for="item in dic" :key="item.id" :value="item.id">
           {{ item.name }}
         </j-select-option>
       </j-select>
@@ -54,6 +55,7 @@
               placeholder="请选择"
               :options="functionList"
               allowClear
+              showSearch
               @change="onFunChange"
             >
             </j-select>
@@ -75,6 +77,7 @@
               placeholder="请选择"
               :options="commandList"
               allowClear
+              showSearch
               @change="onCommandChange"
             ></j-select>
           </j-form-item>
@@ -129,6 +132,7 @@
           placeholder="请选择"
           :options="labelList"
           allowClear
+          showSearch
           @change="onDataChange"
         >
         </j-select>
@@ -153,6 +157,7 @@
           placeholder="请选择"
           :options="labelList"
           allowClear
+          showSearch
           @change="onDataChange"
         >
         </j-select>

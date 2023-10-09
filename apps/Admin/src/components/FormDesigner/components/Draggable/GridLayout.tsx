@@ -101,13 +101,13 @@ export default defineComponent({
                                 })
                             }
                         </div>
-                        {
-                            unref(isEditModel) &&
-                            <div class="draggable-add">
-                                <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}><span>添加网格列</span></div>
-                            </div>
-                        }
                     </ResizeObserver>
+                    {
+                        unref(isEditModel) &&
+                        <div class="draggable-add">
+                            <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}><span>添加网格列</span></div>
+                        </div>
+                    }
                 </Selection >
             )
         }
