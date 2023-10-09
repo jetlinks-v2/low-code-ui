@@ -118,9 +118,12 @@ import { onlyMessage } from '@jetlinks/utils'
 import draggable from 'vuedraggable'
 import { queryForm_api } from '@/api/process/model'
 
-const props = defineProps<{
-  modelValue: any
-}>()
+const props = defineProps({
+  modelValue: {
+    type: Array as PropType<any[]>,
+    default: () => [],
+  },
+})
 const emits = defineEmits(['update:modelValue', 'change'])
 
 const drag = ref(true)
