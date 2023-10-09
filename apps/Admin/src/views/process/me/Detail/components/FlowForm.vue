@@ -67,14 +67,17 @@
             </j-scrollbar>
         </div>
         <div class="bottom">
-            <j-button danger class="btn">驳回</j-button>
+            <j-button danger class="btn" @click="onClick('refuse')">驳回</j-button>
             <j-button  type="primary" class="btn">通过</j-button>
+            <j-button  type="primary" class="btn">提交</j-button>
             <j-button  type="primary" class="btn">保存</j-button>
         </div>
     </div>
+    <FlowModal v-if="visible" @close="visible=false" @save="onSave" :type="modalType"/>
 </template>
 
 <script setup lang='ts'>
+import FlowModal from './FlowModal.vue';
 
 const props = defineProps({
     current: {
@@ -90,6 +93,17 @@ const modelRef = reactive({
     url: undefined,
     description: ''
 })
+const visible = ref(false)
+const modalType = ref('pass')
+
+const onSave =(value)=>{
+    console.log(value)
+}
+
+const onClick = (value)=>{
+    modalType.value = value
+    visible.value = true
+}
 
 </script>
 
