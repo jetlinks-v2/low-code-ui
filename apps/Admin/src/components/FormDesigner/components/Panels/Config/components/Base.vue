@@ -341,14 +341,22 @@
           :name="['componentProps', 'type']"
           label="切卡样式"
         >
-          <j-radio-group
+          <!-- <j-radio-group
             v-model:value="target.componentProps.type"
             button-style="solid"
             @change="onDataChange"
           >
             <j-radio-button :value="'line'">线框</j-radio-button>
             <j-radio-button :value="'card'">卡片</j-radio-button>
-          </j-radio-group>
+          </j-radio-group> -->
+          <CheckButton
+            :options="[
+              { label: '线框', value: 'line' },
+              { label: '卡片', value: 'card' },
+            ]"
+            @change="onDataChange"
+            v-model:value="target.componentProps.type"
+          />
         </j-form-item>
       </template>
       <template v-if="['space'].includes(type)">
@@ -374,14 +382,22 @@
           required
           :validateFirst="true"
         >
-          <j-radio-group
+          <!-- <j-radio-group
             v-model:value="target.componentProps.direction"
             button-style="solid"
             @change="onDataChange"
           >
             <j-radio-button :value="'vertical'">垂直</j-radio-button>
             <j-radio-button :value="'horizontal'">水平</j-radio-button>
-          </j-radio-group>
+          </j-radio-group> -->
+          <CheckButton
+            :options="[
+              { label: '垂直', value: 'vertical' },
+              { label: '水平', value: 'horizontal' },
+            ]"
+            @change="onDataChange"
+            v-model:value="target.componentProps.direction"
+          />
         </j-form-item>
         <j-form-item
           :name="['componentProps', 'size']"
@@ -566,20 +582,24 @@ const onTypeChange = (val: string) => {
 
 const onTypesChange = (val: string) => {
   const _data = generatorData({
-      type: val,
-      name: '列名',
-      children: [],
-    })
+    type: val,
+    name: '列名',
+    children: [],
+  })
   const obj = {
     ..._data,
     formItemProps: {
       ..._data?.formItemProps,
-      label: target.value.children[0]?.formItemProps?.label || _data?.formItemProps.label,
-      name: target.value.children[0]?.formItemProps?.name || _data?.formItemProps.name,
+      label:
+        target.value.children[0]?.formItemProps?.label ||
+        _data?.formItemProps.label,
+      name:
+        target.value.children[0]?.formItemProps?.name ||
+        _data?.formItemProps.name,
     },
     key: target.value.children[0]?.key,
   }
-  
+
   const arr = updateData(unref(designer.formData)?.children, obj)
   designer.formData.value = {
     ...designer.formData.value,

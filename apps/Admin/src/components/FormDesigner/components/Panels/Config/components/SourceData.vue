@@ -11,14 +11,22 @@
         },
       ]"
     >
-      <j-radio-group
+      <!-- <j-radio-group
         v-model:value="data.type"
         button-style="solid"
         @change="onRadioChange"
       >
         <j-radio-button :value="'dic'">数据字典</j-radio-button>
         <j-radio-button :value="'end'">后端接口</j-radio-button>
-      </j-radio-group>
+      </j-radio-group> -->
+      <CheckButton
+        :options="[
+          { label: '数据字典', value: 'dic' },
+          { label: '后端接口', value: 'end' },
+        ]"
+        @change="onRadioChange"
+        v-model:value="data.type"
+      />
     </j-form-item>
     <j-form-item
       :validateFirst="true"
@@ -249,7 +257,7 @@ const getEnd = () => {
 }
 
 const onRadioChange = (e) => {
-  if (e.target?.value === 'end') {
+  if (e === 'end') {
     emits('change', {
       type: 'end',
       label: undefined,
