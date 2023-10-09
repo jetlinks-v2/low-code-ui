@@ -38,17 +38,6 @@ const onRelease = () => {
 }
 
 const quit = async () => {
-  console.log('product.data', product.data)
-  const item = product.data[0]
-  await product.update({
-    ...item,
-    others: {
-      ...item?.others,
-      activeFile: engine.activeFile,
-      files: engine.files
-    }
-  })
-
   router.push('/delivery/center')
 }
 
@@ -64,7 +53,7 @@ onMounted(() => {
       engine.setActiveFile(data?.id)
       engine.selectFile(data.id)
     }
-  },300)
+  }, 300)
 })
 
 </script>
@@ -114,4 +103,5 @@ onMounted(() => {
   }
 
   .release {}
-}</style>
+}
+</style>
