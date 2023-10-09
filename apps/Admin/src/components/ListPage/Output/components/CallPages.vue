@@ -85,7 +85,7 @@ const title = computed(() => {
 const emit = defineEmits(['close', 'save', 'reload'])
 const visible = ref(false)
 const confirmLoading = ref(false)
-const editValue = ref({})
+const editValue = ref()
 
 const getInfo = async () => {
   const { projectId, parentId, id } = props.resource.callPage
@@ -137,13 +137,15 @@ watch(
 watch(
   () => props.popData,
   (val) => {
-    editValue.value = {};
-    for(const key in val) {
-      const result = props.dataColumns.find(item => item.dataIndex === key)
-      if(result && result.config?.type === 'enum') {
-        editValue.value[key] = Array.isArray(val[key]) ? val?.[key]?.map(item => item.value) : val?.[key]?.value
-      } else {
-        editValue.value[key] = val[key]
+    if(props.type !== 'Add') {
+      editValue.value = {};
+      for(const key in val) {
+        const result = props.dataColumns.find(item => item.dataIndex === key)
+        if(result && result.config?.type === 'enum') {
+          editValue.value[key] = Array.isArray(val[key]) ? val?.[key]?.map(item => item.value) : val?.[key]?.value
+        } else {
+          editValue.value[key] = val[key]
+        }
       }
     }
   },
