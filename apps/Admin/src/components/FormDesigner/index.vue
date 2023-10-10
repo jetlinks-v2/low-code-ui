@@ -131,9 +131,10 @@ const setSelection = (node: any) => {
       selected.value.push(node)
     }
   }
+  const flag = node.type === 'table-item' && ['table-item-index', 'table-item-actions'].includes(node?.children?.[0]?.type)
   isShowConfig.value =
     !(selected.value?.length > 1) &&
-    !map(selected.value, 'type').includes('space-item')
+    !map(selected.value, 'type').includes('space-item') && !flag
   onSaveData()
 }
 

@@ -9,7 +9,7 @@ export const patternList = [
     },
     {
         text: '数字格式',
-        value: '^[+-]?(0|([1-9]\\d*))(\.\\d+)?$'
+        value: '^[-]?(0|([1-9]\\d*))(\.\\d+)?$'
     },
     {
         text: '整数格式',
