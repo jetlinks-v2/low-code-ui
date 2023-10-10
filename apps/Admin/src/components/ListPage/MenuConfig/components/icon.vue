@@ -3,11 +3,12 @@
     :visible="props.visible"
     title="菜单图标"
     width="416px"
-    @cancel="emits('update:visible', false)"
-    @ok="confirm"
+    :maskClosable="false"
     :getContainer='() => refs'
     :wrap-style="{ position: 'absolute', zIndex: 1001 }"
     :mask-style="{ position: 'absolute' }"
+    @cancel="emits('update:visible', false)"
+    @ok="confirm"
   >
     <j-scrollbar>
       <j-radio-group v-model:value="selected" class="radio">
