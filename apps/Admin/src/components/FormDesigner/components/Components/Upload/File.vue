@@ -6,8 +6,11 @@
       :action="_fileUpload"
       :headers="headers"
       :accept="accept"
+      name="file"
+      :multiple="maxCount > 1"
       :before-upload="beforeUpload"
       @change="handleChange"
+      @drop="handleDrop"
     >
       <div>
         <p class="ant-upload-drag-icon">
@@ -114,6 +117,10 @@ const handleChange = async (info: UploadChangeParam) => {
   }
 }
 
+const handleDrop = (e) => {
+  console.log(e)
+}
+
 const onDbClick = (file) => {
   dbId.value = file.uid
   dbRef.value = true
@@ -136,6 +143,10 @@ watch(
     immediate: true,
   },
 )
+
+watchEffect(() => {
+  console.log(props.maxCount)
+})
 </script>
 
 <style scoped lang='less'>

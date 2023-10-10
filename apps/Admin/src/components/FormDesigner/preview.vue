@@ -66,8 +66,7 @@ const onSave = () => {
     formRef.value
       .validate()
       .then((_data: any) => {
-        const obj = { ...unref(formState), ..._data }
-        resolve(obj)
+        resolve({ ...unref(formState), ..._data })
       })
       .catch((err: any) => {
         inject(err)
