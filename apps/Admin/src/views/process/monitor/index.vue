@@ -1,12 +1,23 @@
 <!-- 流程监控 -->
 <template>
   <page-container>
+    <div>
+      <j-radio-group v-model:value="history" button-style="solid" style="margin-bottom: 16px">
+        <j-space>
+          <j-radio-button :value="false">流转中</j-radio-button>
+          <j-radio-button :value="true">已完成</j-radio-button>
+        </j-space>
+      </j-radio-group>
+    </div>
     <pro-search :columns="columns" target="code" @search="handleSearch" />
     <JProTable
       ref="tableRef"
       model="table"
       :columns="columns"
-      :params="params"
+      :params="{
+        history,
+        ...params
+      }"
       :request="getList_api"
       :defaultParams="{
         sorts: [{ name: 'createTime', order: 'desc' }],
@@ -34,7 +45,7 @@
             title: '关闭',
           }"
           :popConfirm="{
-            title: `确认关闭？`,
+            title: `确认关闭该流程？`,
             onConfirm: () => handleDel(slotProps.id),
           }"
         >
@@ -52,20 +63,26 @@
 </template>
 <script setup>
 import Drawer from './Drawer/index.vue'
-import { getList_api } from '@/api/process/instance'
+import { getList_api } from '@/api/process/monitor'
 import dayjs from 'dayjs'
+import { providerEnum } from '@/api/process/model'
+import { useRequest } from '@jetlinks/hooks'
 
+const history = ref(false)
 const columns = [
   {
     title: '流程分类',
-    dataIndex: 'provider',
-    key: 'provider',
+    dataIndex: 'classifiedId',
+    key: 'classifiedId',
     ellipsis: true,
     search: {
       type: 'select',
+      rename: 'classifiedId',
       componentProps: {
         placeholder: '请选择流程分类',
+        fieldNames: { label: 'text', value: 'value' },
       },
+      options: useRequest(providerEnum).data,
     },
   },
   {
@@ -85,24 +102,12 @@ const columns = [
     dataIndex: 'name',
     key: 'name',
     ellipsis: true,
-    search: {
-      type: 'string',
-      componentProps: {
-        placeholder: '请输入流程名称',
-      },
-    },
   },
   {
     title: '摘要',
     dataIndex: 'name',
     key: 'name',
     ellipsis: true,
-    search: {
-      type: 'string',
-      componentProps: {
-        placeholder: '请输入流程名称',
-      },
-    },
   },
   {
     title: '状态',
@@ -130,7 +135,23 @@ const columns = [
       componentProps: {
         placeholder: '请输入发起人',
       },
-      options: []
+      options: async () => {
+        const resp = await getList_api({
+          paging: false,
+          sorts: [{ name: 'createTime', order: 'desc' }],
+        })
+        const listMap = new Map()
+        if (resp.status === 200) {
+          resp.result.data.forEach((item) => {
+            listMap.set(item.creatorId, {
+              label: item.creatorName,
+              value: item.creatorId,
+            })
+          })
+          return [...listMap.values()]
+        }
+        return []
+      },
     },
   },
   {
@@ -149,7 +170,6 @@ const columns = [
     key: 'createTime',
     ellipsis: true,
     scopedSlots: true,
-
     search: {
       type: 'date',
     },
