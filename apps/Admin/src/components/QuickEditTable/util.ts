@@ -50,7 +50,8 @@ export const proAll = (array: Array<Promise<any>>) => {
 export const useValidate = (dataSource) => {
   const validateRef = ref()
   const errorMap = ref({})
-  const watch = {}
+  const watchKeys = {}
+  let cloneData = dataSource
 
   let ruleObj = {}
 
@@ -69,7 +70,7 @@ export const useValidate = (dataSource) => {
         if (item.form.watch && isArray(item.form.watch)) {
           item.form.watch.forEach(key => {
             ruleObj[key] = item.form.rules
-            watch[key] = item.dataIndex
+            watchKeys[key] = item.dataIndex
           })
         }
       }
@@ -87,6 +88,7 @@ export const useValidate = (dataSource) => {
 
   const validate = (name, value, record) => {
     if (name && hasValidate(name)) {
+
       return new Promise((resolve, reject) => {
         validateRef.value.validate(
           { [name]: value, record },
@@ -95,7 +97,7 @@ export const useValidate = (dataSource) => {
             const hasName = err?.find(item => item.field === name)
             const path = createPath(name, record._quick_id, record.index)
             if (err && hasName) { // 有错误
-              if (!watch[hasName.field]) {
+              if (!watchKeys[hasName.field]) {
                 errorMap.value[path] = hasName.message
                 reject({ [path]:[hasName] })
               }
@@ -104,8 +106,8 @@ export const useValidate = (dataSource) => {
               if (errorMap.value[path]) {
                 delete errorMap.value[path]
               }
-              if (watch[name]) {
-                const watchPath = createPath(watch[name], record._quick_id, record.index)
+              if (watchKeys[name]) {
+                const watchPath = createPath(watchKeys[name], record._quick_id, record.index)
                 delete errorMap.value[watchPath]
               }
             }
@@ -118,13 +120,12 @@ export const useValidate = (dataSource) => {
   const validates = () => {
     return new Promise(async (resolve, reject) => {
       let errorMsg = {}
-
-      for (const item of dataSource) {
+      for (const item of cloneData) {
         for (const key in ruleObj) {
           // if (!watch[key]) {
           //   validatePromise.push(validate(key, item[key], item))
           // }
-          if (!watch[key]) {
+          if (!watchKeys[key]) {
             await validate(key, item[key], item)?.catch(e => {
               errorMsg = {
                 ...e,
@@ -138,9 +139,13 @@ export const useValidate = (dataSource) => {
       if (Object.keys(errorMsg).length) {
         reject(errorMsg)
       } else {
-        resolve(dataSource)
+        resolve(cloneData)
       }
     })
+  }
+
+  const updateDataSource = (data) => {
+    cloneData = data
   }
 
 
@@ -150,7 +155,8 @@ export const useValidate = (dataSource) => {
     createValidate,
     createPath,
     validates,
-    errorMap
+    errorMap,
+    updateDataSource
   }
 }
 
