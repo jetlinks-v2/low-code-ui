@@ -212,8 +212,8 @@ const myColumns = [
     dataIndex: 'comment',
     form: {
       rules: {
-        asyncValidator: (rule, value) => {
-          if (!value) {
+        asyncValidator: (rule, value, cb, source) => {
+          if (!value && source.record.index > maxLen.value) {
             return Promise.reject('请输入注释')
           }
           return Promise.resolve()
@@ -227,8 +227,8 @@ const myColumns = [
     width: 150,
     form: {
       rules: {
-        asyncValidator: (rule, value) => {
-          if (!value) {
+        asyncValidator: (rule, value, cb, source) => {
+          if (!value && source.record.index > maxLen.value) {
             return Promise.reject('请选择javaType')
           }
           return Promise.resolve()
@@ -242,8 +242,8 @@ const myColumns = [
     width: 150,
     form: {
       rules: {
-        asyncValidator: (rule, value) => {
-          if (!value) {
+        asyncValidator: (rule, value, cb, source) => {
+          if (!value && source.record.index > maxLen.value) {
             return Promise.reject('请选择jdbcType')
           }
           return Promise.resolve()
@@ -274,7 +274,10 @@ const myColumns = [
       watch: ['other', 'dictionary'],
       rules: {
         asyncValidator: (rule, value, cb, source) => {
-          return settingValidate(source.record)
+          if (source.record.index > maxLen.value) {
+            return settingValidate(source.record)
+          }
+          return Promise.resolve()
         }
       }
     }

@@ -12,7 +12,7 @@ import { configVisualizerConfig } from "./visualizer";
 import { createConfigPlugin } from "./config";
 import { configHttpsPlugin } from "./https";
 import { optimizeDeps } from './optimize'
-// import { JetlinksVueResolver } from 'jetlinks-ui-components/es/plugin'
+import { JetlinksVueResolver } from 'jetlinks-ui-components/es/plugin'
 // import { JetlinksVueResolver } from './jetlinks'
 import { JetLinksStyleResolve } from '../utils'
 
@@ -40,7 +40,7 @@ export async function configVitePlugins(
     optimizeDeps(),
 
     Components({
-        resolvers: [VueAmapResolver()],
+        resolvers: [JetlinksVueResolver({ importStyle: 'less' }), VueAmapResolver()],
         directoryAsNamespace: true
     }),
 
