@@ -171,6 +171,7 @@ const DraggableLayout = defineComponent({
                                     return <TypeComponent
                                         model={unref(designer.model)}
                                         {...omit(_props.componentProps, ['disabled'])}
+                                        source={element.type === 'form' ? element?.componentProps?.source : undefined}
                                     ></TypeComponent>
                                 } else if (['switch'].includes(element.type)) {
                                     return <TypeComponent
@@ -182,13 +183,14 @@ const DraggableLayout = defineComponent({
                                         }}
                                         onChange={onChange}
                                     ></TypeComponent>
-                                } if (['form'].includes(element.type)) {
+                                } else if (['form'].includes(element.type)) {
                                     return <TypeComponent
                                         {..._props.componentProps}
                                         mode={unref(designer.mode)}
+                                        source={element?.componentProps?.source}
                                         value={get(designer.formState, _path)}
                                         onUpdate:value={(newValue) => {
-                                            set(designer.formState, _path, newValue)
+                                            set(designer.formState, _path, newValue || null)
                                         }}
                                         onChange={onChange}
                                     ></TypeComponent>
@@ -203,7 +205,7 @@ const DraggableLayout = defineComponent({
                                         {..._props.componentProps}
                                         value={__value}
                                         onUpdate:value={(newValue) => {
-                                            set(designer.formState, _path, newValue)
+                                            set(designer.formState, _path, newValue || null)
                                         }}
                                         options={unref(options)}
                                         treeData={unref(treeData)}
