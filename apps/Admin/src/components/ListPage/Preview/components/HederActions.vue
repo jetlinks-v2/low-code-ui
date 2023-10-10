@@ -9,7 +9,7 @@
           v-bind:="handleFunction(item.permissionProps, item, item)"
           :danger="item.command === 'Delete'"
           :popConfirm="handleFunction(item.permissionProps)?.popConfirm"
-          :data-id="item.key"
+          :data-id="item.id"
         >
           <j-space>
             <template v-if="item.icon">
@@ -26,7 +26,7 @@
             :actions="item?.children"
             v-else
         >
-          <j-button :dataid="item.key" :class="className(item.style)">
+          <j-button :dataid="item.id" :class="className(item.style)">
             <template #icon>
               <img v-if="item.icon?.includes('http')" :src="item.icon" class="image-icon">
               <AIcon v-else :type="item.icon"/>
