@@ -17,6 +17,8 @@
             v-bind:="handleFunction(item.permissionProps)"
             :danger="item.key === 'delete' "
             type="link"
+            :data-id="item.key"
+            :class="extractCssClass(item.style)"
           >
             <template #icon v-if="item.icon || item.key === 'delete'">
               <img
@@ -38,7 +40,7 @@
 </template>
 
 <script setup name="OtherActions">
-
+import { extractCssClass, insertCustomCssToHead } from '../FormDesigner/utils/utils';
 import {isFunction, isObject} from "lodash-es";
 
 const props = defineProps({
@@ -61,6 +63,11 @@ const handleFunction = (item) => {
   return undefined
 }
 
+watchEffect(() => {
+  props.actions?.forEach((item) => {
+    insertCustomCssToHead(item.style, item.key, 'dataid')
+  })
+})
 </script>
 
 <style scoped>

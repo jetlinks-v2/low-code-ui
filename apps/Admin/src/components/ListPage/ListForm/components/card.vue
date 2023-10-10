@@ -123,6 +123,7 @@
               placeholder="请先配置列表数据"
               v-model:value="formState.dynamicIcon"
               showSearch
+              allowClear
               :options="titleOptions"
               :field-names="{ label: 'name', value: 'id' }"
             >
