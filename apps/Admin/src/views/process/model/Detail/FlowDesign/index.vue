@@ -43,8 +43,15 @@ const nodeSelected = (node) => {
 }
 
 const handleSubmit = () => {
-  nodeConfigRef.value.saveConfig()
-  showConfig.value = false
+  nodeConfigRef.value
+    .saveConfig()
+    .then((valid) => {
+      console.log('valid: ', valid)
+      showConfig.value = false
+    })
+    .catch((err) => {
+      console.log('handleSubmit err: ', err)
+    })
 }
 </script>
 

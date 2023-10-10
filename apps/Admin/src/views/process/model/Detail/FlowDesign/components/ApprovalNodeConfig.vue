@@ -1,7 +1,7 @@
 <!-- 审批节点配置 -->
 <template>
   <j-tabs v-model:activeKey="activeKey" type="card">
-    <j-tab-pane key="basic" tab="基础配置">
+    <j-tab-pane key="basic" tab="基础配置" forceRender>
       <j-form ref="basicFormRef" :model="basicFormData" layout="vertical">
         <h3>表单配置</h3>
         <j-form-item
@@ -36,7 +36,7 @@
         </j-form-item>
       </j-form>
     </j-tab-pane>
-    <j-tab-pane key="member" tab="成员配置">
+    <j-tab-pane key="member" tab="成员配置" forceRender>
       <j-form ref="memberFormRef" :model="memberFormData" layout="vertical">
         <h3>候选人配置</h3>
         <j-form-item
@@ -165,14 +165,32 @@ const nodeList = ref([
  * 将数据保存至pinia
  */
 const saveConfigToPinia = () => {
-  const result = findDataById(flowStore.model.nodes, flowStore.selectedNode.id)
-  //   result.props['formBinds'] = basicFormData.formBinds
-  //   result.props['candidates'] = memberFormData.candidates
-  //   result.props['completeWeight'] = memberFormData.completeWeight
-  //   result.props['rejectWeight'] = memberFormData.rejectWeight
-  //   result.props['gotoWhenReject'] = memberFormData.gotoWhenReject
-  result.props = { ...result.props, ...basicFormData, ...memberFormData }
-  //   console.log('approval: ', result)
+  return new Promise((resolve, reject) => {
+    basicFormRef.value
+      ?.validate()
+      .then((valid1) => {
+        memberFormRef.value
+          ?.validate()
+          .then((valid2) => {
+            const result = findDataById(
+              flowStore.model.nodes,
+              flowStore.selectedNode.id,
+            )
+            result.props = {
+              ...result.props,
+              ...basicFormData,
+              ...memberFormData,
+            }
+            resolve({ ...valid1, ...valid2 })
+          })
+          .catch((err) => {
+            reject(err)
+          })
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
 }
 defineExpose({
   saveConfigToPinia,

@@ -1,7 +1,7 @@
 <!-- 处理节点配置 -->
 <template>
   <j-tabs v-model:activeKey="activeKey" type="card">
-    <j-tab-pane key="basic" tab="基础配置">
+    <j-tab-pane key="basic" tab="基础配置" forceRender>
       <j-form ref="basicFormRef" :model="basicFormData" layout="vertical">
         <h3>表单配置</h3>
         <j-form-item
@@ -13,7 +13,7 @@
         </j-form-item>
       </j-form>
     </j-tab-pane>
-    <j-tab-pane key="member" tab="成员配置">
+    <j-tab-pane key="member" tab="成员配置" forceRender>
       <j-form ref="memberFormRef" :model="memberFormData" layout="vertical">
         <h3>候选人配置</h3>
         <j-form-item
@@ -74,13 +74,13 @@ const memberFormData = reactive({
   allow: props.node?.props?.allow,
 })
 
-watch(
-  () => memberFormData,
-  (val) => {
-    console.log('memberFormData: ', val)
-  },
-  { deep: true },
-)
+// watch(
+//   () => memberFormData,
+//   (val) => {
+//     console.log('memberFormData: ', val)
+//   },
+//   { deep: true },
+// )
 
 const allButtons = ref([{ label: '提交', value: 'submit' }])
 const nodeList = ref([
@@ -92,11 +92,32 @@ const nodeList = ref([
  * 将数据保存至pinia
  */
 const saveConfigToPinia = () => {
-  const result = findDataById(flowStore.model.nodes, flowStore.selectedNode.id)
-  //   result.props['formBinds'] = basicFormData.formBinds
-  //   result.props['candidates'] = memberFormData.candidates
-  result.props = { ...result.props, ...basicFormData, ...memberFormData }
-  //   console.log('deal: ', result)
+  return new Promise((resolve, reject) => {
+    basicFormRef.value
+      ?.validate()
+      .then((valid1) => {
+        memberFormRef.value
+          ?.validate()
+          .then((valid2) => {
+            const result = findDataById(
+              flowStore.model.nodes,
+              flowStore.selectedNode.id,
+            )
+            result.props = {
+              ...result.props,
+              ...basicFormData,
+              ...memberFormData,
+            }
+            resolve({ ...valid1, ...valid2 })
+          })
+          .catch((err) => {
+            reject(err)
+          })
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
 }
 defineExpose({
   saveConfigToPinia,

@@ -41,6 +41,13 @@
           name="complexWeight"
           label="请配置并行分支的通过权重"
           v-if="basicFormData.type === 'complex'"
+          :rules="[
+            {
+              required: true,
+              message: `请输入通过权重`,
+              trigger: 'blur',
+            },
+          ]"
         >
           <j-input-number
             v-model:value="basicFormData.complexWeight"
@@ -59,14 +66,25 @@
     @cancel="visible = false"
   >
     <j-form ref="branchFormRef" :model="branchFormData" layout="vertical">
-      <j-form-item
-        v-for="(item, index) in branchFormItem"
-        :key="index"
-        :name="item.name"
-        :label="item.label"
-      >
-        <j-input-number v-model:value="item.value" style="width: 100%" />
-      </j-form-item>
+      <template v-for="(item, index) in branchFormItem" :key="index">
+        <j-form-item
+          :name="item.name"
+          :label="item.label"
+          :rules="[
+            {
+              required: true,
+              message: `请输入${item.label}权重`,
+              trigger: 'blur',
+            },
+          ]"
+          required
+        >
+          <j-input-number
+            v-model:value="branchFormData[item.name]"
+            style="width: 100%"
+          />
+        </j-form-item>
+      </template>
     </j-form>
   </j-modal>
 </template>
@@ -101,24 +119,46 @@ const basicFormData = reactive({
 // 分支权重配置
 const visible = ref(false)
 const branchFormRef = ref()
-const branchFormData = reactive({})
+const branchFormData = computed(() => {
+  const result = {}
+  flowStore.selectedNode.branches.forEach((item) => {
+    result[item.id] = 1
+  })
+  return result
+})
 const branchFormItem = computed(() => {
-  return flowStore.selectedNode.branches.map((m) => ({
+  return flowStore.selectedNode.branches.map((m, i) => ({
     name: m.id,
-    label: m.name,
+    label: `分支${i + 1}权重`,
     value: 1,
   }))
 })
-const saveBranchWeight = () => {}
+const saveBranchWeight = () => {
+  console.log('branchFormData: ', branchFormData.value)
+  branchFormRef.value.validate().then((valid) => {
+    console.log('valid: ', valid)
+  })
+}
 
 /**
  * 将数据保存至pinia
  */
 const saveConfigToPinia = () => {
-  const result = findDataById(flowStore.model.nodes, flowStore.selectedNode.id)
-  result.props = { ...result.props, ...basicFormData }
-  console.log('saveConfigToPinia1: ', result)
-  console.log('saveConfigToPinia2: ', flowStore.selectedNode)
+  return new Promise((resolve, reject) => {
+    basicFormRef.value
+      .validate()
+      .then((valid) => {
+        const result = findDataById(
+          flowStore.model.nodes,
+          flowStore.selectedNode.id,
+        )
+        result.props = { ...result.props, ...basicFormData }
+        resolve(valid)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
 }
 defineExpose({
   saveConfigToPinia,

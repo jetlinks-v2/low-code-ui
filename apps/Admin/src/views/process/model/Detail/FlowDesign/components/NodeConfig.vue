@@ -33,7 +33,7 @@ const nodeConfigRef = ref()
  * 保存配置
  */
 const saveConfig = () => {
-  nodeConfigRef.value.saveConfigToPinia()
+  return nodeConfigRef.value.saveConfigToPinia()
 }
 
 defineExpose({
