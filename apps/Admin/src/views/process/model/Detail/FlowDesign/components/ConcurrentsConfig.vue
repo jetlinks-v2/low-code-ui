@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { findDataById } from './utils'
+import { findNodeById, findBranchLastNode } from './utils'
 import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
@@ -106,10 +106,6 @@ const props = defineProps({
 // 基础配置
 const basicFormRef = ref()
 const basicFormData = reactive({
-  //   type: 'parallel',
-  //   complexType: 'weight',
-  //   complexWeight: 1,
-  //   inputNodeWeight: {},
   type: props.node?.props?.type || 'parallel',
   complexType: props.node?.props?.complexType || 'weight',
   complexWeight: props.node?.props?.complexWeight || 1,
@@ -126,9 +122,10 @@ watch(
   () => flowStore.selectedNode.branches,
   (val) => {
     val.forEach((item, index) => {
-      branchFormData.value[item.id] = 1
+      const lastNode = findBranchLastNode(item)
+      branchFormData.value[lastNode.id] = 1
       branchFormItem.value.push({
-        name: item.id,
+        name: lastNode.id,
         label: `分支${index + 1}权重`,
       })
     })
@@ -156,7 +153,7 @@ const saveConfigToPinia = () => {
     basicFormRef.value
       .validate()
       .then((valid) => {
-        const result = findDataById(
+        const result = findNodeById(
           flowStore.model.nodes,
           flowStore.selectedNode.id,
         )
@@ -171,14 +168,6 @@ const saveConfigToPinia = () => {
 defineExpose({
   saveConfigToPinia,
 })
-
-watch(
-  () => props.nodes,
-  (val) => {
-    console.log('props.nodes: ', val)
-  },
-  { deep: true },
-)
 </script>
 
 <style lang="less" scoped></style>

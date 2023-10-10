@@ -1,16 +1,30 @@
-export function findDataById(node, id) {
+/**
+ * 通过节点id查找对应节点
+ * @param node 
+ * @param id 
+ * @returns 
+ */
+export function findNodeById(node, id) {
     if (node.id === id) {
         return node
     } else if (node.branches?.length) {
         let _res = null
         for (let i = 0; i < node.branches.length; i++) {
-            _res = findDataById(node.branches[i], id)
+            _res = findNodeById(node.branches[i], id)
             if (_res) break
         }
         if (_res) return _res
     } else if (node.children) {
-        const _res = findDataById(node.children, id)
+        const _res = findNodeById(node.children, id)
         if (_res) return _res
     }
     return null
+}
+
+/**
+ * 查找分支最后一个节点
+ * @param node 
+ */
+export function findBranchLastNode(node) {
+    return !Object.keys(node.children).length ? node : findBranchLastNode(node.children)
 }

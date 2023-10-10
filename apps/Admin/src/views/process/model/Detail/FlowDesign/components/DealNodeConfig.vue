@@ -48,7 +48,7 @@
 
 <script setup lang="ts">
 import ConfigureForm from './ConfigureForm.vue'
-import { findDataById } from './utils'
+import { findNodeById } from './utils'
 import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
@@ -99,7 +99,7 @@ const saveConfigToPinia = () => {
         memberFormRef.value
           ?.validate()
           .then((valid2) => {
-            const result = findDataById(
+            const result = findNodeById(
               flowStore.model.nodes,
               flowStore.selectedNode.id,
             )
