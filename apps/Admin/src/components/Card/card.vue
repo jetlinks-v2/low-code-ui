@@ -58,6 +58,8 @@
             v-bind:="handleFunction(item.permissionProps)"
             :danger="item.key === 'delete'"
             style="width: 100%"
+            :data-id="item.key"
+            :class="extractCssClass(item.style)"
           >
             <template #icon v-if="item.icon || item.key === 'delete'">
               <img
@@ -87,6 +89,7 @@ import {isFunction, isObject, debounce, cloneDeep} from "lodash-es";
 import Active from './active.vue'
 import OtherActions from './otherActions.vue'
 import { hexToRgb } from '@jetlinks/utils'
+import { extractCssClass, insertCustomCssToHead } from '../FormDesigner/utils/utils';
 
 const props = defineProps({
   ...BadgeProps(),
@@ -190,6 +193,12 @@ const onResize = debounce((e) => {
   max.value = e.width
   widthCount.value = 100 * len + deleteWidth.value
 }, 100)
+
+watchEffect(() => {
+  props.actions?.forEach((item) => {
+    insertCustomCssToHead(item.style, item.key, 'dataid')
+  })
+})
 
 </script>
 
