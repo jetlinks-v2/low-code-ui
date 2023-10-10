@@ -28,3 +28,25 @@ export function findNodeById(node, id) {
 export function findBranchLastNode(node) {
     return !Object.keys(node.children).length ? node : findBranchLastNode(node.children)
 }
+
+/**
+ * 将数组处理为特殊字符串, 如: [node1, node2] => '[node1]&[node2]'
+ * @param arr 
+ * @returns 
+ */
+export function handleArrToStr(arr: string[] = []) {
+    let str = ``
+    arr.forEach(item => {
+        str += `[${item}]&`
+    })
+    return str.slice(0, -1)
+}
+
+/**
+ * 将特殊字符串处理为数组, 如: '[node1]&[node2]' => [node1, node2]
+ * @param str 
+ * @returns 
+ */
+export function handleStrToArr(str: string = '') {
+    return str.replace(/\[/g, '').replace(/\]/g, '').split('&')
+}
