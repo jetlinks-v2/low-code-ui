@@ -28,7 +28,7 @@ const props = defineProps({
 const emit = defineEmits(['valueChange', 'stateChange'])
 
 const formData = ref<ISchema>(initData) // 表单数据
-const formState = reactive<any>(getFieldData(formData.value) || {})
+const formState = reactive<any>({})
 const formRef = ref<any>()
 
 watch(
@@ -45,6 +45,8 @@ watch(
 watch(
   () => props.value,
   () => {
+    console.log(getFieldData(formData.value))
+    console.log(props.value)
     Object.assign(formState, props.value)
   },
   {
