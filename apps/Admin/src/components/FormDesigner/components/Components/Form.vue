@@ -40,7 +40,6 @@ const emit = defineEmits(['update:value'])
 const myValue = ref(props.value)
 
 const config = computed(() => {
-  console.log(props.source)
   return JSON.parse(props.source?.code || '{}')
 })
 

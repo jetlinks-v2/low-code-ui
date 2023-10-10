@@ -83,7 +83,7 @@ export default defineComponent({
 
         const onAddIndex = () => {
             const _index = unref(list).findIndex(item => {
-                return map(item.children, 'type').includes('table-item-index')
+                return item.children?.[0]?.type === 'table-item-index'
             })
             if (_index === -1) {
                 const _item = generatorData({
@@ -108,7 +108,7 @@ export default defineComponent({
 
         const onAddAction = () => {
             const _index = unref(list).findIndex(item => {
-                return map(item.children, 'type').includes('table-item-actions')
+                return item.children?.[0]?.type === 'table-item-actions'
             })
             if (_index === -1) {
                 const _item = generatorData({
@@ -137,10 +137,9 @@ export default defineComponent({
             const _props = useProps(__data, unref(designer.formData), unref(designer.mode))
             const options = ref<any[]>(_props.componentProps.options)
             const treeData = ref<any[]>(_props.componentProps.treeData)
-
-            if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(__data.type)) {
+            if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(__data?.type)) {
                 queryOptions(__data.componentProps.source, product.info?.id).then(resp => {
-                    if (['select', 'select-card'].includes(__data.type)) {
+                    if (['select', 'select-card'].includes(__data?.type)) {
                         options.value = resp
                     } else {
                         treeData.value = resp
@@ -152,17 +151,15 @@ export default defineComponent({
                 {
                     __data?.type === 'switch' ?
                         <TypeComponent
-                            data={__data}
                             {..._props?.componentProps}
                             checked={get(designer.formState, _path1)}
-                            onUpdate: checked={(newValue) => set(designer.formState, _path1, newValue)}
+                            onUpdate:checked={(newValue) => set(designer.formState, _path1, newValue)}
                         /> : <TypeComponent
-                            data={__data}
                             {..._props?.componentProps}
                             options={unref(options)}
                             treeData={unref(treeData)}
                             value={get(designer.formState, _path1)}
-                            onUpdate: value={(newValue) => set(designer.formState, _path1, newValue)}
+                            onUpdate:value={(newValue) => set(designer.formState, _path1, newValue)}
                         />
                 }
             </FormItem>
@@ -235,11 +232,11 @@ export default defineComponent({
                                     <div class="draggable-add-btn" style={{ width: '200px' }}>
                                         <span onClick={withModifiers(handleAdd, ['stop'])}>添加列</span>
                                         {
-                                            !unref(list).find(item => map(item.children, 'type').includes('table-item-index')) &&
+                                            !unref(list).find(item => item.children?.[0]?.type === 'table-item-index') &&
                                             <span onClick={withModifiers(onAddIndex, ['stop'])} style={{ marginLeft: '10px' }}>添加索引</span>
                                         }
                                         {
-                                            !unref(list).find(item => map(item.children, 'type').includes('table-item-actions')) &&
+                                            !unref(list).find(item => item.children?.[0]?.type === 'table-item-actions') &&
                                             <span onClick={withModifiers(onAddAction, ['stop'])} style={{ marginLeft: '10px' }}>添加操作</span>
                                         }
                                     </div>
