@@ -169,6 +169,7 @@ const DraggableLayout = defineComponent({
                                 if (unref(isEditModel)) {
                                     return <TypeComponent
                                         model={unref(designer.model)}
+                                        // data={element}
                                         {...omit(_props.componentProps, ['disabled'])}
                                     ></TypeComponent>
                                 } else if (['switch'].includes(element.type)) {

@@ -124,10 +124,18 @@ watch(
     if (val > props.stepList.length || val == 0) {
       return
     }
-    info.value.style.left = position(
+    if(props.stepList[val - 1]?.placement == 'left') {
+      info.value.style.left = null;
+      info.value.style.right = position(
       props.stepList[val - 1].target?.()[0]?.el,
       props.stepList[val - 1]?.placement,
     )[1]
+    } else {
+      info.value.style.left = position(
+        props.stepList[val - 1].target?.()[0]?.el,
+        props.stepList[val - 1]?.placement,
+      )[1]
+    }
     info.value.style.top = position(
       props.stepList[val - 1].target?.()[0]?.el,
       props.stepList[val - 1]?.placement,
@@ -161,11 +169,9 @@ function position(el: HTMLElement, position?: string) {
   switch (position) {
     case 'top':
       result = [
-        el.getBoundingClientRect().top -
-          el.offsetHeight -
-          maskRef.value?.getBoundingClientRect().top - 80 +
+        180 +
           'px',
-        el.getBoundingClientRect().left - 180 + 'px',
+        234 + 'px',
       ]
       break
     case 'right':
@@ -182,16 +188,15 @@ function position(el: HTMLElement, position?: string) {
           el.offsetHeight -
           maskRef.value?.getBoundingClientRect().top + 10 +
           'px',
-        el.getBoundingClientRect().left + 'px',
+          282 + 'px',
       ]
       break
     case 'left':
-      console.log(el.getBoundingClientRect().left - el.offsetWidth - info.value?.offsetWidth - 867 + 'px');
       result = [
         el.getBoundingClientRect().top -
           maskRef.value?.getBoundingClientRect().top +
           'px',
-        el.getBoundingClientRect().left - el.offsetWidth - info.value?.offsetWidth - 300 + 'px',
+        40 + 'px',
       ]
       break
     // (<HTMLElement>info.value).style.left = props.steps[val - 1].target()[0]?.el.getBoundingClientRect()?.left + 'px';
