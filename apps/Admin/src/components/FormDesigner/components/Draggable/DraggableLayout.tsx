@@ -169,7 +169,6 @@ const DraggableLayout = defineComponent({
                                 if (unref(isEditModel)) {
                                     return <TypeComponent
                                         model={unref(designer.model)}
-                                        // data={element}
                                         {...omit(_props.componentProps, ['disabled'])}
                                     ></TypeComponent>
                                 } else if (['switch'].includes(element.type)) {
@@ -182,9 +181,18 @@ const DraggableLayout = defineComponent({
                                         }}
                                         onChange={onChange}
                                     ></TypeComponent>
+                                } if (['form'].includes(element.type)) {
+                                    return <TypeComponent
+                                        {..._props.componentProps}
+                                        mode={unref(designer.mode)}
+                                        value={get(designer.formState, _path)}
+                                        onUpdate:value={(newValue) => {
+                                            set(designer.formState, _path, newValue || false)
+                                        }}
+                                        onChange={onChange}
+                                    ></TypeComponent>
                                 } else {
                                     return <TypeComponent
-                                        // data={element}
                                         {..._props.componentProps}
                                         value={get(designer.formState, _path)}
                                         onUpdate:value={(newValue) => {
