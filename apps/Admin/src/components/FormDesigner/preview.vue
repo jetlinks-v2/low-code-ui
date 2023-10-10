@@ -28,7 +28,7 @@ const props = defineProps({
 const emit = defineEmits(['valueChange', 'stateChange'])
 
 const formData = ref<ISchema>(initData) // 表单数据
-const formState = reactive<any>(getFieldData(formData.value))
+const formState = reactive<any>(getFieldData(formData.value) || {})
 const formRef = ref<any>()
 
 watch(
@@ -66,7 +66,8 @@ const onSave = () => {
     formRef.value
       .validate()
       .then((_data: any) => {
-        resolve({ ...unref(formState), ..._data })
+        const obj = { ...unref(formState), ..._data }
+        resolve(obj)
       })
       .catch((err: any) => {
         inject(err)
