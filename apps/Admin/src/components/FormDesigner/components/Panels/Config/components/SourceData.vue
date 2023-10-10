@@ -88,7 +88,7 @@
             <j-select
               v-model:value="data.commandId"
               placeholder="请选择"
-              :options="commandList"
+              :options="commandOptions"
               allowClear
               showSearch
               @change="onCommandChange"
@@ -299,6 +299,15 @@ const commandList = computed(() => {
         }
       }) || []
   )
+})
+
+const commandOptions = computed(() => {
+  return commandList.value.map((i) => {
+    return {
+      label: i.name,
+      value: i.id,
+    }
+  })
 })
 
 const getArray = (arr: any[]) => {

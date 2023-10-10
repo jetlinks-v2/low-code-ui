@@ -17,6 +17,7 @@ import { onEnd } from './ControlInsertionPlugin';
 import { useProps } from '../../hooks';
 import './index.less'
 import { request } from '@jetlinks/core';
+import dayjs from "dayjs";
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -80,7 +81,7 @@ const DraggableLayout = defineComponent({
                             }
                             return (
                                 <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                                    <TypeComponent data={element} {...element.componentProps} />
+                                    <TypeComponent {...element.componentProps} />
                                 </Selection>
                             )
                         }
@@ -169,7 +170,6 @@ const DraggableLayout = defineComponent({
                                 if (unref(isEditModel)) {
                                     return <TypeComponent
                                         model={unref(designer.model)}
-                                        // data={element}
                                         {...omit(_props.componentProps, ['disabled'])}
                                     ></TypeComponent>
                                 } else if (['switch'].includes(element.type)) {
@@ -193,9 +193,15 @@ const DraggableLayout = defineComponent({
                                         onChange={onChange}
                                     ></TypeComponent>
                                 } else {
+                                    let __value = get(designer.formState, _path)
+                                    if(['date-picker', 'time-picker'].includes(element.type)){
+                                        if(typeof __value){
+                                            __value = dayjs(__value).format('YYYY-MM-DD HH:mm:ss')
+                                        }
+                                    }
                                     return <TypeComponent
                                         {..._props.componentProps}
-                                        value={get(designer.formState, _path)}
+                                        value={__value}
                                         onUpdate:value={(newValue) => {
                                             set(designer.formState, _path, newValue)
                                         }}
