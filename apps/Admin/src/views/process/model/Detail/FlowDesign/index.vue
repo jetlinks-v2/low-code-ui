@@ -46,7 +46,7 @@ const handleSubmit = () => {
   nodeConfigRef.value
     .saveConfig()
     .then((valid) => {
-      console.log('valid: ', valid)
+      console.log('handleSubmit valid: ', valid)
       showConfig.value = false
     })
     .catch((err) => {

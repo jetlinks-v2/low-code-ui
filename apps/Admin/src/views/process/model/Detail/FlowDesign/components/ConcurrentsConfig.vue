@@ -119,24 +119,32 @@ const basicFormData = reactive({
 // 分支权重配置
 const visible = ref(false)
 const branchFormRef = ref()
-const branchFormData = computed(() => {
-  const result = {}
-  flowStore.selectedNode.branches.forEach((item) => {
-    result[item.id] = 1
-  })
-  return result
-})
-const branchFormItem = computed(() => {
-  return flowStore.selectedNode.branches.map((m, i) => ({
-    name: m.id,
-    label: `分支${i + 1}权重`,
-    value: 1,
-  }))
-})
+const branchFormData = ref({})
+const branchFormItem = ref([])
+
+watch(
+  () => flowStore.selectedNode.branches,
+  (val) => {
+    val.forEach((item, index) => {
+      branchFormData.value[item.id] = 1
+      branchFormItem.value.push({
+        name: item.id,
+        label: `分支${index + 1}权重`,
+      })
+    })
+  },
+  { deep: true, immediate: true },
+)
+
+/**
+ * 保存分支权重配置
+ */
 const saveBranchWeight = () => {
-  console.log('branchFormData: ', branchFormData.value)
   branchFormRef.value.validate().then((valid) => {
-    console.log('valid: ', valid)
+    Object.keys(valid).forEach((key: string) => {
+      basicFormData.inputNodeWeight[key] = valid[key]
+    })
+    visible.value = false
   })
 }
 
