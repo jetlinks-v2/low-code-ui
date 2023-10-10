@@ -4,7 +4,6 @@
     
 <script lang="ts" setup>
 import { useTarget } from '../../../../hooks'
-import { omit } from 'lodash-es'
 import SourceData from './SourceData.vue'
 
 const emits = defineEmits(['refresh'])

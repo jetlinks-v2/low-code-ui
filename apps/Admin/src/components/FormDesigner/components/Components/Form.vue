@@ -6,7 +6,6 @@
       :data="config"
       @stateChange="onValueChange"
     />
-    <!-- @valueChange="valueChange" -->
   </div>
 </template>
 <script lang="ts" setup>
@@ -22,14 +21,18 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  data: {
+  // disabled: {
+  //   type: Boolean,
+  //   default: false,
+  // },
+  // data: {
+  //   type: Object,
+  //   default: () => ({}),
+  // },
+  source: {
     type: Object,
     default: () => ({}),
-  },
+  }
 })
 
 const emit = defineEmits(['update:value'])
@@ -37,7 +40,7 @@ const emit = defineEmits(['update:value'])
 const myValue = ref(props.value)
 
 const config = computed(() => {
-  return JSON.parse(props.data.componentProps?.source?.code || '{}')
+  return JSON.parse(props.source?.code || '{}')
 })
 
 const onValueChange = (e) => {

@@ -19,7 +19,7 @@
       <p>将图片拖动到此处，或点击上传</p>
     </div>
 
-    <template #itemRender="{ file, actions }">
+    <template #itemRender="{ file }">
       <div class="render">
         <a-image :src="file.url">
           <template #previewMask>
@@ -27,7 +27,7 @@
             <AIcon
               type="DeleteOutlined"
               style="margin-left: 10px"
-              @click="actions.remove()"
+              @click="onDelete(file)"
             />
           </template>
         </a-image>
@@ -168,6 +168,14 @@ const onBlur = () => {
   dbId.value = ''
   dbRef.value = false
   // console.log(fileList.value)
+}
+
+const onDelete = (file: any) => {
+  const _index = fileList.value.findIndex(item => item.uid === file?.uid)
+  if(_index !== -1){
+    fileList.value.splice(_index, 1)
+    emits('change', fileList.value)
+  }
 }
 
 watch(

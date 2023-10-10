@@ -124,8 +124,8 @@ const Canvas = defineComponent({
             height: '100%',
             width: unref(_width)
           }}
-          data={unref(designer.formData)?.children}
-          parent={unref(designer.formData)}
+          data={designer.formData.value?.children || []}
+          parent={designer.formData.value}
           isRoot
         ></DraggableLayout>
       )
@@ -134,12 +134,12 @@ const Canvas = defineComponent({
         <Form
           ref={designer.formRef}
           model={designer.formState}
-          {...omit(unref(designer.formData)?.componentProps, ['size', 'cssCode', 'eventCode'])}
+          {...omit(designer.formData.value?.componentProps, ['size', 'cssCode', 'eventCode'])}
           onClick={unref(isEditModel) && handleClick}
           class={[...unref(cssClassList)]}
           onValidate={(name, status, errorMsgs) => {
-            if (unref(designer.formData)?.componentProps?.eventCode) {
-              let customFn = new Function('e', unref(designer.formData)?.componentProps?.eventCode)
+            if (designer.formData.value?.componentProps?.eventCode) {
+              let customFn = new Function('e', designer.formData.value?.componentProps?.eventCode)
               customFn.call({ getWidgetRef: getWidgetRef }, name, status, errorMsgs)
             }
           }}

@@ -28,13 +28,14 @@ const props = defineProps({
 const emit = defineEmits(['valueChange', 'stateChange'])
 
 const formData = ref<ISchema>(initData) // 表单数据
-const formState = reactive<any>(getFieldData(formData.value))
+const formState = reactive({})
 const formRef = ref<any>()
 
 watch(
   () => props.data,
   (newVal) => {
     formData.value = (newVal || initData) as ISchema
+    Object.assign(formState, getFieldData(formData.value) || {})
   },
   {
     deep: true,
