@@ -46,7 +46,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   sandBox.removeEventListener('load', () => {
-    updatePreview
+    updatePreview()
   })
 })
 
@@ -102,6 +102,7 @@ function updatePreview() {
         modules.length > 1 ? `s` : ``
       }.`,
     )
+
     const codeToEval = [
       `window.__modules__ = {};window.__css__ = [];` +
         `if (window.__app__) window.__app__.unmount();` +
@@ -117,6 +118,7 @@ function updatePreview() {
         import { createApp as _createApp } from "vue"
         const _mount = () => {
           const AppComponent = __modules__["${mainFile}"].default
+          if (!AppComponent) return
           AppComponent.name = 'Repl'
           const app = window.__app__ = _createApp(AppComponent)
           if (!app.config.hasOwnProperty('unwrapInjectedRef')) {

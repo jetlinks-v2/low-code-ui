@@ -21,7 +21,7 @@
     />
     <CustomHtml
       :code="data || null"
-      v-else-if="props.resource.callPage.type === providerEnum.HtmlPage"
+      v-else-if="props.resource.callPage.type === providerEnum.HtmlPage && data"
     />
   </j-modal>
 </template>
