@@ -157,8 +157,8 @@ export const useProduct = defineStore('product', () => {
     const arr= cloneDeep(data)
     return arr.map(item => {
       if (item.id === record.id) {
-        return { 
-          ...item, 
+        return {
+          ...item,
           ...record,
           others:{
             ...item.others,
@@ -231,7 +231,7 @@ export const useProduct = defineStore('product', () => {
       others: modules ? modules[0]?.others : {}
     }
     published.value = extra.state?.value === 'published'
-  
+
   }
 
   const add = (record: any, parentId: string,open?:any) => {
@@ -244,7 +244,7 @@ export const useProduct = defineStore('product', () => {
     })
   }
 
-  const update = (record: any) => {
+  const update = async (record: any, cb?: Function) => {
     // console.log('item---',record)
     dataMap.set(record.id, omit(record, ['children']))
     data.value = updateProduct(data.value, record)
@@ -252,6 +252,7 @@ export const useProduct = defineStore('product', () => {
     engine.updateFile(record, 'edit')
     updateProductReq(data.value, (result) => {
       handleProjectData(result)
+      cb?.()
     })
   }
 
@@ -276,7 +277,7 @@ export const useProduct = defineStore('product', () => {
     findParent(data.value,record,arr)
     return arr;
   }
-  
+
   //通过名称搜索
   const filterTree = (name) =>{
     data.value = name ? filterTreeNodes(JSON.parse(dataCache), name, 'title') : JSON.parse(dataCache)

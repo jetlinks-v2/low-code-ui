@@ -41,6 +41,10 @@ const props = defineProps({
   tree: {
     type: Array,
     default: () => []
+  },
+  theme: {
+    type: String,
+    default: ''
   }
 })
 
@@ -85,6 +89,24 @@ const releaseDraftFn = (id) => {
   })
 }
 
+const themeChange = () =>{
+  const item = product.getById(product.info.id)
+
+  item.others = {
+    ...(item.others || {}),
+    theme: props.theme
+  }
+
+  product.update(item, () => {
+    const { id } = route.params
+
+    if (id) {
+      status.value = 'loading'
+      releaseDraftFn(id)
+    }
+  })
+}
+
 /**
  * 更新crud中发的列
  */
@@ -125,12 +147,7 @@ const saveMenuFn = (id) => {
 }
 
 const releaseStart = async () => {
-  const { id } = route.params
-
-  if (id) {
-    status.value = 'loading'
-    releaseDraftFn(id)
-  }
+  themeChange()
 }
 
 const restart = () => {
