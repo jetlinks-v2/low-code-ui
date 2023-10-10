@@ -8,6 +8,7 @@ import { initStoreBus } from '@/store'
 import globalComponents from '@jetlinks/components'
 import components from './components'
 import JComponents from 'jetlinks-ui-components'
+import 'jetlinks-ui-components/es/style.js'
 import 'ant-design-vue/dist/antd.variable.min.css'
 import './style.css'
 
