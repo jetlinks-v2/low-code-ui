@@ -196,6 +196,7 @@ const DraggableLayout = defineComponent({
                                     ></TypeComponent>
                                 } else {
                                     let __value = get(designer.formState, _path)
+                                    // 时间组件处理
                                     if(['date-picker', 'time-picker'].includes(element.type)){
                                         if(typeof __value === 'number'){
                                             __value = dayjs(__value).format(_props.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')

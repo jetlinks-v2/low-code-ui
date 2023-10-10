@@ -487,6 +487,7 @@ const onMultipleChange = (e) => {
 const onDateChange = (e) => {
   target.value.componentProps.format = e
   target.value.componentProps.valueFormat = e
+  target.value.componentProps.showTime = !(e === 'YYYY-MM-DD')
   emits('refresh', target.value)
 }
 
