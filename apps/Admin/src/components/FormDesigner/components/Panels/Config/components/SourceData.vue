@@ -11,14 +11,22 @@
         },
       ]"
     >
-      <j-radio-group
+      <!-- <j-radio-group
         v-model:value="data.type"
         button-style="solid"
         @change="onRadioChange"
       >
         <j-radio-button :value="'dic'">数据字典</j-radio-button>
         <j-radio-button :value="'end'">后端接口</j-radio-button>
-      </j-radio-group>
+      </j-radio-group> -->
+      <CheckButton
+        :options="[
+          { label: '数据字典', value: 'dic' },
+          { label: '后端接口', value: 'end' },
+        ]"
+        @change="onRadioChange"
+        v-model:value="data.type"
+      />
     </j-form-item>
     <j-form-item
       :validateFirst="true"
@@ -32,7 +40,12 @@
         showSearch
         @change="onDataChange"
       >
-        <j-select-option :label="item.name" v-for="item in dic" :key="item.id" :value="item.id">
+        <j-select-option
+          :label="item.name"
+          v-for="item in dic"
+          :key="item.id"
+          :value="item.id"
+        >
           {{ item.name }}
         </j-select-option>
       </j-select>
@@ -89,12 +102,6 @@
         :validateFirst="true"
         v-if="isSource"
         :name="['componentProps', 'source', 'source']"
-        :rules="[
-          {
-            message: '请选择',
-            required: true,
-          },
-        ]"
       >
         <template #label>
           数据层级<j-tooltip title="选择树结构的数据在接口的哪一层">
@@ -170,8 +177,7 @@
 import { ref, watch, computed, reactive, inject } from 'vue'
 import { queryDictionary, queryEndCommands } from '@/api/form'
 import { useProduct } from '@/store'
-import { omit } from 'lodash-es'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, omit } from 'lodash-es'
 
 const product = useProduct()
 const designer: any = inject('FormDesigner')
@@ -179,29 +185,32 @@ const designer: any = inject('FormDesigner')
 const props = defineProps({
   value: {
     type: Object,
-    default: () => {},
+    default: () => {
+      return {
+        dictionary: undefined,
+        type: 'dic',
+      }
+    },
   },
 })
 
 const emits = defineEmits(['change'])
 
-const data = reactive<any>({
-  dictionary: undefined,
-  type: 'dic',
-  // type: 'end',
-  // label: undefined,
-  // name: undefined,
-  // functionId: undefined,
-  // commandId: undefined,
-  // source: undefined,
-  // dictionary: undefined,
-  // value: undefined,
-})
+const data = reactive<any>({})
 
 watch(
   () => props.value,
   (newValue) => {
-    Object.assign(data, newValue)
+    const obj = newValue || {
+      dictionary: undefined,
+      type: 'dic',
+    }
+    if (data.type === 'dic') {
+      data.dictionary = obj.dictionary
+      data.type = 'dic'
+    } else {
+      Object.assign(data, cloneDeep(obj))
+    }
   },
   {
     deep: true,
@@ -249,7 +258,7 @@ const getEnd = () => {
 }
 
 const onRadioChange = (e) => {
-  if (e.target?.value === 'end') {
+  if (e === 'end') {
     emits('change', {
       type: 'end',
       label: undefined,
@@ -366,7 +375,7 @@ const onFunChange = (val: string) => {
     source: undefined,
     label: undefined,
     value: undefined,
-    isSource: isSource.value
+    isSource: isSource.value,
   }
   emits('change', obj)
 }

@@ -57,6 +57,7 @@ const handleProps = (node: any) => {
         case 'select':
             result.options = generateOptions(3)
             result.mode = undefined
+            result.showSearch = false
             break
         case 'tree-select':
             result.treeData = [

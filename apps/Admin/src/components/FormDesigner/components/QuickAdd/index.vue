@@ -402,6 +402,10 @@ const handleSource = (arr: any[], list: any[]) => {
 const onSaveData = (_data: any) => {
   const obj = {
     ...props.data,
+    configuration: {
+      type: 'form',
+      code: JSON.stringify(unref(designer.formData)),
+    },
     others: {
       ...props.data.others,
       quickData: _data,

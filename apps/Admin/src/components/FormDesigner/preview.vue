@@ -6,9 +6,9 @@
   
 <script lang="ts" setup>
 import Canvas from './components/Panels/Canvas/index'
-import { provide, ref, reactive, PropType, watch } from 'vue'
+import { provide, ref, reactive, PropType, watch, unref } from 'vue'
 import { ISchema } from './typings'
-import { initData } from './utils/utils'
+import { getFieldData, initData } from './utils/utils'
 
 const props = defineProps({
   value: {
@@ -25,10 +25,10 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['valueChange'])
+const emit = defineEmits(['valueChange', 'stateChange'])
 
-const formData = ref<ISchema>() // 表单数据
-const formState = reactive<any>({})
+const formData = ref<ISchema>(initData) // 表单数据
+const formState = reactive<any>(getFieldData(formData.value))
 const formRef = ref<any>()
 
 watch(
@@ -66,7 +66,7 @@ const onSave = () => {
     formRef.value
       .validate()
       .then((_data: any) => {
-        resolve(_data)
+        resolve({ ...unref(formState), ..._data })
       })
       .catch((err: any) => {
         inject(err)
@@ -78,6 +78,16 @@ watch(
   () => JSON.stringify(formData.value),
   () => {
     emit('valueChange', formData.value)
+  },
+)
+
+watch(
+  () => formState,
+  (newVal) => {
+    emit('stateChange', newVal)
+  },
+  {
+    deep: true,
   },
 )
 

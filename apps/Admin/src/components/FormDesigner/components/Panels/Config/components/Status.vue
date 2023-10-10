@@ -1,10 +1,30 @@
 <template>
   <div>
-    <j-form-item :validateFirst="true" v-if="type !== 'geo'" label="css样式" :name="['componentProps', 'cssCode']">
-      <EditorBtn @change="onDataChange" v-model:value="target.componentProps.cssCode" text="编写css" language="css" />
+    <j-form-item
+      :validateFirst="true"
+      v-if="type !== 'geo'"
+      label="css样式"
+      :name="['componentProps', 'cssCode']"
+    >
+      <EditorBtn
+        @change="onDataChange"
+        v-model:value="target.componentProps.cssCode"
+        text="编写css"
+        language="css"
+      />
     </j-form-item>
-    <j-form-item :validateFirst="true" v-if="type !== 'geo'" label="JS代码" :name="['componentProps', 'eventCode']">
-      <EditorBtn @change="onDataChange" v-model:value="target.componentProps.eventCode" text="编写代码" language="javascript" />
+    <j-form-item
+      :validateFirst="true"
+      v-if="type !== 'geo'"
+      label="JS代码"
+      :name="['componentProps', 'eventCode']"
+    >
+      <EditorBtn
+        @change="onDataChange"
+        v-model:value="target.componentProps.eventCode"
+        text="编写代码"
+        language="javascript"
+      />
     </j-form-item>
     <j-form-item
       label="新增状态是否展示"
@@ -18,10 +38,18 @@
       ]"
       v-if="type !== 'root' && isShow"
     >
-      <j-radio-group @change="onDataChange" v-model:value="target.componentProps.visible" button-style="solid">
+      <!-- <j-radio-group @change="onDataChange" v-model:value="target.componentProps.visible" button-style="solid">
         <j-radio-button :value="true">展示</j-radio-button>
         <j-radio-button :value="false">隐藏</j-radio-button>
-      </j-radio-group>
+      </j-radio-group> -->
+      <CheckButton
+        :options="[
+          { label: '展示', value: true },
+          { label: '隐藏', value: false },
+        ]"
+        @change="onDataChange"
+        v-model:value="target.componentProps.visible"
+      />
     </j-form-item>
     <j-form-item
       label="编辑状态是否支持修改"
@@ -35,10 +63,22 @@
         },
       ]"
     >
-      <j-radio-group @change="onDataChange" v-model:value="target.componentProps.editable" button-style="solid">
+      <!-- <j-radio-group
+        @change="onDataChange"
+        v-model:value="target.componentProps.editable"
+        button-style="solid"
+      >
         <j-radio-button :value="true">支持</j-radio-button>
         <j-radio-button :value="false">不支持</j-radio-button>
-      </j-radio-group>
+      </j-radio-group> -->
+      <CheckButton
+        :options="[
+          { label: '支持', value: true },
+          { label: '不支持', value: false },
+        ]"
+        @change="onDataChange"
+        v-model:value="target.componentProps.editable"
+      />
     </j-form-item>
   </div>
 </template>
@@ -46,7 +86,7 @@
 import EditorBtn from './EditorBtn.vue'
 import { computed, inject, unref } from 'vue'
 import { useTarget } from '../../../../hooks'
-import { findParentById } from '@/components/FormDesigner/utils/utils';
+import { findParentById } from '@/components/FormDesigner/utils/utils'
 
 const designer: any = inject('FormDesigner')
 const { target } = useTarget()

@@ -270,6 +270,10 @@ enum filterType {
 }
 
 const handleSubmit = () => {
+  if(form.async) {
+    emits('update:open', false)
+    return
+  }
   if(form.data.function && form.data.command && form.data.dataSource.length) {
     form.async = true;
   }

@@ -57,14 +57,14 @@
         label="类型"
         :name="['componentProps', 'mode']"
       >
-        <j-radio-group
-          v-model:value="target.componentProps.mode"
-          button-style="solid"
+        <CheckButton
+          :options="[
+            { label: '单选项', value: undefined },
+            { label: '多选项', value: 'multiple' },
+          ]"
           @change="onDataChange"
-        >
-          <j-radio-button :value="undefined">单选项</j-radio-button>
-          <j-radio-button :value="'multiple'">多选项</j-radio-button>
-        </j-radio-group>
+          v-model:value="target.componentProps.mode"
+        />
       </j-form-item>
     </template>
     <template v-if="['upload'].includes(type)">
@@ -79,14 +79,14 @@
           },
         ]"
       >
-        <j-radio-group
-          v-model:value="target.componentProps.listType"
+        <CheckButton
+          :options="[
+            { label: '文件', value: 'text' },
+            { label: '图片', value: 'picture' },
+          ]"
           @change="onChange"
-          button-style="solid"
-        >
-          <j-radio-button :value="'text'">文件</j-radio-button>
-          <j-radio-button :value="'picture'">图片</j-radio-button>
-        </j-radio-group>
+          v-model:value="target.componentProps.listType"
+        />
       </j-form-item>
       <j-form-item
         label="上传个数"
@@ -151,14 +151,14 @@
         label="类型"
         :name="['componentProps', 'multiple']"
       >
-        <j-radio-group
-          v-model:value="target.componentProps.multiple"
-          button-style="solid"
+        <CheckButton
+          :options="[
+            { label: '单选项', value: false },
+            { label: '多选项', value: true },
+          ]"
           @change="onMultipleChange"
-        >
-          <j-radio-button :value="false">单选项</j-radio-button>
-          <j-radio-button :value="true">多选项</j-radio-button>
-        </j-radio-group>
+          v-model:value="target.componentProps.multiple"
+        />
       </j-form-item>
       <template v-if="['tree-select'].includes(type)">
         <j-form-item
@@ -282,7 +282,9 @@
           v-model:value="target.componentProps.format"
         >
           <j-select-option value="YYYY-MM-DD">年-月-日</j-select-option>
-          <j-select-option value="YYYY-MM-DD HH:mm:ss">时-分-秒</j-select-option>
+          <j-select-option value="YYYY-MM-DD HH:mm:ss"
+            >时-分-秒</j-select-option
+          >
         </j-select>
       </j-form-item>
     </template>
@@ -300,7 +302,7 @@
           'select',
           'date-picker',
           'time-picker',
-          'table',
+          // 'table',
           'org',
           'role',
           'user',
@@ -322,14 +324,22 @@
           },
         ]"
       >
-        <j-radio-group
+        <!-- <j-radio-group
           v-model:value="target.formItemProps.required"
           button-style="solid"
           @change="onDataChange"
         >
           <j-radio-button :value="true">必填</j-radio-button>
           <j-radio-button :value="false">非必填</j-radio-button>
-        </j-radio-group>
+        </j-radio-group> -->
+        <CheckButton
+          :options="[
+            { label: '必填', value: true },
+            { label: '非必填', value: false },
+          ]"
+          @change="onDataChange"
+          v-model:value="target.formItemProps.required"
+        />
       </j-form-item>
     </template>
     <template
@@ -465,7 +475,7 @@ const onDataChange = () => {
 }
 
 const onMultipleChange = (e) => {
-  if (e.target.value) {
+  if (e) {
     target.value.componentProps.treeCheckable = true
   } else {
     target.value.componentProps.treeCheckable = false

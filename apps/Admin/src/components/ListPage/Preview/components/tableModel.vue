@@ -8,12 +8,13 @@
       :model="model"
       :params="params"
       v-model:modelValue="tableForm"
-      :scroll="{ x: `calc(${dataColumns.length * 150})` }"
+      :scroll="{ x: '100%' }"
       :defaultParams="defaultParams"
       :rowSelection="
         isCheck
           ? {
               selectedRowKeys: _selectedRowKeys,
+              onSelectNone,
               onSelect,
               onSelectAll
             }
@@ -102,7 +103,8 @@
           }}</span>
         </j-ellipsis>
         <div v-if="item?.key === 'action'">
-          <j-space size="large">
+          <OtherActions :actions="tableActions" :record="slotProps"></OtherActions>
+          <!-- <j-space size="large">
             <PermissionButton
               v-for="item in tableActions"
               :key="item.key"
@@ -126,12 +128,12 @@
                 <AIcon v-else :type="item?.icon" />
               </template>
             </PermissionButton>
-          </j-space>
+          </j-space> -->
         </div>
       </template>
       <template #card="slotProps">
         <Card
-          :status="slotProps[props?.cardConfig?.emphasisField]"
+          :status="slotProps[props?.cardConfig?.emphasisField]?.value || slotProps[props?.cardConfig?.emphasisField]"
           :actions="tableActions"
           :record="slotProps"
           :active="_selectedRowKeys.includes(slotProps.id)"
@@ -453,6 +455,7 @@ import Card from '@/components/Card'
 import HeaderButton from '@/components/ListPage/Preview/components/HederActions.vue'
 import { isFunction, isObject } from 'lodash-es'
 import Image from '@/components/Image/index.vue'
+import OtherActions from './OtherActions.vue'
 import { PropType } from 'vue'
 import {
   extractCssClass,
@@ -551,13 +554,12 @@ const isCheck = computed(() => {
 const _selectedRowKeys = ref<string[]>([])
 
 const defaultParams = reactive({
-  sorts: [{ name: 'createTime', order: 'desc' }],
+  sorts: [{ name: 'createTime', order: 'desc' }, { name: 'id', order: 'desc' }],
 })
 
-// const onSelectChange = (keys: string[]) => {
-//   console.log(keys);
-//   _selectedRowKeys.value = [...keys]
-// }
+const onSelectNone = () => {
+  _selectedRowKeys.value = []
+}
 
 const onSelect = (record, selected) => {
   if (selected) {
@@ -565,7 +567,6 @@ const onSelect = (record, selected) => {
   } else {
     _selectedRowKeys.value = _selectedRowKeys.value.filter(el => el != record.id).map(el => el)
   }
-  console.log(_selectedRowKeys.value);
 }
 
 const onSelectAll = (selected, selectedRows: Record<string, any>[], changeRows: any[]) => {
@@ -596,6 +597,9 @@ const valueFormat = (val: any) => {
 const statusText = computed(() => {
   try {
     return (val: any) => {
+      if(!val) {
+        return '--'
+      }
       if (typeof val === 'string') {
         return val
       } else if (typeof val === 'object') {

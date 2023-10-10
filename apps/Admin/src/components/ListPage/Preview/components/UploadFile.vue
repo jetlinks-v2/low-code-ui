@@ -29,7 +29,7 @@
       <j-space>
         <j-badge status="error" text="导入失败：" />
         <span>{{ failCount }}</span>
-        <j-button type="link" @click="downloadFail">下载</j-button>
+        <j-button type="link" @click="downloadFail" v-if="failCount">下载</j-button>
       </j-space>
     </template>
   </div>
