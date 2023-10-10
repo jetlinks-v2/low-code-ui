@@ -33,8 +33,6 @@
     >
       <template #card="slotProps">
         <Card
-          :value="slotProps"
-          v-bind="slotProps"
           :status="
             type === 'product' ? slotProps.state : slotProps.state?.value
           "
@@ -166,7 +164,7 @@ const columns = [
     },
   },
 ]
-const _selectedRowKeys: any = ref([])
+const _selectedRowKeys: any = ref(props.select)
 const emit = defineEmits(['close', 'updateData'])
 const params = ref()
 const handleSearch = (i: any) => {
@@ -217,11 +215,16 @@ const submitData = () => {
   emit('updateData', _selectedRowKeys.value)
 }
 
-onMounted(() => {
-  if (props.select.length) {
-    _selectedRowKeys.value = props.select
-  }
+watch(() => JSON.stringify(props.select), () => {
+  _selectedRowKeys.value = props.select
 })
+
+// onMounted(() => {
+//   console.log(props.select)
+//   if (props.select.length) {
+//     _selectedRowKeys.value = props.select
+//   }
+// })
 </script>
 <style lang="less" scoped>
 .table {
