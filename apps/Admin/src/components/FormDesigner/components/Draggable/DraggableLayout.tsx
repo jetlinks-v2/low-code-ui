@@ -187,7 +187,7 @@ const DraggableLayout = defineComponent({
                                         mode={unref(designer.mode)}
                                         value={get(designer.formState, _path)}
                                         onUpdate:value={(newValue) => {
-                                            set(designer.formState, _path, newValue || false)
+                                            set(designer.formState, _path, newValue)
                                         }}
                                         onChange={onChange}
                                     ></TypeComponent>
