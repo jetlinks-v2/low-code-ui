@@ -60,13 +60,12 @@ const init = () => {
     const obj = JSON.parse(props.data.model)
     nodesData.value = obj.nodes
     getFormData(obj.config.forms)
-  } catch (error) {
-    console.error(error)
-  }
+  } catch (error) {}
 }
 
 const getFormData = (list: FormsProps[]) => {
   const param = {
+    paging: true,
     terms: [
       {
         type: 'and',

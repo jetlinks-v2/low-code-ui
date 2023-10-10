@@ -159,6 +159,7 @@ const columns = [
       rename: 'classifiedId',
       componentProps: {
         placeholder: '请选择流程分类',
+        fieldNames: { label: 'text', value: 'value' },
       },
       options: useRequest(providerEnum).data,
     },
@@ -193,6 +194,7 @@ const columns = [
       },
       options: async () => {
         const resp = await getProcess_api({
+          paging: false,
           sorts: [{ name: 'createTime', order: 'desc' }],
         })
         const listMap = new Map()

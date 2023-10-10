@@ -38,6 +38,7 @@
           v-model:value="form.classifiedId"
           placeholder="请选择流程分类"
           :options="providerOptions"
+          :fieldNames="{ label: 'text', value: 'value' }"
         >
           <template #notFoundContent>
             <div>
