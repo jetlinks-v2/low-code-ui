@@ -27,7 +27,7 @@ const checkedConfigItem = (node: ISchema, allData: any[], dictionary: any[], for
         message: (node.formItemProps?.label || node.name) + '配置错误'
     }
     const _type = node.type || 'root'
-    if (_type === 'root') {
+    if (['root', 'table-item-index', 'table-item-actions'].includes(_type)) {
         return false
     } else {
         if (arr.includes(_type)) {
