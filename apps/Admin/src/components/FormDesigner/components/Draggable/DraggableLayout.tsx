@@ -80,7 +80,7 @@ const DraggableLayout = defineComponent({
                             }
                             return (
                                 <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                                    <TypeComponent data={element} {...element.componentProps} />
+                                    <TypeComponent {...element.componentProps} />
                                 </Selection>
                             )
                         }
@@ -169,7 +169,6 @@ const DraggableLayout = defineComponent({
                                 if (unref(isEditModel)) {
                                     return <TypeComponent
                                         model={unref(designer.model)}
-                                        // data={element}
                                         {...omit(_props.componentProps, ['disabled'])}
                                     ></TypeComponent>
                                 } else if (['switch'].includes(element.type)) {
