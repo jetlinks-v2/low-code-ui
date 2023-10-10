@@ -113,7 +113,7 @@
           </div>
           <div>
             <div>
-              <j-switch v-model:checked="myAsset.enabled" style="margin-bottom: 16px"/>
+              <j-switch v-model:checked="myAsset.enabled" style="margin-bottom: 16px" @change="assetEnableChange"/>
             </div>
             <template v-if="myAsset.enabled">
               <div style="margin-bottom: 16px">
@@ -322,6 +322,12 @@ const assetChange = (v) => {
   }
 
   emit('update:asset', myAsset)
+  emit('update')
+}
+
+const assetEnableChange = (v) => {
+  myAsset.enabled = v
+  emit('update:asset', v ? myAsset : {})
   emit('update')
 }
 
