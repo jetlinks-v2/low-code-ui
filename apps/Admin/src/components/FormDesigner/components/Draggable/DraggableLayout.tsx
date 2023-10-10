@@ -169,12 +169,12 @@ const DraggableLayout = defineComponent({
                                 if (unref(isEditModel)) {
                                     return <TypeComponent
                                         model={unref(designer.model)}
-                                        data={element}
+                                        // data={element}
                                         {...omit(_props.componentProps, ['disabled'])}
                                     ></TypeComponent>
                                 } else if (['switch'].includes(element.type)) {
                                     return <TypeComponent
-                                        data={element}
+                                        // data={element} // TypeError: Cannot convert object to primitive value报错
                                         {..._props.componentProps}
                                         checked={get(designer.formState, _path)}
                                         onUpdate:checked={(newValue) => {
@@ -184,7 +184,7 @@ const DraggableLayout = defineComponent({
                                     ></TypeComponent>
                                 } else {
                                     return <TypeComponent
-                                        data={element}
+                                        // data={element}
                                         {..._props.componentProps}
                                         value={get(designer.formState, _path)}
                                         onUpdate:value={(newValue) => {
