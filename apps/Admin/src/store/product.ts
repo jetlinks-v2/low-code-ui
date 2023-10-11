@@ -61,7 +61,7 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
       })
     })
   }
-  return treeData
+  return treeData.sort((a,b) => a.others.tree_index - b.others.tree_index)
 }
 
 /**
