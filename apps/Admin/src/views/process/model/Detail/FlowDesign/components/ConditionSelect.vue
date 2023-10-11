@@ -4,7 +4,7 @@
     v-for="(item, index) in conditionSelect"
     :key="index"
   >
-    <a-tree-select
+    <j-tree-select
       v-model:value="item.condition"
       v-model:searchValue="item.searchValue"
       show-search
@@ -36,7 +36,7 @@
           <template v-else>{{ fragment }}</template>
         </template>
       </template>
-    </a-tree-select>
+    </j-tree-select>
     <j-select
       v-model:value="item.termsType"
       :options="termsOptions"
