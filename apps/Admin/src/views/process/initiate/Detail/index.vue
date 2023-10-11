@@ -8,7 +8,6 @@
               ref="previewRef"
               :value="formValue[index]"
               :data="item.configuration"
-              @change="change"
             />
           </div>
           <div class="btn-list">
@@ -169,11 +168,6 @@ const previewRef = ref<any>()
 
 const formValue = ref<any[]>([])
 
-const change = (val: any) => {
-  console.log('change', val)
-  localStorage.removeItem(`${route.query.id}`)
-}
-
 // 判断对象中的属性是否有数据
 const hasData = (array) => {
   if (array.length < 1) return false
@@ -192,7 +186,7 @@ const hasData = (array) => {
  * 取消
  */
 const cancel = () => {
-  const list = previewRef.value.map(item => item.formState)
+  const list = previewRef.value.map((item) => item.formState)
   if (hasData(list)) {
     Modal.confirm({
       title: '是否保存申请表单为草稿？',
@@ -201,9 +195,9 @@ const cancel = () => {
       onOk() {
         // 不校验必填项保存已填数据，toast提示“保存成功”并返回发起申请页；
         // 再次发起该流程时横幅提示“继续编辑草稿”
-        localStorage.setItem(`${route.query.id}`, JSON.stringify(list))
-        onlyMessage('保存成功')
-        router.back()
+        startProcess(list, false).then((flag) => {
+          flag ? router.back() : ''
+        })
       },
       onCancel() {
         // 关闭弹窗并返回发起申请页
@@ -218,23 +212,11 @@ const cancel = () => {
  * 提交
  */
 const submit = () => {
-  const list = previewRef.value.map(item => item.onSave())
+  const list = previewRef.value.map((item) => item.onSave())
   Promise.all(list).then((res) => {
-    const param = {
-      id: route.query.id,
-      form: formData.value.map((i, index) => {
-        return {
-          formId: i.id,
-          data: res[index],
-        }
-      }),
-    }
-    start_api(param).then((resp) => {
-      if (resp.success) {
-        onlyMessage('提交成功')
-        // 跳转至我的流程-我发起的
-        router.push('')
-      }
+    startProcess(res).then((flag) => {
+      // 跳转至我的流程-我发起的
+      flag ? router.push('') : ''
     })
   })
 }
@@ -242,30 +224,53 @@ const submit = () => {
  * 保存
  */
 const save = () => {
-  // 不需要校验表单中的必填项，保存所有已填写内容：
-  // toast提示“提交成功”并跳转至 我的流程-我的待办 页面
-  const list = previewRef.value.map(item => item.formState)
-
-  // onlyMessage('提交成功')
-  // // 跳转至我的流程-我的待办
-  // router.push('')
+  const list = previewRef.value.map((item) => item.formState)
+  startProcess(list, false).then((flag) => {
+    // 跳转至我的流程-我的待办
+    flag ? router.push('') : ''
+  })
 }
 onMounted(() => {
-  // 存在草稿
-  const dataStr = localStorage.getItem(`${route.query.id}`)
-  console.log('dataStr', dataStr)
-  if (dataStr !== null) {
+  // 草稿
+  if (route.query.draft) {
     Modal.confirm({
       title: '继续编辑草稿？',
       okText: '是',
       cancelText: '否',
       onOk() {
-        formValue.value = JSON.parse(dataStr)
+        // formValue.value = JSON.parse(dataStr)
       },
       onCancel() {},
     })
   }
 })
+
+/**
+ * 发起流程处理
+ * @param list 表单数据
+ */
+const startProcess = async (list: any, start = true) => {
+  const param = {
+    id: route.query.id,
+    start: start,
+    form: formData.value.map((i, index) => {
+      return {
+        formId: i.id,
+        data: list[index],
+      }
+    }),
+  }
+  return start_api(param).then((resp) => {
+    if (resp.success) {
+      onlyMessage('提交成功')
+      return true
+    } else {
+      onlyMessage('提交失败')
+      return false
+    }
+  })
+}
+
 /**
  * 获取当前流程
  */

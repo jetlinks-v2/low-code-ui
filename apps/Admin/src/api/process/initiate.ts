@@ -2,12 +2,14 @@ import { request } from '@jetlinks/core'
 
 /**
  * 查询可发起流程
- * @returns 
+ * @returns
  */
-export const getList_api = (data: any) => request.post(`/process/runtime/startable/_query`,data);
+export const getList_api = (data: any) =>
+  request.post(`/process/runtime/startable/_query`, data)
 
 /**
  * 发起流程
- * @returns 
+ * @returns
  */
-export const start_api = (data: any) => request.post(`/process/runtime/${data.id}/_start`,data);
+export const start_api = (data: any) =>
+  request.post(`/process/runtime/${data.id}/_create`, data)
