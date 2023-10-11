@@ -147,11 +147,11 @@ const dataColumns: any = computed(() => {
       title: '操作',
       key: 'action',
       scopedSlots: true,
-      width: actions.value.length > 3 ? '152px' : actions.value?.length * 40 + 32 + `px`,
+      width: actions.value.length > 3 ? '192px' : actions.value?.length * 40 + 32 + `px`,
       customHeaderCell: column => {
         return {
           style: {
-            'max-width': "152px",
+            'max-width': "192px",
             "white-space": "nowrap",
             "text-overflow": "ellipsis"
           }
@@ -455,6 +455,8 @@ const handleActions = (
       callPage: config.resource || [],
       function: config.functions,
       command: config.command,
+      modalWidth: config.modalWidth,
+      modalWidthUnit: config.modalWidthUnit,
     }
     commandType.value = config.type
     // } else if(config.resource.type === providerEnum.HtmlPage) {
