@@ -5,7 +5,7 @@
             <j-button
                 type="primary"
                 ghost
-                :dataid="_item.key"
+                :dataid="_item.id"
                 :class="extractCssClass(_item.style)"
             >
               <img v-if="_item.icon?.includes('http')" :src="_item.icon" class="image-icon">
@@ -41,7 +41,7 @@
                           "
                           ref="secondLevelBtn"
                           :class="extractCssClass(item.style)"
-                          :data-id="item.key"
+                          :data-id="item.id"
                       >
                           <template #icon>
                             <img v-if="item.icon?.includes('http')" :src="item.icon" class="image-icon">
@@ -116,6 +116,7 @@ const batchClick = (v) => {
 
 watchEffect(() => {
   props.actions.forEach((item) => {
+    console.log(item);
     insertCustomCssToHead(item.style, item.key, 'dataid')
   })
 })
