@@ -86,11 +86,11 @@ const props = defineProps({
 const tableActions = ref();
 const showLength = ref(0)
 onMounted(() => {
-  showLength.value = Math.floor(tableActions.value.clientWidth / 40) - 1
+  showLength.value = Math.ceil(tableActions.value.clientWidth / 50) - 1
 })
 
 window.addEventListener('resize', () => {
-  showLength.value = Math.floor(tableActions.value.clientWidth / 40) - 1
+  showLength.value = Math.ceil(tableActions.value.clientWidth / 50) - 1
 })
 const handleFunction = (item) => {
   if (isFunction(item)) {
