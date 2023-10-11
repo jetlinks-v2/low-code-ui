@@ -338,6 +338,7 @@ const actionsBtnFormat = (data: any, type: string) => {
     let result = {
       ...item,
       key: item?.command === 'Delete' ? 'delete' : item?.key,
+      id: item?.key,
       text: item?.title,
       icon: type == 'actions' ? item?.icon || 'SettingOutlined' : item?.icon,
       type: item?.type,
