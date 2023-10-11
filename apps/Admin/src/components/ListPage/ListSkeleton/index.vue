@@ -403,22 +403,22 @@ watchEffect(() => {
         color: #FFFFFF;
       }
       &.filter::after {
-        content: '筛选项';
+        content: '\7b5b\9009\9879';
       }
       &.btn::after {
-        content: '操作按钮';
+        content: '\64cd\4f5c\6309\94ae';
       }
       &.type::after {
-        content: '展示格式';
+        content: '\5c55\793a\683c\5f0f';
       }
       &.column-data::after {
-        content: '数据列表头';
+        content: '\6570\636e\5217\8868\5934';
       }
       &.column-operation::after {
-        content: '操作列';
+        content: '\64cd\4f5c\5217';
       }
       &.pagination::after {
-        content: '分页器';
+        content: '\5206\9875\5668';
       }
     }
     // &.btn:hover {

@@ -2,21 +2,24 @@
   <template v-if="!isEmpty(value)">
     <span v-if="config?.fileValue === 'url'">{{ formatValue }}</span>
     <template v-else-if="config?.fileValue === 'icon'">
-      <Image
-        :preview="{ visible: false }"
-        :src="formatValue.split(',')?.[0]"
-        height="100px"
-        width="100px"
-        style="object-fit: cover"
-        @click="visible = true"
-      />
-      <div style="display: none">
-        <j-image-preview-group
-          :preview="{ visible, onVisibleChange: (vis) => (visible = vis) }"
-        >
-          <Image v-for="item in formatValue.split(',')" :src="item" />
-        </j-image-preview-group>
-      </div>
+      <template v-if="formatValue && formatValue !== '--'">
+        <Image
+          :preview="{ visible: false }"
+          :src="formatValue?.split(',')?.[0]"
+          height="100px"
+          width="100px"
+          style="object-fit: cover"
+          @click="visible = true"
+        />
+        <div style="display: none">
+          <j-image-preview-group
+            :preview="{ visible, onVisibleChange: (vis) => (visible = vis) }"
+          >
+            <Image v-for="item in formatValue?.split(',')" :src="item" />
+          </j-image-preview-group>
+        </div>
+      </template>
+      <span v-else>--</span>
     </template>
     <span v-if="config?.fileValue === 'fileName'">{{ formatValue }}</span>
   </template>
@@ -45,13 +48,15 @@ const props = defineProps({
  * 文件格式化
  */
 const formatFn = (value) => {
-  console.log(value)
   if (isEmpty(value)) {
     return '--'
   }
   try {
     let result = value
     value = typeof value == 'string' ? JSON.parse(value) : value
+    if(Array.isArray(value) && !value.length){
+      return '--'
+    }
     switch (true) {
       case ['url', 'icon'].includes(props.config?.fileValue):
         result = value
