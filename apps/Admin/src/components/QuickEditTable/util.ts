@@ -25,7 +25,7 @@ export const proAll = (array: Array<Promise<any>>) => {
 
     const jump = () => {
       if (count >= length) {
-        error.length ? reject(error) : resolve(success)
+        Object.keys(error).length ? reject(error) : resolve(success)
       }
     }
 
