@@ -245,6 +245,7 @@ const handleChange = (key: any, data?: any) => {
         onPaste(data.id)
         break;
       case 'Rename':
+        // visibleFile.value = false;
         visible.value = true
         type.value = 'Rename'
         provider.value = data.type
