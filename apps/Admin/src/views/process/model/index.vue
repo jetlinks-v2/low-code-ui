@@ -18,7 +18,14 @@
         >
       </template>
       <template #icon="{ icon }">
-        <j-image :width="50" :height="50" :src="icon" :preview="false" />
+        <j-image
+          v-if="icon?.includes('http')"
+          :width="50"
+          :height="50"
+          :src="icon"
+          :preview="false"
+        />
+        <AIcon v-else :type="icon" :style="{ fontSize: '40px' }" />
       </template>
       <template #state="{ state }">
         <BadgeStatus
@@ -74,11 +81,13 @@
                   <!-- <AIcon :type="record.icon ? record.icon : 'DeleteOutlined'" /> -->
                   <j-space align="start">
                     <j-image
+                      v-if="record.icon?.includes('http')"
                       :width="80"
                       :height="80"
                       :src="record.icon"
                       :preview="false"
                     />
+                    <AIcon v-else :type="record.icon" :style="{ fontSize: '40px' }" />
                     <div>{{ record.name }}</div>
                   </j-space>
                 </div>

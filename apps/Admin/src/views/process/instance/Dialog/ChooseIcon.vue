@@ -2,7 +2,12 @@
   <div>
     <j-radio-group v-model:value="selected" class="radio" @change="change">
       <j-radio-button :value="icon" :class="{ active: selected === icon }">
-        <ImageUpload class="upload" v-model:value="icon" :accept="accept" />
+        <ImageUpload
+          class="upload"
+          v-model:value="icon"
+          :accept="accept"
+          style="width: 60px; height: 60px"
+        />
       </j-radio-button>
       <j-radio-button
         v-for="typeStr in iconKeys"
@@ -43,10 +48,7 @@ watch(icon, () => {
   grid-template-columns: repeat(6, 1fr);
   max-height: 500px;
   overflow-y: auto;
-  .upload {
-    width: 60px;
-    height: 60px;
-  }
+
   .ant-radio-button-wrapper {
     display: flex;
     align-items: center;

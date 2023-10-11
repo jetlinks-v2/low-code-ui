@@ -25,7 +25,9 @@
           }"
         />
       </template>
-
+      <template #createTime="{ createTime }">
+        {{ dayjs(createTime).format('YYYY-MM-DD HH:mm:ss') }}
+      </template>
       <template #action="slotProps">
         <div class="table-action">
           <PermissionButton
@@ -180,10 +182,27 @@ const columns = [
     ellipsis: true,
     search: {
       type: 'select',
+      rename: 'creatorId',
       componentProps: {
         placeholder: '请选择部署人',
       },
-      options: [],
+      options: async () => {
+        const resp = await getList_api({
+          paging: false,
+          sorts: [{ name: 'createTime', order: 'desc' }],
+        })
+        const listMap = new Map()
+        if (resp.success) {
+          resp.result.data.forEach((item) => {
+            listMap.set(item.creatorId, {
+              label: item.creatorName,
+              value: item.creatorId,
+            })
+          })
+          return [...listMap.values()]
+        }
+        return []
+      },
     },
   },
   {
@@ -191,6 +210,7 @@ const columns = [
     dataIndex: 'createTime',
     key: 'createTime',
     ellipsis: true,
+    scopedSlots: true,
     search: {
       type: 'date',
     },

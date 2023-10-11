@@ -59,7 +59,25 @@
             <AIcon :type="item" />
           </div>
           <div class="upload-icon">
-            <ImageUpload v-model:value="form.icon" :accept="accept" />
+            <ImageUpload v-model:value="form.icon" :accept="accept">
+              <template #content="{ imageUrl }">
+                <div v-if="imageUrl">
+                  <j-image
+                    v-if="imageUrl?.includes('http')"
+                    :src="imageUrl"
+                    :width="98"
+                    :preview="false"
+                  />
+                  <AIcon
+                    v-else
+                    :type="form.icon"
+                    :style="{ fontSize: '40px' }"
+                  />
+                  <div class="upload-image-mask">更换</div>
+                </div>
+                <AIcon v-else type="PlusOutlined" style="font-size: 20px" />
+              </template>
+            </ImageUpload>
           </div>
         </j-space>
       </j-form-item>
@@ -163,5 +181,24 @@ watch(
   height: 100px;
   font-size: 40px;
   border: 1px dashed #ccc;
+
+  :deep(.upload-image-content) {
+    &:hover .upload-image-mask {
+      display: flex;
+    }
+    .upload-image-mask {
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+      width: 100%;
+      height: 100%;
+      color: #fff;
+      font-size: 16px;
+      background-color: rgba(#000, 0.25);
+    }
+  }
 }
 </style>
