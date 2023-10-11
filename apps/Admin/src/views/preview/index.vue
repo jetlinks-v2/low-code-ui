@@ -35,7 +35,6 @@ const getInfo = async () => {
   queryProject({ terms: [{ value: project, termType: 'eq', column: 'id'}]}).then(resp => {
     if (resp.result && resp.result.data?.length && resp.result.data[0].runningState?.value === 'enabled') {
       isEmpty.value = false
-      console.log('getInfo',resp)
 
       if (resp.result.data[0].others?.theme) {
         ConfigProvider.config({
