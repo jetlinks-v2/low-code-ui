@@ -1,19 +1,23 @@
 <template>
   <template v-if="!isEmpty(value)">
     <span v-if="config?.fileValue === 'url'">{{ formatValue }}</span>
-    <Image
-      :preview="{ visible: false }"
-      :src="formatValue.split(',')?.[0]"
-      height="100px"
-      width="100px"
-      style="object-fit: cover;"
-      @click="visible = true"
-    />
-    <div style="display: none;">
-      <j-image-preview-group :preview="{ visible, onVisibleChange: vis => (visible = vis) }">
-        <Image v-for="item in formatValue.split(',')" :src="item"/>
-      </j-image-preview-group>
-    </div>
+    <template v-else-if="config?.fileValue === 'icon'">
+      <Image
+        :preview="{ visible: false }"
+        :src="formatValue.split(',')?.[0]"
+        height="100px"
+        width="100px"
+        style="object-fit: cover"
+        @click="visible = true"
+      />
+      <div style="display: none">
+        <j-image-preview-group
+          :preview="{ visible, onVisibleChange: (vis) => (visible = vis) }"
+        >
+          <Image v-for="item in formatValue.split(',')" :src="item" />
+        </j-image-preview-group>
+      </div>
+    </template>
     <span v-if="config?.fileValue === 'fileName'">{{ formatValue }}</span>
   </template>
   <span v-else>--</span>
