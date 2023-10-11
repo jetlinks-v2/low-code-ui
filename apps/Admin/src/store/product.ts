@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { queryProjectDraft, updateDraft} from "@/api/project";
 import { useEngine } from './engine'
 import dayjs from 'dayjs';
-import {throttle, cloneDeep, omit} from 'lodash-es'
+import {throttle, cloneDeep, omit, debounce} from 'lodash-es'
 import { Integrate } from '@/utils/project'
 import { providerEnum } from  '@/components/ProJect/index'
 import { filterTreeNodes } from '@jetlinks/utils'
@@ -67,8 +67,9 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
 /**
  * 保存草稿
  */
-const updateProductReq = throttle((draftData: any[], cb) => {
+const updateProductReq = debounce((draftData: any[], cb) => {
   const integrateData = Integrate(draftData)
+  console.log('updateProductReq', new Date().getTime())
   updateDraft(integrateData.draftId, integrateData).then(resp => {
     if (resp.success) {
       const { children, ...oldProject } = draftData[0]
@@ -78,7 +79,7 @@ const updateProductReq = throttle((draftData: any[], cb) => {
       })
     }
   })
-}, 1000)
+}, 100)
 
 export const useProduct = defineStore('product', () => {
   const data = ref<TreeData[]>([]) // 项目
@@ -237,6 +238,7 @@ export const useProduct = defineStore('product', () => {
   const add = (record: any, parentId: string,open?:any) => {
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
+    console.log('add',cloneDeep(data.value), record)
     updateDataCache()
     engine.updateFile(record,'add',open)
     updateProductReq(data.value, (result) => {
@@ -248,6 +250,7 @@ export const useProduct = defineStore('product', () => {
     // console.log('item---',record)
     dataMap.set(record.id, omit(record, ['children']))
     data.value = updateProduct(data.value, record)
+    console.log('update',cloneDeep(data.value))
     updateDataCache()
     engine.updateFile(record, 'edit')
     updateProductReq(data.value, (result) => {

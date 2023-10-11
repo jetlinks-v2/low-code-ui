@@ -1,83 +1,86 @@
 
 <template>
-  <div class="title">
-    <a-radio-group v-model:value="viewType" @change="handleSorts">
-      <a-radio-button value="table">
-        <AIcon type="UnorderedListOutlined" />
-      </a-radio-button>
-      <a-radio-button value="card">
-        <AIcon type="AppstoreOutlined" />
-      </a-radio-button>
-    </a-radio-group>
-    <j-select v-model:value="sorts" class="title-sorts" placeholder="排序方式" @change="handleSorts">
-      <j-select-option value="default">默认排序</j-select-option>
-      <j-select-option value="type">种类</j-select-option>
-      <j-select-option value="name">名称</j-select-option>
-      <j-select-option value="createTime">添加日期</j-select-option>
-      <j-select-option value="modifyTime">修改日期</j-select-option>
-    </j-select>
-  </div>
-  <div class="content" v-if="viewType === 'card'">
-    <ContextMenu type="empty" @select="handleChange" @show="onShow">
-      <j-scrollbar>
-        <a-row>
-          <a-col :span="3" v-for="item in list" class="content-col">
-            <div @click="onClick(item.id)" @dblclick="onDbClick(item)" class="content-item">
-              <ContextMenu type="list" :data="item" @select="handleChange">
-                <div :class="{
-                  'box': true,
-                  'active': selectKey === item.id
-                }">
-                  <div class="box-img">
-                    <img :src="typeImages[item.type]">
+  <div>
+    <div class="title">
+      <a-radio-group v-model:value="viewType" @change="handleSorts">
+        <a-radio-button value="table">
+          <AIcon type="UnorderedListOutlined" />
+        </a-radio-button>
+        <a-radio-button value="card">
+          <AIcon type="AppstoreOutlined" />
+        </a-radio-button>
+      </a-radio-group>
+      <j-select v-model:value="sorts" class="title-sorts" placeholder="排序方式" @change="handleSorts">
+        <j-select-option value="default">默认排序</j-select-option>
+        <j-select-option value="type">种类</j-select-option>
+        <j-select-option value="name">名称</j-select-option>
+        <j-select-option value="createTime">添加日期</j-select-option>
+        <j-select-option value="modifyTime">修改日期</j-select-option>
+      </j-select>
+    </div>
+    <div class="content" v-if="viewType === 'card'">
+      <ContextMenu type="empty" @select="handleChange" @show="onShow">
+        <j-scrollbar>
+          <a-row>
+            <a-col :span="3" v-for="item in list" class="content-col">
+              <div @click="onClick(item.id)" @dblclick="onDbClick(item)" class="content-item">
+                <ContextMenu type="list" :data="item" @select="handleChange">
+                  <div :class="{
+                    'box': true,
+                    'active': selectKey === item.id
+                  }">
+                    <div class="box-img">
+                      <img :src="typeImages[item.type]">
+                    </div>
+                    <j-ellipsis style="max-width: 100px" placement="leftTop">{{ item.name }}</j-ellipsis>
                   </div>
-                  <j-ellipsis style="max-width: 100px" placement="leftTop">{{ item.name }}</j-ellipsis>
-                </div>
-              </ContextMenu>
+                </ContextMenu>
+              </div>
+            </a-col>
+          </a-row>
+        </j-scrollbar>
+      </ContextMenu>
+      <!-- <a-drawer title="添加项目说明" :closable="false" :visible="showMenu" :style="{ position: 'absolute' }" :getContainer="false"
+        @close="showMenu = false" :mask="false">
+        <div class="drawer" v-for="items in projectList">
+          <div class="drawer-title">{{ items.title }}</div>
+          <div class="drawer-items" v-for="item in items.children">
+            <div class="items-img">
+              <img :src="item.img">
             </div>
-          </a-col>
-        </a-row>
-      </j-scrollbar>
-    </ContextMenu>
-    <!-- <a-drawer title="添加项目说明" :closable="false" :visible="showMenu" :style="{ position: 'absolute' }" :getContainer="false"
-      @close="showMenu = false" :mask="false">
-      <div class="drawer" v-for="items in projectList">
-        <div class="drawer-title">{{ items.title }}</div>
-        <div class="drawer-items" v-for="item in items.children">
-          <div class="items-img">
-            <img :src="item.img">
-          </div>
-          <div class="items-text">
-            <div class="text">{{ providerMap[item.type] }}</div>
-            <span>{{ item.text }}</span>
+            <div class="items-text">
+              <div class="text">{{ providerMap[item.type] }}</div>
+              <span>{{ item.text }}</span>
+            </div>
           </div>
         </div>
-      </div>
-    </a-drawer> -->
-    <FileDrawer v-if="visibleFile" @close="visibleFile = false" :data="current" />
-  </div>
-
-  <div v-else>
-    <j-pro-table :columns="columns" :dataSource="list" model="TABLE" :noPagination="true" :childrenColumnName="'list'"
-      :scroll="{ y: 'calc(100vh - 300px)' }" :customRow="(record) => ({
-        onContextmenu: (e) => onContextmenu(e, record),
-        onDblclick: () => onDbClick(record)
-      })">
-      <template #type="{ type }">
-        {{ providerMap[type] }}
-      </template>
-      <template #modifyTime="record">{{ record?.others?.modifyTime }}</template>
-    </j-pro-table>
-    <div v-if="visibleMenu" style="width: 150px;">
-      <j-menu @click="(e) => handleChange(e.key, menuData.data)" :style="menuData.style" class="tableMenu">
-        <j-menu-item :key="actionMap['Profile'].key">{{ actionMap['Profile'].value }}</j-menu-item>
-        <j-menu-item :key="actionMap['Copy'].key">{{ actionMap['Copy'].value }}</j-menu-item>
-        <j-menu-item :key="actionMap['Paste'].key" :disabled="engine.copyFile === ''">{{ actionMap['Paste'].value
-        }}</j-menu-item>
-        <j-menu-item :key="actionMap['Rename'].key">{{ actionMap['Rename'].value }}</j-menu-item>
-        <j-menu-item :key="actionMap['Delete'].key">{{ actionMap['Delete'].value }}</j-menu-item>
-      </j-menu>
+      </a-drawer> -->
     </div>
+
+    <div v-else>
+      <j-pro-table :columns="columns" :dataSource="list" model="TABLE" :noPagination="true" :childrenColumnName="'list'"
+        :scroll="{ y: 'calc(100vh - 300px)' }" :customRow="(record) => ({
+          onContextmenu: (e) => onContextmenu(e, record),
+          onDblclick: () => onDbClick(record)
+        })">
+        <template #type="{ type }">
+          {{ providerMap[type] }}
+        </template>
+        <template #modifyTime="record">{{ record?.others?.modifyTime }}</template>
+      </j-pro-table>
+      <div v-if="visibleMenu" style="width: 150px;">
+        <j-menu @click="(e) => handleChange(e.key, menuData.data)" :style="menuData.style" class="tableMenu">
+          <j-menu-item :key="actionMap['Profile'].key">{{ actionMap['Profile'].value }}</j-menu-item>
+          <j-menu-item :key="actionMap['Copy'].key">{{ actionMap['Copy'].value }}</j-menu-item>
+          <j-menu-item :key="actionMap['Paste'].key" :disabled="engine.copyFile === ''">{{ actionMap['Paste'].value
+          }}</j-menu-item>
+          <j-menu-item :key="actionMap['Rename'].key">{{ actionMap['Rename'].value }}</j-menu-item>
+          <j-menu-item :key="actionMap['Delete'].key">{{ actionMap['Delete'].value }}</j-menu-item>
+        </j-menu>
+      </div>
+
+    </div>
+    <FileDrawer v-if="visibleFile" @close="visibleFile = false" :data="current" />
   </div>
 
   <InputModal v-if="visible" @close="visible = false" @save="onSave" :provider="provider" :data="current" :type="type"
@@ -189,13 +192,14 @@ const onDel = async (data: any) => {
   })
 }
 
-const onPaste = (parentId?: string) => {
+const onPaste = (parentId?: string, type?: string) => {
   const copyItem = product.getById(engine.copyFile)
   provider.value = copyItem.type
+  // console.log('onPaste', type, parentId)
   current.value = {
     title: `copy_${copyItem.name}`,
     children: copyItem.children ? restId(copyItem.children) : undefined,
-    parentId: parentId ? parentId : undefined,
+    parentId: type ? copyItem.parentId || parentId : parentId ? parentId : undefined,
     configuration: copyItem.configuration ? copyItem.configuration : undefined,
     others: copyItem.others ? copyItem.others : undefined
   }
@@ -221,7 +225,7 @@ const onContextmenu = (e, record) => {
 }
 
 const handleChange = (key: any, data?: any) => {
-  // console.log('key',key)
+
   provider.value = key
   if (!data) {
     if (key === 'Paste') {
@@ -242,7 +246,7 @@ const handleChange = (key: any, data?: any) => {
         onlyMessage('复制成功')
         break;
       case 'Paste':
-        onPaste(data.id)
+        onPaste(data.id, data.others?.type)
         break;
       case 'Rename':
         // visibleFile.value = false;
