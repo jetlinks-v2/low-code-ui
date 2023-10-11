@@ -26,7 +26,11 @@ const props = defineProps({
   if(isEmpty(String(value))) {
     return '--'
   }
-  return dayjs(value).format(props.config?.dateValue || 'YYYY-MM-DD')
+  if(typeof value == 'string') {
+    return dayjs(value, props.config?.dateValue).format(props.config?.dateValue || 'YYYY-MM-DD')
+  } else {
+    return dayjs(value).format(props.config?.dateValue || 'YYYY-MM-DD')
+  }
 }
 
 const formatValue = computed(() => {

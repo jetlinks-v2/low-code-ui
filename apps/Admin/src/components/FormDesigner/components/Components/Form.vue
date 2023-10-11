@@ -4,6 +4,7 @@
       :value="myValue"
       :mode="mode"
       :data="config"
+      ref="formRef"
       @stateChange="onValueChange"
     />
   </div>
@@ -32,13 +33,13 @@ const props = defineProps({
   source: {
     type: Object,
     default: () => ({}),
-  }
+  },
 })
 
 const emit = defineEmits(['update:value'])
 
 const myValue = ref(props.value)
-
+const formRef = ref<any>(null)
 const config = computed(() => {
   return JSON.parse(props.source?.code || '{}')
 })
@@ -54,9 +55,24 @@ watch(
   },
   {
     deep: true,
-    immediate: true
-  }
+    immediate: true,
+  },
 )
+
+const onSave = () => {
+  return new Promise((resolve, reject) => {
+    formRef.value
+      ?.onSave()
+      .then((_data) => {
+        resolve(_data)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
+}
+
+defineExpose({ onSave })
 </script>
 <style scoped>
 .form-warp {

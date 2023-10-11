@@ -4,6 +4,36 @@ import { ISchema } from "../typings"
 import { queryDictionaryData, queryRuntime } from "@/api/form"
 import { isObject, map, omit } from "lodash-es"
 
+export const searchTree = (arr: any[], _item: any) => {
+    let _data: any = undefined
+    arr?.map((item) => {
+        if (item.id === _item) {
+            _data = item
+            return
+        }
+        if (item.children?.length) {
+            _data = searchTree(item.children, _item)
+        }
+    })
+    return _data
+}
+
+export const getArray = (arr: any[]) => {
+    const _item = arr.find((i) => i.valueType?.type === 'array')
+    if (_item) {
+        return arr?.map((item) => {
+            const children = item?.properties?.length ? getArray(item.properties) : []
+            return {
+                ...omit(item, 'properties'),
+                label: item?.name,
+                value: item?.id,
+                children,
+            }
+        })
+    } else {
+        return []
+    }
+}
 export const checkIsField = (node: any) => node?.type && (componentMap?.[node?.type]) || ['table'].includes(node?.type)
 
 // 生成多个选项
@@ -21,7 +51,7 @@ export const generateOptions = (len: number) => {
 
 const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo', 'product', 'device', 'org', 'user', 'role']
 
-const checkedConfigItem = (node: ISchema, allData: any[], dictionary: any[], formList: any[]) => {
+const checkedConfigItem = (node: ISchema, allData: any[], source: any, formList: any[]) => {
     const obj = {
         key: node?.key,
         message: (node.formItemProps?.label || node.name) + '配置错误'
@@ -67,16 +97,55 @@ const checkedConfigItem = (node: ISchema, allData: any[], dictionary: any[], for
                 if (node?.componentProps.source?.type === 'dic') {
                     if (!node?.componentProps.source?.dictionary) {
                         return obj
+                    } else {
+                        const flag = (source.dictionary || []).find(i => node?.componentProps.source?.dictionary === i.id)
+                        if (!flag) {
+                            return obj
+                        }
                     }
-                    const flag = dictionary.find(i => node?.componentProps.source?.dictionary === i.id)
-                    if (node?.componentProps.source?.dictionary && !flag) {
-                        return obj
-                    }
+
                 } else {
                     if (!node?.componentProps.source?.functionId || !node?.componentProps.source?.commandId || !node?.componentProps.source?.label || !node?.componentProps.source?.value) {
                         return obj
                     }
                     if (node?.componentProps.source?.isSource && !node?.componentProps.source?.source) {
+                        return obj
+                    }
+                    // 数据是否被删除
+                    const _functions = (source.end || []).find(i => node?.componentProps.source?.functionId === i.id)
+                    if (!_functions) {
+                        return obj
+                    }
+                    const _command = (_functions?.command || []).find(i => node?.componentProps.source?.commandId === i.id)
+                    if (!_command) {
+                        return obj
+                    }
+                    const list = (_command?.output?.properties || [])?.map((item) => {
+                        return {
+                            ...item,
+                            label: item.name,
+                            value: item.id,
+                        }
+                    })
+                    let _array: any[] = []
+                    if (node?.componentProps.source?.isSource) {
+                        const _sourceList = getArray(list)
+                        const _data = searchTree(_sourceList, node?.componentProps.source?.source)
+                        if(!_data){
+                            return obj
+                        }
+                        if (_data?.valueType?.type === 'array') {
+                            _array = _data.valueType?.elementType?.properties?.map((item) => {
+                              return {
+                                label: item.name,
+                                value: item.id,
+                              }
+                            })
+                        }
+                    } else {
+                        _array = [...list]
+                    }
+                    if(!(map(_array, 'value').includes(node?.componentProps.source?.label) && map(_array, 'value').includes(node?.componentProps.source?.value))){
                         return obj
                     }
                 }
@@ -110,23 +179,23 @@ const checkedConfigItem = (node: ISchema, allData: any[], dictionary: any[], for
 }
 
 // 校验配置项必填
-const checkConfig = (node: ISchema, allData: any[], dictionary: any[], formList: any[]) => {
-    const _data: any = checkedConfigItem(node, allData, dictionary, formList);
+const checkConfig = (node: ISchema, allData: any[], source: any, formList: any[]) => {
+    const _data: any = checkedConfigItem(node, allData, source, formList);
     let _rules: any[] = []
     if (_data) {
         _rules.push(_data)
     }
     if (node.children && node.children?.length) {
         node?.children.map(item => {
-            const arr = checkConfig(item, allData, dictionary, formList)
+            const arr = checkConfig(item, allData, source, formList)
             _rules = [..._rules, ...arr]
         })
     }
     return _rules
 }
 
-export const checkedConfig = (node: ISchema, dictionary: any[], formList: any[]) => {
-    return checkConfig(node, node?.children || [], dictionary, formList)
+export const checkedConfig = (node: ISchema, source: any, formList: any[]) => {
+    return checkConfig(node, node?.children || [], source, formList)
 }
 
 export const updateData = (list: ISchema[], item?: any) => {

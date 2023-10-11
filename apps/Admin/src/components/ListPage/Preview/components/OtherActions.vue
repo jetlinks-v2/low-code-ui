@@ -22,46 +22,46 @@
           <AIcon v-else :type="item?.icon" />
         </template>
       </PermissionButton>
-    </j-space>
-    <j-dropdown v-if="actions.length > showLength" placement="bottomRight">
-      <j-button type="link">
-        <AIcon type="EllipsisOutlined" />
-      </j-button>
-      <template #overlay>
-        <j-menu>
-          <j-menu-item
-            v-for="(item, i) in actions.slice(showLength, actions.length)"
-            :key="i + item.key"
-          >
-            <PermissionButton
-              v-if="item.permissionProps"
-              :key="item.key"
-              type="link"
-              v-bind:="handleFunction(item.permissionProps, record)"
-              style="padding: 0"
-              :danger="item.command === 'Delete'"
-              :popConfirm="
-                handleFunction(item.permissionProps, record)?.popConfirm
-              "
-              :class="extractCssClass(item.style)"
-              :data-id="item.id"
+      <j-dropdown v-if="actions.length > showLength" placement="bottom">
+        <j-button type="link" style="padding: 0">
+          <AIcon type="EllipsisOutlined" />
+        </j-button>
+        <template #overlay>
+          <j-menu>
+            <j-menu-item
+              v-for="(item, i) in actions.slice(showLength, actions.length)"
+              :key="i + item.key"
             >
-              <template #icon v-if="item.icon || item.key === 'delete'">
-                <img
-                  :src="item.icon"
-                  v-if="item.icon?.includes('http')"
-                  class="image-icon"
-                />
-                <AIcon
-                  v-else
-                  :type="item.icon ? item.icon : 'DeleteOutlined'"
-                />
-              </template>
-            </PermissionButton>
-          </j-menu-item>
-        </j-menu>
-      </template>
-    </j-dropdown>
+              <PermissionButton
+                v-if="item.permissionProps"
+                :key="item.key"
+                type="link"
+                v-bind:="handleFunction(item.permissionProps, record)"
+                style="padding: 0"
+                :danger="item.command === 'Delete'"
+                :popConfirm="
+                  handleFunction(item.permissionProps, record)?.popConfirm
+                "
+                :class="extractCssClass(item.style)"
+                :data-id="item.id"
+              >
+                <template #icon v-if="item.icon || item.key === 'delete'">
+                  <img
+                    :src="item.icon"
+                    v-if="item.icon?.includes('http')"
+                    class="image-icon"
+                  />
+                  <AIcon
+                    v-else
+                    :type="item.icon ? item.icon : 'DeleteOutlined'"
+                  />
+                </template>
+              </PermissionButton>
+            </j-menu-item>
+          </j-menu>
+        </template>
+      </j-dropdown>
+    </j-space>
   </div>
 </template>
 
@@ -83,14 +83,17 @@ const props = defineProps({
   },
 })
 
-const tableActions = ref();
+const tableActions = ref()
 const showLength = ref(0)
 onMounted(() => {
-  showLength.value = Math.floor(tableActions.value.clientWidth / 40) - 1
+  console.log(tableActions.value.clientWidth / 40);
+  showLength.value = Math.floor(tableActions.value.clientWidth / 40)
 })
 
 window.addEventListener('resize', () => {
-  showLength.value = Math.floor(tableActions.value.clientWidth / 40) - 1
+  nextTick(() => {
+    showLength.value = Math.floor(tableActions.value.clientWidth / 40)
+  })
 })
 const handleFunction = (item) => {
   if (isFunction(item)) {
@@ -111,9 +114,9 @@ watchEffect(() => {
 <style scoped>
 .table-actions {
   width: 100%;
+  display: flex;
 }
 .image-icon {
-  width: 14px;
-  height: 14px;
+  margin: 0;
 }
 </style>

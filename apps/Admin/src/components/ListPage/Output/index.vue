@@ -50,6 +50,7 @@
     :type="commandType"
     :popData="popData"
     :dataColumns="dataColumns"
+    :projectId="projectId"
     @close="addVisible = false"
     @save="addVisible = false"
     @reload="reloadTable"
@@ -146,11 +147,11 @@ const dataColumns: any = computed(() => {
       title: '操作',
       key: 'action',
       scopedSlots: true,
-      width: actions.value.length > 3 ? '200px' : actions.value?.length * 40 + `px`,
+      width: actions.value.length > 3 ? '152px' : actions.value?.length * 40 + 32 + `px`,
       customHeaderCell: column => {
         return {
           style: {
-            'max-width': "200px",
+            'max-width': "152px",
             "white-space": "nowrap",
             "text-overflow": "ellipsis"
           }

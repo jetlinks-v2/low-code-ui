@@ -54,8 +54,6 @@ const DraggableLayout = defineComponent({
         const designer: any = inject('FormDesigner')
         const platform = navigator.platform.toLowerCase();
 
-        const product = useProduct()
-
         const isEditModel = computed(() => {
             return unref(designer.model) === 'edit'
         })
@@ -103,6 +101,7 @@ const DraggableLayout = defineComponent({
                             const TypeComponent = componentMap?.[element?.type] || 'div'
                             const _props = useProps(element, unref(designer.formData), unref(designer.mode))
                             const selectRef = ref<any>(null)
+                            const _formRef = ref<any>(null)
                             const options = ref<any[]>(_props.componentProps.options)
                             const treeData = ref<any[]>(_props.componentProps.treeData)
 
@@ -155,9 +154,9 @@ const DraggableLayout = defineComponent({
                             watchEffect(() => {
                                 registerToRefList(_path, selectRef.value)
                             })
-                            
-                            if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
-                                queryOptions(element.componentProps.source, product.info?.id).then(resp => {
+
+                            if (!isEditModel.value && !unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
+                                queryOptions(element.componentProps.source, designer?.projectId).then(resp => {
                                     if (['select', 'select-card'].includes(element.type)) {
                                         options.value = resp
                                     } else {
@@ -166,59 +165,91 @@ const DraggableLayout = defineComponent({
                                 })
                             }
 
-                            const renderContent = () => {
-                                if (unref(isEditModel)) {
-                                    return <TypeComponent
-                                        model={unref(designer.model)}
-                                        {...omit(_props.componentProps, ['disabled'])}
-                                        source={element.type === 'form' ? element?.componentProps?.source : undefined}
-                                    ></TypeComponent>
-                                } else if (['switch'].includes(element.type)) {
-                                    return <TypeComponent
-                                        // data={element} // TypeError: Cannot convert object to primitive value报错
-                                        {..._props.componentProps}
-                                        checked={get(designer.formState, _path)}
-                                        onUpdate:checked={(newValue) => {
-                                            set(designer.formState, _path, newValue || false)
-                                        }}
-                                        onChange={onChange}
-                                    ></TypeComponent>
-                                } else if (['form'].includes(element.type)) {
-                                    return <TypeComponent
-                                        {..._props.componentProps}
-                                        mode={unref(designer.mode)}
-                                        source={element?.componentProps?.source}
-                                        value={get(designer.formState, _path)}
-                                        onUpdate:value={(newValue) => {
-                                            set(designer.formState, _path, newValue || null)
-                                        }}
-                                        onChange={onChange}
-                                    ></TypeComponent>
-                                } else {
-                                    let __value = get(designer.formState, _path)
-                                    // 时间组件处理
-                                    if(['date-picker', 'time-picker'].includes(element.type)){
-                                        if(typeof __value === 'number'){
-                                            __value = dayjs(__value).format(_props.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
-                                        }
-                                    }
-                                    return <TypeComponent
-                                        {..._props.componentProps}
-                                        value={__value}
-                                        onUpdate:value={(newValue) => {
-                                            set(designer.formState, _path, newValue || null)
-                                        }}
-                                        options={unref(options)}
-                                        treeData={unref(treeData)}
-                                        onChange={onChange}
-                                    ></TypeComponent>
+                            let __value = get(designer.formState, _path)
+                            // 时间组件处理
+                            if (['date-picker', 'time-picker'].includes(element.type)) {
+                                if (typeof __value === 'number') {
+                                    __value = dayjs(__value).format(_props.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
                                 }
                             }
+
+                            // const renderContent = () => {
+                            //     if (unref(isEditModel)) {
+                            //         return <TypeComponent
+                            //             model={unref(designer.model)}
+                            //             {...omit(_props.componentProps, ['disabled'])}
+                            //             source={element.type === 'form' ? element?.componentProps?.source : undefined}
+                            //         ></TypeComponent>
+                            //     } else if (['switch'].includes(element.type)) {
+                            //         return <TypeComponent
+                            //             // data={element} // TypeError: Cannot convert object to primitive value报错
+                            //             {..._props.componentProps}
+                            //             checked={get(designer.formState, _path)}
+                            //             onUpdate:checked={(newValue) => {
+                            //                 set(designer.formState, _path, newValue || false)
+                            //             }}
+                            //             onChange={onChange}
+                            //         ></TypeComponent>
+                            //     } else if (['form'].includes(element.type)) {
+                            //         return <TypeComponent
+                            //             {..._props.componentProps}
+                            //             mode={unref(designer.mode)}
+                            //             source={element?.componentProps?.source}
+                            //             value={get(designer.formState, _path)}
+                            //             onUpdate:value={(newValue) => {
+                            //                 set(designer.formState, _path, newValue || null)
+                            //             }}
+                            //             onChange={onChange}
+                            //             ref={_formRef}
+                            //         ></TypeComponent>
+                            //     } else {
+
+                            //         return <TypeComponent
+                            //             {..._props.componentProps}
+                            //             value={__value}
+                            //             onUpdate:value={(newValue) => {
+                            //                 set(designer.formState, _path, newValue || null)
+                            //             }}
+                            //             options={unref(options)}
+                            //             treeData={unref(treeData)}
+                            //             onChange={onChange}
+                            //         ></TypeComponent>
+                            //     }
+                            // }
+
+                            watchEffect(() => {
+                                if (element.type === 'form' && _formRef.value && !unref(isEditModel) && element?.key) {
+                                    designer.formRefList.value[element.key] = _formRef.value
+                                }
+                            })
 
                             return (
                                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                                     <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true}>
-                                        {renderContent()}
+                                        {/* {renderContent()} */}
+                                        {
+                                            unref(isEditModel) ? <TypeComponent
+                                                model={unref(designer.model)}
+                                                {...omit(_props.componentProps, ['disabled'])}
+                                                source={element.type === 'form' ? element?.componentProps?.source : undefined}
+                                            ></TypeComponent> : <TypeComponent
+                                                {..._props.componentProps}
+                                                value={__value}
+                                                onUpdate: value={(newValue) => {
+                                                    set(designer.formState, _path, newValue || null)
+                                                }}
+                                                checked={get(designer.formState, _path)}
+                                                onUpdate: checked={(newValue) => {
+                                                    set(designer.formState, _path, newValue || false)
+                                                }}
+                                                options={unref(options)}
+                                                treeData={unref(treeData)}
+                                                source={element.type === 'form' ? element?.componentProps?.source : undefined}
+                                                mode={element.type === 'form' ? unref(designer.mode) : _props.componentProps?.mode}
+                                                onChange={onChange}
+                                                ref={_formRef}
+                                            ></TypeComponent>
+                                        }
                                         <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{element.componentProps?.description}</div>
                                     </FormItem>
                                 </Selection>

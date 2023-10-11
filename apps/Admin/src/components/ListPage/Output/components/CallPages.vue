@@ -13,10 +13,11 @@
     @ok="handleSubmit"
   >
     <FormPreview
-      :data="data"
       v-if="props.resource.callPage.type === providerEnum.FormPage"
+      :data="data"
       :mode="mode"
       :value="editValue"
+      :projectId="projectId"
       ref="formPage"
     />
     <CustomHtml
@@ -62,6 +63,10 @@ const props = defineProps({
     type: Array as PropType<Record<string, any>[]>,
     default: () => [],
   },
+  projectId: {
+    type: String,
+    default: ''
+  }
 })
 
 const mode = computed(() => {
@@ -147,6 +152,8 @@ watch(
           editValue.value[key] = val[key]
         }
       }
+    } else{
+      editValue.value = {};
     }
   },
   { immediate: true }
