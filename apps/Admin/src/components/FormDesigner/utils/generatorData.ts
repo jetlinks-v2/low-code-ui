@@ -35,7 +35,7 @@ const handleProps = (node: any) => {
     if (/^(date-picker)$/.test(node.type)) {
         result.placeholder = '请选择日期'
         result.format = "YYYY-MM-DD"
-        result.showTime = true
+        result.showTime = false
         result.valueFormat = "YYYY-MM-DD"
     }
     if (/^(time-picker)$/.test(node.type)) {
@@ -57,6 +57,7 @@ const handleProps = (node: any) => {
         case 'select':
             result.options = generateOptions(3)
             result.mode = undefined
+            result.showSearch = false
             break
         case 'tree-select':
             result.treeData = [

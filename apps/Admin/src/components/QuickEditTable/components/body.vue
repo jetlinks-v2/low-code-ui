@@ -85,7 +85,7 @@ const left = inject(SCROLL_LEFT)
 
 const scrollRef = ref()
 
-const { errorMap, validate, createValidate, validates: validatesFn } = useValidate(props.data)
+const { errorMap, validate, createValidate, validates: validatesFn, updateDataSource } = useValidate(props.data)
 
 const slots = useSlots()
 
@@ -167,6 +167,7 @@ watch(() => JSON.stringify(props.columns),  () => {
 
 watch(() => JSON.stringify(props.data), (newValue, oldValue) => {
   myData.value = dataAddID(props.data, cellHeight)
+  updateDataSource(props.data)
   update()
 }, { immediate: true })
 

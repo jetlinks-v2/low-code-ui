@@ -40,7 +40,12 @@
         showSearch
         @change="onDataChange"
       >
-        <j-select-option :label="item.name" v-for="item in dic" :key="item.id" :value="item.id">
+        <j-select-option
+          :label="item.name"
+          v-for="item in dic"
+          :key="item.id"
+          :value="item.id"
+        >
           {{ item.name }}
         </j-select-option>
       </j-select>
@@ -83,7 +88,7 @@
             <j-select
               v-model:value="data.commandId"
               placeholder="请选择"
-              :options="commandList"
+              :options="commandOptions"
               allowClear
               showSearch
               @change="onCommandChange"
@@ -97,12 +102,6 @@
         :validateFirst="true"
         v-if="isSource"
         :name="['componentProps', 'source', 'source']"
-        :rules="[
-          {
-            message: '请选择',
-            required: true,
-          },
-        ]"
       >
         <template #label>
           数据层级<j-tooltip title="选择树结构的数据在接口的哪一层">
@@ -178,8 +177,7 @@
 import { ref, watch, computed, reactive, inject } from 'vue'
 import { queryDictionary, queryEndCommands } from '@/api/form'
 import { useProduct } from '@/store'
-import { omit } from 'lodash-es'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, omit } from 'lodash-es'
 
 const product = useProduct()
 const designer: any = inject('FormDesigner')
@@ -187,29 +185,32 @@ const designer: any = inject('FormDesigner')
 const props = defineProps({
   value: {
     type: Object,
-    default: () => {},
+    default: () => {
+      return {
+        dictionary: undefined,
+        type: 'dic',
+      }
+    },
   },
 })
 
 const emits = defineEmits(['change'])
 
-const data = reactive<any>({
-  dictionary: undefined,
-  type: 'dic',
-  // type: 'end',
-  // label: undefined,
-  // name: undefined,
-  // functionId: undefined,
-  // commandId: undefined,
-  // source: undefined,
-  // dictionary: undefined,
-  // value: undefined,
-})
+const data = reactive<any>({})
 
 watch(
   () => props.value,
   (newValue) => {
-    Object.assign(data, newValue)
+    const obj = newValue || {
+      dictionary: undefined,
+      type: 'dic',
+    }
+    if (data.type === 'dic') {
+      data.dictionary = obj.dictionary
+      data.type = 'dic'
+    } else {
+      Object.assign(data, cloneDeep(obj))
+    }
   },
   {
     deep: true,
@@ -300,6 +301,15 @@ const commandList = computed(() => {
   )
 })
 
+const commandOptions = computed(() => {
+  return commandList.value.map((i) => {
+    return {
+      label: i.name,
+      value: i.id,
+    }
+  })
+})
+
 const getArray = (arr: any[]) => {
   const _item = arr.find((i) => i.valueType?.type === 'array')
   if (_item) {
@@ -374,7 +384,7 @@ const onFunChange = (val: string) => {
     source: undefined,
     label: undefined,
     value: undefined,
-    isSource: isSource.value
+    isSource: isSource.value,
   }
   emits('change', obj)
 }

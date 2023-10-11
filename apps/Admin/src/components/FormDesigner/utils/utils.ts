@@ -21,13 +21,13 @@ export const generateOptions = (len: number) => {
 
 const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo', 'product', 'device', 'org', 'user', 'role']
 
-const checkedConfigItem = (node: ISchema, allData: any[], dictionary: any[]) => {
+const checkedConfigItem = (node: ISchema, allData: any[], dictionary: any[], formList: any[]) => {
     const obj = {
         key: node?.key,
         message: (node.formItemProps?.label || node.name) + '配置错误'
     }
     const _type = node.type || 'root'
-    if (_type === 'root') {
+    if (['root', 'table-item-index', 'table-item-actions'].includes(_type)) {
         return false
     } else {
         if (arr.includes(_type)) {
@@ -92,6 +92,16 @@ const checkedConfigItem = (node: ISchema, allData: any[], dictionary: any[]) => 
         if (['card'].includes(_type) && !(node?.componentProps?.title)) {
             return obj
         }
+        if (['form'].includes(_type)) {
+            if (!(node.componentProps.source.value)) {
+                return obj
+            } else {
+                const flag = formList.find((i) => i.value === node.componentProps.source.value)
+                if (!flag) {
+                    return obj
+                }
+            }
+        }
         if (node?.formItemProps?.isLayout && !node.formItemProps?.label) {
             return obj
         }
@@ -100,23 +110,23 @@ const checkedConfigItem = (node: ISchema, allData: any[], dictionary: any[]) => 
 }
 
 // 校验配置项必填
-const checkConfig = (node: ISchema, allData: any[], dictionary: any[]) => {
-    const _data: any = checkedConfigItem(node, allData, dictionary);
+const checkConfig = (node: ISchema, allData: any[], dictionary: any[], formList: any[]) => {
+    const _data: any = checkedConfigItem(node, allData, dictionary, formList);
     let _rules: any[] = []
     if (_data) {
         _rules.push(_data)
     }
     if (node.children && node.children?.length) {
         node?.children.map(item => {
-            const arr = checkConfig(item, allData, dictionary)
+            const arr = checkConfig(item, allData, dictionary, formList)
             _rules = [..._rules, ...arr]
         })
     }
     return _rules
 }
 
-export const checkedConfig = (node: ISchema, dictionary: any[]) => {
-    return checkConfig(node, node?.children || [], dictionary)
+export const checkedConfig = (node: ISchema, dictionary: any[], formList: any[]) => {
+    return checkConfig(node, node?.children || [], dictionary, formList)
 }
 
 export const updateData = (list: ISchema[], item?: any) => {
@@ -273,11 +283,10 @@ export const queryOptions = async (source: any, id: string) => {
             return bubbleSort(list)
         }
     }
-    console.log(source)
     if (id && source?.type === 'end' && source?.functionId && source?.commandId && source?.label && source?.value) {
-        const resp = await queryRuntime(id, source?.functionId, source?.commandId)
+        const resp = await queryRuntime(id, id + '.' + source?.functionId, source?.commandId, {})
         if (resp.success) {
-            const arr = getData(source?.source, resp?.result || {})
+            const arr = getData(source?.source, resp?.result || [])
             if (Array.isArray(arr) && arr?.length) {
                 return _getEndData(arr, source)
             } else {
@@ -337,7 +346,7 @@ export const appendChildItem = (arr: any[], newData: any, parent: any, flag?: bo
                 child = [...child, newData]
             }
             if (flag === false) {
-                const _f = child.find(item => item?.formItemProps?.name === 'actions')
+                const _f = child.find(item => item?.children?.[0]?.type === 'table-item-actions')
                 if (_f) {
                     child.splice(child.length - 1, 0, newData)
                 } else {

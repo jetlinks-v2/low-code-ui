@@ -190,6 +190,7 @@ const myColumns = [
             }
 
             const someName = dataSource.value.filter(item => item.index !== source.record.index).some(item => item.name === value)
+
             if (someName) {
               return Promise.reject('有重复列名')
             }
@@ -212,8 +213,8 @@ const myColumns = [
     dataIndex: 'comment',
     form: {
       rules: {
-        asyncValidator: (rule, value) => {
-          if (!value) {
+        asyncValidator: (rule, value, cb, source) => {
+          if (!value && source.record.index > maxLen.value) {
             return Promise.reject('请输入注释')
           }
           return Promise.resolve()
@@ -227,8 +228,8 @@ const myColumns = [
     width: 150,
     form: {
       rules: {
-        asyncValidator: (rule, value) => {
-          if (!value) {
+        asyncValidator: (rule, value, cb, source) => {
+          if (!value && source.record.index > maxLen.value) {
             return Promise.reject('请选择javaType')
           }
           return Promise.resolve()
@@ -242,8 +243,8 @@ const myColumns = [
     width: 150,
     form: {
       rules: {
-        asyncValidator: (rule, value) => {
-          if (!value) {
+        asyncValidator: (rule, value, cb, source) => {
+          if (!value && source.record.index > maxLen.value) {
             return Promise.reject('请选择jdbcType')
           }
           return Promise.resolve()
@@ -274,7 +275,10 @@ const myColumns = [
       watch: ['other', 'dictionary'],
       rules: {
         asyncValidator: (rule, value, cb, source) => {
-          return settingValidate(source.record)
+          if (source.record.index > maxLen.value) {
+            return settingValidate(source.record)
+          }
+          return Promise.resolve()
         }
       }
     }
@@ -516,24 +520,26 @@ const getTypes = () => {
 }
 
 watch(() => props.tree, () => {
+    const cloneTreeSetting = cloneDeep(defaultTreeSetting)
+    const cloneSetting = cloneDeep(defaultSetting)
   if (dataSource.value.length) {
     const isTreeNow = dataSource.value[1].name === 'parent_id'
     const arr = JSON.parse(JSON.stringify(dataSource.value))
     if (props.tree) {
       if (!isTreeNow) {
         const other = arr.slice(5, arr.length )
-        dataSource.value = defaultTreeSetting.concat(other)
+        dataSource.value = cloneTreeSetting.concat(other)
         maxLen.value = 9
       }
     } else {
       if (isTreeNow) {
-        dataSource.value = defaultSetting.concat(arr.slice(9, arr.length))
+        dataSource.value = cloneSetting.concat(arr.slice(9, arr.length))
         maxLen.value = 5
       }
     }
   } else { // 新增数据
     maxLen.value = props.tree ? 9 : 5
-    dataSource.value = props.tree ? [...defaultTreeSetting, ...props.columns] : [...defaultSetting, ...props.columns]
+    dataSource.value = props.tree ? [...cloneTreeSetting, ...props.columns] : [...cloneSetting, ...props.columns]
   }
 
 }, { immediate: true })

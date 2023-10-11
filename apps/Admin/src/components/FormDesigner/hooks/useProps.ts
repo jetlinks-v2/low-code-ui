@@ -39,7 +39,7 @@ const useProps = (element: any, _data: any, mode?: string) => {
   }
   // componentProps
   const _componentProps = {
-    ...omit(element?.componentProps, ['description']),
+    ...omit(element?.componentProps, ['description', 'cssCode', 'editable', 'onChange', 'visible', 'source']),
     size: _data?.componentProps.size,
     disabled: element?.componentProps?.disabled || (mode === 'edit' && !element?.componentProps?.editable)
   }

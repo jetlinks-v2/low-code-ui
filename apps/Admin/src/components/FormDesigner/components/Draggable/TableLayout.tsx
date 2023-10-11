@@ -2,7 +2,7 @@ import Selection from '../Selection/index'
 import './index.less'
 import { withModifiers } from 'vue'
 import { Table, AIcon, Button, TableColumn, FormItem } from 'jetlinks-ui-components'
-import { cloneDeep, get, omit, set } from 'lodash-es'
+import { cloneDeep, get, map, omit, set } from 'lodash-es'
 import { useProps, useTool } from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import { uid } from '../../utils/uid'
@@ -82,46 +82,50 @@ export default defineComponent({
         }
 
         const onAddIndex = () => {
-            const _index = unref(list).findIndex(item => item?.formItemProps?.name === 'index')
+            const _index = unref(list).findIndex(item => {
+                return item.children?.[0]?.type === 'table-item-index'
+            })
             if (_index === -1) {
                 const _item = generatorData({
                     type: props.data?.type + '-item',
-                    children: [],
+                    children: [
+                        generatorData({
+                            type: 'table-item-index',
+                            name: '',
+                            children: []
+                        })
+                    ],
                     componentProps: {
                         name: '索引',
                         width: 60,
                         colSpan: 1,
                         align: 'left',
-                        // fixed: 'left',
                     },
-                    formItemProps: {
-                        name: 'index',
-                        required: false,
-                        rules: []
-                    }
                 })
                 designer.onAddChild(_item, props.data, true)
             }
         }
 
         const onAddAction = () => {
-            const _index = unref(list).findIndex(item => item?.formItemProps?.name === 'actions')
+            const _index = unref(list).findIndex(item => {
+                return item.children?.[0]?.type === 'table-item-actions'
+            })
             if (_index === -1) {
                 const _item = generatorData({
                     type: props.data?.type + '-item',
-                    children: [],
                     componentProps: {
                         name: '操作',
                         width: 60,
                         colSpan: 1,
                         align: 'left',
-                        // fixed: 'right'
                     },
-                    formItemProps: {
-                        name: 'actions',
-                        required: false,
-                        rules: []
-                    }
+                    children: [
+                        generatorData({
+                            type: 'table-item-actions',
+                            name: '',
+                            children: []
+                        })
+                    ],
                 })
                 designer.onAddChild(_item, props.data)
             }
@@ -133,10 +137,9 @@ export default defineComponent({
             const _props = useProps(__data, unref(designer.formData), unref(designer.mode))
             const options = ref<any[]>(_props.componentProps.options)
             const treeData = ref<any[]>(_props.componentProps.treeData)
-
-            if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(__data.type)) {
+            if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(__data?.type)) {
                 queryOptions(__data.componentProps.source, product.info?.id).then(resp => {
-                    if (['select', 'select-card'].includes(__data.type)) {
+                    if (['select', 'select-card'].includes(__data?.type)) {
                         options.value = resp
                     } else {
                         treeData.value = resp
@@ -148,12 +151,10 @@ export default defineComponent({
                 {
                     __data?.type === 'switch' ?
                         <TypeComponent
-                            data={__data}
                             {..._props?.componentProps}
                             checked={get(designer.formState, _path1)}
                             onUpdate:checked={(newValue) => set(designer.formState, _path1, newValue)}
                         /> : <TypeComponent
-                            data={__data}
                             {..._props?.componentProps}
                             options={unref(options)}
                             treeData={unref(treeData)}
@@ -165,9 +166,9 @@ export default defineComponent({
         }
 
         const renderContent = (element: any, dt: any) => {
-            if (element?.formItemProps?.name === 'index') {
+            if (element.children?.[0]?.type === 'table-item-index') {
                 return (dt?.index || 0) + 1
-            } else if (element?.formItemProps?.name === 'actions') {
+            } else if (element.children?.[0]?.type === 'table-item-actions') {
                 return <Button onClick={() => {
                     data.value.splice(dt?.index, 1)
                 }} type="link" danger><AIcon type="DeleteOutlined" /></Button>
@@ -183,7 +184,7 @@ export default defineComponent({
                 }
                 data={element}
                 tag="div"
-                hasCopy={!['actions', 'index'].includes(element?.formItemProps?.name)}
+                hasCopy={!['table-item-index', 'table-item-actions'].includes(element.children?.[0]?.type)}
                 hasDel={true}
                 hasMask={true}
                 parent={unref(list)}
@@ -231,11 +232,11 @@ export default defineComponent({
                                     <div class="draggable-add-btn" style={{ width: '200px' }}>
                                         <span onClick={withModifiers(handleAdd, ['stop'])}>添加列</span>
                                         {
-                                            !unref(list).find(item => item?.formItemProps?.name === 'index') &&
+                                            !unref(list).find(item => item.children?.[0]?.type === 'table-item-index') &&
                                             <span onClick={withModifiers(onAddIndex, ['stop'])} style={{ marginLeft: '10px' }}>添加索引</span>
                                         }
                                         {
-                                            !unref(list).find(item => item?.formItemProps?.name === 'actions') &&
+                                            !unref(list).find(item => item.children?.[0]?.type === 'table-item-actions') &&
                                             <span onClick={withModifiers(onAddAction, ['stop'])} style={{ marginLeft: '10px' }}>添加操作</span>
                                         }
                                     </div>

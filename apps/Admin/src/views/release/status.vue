@@ -122,7 +122,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:status'])
+const emit = defineEmits(['update:status', 'update:theme'])
 
 const engine = useEngine()
 const product = useProduct()
@@ -305,14 +305,15 @@ const validateAll = async (id, cb) => {
 }
 
 const themeChange = (e) =>{
-  const item = product.getById(product.info.id)
-
-  item.others = {
-    ...(item.others || {}),
-    theme: e
-  }
-
-  product.update(item)
+  emit('update:theme', e)
+  // const item = product.getById(product.info.id)
+  //
+  // item.others = {
+  //   ...(item.others || {}),
+  //   theme: e
+  // }
+  //
+  // product.update(item)
 }
 
 const cancel = async () => {

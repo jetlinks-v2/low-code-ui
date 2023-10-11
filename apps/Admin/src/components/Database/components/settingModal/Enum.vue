@@ -1,6 +1,7 @@
 <template>
   <j-form-item label="数据字典" :name="['dictionary', 'dictionaryId']" required :rules="[{ required: true, message: '请选择数据字典'}]">
     <j-select
+      showSearch
       :options="options"
       placeholder="请选择数据字典"
       v-model:value="model.dictionary.dictionaryId"
@@ -60,7 +61,8 @@ const { data: options } = useRequest(dictionaryList, {
       return res.result.map(item => ({ ...item, label: item.name, value: item.id }))
     }
     return []
-  }
+  },
+  defaultParams: [{ sorts: [ { name: 'createTime', order: 'desc'},{ name: 'name', order: 'desc'} ]}]
 })
 
 const model = inject(SETTING_FORM_MODEL, {})

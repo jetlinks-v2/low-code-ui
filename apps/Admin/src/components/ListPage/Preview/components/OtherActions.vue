@@ -44,7 +44,7 @@
                 handleFunction(item.permissionProps, record)?.popConfirm
               "
               :class="extractCssClass(item.style)"
-              :data-id="item.key"
+              :data-id="item.id"
             >
               <template #icon v-if="item.icon || item.key === 'delete'">
                 <img

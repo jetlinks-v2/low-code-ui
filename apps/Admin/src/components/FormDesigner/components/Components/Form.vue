@@ -4,31 +4,35 @@
       :value="myValue"
       :mode="mode"
       :data="config"
-      @valueChange="valueChange"
+      @stateChange="onValueChange"
     />
   </div>
-
 </template>
 <script lang="ts" setup>
 import FormPreview from '@/components/FormDesigner/preview.vue'
+import { watch, computed, ref } from 'vue'
 
 const props = defineProps({
-  value:{
-    type:Array,
-    default:[]
+  value: {
+    type: Array,
+    default: [],
   },
   mode: {
-    type:String,
-    default:''
+    type: String,
+    default: '',
   },
-  disabled:{
-    type:Boolean,
-    default:false
-  },
-  data: {
+  // disabled: {
+  //   type: Boolean,
+  //   default: false,
+  // },
+  // data: {
+  //   type: Object,
+  //   default: () => ({}),
+  // },
+  source: {
     type: Object,
-    default: () =>({})
-  },
+    default: () => ({}),
+  }
 })
 
 const emit = defineEmits(['update:value'])
@@ -36,17 +40,23 @@ const emit = defineEmits(['update:value'])
 const myValue = ref(props.value)
 
 const config = computed(() => {
-  return JSON.parse(props.data.componentProps?.source?.code || '{}')
+  return JSON.parse(props.source?.code || '{}')
 })
 
-const valueChange = (e) => {
+const onValueChange = (e) => {
   emit('update:value', e)
 }
 
-watch(() => JSON.stringify(props.value), () => {
-  myValue.value = props.value
-})
-
+watch(
+  () => props.value,
+  (newVal) => {
+    myValue.value = newVal
+  },
+  {
+    deep: true,
+    immediate: true
+  }
+)
 </script>
 <style scoped>
 .form-warp {

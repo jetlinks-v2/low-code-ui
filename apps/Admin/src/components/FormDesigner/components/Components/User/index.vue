@@ -9,7 +9,7 @@
     :mode="mode"
     :disabled="disabled"
     :size="size"
-    style="min-width: 230px;"
+    style="width: 100%"
   >
   </j-select>
   <UserChoice

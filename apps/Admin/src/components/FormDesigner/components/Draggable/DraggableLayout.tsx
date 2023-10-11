@@ -17,6 +17,7 @@ import { onEnd } from './ControlInsertionPlugin';
 import { useProps } from '../../hooks';
 import './index.less'
 import { request } from '@jetlinks/core';
+import dayjs from "dayjs";
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -80,7 +81,7 @@ const DraggableLayout = defineComponent({
                             }
                             return (
                                 <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                                    <TypeComponent data={element} {...element.componentProps} />
+                                    <TypeComponent {...element.componentProps} />
                                 </Selection>
                             )
                         }
@@ -169,12 +170,12 @@ const DraggableLayout = defineComponent({
                                 if (unref(isEditModel)) {
                                     return <TypeComponent
                                         model={unref(designer.model)}
-                                        data={element}
                                         {...omit(_props.componentProps, ['disabled'])}
+                                        source={element.type === 'form' ? element?.componentProps?.source : undefined}
                                     ></TypeComponent>
                                 } else if (['switch'].includes(element.type)) {
                                     return <TypeComponent
-                                        data={element}
+                                        // data={element} // TypeError: Cannot convert object to primitive value报错
                                         {..._props.componentProps}
                                         checked={get(designer.formState, _path)}
                                         onUpdate:checked={(newValue) => {
@@ -182,13 +183,30 @@ const DraggableLayout = defineComponent({
                                         }}
                                         onChange={onChange}
                                     ></TypeComponent>
-                                } else {
+                                } else if (['form'].includes(element.type)) {
                                     return <TypeComponent
-                                        data={element}
                                         {..._props.componentProps}
+                                        mode={unref(designer.mode)}
+                                        source={element?.componentProps?.source}
                                         value={get(designer.formState, _path)}
                                         onUpdate:value={(newValue) => {
-                                            set(designer.formState, _path, newValue)
+                                            set(designer.formState, _path, newValue || null)
+                                        }}
+                                        onChange={onChange}
+                                    ></TypeComponent>
+                                } else {
+                                    let __value = get(designer.formState, _path)
+                                    // 时间组件处理
+                                    if(['date-picker', 'time-picker'].includes(element.type)){
+                                        if(typeof __value === 'number'){
+                                            __value = dayjs(__value).format(_props.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
+                                        }
+                                    }
+                                    return <TypeComponent
+                                        {..._props.componentProps}
+                                        value={__value}
+                                        onUpdate:value={(newValue) => {
+                                            set(designer.formState, _path, newValue || null)
                                         }}
                                         options={unref(options)}
                                         treeData={unref(treeData)}

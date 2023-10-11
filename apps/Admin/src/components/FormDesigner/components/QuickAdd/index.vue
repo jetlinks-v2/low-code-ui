@@ -52,7 +52,7 @@
                   showSearch
                   placeholder="请选择"
                   v-model:value="modelRef.source.commandId"
-                  :options="commandList"
+                  :options="commandOptions"
                   @change="onCommChange"
                   allowClear
                 />
@@ -128,7 +128,7 @@ import { providerEnum } from '@/components/ProJect'
 import generatorData from '../../utils/generatorData'
 import { map, uniqBy } from 'lodash-es'
 import { uid } from '../../utils/uid'
-import {  typeImages } from '@/components/ProJect/index'
+import { typeImages } from '@/components/ProJect/index'
 
 const product = useProduct()
 const designer: any = inject('FormDesigner')
@@ -199,6 +199,17 @@ const commandList = computed(() => {
           value: i.id,
         }
       }) || []
+  )
+})
+
+const commandOptions = computed(() => {
+  return (
+    commandList.value.map((i) => {
+      return {
+        label: i.name,
+        value: i.id,
+      }
+    }) || []
   )
 })
 
@@ -402,6 +413,10 @@ const handleSource = (arr: any[], list: any[]) => {
 const onSaveData = (_data: any) => {
   const obj = {
     ...props.data,
+    configuration: {
+      type: 'form',
+      code: JSON.stringify(unref(designer.formData)),
+    },
     others: {
       ...props.data.others,
       quickData: _data,

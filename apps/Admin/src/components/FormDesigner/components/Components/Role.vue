@@ -8,7 +8,7 @@
       :disabled="disabled"
       placeholder="请选择"
       :size="size"
-      style="min-width: 230px"
+      style="width: 100%"
     >
     </j-tree-select>
   </div>

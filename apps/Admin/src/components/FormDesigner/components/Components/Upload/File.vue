@@ -6,8 +6,11 @@
       :action="_fileUpload"
       :headers="headers"
       :accept="accept"
+      name="file"
+      :multiple="maxCount > 1"
       :before-upload="beforeUpload"
       @change="handleChange"
+      @drop="handleDrop"
     >
       <div>
         <p class="ant-upload-drag-icon">
@@ -15,7 +18,7 @@
         </p>
         <p class="ant-upload-hint">将文件拖动到此处，或点击上传</p>
       </div>
-      <template #itemRender="{ file, actions }">
+      <template #itemRender="{ file }">
         <div class="render">
           <j-input
             v-model:value="file.name"
@@ -24,7 +27,7 @@
             ref="nameRef"
           ></j-input>
           <div @dblclick="onDbClick(file)" v-else>{{ file.name }}</div>
-          <j-button type="link" style="width: 10%" @click="actions.remove">
+          <j-button type="link" style="width: 10%" @click="onDelete(file)">
             <AIcon type="DeleteOutlined" />
           </j-button>
         </div>
@@ -69,7 +72,7 @@ const props = defineProps({
 
 const emits = defineEmits(['change'])
 
-const fileList = ref<any>([])
+const fileList = ref<any[]>([])
 const dbRef = ref<boolean>(false)
 const dbId = ref<string>('')
 const nameRef = ref()
@@ -111,6 +114,18 @@ const handleChange = async (info: UploadChangeParam) => {
     }))
     emits('change', arr)
     onlyMessage('上传成功！', 'success')
+  }
+}
+
+const handleDrop = (e) => {
+  console.log(e, 'drop')
+}
+
+const onDelete = (file: any) => {
+  const _index = fileList.value.findIndex(item => item.uid === file?.uid)
+  if(_index !== -1){
+    fileList.value.splice(_index, 1)
+    emits('change', fileList.value)
   }
 }
 
