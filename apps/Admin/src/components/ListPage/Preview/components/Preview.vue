@@ -39,6 +39,7 @@
   <Add
     v-model:open="addVisible"
     :resource="popResource"
+    :projectId="projectId"
     :popTitle="popTitle"
     @close="addVisible = false"
     @save="addVisible = false"
