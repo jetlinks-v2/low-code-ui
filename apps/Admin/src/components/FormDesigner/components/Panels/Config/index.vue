@@ -73,6 +73,7 @@ const visible = ref<boolean>(false)
 const _rulesData = reactive<any>({
   value: {},
   type: 'root',
+  index: 0
 })
 
 const Panels = {

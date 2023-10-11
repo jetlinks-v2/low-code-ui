@@ -11,14 +11,6 @@
         },
       ]"
     >
-      <!-- <j-radio-group
-        v-model:value="data.type"
-        button-style="solid"
-        @change="onRadioChange"
-      >
-        <j-radio-button :value="'dic'">数据字典</j-radio-button>
-        <j-radio-button :value="'end'">后端接口</j-radio-button>
-      </j-radio-group> -->
       <CheckButton
         :options="[
           { label: '数据字典', value: 'dic' },
@@ -32,7 +24,7 @@
       :validateFirst="true"
       :name="['componentProps', 'source', 'dictionary']"
       v-if="data?.type === 'dic'"
-      :rules="rules"
+      :rules="rulesDic"
     >
       <j-select
         placeholder="请选择"
@@ -42,7 +34,7 @@
       >
         <j-select-option
           :label="item.name"
-          v-for="item in dic"
+          v-for="item in designer.source?.dictionary || []"
           :key="item.id"
           :value="item.id"
         >
@@ -56,12 +48,7 @@
           <j-form-item
             :validateFirst="true"
             :name="['componentProps', 'source', 'functionId']"
-            :rules="[
-              {
-                message: '请选择',
-                required: true,
-              },
-            ]"
+            :rules="rulesFunc"
           >
             <j-select
               v-model:value="data.functionId"
@@ -77,12 +64,7 @@
         <j-col :span="12">
           <j-form-item
             :validateFirst="true"
-            :rules="[
-              {
-                message: '请选择',
-                required: true,
-              },
-            ]"
+            :rules="rulesComm"
             :name="['componentProps', 'source', 'commandId']"
           >
             <j-select
@@ -101,6 +83,7 @@
       <j-form-item
         :validateFirst="true"
         v-if="isSource"
+        :rules="rulesSource"
         :name="['componentProps', 'source', 'source']"
       >
         <template #label>
@@ -122,12 +105,7 @@
       <j-form-item
         :validateFirst="true"
         :name="['componentProps', 'source', 'label']"
-        :rules="[
-          {
-            message: '请选择',
-            required: true,
-          },
-        ]"
+        :rules="rulesLabel"
       >
         <template #label>
           展示字段<j-tooltip title="选择树结构进行展示的数据">
@@ -147,12 +125,7 @@
       <j-form-item
         :validateFirst="true"
         :name="['componentProps', 'source', 'value']"
-        :rules="[
-          {
-            message: '请选择',
-            required: true,
-          },
-        ]"
+        :rules="rulesLabel"
       >
         <template #label>
           存入后端字段<j-tooltip title="选择树结构存入后端的数据">
@@ -174,12 +147,13 @@
 </template>
     
 <script lang="ts" setup>
-import { ref, watch, computed, reactive, inject } from 'vue'
-import { queryDictionary, queryEndCommands } from '@/api/form'
-import { useProduct } from '@/store'
-import { cloneDeep, omit } from 'lodash-es'
+import { watch, computed, reactive, inject, onMounted } from 'vue'
+// import { queryDictionary, queryEndCommands } from '@/api/form'
+// import { useProduct } from '@/store'
+import { cloneDeep } from 'lodash-es'
+import { getArray, searchTree } from '@/components/FormDesigner/utils/utils'
 
-const product = useProduct()
+// const product = useProduct()
 const designer: any = inject('FormDesigner')
 
 const props = defineProps({
@@ -218,17 +192,17 @@ watch(
   },
 )
 
-const dic = ref<any[]>([])
-const end = ref<any[]>([])
+// const dic = ref<any[]>([])
+// const end = ref<any[]>([])
 
-const rules = [
+const rulesDic = [
   {
     required: true,
     message: '请选择',
   },
   {
     validator(_rule: any, value: string) {
-      const item = dic.value.find((i) => i?.id === value)
+      const item = designer.source.dictionary.find((i) => i?.id === value)
       if (!item) {
         return Promise.reject(`数字字典已被删除或禁用`)
       }
@@ -238,24 +212,91 @@ const rules = [
   },
 ]
 
-const getDictionary = () => {
-  queryDictionary().then((resp) => {
-    if (resp.success) {
-      // 过滤掉没有启用的数据
-      dic.value = resp.result?.filter((item) => item?.status) || []
-      designer.dictionary.value = dic.value
-    }
-  })
-}
+const rulesComm = [
+  {
+    required: true,
+    message: '请选择',
+  },
+  {
+    validator(_rule: any, value: string) {
+      const item = commandOptions.value.find((i) => i?.value === value)
+      if (!item) {
+        return Promise.reject(`数据已被删除`)
+      }
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+const rulesFunc = [
+  {
+    required: true,
+    message: '请选择',
+  },
+  {
+    validator(_rule: any, value: string) {
+      const item = functionList.value.find((i) => i?.value === value)
+      if (!item) {
+        return Promise.reject(`数据已被删除`)
+      }
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
 
-const getEnd = () => {
-  const id = product.info?.draftId
-  queryEndCommands(id, ['rdb-crud']).then((resp) => {
-    if (resp.success) {
-      end.value = resp.result || []
-    }
-  })
-}
+const rulesLabel = [
+  {
+    required: true,
+    message: '请选择',
+  },
+  {
+    validator(_rule: any, value: string) {
+      const item = labelList.value.find((i) => i?.value === value)
+      if (!item) {
+        return Promise.reject(`数据已被删除`)
+      }
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
+const rulesSource = [
+  {
+    required: true,
+    message: '请选择',
+  },
+  {
+    validator(_rule: any, value: string) {
+      const item = sourceList.value.find((i) => i?.value === value)
+      if (!item) {
+        return Promise.reject(`数据已被删除`)
+      }
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
+// const getDictionary = () => {
+//   queryDictionary().then((resp) => {
+//     if (resp.success) {
+//       // 过滤掉没有启用的数据
+//       dic.value = resp.result?.filter((item) => item?.status) || []
+//       designer.dictionary.value = dic.value
+//     }
+//   })
+// }
+
+// const getEnd = () => {
+//   const id = product.info?.draftId
+//   queryEndCommands(id, ['rdb-crud']).then((resp) => {
+//     if (resp.success) {
+//       end.value = resp.result || []
+//     }
+//   })
+// }
 
 const onRadioChange = (e) => {
   if (e === 'end') {
@@ -278,7 +319,7 @@ const onRadioChange = (e) => {
 
 const functionList = computed(() => {
   return (
-    end.value?.map((item) => {
+    (designer.source?.end || []).map((item) => {
       return {
         label: item.name + '.' + item.id,
         value: item.id,
@@ -289,7 +330,7 @@ const functionList = computed(() => {
 
 const commandList = computed(() => {
   return (
-    end.value
+    (designer.source?.end || [])
       .find((item) => data?.functionId === item.id)
       ?.command?.map((i) => {
         return {
@@ -310,23 +351,6 @@ const commandOptions = computed(() => {
   })
 })
 
-const getArray = (arr: any[]) => {
-  const _item = arr.find((i) => i.valueType?.type === 'array')
-  if (_item) {
-    return arr?.map((item) => {
-      const children = item?.properties?.length ? getArray(item.properties) : []
-      return {
-        ...omit(item, 'properties'),
-        label: item?.name,
-        value: item?.id,
-        children,
-      }
-    })
-  } else {
-    return []
-  }
-}
-
 const sourceList = computed(() => {
   const properties =
     commandList.value.find((item) => item.id === data?.commandId)?.output
@@ -335,22 +359,8 @@ const sourceList = computed(() => {
 })
 
 const isSource = computed(() => {
-  return data.type === 'end' && sourceList.value.length
+  return !!(data.type === 'end' && sourceList.value?.length)
 })
-
-const searchTree = (arr: any[], _item: any) => {
-  let _data: any = undefined
-  arr?.map((item) => {
-    if (item.id === _item) {
-      _data = item
-      return
-    }
-    if (item.children?.length) {
-      _data = searchTree(item.children, _item)
-    }
-  })
-  return _data
-}
 
 const labelList = computed(() => {
   const _item = data?.source
@@ -393,31 +403,23 @@ const onCommandChange = () => {
   data.source = undefined
   data.label = undefined
   data.value = undefined
+  data.isSource = isSource.value
   emits('change', data)
 }
 
 const onSourceChange = () => {
   data.label = undefined
   data.value = undefined
+  data.isSource = isSource.value
   emits('change', data)
 }
 
 const onDataChange = () => {
+  data.isSource = isSource.value
   emits('change', data)
 }
 
-watch(
-  () => data?.type,
-  (newVal) => {
-    if (newVal === 'dic') {
-      getDictionary()
-    }
-    if (newVal === 'end') {
-      getEnd()
-    }
-  },
-  {
-    immediate: true,
-  },
-)
+onMounted(() => {
+  designer.handleSearch()
+})
 </script>

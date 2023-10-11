@@ -54,12 +54,13 @@ watch(
   },
   {
     immediate: true,
-    deep: true
-  }
+    deep: true,
+  },
 )
 
 const onChange = (item: any) => {
-  emit('update:value', JSON.stringify(item || []))
+  const _value = item && item?.length > 0 ? JSON.stringify(item) : null
+  emit('update:value', _value)
 }
 
 const _componentProps = computed(() => {

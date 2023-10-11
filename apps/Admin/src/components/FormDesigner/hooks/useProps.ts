@@ -29,6 +29,7 @@ const useProps = (element: any, _data: any, mode?: string) => {
     }
     return { ...omit(item, 'key'), trigger }
   })
+  // 处理内嵌表单的校验问题
   if (element?.formItemProps?.required) {
     if (['org', 'user', 'role', 'device', 'product', 'select-card', 'switch', 'tree-select', 'select', 'date-picker', 'time-picker'].includes(element.type)) {
       rules = [{
