@@ -7,7 +7,7 @@
     :title="title"
     okText="确定"
     cancelText="取消"
-    width="630px"
+    :width="modalWidth"
     :destroyOnClose="true"
     @cancel="emit('close', true)"
     @ok="handleSubmit"
@@ -39,6 +39,13 @@ const data = ref<any>()
 
 const vueMode = ref(true)
 const store = new ReplStore(JSON.stringify(data.value))
+const modalWidth = computed(() => {
+  if(props.resource.modalWidth) {
+    return props.resource.modalWidth + props.resource.modalWidthUnit
+  } else {
+    return '520px'
+  }
+})
 const formPage = ref()
 provide('store', store)
 provide('useVueMode', vueMode)
