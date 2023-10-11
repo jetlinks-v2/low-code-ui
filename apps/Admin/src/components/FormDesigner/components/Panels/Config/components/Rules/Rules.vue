@@ -93,7 +93,7 @@
 </template>
   
   <script lang="ts" setup>
-import { ref, reactive, unref, watchEffect, watch } from 'vue'
+import { ref, reactive, unref, watch } from 'vue'
 import { patternList } from './index'
 import EditorBtn from '../EditorBtn.vue'
 
@@ -114,7 +114,6 @@ const ruleModel = reactive<any>({
   message: undefined,
   max: undefined,
   min: undefined,
-  // required: false,
   trigger: ['change'],
   pattern: undefined,
   validator: undefined,
@@ -123,7 +122,6 @@ const regRef = ref<any>(undefined)
 const inputRef = ref<any>('')
 
 const handleChange = (e: any) => {
-  // const reg = new RegExp(e) // 使用的时候处理
   ruleModel.pattern = e
   emits('change', unref(ruleModel))
 }
@@ -140,13 +138,19 @@ watch(
   },
 )
 
-watchEffect(() => {
-  Object.assign(ruleModel, props.value)
-  if (props.value?.pattern) {
-    // const reg = `${props.value.pattern}`
-    inputRef.value = props.value?.pattern // reg.slice(1, reg.length - 1)
-  }
-})
+watch(
+  () => props.value,
+  (newVal) => {
+    Object.assign(ruleModel, newVal)
+    if (newVal?.pattern) {
+      inputRef.value = newVal?.pattern
+    }
+  },
+  {
+    deep: true,
+    immediate: true,
+  },
+)
 
 const onPatternChange = (e) => {
   ruleModel.pattern = e.target?.value
@@ -159,7 +163,7 @@ const onChange = () => {
 
 const onBack = () => {
   emits('change', unref(ruleModel))
-    emits('close')
+  emits('close')
 }
 </script>
   

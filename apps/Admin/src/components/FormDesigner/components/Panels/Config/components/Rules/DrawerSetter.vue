@@ -40,12 +40,15 @@ const onClickItem = () => {
   __rules.visible.value = true
   __rules.data.value = props.value
   __rules.data.type = props.type
+  __rules.data.index = props.index
 }
 
 watch(
-  () => __rules.data.value,
+  () => __rules.data,
   (newVal) => {
-    emits('change', newVal, props.index)
+    if(props.index === newVal?.index){
+      emits('change', newVal.value, props.index)
+    }
   },
   {
     deep: true,

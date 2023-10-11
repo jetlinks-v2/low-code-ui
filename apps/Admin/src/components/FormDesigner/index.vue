@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Header @save="onSave" :data="data" @validate="onValid" />
+    <Header @save="onSave" :type="type" :data="data" @validate="onValid" />
     <div class="box">
       <div class="left" v-if="model !== 'preview'"><Filed /></div>
       <div
@@ -37,8 +37,9 @@ import {
   unref,
   computed,
   reactive,
+  onMounted,
 } from 'vue'
-import {cloneDeep, debounce, map} from 'lodash-es'
+import { cloneDeep, debounce, map } from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
 import { Modal } from 'jetlinks-ui-components'
 import {
@@ -53,8 +54,9 @@ import {
 import { uid } from './utils/uid'
 import Check from './components/Check/index.vue'
 import { onlyMessage } from '@jetlinks/utils'
-import { queryDictionary } from '@/api/form'
+import { queryDictionary, queryEndCommands } from '@/api/form'
 import { providerEnum } from '@/components/ProJect'
+import { proAll } from '../QuickEditTable/util'
 
 const props = defineProps({
   value: {
@@ -69,6 +71,11 @@ const props = defineProps({
   data: {
     type: Object,
   },
+  type: {
+    // 判断是工作流还是低代码
+    type: String as PropType<'workflow' | 'low-code'>,
+    default: 'low-code',
+  },
 })
 
 const model = ref<'preview' | 'edit'>(props.mode ? 'preview' : 'edit') // 预览；编辑
@@ -79,6 +86,7 @@ const errorKey = ref<string[]>([])
 const configRef = ref<any>()
 const refList = ref<any>({})
 const formRef = ref<any>()
+const formRefList = ref<any>({})
 const formState = reactive({})
 const collectVisible = ref<boolean>(false)
 const collectData = ref<any[]>([])
@@ -88,8 +96,11 @@ const _ctrl = ref<boolean>(false)
 const _other = ref<boolean>(false)
 const focus = ref<boolean>(false)
 const focused = ref<boolean>(false)
-const dictionary = ref<any[]>([])
-
+// 存储数据源请求的数据
+const source = reactive<any>({
+  dictionary: [],
+  end: [],
+})
 const product = useProduct()
 const formDesigner = useFormDesigner()
 
@@ -131,10 +142,15 @@ const setSelection = (node: any) => {
       selected.value.push(node)
     }
   }
-  const flag = node.type === 'table-item' && ['table-item-index', 'table-item-actions'].includes(node?.children?.[0]?.type)
+  const flag =
+    node.type === 'table-item' &&
+    ['table-item-index', 'table-item-actions'].includes(
+      node?.children?.[0]?.type,
+    )
   isShowConfig.value =
     !(selected.value?.length > 1) &&
-    !map(selected.value, 'type').includes('space-item') && !flag
+    !map(selected.value, 'type').includes('space-item') &&
+    !flag
   onSaveData()
 }
 
@@ -267,14 +283,19 @@ const setModel = (_type: 'preview' | 'edit') => {
 
 const onSave = () => {
   if (model.value === 'preview') {
-    return new Promise((resolve, inject) => {
-      formRef.value
-        .validate()
-        .then((_data: any) => {
-          resolve(_data)
+    // 校验内嵌表单
+    const _func = Object.keys(formRefList.value || {}).map((item) => {
+      return formRefList.value[item]?.onSave()
+    })
+    // 主表单
+    _func.push(formRef.value?.validate())
+    return new Promise((resolve, reject) => {
+      proAll(_func)
+        .then(() => {
+          resolve(formState)
         })
-        .catch((err: any) => {
-          inject(err)
+        .catch((err) => {
+          reject(err)
         })
     })
   }
@@ -293,8 +314,22 @@ const getFormList = computed(() => {
   })
 })
 
+const handleSearch = async () => {
+  const resp = await await queryDictionary()
+  if (resp.success) {
+    // 过滤掉没有启用的数据
+    source.dictionary = resp.result?.filter((item) => item?.status) || []
+  }
+  const resp1 = await queryEndCommands(product.info?.draftId, ['rdb-crud'])
+  if (resp1.success) {
+    source.end = resp1.result || []
+  }
+}
+
 provide('FormDesigner', {
+  projectId: product.info?.id,
   model,
+  type: props?.type || 'low-code',
   formData,
   formState,
   formRef,
@@ -303,6 +338,7 @@ provide('FormDesigner', {
   errorKey,
   mode: props?.mode,
   refList,
+  formRefList,
   collectVisible,
   collectData,
   delVisible,
@@ -310,7 +346,7 @@ provide('FormDesigner', {
   _other,
   focus,
   focused, // 其他组件
-  dictionary,
+  source,
   formList: getFormList,
   setSelection,
   setModel,
@@ -322,6 +358,7 @@ provide('FormDesigner', {
   onCollect,
   onAddChild,
   onSave,
+  handleSearch
 })
 
 watch(
@@ -355,24 +392,14 @@ watch(
   },
 )
 
-// onMounted(() => {
-//   // setSelection('root')
-// })
-
 onUnmounted(() => {
   onSaveData()
 })
 
 // 校验
 const onValidate = async () => {
-  if (!dictionary.value?.length) {
-    const resp = await queryDictionary()
-    if (resp.success) {
-      // 过滤掉没有启用的数据
-      dictionary.value = resp.result?.filter((item) => item?.status) || []
-    }
-  }
-  errorKey.value = checkedConfig(unref(formData), dictionary.value, getFormList.value)
+  await handleSearch()
+  errorKey.value = checkedConfig(unref(formData), source, getFormList.value)
   return new Promise((resolve, reject) => {
     if (errorKey.value?.length) {
       reject(errorKey.value)

@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <div class="left" v-if="isEditModel">
+    <div class="left" v-if="isEditModel && type === 'low-code'">
       <j-space :size="12">
         <span>提供多种方式帮助你快速添加表单页内容</span>
         <QuickAdd :data="data" />
@@ -8,7 +8,10 @@
     </div>
     <div class="right">
       <j-space>
-        <j-button v-if="isEditModel" type="primary" @click="onCheck"
+        <j-button
+          v-if="isEditModel && type === 'low-code'"
+          type="primary"
+          @click="onCheck"
           >校验</j-button
         >
         <j-button
@@ -23,6 +26,9 @@
             ><AIcon type="LeftOutlined" />结束预览</j-button
           >
           <div>正在预览</div>
+        </template>
+        <template v-if="type === 'workflow'">
+          <j-button type="primary" @click="onSave">保存</j-button>
         </template>
       </j-space>
     </div>
@@ -40,6 +46,11 @@ const props = defineProps({
     type: Object,
     default: () => {},
   },
+  type: {
+    // 判断是工作流还是低代码
+    type: String as PropType<'workflow' | 'low-code'>,
+    default: 'low-code',
+  },
 })
 
 const emits = defineEmits(['save', 'validate'])
@@ -55,6 +66,10 @@ const onPreview = (_type: 'preview' | 'edit') => {
 
 const onCheck = () => {
   emits('validate')
+}
+
+const onSave = () => {
+  
 }
 </script>
 
