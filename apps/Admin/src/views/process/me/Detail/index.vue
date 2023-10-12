@@ -1,15 +1,17 @@
 
 <template>
-    <j-drawer visible :closable="false" @close="emit('close')" title="流程详情" size="large" >
-        <j-tabs v-model:activeKey="activeKey" type="card">
+    <j-drawer visible :closable="false" @close="emit('close')" title="流程详情" size="large">
+        <j-select v-if="type=='todo'" showSearch v-model:value="taskId" class="top" :options="options" placeholder="请选择办理的节点" @change="onChange">
+        </j-select>
+        <j-tabs v-model:activeKey="activeKey" type="card" v-if="type!=='todo' || !!taskId">
             <j-tab-pane key="form" tab="表单">
-                <FlowForm :current="current"/>
+                <FlowForm :current="current" />
             </j-tab-pane>
             <j-tab-pane key="chart" tab="流程图">
-                <FlowChart :current="current"/>
+                <FlowChart :current="current" />
             </j-tab-pane>
             <j-tab-pane key="history" tab="流程记录">
-                <FlowHistory :current="current"/>
+                <FlowHistory  :info="info"/>
             </j-tab-pane>
         </j-tabs>
     </j-drawer>
@@ -19,20 +21,56 @@
 import FlowForm from './components/FlowForm.vue'
 import FlowChart from './components/FlowChart.vue'
 import FlowHistory from './components/FlowHistory.vue'
+import { getProcessDetail, getProcessTodoDetail } from '@/api/process/me';
 
 const props = defineProps({
     current: {
         type: Object,
         default: {}
+    },
+    type: {
+        type: String,
+        default: ''
     }
 })
 
 const emit = defineEmits(['close'])
 
 const activeKey = ref('form')
+const info = ref<any>({})
+const options = ref([])
+const taskId = ref(undefined)
 
+const getDetail = async (taskId?:string) => {
+    const res =taskId?await getProcessTodoDetail(props.current.id,taskId): await getProcessDetail(props.current.id)
+    if (res.status === 200) {
+        info.value = res.result
+    }
+}
 
+const onChange = (e)=>{
+    getDetail(e)
+}
+
+onMounted(() => {
+    const arr = props.current.identityLinks?.filter(
+        item => item.linkType.value === 'assignee' && item.state.value === 'todo'
+    )
+    options.value = arr?.map(item => ({
+        label: `${item.taskName}-${item.taskName}`,
+        value: item.taskId
+    }))
+    if(props.type!=='todo'){
+        getDetail()
+    }
+   
+    // console.log('arr--', props.current.identityLinks, arr)
+})
 </script>
 
 <style scoped lang='less'>
+.top{
+    margin-bottom: 10px;
+    width: 200px;
+}
 </style>

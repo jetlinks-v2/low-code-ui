@@ -117,10 +117,44 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
             {
                 path: '/flow-engine/me',
                 name: 'Me',
-                component: () => import('@/views/process/me/index.vue'),
+                // component: () => import('@/views/process/me/index.vue'),
                 meta: {
                     title: '我的流程',
                 },
+                children: [
+                    {
+                        path: '/flow-engine/me/todo',
+                        name: 'todo',
+                        component: () => import('@/views/process/me/index.vue'),
+                        meta: {
+                            title: '待办事项'
+                        }
+                    },
+                    {
+                        path: '/flow-engine/me/finished',
+                        name: 'finished',
+                        component: () => import('@/views/process/me/index.vue'),
+                        meta: {
+                            title: '已办事项'
+                        }
+                    },
+                    {
+                        path: '/flow-engine/me/cc',
+                        name: 'cc',
+                        component: () => import('@/views/process/me/index.vue'),
+                        meta: {
+                            title: '抄送给我'
+                        }
+                    },
+                    {
+                        path: '/flow-engine/me/initiate',
+                        name: 'initiate',
+                        component: () => import('@/views/process/me/index.vue'),
+                        meta: {
+                            title: '我发起的'
+                        }
+                    },
+                  ]
               },
         ]
     },

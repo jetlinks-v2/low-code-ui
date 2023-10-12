@@ -1,30 +1,43 @@
 
 <template>
    <page-container>
-      <div class="header">
+      <div class="header" v-if="type!=='todo'">
          <div v-for="item in types" :class="{'item':true,'active':item.key===activeKey}" @click="onClick(item.key)">{{ item.value }}</div>
       </div>
       <div class="content">
-         <Content :active-key="activeKey"/>
+         <Content :history="activeKey!=='running'" :type="type"/>
       </div>
    </page-container>
 </template>
 
 <script setup >
 import Content from './content.vue'
+const route = useRoute()
 
-const types = [
-   { key: 'wait', value: '代办事项' },
-   { key: 'already', value: '已办事项' },
-   { key: 'initiate', value: '我发起的' },
-   { key: 'copy', value: '抄送给我' },
+const types = [ 
+   { key: 'running', value: '流转中' },
+   { key: 'completed', value: '已完成' },
 ]
 
-const activeKey = ref('wait')
+const processType = new Map()
+processType.set('todo','待办事项')
+processType.set('finished','已办事项')
+processType.set('cc','抄送给我')
+processType.set('initiate','我发起的')
+
+const activeKey = ref('running')
+const type =  ref('')
 
 const onClick = (key)=>{
    activeKey.value = key
 }
+
+onMounted(()=>{
+   // console.log('route',route.path)
+   const item = route.path?.split('/')
+   // console.log(item)
+   type.value = item[item.length - 1]
+})
 
 </script>
 
