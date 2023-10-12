@@ -7,7 +7,7 @@
             left: x + 'px',
             top: y + 'px'
          }">
-            <j-menu v-if="props.type === 'list'" @click="handleClick">
+            <j-menu v-if="props.type === 'list'" :selectedKeys="[]" @click="handleClick">
                <j-menu-item :key="actionMap['Profile'].key">{{ actionMap['Profile'].value }}</j-menu-item>
                <!-- <j-menu-item key="Cut">剪切</j-menu-item> -->
                <j-menu-item :key="actionMap['Copy'].key">{{ actionMap['Copy'].value }}</j-menu-item>

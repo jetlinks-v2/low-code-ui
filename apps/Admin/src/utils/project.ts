@@ -24,9 +24,11 @@ const handleModuleChildren = (data: any[]) => {
   const functions: any[] = []
   const children: any[] = []
 
-  data?.forEach?.(item => {
+  data?.forEach?.((item, index) => {
     const type = item.others.type
     item.provider = item.others.type
+    item.others.tree_index = index
+
     if ([providerEnum.HtmlPage, providerEnum.ListPage, providerEnum.FormPage].includes(type)) {
       item.provider = 'page-code'
       resources.push(omit(item, ['fullId']))

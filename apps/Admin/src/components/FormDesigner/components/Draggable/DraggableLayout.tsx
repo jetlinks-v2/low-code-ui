@@ -155,7 +155,7 @@ const DraggableLayout = defineComponent({
                                 registerToRefList(_path, selectRef.value)
                             })
 
-                            if (!isEditModel.value && !unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
+                            if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
                                 queryOptions(element.componentProps.source, designer?.projectId).then(resp => {
                                     if (['select', 'select-card'].includes(element.type)) {
                                         options.value = resp
@@ -235,11 +235,11 @@ const DraggableLayout = defineComponent({
                                             ></TypeComponent> : <TypeComponent
                                                 {..._props.componentProps}
                                                 value={__value}
-                                                onUpdate: value={(newValue) => {
+                                                onUpdate:value={(newValue) => {
                                                     set(designer.formState, _path, newValue || null)
                                                 }}
                                                 checked={get(designer.formState, _path)}
-                                                onUpdate: checked={(newValue) => {
+                                                onUpdate:checked={(newValue) => {
                                                     set(designer.formState, _path, newValue || false)
                                                 }}
                                                 options={unref(options)}
