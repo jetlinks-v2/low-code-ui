@@ -77,7 +77,7 @@
           class="table"
           rowKey="id"
           :rowSelection="{
-            selectedRowKeys: _selectedRowKeys,
+            selectedRowKeys: map(_selectedRowKeys, 'id'),
             onSelect: onSelectChange,
             onSelectNone: () => (_selectedRowKeys = []),
             onSelectAll: selectAll,
@@ -101,10 +101,10 @@
 </template>
 
 <script lang="ts" setup>
-import { getDepartmentList_api } from '@/api/user'
+// import { getDepartmentList_api } from '@/api/user'
 import { getUserList, getRoleList, getTissue } from '@/api/form'
 import { onMounted, ref, watch } from 'vue'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, map } from 'lodash-es'
 
 const sourceType = ref('tissue')
 const props = defineProps({
@@ -183,34 +183,32 @@ const selectedKeys: any = ref([])
 const expandedKeys: any = ref([])
 const _selectedRowKeys: any = ref([])
 
-const onSelectChange = (row: any, _select: boolean) => {
+const onSelectChange = (row: any) => {
   if (props.mode !== 'multiple') {
-    _selectedRowKeys.value = [row.id]
+    _selectedRowKeys.value = [row]
   } else {
-    const arr: any = new Set(_selectedRowKeys.value)
-    if (_select) {
-      arr.add(row.id)
+    const _index = _selectedRowKeys.value?.findIndex(item => item?.id === row?.id)
+    if (_index === -1) {
+      _selectedRowKeys.value.push(row)
     } else {
-      arr.delete(row.id)
+      _selectedRowKeys.value.splice(_index, 1)
     }
-    _selectedRowKeys.value = [...arr.values()]
   }
 }
 
 const selectAll = (_select: boolean, _: any, changeRows: any) => {
   if (_select) {
-    const list = cloneDeep(_selectedRowKeys.value) || []
+    const list = map(_selectedRowKeys.value, 'id') || []
     changeRows.map((i: any) => {
       if (!list.includes(i.id)) {
-        list.push(i.id)
+        _selectedRowKeys.value.push(i)
       }
     })
-    _selectedRowKeys.value = list
   } else {
     const arr = changeRows.map((item: any) => item.id)
     const _ids: string[] = []
     _selectedRowKeys.value.map((i: any) => {
-      if (!arr.includes(i)) {
+      if (!arr.includes(i.id)) {
         _ids.push(i)
       }
     })

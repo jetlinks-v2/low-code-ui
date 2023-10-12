@@ -50,6 +50,7 @@ import {
   initData,
   appendChildItem,
   handleCopyData,
+  handleExportData,
 } from './utils/utils'
 import { uid } from './utils/uid'
 import Check from './components/Check/index.vue'
@@ -391,6 +392,10 @@ watch(
     immediate: true,
   },
 )
+
+onMounted(() => {
+    handleSearch()
+})
 
 onUnmounted(() => {
   onSaveData()

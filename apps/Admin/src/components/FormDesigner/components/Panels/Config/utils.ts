@@ -49,12 +49,12 @@ export const getConfigList = (_type: string, obj: any) => {
         })
     }
 
-  if (unref(_type) === 'form') {
-    arr.push({
-      key: 'SourceForm',
-      header: '数据来源',
-    })
-  }
+    if (unref(_type) === 'form') {
+        arr.push({
+            key: 'SourceForm',
+            header: '数据来源',
+        })
+    }
 
     if (unref(_type) === 'grid' || unref(_type) === 'grid-item') {
         arr.push({
@@ -96,12 +96,12 @@ export const getConfigList = (_type: string, obj: any) => {
             header: '高级配置',
         })
     }
-    if(_type === 'table-item') {
+    if (_type === 'table-item') {
         arr.push({
             key: 'Table',
             header: '组件属性',
         })
-        if(['select', 'select-card', 'tree-select'].includes(obj?.children?.[0]?.type)) {
+        if (['select', 'select-card', 'tree-select'].includes(obj?.children?.[0]?.type)) {
             arr.push({
                 key: 'TableSource',
                 header: '数据来源',

@@ -173,49 +173,15 @@ const DraggableLayout = defineComponent({
                                 }
                             }
 
-                            // const renderContent = () => {
-                            //     if (unref(isEditModel)) {
-                            //         return <TypeComponent
-                            //             model={unref(designer.model)}
-                            //             {...omit(_props.componentProps, ['disabled'])}
-                            //             source={element.type === 'form' ? element?.componentProps?.source : undefined}
-                            //         ></TypeComponent>
-                            //     } else if (['switch'].includes(element.type)) {
-                            //         return <TypeComponent
-                            //             // data={element} // TypeError: Cannot convert object to primitive value报错
-                            //             {..._props.componentProps}
-                            //             checked={get(designer.formState, _path)}
-                            //             onUpdate:checked={(newValue) => {
-                            //                 set(designer.formState, _path, newValue || false)
-                            //             }}
-                            //             onChange={onChange}
-                            //         ></TypeComponent>
-                            //     } else if (['form'].includes(element.type)) {
-                            //         return <TypeComponent
-                            //             {..._props.componentProps}
-                            //             mode={unref(designer.mode)}
-                            //             source={element?.componentProps?.source}
-                            //             value={get(designer.formState, _path)}
-                            //             onUpdate:value={(newValue) => {
-                            //                 set(designer.formState, _path, newValue || null)
-                            //             }}
-                            //             onChange={onChange}
-                            //             ref={_formRef}
-                            //         ></TypeComponent>
-                            //     } else {
-
-                            //         return <TypeComponent
-                            //             {..._props.componentProps}
-                            //             value={__value}
-                            //             onUpdate:value={(newValue) => {
-                            //                 set(designer.formState, _path, newValue || null)
-                            //             }}
-                            //             options={unref(options)}
-                            //             treeData={unref(treeData)}
-                            //             onChange={onChange}
-                            //         ></TypeComponent>
-                            //     }
-                            // }
+                            if(['org', 'role', 'user', 'product', 'device'].includes(element.type) && element.componentProps?.mode !== "multiple"){
+                                const obj = {}
+                                element.componentProps.keys.forEach(i => {
+                                    const __path = _path.slice(0, _path.length - 1) || []
+                                    __path.push(i.config?.source)
+                                    obj[i.key] = get(designer.formState, __path)
+                                })
+                                __value = obj
+                            }
 
                             watchEffect(() => {
                                 if (element.type === 'form' && _formRef.value && !unref(isEditModel) && element?.key) {
@@ -226,7 +192,6 @@ const DraggableLayout = defineComponent({
                             return (
                                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                                     <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true}>
-                                        {/* {renderContent()} */}
                                         {
                                             unref(isEditModel) ? <TypeComponent
                                                 model={unref(designer.model)}
@@ -236,7 +201,15 @@ const DraggableLayout = defineComponent({
                                                 {..._props.componentProps}
                                                 value={__value}
                                                 onUpdate:value={(newValue) => {
-                                                    set(designer.formState, _path, newValue || null)
+                                                    if(['org', 'role', 'user', 'product', 'device'].includes(element.type) && !Array.isArray(newValue)){
+                                                        element.componentProps.keys.forEach(i => {
+                                                            const __path = _path.slice(0, _path.length - 1) || []
+                                                            __path.push(i.config?.source)
+                                                            set(designer.formState, __path, newValue?.[i?.key] || null)
+                                                        })
+                                                    } else {
+                                                        set(designer.formState, _path, newValue || null)
+                                                    }
                                                 }}
                                                 checked={get(designer.formState, _path)}
                                                 onUpdate:checked={(newValue) => {

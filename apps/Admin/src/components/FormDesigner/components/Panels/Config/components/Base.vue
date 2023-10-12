@@ -66,20 +66,58 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item
-        label="标识"
-        :name="['formItemProps', 'name']"
-        required
-        :rules="rules"
-        :validateFirst="true"
+      <template
+        v-if="['org', 'role', 'user', 'product', 'device'].includes(type)"
       >
-        <j-input
-          placeholder="请输入"
-          :maxlength="64"
-          @change="onDataChange"
-          v-model:value="target.formItemProps.name"
-        />
-      </j-form-item>
+        <j-form-item
+          label="标识"
+          :name="['formItemProps', 'name']"
+          required
+          :rules="rules"
+          v-if="isShowName"
+          :validateFirst="true"
+        >
+          <j-input
+            placeholder="请输入"
+            :maxlength="64"
+            @change="onDataChange"
+            v-model:value="target.formItemProps.name"
+          />
+        </j-form-item>
+        <j-form-item
+          label="存储配置"
+          :name="['componentProps', 'keys']"
+          required
+          :rules="[
+            {
+              required: true,
+              message: '请配置存储配置',
+            },
+          ]"
+          :validateFirst="true"
+        >
+          <Storage
+            v-model:value="target.componentProps.keys"
+            @change="onStorageChange"
+          />
+        </j-form-item>
+      </template>
+      <template v-else>
+        <j-form-item
+          label="标识"
+          :name="['formItemProps', 'name']"
+          required
+          :rules="rules"
+          :validateFirst="true"
+        >
+          <j-input
+            placeholder="请输入"
+            :maxlength="64"
+            @change="onDataChange"
+            v-model:value="target.formItemProps.name"
+          />
+        </j-form-item>
+      </template>
       <template v-if="['text'].includes(type)">
         <j-form-item
           label="文本内容"
@@ -444,6 +482,8 @@ import { useTarget } from '../../../../hooks'
 import { basic } from '@/components/FormDesigner/utils/defaultData'
 import generatorData from '@/components/FormDesigner/utils/generatorData'
 import { getBrotherList, updateData } from '../../../../utils/utils'
+import Storage from './Storage.vue'
+import { uid } from '@/components/FormDesigner/utils/uid'
 
 const designer: any = inject('FormDesigner')
 
@@ -607,12 +647,18 @@ const onTypesChange = (val: string) => {
   }
 }
 
-// const onChange = (arr: any[]) => {
-//   target.value.formItemProps.rules = arr
-//   emits('refresh', target.value)
-// }
+const isShowName = computed(() => {
+  return target.value?.componentProps?.mode === 'multiple'
+})
 
 const onDataChange = () => {
+  emits('refresh', target.value)
+}
+
+const onStorageChange = () => {
+  if(!isShowName.value){
+    target.value.formItemProps.name = target.value.componentProps?.keys?.find(i => i?.config?.flag)?.config?.source || `${type.value}_${uid()}`
+  }
   emits('refresh', target.value)
 }
 </script>
