@@ -5,9 +5,9 @@
     :visible="visible"
     :confirm-loading="confirmLoading"
     :title="popTitle"
+    :width="modalWidth"
     okText="确定"
     cancelText="取消"
-    width="630px"
     @cancel="emit('close', true)"
     @ok="emit('close', true)"
   >
@@ -34,6 +34,14 @@ import { useProduct } from '@/store'
 const data = ref<string>('')
 
 const productStore = useProduct()
+
+const modalWidth = computed(() => {
+  if(props.resource.modalWidth) {
+    return props.resource.modalWidth + props.resource.modalWidthUnit
+  } else {
+    return '520px'
+  }
+})
 const vueMode = ref(true)
 const store = new ReplStore(JSON.stringify(data.value))
 provide('store', store)
