@@ -1,7 +1,8 @@
 <template>
   <span v-if="config?.demonstrations === 'json'">{{ value || '--' }}</span>
   <span v-else-if="config?.demonstrations === 'page'">
-    <AIcon type="SearchOutlined" @click="visible = true"/>
+    <AIcon type="SearchOutlined" @click="visible = true" v-if="!isEmpty(value)"/>
+    <span v-else>--</span>
   </span>
   <JsonPreview
     v-model:open="visible"
@@ -13,6 +14,7 @@
 <script setup lang="ts">
 import { PropType } from 'vue'
 import JsonPreview from '../JsonPreview.vue';
+import { isEmpty } from '@/components/ListPage/utils';
 
 const props = defineProps({
   config: {

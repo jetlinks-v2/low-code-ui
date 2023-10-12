@@ -9,6 +9,7 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
     component: BasicLayoutPage,
     meta: {
       title: '交付中心',
+      keepAlive: true
     },
     children: [
       {
@@ -16,6 +17,7 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
         name: 'delivery/center',
         meta: {
           title: '低码引擎',
+          keepAlive: true
         },
         component: () => import('@/views/center/index.vue'),
       },

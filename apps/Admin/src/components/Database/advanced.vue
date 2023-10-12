@@ -181,8 +181,8 @@
                     <j-form-item
                       name="assetType"
                       :rules="[{ required: true, message: '请选择资产标识'}]">
-                      <j-select style="width: 100%;" v-model:value="myAsset.assetType"
-                                :options="options" :fieldNames="{ label: 'name', value: 'id'}"
+                      <j-select showSearch style="width: 100%;" v-model:value="myAsset.assetType"
+                                :options="options"
                                 @change="assetChange"/>
                     </j-form-item>
                   </div>
@@ -264,7 +264,11 @@ const project = useProduct()
 const relationRef = ref()
 const assetRef = ref()
 
-const {data: options} = useRequest(getAssetType)
+const {data: options} = useRequest(getAssetType, {
+  onSuccess(resp) {
+    return resp.result?.map(item => ({ ...item, label: item.name, value: item.id})) || []
+  }
+})
 const {data: apiDataSource, run: apiRun} = useRequest(queryEndCommands,
   {
     immediate: false,

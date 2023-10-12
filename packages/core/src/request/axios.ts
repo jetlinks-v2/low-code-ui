@@ -40,10 +40,12 @@ export class Axios {
     //axios在这里默认把响应体从json字符串转成了js对象
     // axios.defaults.transformResponse = [function (data) {
     //   try {
-    //     return JSONBig.parse(data)
+    //     console.log('axios old data', JSON.parse(data))
+    //     console.log('axios new data',JSONBig.parse(data))
+    //     return JSON.parse(data)
     //   } catch(err) {
     //     console.warn('@jetlinks/core transformResponse error:', err)
-    //     return data;
+    //     return JSON.parse(data);
     //   }
     // }]
     this.axiosInstance = axios.create({
@@ -165,6 +167,7 @@ export class Axios {
   }
 
   get<T = any>(url: string, params: any = undefined, ext?: any) {
+    console.log(ext)
     return this.axiosInstance<any, AxiosResponseRewrite<T>>({
       method: 'GET',
       url,

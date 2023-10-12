@@ -15,7 +15,7 @@
               <AIcon type="QuestionCircleOutlined" /> </j-tooltip
           ></j-button>
           <j-button :disabled="disabled" class="btn" @click="onInput('set')"
-            >加载数据<j-tooltip title="将代码框输入的模拟数据反显到表单">
+            >加载数据<j-tooltip title="将代码框输入的模拟数据反显到表单" placement="topRight">
               <AIcon type="QuestionCircleOutlined" /> </j-tooltip
           ></j-button>
         </j-space>

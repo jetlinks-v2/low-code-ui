@@ -39,6 +39,7 @@
   <Add
     v-model:open="addVisible"
     :resource="popResource"
+    :projectId="projectId"
     :popTitle="popTitle"
     @close="addVisible = false"
     @save="addVisible = false"
@@ -129,7 +130,7 @@ const dataColumns: any = computed(() => {
       title: '操作',
       key: 'action',
       scopedSlots: true,
-      width: actions.value.length > 3 ? '152px' : actions.value?.length * 40 + 32 + `px`,
+      width: actions.value.length > 3 ? '192px' : actions.value?.length * 40 + 32 + `px`,
       fixed: 'right',
     })
   }

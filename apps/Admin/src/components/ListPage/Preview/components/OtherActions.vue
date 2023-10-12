@@ -2,7 +2,7 @@
   <div class="table-actions" ref="tableActions">
     <j-space size="large">
       <PermissionButton
-        v-for="item in actions.slice(0, showLength)"
+        v-for="item in actions.slice(0, showLength < 4 || showLength >= actions.length ? showLength : showLength - 1)"
         :key="item.key"
         type="link"
         v-bind:="handleFunction(item.permissionProps, record)"
@@ -29,7 +29,7 @@
         <template #overlay>
           <j-menu>
             <j-menu-item
-              v-for="(item, i) in actions.slice(showLength, actions.length)"
+              v-for="(item, i) in actions.slice(showLength - 1, actions.length)"
               :key="i + item.key"
             >
               <PermissionButton
@@ -86,13 +86,13 @@ const props = defineProps({
 const tableActions = ref()
 const showLength = ref(0)
 onMounted(() => {
-  console.log(tableActions.value.clientWidth / 40);
+  console.log(Math.ceil(tableActions.value.clientWidth / 40));
   showLength.value = Math.floor(tableActions.value.clientWidth / 40)
 })
 
 window.addEventListener('resize', () => {
   nextTick(() => {
-    showLength.value = Math.floor(tableActions.value.clientWidth / 40)
+    showLength.value = Math.ceil(tableActions.value?.clientWidth / 40)
   })
 })
 const handleFunction = (item) => {
