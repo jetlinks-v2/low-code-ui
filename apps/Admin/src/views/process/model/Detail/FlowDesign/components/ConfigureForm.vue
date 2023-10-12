@@ -55,11 +55,11 @@
             </div>
             <div
               class="form-fields"
-              v-for="(field, idx) in form.configuration.schema.properties"
+              v-for="(field, idx) in form.configuration.children"
               :key="'field' + idx"
             >
               <div class="field-title">
-                <div class="name">{{ field.title }}</div>
+                <div class="name">{{ field.name }}</div>
                 <div class="permission">
                   <j-checkbox-group
                     v-model:value="field.accessModes"
@@ -114,20 +114,27 @@ const permissions = ref([
 const getFormList = async () => {
   const { result } = await queryFormNoPage_api({ paging: false })
   formList.value = result.map((m) => {
-    const _properties = m.configuration.schema.properties
+    const _fields = m.configuration.children
     // 已经存在的字段
-    const _fields = forms.value[m.id]
-    if (_fields && _fields.length) {
-      Object.keys(_properties).forEach((key) => {
-        const _currentField = _fields.find((f) => f.id === key)
-        _properties[key]['accessModes'] = _currentField
-          ? _currentField.accessModes
-          : []
+    const existFields = forms.value[m.id]
+    if (existFields && existFields.length) {
+      //   Object.keys(_fields).forEach((key) => {
+      //     const _currentField = existFields.find((f) => f.id === key)
+      //     _fields[key]['accessModes'] = _currentField
+      //       ? _currentField.accessModes
+      //       : []
+      //   })
+      _fields.forEach((p) => {
+        const _currentField = existFields.find((f) => f.id === p.key)
+        p['accessModes'] = _currentField ? _currentField.accessModes : []
       })
       return { accessModes: [], ...m }
     } else {
-      Object.keys(_properties).forEach((key) => {
-        _properties[key]['accessModes'] = []
+      //   Object.keys(_fields).forEach((key) => {
+      //     _fields[key]['accessModes'] = []
+      //   })
+      _fields.forEach((p) => {
+        p['accessModes'] = []
       })
       return { accessModes: [], ...m }
     }
@@ -150,9 +157,12 @@ const handleAllCheck = () => {
  * 表单读写勾选/取消勾选
  */
 const handleFormCheck = (form: any) => {
-  const _fields = form.configuration.schema.properties
-  Object.keys(_fields).forEach((key) => {
-    _fields[key].accessModes = form.accessModes
+  const _fields = form.configuration.children
+  //   Object.keys(_fields).forEach((key) => {
+  //     _fields[key].accessModes = form.accessModes
+  //   })
+  _fields.forEach((p) => {
+    p.accessModes = form.accessModes
   })
 }
 
@@ -161,14 +171,23 @@ const handleFormCheck = (form: any) => {
  */
 const handleOk = () => {
   formList.value.forEach((item) => {
-    const _properties = item.configuration.schema.properties
+    const _fields = item.configuration.children
     forms.value[item.id] = []
-    Object.keys(_properties).forEach((key) => {
-      if (_properties[key]['accessModes'].length) {
+    // Object.keys(_fields).forEach((key) => {
+    //   if (_fields[key]['accessModes'].length) {
+    //     forms.value[item.id].push({
+    //       id: key,
+    //       required: true,
+    //       accessModes: _fields[key]['accessModes'],
+    //     })
+    //   }
+    // })
+    _fields.forEach((p) => {
+      if (p.accessModes.length) {
         forms.value[item.id].push({
-          id: key,
+          id: p.key,
           required: true,
-          accessModes: _properties[key]['accessModes'],
+          accessModes: p.accessModes,
         })
       }
     })
