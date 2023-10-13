@@ -35,10 +35,10 @@
             :options="allButtons"
           />
         </j-form-item>
-        <j-form-item label="办理成员可以自由选择下一节点办理人" name="allow">
+        <j-form-item label="办理成员可以自由选择下一节点办理人" name="freeChoiceUser">
           <j-switch
             size="small"
-            v-model:checked="memberFormData.allow"
+            v-model:checked="memberFormData.freeChoiceUser"
           ></j-switch>
         </j-form-item>
       </j-form>
@@ -71,7 +71,7 @@ const memberFormRef = ref()
 const memberFormData = reactive({
   candidates: props.node?.props?.candidates, // 候选人配置
   authButtons: props.node?.props?.authButtons,
-  allow: props.node?.props?.allow,
+  freeChoiceUser: props.node?.props?.freeChoiceUser,
 })
 
 // watch(
