@@ -279,20 +279,52 @@ const handleSubmit = () => {
   }
   form.dataFrom = commandOptions.value?.find(item => item.id === form.data.command)?.output
   dataBind = Object.assign(dataBind, form)
-  columnData.value = [...columnData.value.filter(item => item.mark === 'add'), ...dataBind.data.dataSource.map(item => {
+  let newColumnData: any = [];
+  for (let index = 0; index < columnData.value.length; index++) {
+    if(dataBind.data.dataSource.findIndex(item => item.id === columnData.value[index].id) !== -1 && columnData.value[index].mark !== 'add') {
+      newColumnData.push(columnData.value[index])
+    } else if(columnData.value[index].mark === 'add'){
+      newColumnData.push(columnData.value[index])
+    }
+  }
+  columnData.value = [...newColumnData, ...dataBind.data.dataSource.filter(item => newColumnData.findIndex(val => val.id === item.id) === -1).map(item => {
     return {
       rowKey: randomString(8),
       ...item,
       type: javaType[item.type],
     }
   })]
-  searchData.value = [...searchData.value.filter(item => item.mark === 'add'), ...dataBind.data.dataSource.map(item => {
+
+  let newColumnData2: any = [];
+  for (let index = 0; index < searchData.value.length; index++) {
+    if(dataBind.data.dataSource.findIndex(item => item.id === searchData.value[index].id) !== -1 && searchData.value[index].mark !== 'add') {
+      newColumnData2.push(searchData.value[index])
+    } else if(searchData.value[index].mark === 'add'){
+      newColumnData2.push(searchData.value[index])
+    }
+  }
+
+  searchData.value = [...newColumnData2, ...dataBind.data.dataSource.filter(item => newColumnData2.findIndex(val => val.id === item.id) === -1).map(item => {
     return {
       rowKey: randomString(8),
       ...item,
-      type: filterType[item.type],
+      type: javaType[item.type],
     }
   })]
+  // columnData.value = [...columnData.value.filter(item => item.mark === 'add'), ...dataBind.data.dataSource.map(item => {
+  //   return {
+  //     rowKey: randomString(8),
+  //     ...item,
+  //     type: javaType[item.type],
+  //   }
+  // })]
+  // searchData.value = [...searchData.value.filter(item => item.mark === 'add'), ...dataBind.data.dataSource.map(item => {
+  //   return {
+  //     rowKey: randomString(8),
+  //     ...item,
+  //     type: filterType[item.type],
+  //   }
+  // })]
   emits('update:open', false)
 }
 
