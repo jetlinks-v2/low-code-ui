@@ -13,7 +13,7 @@
 
         <div class="btn">
           <j-button v-if="current > 0" @click="current--">上一步</j-button>
-          <j-button v-if="current < 2" @click="current++">下一步</j-button>
+          <j-button v-if="current < 2" @click="handleNext">下一步</j-button>
           <j-button type="primary" @click="save" :loading="saveLoading">
             保存
             <template #icon>
@@ -38,7 +38,7 @@
       </div>
     </j-card>
     <j-card>
-      <component :is="componentsMap[current]" />
+      <component ref="stepRef" :is="componentsMap[current]" />
     </j-card>
   </page-container>
 </template>
@@ -69,10 +69,18 @@ const componentsMap = {
 const getFlowDetail = async () => {
   const { result } = await detail_api(route.query.id as string)
   const model = JSON.parse(result.model || '{}')
-  console.log('model: ', model);
+  //   console.log('model: ', model)
 
   flowStore.setModel(model)
   flowStore.setModelBaseInfo(result)
+}
+
+/**
+ * 下一步, 校验当前步骤的数据规范
+ */
+const stepRef = ref()
+const handleNext = () => {
+  current.value++
 }
 
 /**

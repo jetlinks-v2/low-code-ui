@@ -4,8 +4,8 @@
     <j-tab-pane key="basic" tab="基础配置">
       <j-form ref="basicFormRef" :model="basicFormData" layout="vertical">
         <h3>条件配置</h3>
-        <j-form-item label="请配置进入下方节点的条件" name="conditions">
-          <ConditionSelect v-model:value="basicFormData.conditions" />
+        <j-form-item label="请配置进入下方节点的条件" name="terms">
+          <ConditionSelect v-model:value="basicFormData.terms" />
         </j-form-item>
       </j-form>
     </j-tab-pane>
@@ -28,8 +28,10 @@ const props = defineProps({
 
 // 基础配置
 const basicFormRef = ref()
-const basicFormData = ref({
-  conditions: props.node?.props?.conditions,
+const basicFormData = reactive({
+  condition: props.node?.props?.condition,
+  //   此字段仅用于前端
+  terms: [],
 })
 
 /**
@@ -44,7 +46,9 @@ const saveConfigToPinia = () => {
           flowStore.model.nodes,
           flowStore.selectedNode.id,
         )
-        result.props = { ...result.props, ...basicFormData }
+        const { condition, terms } = basicFormData
+        condition.configuration.terms = terms
+        result.props = { ...result.props, condition }
         resolve(valid)
       })
       .catch((err) => {

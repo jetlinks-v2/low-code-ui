@@ -5,14 +5,15 @@
     :key="index"
   >
     <j-tree-select
-      v-model:value="item.condition"
+      v-model:value="item.column"
       v-model:searchValue="item.searchValue"
       show-search
       placeholder="请选择"
       allow-clear
       tree-default-expand-all
-      tree-node-filter-prop="label"
+      tree-node-filter-prop="name"
       :tree-data="conditionOptions"
+      :field-names="{ value: 'fullId', label: 'name' }"
       :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
     >
       <template #title="{ value: val, label }">
@@ -44,7 +45,7 @@
     />
 
     <j-select
-      v-model:value="item.result"
+      v-model:value="item.value"
       :options="valueOptions"
       placeholder="请选择"
       :mode="['eq', 'neq'].includes(item.termsType) ? 'combobox' : 'multiple'"
@@ -62,25 +63,24 @@
 </template>
 
 <script setup lang="ts">
+import type { TreeSelectProps } from 'ant-design-vue'
+import { queryVariables_api } from '@/api/process/model'
+import { useFlowStore } from '@/store/flow'
+
+const flowStore = useFlowStore()
+
 interface IConditionSelect {
-  condition: string
-  termsType: string
-  result: string | string[]
-  searchValue: string
+  column: string | undefined
+  termsType: string | undefined
+  value: string | string[]
+  searchValue: string | undefined
 }
 
 const emit = defineEmits(['update:value'])
 const props = defineProps({
   value: {
     type: Array as PropType<IConditionSelect[]>,
-    default: () => [
-      {
-        condition: undefined,
-        termsType: undefined,
-        result: undefined,
-        searchValue: '',
-      },
-    ],
+    default: () => [],
   },
 })
 
@@ -88,7 +88,17 @@ const conditionSelect = ref<IConditionSelect[]>([])
 watch(
   () => props.value,
   (val) => {
-    conditionSelect.value = val
+    conditionSelect.value =
+      val && val.length
+        ? val
+        : [
+            {
+              column: undefined,
+              termsType: undefined,
+              value: undefined,
+              searchValue: '',
+            },
+          ]
   },
   { deep: true, immediate: true },
 )
@@ -100,7 +110,18 @@ watch(
 //   },
 // })
 
+// <TreeSelectProps['treeData']>
 const conditionOptions = ref([
+  //   {
+  //     name: '测试',
+  //     fullId: '111',
+  //     children: [
+  //       {
+  //         name: '测试1',
+  //         fullId: '222',
+  //       },
+  //     ],
+  //   },
   {
     label: '审批节点',
     value: 'node-0',
@@ -170,15 +191,35 @@ const valueOptions = ref([
   },
 ])
 
+/**
+ * 获取条件下拉数据
+ */
+const getFormFields = async () => {
+  const { id, name, key, model, provider } = flowStore.modelBaseInfo
+  const params = {
+    definition: {
+      id,
+      name,
+      key,
+      model,
+      provider,
+    },
+    nodeId: flowStore.selectedNode.props.branchBy, // 条件节点配置, id传当前条件节点的branchBy
+  }
+  const { result } = await queryVariables_api(params)
+  //   conditionOptions.value = result
+  console.log('conditionOptions.value: ', conditionOptions.value)
+}
+
 const handleRemove = (index: number) => {
   conditionSelect.value.splice(index, 1)
 }
 
 const handleAdd = () => {
   conditionSelect.value.push({
-    condition: undefined,
+    column: undefined,
     termsType: undefined,
-    result: undefined,
+    value: undefined,
     searchValue: '',
   })
 }
@@ -190,6 +231,10 @@ watch(
   },
   { deep: true },
 )
+
+onMounted(() => {
+  getFormFields()
+})
 </script>
 
 <style lang="less" scoped>
