@@ -27,7 +27,7 @@
         <j-input
           v-model:value="form.name"
           :maxlength="64"
-          :placeholder="`copy_${data.name}`"
+          placeholder="请输入流程名称"
         />
       </j-form-item>
       <j-form-item

@@ -288,9 +288,9 @@ const getActions = (record, type = 'card') => {
       icon: 'DeleteOutlined',
       permissionProps: (data) => ({
         // 实例下有发起过的流程时，删除按钮置灰
-        // disabled: record.state?.value !== 'enabled' || true,
+        disabled: record.state?.value !== 'disabled',
         tooltip: {
-          title: '删除',
+          title: record.state?.value !== 'disabled' ? '请先禁用再删除' : '删除',
         },
         hasPermission: false,
         popConfirm: {
