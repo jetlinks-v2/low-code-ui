@@ -13,12 +13,12 @@
       tree-default-expand-all
       tree-node-filter-prop="name"
       :tree-data="conditionOptions"
-      :field-names="{ value: 'fullId', label: 'name' }"
+      :field-names="{ label: 'name', value: 'fullId' }"
       :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
     >
-      <template #title="{ value: val, label }">
+      <template #title="{ name }">
         <template
-          v-for="(fragment, i) in label
+          v-for="(fragment, i) in name
             ?.toString()
             ?.split(
               new RegExp(
@@ -63,7 +63,6 @@
 </template>
 
 <script setup lang="ts">
-import type { TreeSelectProps } from 'ant-design-vue'
 import { queryVariables_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 
@@ -110,53 +109,7 @@ watch(
 //   },
 // })
 
-// <TreeSelectProps['treeData']>
-const conditionOptions = ref([
-  //   {
-  //     name: '测试',
-  //     fullId: '111',
-  //     children: [
-  //       {
-  //         name: '测试1',
-  //         fullId: '222',
-  //       },
-  //     ],
-  //   },
-  {
-    label: '审批节点',
-    value: 'node-0',
-    children: [
-      {
-        label: '审批人',
-        value: 'node-0-1',
-      },
-    ],
-  },
-  {
-    label: '办理节点',
-    value: 'node-1',
-    children: [
-      {
-        label: '办理人',
-        value: 'node-1-1',
-      },
-    ],
-  },
-  {
-    label: '请假申请',
-    value: 'node-2',
-    children: [
-      {
-        label: '请假人',
-        value: 'node-2-1',
-      },
-      {
-        label: '请假时间',
-        value: 'node-2-2',
-      },
-    ],
-  },
-])
+const conditionOptions = ref([])
 
 const termsOptions = ref([
   {
@@ -207,8 +160,7 @@ const getFormFields = async () => {
     nodeId: flowStore.selectedNode.props.branchBy, // 条件节点配置, id传当前条件节点的branchBy
   }
   const { result } = await queryVariables_api(params)
-  //   conditionOptions.value = result
-  console.log('conditionOptions.value: ', conditionOptions.value)
+  conditionOptions.value = result
 }
 
 const handleRemove = (index: number) => {
