@@ -146,7 +146,7 @@ const options = [
   { label: '海棠', value: '#eb2f96' },
 ]
 
-const theme = ref(props.theme)
+const theme = ref(props.theme || '#1677ff')
 
 const check = reactive({
   success: 0,
