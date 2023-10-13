@@ -255,8 +255,8 @@ const onCollect = () => {
 }
 
 // 添加子组件
-const onAddChild = (newData: any, parent: any, flag?: boolean) => {
-  const arr = appendChildItem(formData.value?.children, newData, parent, flag)
+const onAddChild = (newData: any, parent: any, __flag?: 'start' | 'end' | undefined) => {
+  const arr = appendChildItem(formData.value?.children, newData, parent, __flag)
   formData.value = {
     ...formData.value,
     children: arr || [],

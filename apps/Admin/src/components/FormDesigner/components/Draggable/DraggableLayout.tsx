@@ -43,6 +43,10 @@ const DraggableLayout = defineComponent({
         index: {
             type: Number,
             default: 0
+        },
+        visible: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
@@ -58,41 +62,40 @@ const DraggableLayout = defineComponent({
                 const _path: string[] = cloneDeep(props?.path || []);
                 const _index: number = props?.index || 0;
 
-                const _hidden = computed(() => {
-                    return !unref(isEditModel) && !element.componentProps?.visible && unref(designer.mode) === 'add'
+                const _visible = computed(() => {
+                    if (!unref(isEditModel) && unref(designer.mode) === 'add') {
+                        if (props.visible === false) {
+                            return false
+                        }
+                        return element.componentProps?.visible
+                    }
+                    return true
                 })
 
-                if (unref(_hidden)) return ''
+                if (!unref(_visible)) return ''
 
                 switch (element.type) {
                     case 'text':
-                        if (unref(isEditModel) || componentMap?.[element?.type]) {
-                            const TypeComponent = componentMap?.[element?.type] || 'div'
-                            const params = {
-                                data: element,
-                                parent: props.data
-                            }
-                            return (
-                                <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                                    <TypeComponent {...element.componentProps} />
-                                </Selection>
-                            )
-                        }
-                        break
+                        const TypeComponent = componentMap?.[element?.type] || 'div'
+                        return (
+                            <Selection data={element} parent={props.data} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
+                                <TypeComponent {...element.componentProps} />
+                            </Selection>
+                        )
                     case 'card':
-                        return (<CardLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></CardLayout>)
+                        return (<CardLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></CardLayout>)
                     case 'space':
-                        return (<SpaceLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></SpaceLayout>)
+                        return (<SpaceLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></SpaceLayout>)
                     case 'grid':
-                        return (<GridLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></GridLayout>)
+                        return (<GridLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></GridLayout>)
                     case 'tabs':
-                        return (<TabsLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></TabsLayout>)
+                        return (<TabsLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></TabsLayout>)
                     case 'collapse':
-                        return (<CollapseLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></CollapseLayout>)
+                        return (<CollapseLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></CollapseLayout>)
                     case 'table':
-                        return (<TableLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></TableLayout>)
+                        return (<TableLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></TableLayout>)
                     default:
-                        return (<CommLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></CommLayout>)
+                        return (<CommLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.parent}></CommLayout>)
                 }
             },
             footer() {

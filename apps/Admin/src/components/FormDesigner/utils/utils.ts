@@ -415,15 +415,12 @@ export const copyDataByKey = (arr: any[], newData: any[], _item: any) => {
     }
 }
 
-// 添加子组件flag: true: 开头， undefined: 尾部，false: 中间
-export const appendChildItem = (arr: any[], newData: any, parent: any, flag?: boolean) => {
+// 添加子组件_flag: start: 开头， end: 尾部  undefined：中间
+export const appendChildItem = (arr: any[], newData: any, parent: any, _flag?: 'start' | 'end' | undefined) => {
     return arr.map(item => {
         let child: any[] = item?.children || []
         if (item.key === parent?.key) {
-            if (flag === undefined) {
-                child = [...child, newData]
-            }
-            if (flag === false) {
+            if (!_flag) {
                 const _f = child.find(item => item?.children?.[0]?.type === 'table-item-actions')
                 if (_f) {
                     child.splice(child.length - 1, 0, newData)
@@ -431,16 +428,18 @@ export const appendChildItem = (arr: any[], newData: any, parent: any, flag?: bo
                     child.push(newData)
                 }
             }
-            if (flag === true) {
+            if (_flag === 'end') {
+                child = [...child, newData]
+            }
+            if (_flag === 'start') {
                 child = [newData, ...child]
             }
             return {
                 ...item,
                 children: child
             }
-        }
-        if (item.children?.length) {
-            child = appendChildItem(item.children, newData, parent)
+        } else if (item.children?.length) {
+            child = appendChildItem(item.children, newData, parent, _flag)
         }
         return {
             ...item,

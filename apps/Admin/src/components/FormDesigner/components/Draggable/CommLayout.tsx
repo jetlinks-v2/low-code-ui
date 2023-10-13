@@ -28,6 +28,10 @@ export default defineComponent({
         index: {
             type: Number,
             default: 0
+        },
+        visible: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
@@ -97,7 +101,7 @@ export default defineComponent({
             registerToRefList(_path, selectRef.value)
         })
 
-        if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
+        if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(props.data?.type)) {
             queryOptions(props.data?.componentProps.source, designer?.projectId).then(resp => {
                 if (['select', 'select-card'].includes(props.data?.type)) {
                     options.value = resp
@@ -142,7 +146,7 @@ export default defineComponent({
                             ></TypeComponent> : <TypeComponent
                                 {..._props.componentProps}
                                 value={__value}
-                                onUpdate: value={(newValue) => {
+                                onUpdate:value={(newValue) => {
                                     if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && !Array.isArray(newValue)) {
                                         props.data?.componentProps.keys.forEach(i => {
                                             const __path = _path.slice(0, _path.length - 1) || []
@@ -154,7 +158,7 @@ export default defineComponent({
                                     }
                                 }}
                                 checked={get(designer.formState, _path)}
-                                onUpdate: checked={(newValue) => {
+                                onUpdate:checked={(newValue) => {
                                     set(designer.formState, _path, newValue || false)
                                 }}
                                 options={unref(options)}
