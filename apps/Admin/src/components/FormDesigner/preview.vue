@@ -71,19 +71,7 @@ provide('FormDesigner', {
   projectId: props.projectId
 })
 
-console.log('form--preview--onMounted')
-
 const onSave = () => {
-  // return new Promise((resolve, reject) => {
-  //   formRef.value
-  //     .validate()
-  //     .then((_data: any) => {
-  //       resolve({ ...unref(formState), ..._data })
-  //     })
-  //     .catch((err: any) => {
-  //       reject(err)
-  //     })
-  // })
   // 校验内嵌表单
   const _func = Object.keys(formRefList.value || {}).map((item) => {
       return formRefList.value[item]?.onSave()
@@ -93,6 +81,7 @@ const onSave = () => {
     return new Promise((resolve, reject) => {
       proAll(_func)
         .then(() => {
+          //
           resolve(formState)
         })
         .catch((err) => {

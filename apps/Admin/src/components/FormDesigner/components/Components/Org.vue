@@ -2,7 +2,7 @@
   <div>
     <j-tree-select
       :tree-data="data"
-      :value="_value"
+      :value="__value"
       @change="valueChange"
       :multiple="mode === 'multiple'"
       :disabled="disabled"
@@ -17,7 +17,9 @@
 <script lang="ts" setup>
 import { getDepartmentList_api } from '@/api/user'
 import { useRequest } from '@jetlinks/hooks'
-import { ref, watch } from 'vue'
+import { map } from 'lodash-es'
+import { ref, watch, computed } from 'vue'
+
 const props = defineProps({
   value: {
     type: [Array, String],
@@ -39,24 +41,70 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  keys: {
+    type: Array,
+    default: () => [],
+  },
 })
 const emit = defineEmits(['update:value'])
 
-const _value = ref()
+const _value = ref<any>()
+
+const __value = computed(() => {
+  if (props.mode !== 'multiple') {
+    return _value?.value?.id
+  } else {
+    const _val = Array.isArray(props.value) ? props.value : []
+    return map(_val, 'id')
+  }
+})
+
+const getObj = (arr: any[], _item: string) => {
+  for (let index = 0; index < arr?.length; index++) {
+    const element = arr[index]
+    if (element?.id === _item) {
+      return element
+    } else {
+      if (element?.children?.length) {
+        return getObj(element?.children, _item)
+      }
+    }
+  }
+}
+
+const _getObj = (value: any) => {
+  const obj = {}
+  props.keys.map((item: any) => {
+    if (item?.key) {
+      obj[item.key] = value?.[item?.key]
+    }
+  })
+  return obj
+}
 
 const valueChange = (value: any) => {
-  emit('update:value', value)
+  if (props.mode !== 'multiple') {
+    emit('update:value', _getObj(getObj(data, value)))
+  } else {
+    const arr = value.map((i) => {
+      return _getObj(getObj(data, i))
+    })
+    emit('update:value', arr)
+  }
 }
-const dealTreeData = (tree: any) => {
+
+const dealTreeData = (tree: any[]) => {
   return tree.map((item: any) => {
     if (item?.children) {
       return {
+        ...item,
         label: item?.name,
         value: item?.id,
         children: dealTreeData(item.children),
       }
     } else {
       return {
+        ...item,
         label: item?.name,
         value: item?.id,
       }

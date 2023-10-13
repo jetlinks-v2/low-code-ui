@@ -62,7 +62,7 @@
             { label: '单选项', value: undefined },
             { label: '多选项', value: 'multiple' },
           ]"
-          @change="onDataChange"
+          @change="onModeChange"
           v-model:value="target.componentProps.mode"
         />
       </j-form-item>
@@ -388,6 +388,7 @@ import { computed, unref, watchEffect } from 'vue'
 import { useRequest } from '@jetlinks/hooks'
 import { getGeoType } from '@/api/form'
 import Rule from './Rules/Rule.vue'
+import { uid } from '@/components/FormDesigner/utils/uid'
 
 const { target } = useTarget()
 
@@ -471,6 +472,13 @@ const minRules = [
 ]
 
 const onDataChange = () => {
+  emits('refresh', target.value)
+}
+
+const onModeChange = () => {
+  if (unref(type) !== 'select') {
+    target.value.formItemProps.name = `${type.value}_${uid()}`
+  }
   emits('refresh', target.value)
 }
 

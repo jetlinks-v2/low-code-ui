@@ -202,7 +202,7 @@ const rulesDic = [
   },
   {
     validator(_rule: any, value: string) {
-      const item = designer.source.dictionary.find((i) => i?.id === value)
+      const item = designer.source.dictionary?.find((i) => i?.id === value)
       if (!item) {
         return Promise.reject(`数字字典已被删除或禁用`)
       }
@@ -219,7 +219,7 @@ const rulesComm = [
   },
   {
     validator(_rule: any, value: string) {
-      const item = commandOptions.value.find((i) => i?.value === value)
+      const item = commandOptions.value?.find((i) => i?.value === value)
       if (!item) {
         return Promise.reject(`数据已被删除`)
       }
@@ -235,7 +235,7 @@ const rulesFunc = [
   },
   {
     validator(_rule: any, value: string) {
-      const item = functionList.value.find((i) => i?.value === value)
+      const item = functionList.value?.find((i) => i?.value === value)
       if (!item) {
         return Promise.reject(`数据已被删除`)
       }
@@ -252,7 +252,7 @@ const rulesLabel = [
   },
   {
     validator(_rule: any, value: string) {
-      const item = labelList.value.find((i) => i?.value === value)
+      const item = labelList.value?.find((i) => i?.value === value)
       if (!item) {
         return Promise.reject(`数据已被删除`)
       }
@@ -269,7 +269,7 @@ const rulesSource = [
   },
   {
     validator(_rule: any, value: string) {
-      const item = sourceList.value.find((i) => i?.value === value)
+      const item = sourceList.value?.find((i) => i?.value === value)
       if (!item) {
         return Promise.reject(`数据已被删除`)
       }

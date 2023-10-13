@@ -85,7 +85,7 @@ const Panels = {
   Grid,
   SourceForm,
   Table,
-  TableSource,
+  TableSource
 }
 
 const panelsList = computed(() => {

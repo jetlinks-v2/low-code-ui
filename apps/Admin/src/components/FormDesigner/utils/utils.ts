@@ -174,6 +174,15 @@ const checkedConfigItem = (node: ISchema, allData: any[], source: any, formList:
         if (node?.formItemProps?.isLayout && !node.formItemProps?.label) {
             return obj
         }
+        if(['org', 'role', 'user', 'product', 'device'].includes(_type)){
+            if(!node.componentProps?.keys?.length){
+                return obj
+            }
+            // const _a = node.formItemProps.keys?.filter(i => !i.config?.source)
+            // if(_a?.length){
+            //     return obj
+            // }
+        }
     }
     return false
 }
@@ -462,6 +471,14 @@ export const getFieldData = (data: ISchema) => {
             _obj[data?.formItemProps?.name] = [omit(obj, ['actions', 'index'])]
         } else if (data.type === 'switch') {
             _obj[data?.formItemProps?.name] = obj || false
+        } else if(['org', 'role', 'user', 'product', 'device'].includes(data.type)){
+            if(data.componentProps?.mode === 'multiple'){
+                _obj[data?.formItemProps?.name] = obj
+            } else {
+                data.componentProps.keys.map(i => {
+                    _obj[i?.config?.source] = undefined
+                })
+            }
         } else {
             _obj[data?.formItemProps?.name] = obj
         }

@@ -36,7 +36,10 @@
 </template>
   
 <script lang="ts" setup>
+import { pick } from 'lodash-es'
+import { cloneDeep } from 'lodash-es'
 import { inject, computed, unref } from 'vue'
+import { getFieldData } from '../../utils/utils'
 import QuickAdd from '../QuickAdd/index.vue'
 
 const designer: any = inject('FormDesigner')
@@ -62,15 +65,21 @@ const isEditModel = computed(() => {
 const onPreview = (_type: 'preview' | 'edit') => {
   designer.setModel(_type)
   designer.setSelection('root')
+  const obj = cloneDeep(getFieldData(designer.formData.value))
+  const path = Object.keys(obj)
+  Object.assign(designer.formState, obj)
+  Object.keys(designer.formState).forEach(i => {
+    if(!path.includes(i)){
+      delete designer.formState[i]
+    }
+  })
 }
 
 const onCheck = () => {
   emits('validate')
 }
 
-const onSave = () => {
-  
-}
+const onSave = () => {}
 </script>
 
   <style lang="less" scoped>
