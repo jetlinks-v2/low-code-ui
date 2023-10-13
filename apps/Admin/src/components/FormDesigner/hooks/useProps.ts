@@ -34,7 +34,7 @@ const useProps = (element: any, _data: any, mode?: string) => {
       trigger,
       validator(rule,value,cb) {
         const errorMessage: Array<string> = []
-        const len = elementValueType === 'number' ? value : value.length
+        const len = elementValueType === 'number' ? value : value?.length
         // validator
         let customFn = new Function('rule', 'value', 'callback', item?.validator)
         customFn(rule, value, cb)?.catch?.(err => {
@@ -42,11 +42,11 @@ const useProps = (element: any, _data: any, mode?: string) => {
         })
 
         // max
-        if (item.max && len > item.max) {
+        if (item.max && len !== undefined && len > item.max) {
           errorMessage.push(`长度或值不能大于${item.max}`)
         }
         // min
-        if (item.min && len < item.min) {
+        if (item.min && len !== undefined && len < item.min) {
           errorMessage.push(`长度或值不能小于${item.min}`)
         }
         // pattern
