@@ -49,128 +49,18 @@ interface formDataProps {
 
 const router = useRouter()
 const route = useRoute()
-const formData: Ref<formDataProps[]> = ref([
-  {
-    id: '123',
-    configuration: {
-      code: '123',
-      type: 'form',
-
-      key: 'root',
-      componentProps: {
-        layout: 'horizontal',
-        size: 'default',
-        cssCode: '',
-        eventCode: '',
-      },
-      children: [
-        {
-          type: 'input',
-          name: '下拉框',
-          key: 'form_jizlh9evql7',
-          formItemProps: {
-            label: '下拉框',
-            required: true,
-            rules: [],
-            name: 'select_hsvrpinwbtb',
-          },
-          componentProps: {
-            style: {
-              width: '100%',
-            },
-            cssCode: '',
-            onChange: '',
-            disabled: false,
-            description: '',
-            placeholder: '请选择',
-            source: {
-              type: 'dic',
-            },
-            options: [
-              {
-                label: '选项1',
-                value: '5my4vth6b3r',
-              },
-              {
-                label: '选项2',
-                value: 'nj6ocngvrxz',
-              },
-              {
-                label: '选项3',
-                value: 'esb3r7usio7',
-              },
-            ],
-            visible: true,
-            editable: true,
-          },
-        },
-      ],
-    },
-  },
-  {
-    configuration: {
-      type: 'root',
-      key: 'root',
-      componentProps: {
-        layout: 'horizontal',
-        size: 'default',
-        cssCode: '',
-        eventCode: '',
-      },
-      children: [
-        {
-          type: 'input',
-          name: '下拉框',
-          key: 'form_jizlh9evql7',
-          formItemProps: {
-            label: '下拉框',
-            required: true,
-            rules: [],
-            name: 'select_hsvrpinwbtb',
-          },
-          componentProps: {
-            style: {
-              width: '100%',
-            },
-            cssCode: '',
-            onChange: '',
-            disabled: false,
-            description: '',
-            placeholder: '请选择',
-            source: {
-              type: 'dic',
-            },
-            options: [
-              {
-                label: '选项1',
-                value: '5my4vth6b3r',
-              },
-              {
-                label: '选项2',
-                value: 'nj6ocngvrxz',
-              },
-              {
-                label: '选项3',
-                value: 'esb3r7usio7',
-              },
-            ],
-            visible: true,
-            editable: true,
-          },
-        },
-      ],
-    },
-  },
-])
-// const formData: Ref<formDataProps[]> = ref([])
+const formData: Ref<formDataProps[]> = ref([])
 const currentProcess = reactive<any>({})
 const previewRef = ref<any>()
 
 const formValue = ref<any[]>([])
 
-// 判断对象中的属性是否有数据
-const hasData = (array) => {
-  if (array.length < 1) return false
+/**
+ * 判断数组对象中的属性是否有数据
+ * @param array
+ */
+const hasData = (array: any[]) => {
+  if (array?.length < 1) return false
   let flag = false
   for (const i of array) {
     const arr = Object.values(i).filter((key: any) => key && key.length > 0)
@@ -212,7 +102,7 @@ const cancel = () => {
  * 提交
  */
 const submit = () => {
-  const list = previewRef.value.map((item) => item.onSave())
+  const list = previewRef.value?.map((item) => item.onSave())
   Promise.all(list).then((res) => {
     startProcess(res).then((flag) => {
       // 跳转至我的流程-我发起的
@@ -249,23 +139,20 @@ onMounted(() => {
  * 发起流程处理
  * @param list 表单数据
  */
-const startProcess = async (list: any, start = true) => {
+const startProcess = async (list: any, start: boolean = true) => {
   const param = {
     id: route.query.id,
     start: start,
-    form: formData.value.map((i, index) => {
-      return {
-        formId: i.id,
-        data: list[index],
-      }
-    }),
+    form: formData.value?.map((i, index) => ({
+      formId: i.id,
+      data: list[index],
+    })),
   }
   return start_api(param).then((resp) => {
     if (resp.success) {
-      onlyMessage('提交成功')
+      onlyMessage(`${start ? '提交' : '保存'}成功`)
       return true
     } else {
-      onlyMessage('提交失败')
       return false
     }
   })

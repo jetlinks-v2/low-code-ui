@@ -1,26 +1,31 @@
 <!-- 发起流程 -->
 <template>
   <page-container>
-    <j-row :gutter="[24, 24]">
-      <span v-for="key of Object.keys(data)">
-        <TitleComponent data="日常管理" />
-        <j-col :span="2" v-for="item of data[key]">
-          <div class="process" @click="handleDetail(item)">
-            <div class="icon">
-              <j-image
-                v-if="item.icon?.includes('http')"
-                :width="50"
-                :height="50"
-                :src="item.icon"
-                :preview="false"
-              />
-              <AIcon v-else :type="item.icon" :style="{ fontSize: '40px' }" />
+    <FullPage>
+      <j-row :gutter="[24, 24]">
+        <span v-for="key of Object.keys(data)">
+          <TitleComponent data="日常管理" />
+          <j-col :span="2" v-for="item of data[key]">
+            <div class="process" @click="handleDetail(item)">
+              <div class="icon">
+                <j-image
+                  v-if="item.icon?.includes('http')"
+                  :width="50"
+                  :height="50"
+                  :src="item.icon"
+                  :preview="false"
+                />
+                <AIcon v-else :type="item.icon" :style="{ fontSize: '40px' }" />
+              </div>
+              {{ item.name }}
             </div>
-            {{ item.name }}
-          </div>
-        </j-col>
-      </span>
-    </j-row>
+          </j-col>
+        </span>
+      </j-row>
+      <div class="empty" v-show="Object.keys(data).length < 1">
+        <j-empty />
+      </div>
+    </FullPage>
   </page-container>
 </template>
 <script setup>
@@ -29,22 +34,8 @@ import { getList_api } from '@/api/process/initiate'
 const router = useRouter()
 const data = reactive({})
 
-const demo = [
-  {
-    id: '1710961447945199616',
-    key: 'c30w2s',
-    name: '模型1',
-    icon: 'http://192.168.32.66:9000/api/file/44d16619f7cc42a998e540c0ec448b46.jpg?accessKey=5c601fa473f5bc71041a4b6bd2d24317',
-    provider: 'wflow',
-    classifiedId: '日常管理',
-    model: '',
-    creatorId: '1199596756811550720',
-    creatorName: '超级管理员',
-    createTime: 1694596802888,
-  },
-]
 const groupedData = (arr, field) => {
-  return arr.reduce((acc, curr) => {
+  return arr?.reduce((acc, curr) => {
     let key = curr[field]
     if (!acc[key]) {
       acc[key] = []
@@ -57,8 +48,7 @@ const groupedData = (arr, field) => {
 getList_api({
   paging: false,
 }).then((res) => {
-  // Object.assign(data, res.result.data)
-  Object.assign(data, groupedData(demo, 'classifiedId'))
+  Object.assign(data, groupedData(res.result.data, 'classifiedId'))
 })
 
 const handleDetail = (data) => {
@@ -81,8 +71,11 @@ const handleDetail = (data) => {
   justify-content: center;
   align-items: center;
   .icon {
-    // border-radius: 10px;
     font-size: 40px;
   }
+}
+
+.empty {
+  margin-top: 40px;
 }
 </style>
