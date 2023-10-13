@@ -47,6 +47,10 @@ const DraggableLayout = defineComponent({
         visible: {
             type: Boolean,
             default: true
+        },
+        editable: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
@@ -72,6 +76,16 @@ const DraggableLayout = defineComponent({
                     return true
                 })
 
+                const _editable = computed(() => {
+                    if (!unref(isEditModel) && unref(designer.mode) === 'edit') {
+                        if (props?.editable === false) {
+                            return false
+                        }
+                        return element.componentProps?.editable
+                    }
+                    return true
+                })
+                
                 if (!unref(_visible)) return ''
 
                 switch (element.type) {
@@ -83,19 +97,19 @@ const DraggableLayout = defineComponent({
                             </Selection>
                         )
                     case 'card':
-                        return (<CardLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></CardLayout>)
+                        return (<CardLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></CardLayout>)
                     case 'space':
-                        return (<SpaceLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></SpaceLayout>)
+                        return (<SpaceLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></SpaceLayout>)
                     case 'grid':
-                        return (<GridLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></GridLayout>)
+                        return (<GridLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></GridLayout>)
                     case 'tabs':
-                        return (<TabsLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></TabsLayout>)
+                        return (<TabsLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></TabsLayout>)
                     case 'collapse':
-                        return (<CollapseLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></CollapseLayout>)
+                        return (<CollapseLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></CollapseLayout>)
                     case 'table':
-                        return (<TableLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></TableLayout>)
+                        return (<TableLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></TableLayout>)
                     default:
-                        return (<CommLayout visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.parent}></CommLayout>)
+                        return (<CommLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.parent}></CommLayout>)
                 }
             },
             footer() {

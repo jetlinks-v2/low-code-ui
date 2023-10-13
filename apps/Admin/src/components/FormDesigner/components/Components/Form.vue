@@ -5,6 +5,7 @@
       :mode="mode"
       :data="config"
       ref="formRef"
+      :disabled="disabled"
       @stateChange="onValueChange"
     />
   </div>
@@ -22,14 +23,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  // disabled: {
-  //   type: Boolean,
-  //   default: false,
-  // },
-  // data: {
-  //   type: Object,
-  //   default: () => ({}),
-  // },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
   source: {
     type: Object,
     default: () => ({}),

@@ -96,7 +96,7 @@ export const getConfigList = (_type: string, obj: any) => {
             header: '高级配置',
         })
     }
-    if (_type === 'table-item') {
+    if (_type === 'table-item' && !['table-item-index', 'table-item-actions'].includes(obj?.children?.[0]?.type)) {
         arr.push({
             key: 'Table',
             header: '组件属性',
