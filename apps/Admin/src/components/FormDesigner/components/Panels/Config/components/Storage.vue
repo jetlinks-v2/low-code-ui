@@ -7,7 +7,7 @@
       @cancel="visible = false"
     >
       <div v-if="configVisible">
-        <div>请选择device_id存储位置</div>
+        <div>请选择{{ config?.key}}存储位置</div>
         <div class="box">
           <j-form ref="formRef" :model="config" layout="vertical">
             <j-form-item
@@ -59,10 +59,10 @@
                 },
               ]"
             >
-              <j-select
+              <j-tree-select
                 allowClear
                 showSearch
-                :options="sourceList"
+                :tree-data="sourceList"
                 v-model:value="config.config.source"
                 placeholder="数据选择"
               />
@@ -156,10 +156,6 @@ const list = [
     label: 'name',
     value: 'name',
   },
-//   {
-//     label: 'description',
-//     value: 'description',
-//   },
 ]
 
 const dataList = ref<any[]>([...list])
@@ -203,10 +199,8 @@ const getArray = (arr: any[]) => {
       children = getArray(i.valueType?.properties || [])
     }
     return {
-      ...i,
       value: i.id,
       label: `${i.id}${i?.name ? '(' + i?.name + ')' : ''}`,
-      //   disabled: _disabled.includes(i.id),
       children,
     }
   })
