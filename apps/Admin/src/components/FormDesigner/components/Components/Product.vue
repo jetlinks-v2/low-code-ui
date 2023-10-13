@@ -4,35 +4,65 @@
 
 <script lang="ts" setup>
 import Iot from './iotComponents/index.vue'
-import {  provide } from 'vue'
-const props =  defineProps({
-  value:{
-    type:Array || String,
-    default:[] || ''
+import { provide, ref, watch } from 'vue'
+const props = defineProps({
+  value: {
+    type: Array || String,
+    default: [] || '',
   },
-  mode:{
-    type:String,
-    default:''
+  mode: {
+    type: String,
+    default: '',
   },
-  disabled:{
-    type:Boolean,
-    default:false
-  }
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  keys: {
+    type: Array,
+    default: () => [],
+  },
 })
-const _value:any = ref([])
+const _value: any = ref([])
 const emit = defineEmits(['update:value'])
-const updateValue = (value:any) =>{
-  emit('update:value',value)
-}
-provide('type','product')
-provide('mode',props.mode)
-watch(()=>props.value,()=>{
-  _value.value = props.value
-},{deep:true,immediate:true})
 
-watch(()=>props.mode,()=>{
-  props.mode ? _value.value = [] : _value.value = ''
-},{immediate:true})
+const getObj = (value: any) => {
+  const obj = {}
+  props.keys.map((item: any) => {
+    if (item?.key) {
+      obj[item.key] = value[item.key]
+    }
+  })
+  return obj
+}
+const updateValue = (value: any) => {
+  if (props.mode === 'multiple') {
+    const _arr = (value || []).map((item) => {
+      return getObj(item)
+    })
+    emit('update:value', _arr)
+  } else {
+    emit('update:value', getObj(value))
+  }
+}
+provide('type', 'product')
+provide('mode', props.mode)
+
+watch(
+  () => props.value,
+  () => {
+    _value.value = props.value
+  },
+  { deep: true, immediate: true },
+)
+
+watch(
+  () => props.mode,
+  () => {
+    props.mode ? (_value.value = []) : (_value.value = undefined)
+  },
+  { immediate: true },
+)
 </script>
 <style lang="less" scoped>
 </style>
