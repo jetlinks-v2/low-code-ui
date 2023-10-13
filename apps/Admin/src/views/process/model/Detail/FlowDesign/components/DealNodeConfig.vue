@@ -35,10 +35,16 @@
             :options="allButtons"
           />
         </j-form-item>
-        <j-form-item label="办理成员可以自由选择下一节点办理人" name="freeChoiceUser">
+        <j-form-item
+          label="办理成员可以自由选择下一节点办理人"
+          name="freeChoiceUser"
+        >
           <j-switch
             size="small"
             v-model:checked="memberFormData.freeChoiceUser"
+            :checkedValue="flowStore.selectedNode.children.id"
+            :unCheckedValue="undefined"
+            @change="handleSwitchChange"
           ></j-switch>
         </j-form-item>
       </j-form>
@@ -50,6 +56,7 @@
 import ConfigureForm from './ConfigureForm.vue'
 import { findNodeById } from './utils'
 import { useFlowStore } from '@/store/flow'
+import { onlyMessage } from '@jetlinks/utils'
 
 const flowStore = useFlowStore()
 
@@ -87,6 +94,14 @@ const nodeList = ref([
   { label: '审批节点', value: 'approval' },
   { label: '处理节点', value: 'deal' },
 ])
+
+const handleSwitchChange = () => {
+  const child = flowStore.selectedNode.children
+  if (!Object.keys(child).length || child.type !== 'APPROVAL') {
+    onlyMessage('下一节点为审批节点时可配置', 'warning')
+    memberFormData.freeChoiceUser = undefined
+  }
+}
 
 /**
  * 将数据保存至pinia

@@ -1,6 +1,6 @@
 <!-- 流程设计 -->
 <template>
-  <FlowDesigner @selectNode="nodeSelected" />
+  <FlowDesigner @selectNode="nodeSelected" @delNode="nodeDel" />
 
   <j-drawer
     destroyOnClose
@@ -25,6 +25,7 @@
 import FlowDesigner from '@/components/FlowDesigner'
 import NodeConfig from './components/NodeConfig.vue'
 import { useFlowStore } from '@/store/flow'
+import { findNodeById } from './components/utils'
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
@@ -38,8 +39,24 @@ const title = computed(() => {
 const nodeConfigRef = ref()
 const showConfig = ref(false)
 const nodeSelected = (node) => {
-  console.log('配置节点', node)
+  console.log('节点选中', node)
   showConfig.value = true
+}
+
+/**
+ * 删除审批节点时, 判断上一个节点是否是办理节点,
+ * 并且props.freeChoiceUser是否是当前删除节点的id
+ * 如果是则设置props.freeChoiceUser = undefined
+ */
+const nodeDel = (node) => {
+  //   console.log('节点删除', node)
+  const parentNode = findNodeById(flowStore.model.nodes, node.parentId)
+  if (
+    parentNode.type === 'DEAL' &&
+    parentNode.props.freeChoiceUser === node.id
+  ) {
+    parentNode.props.freeChoiceUser = undefined
+  }
 }
 
 const handleSubmit = () => {
