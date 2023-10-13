@@ -30,6 +30,10 @@ export default defineComponent({
         index: {
             type: Number,
             default: 0
+        },
+        visible: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
@@ -78,7 +82,7 @@ export default defineComponent({
                     })
                 ]
             })
-            designer.onAddChild(_item, props.data, false)
+            designer.onAddChild(_item, props.data)
         }
 
         const onAddIndex = () => {
@@ -102,7 +106,7 @@ export default defineComponent({
                         align: 'left',
                     },
                 })
-                designer.onAddChild(_item, props.data, true)
+                designer.onAddChild(_item, props.data, 'start')
             }
         }
 
@@ -127,7 +131,7 @@ export default defineComponent({
                         })
                     ],
                 })
-                designer.onAddChild(_item, props.data)
+                designer.onAddChild(_item, props.data, 'end')
             }
         }
 

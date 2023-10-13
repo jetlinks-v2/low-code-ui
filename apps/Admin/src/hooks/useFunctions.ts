@@ -46,8 +46,9 @@ export const useFunctions = () => {
    * @param functionId 功能id
    */
   const handleFunction = (functionId_: string) => {
+    console.log(functionId_);
     queryCommand(info.value.draftId, []).then(res => {
-      commandOptions.value = res.result?.find(item => item.moduleId + '.' + item.id === functionId_)?.command || []
+      commandOptions.value = res.result?.find(item => functionId_.includes(item.id))?.command || []
     })
   }
 
