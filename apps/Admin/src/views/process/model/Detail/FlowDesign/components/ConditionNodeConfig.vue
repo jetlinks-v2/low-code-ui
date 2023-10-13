@@ -31,7 +31,7 @@ const basicFormRef = ref()
 const basicFormData = reactive({
   condition: props.node?.props?.condition,
   //   此字段仅用于前端
-  terms: [],
+  terms: props.node?.props?.condition?.configuration?.terms || [],
 })
 
 /**

@@ -5,7 +5,7 @@
   <j-drawer
     destroyOnClose
     placement="right"
-    :width="500"
+    :width="600"
     :title="title"
     :visible="showConfig"
     @close="showConfig = false"

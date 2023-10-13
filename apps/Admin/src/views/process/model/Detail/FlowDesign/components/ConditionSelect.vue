@@ -15,6 +15,7 @@
       :tree-data="conditionOptions"
       :field-names="{ label: 'name', value: 'fullId' }"
       :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+      style="width: 400px"
     >
       <template #title="{ name }">
         <template
@@ -42,14 +43,44 @@
       v-model:value="item.termsType"
       :options="termsOptions"
       placeholder="请选择"
+      style="width: 90px"
     />
 
-    <j-select
+    <j-tree-select
       v-model:value="item.value"
-      :options="valueOptions"
+      v-model:searchValue="item.searchValue"
+      show-search
       placeholder="请选择"
-      :mode="['eq', 'neq'].includes(item.termsType) ? 'combobox' : 'multiple'"
-    />
+      allow-clear
+      tree-default-expand-all
+      tree-node-filter-prop="name"
+      :tree-data="conditionOptions"
+      :field-names="{ label: 'name', value: 'fullId' }"
+      :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+      :multiple="['eq', 'not'].includes(item.termsType) ? false : true"
+    >
+      <template #title="{ name }">
+        <template
+          v-for="(fragment, i) in name
+            ?.toString()
+            ?.split(
+              new RegExp(
+                `(?<=${item.searchValue})|(?=${item.searchValue})`,
+                'i',
+              ),
+            )"
+        >
+          <span
+            v-if="fragment.toLowerCase() === item.searchValue.toLowerCase()"
+            :key="i"
+            style="color: #08c"
+          >
+            {{ fragment }}
+          </span>
+          <template v-else>{{ fragment }}</template>
+        </template>
+      </template>
+    </j-tree-select>
     <AIcon
       type="DeleteOutlined"
       style="color: red"
@@ -118,29 +149,15 @@ const termsOptions = ref([
   },
   {
     label: '!=',
-    value: 'neq',
+    value: 'not',
   },
   {
     label: '包含',
-    value: 'include',
+    value: 'in',
   },
   {
     label: '不包含',
-    value: 'ninclude',
-  },
-])
-const valueOptions = ref([
-  {
-    label: '表单提交人',
-    value: 'id1',
-  },
-  {
-    label: '节点审核人',
-    value: 'id2',
-  },
-  {
-    label: '节点办理人',
-    value: 'id3',
+    value: 'nin',
   },
 ])
 
