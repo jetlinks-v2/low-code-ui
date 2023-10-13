@@ -56,7 +56,7 @@ const useProps = (element: any, _data: any, mode?: string) => {
           try {
             _pattern = new RegExp(item?.pattern)
             if (!_pattern.test(value)) {
-              errorMessage.push('该值不匹配/^[-]?(0|([1-9]\\d*))(.\\d+)?$/')
+              errorMessage.push(`该值不匹配${item?.pattern}`)
             }
 
           } catch (error) {
@@ -64,7 +64,7 @@ const useProps = (element: any, _data: any, mode?: string) => {
         }
 
         if (errorMessage.length) {
-          return Promise.reject(errorMessage.toString())
+          return Promise.reject(item.message || errorMessage.toString())
         }
         return Promise.resolve()
       }
