@@ -3,7 +3,7 @@ import { queryProjectDraft, updateDraft} from "@/api/project";
 import { useEngine } from './engine'
 import dayjs from 'dayjs';
 import {throttle, cloneDeep, omit, debounce} from 'lodash-es'
-import { Integrate } from '@/utils/project'
+import {Integrate, IntegrateFilterType} from '@/utils/project'
 import { providerEnum } from  '@/components/ProJect/index'
 import { filterTreeNodes } from '@jetlinks/utils'
 
@@ -287,8 +287,8 @@ export const useProduct = defineStore('product', () => {
     engine.expandedAll()
   }
 
-  const getServerModulesData = async () => {
-    const integrateData = Integrate(data.value)
+  const getServerModulesData = async (filter?: IntegrateFilterType) => {
+    const integrateData = Integrate(data.value, filter)
     return integrateData?.modules || []
   }
 

@@ -149,6 +149,12 @@ const loop = (data, key, callback) => {
   });
 };
 
+const someName = (drop, drag, parentId) => {
+  // 获取同级下的元素，过滤掉自身
+  const children = [...product.getDataMap().values()].filter(item => item.parentId === parentId && item.id !== drag.id)
+  return children.some(item => item.name === drag.name)
+}
+
 const onDrop = (info) => {
   console.log('info--', info)
   const dropKey = info.node.key; //目标元素
@@ -164,8 +170,14 @@ const onDrop = (info) => {
 
 
   let dragObj;
-  //平级
+  const parentId = mayType.includes(info.node.type) ? info.node.id : info.node.parentId
+  if (someName(info.node, info.dragNode, parentId)) { // 有同名禁止拖拽
+    return
+  }
+    //平级
+
   if (!info.dropToGap && mayType.includes(info.node.type)) {
+
     loop(data, dragKey, (item, index, arr) => {
       dragObj = item;
       arr?.splice(index, 1);
@@ -178,6 +190,7 @@ const onDrop = (info) => {
   }
 
   if (info.dropToGap && info.node.type !== 'project') {
+
     loop(data, dragKey, (item, index, arr) => {
       dragObj = item;
       arr?.splice(index, 1);

@@ -129,7 +129,8 @@ provide(CRUD_COLUMNS, tableColumns)
 provide(WARP_REF, warpRef)
 
 const ownerId = computed(() => {
-  return `${project.info?.id}.${props.parentId}.${props.id}`
+  const stId = project.info?.id === props.parentId ? [project.info?.id,project.info?.id] : [project.info?.id,project.info?.id,props.parentId]
+  return `${stId.join('.')}.${props.id}`
 })
 
 const tableName = ref(props.configuration.tableName)
