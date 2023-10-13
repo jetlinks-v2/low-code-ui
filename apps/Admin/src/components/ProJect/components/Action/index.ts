@@ -18,11 +18,11 @@ export const providerList = [
     },
     {
         value:'ListPage',
-        text:'列表页模版'
+        text:'列表页'
     },
     {
         value:'FormPage',
-        text:'表单页模版'
+        text:'表单页'
     },
     {
         value:'SQL',

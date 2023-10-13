@@ -2,8 +2,9 @@ import { isHTMLTag } from '@vue/shared'
 import { withModifiers } from 'vue'
 import './index.less'
 import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
-import { checkIsField, extractCssClass, insertCustomCssToHead, updateData } from '../../utils/utils'
+import { checkIsField, copyDataByKey, extractCssClass, findParentById, handleCopyData, insertCustomCssToHead, updateData } from '../../utils/utils'
 import { map, set } from 'lodash-es'
+import { uid } from '../../utils/uid'
 
 const Selection = defineComponent({
   name: 'Selection',
@@ -74,7 +75,11 @@ const Selection = defineComponent({
 
     const _error = computed(() => {
       const arr = map(designer.errorKey?.value, 'key')
-      return arr.includes(props.data?.key)
+      if (props?.data?.type === 'table-item') {
+        return arr.includes(props.data?.children?.[0]?.key)
+      } else {
+        return arr.includes(props.data?.key)
+      }
     })
 
     watchEffect(() => {
@@ -88,13 +93,17 @@ const Selection = defineComponent({
     }
 
     const setOptions = (arr: any[]) => {
-      const _list = updateData(unref(designer.formData)?.children, {
+      const obj = {
         ...props.data,
-        componentProps: {
+        componentProps: props.data.type === 'tree-select' ? {
           ...props.data.componentProps,
           options: arr
+        } : {
+          ...props.data.componentProps,
+          treeData: arr
         }
-      })
+      }
+      const _list = updateData(unref(designer.formData)?.children, obj)
       designer.formData.value = {
         ...designer.formData.value,
         children: _list || [],
@@ -125,7 +134,31 @@ const Selection = defineComponent({
 
     // 复制
     const onCopy = () => {
-      designer.onCopy()
+      const _data: any = {
+        ...props.data,
+        key: props.data?.key + '_' + uid(),
+        children: handleCopyData(props.data?.children || []),
+      }
+      if (!['grid-item'].includes(props.data?.type)) {
+        _data.formItemProps = {
+          ...props.data?.formItemProps,
+          label: 'copy_' + props.data?.formItemProps?.label,
+          name: 'copy_' + props.data?.formItemProps?.name
+        }
+      }
+      const dt = findParentById(designer.formData.value, props.data)
+      if (dt?.key === 'root') {
+        designer.formData.value = {
+          ...designer.formData.value,
+          children: [...designer.formData.value?.children, _data],
+        }
+      } else {
+        designer.formData.value = {
+          ...designer.formData.value,
+          children: copyDataByKey(designer.formData.value?.children, [_data], props.data),
+        }
+      }
+      designer.setSelection(_data || 'root')
     }
     // 粘贴
     const onPaste = () => {
@@ -160,7 +193,7 @@ const Selection = defineComponent({
           overlay: () => {
             return (
               <Menu>
-                <MenuItem key="copy"><Button type="link" onClick={onCopy}>复制</Button></MenuItem>
+                <MenuItem key="copy"><Button type="link" onClick={() => { designer.onCopy() }}>复制</Button></MenuItem>
                 <MenuItem key="paste"><Button type="link" onClick={onPaste}>粘贴</Button></MenuItem>
                 <MenuItem key="shear"><Button type="link" onClick={onShear}>剪切</Button></MenuItem>
                 <MenuItem key="delete"><Button danger type="link" onClick={onDelete}>删除</Button></MenuItem>
@@ -170,7 +203,7 @@ const Selection = defineComponent({
           }
         }}
       >
-        <div style={{position: 'relative'}}>
+        <div style={{ position: 'relative' }}>
           {slots?.default()}
           {props.hasMask && <div class={['mask']}></div>}
         </div>

@@ -12,7 +12,6 @@
 
 <script setup name="Engine">
 import { Header, Tree, Content } from './components'
-import { useProduct, useEngine } from '@/store'
 
 
 </script>

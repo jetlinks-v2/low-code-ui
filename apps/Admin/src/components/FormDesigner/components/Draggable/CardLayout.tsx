@@ -25,6 +25,10 @@ export default defineComponent({
         index: {
             type: Number,
             default: 0
+        },
+        visible: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
@@ -77,6 +81,7 @@ export default defineComponent({
                                             parent={element}
                                             path={_path}
                                             index={_index + 1}
+                                            visible={props.visible}
                                         />
                                     </Selection>
                                 )
@@ -89,12 +94,12 @@ export default defineComponent({
                 <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     {
                         unref(_isLayout) ?
-                            <FormItem {...unref(_formItemProps)}>
+                            <FormItem {...unref(_formItemProps)} validateFirst={true}>
                                 {renderContent()}
                             </FormItem>
                             : renderContent()
                     }
-
+                    <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{props.data?.componentProps?.description}</div>
                 </Selection>
             )
         }

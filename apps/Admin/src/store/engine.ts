@@ -9,6 +9,8 @@ type FileItemType = {
   type: string
   parentName: string
   parentId: string
+  key: string,
+  parentKey: string,
   [key: string]: any
 }
 
@@ -58,10 +60,13 @@ export const useEngine = defineStore('engine', () => {
     const arr = [...files.value]
     handleActiveKey(key)
     files.value = arr.filter(item => item.id !== key)
+    if (files.value.length === 0) {
+      activeFile.value = product.data[0].id
+    }
   }
 
   const getExpandsKeys = (id: string, type?: string) => {
-    console.log(id)
+    // console.log(id)
     const arrSet: Set<string> = new Set([...expandedKeys.value])
     const map = product.getDataMap()
 
@@ -103,16 +108,37 @@ export const useEngine = defineStore('engine', () => {
    * 新增打开的文件
    * @param record
    */
-  const addFile = (record: FileItemType) => {
-    activeFile.value = record.id
+  const addFile = (record: FileItemType, open?: any) => {
+    // console.log('------open',open)
+    if (!open) {
+      activeFile.value = record.id
+    }
     const type = record.type
     if (!files.value.some(item => item.id === record.id)) {
       const cloneRecord = cloneDeep(record)
       if (type === 'project') {
         delete cloneRecord.children
       }
-      if(type!=='module'&& type!=='project'){
+      const item = product.data[0]
+      if (type !== 'module' && type !== 'project') {
         files.value.unshift(cloneRecord)
+        product.update({
+          ...item,
+          others: {
+            ...item?.others,
+            activeFile: activeFile.value,
+            files: files.value
+          }
+        })
+      }else{
+        product.update({
+          ...item,
+          others: {
+            ...item?.others,
+            activeFile: activeFile.value,
+            files: []
+          }
+        })
       }
       // files.value.push(cloneRecord)
     }
@@ -121,18 +147,18 @@ export const useEngine = defineStore('engine', () => {
 
 
   const updateTree = (data: any[], record: any) => {
-    const arr  = cloneDeep(data)
+    const arr = cloneDeep(data)
     return arr.map(item => {
       if (item.id === record.id) {
-        return { 
-          ...item, 
+        return {
+          ...item,
           ...record,
-          others:{
+          others: {
             ...item.others,
             ...record.others,
-            modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss')
+            modifyTime: dayjs().format('YYYY-MM-DD HH:mm:ss')
           }
-         }
+        }
       } else if (item.children) {
         item.children = updateTree(item.children, record)
       }
@@ -141,14 +167,14 @@ export const useEngine = defineStore('engine', () => {
   }
 
   const addTree = (data: any[], record: any) => {
-   return  data.map(item => {
+    return data.map(item => {
       if (item.id === record.parentId) {
         const add = {
           ...record,
-          others:{
-            createTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
-            modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
-            useList:[]
+          others: {
+            createTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            modifyTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            useList: []
           },
         }
         return {
@@ -156,7 +182,7 @@ export const useEngine = defineStore('engine', () => {
           children: item.children?.length ? [...item.children, add] : [add]
         }
       } else if (item.children) {
-       item.children= addTree(item.children, record)
+        item.children = addTree(item.children, record)
       }
       return item
     })
@@ -167,17 +193,36 @@ export const useEngine = defineStore('engine', () => {
    * @param record
    * @param type
    */
-  const updateFile = (record: any, type: string) => {
-    const index = files.value.findIndex(item => item.id === record.id)
+  const updateFile = (record: any, type: string, open?: any) => {
+    const index = files.value?.findIndex(item => item.id === record.id)
+    
 
     files.value = files.value.map(item => {
       return product.getById(item.id)
     })
 
     if (['del', 'edit'].includes(type)) {
-      type === 'del' ? files.value.splice(index,1) : files.value[index] = record
+      if (type === 'del') {
+        files.value.splice(index, 1)
+        if (files.value.length === 0) {
+          activeFile.value = product.data[0].id
+        } else {
+          activeFile.value = files.value[index]?.id
+        }
+        const item = product.data[0]
+        product.update({
+          ...item,
+          others: {
+            ...item?.others,
+            activeFile: activeFile.value,
+            files: files.value
+          }
+        })
+      } else {
+        files.value[index] = record
+      }
     } else if (type === 'add') {
-      addFile(record)
+      addFile(record, open) 
     }
   }
 
@@ -187,6 +232,14 @@ export const useEngine = defineStore('engine', () => {
  */
   const setCopyFile = (record: FileItemType) => {
     copyFile.value = record.id
+  }
+
+  const setActiveFile = (v) => {
+    activeFile.value = v
+  }
+
+  const selectFiles = (v) => {
+    files.value = v
   }
 
   // watch(() => activeFile.value, () => {
@@ -208,6 +261,8 @@ export const useEngine = defineStore('engine', () => {
     packUpAll,
     setCopyFile,
     updateFile,
-    initEngineState
+    initEngineState,
+    setActiveFile,
+    selectFiles
   }
 })

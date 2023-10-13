@@ -4,7 +4,7 @@ import type { RouteRecordItem } from '@jetlinks/types'
 export const NOT_FIND_ROUTE = {
     path: '/:pathMatch(.*)',
     name: 'error',
-    component: () => Exception
+    component: Exception
 }
 
 export const LOGIN_ROUTE: RouteRecordItem = {

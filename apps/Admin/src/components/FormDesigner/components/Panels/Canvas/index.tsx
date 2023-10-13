@@ -1,4 +1,4 @@
-import { Form, Scrollbar, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
+import { Form, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import DraggableLayout from "../../Draggable/DraggableLayout"
 import './index.less'
 import { cloneDeep, omit } from "lodash-es"
@@ -30,35 +30,38 @@ const Canvas = defineComponent({
       return unref(designer?.model) === 'edit'
     })
 
-    watch( 
-      () => [keys['Ctrl']?.value, keys['Meta']?.value],
+    watch(
+      () => [keys?.['Ctrl']?.value, keys?.['Meta']?.value],
       ([v1, v2]) => {
         designer._ctrl.value = v1 || v2
       },
     )
 
     watch(
-      () => [keys['Ctrl+C']?.value, keys['Meta+C']?.value],
+      () => [keys?.['Ctrl+C']?.value, keys?.['Meta+C']?.value],
       ([v1, v2]) => {
-        if ((v1 || v2) && isEditModel.value && designer.focus) {
+        designer._other.value = v1 || v2
+        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
           designer.onCopy()
         }
       },
     )
 
     watch(
-      () => [keys['Ctrl+X']?.value, keys['Meta+X']?.value],
+      () => [keys?.['Ctrl+X']?.value, keys?.['Meta+X']?.value],
       ([v1, v2]) => {
-        if ((v1 || v2) && isEditModel.value && designer.focus) {
+        designer._other.value = v1 || v2
+        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
           designer.onShear()
         }
       },
     )
 
     watch(
-      () => [keys['Ctrl+V']?.value, keys['Meta+V']?.value],
+      () => [keys?.['Ctrl+V']?.value, keys?.['Meta+V']?.value],
       ([v1, v2]) => {
-        if ((v1 || v2) && isEditModel.value && designer.focus) {
+        designer._other.value = v1 || v2
+        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
           designer.onPaste()
         }
       },
@@ -66,9 +69,10 @@ const Canvas = defineComponent({
 
     // 删除
     watch(
-      () => [keys['Backspace'].value, keys['Delete'].value],
+      () => [keys?.['Backspace'].value, keys?.['Delete'].value],
       ([v1, v2]) => {
-        if ((v1 || v2) && isEditModel.value && designer.focus) {
+        designer._other.value = v1 || v2
+        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
           if (!designer.delVisible.value) {
             designer.onDelete()
           }
@@ -81,12 +85,9 @@ const Canvas = defineComponent({
       return foundRef
     }
 
-    const _style = {
-      margin: '10px 10px 0 10px',
-      paddingTop: '10px',
-      height: '100%',
-      boxSizing: 'border-box'
-    }
+    const _width = computed(() => {
+      return !unref(designer.formData)?.children?.length ? "100%" : ''
+    })
 
     const onPaste = () => {
       designer.onPaste()
@@ -98,12 +99,18 @@ const Canvas = defineComponent({
       insertCustomCssToHead(unref(designer.formData)?.componentProps?.cssCode, 'root')
     })
 
-    watch(() => focused.value, (newValue) => {
-      designer.focus = newValue
-    }, {
-      immediate: true,
-      deep: true
-    })
+    watch(
+      () => focused?.value,
+      (newValue) => {
+        if (designer.focus) {
+          designer.focus.value = newValue
+        }
+      },
+      {
+        immediate: true,
+        deep: true
+      }
+    )
 
     const renderContent = () => {
       const Layout = (
@@ -111,31 +118,37 @@ const Canvas = defineComponent({
           path={[]}
           index={0}
           data-layout-type={'root'}
-          style={_style}
-          data={unref(designer.formData)?.children}
-          parent={unref(designer.formData)}
+          style={{
+            margin: '10px 10px 0 10px',
+            paddingTop: '10px',
+            height: '100%',
+            width: unref(_width)
+          }}
+          data={designer.formData.value?.children || []}
+          parent={designer.formData.value}
           isRoot
         ></DraggableLayout>
       )
 
       return (
-        <div style={{ height: '100%' }}>
-          <Form
-            ref={designer.formRef}
-            model={designer.formState}
-            {...omit(unref(designer.formData)?.componentProps, ['size'])}
-            onClick={unref(isEditModel) && handleClick}
-            class={[...unref(cssClassList)]}
-            onValidate={(name, status, errorMsgs) => {
-              if (unref(designer.formData)?.componentProps?.eventCode) {
-                let customFn = new Function('e', unref(designer.formData)?.componentProps?.eventCode)
-                customFn.call({ getWidgetRef: getWidgetRef }, name, status, errorMsgs)
-              }
-            }}
-          >
-            {Layout}
-          </Form>
-        </div>
+        <Form
+          ref={designer.formRef}
+          model={designer.formState}
+          {...omit(designer.formData.value?.componentProps, ['size', 'cssCode', 'eventCode'])}
+          onClick={unref(isEditModel) && handleClick}
+          class={[...unref(cssClassList)]}
+          onValidate={(name, status, errorMsgs) => {
+            if (designer.formData.value?.componentProps?.eventCode) {
+              let customFn = new Function('e', designer.formData.value?.componentProps?.eventCode)
+              customFn.call({ getWidgetRef: getWidgetRef }, name, status, errorMsgs)
+            }
+          }}
+          style={{
+            height: "100%"
+          }}
+        >
+          {Layout}
+        </Form>
       )
     }
 
@@ -164,14 +177,8 @@ const Canvas = defineComponent({
 
     return () => {
       return (
-        <div ref={canvasRef} class={['canvas-box', unref(isEditModel) && 'editModel']}>
-          <div class="container">
-            <Scrollbar height={'100%'}>
-              <div class="subject">
-                {unref(isEditModel) ? renderChildren() : renderContent()}
-              </div>
-            </Scrollbar>
-          </div>
+        <div class="subject" ref={canvasRef}>
+          {unref(isEditModel) ? renderChildren() : renderContent()}
           {unref(designer.collectVisible) && unref(isEditModel) && <CollectModal
             onSave={(name: string) => {
               const obj = {

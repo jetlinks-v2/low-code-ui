@@ -22,7 +22,7 @@
         ].includes(type)
       "
     >
-      <j-form-item required label="组件类型" name="type">
+      <j-form-item :validateFirst="true" required label="组件类型" name="type">
         <j-select
           :value="target.type"
           @change="onTypeChange"
@@ -50,6 +50,7 @@
         label="名称"
         :name="['formItemProps', 'label']"
         v-if="!['text'].includes(type)"
+        :validateFirst="true"
         :rules="[
           {
             required: true,
@@ -65,52 +66,70 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item
-        label="标识"
-        :name="['formItemProps', 'name']"
-        required
-        :rules="rules"
+      <template
+        v-if="['org', 'role', 'user', 'product', 'device'].includes(type)"
       >
-        <j-input
-          placeholder="请输入"
-          :maxlength="64"
-          @change="onDataChange"
-          v-model:value="target.formItemProps.name"
-        />
-      </j-form-item>
+        <j-form-item
+          label="标识"
+          :name="['formItemProps', 'name']"
+          required
+          :rules="rules"
+          v-if="isShowName"
+          :validateFirst="true"
+        >
+          <j-input
+            placeholder="请输入"
+            :maxlength="64"
+            @change="onDataChange"
+            v-model:value="target.formItemProps.name"
+          />
+        </j-form-item>
+        <j-form-item
+          label="存储配置"
+          :name="['componentProps', 'keys']"
+          required
+          :rules="[
+            {
+              required: true,
+              message: '请配置存储配置',
+            },
+          ]"
+          :validateFirst="true"
+        >
+          <Storage
+            v-model:value="target.componentProps.keys"
+            @change="onStorageChange"
+          />
+        </j-form-item>
+      </template>
+      <template v-else>
+        <j-form-item
+          label="标识"
+          :name="['formItemProps', 'name']"
+          required
+          :rules="rules"
+          :validateFirst="true"
+        >
+          <j-input
+            placeholder="请输入"
+            :maxlength="64"
+            @change="onDataChange"
+            v-model:value="target.formItemProps.name"
+          />
+        </j-form-item>
+      </template>
       <template v-if="['text'].includes(type)">
         <j-form-item
           label="文本内容"
           :name="['componentProps', 'value']"
           required
+          :validateFirst="true"
         >
           <j-input
             placeholder="请输入"
             @change="onDataChange"
-            v-model:value="target.componentProps.value"
-          />
-        </j-form-item>
-      </template>
-      <template
-        v-if="
-          [
-            'input',
-            'textarea',
-            'input-number',
-            'input-password',
-            'tree-select',
-            'select',
-            'date-picker',
-            'time-picker',
-          ].includes(type)
-        "
-      >
-        <j-form-item label="占位提示" :name="['componentProps', 'placeholder']">
-          <j-input
-            placeholder="请输入"
-            v-model:value="target.componentProps.placeholder"
             :maxlength="32"
-            @change="onDataChange"
+            v-model:value="target.componentProps.value"
           />
         </j-form-item>
       </template>
@@ -119,6 +138,7 @@
       <template v-if="type === 'card'">
         <j-form-item
           label="卡片名称"
+          :validateFirst="true"
           :name="['componentProps', 'title']"
           :rules="[
             {
@@ -139,6 +159,7 @@
       <template v-if="['card', 'collapse', 'tabs'].includes(type)">
         <j-form-item
           label="容器组件"
+          :validateFirst="true"
           :name="['formItemProps', 'isLayout']"
           :rules="[
             {
@@ -149,7 +170,7 @@
           ]"
         >
           <j-switch
-            v-model:checked="target.formItemProps.isLayout"
+            :checked="target.formItemProps.isLayout"
             @change="onSwitch"
           />
         </j-form-item>
@@ -158,6 +179,7 @@
           label="标识"
           :name="['formItemProps', 'name']"
           required
+          :validateFirst="true"
           :rules="rules"
         >
           <j-input
@@ -170,6 +192,7 @@
         <j-form-item
           v-if="target.formItemProps.isLayout"
           label="名称"
+          :validateFirst="true"
           :name="['formItemProps', 'label']"
           :rules="[
             {
@@ -192,6 +215,7 @@
         <j-form-item
           label="名称"
           :name="['componentProps', 'name']"
+          :validateFirst="true"
           :rules="[
             {
               required: true,
@@ -211,6 +235,7 @@
           label="标识"
           :name="['formItemProps', 'name']"
           required
+          :validateFirst="true"
           :rules="rules"
         >
           <j-input
@@ -225,6 +250,7 @@
         <j-form-item
           label="名称"
           :name="['componentProps', 'name']"
+          :validateFirst="true"
           :rules="[
             {
               required: true,
@@ -244,6 +270,7 @@
           label="标识"
           :name="['formItemProps', 'name']"
           required
+          :validateFirst="true"
           :rules="rules"
         >
           <j-input
@@ -258,6 +285,7 @@
         <j-form-item
           label="名称"
           :name="['componentProps', 'name']"
+          :validateFirst="true"
           :rules="[
             {
               required: true,
@@ -275,30 +303,37 @@
         </j-form-item>
         <j-form-item
           label="标识"
-          :name="['formItemProps', 'name']"
+          :name="['children', 0, 'formItemProps', 'name']"
           required
+          :validateFirst="true"
           :rules="rules"
         >
           <j-input
             placeholder="请输入"
             :maxlength="64"
             @change="onDataChange"
-            v-model:value="target.formItemProps.name"
+            v-model:value="target.children[0].formItemProps.name"
           />
         </j-form-item>
         <j-form-item
           label="表头跨列"
           :name="['componentProps', 'colSpan']"
-          required
+          :validateFirst="true"
         >
           <j-input-number
             placeholder="请输入表头跨列"
             @change="onDataChange"
             style="width: 100%"
+            :precision="0"
+            :min="0"
             v-model:value="target.componentProps.colSpan"
           />
         </j-form-item>
-        <j-form-item label="内容对齐" :name="['componentProps', 'align']">
+        <j-form-item
+          :validateFirst="true"
+          label="内容对齐"
+          :name="['componentProps', 'align']"
+        >
           <j-select
             v-model:value="target.componentProps.align"
             placeholder="请选择"
@@ -309,12 +344,25 @@
             <j-select-option :value="'center'">中</j-select-option>
           </j-select>
         </j-form-item>
+        <j-form-item
+          :validateFirst="true"
+          label="组件类型"
+          :name="['children', 0, 'type']"
+        >
+          <j-select
+            v-model:value="target.children[0].type"
+            placeholder="请选择"
+            @change="onTypesChange"
+            :options="typeList"
+          />
+        </j-form-item>
       </template>
       <template v-if="['grid', 'space'].includes(type)">
         <j-form-item
           label="标识"
           :name="['formItemProps', 'name']"
           required
+          :validateFirst="true"
           :rules="rules"
         >
           <j-input
@@ -326,19 +374,35 @@
         </j-form-item>
       </template>
       <template v-if="['tabs'].includes(type)">
-        <j-form-item :name="['componentProps', 'type']" label="切卡样式">
-          <j-radio-group
+        <j-form-item
+          :validateFirst="true"
+          :name="['componentProps', 'type']"
+          label="切卡样式"
+        >
+          <!-- <j-radio-group
             v-model:value="target.componentProps.type"
             button-style="solid"
             @change="onDataChange"
           >
             <j-radio-button :value="'line'">线框</j-radio-button>
             <j-radio-button :value="'card'">卡片</j-radio-button>
-          </j-radio-group>
+          </j-radio-group> -->
+          <CheckButton
+            :options="[
+              { label: '线框', value: 'line' },
+              { label: '卡片', value: 'card' },
+            ]"
+            @change="onDataChange"
+            v-model:value="target.componentProps.type"
+          />
         </j-form-item>
       </template>
       <template v-if="['space'].includes(type)">
-        <j-form-item :name="['componentProps', 'align']" label="对齐">
+        <j-form-item
+          :validateFirst="true"
+          :name="['componentProps', 'align']"
+          label="对齐"
+        >
           <j-select
             v-model:value="target.componentProps.align"
             placeholder="请选择"
@@ -354,45 +418,48 @@
           :name="['componentProps', 'direction']"
           label="类型"
           required
+          :validateFirst="true"
         >
-          <j-radio-group
+          <!-- <j-radio-group
             v-model:value="target.componentProps.direction"
             button-style="solid"
             @change="onDataChange"
           >
             <j-radio-button :value="'vertical'">垂直</j-radio-button>
             <j-radio-button :value="'horizontal'">水平</j-radio-button>
-          </j-radio-group>
+          </j-radio-group> -->
+          <CheckButton
+            :options="[
+              { label: '垂直', value: 'vertical' },
+              { label: '水平', value: 'horizontal' },
+            ]"
+            @change="onDataChange"
+            v-model:value="target.componentProps.direction"
+          />
         </j-form-item>
         <j-form-item
           :name="['componentProps', 'size']"
           label="间隔尺寸"
+          :validateFirst="true"
           required
         >
           <j-input-number
             v-model:value="target.componentProps.size"
             style="width: 100%"
             :precision="0"
+            :min="0"
             @change="onDataChange"
           />
         </j-form-item>
       </template>
     </template>
 
-    <!-- 规则校验 -->
-    <template v-if="rulesVisible">
-      <j-form-item>
-        <Rule
-          :type="type"
-          v-model:value="target.formItemProps.rules"
-          @change="onChange"
-        />
-      </j-form-item>
-    </template>
-
     <!-- 说明 -->
     <template v-if="descVisible">
-      <j-form-item :name="['componentProps', 'description']">
+      <j-form-item
+        :validateFirst="true"
+        :name="['componentProps', 'description']"
+      >
         <template #label>
           说明内容<j-tooltip title="配置后会在该配置项名称后方展示">
             <AIcon type="QuestionCircleOutlined" />
@@ -412,11 +479,11 @@
 <script lang="ts" setup>
 import { computed, inject, unref } from 'vue'
 import { useTarget } from '../../../../hooks'
-import Rule from './Rules/Rule.vue'
 import { basic } from '@/components/FormDesigner/utils/defaultData'
-import { omit } from 'lodash-es'
 import generatorData from '@/components/FormDesigner/utils/generatorData'
 import { getBrotherList, updateData } from '../../../../utils/utils'
+import Storage from './Storage.vue'
+import { uid } from '@/components/FormDesigner/utils/uid'
 
 const designer: any = inject('FormDesigner')
 
@@ -430,7 +497,7 @@ const emits = defineEmits(['refresh'])
 
 const onSwitch = (_checked: boolean) => {
   target.value.formItemProps.label = _checked ? target.value.name : undefined
-  // target.value.formItemProps.name = undefined
+  target.value.formItemProps.isLayout = _checked
   emits('refresh', target.value)
 }
 
@@ -458,16 +525,44 @@ const descVisible = computed(() => {
   ].includes(unref(type))
 })
 
-const rulesVisible = computed(() => {
-  return [
-    'input',
-    'textarea',
-    'input-password',
-    'date-picker',
-    'time-picker',
-    'table',
-  ].includes(unref(type))
-})
+const typeList = [
+  {
+    label: '文本框',
+    value: 'input',
+  },
+  {
+    label: '文本域',
+    value: 'textarea',
+  },
+  {
+    label: '数字输入',
+    value: 'input-number',
+  },
+  {
+    label: '密码框',
+    value: 'input-password',
+  },
+  {
+    label: '下拉框',
+    value: 'select',
+  },
+  {
+    label: '开关',
+    value: 'switch',
+  },
+  {
+    label: '树选择',
+    value: 'tree-select',
+  },
+  {
+    label: '日期选择',
+    value: 'date-picker',
+  },
+  {
+    label: '时间选择',
+    value: 'time-picker',
+  },
+]
 
 const rules = [
   {
@@ -507,8 +602,14 @@ const typeOptions = computed(() => {
 
 const onTypeChange = (val: string) => {
   const item = basic.find((item) => item?.type === val)
+  const _data = generatorData(item)
   const obj = {
-    ...generatorData(omit(item, ['icon'])),
+    ..._data,
+    formItemProps: {
+      ..._data?.formItemProps,
+      label: target.value?.formItemProps?.label || _data?.formItemProps.label,
+      name: target.value?.formItemProps?.name || _data?.formItemProps.name,
+    },
     key: target.value?.key,
   }
   const arr = updateData(unref(designer.formData)?.children, obj)
@@ -519,12 +620,45 @@ const onTypeChange = (val: string) => {
   designer.setSelection(obj)
 }
 
-const onChange = (arr: any[]) => {
-  target.value.formItemProps.rules = arr
+const onTypesChange = (val: string) => {
+  const _data = generatorData({
+    type: val,
+    name: '列名',
+    children: [],
+  })
+  const obj = {
+    ..._data,
+    formItemProps: {
+      ..._data?.formItemProps,
+      label:
+        target.value.children[0]?.formItemProps?.label ||
+        _data?.formItemProps.label,
+      name:
+        target.value.children[0]?.formItemProps?.name ||
+        _data?.formItemProps.name,
+    },
+    key: target.value.children[0]?.key,
+  }
+
+  const arr = updateData(unref(designer.formData)?.children, obj)
+  designer.formData.value = {
+    ...designer.formData.value,
+    children: arr,
+  }
+}
+
+const isShowName = computed(() => {
+  return target.value?.componentProps?.mode === 'multiple'
+})
+
+const onDataChange = () => {
   emits('refresh', target.value)
 }
 
-const onDataChange = () => {
+const onStorageChange = () => {
+  if(!isShowName.value){
+    target.value.formItemProps.name = target.value.componentProps?.keys?.find(i => i?.config?.flag)?.config?.source || `${type.value}_${uid()}`
+  }
   emits('refresh', target.value)
 }
 </script>

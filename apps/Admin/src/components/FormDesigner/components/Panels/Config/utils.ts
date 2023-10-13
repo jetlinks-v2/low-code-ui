@@ -1,4 +1,4 @@
-export const getConfigList = (_type: string) => {
+export const getConfigList = (_type: string, obj: any) => {
     const arr: any[] = []
     if (['root'].includes(unref(_type))) {
         arr.push({
@@ -22,7 +22,7 @@ export const getConfigList = (_type: string) => {
             'input-password',
             'select-card',
             'upload',
-            'switch',
+            // 'switch',
             'tree-select',
             'select',
             'date-picker',
@@ -49,12 +49,12 @@ export const getConfigList = (_type: string) => {
         })
     }
 
-  if (unref(_type) === 'form') {
-    arr.push({
-      key: 'SourceForm',
-      header: '数据来源',
-    })
-  }
+    if (unref(_type) === 'form') {
+        arr.push({
+            key: 'SourceForm',
+            header: '数据来源',
+        })
+    }
 
     if (unref(_type) === 'grid' || unref(_type) === 'grid-item') {
         arr.push({
@@ -95,6 +95,18 @@ export const getConfigList = (_type: string) => {
             key: 'Status',
             header: '高级配置',
         })
+    }
+    if (_type === 'table-item') {
+        arr.push({
+            key: 'Table',
+            header: '组件属性',
+        })
+        if (['select', 'select-card', 'tree-select'].includes(obj?.children?.[0]?.type)) {
+            arr.push({
+                key: 'TableSource',
+                header: '数据来源',
+            })
+        }
     }
 
     return [...arr]

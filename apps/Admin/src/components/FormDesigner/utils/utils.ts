@@ -4,6 +4,36 @@ import { ISchema } from "../typings"
 import { queryDictionaryData, queryRuntime } from "@/api/form"
 import { isObject, map, omit } from "lodash-es"
 
+export const searchTree = (arr: any[], _item: any) => {
+    let _data: any = undefined
+    arr?.map((item) => {
+        if (item.id === _item) {
+            _data = item
+            return
+        }
+        if (item.children?.length) {
+            _data = searchTree(item.children, _item)
+        }
+    })
+    return _data
+}
+
+export const getArray = (arr: any[]) => {
+    const _item = arr.find((i) => i.valueType?.type === 'array')
+    if (_item) {
+        return arr?.map((item) => {
+            const children = item?.properties?.length ? getArray(item.properties) : []
+            return {
+                ...omit(item, 'properties'),
+                label: item?.name,
+                value: item?.id,
+                children,
+            }
+        })
+    } else {
+        return []
+    }
+}
 export const checkIsField = (node: any) => node?.type && (componentMap?.[node?.type]) || ['table'].includes(node?.type)
 
 // 生成多个选项
@@ -19,122 +49,162 @@ export const generateOptions = (len: number) => {
     return result
 }
 
-const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo']
+const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo', 'product', 'device', 'org', 'user', 'role']
 
-const checkedConfigItem = (node: ISchema, allData: any[]) => {
+const checkedConfigItem = (node: ISchema, allData: any[], source: any, formList: any[]) => {
+    const obj = {
+        key: node?.key,
+        message: (node.formItemProps?.label || node.name) + '配置错误'
+    }
     const _type = node.type || 'root'
-    if (_type === 'root') {
+    if (['root', 'table-item-index', 'table-item-actions'].includes(_type)) {
         return false
     } else {
-        if (['text'].includes(_type) && !(node?.componentProps?.value && node?.formItemProps?.name)) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
+        if (arr.includes(_type)) {
+            if (!node?.formItemProps?.label) {
+                return obj
             }
         }
-        if (arr.includes(_type)) {
-            if (!node?.formItemProps?.name || !node?.formItemProps?.label) {
-                return {
-                    key: node?.key,
-                    message: (node.formItemProps?.label || node.name) + '配置错误'
-                }
+        if (!['space-item', 'card-item', 'grid-item', 'table-item'].includes(_type)) {
+            if (!node?.formItemProps?.name) {
+                return obj
             } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
-                return {
-                    key: node?.key,
-                    message: (node.formItemProps?.label || node.name) + '配置错误'
-                }
+                return obj
             } else {
                 const arr = getBrotherList(node?.key || '', allData)
                 const flag = arr.filter((item) => item.key !== node.key).find((i) => i?.formItemProps?.name === node?.formItemProps?.name)
                 if (flag) { // `标识${value}已被占用`
-                    return {
-                        key: node?.key,
-                        message: (node.formItemProps?.label || node.name) + '配置错误'
-                    }
+                    return obj
                 }
             }
         }
+        if (['text'].includes(_type) && !node?.componentProps?.value) {
+            return obj
+        }
         if ('input-number' === _type && (node?.componentProps?.max === undefined || node?.componentProps?.min === undefined || node?.componentProps?.precision === undefined)) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
+            return obj
         }
         if ('input-number' === _type && (node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined)) {
             if (node?.componentProps?.max < node?.componentProps?.min) {
-                return {
-                    key: node?.key,
-                    message: (node.formItemProps?.label || node.name) + '配置错误'
-                }
+                return obj
             }
         }
         if (['select', 'tree-select', 'select-card'].includes(_type)) {
             // 数据源
-            // if (node?.componentProps?.source?.type === 'dic' && !node?.componentProps.source?.dictionary) {
-            //     return node?.key
-            // }
-            // if (node?.componentProps?.source?.type === 'end' && (!node?.componentProps.source?.commandId || !node?.componentProps.source?.functionId || !node?.componentProps.source?.label || !node?.componentProps.source?.value)) {
-            if (node?.componentProps.source?.functionId && !node?.componentProps.source?.commandId) {
-                return {
-                    key: node?.key,
-                    message: (node.formItemProps?.label || node.name) + '配置错误'
+            if (!node?.componentProps.source?.type) {
+                return obj
+            } else {
+                if (node?.componentProps.source?.type === 'dic') {
+                    if (!node?.componentProps.source?.dictionary) {
+                        return obj
+                    } else {
+                        const flag = (source.dictionary || []).find(i => node?.componentProps.source?.dictionary === i.id)
+                        if (!flag) {
+                            return obj
+                        }
+                    }
+
+                } else {
+                    if (!node?.componentProps.source?.functionId || !node?.componentProps.source?.commandId || !node?.componentProps.source?.label || !node?.componentProps.source?.value) {
+                        return obj
+                    }
+                    if (node?.componentProps.source?.isSource && !node?.componentProps.source?.source) {
+                        return obj
+                    }
+                    // 数据是否被删除
+                    const _functions = (source.end || []).find(i => node?.componentProps.source?.functionId === i.id)
+                    if (!_functions) {
+                        return obj
+                    }
+                    const _command = (_functions?.command || []).find(i => node?.componentProps.source?.commandId === i.id)
+                    if (!_command) {
+                        return obj
+                    }
+                    const list = (_command?.output?.properties || [])?.map((item) => {
+                        return {
+                            ...item,
+                            label: item.name,
+                            value: item.id,
+                        }
+                    })
+                    let _array: any[] = []
+                    if (node?.componentProps.source?.isSource) {
+                        const _sourceList = getArray(list)
+                        const _data = searchTree(_sourceList, node?.componentProps.source?.source)
+                        if(!_data){
+                            return obj
+                        }
+                        if (_data?.valueType?.type === 'array') {
+                            _array = _data.valueType?.elementType?.properties?.map((item) => {
+                              return {
+                                label: item.name,
+                                value: item.id,
+                              }
+                            })
+                        }
+                    } else {
+                        _array = [...list]
+                    }
+                    if(!(map(_array, 'value').includes(node?.componentProps.source?.label) && map(_array, 'value').includes(node?.componentProps.source?.value))){
+                        return obj
+                    }
                 }
             }
         }
-        // !node?.componentProps?.accept || 
-        if ('upload' === _type && (!node?.componentProps?.maxCount || !node?.componentProps?.fileSize)) {
+        if ('upload' === _type && ((node?.componentProps?.maxCount !== 0 && !node?.componentProps?.maxCount) || (node?.componentProps?.fileSize !== 0 && !node?.componentProps?.fileSize))) {
             // 个数和单位
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
+            return obj
         }
-        if ('space' === _type && !node?.componentProps?.size) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
-            }
+        if ('space' === _type && (node?.componentProps?.size !== 0 && !node?.componentProps?.size)) {
+            return obj
         }
         if (['card'].includes(_type) && !(node?.componentProps?.title)) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.label || node.name) + '配置错误'
+            return obj
+        }
+        if (['form'].includes(_type)) {
+            if (!(node.componentProps.source.value)) {
+                return obj
+            } else {
+                const flag = formList.find((i) => i.value === node.componentProps.source.value)
+                if (!flag) {
+                    return obj
+                }
             }
         }
-        if (['table-item', 'collapse-item', 'tabs-item', 'collapse', 'tabs'].includes(_type) && !(node?.formItemProps?.name)) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.name || node.name) + '配置错误'
-            }
+        if (node?.formItemProps?.isLayout && !node.formItemProps?.label) {
+            return obj
         }
-        if (['table-item', 'collapse-item', 'tabs-item'].includes(_type) && !(node?.componentProps?.name)) {
-            return {
-                key: node?.key,
-                message: (node.formItemProps?.name || node.name) + '配置错误'
+        if(['org', 'role', 'user', 'product', 'device'].includes(_type)){
+            if(!node.componentProps?.keys?.length){
+                return obj
             }
+            // const _a = node.formItemProps.keys?.filter(i => !i.config?.source)
+            // if(_a?.length){
+            //     return obj
+            // }
         }
     }
     return false
 }
 
 // 校验配置项必填
-const checkConfig = (node: ISchema, allData: any[]) => {
-    const _data: any = checkedConfigItem(node, allData);
+const checkConfig = (node: ISchema, allData: any[], source: any, formList: any[]) => {
+    const _data: any = checkedConfigItem(node, allData, source, formList);
     let _rules: any[] = []
     if (_data) {
         _rules.push(_data)
     }
     if (node.children && node.children?.length) {
         node?.children.map(item => {
-            const arr = checkConfig(item, allData)
+            const arr = checkConfig(item, allData, source, formList)
             _rules = [..._rules, ...arr]
         })
     }
     return _rules
 }
 
-export const checkedConfig = (node: ISchema) => {
-    return checkConfig(node, node?.children || [])
+export const checkedConfig = (node: ISchema, source: any, formList: any[]) => {
+    return checkConfig(node, node?.children || [], source, formList)
 }
 
 export const updateData = (list: ISchema[], item?: any) => {
@@ -191,14 +261,14 @@ export const extractCssClass = (formCssCode: string) => {
     return Array.from(new Set(cssNameArray))  //数组去重
 }
 
-export const insertCustomCssToHead = (cssCode: string, formId: string) => {
+export const insertCustomCssToHead = (cssCode: string, formId: string, attrKey: string = 'data-id') => {
     if (!cssCode || !formId) return
     let head = document.getElementsByTagName('head')[0]
     let oldStyle = document.getElementById(formId)
     if (!!oldStyle) {
         head.removeChild(oldStyle)  //先清除后插入！！
     }
-    const id = `[data-id="${formId}"]`
+    const id = `[${attrKey}="${formId}"]`
     const result = cssCode.replace(/\.([a-zA-Z-]+)/g, `.$1${id}`)
         .replace(/#([a-zA-Z-]+)/g, `#$1${id}`)
         .replace(/([a-zA-Z-]+)(?=\s*\{)/g, `$1${id}`);
@@ -247,30 +317,56 @@ const getData = (key: string, obj: any) => {
     return obj
 }
 
+function bubbleSort(arr: any[]) {
+    const len = arr.length;
+    for (let i = 0; i < len; i++) {
+        for (let j = 0; j < len - 1 - i; j++) {
+            if (arr[j]?.ordinal > arr[j + 1]?.ordinal) {        //相邻元素两两对比
+                const temp = arr[j + 1];        //元素交换
+                arr[j + 1] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+    return arr;
+}
+
+const _getData = (arr: any[]) => {
+    return arr.map(item => {
+        return {
+            ordinal: item?.ordinal,
+            label: item.text,
+            value: item.value,
+            children: _getData(item?.children || [])
+        }
+    })
+}
+
+const _getEndData = (arr: any[], source: any) => {
+    return arr.map(item => {
+        return {
+            label: item[source?.label],
+            value: item[source?.value],
+            children: _getData(item?.children || [])
+        }
+    })
+}
+
 // 获取options
 export const queryOptions = async (source: any, id: string) => {
     if (source?.type === 'dic' && source?.dictionary) {
         const resp = await queryDictionaryData(source?.dictionary)
         if (resp.success) {
-            return resp.result.map(item => {
-                return {
-                    label: item.name,
-                    value: item.id
-                }
-            })
+            const list = _getData(resp.result || [])
+            return bubbleSort(list)
         }
     }
     if (id && source?.type === 'end' && source?.functionId && source?.commandId && source?.label && source?.value) {
-        const resp = await queryRuntime(id, source?.functionId, source?.commandId)
+        const resp = await queryRuntime(id, id + '.' + source?.functionId, source?.commandId, {})
         if (resp.success) {
-            const arr = getData(source?.source, resp?.result || {})
+            const arr = getData(source?.source, resp?.result || [])
             if (Array.isArray(arr) && arr?.length) {
-                return arr.map(item => {
-                    return {
-                        label: item[source?.label],
-                        value: item[source?.value]
-                    }
-                })
+                return _getEndData(arr, source)
             } else {
                 return []
             }
@@ -306,7 +402,7 @@ export const deleteDataByKey = (arr: any[], _items: any[]) => {
 
 // 插入数据，主要是为了粘贴
 export const copyDataByKey = (arr: any[], newData: any[], _item: any) => {
-    const _index = arr.findIndex(item => item.key === _item.key)
+    const _index = arr.findIndex(item => item?.key === _item?.key)
     if (_index === -1) {
         return arr.map(item => {
             return {
@@ -319,32 +415,31 @@ export const copyDataByKey = (arr: any[], newData: any[], _item: any) => {
     }
 }
 
-// 添加子组件flag: true: 开头， undefined: 尾部，false: 中间
-export const appendChildItem = (arr: any[], newData: any, parent: any, flag?: boolean) => {
+// 添加子组件_flag: start: 开头， end: 尾部  undefined：中间
+export const appendChildItem = (arr: any[], newData: any, parent: any, _flag?: 'start' | 'end' | undefined) => {
     return arr.map(item => {
         let child: any[] = item?.children || []
         if (item.key === parent?.key) {
-            if (flag === undefined) {
-                child = [...child, newData]
-            }
-            if (flag === false) {
-                const _f = child.find(item => item?.formItemProps?.name === 'actions')
+            if (!_flag) {
+                const _f = child.find(item => item?.children?.[0]?.type === 'table-item-actions')
                 if (_f) {
                     child.splice(child.length - 1, 0, newData)
                 } else {
                     child.push(newData)
                 }
             }
-            if (flag === true) {
+            if (_flag === 'end') {
+                child = [...child, newData]
+            }
+            if (_flag === 'start') {
                 child = [newData, ...child]
             }
             return {
                 ...item,
                 children: child
             }
-        }
-        if (item.children?.length) {
-            child = appendChildItem(item.children, newData, parent)
+        } else if (item.children?.length) {
+            child = appendChildItem(item.children, newData, parent, _flag)
         }
         return {
             ...item,
@@ -373,6 +468,16 @@ export const getFieldData = (data: ISchema) => {
     if (data?.formItemProps?.name) {
         if (data.type === 'table') {
             _obj[data?.formItemProps?.name] = [omit(obj, ['actions', 'index'])]
+        } else if (data.type === 'switch') {
+            _obj[data?.formItemProps?.name] = obj || false
+        } else if(['org', 'role', 'user', 'product', 'device'].includes(data.type)){
+            if(data.componentProps?.mode === 'multiple'){
+                _obj[data?.formItemProps?.name] = obj
+            } else {
+                data.componentProps.keys.map(i => {
+                    _obj[i?.config?.source] = undefined
+                })
+            }
         } else {
             _obj[data?.formItemProps?.name] = obj
         }
@@ -405,15 +510,18 @@ export const handleCopyData = (arr: any[]) => {
 }
 
 // 查找父节点
-export const findParentById = (obj: any, _item: any) => {
-    if (obj?.children?.length) {
-        for (let index = 0; index < obj.children.length; index++) {
-            const element = obj?.children[index];
-            if(element.key === _item.key){
-                return obj
+export const findParentById = (tree: any, node: any) => {
+    let result: any = []
+    function find(node, tree) {
+        tree?.children.forEach(item => {
+            if (item.key === node.key) {
+                result.push(tree)
             }
-            return findParentById(element, _item)
-        }
+            if ('children' in item) {
+                find(node, item)
+            }
+        })
     }
-    return undefined
+    find(node, tree)
+    return result?.[0]
 }
