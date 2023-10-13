@@ -8,6 +8,7 @@
                 {{ record.createTime ? dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}
             </template>
             <template #endTime="record">{{ record.createTime ? dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}</template>
+            <!-- <template #modifyTime="record">{{ record.modifyTime ? dayjs(record.modifyTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}</template> -->
             <template #state="record">{{ record.state.text }}</template>
             <template #action="record">
                 <div v-if="type === 'todo'">
@@ -37,7 +38,6 @@
                         删除
                     </PermissionButton>
                 </div>
-
             </template>
         </JProTable>
         <Detail v-if="visible" @close="visible = false" :current="current" :type="type"/>
@@ -221,16 +221,16 @@ const columnsFinished = [
             type: 'date',
         },
     },
-    {
-        title: '办理时间',
-        dataIndex: 'endTime',
-        key: 'endTime',
-        ellipsis: true,
-        scopedSlots: true,
-        search: {
-            type: 'date',
-        },
-    },
+    // {
+    //     title: '办理时间',
+    //     dataIndex: 'modifyTime',
+    //     key: 'modifyTime',
+    //     ellipsis: true,
+    //     scopedSlots: true,
+    //     search: {
+    //         type: 'date',
+    //     },
+    // },
     {
         title: '操作',
         key: 'action',
