@@ -31,6 +31,10 @@ export default defineComponent({
         visible: {
             type: Boolean,
             default: true
+        },
+        editable: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
@@ -99,6 +103,7 @@ export default defineComponent({
                                                     path={_path}
                                                     index={_index + 1}
                                                     visible={props.visible}
+                                                    editable={props.editable}
                                                 />
                                             </Selection>
                                         </div>

@@ -8,7 +8,7 @@ import { provide, ref, watch } from 'vue'
 const props = defineProps({
   value: {
     type: Array || String,
-    default: [] || '',
+    default: () => []
   },
   mode: {
     type: String,
@@ -23,10 +23,10 @@ const props = defineProps({
     default: () => [],
   },
 })
-const _value: any = ref([])
+const _value:any = ref()
 const emit = defineEmits(['update:value'])
 
-const getObj = (value: any) => {
+const getObj: any = (value: any) => {
   const obj = {}
   props.keys.map((item: any) => {
     if (item?.key) {
@@ -39,10 +39,10 @@ const updateValue = (value: any) => {
   if (props.mode === 'multiple') {
     const _arr = (value || []).map((item) => {
       return getObj(item)
-    })
+    }).filter(i => i?.id)
     emit('update:value', _arr)
   } else {
-    emit('update:value', getObj(value))
+    emit('update:value', getObj(value)?.id ? getObj(value) : undefined)
   }
 }
 provide('type', 'product')
@@ -54,14 +54,6 @@ watch(
     _value.value = props.value
   },
   { deep: true, immediate: true },
-)
-
-watch(
-  () => props.mode,
-  () => {
-    props.mode ? (_value.value = []) : (_value.value = undefined)
-  },
-  { immediate: true },
 )
 </script>
 <style lang="less" scoped>

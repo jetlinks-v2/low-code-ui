@@ -6,7 +6,7 @@
     <SelectModal
       v-if="visible"
       @close="closeModal"
-      @update-data="updateData"
+      @save="updateData"
       :select="selectIds"
     ></SelectModal>
     <div class="select">
@@ -25,9 +25,10 @@
 import SelectModal from './modal.vue'
 import { queryProductNoPage, queryDeviceNoPage } from '@/api/form'
 import { cloneDeep } from 'lodash-es'
+import { watch } from 'vue'
 const props = defineProps({
   value: {
-    type: [Array || String],
+    type: [Array, String],
     default: [] || '',
   },
   disabled: {
@@ -54,7 +55,6 @@ const updateData = (data: any) => {
 const cancelSelect = (id: string) => {
   const index = selectIds.value.findIndex((item: any) => item?.id === id)
   selectIds.value.splice(index, 1)
-  // selectData.value.splice(index, 1)
 }
 // 查询设备|产品接口获取对应id的名称 如果没有则显示id
 const queryName = async (data: any) => {
@@ -81,34 +81,36 @@ const queryName = async (data: any) => {
   }
   if (req.status === 200) {
     const array = cloneDeep(selectIds.value)
-    console.log(array, 'array')
-    selectData.value = array.map((item: any) => {
-      const _data = req.result.find((x: any) => x.id === item)
-      if (_data) {
-        return {
-          name: _data.name,
-          id: item.id,
-        }
-      } else {
-        return {
-          id: item,
-        }
-      }
-    })
+    // selectData.value = array.map((item: any) => {
+    //   const _data = req.result.find((x: any) => x.id === item)
+    //   if (_data) {
+    //     return {
+    //       name: _data.name,
+    //       id: item.id,
+    //     }
+    //   } else {
+    //     return {
+    //       id: item,
+    //     }
+    //   }
+    // })
   } else {
     const array = cloneDeep(selectIds.value)
-    selectData.value = array.map((item: any) => {
-      return {
-        id: item,
-      }
-    })
+    // selectData.value = array.map((item: any) => {
+    //   return {
+    //     id: item,
+    //   }
+    // })
   }
 }
 watch(
   () => props.value,
   () => {
     if (props.value) {
-      selectIds.value = mode === 'multiple' ? (props?.value || []) : [props.value]
+      const __value = Array.isArray(props?.value) ? (props.value || []) : (props.value && Object.keys(props.value)?.length ? [props.value] : [])
+      selectIds.value = __value.filter((i: any) => {
+        return Object.keys(i)?.length && i
+      })
       // queryName(props.value)
     } else {
       selectIds.value = []
