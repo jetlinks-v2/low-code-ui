@@ -25,7 +25,7 @@
     </template>
     <j-row :gutter="20">
       <j-col :span="8">
-        <j-input>
+        <j-input v-model:value="keywords" @keyup.enter="getFormList">
           <template #suffix>
             <AIcon type="SearchOutlined" />
           </template>
@@ -38,6 +38,9 @@
           全部内容
         </j-checkbox>
         <div class="form-box">
+          <div v-if="loading" style="text-align: center">
+            <j-spin />
+          </div>
           <div
             class="form-item"
             v-for="(form, index) in formList"
@@ -55,7 +58,7 @@
             </div>
             <div
               class="form-fields"
-              v-for="(field, idx) in form.configuration.children"
+              v-for="(field, idx) in form.configuration?.children"
               :key="'field' + idx"
             >
               <div class="field-title">
@@ -111,34 +114,46 @@ const permissions = ref([
 /**
  * 获取所有表单字段数据, 不分页, 并根据forms渲染已经存在的字段权限
  */
+const loading = ref(false)
+const keywords = ref('')
 const getFormList = async () => {
-  const { result } = await queryFormNoPage_api({ paging: false })
+  loading.value = true
+  const terms = [
+    {
+      terms: [
+        {
+          column: 'name',
+          termType: 'like',
+          type: 'or',
+          value: `%${keywords.value}%`,
+        },
+      ],
+    },
+  ]
+
+  const { result } = await queryFormNoPage_api({
+    paging: false,
+    terms: keywords.value ? terms : [],
+  })
   formList.value = result.map((m) => {
-    const _fields = m.configuration.children
+    const _fields = m.configuration?.children
     // 已经存在的字段
     const existFields = forms.value[m.id]
     if (existFields && existFields.length) {
-      //   Object.keys(_fields).forEach((key) => {
-      //     const _currentField = existFields.find((f) => f.id === key)
-      //     _fields[key]['accessModes'] = _currentField
-      //       ? _currentField.accessModes
-      //       : []
-      //   })
-      _fields.forEach((p) => {
+      _fields?.forEach((p) => {
         const _currentField = existFields.find((f) => f.id === p.key)
         p['accessModes'] = _currentField ? _currentField.accessModes : []
       })
       return { accessModes: [], ...m }
     } else {
-      //   Object.keys(_fields).forEach((key) => {
-      //     _fields[key]['accessModes'] = []
-      //   })
-      _fields.forEach((p) => {
+      _fields?.forEach((p) => {
         p['accessModes'] = []
       })
       return { accessModes: [], ...m }
     }
   })
+
+  loading.value = false
 }
 getFormList()
 
@@ -157,11 +172,8 @@ const handleAllCheck = () => {
  * 表单读写勾选/取消勾选
  */
 const handleFormCheck = (form: any) => {
-  const _fields = form.configuration.children
-  //   Object.keys(_fields).forEach((key) => {
-  //     _fields[key].accessModes = form.accessModes
-  //   })
-  _fields.forEach((p) => {
+  const _fields = form.configuration?.children
+  _fields?.forEach((p) => {
     p.accessModes = form.accessModes
   })
 }
@@ -170,19 +182,10 @@ const handleFormCheck = (form: any) => {
  * 确认之后, 将数据同步至父组件的basicFormData.forms
  */
 const handleOk = () => {
-  formList.value.forEach((item) => {
-    const _fields = item.configuration.children
+  formList.value?.forEach((item) => {
+    const _fields = item.configuration?.children
     forms.value[item.id] = []
-    // Object.keys(_fields).forEach((key) => {
-    //   if (_fields[key]['accessModes'].length) {
-    //     forms.value[item.id].push({
-    //       id: key,
-    //       required: true,
-    //       accessModes: _fields[key]['accessModes'],
-    //     })
-    //   }
-    // })
-    _fields.forEach((p) => {
+    _fields?.forEach((p) => {
       if (p.accessModes.length) {
         forms.value[item.id].push({
           id: p.key,
@@ -192,7 +195,6 @@ const handleOk = () => {
       }
     })
   })
-  //   console.log('forms.value: ', forms.value)
   visible.value = false
 }
 
