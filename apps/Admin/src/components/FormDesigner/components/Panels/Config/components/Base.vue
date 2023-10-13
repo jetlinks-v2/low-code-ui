@@ -305,6 +305,7 @@
           label="标识"
           :name="['children', 0, 'formItemProps', 'name']"
           required
+          v-if="['table-item-index', 'table-item-actions'].includes(type)"
           :validateFirst="true"
           :rules="rules"
         >
@@ -347,6 +348,7 @@
         <j-form-item
           :validateFirst="true"
           label="组件类型"
+          v-if="['table-item-index', 'table-item-actions'].includes(type)"
           :name="['children', 0, 'type']"
         >
           <j-select

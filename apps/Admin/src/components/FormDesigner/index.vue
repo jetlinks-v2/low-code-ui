@@ -143,15 +143,9 @@ const setSelection = (node: any) => {
       selected.value.push(node)
     }
   }
-  const flag =
-    node.type === 'table-item' &&
-    ['table-item-index', 'table-item-actions'].includes(
-      node?.children?.[0]?.type,
-    )
   isShowConfig.value =
     !(selected.value?.length > 1) &&
-    !map(selected.value, 'type').includes('space-item') &&
-    !flag
+    !map(selected.value, 'type').includes('space-item')
   onSaveData()
 }
 
@@ -255,7 +249,11 @@ const onCollect = () => {
 }
 
 // 添加子组件
-const onAddChild = (newData: any, parent: any, __flag?: 'start' | 'end' | undefined) => {
+const onAddChild = (
+  newData: any,
+  parent: any,
+  __flag?: 'start' | 'end' | undefined,
+) => {
   const arr = appendChildItem(formData.value?.children, newData, parent, __flag)
   formData.value = {
     ...formData.value,
@@ -359,7 +357,7 @@ provide('FormDesigner', {
   onCollect,
   onAddChild,
   onSave,
-  handleSearch
+  handleSearch,
 })
 
 watch(
@@ -394,7 +392,7 @@ watch(
 )
 
 onMounted(() => {
-    handleSearch()
+  handleSearch()
 })
 
 onUnmounted(() => {

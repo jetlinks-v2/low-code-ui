@@ -32,19 +32,24 @@ export default defineComponent({
         visible: {
             type: Boolean,
             default: true
+        },
+        editable: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
         const { isEditModel } = useTool()
         const designer: any = inject('FormDesigner')
         const TypeComponent = componentMap?.[props?.data?.type] || 'div'
-        const _props = useProps(props.data, unref(designer.formData), unref(designer.mode))
+        const _path: string[] = cloneDeep(props?.path || []);
+
+        const _props = useProps(props.data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
         const selectRef = ref<any>(null)
         const _formRef = ref<any>(null)
         const options = ref<any[]>(_props.componentProps.options)
         const treeData = ref<any[]>(_props.componentProps.treeData)
-
-        const _path: string[] = cloneDeep(props?.path || []);
+        const __value = ref<any>(get(designer.formState, _path))
 
         const _index = computed(() => {
             return isNumber(props?.index) ? props.index : 0
@@ -111,23 +116,26 @@ export default defineComponent({
             })
         }
 
-        let __value = get(designer.formState, _path)
-        // 时间组件处理
-        if (['date-picker', 'time-picker'].includes(props?.data.type)) {
-            if (typeof __value === 'number') {
-                __value = dayjs(__value).format(_props.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
+        watchEffect(() => {
+            // 时间组件处理
+            if (['date-picker', 'time-picker'].includes(props?.data.type)) {
+                if (typeof __value.value === 'number') {
+                    __value.value = dayjs(__value).format(_props.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
+                }
+            } else if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && props.data?.componentProps?.mode !== "multiple") {
+                const obj = {}
+                props.data?.componentProps.keys?.forEach((i: any) => {
+                    const __path = _path.slice(0, _path.length - 1) || []
+                    __path.push(i?.config?.source)
+                    if(get(designer.formState, __path)){
+                        obj[i?.key] = get(designer.formState, __path)
+                    }
+                })
+                __value.value = obj
+            } else {
+                __value.value = get(designer.formState, _path)
             }
-        }
-
-        if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && props.data?.componentProps?.mode !== "multiple") {
-            const obj = {}
-            props.data?.componentProps.keys?.forEach((i: any) => {
-                const __path = _path.slice(0, _path.length - 1) || []
-                __path.push(i?.config?.source)
-                obj[i?.key] = get(designer.formState, __path)
-            })
-            __value = obj
-        }
+        })
 
         watchEffect(() => {
             if (props.data?.type === 'form' && _formRef.value && !unref(isEditModel) && props.data?.key) {
@@ -145,7 +153,7 @@ export default defineComponent({
                                 source={props.data?.type === 'form' ? props.data?.componentProps?.source : undefined}
                             ></TypeComponent> : <TypeComponent
                                 {..._props.componentProps}
-                                value={__value}
+                                value={__value.value}
                                 onUpdate:value={(newValue) => {
                                     if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && !Array.isArray(newValue)) {
                                         props.data?.componentProps.keys.forEach(i => {

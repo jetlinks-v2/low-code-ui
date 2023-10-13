@@ -113,11 +113,11 @@
 <script lang="ts" setup>
 import { queryProductList, queryDeviceList } from '@/api/form'
 import { map } from 'lodash-es'
-import { inject, ref } from 'vue'
+import { inject, ref, watch } from 'vue'
 const props = defineProps({
   select: {
     type: Array,
-    default: [],
+    default: () => [],
   },
 })
 const type = inject('type')
@@ -173,8 +173,8 @@ const columns = [
     },
   },
 ]
-const _selectedRowKeys: any = ref(props.select)
-const emit = defineEmits(['close', 'updateData'])
+const _selectedRowKeys:any = ref<any[]>([])
+const emit = defineEmits(['close', 'save'])
 
 const params = ref()
 
@@ -223,13 +223,16 @@ const closeModal = () => {
 }
 
 const submitData = () => {
-  emit('updateData', _selectedRowKeys.value)
+  emit('save', _selectedRowKeys.value)
 }
 
 watch(
-  () => JSON.stringify(props.select),
+  () => props.select,
   () => {
-    _selectedRowKeys.value = props.select
+    _selectedRowKeys.value = props?.select || []
+  },
+  {
+    deep: true,
   },
 )
 </script>
