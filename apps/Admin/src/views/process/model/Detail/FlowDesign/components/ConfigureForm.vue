@@ -25,7 +25,11 @@
     </template>
     <j-row :gutter="20">
       <j-col :span="8">
-        <j-input v-model:value="keywords" @keyup.enter="getFormList">
+        <j-input
+          v-model:value="keywords"
+          @keyup.enter="handleSearch"
+          placeholder="请输入"
+        >
           <template #suffix>
             <AIcon type="SearchOutlined" />
           </template>
@@ -43,7 +47,7 @@
           </div>
           <div
             class="form-item"
-            v-for="(form, index) in formList"
+            v-for="(form, index) in filterFormList"
             :key="'form' + index"
           >
             <div class="form-title">
@@ -83,6 +87,8 @@
 import type { TreeProps } from 'ant-design-vue'
 import { queryFormNoPage_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
+import { filterFormByName } from './utils'
+import { cloneDeep } from 'lodash-es'
 
 const flowStore = useFlowStore()
 
@@ -104,8 +110,6 @@ const forms = computed({
   set: (val) => emits('update:value', val),
 })
 
-const formList = ref([])
-
 const permissions = ref([
   { label: '读', value: 'read' },
   { label: '写', value: 'write' },
@@ -116,26 +120,12 @@ const permissions = ref([
  */
 const loading = ref(false)
 const keywords = ref('')
+const filterFormList = ref([])
+const allFormList = ref([])
 const getFormList = async () => {
   loading.value = true
-  const terms = [
-    {
-      terms: [
-        {
-          column: 'name',
-          termType: 'like',
-          type: 'or',
-          value: `%${keywords.value}%`,
-        },
-      ],
-    },
-  ]
-
-  const { result } = await queryFormNoPage_api({
-    paging: false,
-    terms: keywords.value ? terms : [],
-  })
-  formList.value = result.map((m) => {
+  const { result } = await queryFormNoPage_api({ paging: false })
+  filterFormList.value = result.map((m) => {
     const _fields = m.configuration?.children
     // 已经存在的字段
     const existFields = forms.value[m.id]
@@ -152,17 +142,23 @@ const getFormList = async () => {
       return { accessModes: [], ...m }
     }
   })
+  //   所有表单数据
+  allFormList.value = cloneDeep(filterFormList.value)
 
   loading.value = false
 }
 getFormList()
+
+const handleSearch = () => {
+  filterFormList.value = filterFormByName(allFormList.value, keywords.value)
+}
 
 /**
  * 全部内容勾选/取消勾选
  */
 const checkAll = ref(false)
 const handleAllCheck = () => {
-  formList.value?.forEach((item) => {
+  filterFormList.value?.forEach((item) => {
     item.accessModes = checkAll.value ? ['read', 'write'] : []
     handleFormCheck(item)
   })
@@ -182,7 +178,7 @@ const handleFormCheck = (form: any) => {
  * 确认之后, 将数据同步至父组件的basicFormData.forms
  */
 const handleOk = () => {
-  formList.value?.forEach((item) => {
+  filterFormList.value?.forEach((item) => {
     const _fields = item.configuration?.children
     forms.value[item.id] = []
     _fields?.forEach((p) => {

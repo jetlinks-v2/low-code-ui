@@ -50,3 +50,19 @@ export function handleArrToStr(arr: string[] = []) {
 export function handleStrToArr(str: string = '') {
     return str.replace(/\[/g, '').replace(/\]/g, '').split('&')
 }
+
+/**
+ * 前端筛选表单名称/字段名称/字段标识
+ * @param list 
+ * @param name 
+ * @returns 
+ */
+export function filterFormByName(list, name) {
+    console.log('list: ', list);
+    return list?.filter(item => {
+        // if (item.configuration) {
+        //     item.configuration.children = filterFormByName(item.configuration.children, name)
+        // }
+        return item.name.includes(name)
+    })
+}
