@@ -1,8 +1,7 @@
 
-import { cloneDeep, get, isEmpty, omit, set } from 'lodash-es';
+import { cloneDeep, isEmpty } from 'lodash-es';
 import DraggableWrap from './DragGableWrap'
 import Selection from '../Selection'
-import { FormItem } from 'jetlinks-ui-components'
 import componentMap from '../../utils/componentMap';
 import GridLayout from './GridLayout';
 import TabsLayout from './TabsLayout';
@@ -10,14 +9,10 @@ import CardLayout from './CardLayout';
 import SpaceLayout from './SpaceLayout';
 import CollapseLayout from './CollapseLayout';
 import TableLayout from './TableLayout'
+import CommLayout from './CommLayout';
 import { PropType } from 'vue';
-import { queryOptions } from '../../utils/utils';
-import { useProduct } from '@/store';
 import { onEnd } from './ControlInsertionPlugin';
-import { useProps } from '../../hooks';
-import './index.less'
-import { request } from '@jetlinks/core';
-import dayjs from "dayjs";
+import './index.less';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -97,138 +92,7 @@ const DraggableLayout = defineComponent({
                     case 'table':
                         return (<TableLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></TableLayout>)
                     default:
-                        if (unref(isEditModel) || componentMap?.[element?.type]) {
-                            const TypeComponent = componentMap?.[element?.type] || 'div'
-                            const _props = useProps(element, unref(designer.formData), unref(designer.mode))
-                            const selectRef = ref<any>(null)
-                            const _formRef = ref<any>(null)
-                            const options = ref<any[]>(_props.componentProps.options)
-                            const treeData = ref<any[]>(_props.componentProps.treeData)
-
-                            const params = {
-                                data: element,
-                                parent: props.data
-                            }
-                            if (element?.formItemProps?.name) {
-                                _path[_index] = element?.formItemProps?.name
-                            }
-
-                            const onChange = (...arg) => {
-                                const _this = {
-                                    getWidgetRef: (path) => {
-                                        let foundRef = unref(designer.refList)?.[path]
-                                        return foundRef
-                                    },
-                                    request: request
-                                }
-                                if (!element?.componentProps?.eventCode && !unref(isEditModel)) return
-                                if (['input', 'textarea', 'input-password'].includes(element.type)) {
-                                    let customFn = new Function('e', element?.componentProps?.eventCode)
-                                    customFn.call(_this, arg?.[0])
-                                }
-                                if (['input-number'].includes(element.type)) {
-                                    let customFn = new Function('value', element?.componentProps?.eventCode)
-                                    customFn.call(_this, arg?.[0])
-                                }
-                                if (['select', 'switch', 'select-card', 'tree-select'].includes(element.type)) {
-                                    let customFn = new Function('value', 'option', element?.componentProps?.eventCode)
-                                    customFn.call(_this, arg?.[0], arg?.[1])
-                                }
-                                if (['time-picker'].includes(element.type)) {
-                                    let customFn = new Function('time', 'timeString', element?.componentProps?.eventCode)
-                                    customFn.call(_this, arg?.[0], arg?.[1])
-                                }
-                                if (['date-picker'].includes(element.type)) {
-                                    let customFn = new Function('date', 'timeString', element?.componentProps?.eventCode)
-                                    customFn.call(_this, arg?.[0], arg?.[1])
-                                }
-                            }
-
-                            const registerToRefList = (path: string[], _ref: any) => {
-                                if (!unref(isEditModel) && Array.isArray(path) && path?.length && element?.formItemProps?.name && designer.refList) {
-                                    const __path = path.join('.')
-                                    designer.refList.value[__path] = _ref
-                                }
-                            }
-
-                            watchEffect(() => {
-                                registerToRefList(_path, selectRef.value)
-                            })
-
-                            if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
-                                queryOptions(element.componentProps.source, designer?.projectId).then(resp => {
-                                    if (['select', 'select-card'].includes(element.type)) {
-                                        options.value = resp
-                                    } else {
-                                        treeData.value = resp
-                                    }
-                                })
-                            }
-
-                            let __value = get(designer.formState, _path)
-                            // 时间组件处理
-                            if (['date-picker', 'time-picker'].includes(element.type)) {
-                                if (typeof __value === 'number') {
-                                    __value = dayjs(__value).format(_props.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
-                                }
-                            }
-
-                            if(['org', 'role', 'user', 'product', 'device'].includes(element.type) && element.componentProps?.mode !== "multiple"){
-                                const obj = {}
-                                element.componentProps.keys.forEach(i => {
-                                    const __path = _path.slice(0, _path.length - 1) || []
-                                    __path.push(i.config?.source)
-                                    obj[i.key] = get(designer.formState, __path)
-                                })
-                                __value = obj
-                            }
-
-                            watchEffect(() => {
-                                if (element.type === 'form' && _formRef.value && !unref(isEditModel) && element?.key) {
-                                    designer.formRefList.value[element.key] = _formRef.value
-                                }
-                            })
-
-                            return (
-                                <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                                    <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true}>
-                                        {
-                                            unref(isEditModel) ? <TypeComponent
-                                                model={unref(designer.model)}
-                                                {...omit(_props.componentProps, ['disabled'])}
-                                                source={element.type === 'form' ? element?.componentProps?.source : undefined}
-                                            ></TypeComponent> : <TypeComponent
-                                                {..._props.componentProps}
-                                                value={__value}
-                                                onUpdate:value={(newValue) => {
-                                                    if(['org', 'role', 'user', 'product', 'device'].includes(element.type) && !Array.isArray(newValue)){
-                                                        element.componentProps.keys.forEach(i => {
-                                                            const __path = _path.slice(0, _path.length - 1) || []
-                                                            __path.push(i.config?.source)
-                                                            set(designer.formState, __path, newValue?.[i?.key] || null)
-                                                        })
-                                                    } else {
-                                                        set(designer.formState, _path, newValue || null)
-                                                    }
-                                                }}
-                                                checked={get(designer.formState, _path)}
-                                                onUpdate:checked={(newValue) => {
-                                                    set(designer.formState, _path, newValue || false)
-                                                }}
-                                                options={unref(options)}
-                                                treeData={unref(treeData)}
-                                                source={element.type === 'form' ? element?.componentProps?.source : undefined}
-                                                mode={element.type === 'form' ? unref(designer.mode) : _props.componentProps?.mode}
-                                                onChange={onChange}
-                                                ref={_formRef}
-                                            ></TypeComponent>
-                                        }
-                                        <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{element.componentProps?.description}</div>
-                                    </FormItem>
-                                </Selection>
-                            )
-                        }
-                        break
+                        return (<CommLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></CommLayout>)
                 }
             },
             footer() {
