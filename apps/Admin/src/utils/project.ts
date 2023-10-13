@@ -1,6 +1,8 @@
 import { providerEnum } from  '@/components/ProJect/index'
 import { cloneDeep, omit } from "lodash-es";
-export const Integrate = (data: any[]) => {
+
+export type IntegrateFilterType = { key: string, value: Array<any>}
+export const Integrate = (data: any[], filter?: IntegrateFilterType) => {
   const cloneData = cloneDeep(data)
   const { children, others, ...project } = cloneData[0]
 
@@ -10,7 +12,7 @@ export const Integrate = (data: any[]) => {
     children: children,
     type: providerEnum.Module,
     others
-  }])
+  }], filter)
 
   return {
     ...project,
@@ -19,12 +21,13 @@ export const Integrate = (data: any[]) => {
   }
 }
 
-const handleModuleChildren = (data: any[]) => {
+const handleModuleChildren = (data: any[], filter?: IntegrateFilterType) => {
   const resources: any[] = []
   const functions: any[] = []
   const children: any[] = []
 
-  data?.forEach?.((item, index) => {
+  const filterData = filter && filter.key ? data?.filter?.(item =>  !filter.value.includes(item[filter.key])) : data
+  filterData?.forEach?.((item, index) => {
     const type = item.others.type
     item.provider = item.others.type
     item.others.tree_index = index
@@ -47,13 +50,13 @@ const handleModuleChildren = (data: any[]) => {
   }
 }
 
-const handleChildren = (data: any[]) => {
+const handleChildren = (data: any[], filter?: IntegrateFilterType) => {
   const modules: any[] = []
   data.forEach(item => {
     if (item.type === providerEnum.Module) {
-      let extra = handleModuleChildren(item.children)
+      let extra = handleModuleChildren(item.children, filter)
       if (extra.children) {
-        extra.children = handleChildren(extra.children)
+        extra.children = handleChildren(extra.children, filter)
       }
       modules.push({
         ...item,

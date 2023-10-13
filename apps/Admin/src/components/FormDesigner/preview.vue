@@ -3,10 +3,10 @@
     <Canvas></Canvas>
   </div>
 </template>
-  
+
 <script lang="ts" setup>
 import Canvas from './components/Panels/Canvas/index'
-import { provide, ref, reactive, PropType, watch, unref } from 'vue'
+import {provide, ref, reactive, PropType, watch, unref, onUnmounted} from 'vue'
 import { ISchema } from './typings'
 import { getFieldData, initData } from './utils/utils'
 import { proAll } from '../QuickEditTable/util'
@@ -15,7 +15,7 @@ const props = defineProps({
   value: {
     // 表单初始值
     type: Object,
-    default: () => {},
+    default: () => ({}),
   },
   mode: {
     type: String as PropType<'add' | 'edit'>,
@@ -23,6 +23,7 @@ const props = defineProps({
   },
   data: {
     type: Object,
+    default: () => ({}),
   },
   type: {
     // 判断是工作流还是低代码
@@ -43,28 +44,20 @@ const refList = ref<any>({})
 const formRefList = ref<any>({})
 
 watch(
-  () => props.data,
-  (newVal) => {
-    formData.value = (newVal || initData) as ISchema
-    // 初始值处理
-    Object.assign(formState, getFieldData(formData.value) || {})
+  () => [JSON.stringify(props.value), JSON.stringify(props.data)],
+  () => {
+    console.log('form--preview', props.value)
+    if (props.data) {
+      formData.value = (props.data || initData) as ISchema
+      Object.assign(formState, getFieldData(formData.value) || {})
+    }
+    Object.assign(formState, props.value || {})
   },
   {
-    deep: true,
     immediate: true,
   },
 )
 
-watch(
-  () => props.value,
-  () => {
-    Object.assign(formState, props.value)
-  },
-  {
-    deep: true,
-    immediate: true,
-  },
-)
 
 provide('FormDesigner', {
   model: 'preview',
@@ -116,7 +109,7 @@ watch(
 
 defineExpose({ onSave })
 </script>
-  
+
 <style lang="less" scoped>
 .container {
   background-color: #fff;
