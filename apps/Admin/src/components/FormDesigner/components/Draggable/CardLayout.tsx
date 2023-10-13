@@ -25,6 +25,10 @@ export default defineComponent({
         index: {
             type: Number,
             default: 0
+        },
+        visible: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
@@ -77,6 +81,7 @@ export default defineComponent({
                                             parent={element}
                                             path={_path}
                                             index={_index + 1}
+                                            visible={props.visible}
                                         />
                                     </Selection>
                                 )
