@@ -5,7 +5,7 @@
    </div>
   </template>
   
-  <script setup lang='ts'>
+  <script setup>
   import FlowDesigner from '@/components/FlowDesigner'
   const props = defineProps({
    info:{
