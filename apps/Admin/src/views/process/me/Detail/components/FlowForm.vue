@@ -9,15 +9,16 @@
         </div>
         <div class="bottom" v-if="type === 'todo'">
             <j-button danger class="btn" @click="onClick('refuse')"
-                v-if="nodeType === 'APPROVAL' && btnList.includes('reject')">驳回</j-button>
+                v-if="nodeType === 'APPROVAL' && btnList.includes('reject')" :loading="btnLoading">驳回</j-button>
             <j-button type="primary" class="btn" @click="onClick('pass')"
-                v-if="nodeType === 'APPROVAL' && btnList.includes('pass')">通过</j-button>
+                v-if="nodeType === 'APPROVAL' && btnList.includes('pass')" :loading="btnLoading">通过</j-button>
             <j-button type="primary" class="btn" @click="submitForm"
-                v-if="nodeType === 'DEAL' && btnList.includes('submit')">提交</j-button>
-            <j-button type="primary" class="btn" @click="onClick('save')">保存</j-button>
+                v-if="nodeType === 'DEAL' && btnList.includes('submit')" :loading="btnLoading">提交</j-button>
+            <j-button type="primary" class="btn" @click="onClick('save')" :loading="btnLoading">保存</j-button>
         </div>
     </div>
-    <FlowModal v-if="visible" @close="visible = false" @save="onSave" :type="modalType" :required="required" :taskId="taskId"/>
+    <FlowModal v-if="visible" @close="visible = false" @save="onSave" :type="modalType" :required="required"
+        :taskId="taskId" />
 </template>
 
 <script setup>
@@ -25,6 +26,7 @@ import FlowModal from './FlowModal.vue';
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import { cloneDeep } from 'lodash-es'
 import { _claim, _save, _complete, _reject } from '@/api/process/me'
+import { onlyMessage } from '@jetlinks/utils';
 const props = defineProps({
     info: {
         type: Object,
@@ -52,8 +54,10 @@ const required = ref(false)
 // 提交是否可以选择审批人
 const freeChoiceUser = ref(false)
 // 审批ID
-const taskId= ref()
+const taskId = ref()
 const btnList = ref([])
+//按钮加载
+const btnLoading = ref(false)
 const onSave = (value) => {
     comment.value = value
     switch (modelType) {
@@ -82,33 +86,39 @@ const onSave = (value) => {
 }
 
 const onClick = async (value) => {
+    btnLoading.value = true
     const promise = []
-    formRef.value.forEach((i, index) => {
-        promise.push(i.onSave())
-    })
-    Promise.all(promise).then((res) => {
-        res.forEach((i, index) => {
-            submitData.value.push({
-                formId: formValue.value[index].formId,
-                data: {
-                    ...formValue.value[index].data,
-                    ...i
-                }
-            })
+    modalType.value = value
+    if (modalType.value === 'save') {
+        _save(props.info.currentTaskId, {
+            form: submitData.value
+        }).then((res) => {
+            if (res.status === 200) {
+                onlyMessage('保存成功')
+                btnLoading.value = false
+            }
         })
-        modalType.value = value
-        if (modalType.value === 'save') {
-            _save(props.info.currentTaskId, {
-                form: submitData.value
+    } else {
+        formRef.value.forEach((i, index) => {
+            promise.push(i.onSave())
+        })
+        Promise.all(promise).then((res) => {
+            res.forEach((i, index) => {
+                submitData.value.push({
+                    formId: formValue.value[index].formId,
+                    data: {
+                        ...formValue.value[index].data,
+                        ...i
+                    }
+                })
             })
-        } else {
             visible.value = true
-        }
-    })
+        })
+    }
 }
 const submitForm = () => {
     if (freeChoiceUser.value) {
-        props.info.tasks.forEach((i)=>{
+        props.info.tasks.forEach((i) => {
             i.nodeId === freeChoiceUser.value ? taskId.value = i.id : ''
         })
         onClick('save')
@@ -125,11 +135,11 @@ const dealForm = (nodes) => {
         //获取节点类型
         nodeType.value = nodes.type
         //审批意见是否必填
-        required.value = nodes?.dealRequired
+        required.value = nodes?.props?.dealRequired
         //审批提交是否可以指定处理人
-        freeChoiceUser.value = nodes?.freeChoiceUser
+        freeChoiceUser.value = nodes?.props?.freeChoiceUser
         //节点拥有哪些按钮权限
-        btnList.value = nodes?.authButtons
+        btnList.value = nodes?.props?.authButtons
         //详情接口nodeId
         const bindMap = new Map()
         Object.keys(nodes.props.formBinds).forEach((item) => {
@@ -158,6 +168,11 @@ const dealForm = (nodes) => {
         })
     } else {
         nodes?.children ? dealForm(nodes.children) : ''
+        if (nodes?.branches) {
+            nodes.branches.forEach((i) => {
+                dealForm(i)
+            })
+        }
     }
 }
 watch(() => props.info, () => {
@@ -196,4 +211,5 @@ watch(() => props.info, () => {
     .btn {
         margin-right: 15px;
     }
-}</style>
+}
+</style>
