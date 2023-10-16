@@ -19,9 +19,7 @@ const defaultModel = {
 
 export const useFlowStore = defineStore('flow', () => {
     const nodeMap = new Map()
-    // const isEdit = ref(null)
     const selectedNode = ref({})
-    // const selectFormItem = ref(null)
     // 流程模型数据
     const model = ref<IModel>({
         config: {},
@@ -53,23 +51,12 @@ export const useFlowStore = defineStore('flow', () => {
         modelBaseInfo.value = data
     }
 
-    /**
-     * 是否可编辑
-     * @param data 
-     */
-    // const setIsEdit = (data: any) => {
-    //     isEdit.value = data
-    // }
-
     return {
         selectedNode,
-        // isEdit,
         nodeMap,
         model,
         modelBaseInfo,
-        // selectFormItem,
         setModel,
-        // setIsEdit,
         setSelectedNode,
         setModelBaseInfo
     }

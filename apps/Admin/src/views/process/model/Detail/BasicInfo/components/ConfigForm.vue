@@ -118,6 +118,9 @@
 import { onlyMessage } from '@jetlinks/utils'
 import draggable from 'vuedraggable'
 import { queryForm_api } from '@/api/process/model'
+import { useFlowStore } from '@/store/flow'
+
+const flowStore = useFlowStore()
 
 const props = defineProps({
   modelValue: {
@@ -216,23 +219,28 @@ const query = (params) => {
 
 // 是否选中
 const isActive = computed(() => (key) => {
-  return selectedRow.value?.map((i) => i.id).includes(key)
+  return selectedRow.value?.map((i) => i.formId).includes(key)
 })
 // 选中项
 const selectedRow = ref<any>([])
 /**
- * 选中
+ * 表格选中/右侧已选删除
  */
 const onSelectChange = (row: any) => {
-  if (isActive.value(row.id)) {
-    selectedRow.value = selectedRow.value.filter(
-      (item: any) => item.id !== row.id,
+  if (row.formId) {
+    // row存在formId字段, 表示为右侧删除已选
+    selectedRow.value.splice(
+      selectedRow.value.findIndex((item: any) => item.formId === row.formId),
+      1,
     )
   } else {
+    // row没有formId字段, 则表示左侧表格选中
     selectedRow.value.push({
       formId: row.id,
       formName: row.name,
       multiple: false,
+      // 表单完整信息: 仅供前端使用
+      fullInfo: row,
     })
   }
   //   console.log('selectedRow.value: ', selectedRow.value)

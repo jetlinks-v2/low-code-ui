@@ -80,6 +80,6 @@ export function filterFormByName(list, name) {
         // if (item.configuration) {
         //     item.configuration.children = filterFormByName(item.configuration.children, name)
         // }
-        return item.name.includes(name)
+        return item.formName.includes(name)
     })
 }

@@ -9,11 +9,18 @@ export interface INode {
     branches?: INode[];
 }
 
+export interface IForms {
+    formId: string
+    multiple: boolean
+    formName?: string
+    // 仅前端使用
+    fullInfo?: any
+}
 export interface IConfig {
     nameGenerator: string;
     summaryGenerator: string;
     ccMember: Partial<ICandidate>;
-    forms: { formId: string; multiple: boolean }[];
+    forms: IForms[];
     // fields?: IVariables[];
     variables?: any[];
 }
