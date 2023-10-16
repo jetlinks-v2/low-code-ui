@@ -71,6 +71,7 @@
                   <j-checkbox-group
                     v-model:value="field.accessModes"
                     :options="permissions"
+                    @change="handleFieldCheck(field)"
                   />
                 </div>
               </div>
@@ -78,7 +79,34 @@
           </div>
         </div>
       </j-col>
-      <j-col :span="16"> 表单名称 </j-col>
+      <j-col :span="16">
+        <div class="preview-box">
+          <template v-for="(item, index) in allFormList" :key="index">
+            <div>{{ item.formName }}</div>
+            <Preview
+              v-if="!item.multiple"
+              :data="item.fullInfo?.configuration"
+            />
+            <QuickEditTable
+              serial
+              :data="tableData"
+              :columns="getTableColumns(item.fullInfo?.configuration?.children)"
+              :height="200"
+              v-else
+            >
+              <template
+                v-for="(column, index) in getTableColumns(
+                  item.fullInfo?.configuration?.children,
+                )"
+                :key="index + 'column'"
+                #column.dataIndex="{ record, index }"
+              >
+                <div>{{ record[column.dataIndex] }}</div>
+              </template>
+            </QuickEditTable>
+          </template>
+        </div>
+      </j-col>
     </j-row>
   </j-modal>
 </template>
@@ -89,6 +117,7 @@ import { queryFormNoPage_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { filterFormByName } from './utils'
 import { cloneDeep } from 'lodash-es'
+import Preview from '@/components/FormDesigner/preview.vue'
 
 const flowStore = useFlowStore()
 
@@ -197,6 +226,31 @@ const handleFormCheck = (form: any) => {
 }
 
 /**
+ * 字段勾选/取消"写", 自动勾选/取消"读"
+ */
+const handleFieldCheck = ({ accessModes }) => {
+  //   console.log('handleFieldCheck: ', accessModes)
+  //   if (accessModes.includes('read')) return
+  //   if (accessModes.includes('write')) {
+  //     accessModes = ['read', 'write']
+  //   } else {
+  //     accessModes = []
+  //   }
+}
+
+const tableData = ref([{ description: '' }])
+const getTableColumns = (fields: any[]) => {
+  console.log('getTableColumns: ', fields)
+
+  const _columns = fields?.map((m) => ({
+    title: m.formItemProps?.label,
+    dataIndex: m.formItemProps?.name,
+    // width: 200,
+  }))
+  return _columns
+}
+
+/**
  * 确认之后, 将数据同步至父组件的basicFormData.forms
  */
 const handleOk = () => {
@@ -226,7 +280,7 @@ watch(
 
 <style lang="less" scoped>
 .form-box {
-  max-height: 500px;
+  max-height: 600px;
   overflow: auto;
   .form-item {
     .form-title {
@@ -243,5 +297,9 @@ watch(
       }
     }
   }
+}
+.preview-box {
+  max-height: 600px;
+  overflow: auto;
 }
 </style>
