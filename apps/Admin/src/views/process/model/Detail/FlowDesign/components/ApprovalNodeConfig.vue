@@ -9,7 +9,7 @@
           name="formBinds"
           :rules="[{ required: true, message: '请配置表单内容' }]"
         >
-          <ConfigureForm v-model:value="basicFormData.formBinds" />
+          <ConfigFormFields v-model:value="basicFormData.formBinds" />
         </j-form-item>
 
         <h3 style="margin-top: 20px">节点控制</h3>
@@ -120,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import ConfigureForm from './ConfigureForm.vue'
+import ConfigFormFields from './ConfigFormFields.vue'
 import { findNodeById } from './utils'
 import { useFlowStore } from '@/store/flow'
 

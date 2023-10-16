@@ -1,3 +1,4 @@
+<!-- 基础信息配置表单 -->
 <template>
   <div>
     <j-button @click="handleClick" style="width: 200px">表单配置</j-button>

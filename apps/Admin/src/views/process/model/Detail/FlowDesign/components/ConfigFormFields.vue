@@ -1,4 +1,4 @@
-<!-- 配置表单内容 -->
+<!-- 节点-配置表单/字段 -->
 <template>
   <j-button type="primary" block size="small" ghost @click="visible = true">
     配置表单内容
