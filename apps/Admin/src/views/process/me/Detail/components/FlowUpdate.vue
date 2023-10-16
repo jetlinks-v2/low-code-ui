@@ -41,9 +41,9 @@ const formValue = ref<any>({})
 const columns = ref<any>([])
 const dataSource = ref<any>([])
 const init = reactive<any>({
-    columns:undefined,
-    data:undefined,
-    
+    columns: undefined,
+    data: undefined,
+
 })
 
 
@@ -51,18 +51,25 @@ const init = reactive<any>({
 onMounted(() => {
     const config = props.info?.form?.find(item => item.formId === props.current.others.formId)
     formConfig.value = config
-    formValue.value = config.data
-    console.log('config----', config,props.current)
+
+    // formValue.value = props.current.others.after
+    const obj = {}
+    props.current.others.diff.forEach(item => {
+        obj[item.property] = item.before
+    })
+    formValue.value = obj
+    console.log('config----', config, props.current)
     const arr = formConfig.value?.configuration.children?.map(item => ({
         title: item.formItemProps.label,
         dataIndex: item.formItemProps.name,
         ellipsis: true,
     }))
+
     columns.value = arr
     dataSource.value = [config.data]
 
     init.columns = arr
-    init.data = config.data
+    init.data = obj
     // console.log(columns.value, config.data)
 })
 
@@ -70,26 +77,11 @@ watch(
     () => activeKey.value,
     (val) => {
         if (val === 'after') {
-            const obj={}
-             props.current.others.diff.forEach(item=>{
-                obj[item.property]=item.after
-            })
-            console.log('diff------',obj,init.data)
-            //不同值
-            const diff = {
-                ...init.data,
-                ...obj,
-            }
-            dataSource.value = [diff] 
-            formValue.value ={
-                ...diff,
-                kg1:false
-            }
-           
+            dataSource.value = [props.current.others.after]
+            formValue.value = props.current.others.after
         }
-        if(val === 'before'){
-            dataSource.value = [{...init.data}]
-            // console.log('before------',init.data)
+        if (val === 'before') {
+            dataSource.value = [{ ...init.data }]
             formValue.value = init.data
         }
     },

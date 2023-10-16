@@ -7,7 +7,8 @@
             <template #createTime="record">
                 {{ record.createTime ? dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}
             </template>
-            <template #endTime="record">{{ record.createTime ? dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}</template>
+            <template #endTime="record">{{ record.createTime ? dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '--'
+            }}</template>
             <!-- <template #modifyTime="record">{{ record.modifyTime ? dayjs(record.modifyTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}</template> -->
             <template #state="record">{{ record.state.text }}</template>
             <template #action="record">
@@ -30,17 +31,17 @@
                     }" @click="onSave(record)">
                         详情
                     </PermissionButton>
-                    <PermissionButton v-if="type === 'initiate'" :hasPermission="true" type="link" danger
+                    <!-- <PermissionButton v-if="type === 'initiate'" :hasPermission="true" type="link" danger
                         :disabled="record.state.value === 'running'" :popConfirm="{
                             title: `确认删除？`,
                             onConfirm: () => onDel(record),
                         }" :tooltip="{ title: record.state.value !== 'running' ? '删除' : '不支持删除未结束的流程' }">
                         删除
-                    </PermissionButton>
+                    </PermissionButton> -->
                 </div>
             </template>
         </JProTable>
-        <Detail v-if="visible" @close="visible = false" :current="current" :type="type"/>
+        <Detail v-if="visible" @close="visible = false" :current="current" :type="type" :history="history"/>
     </div>
 </template>
 
@@ -58,6 +59,10 @@ const props = defineProps({
     type: {
         type: String,
         default: ''
+    },
+    activeKey:{
+        type:String,
+        default:'running'
     }
 })
 
@@ -101,7 +106,7 @@ const columnsTodo = [
         key: 'name',
         ellipsis: true,
         scopedSlots: true,
-       
+
     },
     {
         title: '摘要',
@@ -178,7 +183,7 @@ const columnsFinished = [
         key: 'name',
         ellipsis: true,
         scopedSlots: true,
-       
+
     },
     {
         title: '摘要',
@@ -267,7 +272,7 @@ const columnsInitiate = [
         dataIndex: 'id',
         key: 'id',
         ellipsis: true,
-        hideInTable:true,
+        hideInTable: true,
         search: {
             type: 'string',
             componentProps: {
@@ -281,7 +286,7 @@ const columnsInitiate = [
         key: 'name',
         ellipsis: true,
         scopedSlots: true,
-       
+
     },
     {
         title: '摘要',
@@ -366,7 +371,7 @@ const columnsCc = [
         dataIndex: 'id',
         key: 'id',
         ellipsis: true,
-        hideInTable:true,
+        hideInTable: true,
         search: {
             type: 'string',
             componentProps: {
@@ -380,7 +385,7 @@ const columnsCc = [
         key: 'name',
         ellipsis: true,
         scopedSlots: true,
-       
+
     },
     {
         title: '摘要',
@@ -441,14 +446,14 @@ const columnsCc = [
 ]
 
 
-const columns = computed(()=>{
-    if(props.type==='todo'){
+const columns = computed(() => {
+    if (props.type === 'todo') {
         return columnsTodo
-    }else if(props.type === 'finished'){
+    } else if (props.type === 'finished') {
         return columnsFinished
-    }else if(props.type === 'initiate'){
+    } else if (props.type === 'initiate') {
         return columnsInitiate
-    }else{
+    } else {
         return columnsCc
     }
 })
@@ -468,9 +473,8 @@ const onConfirm = async (item) => {
     }
 }
 
-const onDel = async (item) => {
-
-}
+// const onDel = async (item) => {
+// }
 
 const onSave = (item) => {
     current.value = item
@@ -487,9 +491,28 @@ const isSign = (arr) => {
 watch(
     () => props.history,
     () => {
-        // console.log('history',props.history)
         tableRef.value?.reload()
     }
+)
+
+watch(
+    ()=>props.activeKey,
+    ()=>{
+        // if(props.type ==='initiate' ){
+        //     console.log('222222222')
+        //     const parms = {
+        //         sorts: [{ name: 'createTime', order: 'desc' }],
+        //         terms: [{
+        //             "value": 'ready',
+        //             "termType":props.activeKey==='draft' ? "eq":'not',
+        //             "column": "state"
+        //         }]
+        //     }
+        //     defaultParams.value = parms
+
+        // }
+    },
+    {immediate:true,deep:true}
 )
 
 

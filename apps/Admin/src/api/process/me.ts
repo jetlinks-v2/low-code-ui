@@ -17,7 +17,7 @@ export const _complete = (taskId: string, data: any) => request.post(`/process/r
 export const _reject = (taskId: string, data: any) => request.post(`/process/runtime/task/${taskId}/_reject`, data);
 
 //获取流程详情
-export const getProcessDetail = (id: string) => request.get(`/process/runtime/process/detail/${id}`);
+export const getProcessDetail = (id: string,todo:boolean) => request.get(`/process/runtime/process/detail/${id}?history=${todo}`);
 
 //获取待办流程详情
 export const getProcessTodoDetail = (id: string,taskId:string) => request.get(`/process/runtime/process/todo/${id}/${taskId}`);

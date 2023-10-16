@@ -32,6 +32,10 @@ const props = defineProps({
     type: {
         type: String,
         default: ''
+    },
+    history:{
+        type:Boolean,
+        default:false
     }
 })
 
@@ -43,7 +47,7 @@ const options = ref([])
 const taskId = ref(undefined)
 const taskNodeId = ref()
 const getDetail = async (taskId?: string) => {
-    const res = taskId ? await getProcessTodoDetail(props.current.id, taskId) : await getProcessDetail(props.current.id)
+    const res = taskId ? await getProcessTodoDetail(props.current.id, taskId) : await getProcessDetail(props.current.id,props.history)
     if (res.status === 200) {
         info.value = res.result
     }
@@ -59,7 +63,8 @@ onMounted(() => {
         item => item.linkType.value === 'assignee' && item.state.value === 'todo'
     )
     options.value = arr?.map(item => ({
-        label: `${item.taskName}-${item.taskName}`,
+        // label: `${item.taskName}-${item.taskName}`,
+        label:item.taskName,
         value: item.taskId,
         nodeId: item.nodeId
     }))
