@@ -41,8 +41,9 @@ const props = defineProps({
         default: ''
     }
 })
+const emit = defineEmits(['close'])
 const formValue = ref()
-const visible = ref(false)
+const visible = ref(true)
 const modalType = ref('pass')
 const comment = ref()
 const formRef = ref()
@@ -60,20 +61,29 @@ const btnList = ref([])
 const btnLoading = ref(false)
 const onSave = (value) => {
     comment.value = value
-    switch (modelType) {
-        case 'pass': () => {
+    btnLoading.value = true
+    switch (modalType.value) {
+        case 'pass':
             _complete(props.info.currentTaskId, {
                 form: submitData.value,
                 variables: comment.value
+            }).then((res) => {
+                if (res.status === 200) {
+                    onlyMessage('提交成功')
+                    emit('close')
+                }
             })
-        };
             break;
-        case 'refuse': () => {
+        case 'refuse':
             _reject(props.info.currentTaskId, {
                 form: submitData.value,
                 variables: comment.value
+            }).then((res) => {
+                if (res.status === 200) {
+                    onlyMessage('提交成功')
+                    emit('close')
+                }
             })
-        };
             break;
         case 'submit': () => {
             _complete(props.info.currentTaskId, {
@@ -86,10 +96,11 @@ const onSave = (value) => {
 }
 
 const onClick = async (value) => {
-    btnLoading.value = true
+
     const promise = []
     modalType.value = value
     if (modalType.value === 'save') {
+        btnLoading.value = true
         _save(props.info.currentTaskId, {
             form: submitData.value
         }).then((res) => {
@@ -118,6 +129,7 @@ const onClick = async (value) => {
 }
 const submitForm = () => {
     if (freeChoiceUser.value) {
+        console.log(freeChoiceUser.value)
         props.info.tasks.forEach((i) => {
             i.nodeId === freeChoiceUser.value ? taskId.value = i.id : ''
         })
