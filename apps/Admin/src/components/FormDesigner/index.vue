@@ -37,7 +37,6 @@ import {
   unref,
   computed,
   reactive,
-  onMounted,
 } from 'vue'
 import { cloneDeep, debounce, map } from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
@@ -50,12 +49,10 @@ import {
   initData,
   appendChildItem,
   handleCopyData,
-  handleExportData,
 } from './utils/utils'
 import { uid } from './utils/uid'
 import Check from './components/Check/index.vue'
 import { onlyMessage } from '@jetlinks/utils'
-import { queryDictionary, queryEndCommands } from '@/api/form'
 import { providerEnum } from '@/components/ProJect'
 import { proAll } from '../QuickEditTable/util'
 
@@ -83,7 +80,7 @@ const model = ref<'preview' | 'edit'>(props.mode ? 'preview' : 'edit') // 预览
 const formData = ref<any>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
 const selected = ref<any[]>([]) // 被选择数据,需要多选
-const errorKey = ref<string[]>([])
+const errorKey = ref<any[]>([])
 const configRef = ref<any>()
 const refList = ref<any>({})
 const formRef = ref<any>()
@@ -97,11 +94,7 @@ const _ctrl = ref<boolean>(false)
 const _other = ref<boolean>(false)
 const focus = ref<boolean>(false)
 const focused = ref<boolean>(false)
-// 存储数据源请求的数据
-const source = reactive<any>({
-  dictionary: [],
-  end: [],
-})
+
 const product = useProduct()
 const formDesigner = useFormDesigner()
 
@@ -313,18 +306,6 @@ const getFormList = computed(() => {
   })
 })
 
-const handleSearch = async () => {
-  const resp = await await queryDictionary()
-  if (resp.success) {
-    // 过滤掉没有启用的数据
-    source.dictionary = resp.result?.filter((item) => item?.status) || []
-  }
-  const resp1 = await queryEndCommands(product.info?.draftId, ['rdb-crud'])
-  if (resp1.success) {
-    source.end = resp1.result || []
-  }
-}
-
 provide('FormDesigner', {
   projectId: product.info?.id,
   model,
@@ -345,7 +326,6 @@ provide('FormDesigner', {
   _other,
   focus,
   focused, // 其他组件
-  source,
   formList: getFormList,
   setSelection,
   setModel,
@@ -357,7 +337,6 @@ provide('FormDesigner', {
   onCollect,
   onAddChild,
   onSave,
-  handleSearch,
 })
 
 watch(
@@ -391,19 +370,15 @@ watch(
   },
 )
 
-onMounted(() => {
-  handleSearch()
-})
-
 onUnmounted(() => {
   onSaveData()
 })
 
 // 校验
 const onValidate = async () => {
-  await handleSearch()
-  errorKey.value = checkedConfig(unref(formData), source, getFormList.value)
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
+    const resp: any = await checkedConfig(unref(formData), getFormList.value)
+    errorKey.value = resp
     if (errorKey.value?.length) {
       reject(errorKey.value)
     } else {

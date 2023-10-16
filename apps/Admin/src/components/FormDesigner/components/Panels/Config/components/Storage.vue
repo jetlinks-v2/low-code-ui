@@ -7,7 +7,7 @@
       @cancel="visible = false"
     >
       <div v-if="configVisible">
-        <div>请选择{{ config?.key}}存储位置</div>
+        <div>请选择{{ config?.key }}存储位置</div>
         <div class="box">
           <j-form ref="formRef" :model="config" layout="vertical">
             <j-form-item
@@ -79,29 +79,29 @@
             @search="onSearch"
           />
         </div>
-        <div class="box-item" v-for="item in dataList" :key="item.value">
+        <div class="box-item" v-for="item in dataList" :key="item">
           <div
             class="box-item-content"
-            @click="onClick(item.value)"
+            @click="onClick(item)"
             :class="{
               'box-item-content': true,
-              active: getKeys.includes(item.value),
+              active: getKeys.includes(item),
             }"
           >
-            <span>{{ item.label }}</span>
-            <template v-if="getKeys.includes(item.value)">
+            <span>{{ item }}</span>
+            <template v-if="getKeys.includes(item)">
               <j-space
-                v-if="_value.find((i) => i.key === item?.value)?.config?.source"
+                v-if="_value.find((i) => i.key === item)?.config?.source"
               >
                 <span>{{
-                  _value.find((i) => i.key === item?.value)?.config?.source
+                  _value.find((i) => i.key === item)?.config?.source
                 }}</span>
-                <span @click.stop="onConfig(item.value)">修改</span>
+                <span @click.stop="onConfig(item)">修改</span>
               </j-space>
-              <span @click.stop="onConfig(item.value)" v-else>配置</span>
+              <span @click.stop="onConfig(item)" v-else>配置</span>
             </template>
           </div>
-          <div class="error" v-if="error.includes(item.value)">
+          <div class="error" v-if="error.includes(item)">
             请配置存储位置
           </div>
         </div>
@@ -120,6 +120,7 @@
 import { ref, inject, computed, unref, watch } from 'vue'
 import { map } from 'lodash-es'
 import { onlyMessage } from '@jetlinks/utils'
+import { product, role, org, device, user } from './index'
 
 const designer: any = inject('FormDesigner')
 
@@ -127,6 +128,10 @@ const _key = 'id'
 const props = defineProps({
   value: {
     type: Array,
+  },
+  type: {
+    type: String,
+    default: 'device',
   },
 })
 
@@ -147,18 +152,22 @@ const _value = ref<any[]>(
 
 const config = ref<any>({})
 
-const list = [
-  {
-    label: 'id',
-    value: 'id',
-  },
-  {
-    label: 'name',
-    value: 'name',
-  },
-]
+const list = computed(() => {
+  switch (props.type) {
+    case 'product':
+      return product
+    case 'org':
+      return org
+    case 'role':
+      return role
+    case 'user':
+      return user
+    default:
+      return device
+  }
+})
 
-const dataList = ref<any[]>([...list])
+const dataList = ref<any[]>([...list.value])
 
 const functionList = computed(() => {
   return (
@@ -294,26 +303,30 @@ const onCommandChange = (val: string | undefined) => {
 
 const onSearch = (searchValue: string) => {
   if (searchValue) {
-    dataList.value = list.filter(
-      (item) => item.value.indexOf(searchValue) !== -1,
+    dataList.value = list.value.filter(
+      (item) => item.indexOf(searchValue) !== -1,
     )
   } else {
-    dataList.value = list
+    dataList.value = list.value
   }
 }
 
 watch(
   () => props?.value,
   () => {
-    _value.value = props?.value?.length ? props.value : [{
-      key: _key,
-      config: {},
-      flag: true
-    }]
+    _value.value = props?.value?.length
+      ? props.value
+      : [
+          {
+            key: _key,
+            config: {},
+            flag: true,
+          },
+        ]
   },
   {
     deep: true,
-    immediate: true
+    immediate: true,
   },
 )
 </script>
