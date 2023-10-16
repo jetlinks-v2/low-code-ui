@@ -195,7 +195,7 @@ const rulesDic = [
   },
   {
     validator(_rule: any, value: string) {
-      const item = designer.source.dictionary?.find((i) => i?.id === value)
+      const item = dic.value?.find((i) => i?.id === value)
       if (!item) {
         return Promise.reject(`数字字典已被删除或禁用`)
       }
@@ -410,11 +410,9 @@ const labelList = computed(() => {
 })
 
 const onProjectChange = (val: string) => {
-  if (val) {
-    getEnd(val)
-  }
   const obj = {
     type: 'end',
+    projectId: val,
     functionId: undefined,
     commandId: undefined,
     source: undefined,

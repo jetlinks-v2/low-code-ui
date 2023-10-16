@@ -60,13 +60,13 @@ export default defineComponent({
         return () => {
             const _path = cloneDeep(props?.path || []);
             const _index = props?.index || 0;
-            const _span = (props.data.componentProps?.inlineMax || 4)
+            const _inlineMax = (props.data.componentProps?.inlineMax || 4) // 最大的列数
 
             if (props.data?.formItemProps?.name) {
                 _path[_index] = props.data.formItemProps.name || ''
             }
             const a = (_width.value - 50) / (50 + (props.data.componentProps?.colSpan || 0)) + 1
-            const _number = Math.floor(a) > _span ? _span : Math.floor(a)
+            const _number = Math.floor(a) > _inlineMax ? _inlineMax : Math.floor(a)
 
             return (
                 <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
@@ -79,14 +79,14 @@ export default defineComponent({
                             style={{
                                 display: 'grid',
                                 gap: `${props.data.componentProps?.rowSpan}px ${props.data.componentProps?.colSpan}px`,
-                                gridTemplateColumns: `repeat(${_number}, 1fr)`,
+                                gridTemplateColumns: `repeat(${_number < unref(list)?.length ? _number : unref(list).length}, 1fr)`,
                             }}
                         >
                             {
                                 unref(list).map((element) => {
                                     const a = (element.componentProps?.span || 1)
                                     return (
-                                        <div key={element.key} {...omit(element.componentProps, 'span')} style={{ gridColumn: `span ${a > _span ? _span : a} / auto` }}>
+                                        <div key={element.key} {...omit(element.componentProps, 'span')} style={{ gridColumn: `span ${a > _inlineMax ? _inlineMax : a} / auto` }}>
                                             <Selection
                                                 class={unref(isDragArea) && 'drag-area'}
                                                 hasDel={unref(list).length > 1}
