@@ -21,3 +21,15 @@ export const del_api = (id: string) => request.remove(`/process/deployment/${id}
  * @returns 
  */
 export const updateState_api = (data: any) => request.put(`/process/deployment/${data.id}`, data);
+
+/**
+ * 查询对应流程实例可发起成员
+ * @returns 
+ */
+export const getMembers_api = (id: string) => request.get(`/process/deployment/${id}/allowedMembers/_query`);
+
+/**
+ * 查询对应流程实例可发起成员
+ * @returns 
+ */
+export const updateMembers_api = (id:string, data: any) => request.post(`/process/deployment/${id}/allowedMembers/_updata`, data);

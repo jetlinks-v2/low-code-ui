@@ -103,6 +103,12 @@
       v-model:visible="drawer.visible"
       :data="drawer.selectItem"
     />
+    <PermissionDialog
+      v-if="permission.visible"
+      v-model:visible="permission.visible"
+      :data="permission.selectItem"
+      @refresh="refresh"
+    />
   </page-container>
 </template>
 <script setup>
@@ -110,6 +116,7 @@ import { onlyMessage } from '@jetlinks/utils'
 import dayjs from 'dayjs'
 import Dialog from './Dialog/index.vue'
 import Drawer from '../components/Drawer/index.vue'
+import PermissionDialog from './PermissionDialog/index.vue'
 import { isFunction, isObject } from 'lodash-es'
 import { getList_api, del_api, updateState_api } from '@/api/process/instance'
 import { providerEnum } from '@/api/process/model'
@@ -235,6 +242,12 @@ const drawer = reactive({
   visible: false,
 })
 
+// 权限控制
+const permission = reactive({
+  selectItem: {},
+  visible: false,
+})
+
 const getActions = (record, type = 'card') => {
   const actions = [
     {
@@ -279,6 +292,21 @@ const getActions = (record, type = 'card') => {
               }
             })
           },
+        },
+      }),
+    },
+    {
+      key: 'permission',
+      text: '权限控制',
+      icon: 'TeamOutlined',
+      permissionProps: (data) => ({
+        tooltip: {
+          title: '权限控制',
+        },
+        hasPermission: false,
+        onClick: () => {
+          permission.selectItem = { ...data }
+          permission.visible = true
         },
       }),
     },
