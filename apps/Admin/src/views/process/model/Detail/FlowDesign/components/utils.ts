@@ -1,5 +1,6 @@
 /**
  * 通过节点id查找对应节点
+ * 节点存在branches[]和children{}下级关系
  * @param node 
  * @param id 
  * @returns 
@@ -17,6 +18,22 @@ export function findNodeById(node, id) {
     } else if (node.children) {
         const _res = findNodeById(node.children, id)
         if (_res) return _res
+    }
+    return null
+}
+
+/**
+ * 通过变量id, 递归查找对应变量
+ * @param vars 
+ * @param id
+ */
+export function findVariableById(vars, id) {
+    for (let i = 0; i < vars.length; i++) {
+        if (vars[i].fullId === id) return vars[i]
+        if (vars[i].children?.length) {
+            const _res = findVariableById(vars[i].children, id)
+            if (_res) return _res
+        }
     }
     return null
 }

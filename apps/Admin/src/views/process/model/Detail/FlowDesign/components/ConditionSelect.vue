@@ -46,7 +46,13 @@
       style="width: 90px"
     />
 
+    <j-input
+      v-if="getComponentsType(item) === 'input'"
+      v-model:value="item.value"
+      placeholder="请输入"
+    />
     <j-tree-select
+      v-if="getComponentsType(item) === 'select'"
       v-model:value="item.value"
       v-model:searchValue="item.searchValue"
       show-search
@@ -96,6 +102,7 @@
 <script setup lang="ts">
 import { queryVariables_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
+import { findVariableById } from './utils'
 
 const flowStore = useFlowStore()
 
@@ -162,6 +169,40 @@ const termsOptions = ref([
 ])
 
 /**
+ * 变量列表的others.type = 组织org、用户user、角色role、产品product、设备device时,
+ * 取下拉值为下拉单选/多选框, 否则为输入框
+ */
+const getComponentsType = (item) => {
+  const _var = findVariableById(conditionOptions.value, item.column)
+  let _type = 'input'
+  //   console.log('_var?.others: ', _var?.others)
+  //   console.log('_var?.others?.type: ', _var?.others?.type)
+  switch (_var?.others?.type) {
+    case 'org':
+      _type = 'select'
+      break
+    case 'user':
+      _type = 'select'
+      break
+    case 'role':
+      _type = 'select'
+      break
+    case 'product':
+      _type = 'select'
+      break
+    case 'device':
+      _type = 'select'
+      break
+
+    default:
+      break
+  }
+
+  //   console.log('_type: ', _type)
+  return _type
+}
+
+/**
  * 获取条件下拉数据
  */
 const getFormFields = async () => {
@@ -196,6 +237,7 @@ const handleAdd = () => {
 watch(
   () => conditionSelect.value,
   (val) => {
+    // console.log('conditionSelect: ', val)
     emit('update:value', val)
   },
   { deep: true },
