@@ -33,8 +33,7 @@
             mode="multiple"
             :max-tag-count="3"
             v-model:value="showColumns"
-            :options="dataColumns"
-            :field-names="{ label: 'title', value: 'key' }"
+            :options="options"
           >
             <template #tagRender="{ label }">
               <span class="select-tag" :title="label">{{ label.length > 2 ? label.substring(0, 2) + '...' : label }}</span>
@@ -536,9 +535,17 @@ const tableForm = ref(props.defaultFormType)
 const showColumns = ref<string[]>(props.dataColumns.map(item => {
   return item.key
 }))
+
+const options = computed(() => {
+  return props.dataColumns.map(item => {
+    return {
+      label: item.title,
+      value: item.key
+    }
+  })
+})
 const columns = computed(() => {
   const result = props.dataColumns.filter((item) => {
-    console.log(item);
     return showColumns.value.includes(item.key)
   })
   return result
