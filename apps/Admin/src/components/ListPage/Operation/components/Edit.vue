@@ -43,91 +43,116 @@
         </div>
       </j-form-item>
       <template v-if="activeBtn!.type !== 'customer'">
-        <j-row :gutter="20" v-if="activeBtn?.type !== 'Detail'">
-          <j-col :span="12">
-            <j-form-item label="调用功能" name="functions">
-              <ErrorItem :errorData="errorMessage['functions']">
+        <template v-if="activeBtn!.type !== 'Relation'">
+          <j-row :gutter="20" v-if="activeBtn?.type !== 'Detail'">
+            <j-col :span="12">
+              <j-form-item label="调用功能" name="functions">
+                <ErrorItem :errorData="errorMessage['functions']">
+                  <j-select
+                    v-model:value="form.functions"
+                    placeholder="请选择调用功能"
+                  >
+                    <j-select-option
+                      v-for="item in functionOptions"
+                      :value="item.fullId"
+                      :key="item.id"
+                      :title="item.title"
+                    >
+                      <img :src="getImages(item.type)" class="options-img" />
+                      {{ item.title }}
+                    </j-select-option>
+                  </j-select>
+                </ErrorItem>
+              </j-form-item>
+            </j-col>
+            <j-col :span="12">
+              <j-form-item label=" " name="command">
+                <ErrorItem :errorData="errorMessage['command']">
+                  <j-select
+                    v-model:value="form.command"
+                    placeholder="当前功能下无可用接口"
+                    disabled
+                  >
+                    <j-select-option
+                      v-for="item in commandOptions"
+                      :value="item.id"
+                      :key="item.id"
+                      >{{ item.name }}</j-select-option
+                    >
+                  </j-select>
+                </ErrorItem>
+              </j-form-item>
+            </j-col>
+          </j-row>
+          <template
+            v-if="
+              activeBtn?.type === 'Add' ||
+              activeBtn?.type === 'Update' ||
+              activeBtn?.type === 'Detail'
+            "
+          >
+            <j-form-item label="调用页面" name="pages">
+              <ErrorItem :errorData="errorMessage['pages']">
                 <j-select
-                  v-model:value="form.functions"
-                  placeholder="请选择调用功能"
+                  v-model:value="form.pages"
+                  placeholder="请选择调用页面"
+                  @change="handlePages"
                 >
                   <j-select-option
-                    v-for="item in functionOptions"
-                    :value="item.fullId"
+                    v-for="item in pagesOptions"
+                    :value="item.id"
                     :key="item.id"
-                    :title="item.title"
                   >
                     <img :src="getImages(item.type)" class="options-img" />
-                    {{ item.title }}
+                    {{ item.name }}
                   </j-select-option>
                 </j-select>
               </ErrorItem>
             </j-form-item>
-          </j-col>
-          <j-col :span="12">
-            <j-form-item label=" " name="command">
-              <ErrorItem :errorData="errorMessage['command']">
-                <j-select
-                  v-model:value="form.command"
-                  placeholder="当前功能下无可用接口"
-                  disabled
-                >
-                  <j-select-option
-                    v-for="item in commandOptions"
-                    :value="item.id"
-                    :key="item.id"
-                    >{{ item.name }}</j-select-option
-                  >
-                </j-select>
-              </ErrorItem>
-            </j-form-item>
-          </j-col>
-        </j-row>
-        <template
-          v-if="
-            activeBtn?.type === 'Add' ||
-            activeBtn?.type === 'Update' ||
-            activeBtn?.type === 'Detail'
-          "
-        >
-          <j-form-item label="调用页面" name="pages">
-            <ErrorItem :errorData="errorMessage['pages']">
-              <j-select
-                v-model:value="form.pages"
-                placeholder="请选择调用页面"
-                @change="handlePages"
-              >
-                <j-select-option
-                  v-for="item in pagesOptions"
-                  :value="item.id"
-                  :key="item.id"
-                >
-                  <img :src="getImages(item.type)" class="options-img" />
-                  {{ item.name }}
-                </j-select-option>
-              </j-select>
-            </ErrorItem>
-          </j-form-item>
-          <j-form-item label="页面弹窗宽度" name="pages">
-            <ErrorItem :errorData="errorMessage['pages']">
+            <j-form-item label="页面弹窗宽度" name="modalWidth">
               <j-input-number
-                style="width: 100%;"
+                style="width: 100%"
                 v-model:value="form.modalWidth"
                 :min="limitValue?.[0]"
                 :max="limitValue?.[1]"
                 placeholder="页面弹窗宽度"
               >
                 <template #addonAfter>
-                  <j-select v-model:value="form.modalWidthUnit" style="width: 60px" @change="form.modalWidth = null">
+                  <j-select
+                    v-model:value="form.modalWidthUnit"
+                    style="width: 60px"
+                    allowClear
+                    @change="form.modalWidth = null"
+                  >
                     <j-select-option value="%">%</j-select-option>
                     <j-select-option value="px">px</j-select-option>
                   </j-select>
                 </template>
               </j-input-number>
+            </j-form-item>
+          </template>
+        </template>
+        <template v-else>
+          <j-form-item label="关系对象类型" name="functions">
+            <ErrorItem :errorData="errorMessage['functions']">
+              <j-select
+                v-model:value="form.relation"
+                placeholder="请选择关系对象类型"
+              >
+                <j-select-option
+                  v-for="item in crudFunctions"
+                  :value="item.relationType"
+                  :key="item.relationType"
+                  :title="item.relationTypeName"
+                >
+                  {{ item.relationTypeName }}
+                </j-select-option>
+              </j-select>
             </ErrorItem>
           </j-form-item>
         </template>
       </template>
+
       <j-form-item label="自定义脚本">
         <EditorButton
           v-model:value="form.script"
@@ -179,7 +204,7 @@ const errorList = inject(errorListKey)
 const type = inject(typeKey)
 
 const limitValue = computed(() => {
-  if(form.modalWidthUnit === '%') {
+  if (form.modalWidthUnit === '%') {
     return [10, 100]
   } else {
     return [100, 9999]
@@ -190,6 +215,12 @@ const productStore = useProduct()
 const { info } = productStore
 const { functionOptions, commandOptions, pagesOptions, handleFunction } =
   useFunctions()
+
+const crudFunctions = computed(() => {
+  return functionOptions.value.filter((item) => {
+    return item.provider === providerEnum.CRUD && item.configuration?.relation?.enabled
+  }).map(item => item.configuration?.relation)
+})
 const { getImages } = useImages()
 
 const errorMessage = computed(() => {
@@ -216,8 +247,8 @@ const form = reactive({
   type: props.data.type,
   script: props.data.script || `//console.log('hello world')`,
   key: props.data.key,
-  modalWidth: props.data.modalWidth,
-  modalWidthUnit: props.data.modalWidthUnit || '%',
+  modalWidth: props.data.modalWidth || 520,
+  modalWidthUnit: props.data.modalWidthUnit || 'px',
   functions:
     editType!.value === 'add' &&
     functionOptions!.value.find((item) => item.fullId === props.data.functions)
@@ -237,6 +268,7 @@ const form = reactive({
   color: red;
 } */`,
   resource: props.data.resource,
+  relation: props.data.relation,
 })
 
 const rules = {
@@ -257,7 +289,6 @@ const rules = {
   ],
   icon: [{ required: true, message: '请选择图标', trigger: 'blur' }],
   functions: [{ required: true, message: '', trigger: 'change' }],
-  command: [{ required: true, message: '', trigger: 'change' }],
   pages: [{ required: true, message: '', trigger: 'change' }],
 }
 
@@ -267,7 +298,7 @@ const handlePages = (val: string) => {
     ...pick(data, ['id', 'parentId', 'type']),
     projectId: info.id,
   }
-  console.log(form.resource.parentId, form.resource.projectId);
+  console.log(form.resource.parentId, form.resource.projectId)
   form.resource.parentId = `${
     form.resource.projectId == form.resource.parentId
       ? form.resource.parentId
