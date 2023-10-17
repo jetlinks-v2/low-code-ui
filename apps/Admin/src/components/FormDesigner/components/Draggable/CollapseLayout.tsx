@@ -56,7 +56,7 @@ export default defineComponent({
           name: uid(6)
         },
         componentProps: {
-          name: 'Collapse' + uid(6)
+          name: 'Title'
         }
       })
       designer.onAddChild(_item, props.data)

@@ -82,6 +82,7 @@
         <j-row style="margin-top: 16px;">
             <j-col :span="21">
               <j-form-item>
+                <ErrorItem :error-data="errorData('output' + props.data._sortIndex)">
                 <j-tree-select
                   showSearch
                   placeholder="请选择"
@@ -91,6 +92,7 @@
                   :treeCheckStrictly="false"
                   @select="handleChangeData"
                 />
+              </ErrorItem>
               </j-form-item>
             </j-col>
           </j-row>
