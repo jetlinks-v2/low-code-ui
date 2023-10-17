@@ -40,6 +40,7 @@ import { typeImages } from '@/components/ProJect/index'
 import { restParentId } from './tree'
 import { cloneDeep } from 'lodash-es';
 import { delMenu } from '@/api/menu'
+import { Modal } from 'jetlinks-ui-components'
 
 const engine = useEngine()
 const product = useProduct()
@@ -164,14 +165,15 @@ const onDrop = (info) => {
 
   const mayType = ['module', 'project']
 
-
-
   const data = cloneDeep([...list.value])
-
 
   let dragObj;
   const parentId = mayType.includes(info.node.type) ? info.node.id : info.node.parentId
   if (someName(info.node, info.dragNode, parentId)) { // 有同名禁止拖拽
+    Modal.warning ({
+      title: `名称"${info.dragNode.title}"已被占用，请重新命名`,
+      okText: '确定'
+    })
     return
   }
     //平级
