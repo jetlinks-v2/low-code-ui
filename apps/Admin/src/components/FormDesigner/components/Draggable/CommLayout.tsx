@@ -43,12 +43,10 @@ export default defineComponent({
         const designer: any = inject('FormDesigner')
         const TypeComponent = componentMap?.[props?.data?.type] || 'div'
         const _path: string[] = cloneDeep(props?.path || []);
-
-        const _props = useProps(props.data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
         const selectRef = ref<any>(null)
         const _formRef = ref<any>(null)
-        const options = ref<any[]>(_props.componentProps.options)
-        const treeData = ref<any[]>(_props.componentProps.treeData)
+        const options = ref<any[]>(props.data?.componentProps.options || [])
+        const treeData = ref<any[]>(props.data?.componentProps.treeData || [])
         const __value = ref<any>(get(designer.formState, _path))
 
         const _index = computed(() => {
@@ -120,7 +118,7 @@ export default defineComponent({
             // 时间组件处理
             if (['date-picker', 'time-picker'].includes(props?.data.type)) {
                 if (typeof __value.value === 'number') {
-                    __value.value = dayjs(__value).format(_props.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
+                    __value.value = dayjs(__value).format(props.data.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
                 }
             } else if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && props.data?.componentProps?.mode !== "multiple") {
                 const obj = {}
@@ -143,6 +141,8 @@ export default defineComponent({
             }
         })
         return () => {
+            const _props = useProps(props.data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
+
             return (
                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                     <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true} extra={props.data?.componentProps?.description || ''}>
