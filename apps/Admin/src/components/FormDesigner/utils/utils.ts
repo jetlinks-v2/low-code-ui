@@ -409,7 +409,7 @@ export const queryOptions = async (source: any) => {
         }
     }
     if (source?.projectId && source?.type === 'end' && source?.functionId && source?.commandId && source?.label && source?.value) {
-        const resp = await queryRuntime(source?.projectId, source?.projectId + '.' + source?.functionId, source?.commandId, {})
+        const resp = await queryRuntime(source?.projectId, source?.fullId, source?.commandId, {})
         if (resp.success) {
             const arr = getData(source?.source, resp?.result || [])
             if (Array.isArray(arr) && arr?.length) {

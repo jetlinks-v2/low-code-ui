@@ -366,6 +366,7 @@ const getProject = () => {
     if (resp.success) {
       projectList.value = resp.result.map((item) => {
         return {
+          modules: item.modules || [],
           label: item.name,
           value: item.id,
         }
