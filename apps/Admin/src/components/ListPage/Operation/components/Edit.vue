@@ -207,7 +207,7 @@ const limitValue = computed(() => {
   if (form.modalWidthUnit === '%') {
     return [10, 100]
   } else {
-    return [100, 9999]
+    return [300, 9999]
   }
 })
 

@@ -50,6 +50,12 @@
     :json="jsonData.value"
     @close="jsonData.previewVisible = false"
   />
+
+  <Relation 
+    v-model:open="relationVisible" 
+    :config="columnOperation" 
+    :projectId="projectId"
+  />
 </template>
 
 <script setup lang="ts" name="Preview">
@@ -58,6 +64,7 @@ import dayjs from 'dayjs'
 import Import from './Import.vue'
 import Export from './Export.vue'
 import Add from './Add.vue'
+import Relation from '../../Output/components/Relation/index.vue'
 import JsonPreview from './JsonPreview.vue'
 
 const props = defineProps({
@@ -78,10 +85,14 @@ const props = defineProps({
 const target = computed(() => {
   return `${props.projectId}.${props.pageId}`
 })
+
+provide('projectId', props.projectId)
 const emits = defineEmits()
 const importVisible = ref<boolean>(false)
 const exportVisible = ref<boolean>(false)
 const addVisible = ref<boolean>(false)
+const relationVisible = ref(false)
+const columnOperation = ref()
 const tableRef = ref()
 
 const allData = computed(() => {
@@ -279,7 +290,6 @@ const actionsBtnFormat = (data: any, type: string) => {
         tooltip: {
           title: item?.title,
         },
-        hasPermission: false,
         popConfirm:
           item?.command === 'Delete' && item?.title !== '批量删除'
             ? {
@@ -326,6 +336,7 @@ const handleActions = (
   data: Record<string, any>,
   config: Record<string, any>,
 ) => {
+  columnOperation.value = config
   popTitle.value = config?.title
   if (
     config.type === 'Add' ||
@@ -334,7 +345,8 @@ const handleActions = (
   ) {
     // if(config.resource.type === providerEnum.FormPage) {
     addVisible.value = true
-    popResource.value = config.resource
+    popResource.value = {...config.resource, modalWidth: config.modalWidth,
+      modalWidthUnit: config.modalWidthUnit}
     // } else if(config.resource.type === providerEnum.HtmlPage) {
     //   router.push(`/preview/${config.resource.projectId}/${config.resource.parentId}/${config.resource.id}/html/${randomString(8)}`)
     // }
@@ -345,6 +357,9 @@ const handleActions = (
   if (config.command === 'Export') {
     console.log(config, data)
     exportVisible.value = data?.command === 'Export'
+  }
+  if(config.type === 'Relation') {
+    relationVisible.value = true
   }
 }
 //表头按钮
