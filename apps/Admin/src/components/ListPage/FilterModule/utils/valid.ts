@@ -80,6 +80,13 @@ export const validFilterModule = async (list: any[]) => {
             message: '请配置后端指令'
           })
         }
+        if(!item.config?.output || !item.config?.output?.length) {
+          errorList.push({
+            key: 'config' + index,
+            childKey: 'output' + index,
+            message: '请配置输出字段'
+          })
+        }
       }
     })
     resolve(errorList)
