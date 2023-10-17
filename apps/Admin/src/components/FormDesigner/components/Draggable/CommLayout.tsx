@@ -10,7 +10,7 @@ import dayjs from 'dayjs'
 
 export default defineComponent({
     name: 'CommLayout',
-    inheritAttrs: false,
+    // inheritAttrs: false, 默认情况下父作用域的不被认作 props 的 attribute 绑定 (attribute bindings) 将会“回退”且作为普通的 HTML attribute 应用在子组件的根元素上。
     customOptions: {},
     props: {
         data: {
