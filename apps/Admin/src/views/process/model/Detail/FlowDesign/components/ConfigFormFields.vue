@@ -83,27 +83,15 @@
         <div class="preview-box">
           <template v-for="(item, index) in allFormList" :key="index">
             <div>{{ item.formName }}</div>
-            <Preview
+            <FormPreview
               v-if="!item.multiple"
               :data="item.fullInfo?.configuration"
             />
-            <QuickEditTable
-              serial
-              :data="tableData"
+            <TableFormPreview
+              :data-source="tableData"
               :columns="getTableColumns(item.fullInfo?.configuration?.children)"
-              :height="200"
               v-else
-            >
-              <template
-                v-for="(column, index) in getTableColumns(
-                  item.fullInfo?.configuration?.children,
-                )"
-                :key="index + 'column'"
-                #column.dataIndex="{ record, index }"
-              >
-                <div>{{ record[column.dataIndex] }}</div>
-              </template>
-            </QuickEditTable>
+            />
           </template>
         </div>
       </j-col>
@@ -117,7 +105,8 @@ import { queryFormNoPage_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { filterFormByName } from './utils'
 import { cloneDeep } from 'lodash-es'
-import Preview from '@/components/FormDesigner/preview.vue'
+import FormPreview from '@/components/FormDesigner/preview.vue'
+import TableFormPreview from './TableFormPreview.vue'
 
 const flowStore = useFlowStore()
 
@@ -238,15 +227,21 @@ const handleFieldCheck = ({ accessModes }) => {
   //   }
 }
 
-const tableData = ref([{ description: '' }])
+const tableData = ref([{}])
 const getTableColumns = (fields: any[]) => {
   console.log('getTableColumns: ', fields)
 
   const _columns = fields?.map((m) => ({
     title: m.formItemProps?.label,
     dataIndex: m.formItemProps?.name,
-    // width: 200,
+    ellipsis: true,
+    componentType: m.type,
   }))
+
+  _columns?.forEach((item) => {
+    tableData.value[0][item.dataIndex] = undefined
+  })
+  console.log('tableData.value: ', tableData.value)
   return _columns
 }
 
