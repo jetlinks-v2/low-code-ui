@@ -18,7 +18,7 @@
         </div>
     </div>
     <FlowModal v-if="visible" @close="visible = false" @save="onSave" :type="modalType" :required="required"
-        :taskId="taskId" />
+        :taskId="taskId" :candidates="candidates"/>
 </template>
 
 <script setup>
@@ -27,6 +27,7 @@ import FormPreview from '@/components/FormDesigner/preview.vue'
 import { cloneDeep } from 'lodash-es'
 import { _claim, _save, _complete, _reject } from '@/api/process/me'
 import { onlyMessage } from '@jetlinks/utils';
+import md5 from 'md5'
 const props = defineProps({
     info: {
         type: Object,
@@ -43,12 +44,13 @@ const props = defineProps({
 })
 const emit = defineEmits(['close'])
 const formValue = ref()
-const visible = ref(true)
+const visible = ref(false)
 const modalType = ref('pass')
 const comment = ref()
 const formRef = ref()
 const submitData = ref([])
 const nodeType = ref()
+//提交审批taskId 
 const nodes = ref()
 // 审批意见是否必填
 const required = ref(false)
@@ -56,14 +58,18 @@ const required = ref(false)
 const freeChoiceUser = ref(false)
 // 审批ID
 const taskId = ref()
+//提交审批的taskId
+const submitId = ref()
 const btnList = ref([])
 //按钮加载
 const btnLoading = ref(false)
+//提交可选审批人条件
+const candidates = ref()
 const onSave = (value) => {
-    comment.value = value
-    btnLoading.value = true
+    // btnLoading.value = true
     switch (modalType.value) {
         case 'pass':
+            comment.value = value
             _complete(props.info.currentTaskId, {
                 form: submitData.value,
                 variables: comment.value
@@ -75,6 +81,7 @@ const onSave = (value) => {
             })
             break;
         case 'refuse':
+            comment.value = value
             _reject(props.info.currentTaskId, {
                 form: submitData.value,
                 variables: comment.value
@@ -85,14 +92,29 @@ const onSave = (value) => {
                 }
             })
             break;
-        case 'submit': () => {
+        case 'submit': 
+            
+            const commands = [
+            {
+            commandId: "ClaimTask",
+            param: {
+                taskId: submitId.value,
+                identity: value
+            }
+        }
+            ]
+            console.log(commands)
             _complete(props.info.currentTaskId, {
                 form: submitData.value,
-                variables: comment.value
+                commands: commands
+            }).then((res)=>{
+                if (res.status === 200) {
+                    onlyMessage('提交成功')
+                    emit('close')
+                }
             })
-        };
             break;
-    }
+        }
 }
 
 const onClick = async (value) => {
@@ -133,7 +155,8 @@ const submitForm = () => {
         props.info.tasks.forEach((i) => {
             i.nodeId === freeChoiceUser.value ? taskId.value = i.id : ''
         })
-        onClick('save')
+        submitId.value = md5(props.info?.modelId + '|' + props?.info?.id + '|' + freeChoiceUser.value)
+        onClick('submit')
     }
     else {
         _complete(props.info.currentTaskId, {
@@ -149,7 +172,10 @@ const dealForm = (nodes) => {
         //审批意见是否必填
         required.value = nodes?.props?.dealRequired
         //审批提交是否可以指定处理人
-        freeChoiceUser.value = nodes?.props?.freeChoiceUser
+        if(nodes?.props?.freeChoiceUser && nodes?.props.freeChoiceUser === nodes?.children?.id){
+            freeChoiceUser.value = nodes.props.freeChoiceUser
+            candidates.value = nodes?.children?.props?.candidates
+        }
         //节点拥有哪些按钮权限
         btnList.value = nodes?.props?.authButtons
         //详情接口nodeId

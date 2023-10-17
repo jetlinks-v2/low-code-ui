@@ -22,5 +22,5 @@ export const getProcessDetail = (id: string,todo:boolean) => request.get(`/proce
 //获取待办流程详情
 export const getProcessTodoDetail = (id: string,taskId:string) => request.get(`/process/runtime/process/todo/${id}/${taskId}`);
 
-//获取指定审批人列表
-export const getApprover = (taskId:string,data:any) => request.post(`/process/runtime/taskLink/${taskId}/_query`,data)
+//获取用户
+export const getUserList_api = (data: object) => request.post(`/user/detail/_query`, data);
