@@ -51,7 +51,7 @@ export default defineComponent({
                 type: props.data?.type + '-item',
                 children: [],
                 componentProps: {
-                    name: 'Tab' + uid(6)
+                    name: 'Title'
                 },
                 formItemProps: {
                     name: uid(6)
