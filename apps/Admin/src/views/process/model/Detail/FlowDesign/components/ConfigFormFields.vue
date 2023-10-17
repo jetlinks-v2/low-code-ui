@@ -148,11 +148,15 @@ const getFormList = async () => {
       _fields?.forEach((p) => {
         const _currentField = existFields.find((f) => f.id === p.key)
         p['accessModes'] = _currentField ? _currentField.accessModes : []
+        // 只有"写"权限时, 表单才可编辑
+        p.componentProps.disabled = !p.accessModes.includes('write')
       })
       return { accessModes: [], ...m }
     } else {
       _fields?.forEach((p) => {
         p['accessModes'] = []
+        // 初始状态没有权限, 不可编辑
+        p.componentProps.disabled = true
       })
       return { accessModes: [], ...m }
     }
@@ -195,12 +199,13 @@ const handleFieldCheck = (field) => {
   if (field.accessModes.length === 1 && field.accessModes[0] === 'write') {
     field.accessModes = ['read', 'write']
   }
+  // 只有"写"权限时, 表单才可编辑
   field.componentProps.disabled = !field.accessModes.includes('write')
 }
 
 const tableData = ref([{}])
 const getTableColumns = (fields: any[]) => {
-  console.log('getTableColumns: ', fields)
+  //   console.log('getTableColumns: ', fields)
 
   const _columns = fields?.map((m) => ({
     title: m.formItemProps?.label,
