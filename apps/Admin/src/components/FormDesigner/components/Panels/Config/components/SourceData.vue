@@ -162,12 +162,11 @@
 </template>
     
 <script lang="ts" setup>
-import { watch, computed, reactive, inject, ref } from 'vue'
+import { watch, computed, reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash-es'
 import { getArray, searchTree } from '@/components/FormDesigner/utils/utils'
 import { queryDictionary, queryEndCommands, queryProject } from '@/api/form'
 
-const designer: any = inject('FormDesigner')
 const projectList = ref<any[]>([])
 const dic = ref<any[]>([])
 const end = ref<any[]>([])

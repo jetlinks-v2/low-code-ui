@@ -107,7 +107,7 @@ export default defineComponent({
         })
 
         if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(props.data?.type)) {
-            queryOptions(props.data?.componentProps.source, designer?.projectId).then(resp => {
+            queryOptions(props.data?.componentProps.source).then(resp => {
                 if (['select', 'select-card'].includes(props.data?.type)) {
                     options.value = resp
                 } else {

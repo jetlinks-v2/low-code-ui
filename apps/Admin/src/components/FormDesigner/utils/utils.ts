@@ -351,14 +351,15 @@ export const getBrotherList = (value: string | number, arr: any[]) => {
 const getData = (key: string, obj: any) => {
     if (key) {
         const arr = Object.keys(obj) || []
-        return arr.find(item => {
+        let _item = undefined;
+        arr.map(item => {
             if (item === key) {
-                return obj?.[key]
-            }
-            if (isObject(obj[item])) {
-                return getData(key, obj[item])
+                _item = obj?.[key]
+            } else if (isObject(obj[item])) {
+                _item = getData(key, obj[item])
             }
         })
+        return _item
     }
     return obj
 }
@@ -399,7 +400,7 @@ const _getEndData = (arr: any[], source: any) => {
 }
 
 // 获取options
-export const queryOptions = async (source: any, id: string) => {
+export const queryOptions = async (source: any) => {
     if (source?.type === 'dic' && source?.dictionary) {
         const resp = await queryDictionaryData(source?.dictionary)
         if (resp.success) {
@@ -407,8 +408,8 @@ export const queryOptions = async (source: any, id: string) => {
             return bubbleSort(list)
         }
     }
-    if (id && source?.type === 'end' && source?.functionId && source?.commandId && source?.label && source?.value) {
-        const resp = await queryRuntime(id, id + '.' + source?.functionId, source?.commandId, {})
+    if (source?.projectId && source?.type === 'end' && source?.functionId && source?.commandId && source?.label && source?.value) {
+        const resp = await queryRuntime(source?.projectId, source?.projectId + '.' + source?.functionId, source?.commandId, {})
         if (resp.success) {
             const arr = getData(source?.source, resp?.result || [])
             if (Array.isArray(arr) && arr?.length) {
