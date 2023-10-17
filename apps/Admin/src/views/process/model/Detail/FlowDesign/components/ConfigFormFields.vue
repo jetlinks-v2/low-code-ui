@@ -81,7 +81,7 @@
       </j-col>
       <j-col :span="16">
         <div class="preview-box">
-          <template v-for="(item, index) in allFormList" :key="index">
+          <template v-for="(item, index) in filterFormList" :key="index">
             <div>{{ item.formName }}</div>
             <FormPreview
               v-if="!item.multiple"
@@ -100,7 +100,6 @@
 </template>
 
 <script setup lang="ts">
-import type { TreeProps } from 'ant-design-vue'
 import { queryFormNoPage_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { filterFormByName } from './utils'
@@ -141,32 +140,6 @@ const keywords = ref('')
 const filterFormList = ref([])
 const allFormList = ref([])
 const getFormList = async () => {
-  //   接口返回的数据
-  //   loading.value = true
-  //   const { result } = await queryFormNoPage_api({ paging: false })
-  //   filterFormList.value = result.map((m) => {
-  //     const _fields = m.configuration?.children
-  //     // 已经存在的字段
-  //     const existFields = forms.value[m.id]
-  //     if (existFields && existFields.length) {
-  //       _fields?.forEach((p) => {
-  //         const _currentField = existFields.find((f) => f.id === p.key)
-  //         p['accessModes'] = _currentField ? _currentField.accessModes : []
-  //       })
-  //       return { accessModes: [], ...m }
-  //     } else {
-  //       _fields?.forEach((p) => {
-  //         p['accessModes'] = []
-  //       })
-  //       return { accessModes: [], ...m }
-  //     }
-  //   })
-  //   //   所有表单数据
-  //   allFormList.value = cloneDeep(filterFormList.value)
-
-  //   loading.value = false
-
-  //   console.log('flowStore.model.config.forms: ', flowStore.model.config.forms)
   filterFormList.value = flowStore.model.config.forms?.map((m) => {
     const _fields = m.fullInfo.configuration?.children
     // 已经存在的字段
@@ -217,14 +190,12 @@ const handleFormCheck = (form: any) => {
 /**
  * 字段勾选/取消"写", 自动勾选/取消"读"
  */
-const handleFieldCheck = ({ accessModes }) => {
-  //   console.log('handleFieldCheck: ', accessModes)
-  //   if (accessModes.includes('read')) return
-  //   if (accessModes.includes('write')) {
-  //     accessModes = ['read', 'write']
-  //   } else {
-  //     accessModes = []
-  //   }
+const handleFieldCheck = (field) => {
+  // 字段有写权限, 必有读
+  if (field.accessModes.length === 1 && field.accessModes[0] === 'write') {
+    field.accessModes = ['read', 'write']
+  }
+  field.componentProps.disabled = !field.accessModes.includes('write')
 }
 
 const tableData = ref([{}])
@@ -235,13 +206,13 @@ const getTableColumns = (fields: any[]) => {
     title: m.formItemProps?.label,
     dataIndex: m.formItemProps?.name,
     ellipsis: true,
-    componentType: m.type,
+    ...m,
   }))
 
   _columns?.forEach((item) => {
     tableData.value[0][item.dataIndex] = undefined
   })
-  console.log('tableData.value: ', tableData.value)
+  //   console.log('tableData.value: ', tableData.value)
   return _columns
 }
 
