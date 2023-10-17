@@ -80,11 +80,8 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
     }
   }
 
-  console.log(__disabled, element.type)
 
   const _disabled = element?.componentProps?.disabled || __disabled || !editable || (mode === 'edit' && !element?.componentProps?.editable)
-
-  console.log(_disabled)
   // componentProps
   const _componentProps = {
     ...omit(element?.componentProps, ['description', 'cssCode', 'editable', 'onChange', 'visible', 'source']),

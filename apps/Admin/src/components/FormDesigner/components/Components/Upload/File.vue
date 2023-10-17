@@ -118,7 +118,7 @@ const handleChange = async (info: UploadChangeParam) => {
 }
 
 const handleDrop = (e) => {
-  console.log(e, 'drop')
+  // console.log(e, 'drop')
 }
 
 const onDelete = (file: any) => {

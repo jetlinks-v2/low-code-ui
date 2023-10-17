@@ -1,5 +1,5 @@
 <template>
-  <SourceData :value="target?.children?.[0]?.componentProps?.source" @change="onChange" />
+  <SourceData :key="target.children?.[0]?.key" :value="target?.children?.[0]?.componentProps?.source" @change="onChange" />
 </template>
     
 <script lang="ts" setup>
