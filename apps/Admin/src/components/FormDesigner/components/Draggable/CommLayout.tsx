@@ -18,7 +18,7 @@ export default defineComponent({
             default: () => { }
         },
         parent: {
-            type: Array,
+            type: [Array, Object],
             default: () => []
         },
         path: {
@@ -145,7 +145,7 @@ export default defineComponent({
         return () => {
             return (
                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                    <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true}>
+                    <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true} extra={props.data?.componentProps?.description || ''}>
                         {
                             unref(isEditModel) ? <TypeComponent
                                 model={unref(designer.model)}
@@ -177,7 +177,6 @@ export default defineComponent({
                                 ref={_formRef}
                             ></TypeComponent>
                         }
-                        <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{props.data?.componentProps?.description}</div>
                     </FormItem>
                 </Selection>
             )

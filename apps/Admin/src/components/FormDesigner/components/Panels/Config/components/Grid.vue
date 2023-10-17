@@ -41,7 +41,7 @@
           placeholder="请输入"
           v-model:value="target.componentProps.span"
           @change="onDataChange"
-          :min="0"
+          :min="1"
           :max="99999999999999"
           :precision="0"
           style="width: 100%"
