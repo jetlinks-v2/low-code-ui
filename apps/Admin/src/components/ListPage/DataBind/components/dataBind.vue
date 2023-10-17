@@ -101,7 +101,7 @@
     </div>
     <j-modal v-model:visible="visible" title="提示" :maskClosable="false" @ok="handleOk">
       <p class="text">
-        列表页中引用自当前功能的数据将同步变更
+        标准列表页中引用自当前功能的数据将同步变更
       </p>
     </j-modal>
     <j-modal v-model:visible="changeModalVisible" title="提示" :maskClosable="false" @ok="handleAsync">
