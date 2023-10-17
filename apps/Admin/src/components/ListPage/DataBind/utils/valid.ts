@@ -10,7 +10,7 @@ export const validDataBind = (data: any, functionOptions: any) => {
         key,
         message: '请配置'
       })
-    } else if(!data[key] && isExist?.provider !== providerEnum.Function) {
+    } else if(!data[key]) {
       errorList.push({
         key,
         message: '请配置'
