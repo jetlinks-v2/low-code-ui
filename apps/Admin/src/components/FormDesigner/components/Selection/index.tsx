@@ -210,11 +210,16 @@ const Selection = defineComponent({
       </Dropdown>
     }
 
+    const isInline = computed(() => {
+      return designer.formData?.value?.componentProps?.layout === 'inline'
+    })
+
     const renderSelected = () => {
       return <TagComponent
         data-id={props.data?.key}
         class={[
           'selectElement',
+          unref(isInline) && 'inlineElement',
           unref(isEditModel) && unref(_hasDrag) && 'handle',
           !isField && 'borderless',
           unref(isEditModel) && Selected.value && 'Selected',

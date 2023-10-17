@@ -162,12 +162,11 @@
 </template>
     
 <script lang="ts" setup>
-import { watch, computed, reactive, inject, ref } from 'vue'
+import { watch, computed, reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash-es'
 import { getArray, searchTree } from '@/components/FormDesigner/utils/utils'
 import { queryDictionary, queryEndCommands, queryProject } from '@/api/form'
 
-const designer: any = inject('FormDesigner')
 const projectList = ref<any[]>([])
 const dic = ref<any[]>([])
 const end = ref<any[]>([])
@@ -295,6 +294,7 @@ const getProject = () => {
     if (resp.success) {
       projectList.value = resp.result.map((item) => {
         return {
+          modules: item.modules || [],
           label: item.name,
           value: item.id,
         }
@@ -414,20 +414,30 @@ const onProjectChange = (val: string) => {
     type: 'end',
     projectId: val,
     functionId: undefined,
+    fullId: undefined,
     commandId: undefined,
     source: undefined,
     label: undefined,
     value: undefined,
     isSource: isSource.value,
   }
+  end.value = []
   emits('change', obj)
 }
+
+const _project = computed(() => {
+  return projectList.value.find((item) => {
+    return item?.value === data?.projectId
+  })
+})
 
 const onFunChange = (val: string) => {
   const obj = {
     projectId: data.projectId,
     type: 'end',
     functionId: val,
+    fullId: _project.value?.modules?.[0]?.functions?.find((i) => i.id === val)
+      ?.fullId,
     commandId: undefined,
     source: undefined,
     label: undefined,
@@ -460,15 +470,15 @@ const onDataChange = () => {
 watch(
   () => data?.type,
   (newVal) => {
-    if(newVal === 'dic'){
+    if (newVal === 'dic') {
       getDictionary()
     } else {
       getProject()
     }
   },
   {
-    immediate: true
-  }
+    immediate: true,
+  },
 )
 
 watch(
@@ -483,7 +493,7 @@ watch(
       data.type = 'dic'
     } else {
       Object.assign(data, cloneDeep(obj))
-      if(data?.projectId && !end.value?.length){
+      if (data?.projectId && !end.value?.length) {
         getEnd(data.projectId)
       }
     }

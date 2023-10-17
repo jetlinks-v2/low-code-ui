@@ -97,7 +97,7 @@ export const layout: ISchema[] = [
         type: 'card',
         name: '卡片',
         componentProps: {
-            title: '卡片',
+            title: 'Title',
             extra: ''
         },
         formItemProps: {

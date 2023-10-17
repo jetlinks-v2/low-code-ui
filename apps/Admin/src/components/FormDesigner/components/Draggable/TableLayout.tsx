@@ -42,7 +42,6 @@ export default defineComponent({
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
-        const product = useProduct()
 
         const { isEditModel, isDragArea, layoutPadStyle } = useTool()
 
@@ -147,7 +146,7 @@ export default defineComponent({
             const treeData = ref<any[]>(_props.componentProps.treeData)
 
             if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(__data?.type)) {
-                queryOptions(__data.componentProps.source, product.info?.id).then(resp => {
+                queryOptions(__data.componentProps.source).then(resp => {
                     if (['select', 'select-card'].includes(__data?.type)) {
                         options.value = resp
                     } else {

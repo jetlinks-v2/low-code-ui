@@ -69,7 +69,7 @@ const Canvas = defineComponent({
 
     // 删除
     watch(
-      () => [keys?.['Backspace'].value, keys?.['Delete'].value],
+      () => [keys?.['Backspace']?.value, keys?.['Delete']?.value],
       ([v1, v2]) => {
         designer._other.value = v1 || v2
         if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
@@ -144,7 +144,8 @@ const Canvas = defineComponent({
             }
           }}
           style={{
-            height: "100%"
+            height: "100%",
+            width: "100%"
           }}
         >
           {Layout}

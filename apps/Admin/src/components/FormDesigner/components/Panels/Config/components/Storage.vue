@@ -12,6 +12,21 @@
           <j-form ref="formRef" :model="config" layout="vertical">
             <j-form-item
               :validateFirst="true"
+              :name="['config', 'projectId']"
+              :rules="rulesProject"
+            >
+              <j-select
+                v-model:value="config.config.projectId"
+                placeholder="请选择"
+                :options="projectList"
+                allowClear
+                showSearch
+                @change="onProjectChange"
+              >
+              </j-select>
+            </j-form-item>
+            <j-form-item
+              :validateFirst="true"
               :name="['config', 'functionId']"
               :rules="[
                 {
@@ -101,9 +116,7 @@
               <span @click.stop="onConfig(item)" v-else>配置</span>
             </template>
           </div>
-          <div class="error" v-if="error.includes(item)">
-            请配置存储位置
-          </div>
+          <div class="error" v-if="error.includes(item)">请配置存储位置</div>
         </div>
       </div>
       <template #footer>
@@ -117,12 +130,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, inject, computed, unref, watch } from 'vue'
+import { ref, computed, unref, watch } from 'vue'
 import { map } from 'lodash-es'
 import { onlyMessage } from '@jetlinks/utils'
 import { product, role, org, device, user } from './index'
-
-const designer: any = inject('FormDesigner')
+import { queryEndCommands, queryProject } from '@/api/form'
 
 const _key = 'id'
 const props = defineProps({
@@ -168,10 +180,29 @@ const list = computed(() => {
 })
 
 const dataList = ref<any[]>([...list.value])
+const projectList = ref<any[]>([])
+const end = ref<any[]>([])
+
+const rulesProject = [
+  {
+    required: true,
+    message: '请选择',
+  },
+  {
+    validator(_rule: any, value: string) {
+      const item = projectList.value?.find((i) => i?.value === value)
+      if (!item) {
+        return Promise.reject(`数据已被删除`)
+      }
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
 
 const functionList = computed(() => {
   return (
-    (designer.source?.end || []).map((item) => {
+    (end.value || []).map((item) => {
       return {
         label: item.name + '.' + item.id,
         value: item.id,
@@ -182,7 +213,7 @@ const functionList = computed(() => {
 
 const commandList = computed(() => {
   return (
-    (designer.source?.end || [])
+    (end.value || [])
       .find((item) => config.value?.config?.functionId === item.id)
       ?.command?.map((i) => {
         return {
@@ -239,6 +270,9 @@ const onClick = (_val: any) => {
 const onConfig = (_val: string) => {
   config.value = _value.value?.find((item) => item?.key === _val)
   configVisible.value = true
+  if (!projectList.value?.length) {
+    getProject()
+  }
 }
 
 const handleOk = async () => {
@@ -283,7 +317,23 @@ const onFunChange = (val: string | undefined) => {
   config.value = {
     ...config.value,
     config: {
+      ...config.value.config,
       functionId: val,
+      commandId: undefined,
+      source: undefined,
+    },
+  }
+}
+
+const onProjectChange = (val: string | undefined) => {
+  if(val){
+    getEnd(val)
+  }
+  config.value = {
+    ...config.value,
+    config: {
+      projectId: val,
+      functionId: undefined,
       commandId: undefined,
       source: undefined,
     },
@@ -309,6 +359,28 @@ const onSearch = (searchValue: string) => {
   } else {
     dataList.value = list.value
   }
+}
+
+const getProject = () => {
+  queryProject().then((resp) => {
+    if (resp.success) {
+      projectList.value = resp.result.map((item) => {
+        return {
+          modules: item.modules || [],
+          label: item.name,
+          value: item.id,
+        }
+      })
+    }
+  })
+}
+
+const getEnd = (id: string) => {
+  queryEndCommands(id, ['rdb-crud']).then((resp) => {
+    if (resp.success) {
+      end.value = resp.result || []
+    }
+  })
 }
 
 watch(
