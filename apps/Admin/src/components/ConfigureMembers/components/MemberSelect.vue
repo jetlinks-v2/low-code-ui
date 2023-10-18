@@ -1,123 +1,157 @@
 <template>
   <div>
-    <div>
-      <PermissionButton type="link" @click="emits('back')">
+    <div v-show="infoState.isNode">
+      <PermissionButton type="text" @click="emits('back')">
         <AIcon type="LeftOutlined" /> 返回
       </PermissionButton>
     </div>
     <div class="content">
-      <j-row>
-        <j-col span="4" v-if="infoState.isNode">
-          <div class="content-left">
-            <!-- <j-space direction="vertical"> -->
-            <div
-              class="left-item"
-              :class="{ active: active === item.key }"
-              v-for="item of leftList"
-              :key="item.key"
-              @click="itemClick(item.key)"
-            >
-              <div class="left-item-title">
-                {{ item.title }}
+      <div class="content-left" v-if="infoState.isNode">
+        <j-radio-group
+          v-model:value="active"
+          button-style="solid"
+          class="radio"
+          @change="itemClick"
+        >
+          <j-radio-button
+            v-for="item in leftData[type]"
+            :value="item.key"
+            :key="item.key"
+            :class="{ selected: active === item.key }"
+          >
+            <j-space>
+              <div class="icon">
+                <AIcon type="CheckSquareFilled" style="font-size: 40px"></AIcon>
               </div>
-              <span>
-                {{ item.description }}
-              </span>
-            </div>
-            <!-- </j-space> -->
+              <div class="text">
+                <div class="left-item-title">
+                  {{ item.title }}
+                </div>
+                <span class="description">
+                  <j-ellipsis line-clamp="3">{{ item.description }}</j-ellipsis>
+                </span>
+              </div>
+            </j-space>
+          </j-radio-button>
+        </j-radio-group>
+      </div>
+      <div class="content-center">
+        <div class="center-tree" v-if="active !== 'relation'">
+          <!-- 搜索 -->
+          <j-input-search
+            style="margin-bottom: 8px"
+            v-model:value="searchText"
+            placeholder="请输入"
+            v-show="showSearch && active === type"
+            @search="onSearch"
+          />
+          <j-tree
+            multiple
+            block-node
+            :tree-data="treeDataCom"
+            :selectedKeys="selectedKeys"
+            :fieldNames="{
+              children: 'children',
+              title: 'name',
+              key: 'id',
+            }"
+            :height="showSearch && active === type ? 294 : 333"
+            @select="onSelect"
+          >
+            <template #title="data">
+              <j-ellipsis>
+                <span>
+                  {{ data.name }}
+                </span>
+              </j-ellipsis>
+            </template>
+          </j-tree>
+          <j-empty v-if="treeDataCom.length < 1" />
+        </div>
+        <!-- 主体的关系 -->
+        <Relational
+          v-else
+          :type="type"
+          :dataSource="dataSource"
+          :treeData="relData"
+          @rel-submit="relSubmit"
+        />
+      </div>
+      <div class="content-right">
+        <div class="right-top">
+          <div class="selected">
+            已选择<span class="num">{{ dataSource.length }}</span
+            >项
           </div>
-        </j-col>
-        <j-col span="10">
-          <div class="content-center">
-            <div class="center-tree" v-if="active !== 'relation'">
-              <!-- <div v-if="active === 'relation'">主体</div> -->
-              <!-- 搜索 -->
-              <j-input
-                v-model:value="searchText"
-                placeholder="请输入"
-                v-show="showSearch && active === type"
+          <PermissionButton
+            type="primary"
+            size="small"
+            :popConfirm="{
+              title: `确认清空？`,
+              onConfirm: () => clear(),
+            }"
+          >
+            清空
+          </PermissionButton>
+        </div>
+        <j-table
+          size="small"
+          model="TABLE"
+          :columns="columns"
+          :dataSource="dataSource"
+          :pagination="{
+            defaultPageSize: 10,
+          }"
+          :scroll="{ y: 230 }"
+          class="table-row"
+        >
+          <template #bodyCell="{ column, text, record }">
+            <template v-if="column.key === 'name'">
+              <!-- <j-ellipsis style="width: 40px;">
+                {{ text }}
+              </j-ellipsis> -->
+              <div class="name">
+                <div
+                  v-if="infoState.isNode"
+                  class="type"
+                  :style="{
+                    background: dimensionsColor[record.groupField],
+                  }"
+                ></div>
+                <div class="name-text">
+                  {{ text }}
+                </div>
+              </div>
+            </template>
+            <template v-if="column.key === 'weight'">
+              <j-input-number
+                :min="1"
+                :max="99"
+                :precision="0"
+                :controls="false"
+                v-model:value="record[column.dataIndex]"
+                style="margin: -5px 0"
               />
-              <j-tree
-                multiple
-                block-node
-                :tree-data="treeDataCom"
-                :selectedKeys="selectedKeys"
-                :fieldNames="{ children: 'children', title: 'name', key: 'id' }"
-                :height="368"
-                @select="onSelect"
-              >
-                <template #title="data">
-                  <j-ellipsis>
-                    <span>
-                      {{ data.name }}
-                    </span>
-                  </j-ellipsis>
-                </template>
-              </j-tree>
-              <j-empty v-if="treeDataCom.length < 1" />
-            </div>
-            <!-- 主体的关系 -->
-            <Relational
-              v-else
-              :type="type"
-              :dataSource="dataSource"
-              :treeData="relData"
-              @rel-submit="relSubmit"
-            />
-          </div>
-        </j-col>
-        <j-col span="10">
-          <div class="content-right">
-            <div class="right-top">
-              <div class="selected">已选择：{{ dataSource.length }}</div>
+              <!-- :bordered="bordered"
+                @focus="bordered=true"
+                @blur="bordered=false" -->
+            </template>
+            <template v-if="column.key === 'action'">
               <PermissionButton
-                type="primary"
+                size="small"
+                type="link"
+                danger
                 :popConfirm="{
-                  title: `确认清空？`,
-                  onConfirm: () => clear(),
+                  title: `确认删除？`,
+                  onConfirm: () => handleDel(record.id),
                 }"
               >
-                清空
+                <AIcon type="DeleteOutlined" />
               </PermissionButton>
-            </div>
-            <j-table
-              size="small"
-              model="TABLE"
-              :columns="columns"
-              :dataSource="dataSource"
-              :pagination="{
-                defaultPageSize: 10,
-              }"
-              childrenColumnName="no_children"
-            >
-              <template #bodyCell="{ column, text, record }">
-                <template v-if="column.key === 'weight'">
-                  <j-input-number
-                    :min="1"
-                    :max="99"
-                    :precision="0"
-                    :controls="false"
-                    v-model:value="record[column.dataIndex]"
-                    style="margin: -5px 0"
-                  />
-                </template>
-                <template v-if="column.key === 'action'">
-                  <PermissionButton
-                    size="small"
-                    type="link"
-                    :popConfirm="{
-                      title: `确认删除？`,
-                      onConfirm: () => handleDel(record.id),
-                    }"
-                  >
-                    删除
-                  </PermissionButton>
-                </template>
-              </template>
-            </j-table>
-          </div>
-        </j-col>
-      </j-row>
+            </template>
+          </template>
+        </j-table>
+      </div>
     </div>
   </div>
 </template>
@@ -149,13 +183,15 @@ const emits = defineEmits<{
   (e: 'back'): void
 }>()
 
+// const bordered = ref(false)
 const route = useRoute()
 const infoState: any = inject('infoState')
 // 筛选关键字
 const searchText = ref<string>('')
-const active = ref<string>()
+const active = ref<string>('')
 // 树数据
 const treeData = ref<any[]>([])
+// const filterData = ref<any[]>([])
 // 选中的树节点
 const selectedKeys = ref<string[]>([])
 // 表格数据
@@ -172,16 +208,25 @@ const columns = computed(() => {
     : _columns.filter((item) => item.key !== 'weight')
 })
 
-const leftList = computed(() => {
-  active.value = props.type
-  return leftData[props.type]
-})
+const dimensionsColor = {
+  org: '#315efb',
+  user: '#315efb',
+  role: '#315efb',
+  var: '#f8c051',
+  relation: '#ba97fa',
+}
 
 const treeDataCom = computed(() => {
   return searchText.value
     ? treeFilter(treeData.value, searchText.value, 'name')
     : treeData.value
 })
+
+const onSearch = (value: string) => {
+  //   filterData.value = value
+  //     ? treeFilter(treeData.value, value, 'name')
+  //     : treeData.value
+}
 
 onMounted(() => {
   if (infoState.supCancel) {
@@ -223,7 +268,7 @@ const hasRelation = (data: any) => {
     tree.forEach((item, index) => {
       if (item.children) {
         delTree(item.children)
-      } else if (!item.others.relation) {
+      } else if (!item.others?.relation) {
         tree.splice(index, 1)
       }
     })
@@ -236,12 +281,11 @@ const hasRelation = (data: any) => {
  * 固定数据/变量/关系选择
  * @param key
  */
-const itemClick = (key: string) => {
-  active.value = key
+const itemClick = (e: Event) => {
   treeData.value =
-    key === 'var'
+    active.value === 'var'
       ? varData.value
-      : key === 'relation'
+      : active.value === 'relation'
       ? relData.value
       : fixedData.value
 }
@@ -282,6 +326,7 @@ const onSelect = (keys: string[], { node, selected }) => {
       name: active.value === 'var' ? node.fullName : node.name,
       weight: infoState.hasWeight ? 1 : undefined,
       type: props.type,
+      // groupField: infoState.isNode ? active.value: undefined,
       groupField: active.value,
       others:
         active.value === 'var'
@@ -304,7 +349,6 @@ const relSubmit = (subject: any, data: any) => {
     weight: infoState.hasWeight ? 1 : undefined,
     type: props.type,
     groupField: active.value,
-
     others: {
       objectSource: {
         source: 'upper',
@@ -345,6 +389,7 @@ const apiType = {
   role: getRoleList_api,
 }
 const getTreeData = () => {
+  if (!props.type) return
   apiType[props.type](props.type === 'user' ? { paging: false } : {}).then(
     (res) => {
       fixedData.value = props.type === 'user' ? res.result.data : res.result
@@ -352,7 +397,14 @@ const getTreeData = () => {
     },
   )
 }
-getTreeData()
+watch(
+  () => props.type,
+  () => {
+    active.value = props.type
+    getTreeData()
+  },
+  { immediate: true },
+)
 
 watch(
   () => [props.type, infoState.members],
@@ -371,40 +423,81 @@ defineExpose({
 </script>
 <style scoped lang="less">
 .content {
-  min-height: 400px;
+  display: inline-flex;
+  height: 100%;
+
   .content-left {
+    // width: 35%;
+    // width: 248px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    min-height: 400px;
-
-    height: 100%;
     padding: 0 10px;
-    border-right: 1px solid #7cb305;
-    .left-item {
-      height: 100%;
-      padding: 10px;
-      background-color: #f0f2f5;
-    }
-
-    .active {
-      background-color: #e2c2ff;
+    .radio {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 248px;
+      .ant-radio-button-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 117px;
+        border: none;
+        border-radius: 2px;
+        cursor: pointer;
+        background-color: #e9ecf1;
+        &.selected {
+          border: none;
+          background: v-bind('dimensionsColor[active]');
+          .text {
+            .left-item-title,
+            .description {
+              color: #fff;
+            }
+          }
+        }
+        &::before {
+          content: none;
+        }
+        .text {
+          .left-item-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333333;
+          }
+          .description {
+            font-size: 14px;
+            color: #666666;
+          }
+        }
+      }
     }
   }
 
   .content-center {
-    height: 100%;
-
+    width: 60%;
+    min-width: 200px;
     .center-tree {
-      padding: 0 10px;
-      flex: 1;
+      border: 1px solid #e0e0e0;
+      padding: 16px 27px 16px 13px;
+      height: 100%;
+      :deep(.ant-tree) {
+        .ant-tree-title {
+          // height: 32px;
+          line-height: 32px;
+          &:hover {
+            color: #315efb;
+          }
+        }
+      }
     }
   }
 
   .content-right {
-    height: 100%;
-    padding: 0 10px;
-
+    border: 1px solid #e0e0e0;
+    border-left: none;
+    width: 40%;
     .right-top {
       display: inline-flex;
       justify-content: space-between;
@@ -412,12 +505,36 @@ defineExpose({
       align-items: center;
       width: 100%;
       height: 32px;
+      padding: 0 12px;
       margin-bottom: 10px;
-
+      background-color: #f2f2f2;
       .selected {
-        line-height: 32px;
-        flex: 1;
-        background-color: #f2f2f2;
+        .num {
+          color: #315efb;
+        }
+      }
+    }
+    .table-row {
+      padding: 0 10px;
+      :deep(.ant-table-thead > tr > th) {
+        background-color: #e9ecf1;
+      }
+      :deep(.name) {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        max-width: 100%;
+        .name-text {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
+
+      :deep(.type) {
+        width: 4px;
+        height: 16px;
+        border-radius: 1px;
       }
     }
   }

@@ -1,36 +1,60 @@
 <template>
-  <div>
-    <j-button type="primary" @click="dialog.visible = true">选择成员</j-button>
-    <!-- 列表 -->
-    <ul>
-      <li v-for="item in list" :key="item.id">
-        {{ item.name }}
-      </li>
-    </ul>
-    <Dialog
-      v-if="dialog.visible"
-      v-model:visible="dialog.visible"
-      @get-data="getData"
-    />
+  <div class="member">
+    <a-form-item-rest>
+      <j-button class="btn" @click="dialog.visible = true">
+        <span>选择成员</span>
+        <span class="icon"  v-show="list.length > 0">
+          <img :src="getImage('/check.png')" />
+        </span>
+      </j-button>
+      <!-- 列表 -->
+      <j-scrollbar max-height="172px">
+        <j-list
+          v-show="list.length > 0"
+          :grid="{ gutter: 8, column: column }"
+          :data-source="list"
+          size="small"
+          :split="false"
+        >
+          <template #renderItem="{ item }">
+            <j-list-item>
+              <j-ellipsis line-clamp="1">
+                <AIcon type="CheckSquareFilled" style="font-size: 14px"></AIcon>
+                {{ item.name }}
+              </j-ellipsis>
+            </j-list-item>
+          </template>
+        </j-list>
+      </j-scrollbar>
+      <Dialog
+        v-if="dialog.visible"
+        v-model:visible="dialog.visible"
+        :isNode="isNode"
+        @get-data="getData"
+      />
+    </a-form-item-rest>
   </div>
 </template>
 <script setup lang="ts">
 import Dialog from './Dialog/index.vue'
 import { DataSourceProps } from './types'
 import { isArray, isObject, pick } from 'lodash-es'
+import { getImage } from '@jetlinks/utils'
 
 const props = withDefaults(
   defineProps<{
     isNode?: boolean
     hasWeight?: boolean
-    members: DataSourceProps[] | DataSourceProps
+    members: DataSourceProps[] | DataSourceProps | undefined
     nodeId?: string // 节点id
     supCancel?: boolean // 是否支持取消选中
+    column?: number
   }>(),
   {
     isNode: true,
     hasWeight: true,
-    supCancel: true
+    supCancel: true,
+    column: 3,
   },
 )
 
@@ -46,8 +70,7 @@ const list = ref<DataSourceProps[]>([])
 const getData = (data: DataSourceProps[], type: string) => {
   // 暂存其他维度数据
   const newList = list.value.filter((item) => item.type != type)
-  // 数组去重
-  list.value = [...new Set([...data, ...newList])]
+  list.value = [...data, ...newList]
   props.isNode
     ? emits('update:members', groupedData(list.value, 'groupField'))
     : emits('update:members', list.value)
@@ -102,4 +125,33 @@ watch(
   { immediate: true },
 )
 </script>
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.member {
+  width: 100%;
+  .btn {
+    width: 100%;
+    position: relative;
+    // width: 496px;
+    margin-bottom: 8px;
+  }
+  .icon {
+    position: absolute;
+    top: -4px;
+    right: 0;
+    > img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  :deep(.ant-list) {
+    overflow: hidden;
+    .ant-list-item {
+      height: 40px;
+      line-height: 40px;
+      border-radius: 4px;
+      background: #f6f7f9;
+    }
+  }
+}
+</style>
