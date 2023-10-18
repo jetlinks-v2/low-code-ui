@@ -14,6 +14,7 @@ import iconKeys from './fields';
 const emits = defineEmits(['confirm', 'update:visible']);
 const props = defineProps<{
     visible: boolean;
+    selected:string
 }>();
 
 const confirm = () => {
@@ -21,7 +22,7 @@ const confirm = () => {
     emits('update:visible', false);
 };
 
-const selected = ref<string>('');
+const selected = ref<string>(props.selected);
 </script>
 
 <style lang="less" scoped>
@@ -29,7 +30,7 @@ const selected = ref<string>('');
     display: grid;
     grid-gap: 18px;
     grid-template-columns: repeat(6, 1fr);
-    max-height: 500px;
+    max-height: 300px;
     overflow-y: auto;
 
     .ant-radio-button-wrapper {

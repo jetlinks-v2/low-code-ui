@@ -11,7 +11,7 @@
       :visible="_visible"
       :title="type == 'columns' ? '操作列配置' : '添加按钮配置'"
       :getContainer="() => $refs.operationDrawer"
-      :wrap-style="{ position: 'absolute', zIndex: 1 }"
+      :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
       @close="close"
 
     >
@@ -51,6 +51,9 @@ import {
 import { validOperationsBtn } from './index'
 import { PropType } from 'vue'
 import { getImage } from '@jetlinks/utils';
+import { useFunctions } from '@/hooks'
+import { useProduct } from '@/store'
+import { providerEnum } from '@/components/ProJect'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -73,6 +76,8 @@ const props = defineProps({
   }
 })
 
+const { functionOptions } = useFunctions()
+const productStore = useProduct()
 const columnsTree = computed({
   get() {
     return props.columnsTree
@@ -111,7 +116,10 @@ const save = async () => {
 }
 
 const valid = () => {
-  errorList.value = validOperationsBtn(columnsTree.value)
+  const pages = [...productStore.getDataMap().values()].filter((item) => {
+    return [providerEnum.FormPage, providerEnum.HtmlPage].includes(item.type)
+  })
+  errorList.value = validOperationsBtn(columnsTree.value, functionOptions.value, pages)
   return errorList.value.length ? [{message: props.type === 'columns' ? '操作列配置错误': '操作按钮配置错误'}] : []
   // return new Promise((resolve, reject) => {
   //   errorList.value = validOperationsBtn(columnsTree.value)

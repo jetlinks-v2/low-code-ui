@@ -9,12 +9,12 @@
       @change="providerChange"
     />
   </j-form-item>
-  <j-form-item v-if="model.validator.provider" label="校验生效" :name="['validator', 'configuration', 'group']">
+  <j-form-item v-if="model.validator.provider" label="校验生效" :name="['validator', 'configuration', 'group']" :rules="[{ required: true, message: '请选择校验生效'}]">
     <j-card-select
       :options="[
         {
           label: '新增/保存',
-          value: 'add'
+          value: 'insert'
         },
         {
           label: '修改',
@@ -24,6 +24,7 @@
       :column="2"
       :showImage="false"
       :multiple="true"
+      @change="groupChange"
       v-model:value="model.validator.configuration.group"
     />
   </j-form-item>
@@ -51,7 +52,8 @@
     v-if="model.validator.provider === 'max'"
     label="最大值"
     :name="['validator', 'configuration', 'value']"
-    :rules="model.javaType === 'Int' ? [intMax] : undefined"
+    :validateFirst="true"
+    :rules="model.javaType === 'Integer' ? [intMax, { required: true, message: '请输入最大值'}] : [{ required: true, message: '请输入最大值'}]"
   >
     <j-input-number v-model:value="model.validator.configuration.value" :stringMode="openStringMode" :precision="precision" style="width: 100%;" />
   </j-form-item>
@@ -59,7 +61,8 @@
     v-if="model.validator.provider === 'min'"
     label="最小值"
     :name="['validator', 'configuration', 'value']"
-    :rules="model.javaType === 'Int' ? [intMin] : undefined"
+    :validateFirst="true"
+    :rules="model.javaType === 'Integer' ? [intMin, { required: true, message: '请输入最小值'}] : [{ required: true, message: '请输入最小值'}]"
   >
     <j-input-number v-model:value="model.validator.configuration.value" :stringMode="openStringMode" :precision="precision" style="width: 100%;" />
   </j-form-item>
@@ -80,7 +83,7 @@ const formRef = inject(SETTING_FORM_REF)
 const rulesOptions = [
   {
     label: '非空',
-    value: 'noEmpty'
+    value: 'notEmpty'
   },
   {
     label: '范围',
@@ -97,12 +100,26 @@ const rulesOptions = [
 ]
 
 const precision = computed(() => {
-  return model.value.javaType === 'Int' ? 0 : undefined
+  return model.value.javaType === 'Integer' ? 0 : undefined
 })
 
 const openStringMode = computed(() => {
   return ['Float','Double'].includes(model.value.javaType)
 })
+
+const groupChange = (v) => {
+  const groupSet = new Set(v)
+  if (groupSet.has('insert')) {
+    groupSet.add('save')
+  } else {
+    groupSet.delete('save')
+  }
+  model.value.validator.configuration.group = [...groupSet.values()]
+}
+
+const InterMinMax = (value) => {
+  return value > 2147483647 || value < -2147483648
+}
 
 const InterValidatorFn = (value) => {
   if (value > 2147483647) {
@@ -115,7 +132,7 @@ const InterValidatorFn = (value) => {
 
 const intMax = {
   validator(_, value) {
-    if (model.value.javaType === 'Int') {
+    if (model.value.javaType === 'Integer') {
       return InterValidatorFn(value)
     }
     return Promise.resolve()
@@ -124,7 +141,7 @@ const intMax = {
 
 const intMin = {
   validator(_, value) {
-    if (model.value.javaType === 'Int') {
+    if (model.value.javaType === 'Integer') {
       return InterValidatorFn(value)
     }
     return Promise.resolve()
@@ -136,6 +153,7 @@ const rules = {
     { max: model.value.length, message: `请输入长度在${model.value.length}以内的字符`}
   ],
   message: [
+    { required: true, message: '请输入校验不通过时提示语' },
     { max: 64, message: '最多输入64位字符'}
   ],
   min: [
@@ -144,11 +162,11 @@ const rules = {
         if (!value) {
           return Promise.reject('请输入最小值')
         }
-        if (model.value.javaType === 'Int') {
+        if (model.value.javaType === 'Integer' && InterMinMax(value)) {
           return InterValidatorFn(value)
         }
-        if (value > model.value.validator.configuration.max) {
-          return Promise.reject('最小值不能大于最大值')
+        if (value && model.value.validator.configuration.max && (BigInt(value) >= BigInt(model.value.validator.configuration.max))) {
+          return Promise.reject('最小值不能大于等于最大值')
         }
         return Promise.resolve()
       }
@@ -163,7 +181,7 @@ const rules = {
 
         formRef.value.validateFields([['validator', 'configuration', 'min']])
 
-        if (model.value.javaType === 'Int') {
+        if (model.value.javaType === 'Integer') {
           return InterValidatorFn(value)
         }
         return Promise.resolve()
@@ -175,7 +193,7 @@ const rules = {
 const providerChange = (key) => {
   const configuration = model.value.validator.configuration
   switch (key) {
-    case 'noEmpty':
+    case 'notEmpty':
       model.value.validator.configuration = {
         message: configuration.message,
         group: configuration.group
@@ -191,7 +209,7 @@ const providerChange = (key) => {
       }
       break;
     case 'max':
-    case 'main':
+    case 'min':
       model.value.validator.configuration = {
         message: configuration.message,
         group: configuration.group,
@@ -205,7 +223,7 @@ const providerChange = (key) => {
         min: undefined,
         max: undefined,
         message: '数据格式错误',
-        group: undefined,
+        group: ['save', 'update', 'insert'],
         classType: model.value.javaType
       }
       break

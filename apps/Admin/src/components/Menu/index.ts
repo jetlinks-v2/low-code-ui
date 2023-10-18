@@ -58,6 +58,23 @@ export const handleTreeModal = (data, record) => {
   if (isIdInTree(arr, record.id)) {
     return arr
   } else {
-    return [...arr, record]
+    return [ record,...arr]
   }
+}
+
+//sortIndex
+export const handleSort = (tree,parentId=null) => {
+  return tree.map((item, index) => {
+    if (item) {
+      return {
+        ...item,
+        sortIndex: index,
+        parentId:parentId?parentId:undefined,
+      }
+    }
+    if (item.children) {
+      item.children = handleSort(item.children,item.id)
+    }
+    return item
+  })
 }

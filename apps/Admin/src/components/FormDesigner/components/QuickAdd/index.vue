@@ -11,44 +11,82 @@
       <p>自由组合快速添加表单页内容</p>
       <div class="content">
         <j-form :layout="'vertical'" ref="formRef" :model="modelRef">
-          <j-form-item label="后端功能">
-            <j-row :gutter="24">
-              <j-col :span="12">
-                <j-select
+          <j-row :gutter="24">
+            <j-col :span="12">
+              <j-form-item label="后端功能" :name="['source', 'functionId']">
+                <a-select
                   showSearch
                   placeholder="请选择"
-                  :options="functionList"
                   v-model:value="modelRef.source.functionId"
                   @change="onFunChange"
                   allowClear
-                />
-              </j-col>
-              <j-col :span="12">
+                >
+                  <a-select-option
+                    :key="item.value"
+                    v-for="item in functionList"
+                    :value="item.value"
+                  >
+                    <span>
+                      <img
+                        :src="typeImages[item.type]"
+                        style="width: 20px; height: 20px; margin-right: 5px"
+                      />
+                      {{ item.label }}
+                    </span>
+                  </a-select-option>
+                </a-select>
+              </j-form-item>
+            </j-col>
+            <j-col :span="12">
+              <j-form-item
+                :rules="[
+                  {
+                    required: modelRef.source.functionId,
+                    message: '请选择',
+                  },
+                ]"
+                :name="['source', 'commandId']"
+                style="padding-top: 28px"
+              >
                 <j-select
                   showSearch
                   placeholder="请选择"
                   v-model:value="modelRef.source.commandId"
-                  :options="commandList"
+                  :options="commandOptions"
                   @change="onCommChange"
                   allowClear
                 />
-              </j-col>
-            </j-row>
-          </j-form-item>
-          <j-form-item name="sourceData">
+              </j-form-item>
+            </j-col>
+          </j-row>
+          <j-form-item :name="['source', 'inputs']" label="输入">
             <j-tree-select
               showSearch
               placeholder="请选择"
-              v-model:value="modelRef.source.sourceData"
-              :treeData="sourceList"
+              v-model:value="modelRef.source.inputs"
+              :treeData="inputsList"
               multiple
               allowClear
-              :treeDefaultExpandedKeys="['output', 'inputs']"
+              :treeCheckStrictly="false"
+            />
+          </j-form-item>
+          <j-form-item :name="['source', 'output']" label="输出">
+            <j-tree-select
+              showSearch
+              placeholder="请选择"
+              v-model:value="modelRef.source.output"
+              :treeData="outputList"
+              multiple
+              allowClear
               :treeCheckStrictly="false"
             />
           </j-form-item>
           <j-form-item name="json" label="复制json">
-            <Editor language="json" v-model:value="modelRef.json" />
+            <Editor
+              :height="300"
+              language="json"
+              v-model:value="modelRef.json"
+            />
           </j-form-item>
           <j-form-item label="复制表单" placeholder="请选择" name="formCopy">
             <j-select
@@ -89,6 +127,8 @@ import { onlyMessage } from '@jetlinks/utils'
 import { providerEnum } from '@/components/ProJect'
 import generatorData from '../../utils/generatorData'
 import { map, uniqBy } from 'lodash-es'
+import { uid } from '../../utils/uid'
+import { typeImages } from '@/components/ProJect/index'
 
 const product = useProduct()
 const designer: any = inject('FormDesigner')
@@ -114,7 +154,8 @@ const modelRef = reactive({
   source: {
     functionId: undefined,
     commandId: undefined,
-    sourceData: undefined,
+    inputs: undefined,
+    output: undefined,
   },
 })
 
@@ -124,7 +165,13 @@ const getEnd = () => {
   const id = product.info?.draftId
   queryEndCommands(id, []).then((resp) => {
     if (resp.success) {
-      end.value = resp.result || []
+      const _map = product.getDataMap()
+      end.value = (resp.result || []).map((item) => {
+        return {
+          ...item,
+          type: _map.get(item.id)?.type,
+        }
+      })
     }
   })
 }
@@ -133,6 +180,7 @@ const functionList = computed(() => {
   return (
     end.value.map((item) => {
       return {
+        ...item,
         label: item.name + '.' + item.id,
         value: item.id,
       }
@@ -144,7 +192,7 @@ const commandList = computed(() => {
   return (
     end.value
       .find((item) => modelRef.source?.functionId === item.id)
-      ?.command.map((i) => {
+      ?.command?.map((i) => {
         return {
           ...i,
           label: i.name,
@@ -154,76 +202,60 @@ const commandList = computed(() => {
   )
 })
 
-const getArray = (arr: any[], parentId: string) => {
+const commandOptions = computed(() => {
+  return (
+    commandList.value.map((i) => {
+      return {
+        label: i.name,
+        value: i.id,
+      }
+    }) || []
+  )
+})
+
+const getArray = (arr: any[], _disabled: any[]) => {
   return (arr || []).map((i) => {
     let children: any[] = []
     if (i.valueType.type === 'array') {
-      children = getArray(i.valueType?.elementType?.properties || [], i.id)
+      children = getArray(i.valueType?.elementType?.properties || [], _disabled)
     }
     if (i.valueType.type === 'object') {
-      children = getArray(i.valueType?.properties || [], i.id)
+      children = getArray(i.valueType?.properties || [], _disabled)
     }
     return {
       ...i,
-      parentId,
+      value: i.id,
       label: `${i.id}${i?.name ? '(' + i?.name + ')' : ''}`,
-      value: `${i.id}_${parentId}`,
+      disabled: _disabled.includes(i.id),
       children,
     }
   })
 }
 
-const sourceList = computed(() => {
+const inputsList = computed(() => {
   const _item = commandList.value.find(
     (item) => item.id === modelRef?.source?.commandId,
   )
-  const arr: any[] = []
-  if (_item?.inputs) {
-    arr.push({
-      label: '输入',
-      value: 'inputs',
-      disabled: true,
-      children: getArray(_item?.inputs || [], 'inputs'),
-    })
-  }
-  if (_item?.output && _item?.output?.properties?.length) {
-    arr.push({
-      label: '输出',
-      value: 'output',
-      disabled: true,
-      children: getArray(_item?.output?.properties || [], 'output'),
-    })
-  }
-  return arr
+  return getArray(_item?.inputs || [], modelRef.source.output || [])
+})
+
+const outputList = computed(() => {
+  const _item = commandList.value.find(
+    (item) => item.id === modelRef?.source?.commandId,
+  )
+  return getArray(_item?.output?.properties || [], modelRef.source.inputs || [])
 })
 
 const onFunChange = () => {
   modelRef.source.commandId = undefined
-  modelRef.source.sourceData = undefined
+  modelRef.source.inputs = undefined
+  modelRef.source.output = undefined
 }
 
 const onCommChange = () => {
-  modelRef.source.sourceData = undefined
+  modelRef.source.inputs = undefined
+  modelRef.source.output = undefined
 }
-
-watch(
-  () => visible.value,
-  () => {
-    if (visible.value) {
-      modelRef.json = undefined
-      modelRef.formCopy = []
-      modelRef.source = {
-        functionId: undefined,
-        commandId: undefined,
-        sourceData: undefined,
-      }
-      getEnd()
-    }
-  },
-  {
-    immediate: true,
-  },
-)
 
 const formDataOptions = computed(() => {
   const arr = product.getDataMapByType(providerEnum.FormPage)
@@ -256,30 +288,21 @@ const findItem = (arr: any[], value: string) => {
   }
 }
 
-const generatorSource = (_item: any) => {
+const generatorTableSource = (_item: any) => {
   const _type = _item.valueType.type || 'string'
   let type: string = 'input'
   switch (_type) {
-    case 'enum':
-      type = 'select'
-      break
-    case 'file':
-      type = 'file'
-      break
-    case 'date':
-      type = 'date-picker'
-      break
-    case 'array':
-      type = 'table'
+    case 'long':
+    case 'int':
+    case 'float':
+    case 'double':
+      type = 'input-number'
       break
     case 'boolean':
       type = 'switch'
       break
-    case 'password':
-      type = 'input-password'
-      break
-    case 'object':
-      type = 'form'
+    case 'date':
+      type = 'date-picker'
       break
     default:
       type = 'input'
@@ -290,7 +313,48 @@ const generatorSource = (_item: any) => {
     name: _item?.name,
   })
   let children: any = []
-  if (_type === 'array' || _type === 'object') {
+  return {
+    ...obj,
+    children,
+    formItemProps: {
+      ...obj.formItemProps,
+      name: _item.id,
+    },
+  }
+}
+
+const generatorSource = (_item: any) => {
+  const _type = _item.valueType.type || 'string'
+  let type: string = 'input'
+  switch (_type) {
+    case 'object':
+      type = 'form'
+      break
+    case 'array':
+      type = 'table'
+      break
+    case 'long':
+    case 'int':
+    case 'float':
+    case 'double':
+      type = 'input-number'
+      break
+    case 'boolean':
+      type = 'switch'
+      break
+    case 'date':
+      type = 'date-picker'
+      break
+    default:
+      type = 'input'
+      break
+  }
+  const obj = generatorData({
+    type: type,
+    name: _item?.name,
+  })
+  let children: any = []
+  if (_type === 'object') {
     children = _item.children?.map((i) => {
       const _data = generatorSource(i)
       return {
@@ -299,6 +363,29 @@ const generatorSource = (_item: any) => {
           ..._data.componentProps,
           name: i.name,
         },
+      }
+    })
+  }
+  if (_type === 'array') {
+    children = _item.children?.map((i) => {
+      const _data = generatorTableSource(i)
+      return {
+        type: 'table-item',
+        key: `table-item_${uid()}`,
+        componentProps: {
+          name: '列名' + uid(6),
+          colSpan: 1,
+          align: 'left',
+        },
+        children: [
+          {
+            ..._data,
+            componentProps: {
+              ..._data.componentProps,
+              name: i.name,
+            },
+          },
+        ],
       }
     })
   }
@@ -312,10 +399,10 @@ const generatorSource = (_item: any) => {
   }
 }
 
-const handleSource = (arr: any[]) => {
+const handleSource = (arr: any[], list: any[]) => {
   const _array = arr
     .map((item) => {
-      return findItem(sourceList.value, item)
+      return findItem(list, item)
     })
     .map((i) => {
       return generatorSource(i)
@@ -323,14 +410,33 @@ const handleSource = (arr: any[]) => {
   return _array
 }
 
-const onSave = () => {
+const onSaveData = (_data: any) => {
+  const obj = {
+    ...props.data,
+    configuration: {
+      type: 'form',
+      code: JSON.stringify(unref(designer.formData)),
+    },
+    others: {
+      ...props.data.others,
+      quickData: _data,
+    },
+  }
+  product.update(obj)
+}
+
+const onSave = async () => {
+  const valid = await formRef.value?.validate()
+  if (!valid) return
   const obj: any = {
     json: undefined,
     formCopy: undefined,
-    sourceData: undefined,
+    inputs: undefined,
+    output: undefined,
   }
   // 处理后端功能数据
-  obj.sourceData = handleSource(modelRef?.source?.sourceData || [])
+  obj.inputs = handleSource(modelRef?.source?.inputs || [], unref(inputsList))
+  obj.output = handleSource(modelRef?.source?.output || [], unref(outputList))
   // 处理json
   try {
     const _json = JSON.parse(modelRef?.json || '[]')
@@ -346,7 +452,8 @@ const onSave = () => {
     })
   const arr: any[] = []
   ;[
-    ...(obj?.sourceData || []),
+    ...(obj?.inputs || []),
+    ...(obj?.output || []),
     ...(obj?.json || []),
     ...(obj?.formCopy || []),
   ].map((item) => {
@@ -370,6 +477,7 @@ const onSave = () => {
       ...designer.formData.value,
       children: [...designer.formData.value.children, ...dataList.value],
     }
+    onSaveData(modelRef)
     visible.value = false
   }
 }
@@ -385,9 +493,44 @@ const onOk = () => {
     ...designer.formData.value,
     children: uniqBy(arr, 'formItemProps.name'),
   }
+  onSaveData(modelRef)
   modalVisible.value = false
   visible.value = false
 }
+
+watch(
+  () => visible.value,
+  () => {
+    if (visible.value) {
+      getEnd()
+    }
+  },
+  {
+    immediate: true,
+  },
+)
+
+watch(
+  () => props.data?.others?.quickData,
+  (newVal) => {
+    if (newVal) {
+      Object.assign(modelRef, newVal)
+    } else {
+      modelRef.json = undefined
+      modelRef.formCopy = []
+      modelRef.source = {
+        functionId: undefined,
+        commandId: undefined,
+        inputs: undefined,
+        output: undefined,
+      }
+    }
+  },
+  {
+    deep: true,
+    immediate: true,
+  },
+)
 </script>
 
 <style lang="less" scoped>
@@ -402,7 +545,7 @@ const onOk = () => {
   display: flex;
   width: 100%;
   right: 0;
-  justify-content: flex-end;
+  // justify-content: flex-end;
   padding: 10px 24px;
   border-top: 1px solid #f0f0f0;
   background-color: #ffffff;

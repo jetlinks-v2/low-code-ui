@@ -89,30 +89,30 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
                 },
             },
             {
-              path: '/flow-engine/monitor',
-              name: 'Monitor',
-              component: () => import('@/views/process/monitor/index.vue'),
-              meta: {
-                  title: '流程监控',
-              },
+                path: '/flow-engine/monitor',
+                name: 'Monitor',
+                component: () => import('@/views/process/monitor/index.vue'),
+                meta: {
+                    title: '流程监控',
+                },
             },
             {
-              path: '/flow-engine/initiate',
-              name: 'Initiate',
-              component: () => import('@/views/process/initiate/index.vue'),
-              meta: {
-                  title: '发起流程',
-              },
-              children: [
-                {
-                    path: 'initiate-detail',
-                    name: 'initiate-detail',
-                    component: () => import('@/views/process/initiate/Detail/index.vue'),
-                    meta: {
-                        title: '流程详情'
-                    }
+                path: '/flow-engine/initiate',
+                name: 'Initiate',
+                component: () => import('@/views/process/initiate/index.vue'),
+                meta: {
+                    title: '发起流程',
                 },
-              ]
+                children: [
+                    {
+                        path: 'initiate-detail',
+                        name: 'initiate-detail',
+                        component: () => import('@/views/process/initiate/Detail/index.vue'),
+                        meta: {
+                            title: '流程详情'
+                        }
+                    },
+                ]
             },
             {
                 path: '/flow-engine/me',
@@ -154,8 +154,26 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
                             title: '我发起的'
                         }
                     },
-                  ]
-              },
+                ]
+            },
+            {
+                path: '/flow-engine/form',
+                name: 'Form',
+                component: () => import('@/views/process/form/index.vue'),
+                meta: {
+                    title: '流程表单',
+                },
+                children: [
+                    {
+                        path: 'detail/:id',
+                        name: 'detail/:id',
+                        component: () => import('@/views/process/form/Detail/index.vue'),
+                        meta: {
+                            title: '我的表单'
+                        }
+                    },
+                ]
+            }
         ]
     },
     {

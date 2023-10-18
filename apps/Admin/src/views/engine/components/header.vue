@@ -20,10 +20,11 @@
 </template>
 
 <script setup name="EngineHeader">
-import { useProduct } from '@/store'
+import { useProduct, useEngine } from '@/store'
 import { getImage } from '@jetlinks/utils';
 
 const product = useProduct()
+const engine = useEngine()
 
 const router = useRouter()
 const route = useRoute()
@@ -36,10 +37,25 @@ const onRelease = () => {
   })
 }
 
-const quit = () => {
+const quit = async () => {
   router.push('/delivery/center')
-  product.initProjectState()
 }
+
+onMounted(() => {
+  setTimeout(() => {
+    const data = product.data[0]
+    // console.log('data',data)
+    if (data?.state?.value !== 'published') {
+      engine.selectFiles(data?.others?.files || [])
+      engine.setActiveFile(data?.others?.activeFile || data?.id)
+      engine.selectFile(data?.others?.activeFile)
+    } else {
+      engine.setActiveFile(data?.id)
+      engine.selectFile(data.id)
+    }
+  }, 300)
+})
+
 </script>
 
 <style scoped lang="less">
@@ -61,6 +77,7 @@ const quit = () => {
     .btn {
       display: flex;
       color: #333333;
+
       .out {
         width: 18px;
         height: 15px;
@@ -70,13 +87,15 @@ const quit = () => {
           height: 100%;
         }
       }
-      p{
+
+      p {
         line-height: 22px;
         font-size: 16px;
         margin-left: 10px;
       }
     }
-    .title{
+
+    .title {
       font-size: 18px;
       line-height: 22px;
       display: flex;

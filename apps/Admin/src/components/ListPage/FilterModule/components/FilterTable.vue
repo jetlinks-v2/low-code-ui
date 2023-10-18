@@ -1,73 +1,72 @@
 <template>
   <div className="filter-table">
     <div class="tips">{{ props.title }}</div>
-    <j-button
+    <!-- <j-button
       @click="syncData"
       myIcon="SyncOutlined"
       size="small"
-      :type="props.dataBind ? 'primary' : 'stroke'"
-      ghost
+      :type="dataBinds.data.dataSource.length ? 'primary' : 'default'"
     >
       同步数据绑定
-    </j-button>
-    <div class="table">
-      <j-data-table
-        class="ant-table-striped table-striped"
-        rowKey="code"
-        bordered
-        ref="tableRef"
-        size="small"
-        :columns="props.columns"
-        :data-source="props.dataSource"
-        :showTool="false"
-        :height="900"
-        @change="(data) => handleChange(data)"
-      >
-        <template #headerCell="{ column }">
-          <template v-if="column.tips">
-            <span>
-              {{ column.title }}
-              <j-popover trigger="hover">
-                <template #content>
-                  <div class="hover-tips">
-                    <j-table
-                      :columns="tipsColumns"
-                      :data-source="data"
-                      :pagination="false"
-                      bordered
-                      size="small"
-                    />
-                  </div>
-                </template>
-                <AIcon type="QuestionCircleOutlined" />
-              </j-popover>
-            </span>
-          </template>
+    </j-button> -->
+    <j-data-table
+      columnDrag
+      class="ant-table-striped table-striped"
+      rowKey="rowKey"
+      bordered
+      ref="tableRef"
+      size="small"
+      :columns="props.columns"
+      :data-source="props.dataSource"
+      :showTool="false"
+      :height="500"
+      @change="(data) => handleChange(data)"
+    >
+      <template #headerCell="{ column }">
+        <template v-if="column.tips">
+          <span>
+            {{ column.title }}
+            <j-popover trigger="hover">
+              <template #content>
+                <div class="hover-tips">
+                  <div>不同于列自身的数据类型，筛选组件提供string、enum、<br>date、number四种数据类型，用于控制运算符和筛选值样式</div>
+                  <j-table
+                    :columns="tipsColumns"
+                    :data-source="data"
+                    :pagination="false"
+                    bordered
+                    size="small"
+                  />
+                </div>
+              </template>
+              <AIcon type="QuestionCircleOutlined" />
+            </j-popover>
+          </span>
         </template>
-        <template #name="{ data }">
-          <ErrorItem :border="false" :errorData="errorData(data.record.name)">
-            <span>{{ data.record?.name }}</span>
-          </ErrorItem>
-        </template>
-        <template #id="{ data }">
-          <ErrorItem :border="false" :errorData="errorData(data.record.id)">
-            <span>{{ data.record?.id }}</span>
-          </ErrorItem>
-        </template>
-        <template #action="{ data }">
-          <j-space>
-            <j-button type="link" @click="configuration(data)">配置</j-button>
-            <JPopconfirm
-              @confirm="confirm(data)"
-              :loading="loading"
-              title="确定删除此数据？"
-            >
-              <j-button type="text" danger>删除</j-button>
-            </JPopconfirm>
-          </j-space>
-        </template>
-      </j-data-table>
-    </div>
+      </template>
+      <template #name="{ data }">
+        <ErrorItem :border="false" :errorData="errorData('name' + data.record?._sortIndex)">
+          <span class="data-column">{{ data.record?.name }}</span>
+        </ErrorItem>
+      </template>
+      <template #id="{ data }">
+        <ErrorItem :border="false" :errorData="errorData('id' + data.record?._sortIndex)">
+          <span class="data-column">{{ data.record?.id }}</span>
+        </ErrorItem>
+      </template>
+      <template #action="{ data }">
+        <j-space>
+          <j-button type="link" @click="configuration(data)" :style="{ color: errorData('config' + data.record?._sortIndex) ? 'red' : '' }">配置</j-button>
+          <JPopconfirm
+            @confirm="confirm(data)"
+            :loading="loading"
+            title="确定删除此数据？"
+          >
+            <j-button type="text" danger v-if="data.record?.mark === 'add'">删除</j-button>
+          </JPopconfirm>
+        </j-space>
+      </template>
+    </j-data-table>
     <br />
     <j-button
       class="editable-add-btn"
@@ -99,8 +98,9 @@ import { onlyMessage } from '@/utils/comm'
 import { ErrorItem } from '../..'
 import type { PropType } from 'vue'
 import { useProduct } from '@/store';
-import { getImage } from '@jetlinks/utils';
+import { getImage, randomString } from '@jetlinks/utils';
 import { cloneDeep } from 'lodash-es';
+import { DATA_BIND } from '../../keys';
 const props = defineProps({
   title: {
     type: String,
@@ -191,34 +191,40 @@ const props = defineProps({
   }
 })
 
+const dataBinds = inject(DATA_BIND)
 enum javaType {
-  Enum = 'enum',
-  String = 'text',
-  Double = 'double',
-  Int = 'int',
-  BigDecimal = 'text',
-  DateTime = 'date',
-  Float = 'float',
-  Byte = 'int',
-  Long = 'long',
-  List = 'array',
-  Boolean = 'boolean',
-  Map = 'object',
+  enum = 'enum',
+  string = 'text',
+  double = 'double',
+  int = 'int',
+  bigDecimal = 'text',
+  dateTime = 'date',
+  date = 'date',
+  float = 'float',
+  byte = 'int',
+  long = 'long',
+  list = 'array',
+  boolean = 'boolean',
+  object = 'object',
+  array = 'array'
 }
 
 enum filterType {
-  Enum = 'enum',
-  String = 'string',
-  Double = 'number',
-  Int = 'number',
-  BigDecimal = 'string',
-  DateTime = 'date',
-  Float = 'number',
-  Byte = 'number',
-  Long = 'string',
-  List = 'string',
-  Boolean = 'string',
-  Map = 'string',
+  enum = 'enum',
+  string = 'string',
+  double = 'number',
+  int = 'number',
+  bigDecimal = 'string',
+  dateTime = 'date',
+  date = 'date',
+  float = 'number',
+  byte = 'number',
+  long = 'number',
+  list = 'string',
+  boolean = 'enum',
+  map = 'string',
+  object = 'enum',
+  array = 'string'
 }
 
 
@@ -234,10 +240,18 @@ const emit = defineEmits([
   'handleChange',
   'update:data',
   'bindData',
-  'updateBind'
+  'updateBind',
+  'update:asyncData'
 ])
 
 const handleChange = (data) => {
+  data = data.map((item) => {
+    if(props.dataSource.find(val => val.id === item.id)?.type !== item.type) {
+      console.log(item);
+      item.config = null
+    }
+    return item
+  })
   emit('handleChange', data)
 }
 
@@ -254,6 +268,7 @@ const tipsColumns: any = [
   {
     title: '筛选项类型',
     dataIndex: 'type',
+    width: '120px',
     customCell: (_, index) => {
       if (index === 1) {
         return { rowSpan: 2 }
@@ -347,7 +362,12 @@ const data = [
 //新增一列table
 const handleAdd = async () => {
   emit('handleAdd', tableRef.value)
+  setTimeout(() => {
+    //滚动到表格底部
+    tableRef.value.$el.getElementsByTagName('tbody')?.[0].scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
+  })
 }
+
 //配置
 const configuration = async (data: any) => {
   const dataSource = await tableRef.value.getData()
@@ -362,38 +382,39 @@ const confirm = (data: any) => {
 }
 const bindShow = ref(false)
 //是否同步数据绑定
-const asyncData = ref(props.asyncData)
 //同步数据绑定
 const syncData = async () => {
-  if (!props.dataBind) {
+  if (dataBinds.data.dataSource.length === 0) {
     bindShow.value = false
     return onlyMessage('请先完成数据绑定', 'error')
   }
   const changeFunctionData = asyncDataBind()
-  if(!props.dataSource.length) {
-    handleChange(tempData.value)
+  if(!props.asyncData) { 
+    handleChange([...props.dataSource, ...asyncDataBind()])
+    emit('update:asyncData', true)
+    emit('updateBind', cloneDeep([...props.dataSource, ...asyncDataBind()]))
     return
   }
   tempData.value = [];
   changeFunctionData.forEach((item) => {
-    let find = props.bindData?.find((i) => i.alias === item.alias)
-    if(!find) tempData.value.push({
-      id: item.alias,
-      name: item.comment,
-      type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
-    })
+    let find = props.bindData?.find((i) => i.id === item.id)
+    if(!find) tempData.value.push(item)
   })
-  if (tempData.value.length) {
+  if (tempData.value.length || changeFunctionData.length !== props.bindData.length) {
     openModel(props.modelActiveKey)
   } else {
     onlyMessage('已是最新数据', 'success')
   }
 }
 
-const productStore = useProduct()
 const asyncDataBind = () => {
-  const functionId = props.bindFunctionId.split('.')
-  return productStore.getById(functionId[functionId.length - 1])?.configuration?.columns || []
+  return dataBinds.data.dataSource.map(item => {
+    return {
+      rowKey: randomString(8),
+      ...item,
+      type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type],
+    }
+  }) || []
 }
 //打开弹窗
 const openModel = (value: any) => {
@@ -403,16 +424,11 @@ const openModel = (value: any) => {
 //处理方式弹窗
 const handleOk = async () => {
   const newBind = asyncDataBind()
-  const dataSource = activeKey.value?.[0] === '1' ? newBind.map((item) => {
-    return {
-      id: item.alias,
-      name: item.comment,
-      type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
-    }
-  }) : tempData.value
+  const dataSource = activeKey.value?.[0] === '1' ? newBind.map((item) => item) : tempData.value
   emit('updateBind', cloneDeep(newBind))
+  const changeData = [...new Set([...dataSource, ...tempData.value].map(item => JSON.stringify(item)))].map(item => JSON.parse(item))
   tableRef.value.cleanEditStatus()
-  emit('handleOk', activeKey.value?.[0], dataSource)
+  emit('handleOk', activeKey.value?.[0], changeData)
   visible.value = false
 }
 const handleCancel = () => {
@@ -422,7 +438,7 @@ const handleCancel = () => {
 const tempData = ref<any[]>([])
 
 watch(() => props.bindFunctionId, () => {
-  if(!props.bindFunctionId) asyncData.value = false;
+  if(!props.bindFunctionId) emit('update:asyncData', false);
   bindShow.value = true
   tempData.value = props.dataSource.length ? props.dataSource : props.bindData?.map(
     (item) => {
@@ -430,6 +446,7 @@ watch(() => props.bindFunctionId, () => {
         id: item.alias,
         name: item.comment,
         type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
+        rowKey: randomString(8)
       }
     },
   )
@@ -441,10 +458,18 @@ watch(() => props.bindFunctionId, () => {
 .filter-table {
   .tips {
     padding-bottom: 8px;
+    .hover-tips {
+      width: 400px;
+    }
   }
-  .table {
     padding-top: 18px;
-  }
+    .data-column{
+      width: 100%;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   .editable-add-btn{
     width: 100%;
   }

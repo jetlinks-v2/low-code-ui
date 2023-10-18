@@ -4,24 +4,25 @@
     :maskClosable="false"
     :visible="visible"
     :confirm-loading="confirmLoading"
-    title=""
+    :title="title"
     okText="确定"
     cancelText="取消"
-    width="630px"
+    :width="modalWidth"
     :destroyOnClose="true"
     @cancel="emit('close', true)"
     @ok="handleSubmit"
   >
     <FormPreview
-      :data="data"
       v-if="props.resource.callPage.type === providerEnum.FormPage"
+      :data="data"
       :mode="mode"
       :value="editValue"
+      :projectId="projectId"
       ref="formPage"
     />
     <CustomHtml
-      :code="JSON.stringify(data)"
-      v-else-if="props.resource.callPage.type === providerEnum.HtmlPage"
+      :code="data || null"
+      v-else-if="props.resource.callPage.type === providerEnum.HtmlPage && data"
     />
   </j-modal>
 </template>
@@ -32,15 +33,19 @@ import { PropType } from 'vue'
 import { getResource } from '@/api/basis'
 import { providerEnum } from '@/components/ProJect'
 import { ReplStore } from '@/components/CustomHTML/store'
-import { useProduct } from '@/store'
 import { queryRuntime } from '@/api/form'
-import { values } from 'lodash-es'
 
-const data = ref<Record<string, any>>()
+const data = ref<any>()
 
-const productStore = useProduct()
 const vueMode = ref(true)
 const store = new ReplStore(JSON.stringify(data.value))
+const modalWidth = computed(() => {
+  if(props.resource.modalWidth) {
+    return props.resource.modalWidth + props.resource.modalWidthUnit
+  } else {
+    return '520px'
+  }
+})
 const formPage = ref()
 provide('store', store)
 provide('useVueMode', vueMode)
@@ -61,13 +66,31 @@ const props = defineProps({
     type: Object as PropType<Record<string, any>>,
     default: () => {},
   },
+  dataColumns: {
+    type: Array as PropType<Record<string, any>[]>,
+    default: () => [],
+  },
+  projectId: {
+    type: String,
+    default: ''
+  }
 })
 
 const mode = computed(() => {
   if (props.type === 'Add') {
     return 'add'
-  } else if (props.type === 'Update') {
+  } else if (props.type === 'Update' || props.type === 'Detail') {
     return 'edit'
+  }
+})
+
+const title = computed(() => {
+  if(props.type === 'Detail') {
+    return '查看详情'
+  } else if (mode.value === 'add') {
+    return '新增'
+  } else if (mode.value === 'edit') {
+    return '编辑'
   }
 })
 
@@ -83,13 +106,17 @@ const getInfo = async () => {
 }
 
 const handleSubmit = async () => {
-  // formPage.value.onSave()
+  if(!['Add', 'Update'].includes(props.type)) {
+    emit('close', true)
+    return
+  }
+  const data = await formPage.value.onSave()
   confirmLoading.value = true;
-  const data = {
-    data: { name: '123' },
+  const params = {
+    data,
   }
   if(mode.value == 'edit') {
-    data['terms'] = [
+    params['terms'] = [
       {
         terms: [
           { column: 'id', termType: 'eq', value: props.popData.id }
@@ -101,7 +128,7 @@ const handleSubmit = async () => {
     props.resource.callPage.projectId,
     props.resource.function,
     props.resource.command,
-    data,
+    params,
   ).finally(() => confirmLoading.value = false)
   emit('reload')
 }
@@ -122,7 +149,19 @@ watch(
 watch(
   () => props.popData,
   (val) => {
-    editValue.value = val
+    if(props.type !== 'Add') {
+      editValue.value = {};
+      for(const key in val) {
+        const result = props.dataColumns.find(item => item.dataIndex === key)
+        if(result && result.config?.type === 'enum') {
+          editValue.value[key] = Array.isArray(val[key]) ? val?.[key]?.map(item => item.value) : val?.[key]?.value
+        } else {
+          editValue.value[key] = val[key]
+        }
+      }
+    } else{
+      editValue.value = {};
+    }
   },
   { immediate: true }
 )

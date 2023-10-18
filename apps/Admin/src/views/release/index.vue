@@ -2,7 +2,7 @@
   <div class="release-warp">
     <div class="release-header">
       <!-- <j-button type="link" @click="cancel">返回</j-button> -->
-      <j-button type="link" @click="cancel" class="btn">
+      <j-button type="link" @click="cancel" class="btn" :disabled="['success', 'loading'].includes(releaseStatus)">
         <div class="out"><img :src="getImage('/left.png')"></div>
         <p>退出</p>
       </j-button>
@@ -23,9 +23,9 @@
 
       <CardBox class="release-content"  v-if="loading">
         <div class="release-step-content">
-          <Status v-show="step === 0" v-model:status="status" />
+          <Status v-show="step === 0" v-model:status="status" v-model:theme="themeColor" />
           <Tree v-show="step === 1" ref="treeRef" @change="treeChange" />
-          <Finish v-show="step === 2" ref="finishRef"  v-model:value="finishStatus" :tree="tree" />
+          <Finish v-show="step === 2" ref="finishRef"  v-model:value="finishStatus" :theme="themeColor" :tree="tree" @statusChange="e => releaseStatus = e" />
         </div>
         <div class="release-footer">
           <j-button v-if="step === 0" @click="cancel">取消</j-button>
@@ -34,7 +34,7 @@
           <j-button v-if="step === 1" @click="prev">上一步</j-button>
           <j-button v-if="step === 1" type="primary" @click="release">发布</j-button>
 
-          <j-button v-if="step === 2" type="primary" @click="cancel" :disabled="finishStatus !== 100">完成</j-button>
+          <j-button v-if="step === 2" type="primary" @click="cancel" :disabled="!finishStatus">完成</j-button>
         </div>
       </CardBox>
     </div>
@@ -64,7 +64,10 @@ const finishRef = ref()
 const router = useRouter()
 
 const status = ref(true)
-const finishStatus = ref(0)
+const finishStatus = ref(false)
+const themeColor = ref('#1677ff')
+
+const releaseStatus = ref('')
 
 const prev = () => {
   step.value -= 1
@@ -82,9 +85,6 @@ const treeChange = (data) => {
 }
 
 const cancel = () => {
-  // 清空engine中的状态
-  engine.initEngineState()
-
   router.replace({
     name: 'Engine',
     params: {
@@ -95,10 +95,13 @@ const cancel = () => {
 
 const release = () => {
   step.value += 1
+  console.log('release----releaseStart')
   finishRef.value?.releaseStart()
 }
 
 product.queryProduct(route.params.id, () => {
+  console.log('product.info', product.info)
+  themeColor.value = product.info.others?.theme
   loading.value = true
 })
 
@@ -134,6 +137,10 @@ product.queryProduct(route.params.id, () => {
         line-height: 22px;
         font-size: 16px;
         margin-left: 10px;
+      }
+
+      &[disabled] {
+        color: rgba(0, 0, 0, 0.25);
       }
     }
     span{
