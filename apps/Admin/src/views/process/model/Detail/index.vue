@@ -4,7 +4,7 @@
     <j-card style="margin-bottom: 10px">
       <div class="step-box">
         <div class="step">
-          <j-steps v-model:current="current">
+          <j-steps :current="current">
             <j-step title="基础信息" />
             <j-step title="流程设计" />
             <j-step title="展示及抄送" />
@@ -25,7 +25,7 @@
               </j-tooltip>
             </template>
           </j-button>
-          <j-button type="primary">
+          <j-button type="primary" @click="deploy">
             部署
             <template #icon>
               <j-tooltip placement="right">
@@ -48,7 +48,7 @@ import { ref } from 'vue'
 import BasicInfo from './BasicInfo/index.vue'
 import FlowDesign from './FlowDesign/index.vue'
 import ShowCopy from './ShowCopy/index.vue'
-import { detail_api, update_api } from '@/api/process/model'
+import { detail_api, update_api, deploy_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { onlyMessage } from '@jetlinks/utils'
 
@@ -80,13 +80,13 @@ const getFlowDetail = async () => {
  */
 const stepRef = ref()
 const handleNext = () => {
-  stepRef.value.next().then(() => {
+  stepRef.value?.next().then(() => {
     current.value++
   })
 }
 
 /**
- * 保存模型数据
+ * 保存模型数据, 无需校验数据
  */
 const saveLoading = ref(false)
 const save = () => {
@@ -105,6 +105,19 @@ const save = () => {
     .finally(() => {
       saveLoading.value = false
     })
+}
+
+/**
+ * 部署, 需要校验
+ */
+const deploy = () => {
+  //   deploy_api(route.query.id as string).then((res) => {
+  //     if (res.success) {
+  //       onlyMessage('操作成功')
+  //     } else {
+  //       onlyMessage('操作失败', 'error')
+  //     }
+  //   })
 }
 
 onMounted(() => {

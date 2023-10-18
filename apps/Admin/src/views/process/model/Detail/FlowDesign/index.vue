@@ -70,6 +70,18 @@ const handleSubmit = () => {
       console.log('handleSubmit err: ', err)
     })
 }
+
+/**
+ * 下一步
+ */
+const next = () => {
+  // 流程设计步骤, 无直接验证, 只有节点高级配置有验证
+  return new Promise((resolve, reject) => {
+    resolve(true)
+  })
+}
+
+defineExpose({ next })
 </script>
 
 <style lang="less" scoped></style>
