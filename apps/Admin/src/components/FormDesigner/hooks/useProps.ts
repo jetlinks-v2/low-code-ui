@@ -1,6 +1,6 @@
 import { omit } from "lodash-es"
 
-const useProps = (element: any, _data: any, mode?: string) => {
+const useProps = (element: any, _data: any, editable: boolean, __disabled: boolean, mode?: string) => {
   // formItemProps
   let rules: any[] = (element?.formItemProps?.rules || []).map(item => {
     const trigger = item.trigger?.length > 1 ? item?.trigger : item.trigger?.join('')
@@ -69,9 +69,6 @@ const useProps = (element: any, _data: any, mode?: string) => {
         return Promise.resolve()
       }
     }
-
-
-    return { ...omit(item, 'key'), trigger }
   })
   // 处理内嵌表单的校验问题
   if (element?.formItemProps?.required) {
@@ -82,12 +79,16 @@ const useProps = (element: any, _data: any, mode?: string) => {
       }]
     }
   }
+
+
+  const _disabled = element?.componentProps?.disabled || __disabled || !editable || (mode === 'edit' && !element?.componentProps?.editable)
   // componentProps
   const _componentProps = {
     ...omit(element?.componentProps, ['description', 'cssCode', 'editable', 'onChange', 'visible', 'source']),
     size: _data?.componentProps.size,
-    disabled: element?.componentProps?.disabled || (mode === 'edit' && !element?.componentProps?.editable)
+    disabled: _disabled
   }
+
   if (element?.componentProps?.options) {
     _componentProps.options = element?.componentProps?.options || []
   }

@@ -32,6 +32,10 @@ export default defineComponent({
         visible: {
             type: Boolean,
             default: true
+        },
+        editable: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
@@ -47,7 +51,7 @@ export default defineComponent({
                 type: props.data?.type + '-item',
                 children: [],
                 componentProps: {
-                    name: 'Tab' + uid(6)
+                    name: 'Title'
                 },
                 formItemProps: {
                     name: uid(6)
@@ -97,6 +101,7 @@ export default defineComponent({
                                                     path={_path}
                                                     index={_index + 1}
                                                     visible={props.visible}
+                                                    editable={props.editable}
                                                 />
                                             </Selection>
                                         </TabPane>

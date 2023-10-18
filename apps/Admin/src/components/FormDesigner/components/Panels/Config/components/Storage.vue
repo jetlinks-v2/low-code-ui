@@ -7,9 +7,24 @@
       @cancel="visible = false"
     >
       <div v-if="configVisible">
-        <div>请选择{{ config?.key}}存储位置</div>
+        <div>请选择{{ config?.key }}存储位置</div>
         <div class="box">
           <j-form ref="formRef" :model="config" layout="vertical">
+            <j-form-item
+              :validateFirst="true"
+              :name="['config', 'projectId']"
+              :rules="rulesProject"
+            >
+              <j-select
+                v-model:value="config.config.projectId"
+                placeholder="请选择"
+                :options="projectList"
+                allowClear
+                showSearch
+                @change="onProjectChange"
+              >
+              </j-select>
+            </j-form-item>
             <j-form-item
               :validateFirst="true"
               :name="['config', 'functionId']"
@@ -79,31 +94,29 @@
             @search="onSearch"
           />
         </div>
-        <div class="box-item" v-for="item in dataList" :key="item.value">
+        <div class="box-item" v-for="item in dataList" :key="item">
           <div
             class="box-item-content"
-            @click="onClick(item.value)"
+            @click="onClick(item)"
             :class="{
               'box-item-content': true,
-              active: getKeys.includes(item.value),
+              active: getKeys.includes(item),
             }"
           >
-            <span>{{ item.label }}</span>
-            <template v-if="getKeys.includes(item.value)">
+            <span>{{ item }}</span>
+            <template v-if="getKeys.includes(item)">
               <j-space
-                v-if="_value.find((i) => i.key === item?.value)?.config?.source"
+                v-if="_value.find((i) => i.key === item)?.config?.source"
               >
                 <span>{{
-                  _value.find((i) => i.key === item?.value)?.config?.source
+                  _value.find((i) => i.key === item)?.config?.source
                 }}</span>
-                <span @click.stop="onConfig(item.value)">修改</span>
+                <span @click.stop="onConfig(item)">修改</span>
               </j-space>
-              <span @click.stop="onConfig(item.value)" v-else>配置</span>
+              <span @click.stop="onConfig(item)" v-else>配置</span>
             </template>
           </div>
-          <div class="error" v-if="error.includes(item.value)">
-            请配置存储位置
-          </div>
+          <div class="error" v-if="error.includes(item)">请配置存储位置</div>
         </div>
       </div>
       <template #footer>
@@ -117,16 +130,20 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, inject, computed, unref, watch } from 'vue'
+import { ref, computed, unref, watch } from 'vue'
 import { map } from 'lodash-es'
 import { onlyMessage } from '@jetlinks/utils'
-
-const designer: any = inject('FormDesigner')
+import { product, role, org, device, user } from './index'
+import { queryEndCommands, queryProject } from '@/api/form'
 
 const _key = 'id'
 const props = defineProps({
   value: {
     type: Array,
+  },
+  type: {
+    type: String,
+    default: 'device',
   },
 })
 
@@ -147,22 +164,45 @@ const _value = ref<any[]>(
 
 const config = ref<any>({})
 
-const list = [
+const list = computed(() => {
+  switch (props.type) {
+    case 'product':
+      return product
+    case 'org':
+      return org
+    case 'role':
+      return role
+    case 'user':
+      return user
+    default:
+      return device
+  }
+})
+
+const dataList = ref<any[]>([...list.value])
+const projectList = ref<any[]>([])
+const end = ref<any[]>([])
+
+const rulesProject = [
   {
-    label: 'id',
-    value: 'id',
+    required: true,
+    message: '请选择',
   },
   {
-    label: 'name',
-    value: 'name',
+    validator(_rule: any, value: string) {
+      const item = projectList.value?.find((i) => i?.value === value)
+      if (!item) {
+        return Promise.reject(`数据已被删除`)
+      }
+      return Promise.resolve()
+    },
+    trigger: 'change',
   },
 ]
 
-const dataList = ref<any[]>([...list])
-
 const functionList = computed(() => {
   return (
-    (designer.source?.end || []).map((item) => {
+    (end.value || []).map((item) => {
       return {
         label: item.name + '.' + item.id,
         value: item.id,
@@ -173,7 +213,7 @@ const functionList = computed(() => {
 
 const commandList = computed(() => {
   return (
-    (designer.source?.end || [])
+    (end.value || [])
       .find((item) => config.value?.config?.functionId === item.id)
       ?.command?.map((i) => {
         return {
@@ -230,6 +270,9 @@ const onClick = (_val: any) => {
 const onConfig = (_val: string) => {
   config.value = _value.value?.find((item) => item?.key === _val)
   configVisible.value = true
+  if (!projectList.value?.length) {
+    getProject()
+  }
 }
 
 const handleOk = async () => {
@@ -274,7 +317,23 @@ const onFunChange = (val: string | undefined) => {
   config.value = {
     ...config.value,
     config: {
+      ...config.value.config,
       functionId: val,
+      commandId: undefined,
+      source: undefined,
+    },
+  }
+}
+
+const onProjectChange = (val: string | undefined) => {
+  if(val){
+    getEnd(val)
+  }
+  config.value = {
+    ...config.value,
+    config: {
+      projectId: val,
+      functionId: undefined,
       commandId: undefined,
       source: undefined,
     },
@@ -294,26 +353,52 @@ const onCommandChange = (val: string | undefined) => {
 
 const onSearch = (searchValue: string) => {
   if (searchValue) {
-    dataList.value = list.filter(
-      (item) => item.value.indexOf(searchValue) !== -1,
+    dataList.value = list.value.filter(
+      (item) => item.indexOf(searchValue) !== -1,
     )
   } else {
-    dataList.value = list
+    dataList.value = list.value
   }
+}
+
+const getProject = () => {
+  queryProject().then((resp) => {
+    if (resp.success) {
+      projectList.value = resp.result.map((item) => {
+        return {
+          modules: item.modules || [],
+          label: item.name,
+          value: item.id,
+        }
+      })
+    }
+  })
+}
+
+const getEnd = (id: string) => {
+  queryEndCommands(id, ['rdb-crud']).then((resp) => {
+    if (resp.success) {
+      end.value = resp.result || []
+    }
+  })
 }
 
 watch(
   () => props?.value,
   () => {
-    _value.value = props?.value?.length ? props.value : [{
-      key: _key,
-      config: {},
-      flag: true
-    }]
+    _value.value = props?.value?.length
+      ? props.value
+      : [
+          {
+            key: _key,
+            config: {},
+            flag: true,
+          },
+        ]
   },
   {
     deep: true,
-    immediate: true
+    immediate: true,
   },
 )
 </script>

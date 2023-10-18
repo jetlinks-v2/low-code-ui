@@ -6,7 +6,7 @@
 
 <script lang="ts" setup>
 import Canvas from './components/Panels/Canvas/index'
-import {provide, ref, reactive, PropType, watch, unref, onUnmounted} from 'vue'
+import {provide, ref, reactive, PropType, watch} from 'vue'
 import { ISchema } from './typings'
 import { getFieldData, initData } from './utils/utils'
 import { proAll } from '../QuickEditTable/util'
@@ -32,6 +32,10 @@ const props = defineProps({
   },
   projectId: {
     type: String,
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -46,7 +50,6 @@ const formRefList = ref<any>({})
 watch(
   () => [JSON.stringify(props.value), JSON.stringify(props.data)],
   () => {
-    console.log('form--preview', props.value)
     if (props.data) {
       formData.value = (props.data || initData) as ISchema
       Object.assign(formState, getFieldData(formData.value) || {})
@@ -68,7 +71,8 @@ provide('FormDesigner', {
   formState,
   formRef,
   mode: props.mode,
-  projectId: props.projectId
+  projectId: props.projectId,
+  disabled: props.disabled
 })
 
 const onSave = () => {

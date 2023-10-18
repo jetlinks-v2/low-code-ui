@@ -34,7 +34,7 @@
       >
         <j-select-option
           :label="item.name"
-          v-for="item in designer.source?.dictionary || []"
+          v-for="item in dic || []"
           :key="item.id"
           :value="item.id"
         >
@@ -43,6 +43,21 @@
       </j-select>
     </j-form-item>
     <template v-else>
+      <j-form-item
+        :validateFirst="true"
+        :name="['componentProps', 'source', 'projectId']"
+        :rules="rulesProject"
+      >
+        <j-select
+          v-model:value="data.projectId"
+          placeholder="请选择"
+          :options="projectList"
+          allowClear
+          showSearch
+          @change="onProjectChange"
+        >
+        </j-select>
+      </j-form-item>
       <j-row :gutter="16">
         <j-col :span="12">
           <j-form-item
@@ -147,14 +162,14 @@
 </template>
     
 <script lang="ts" setup>
-import { watch, computed, reactive, inject, onMounted } from 'vue'
-// import { queryDictionary, queryEndCommands } from '@/api/form'
-// import { useProduct } from '@/store'
+import { watch, computed, reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash-es'
 import { getArray, searchTree } from '@/components/FormDesigner/utils/utils'
+import { queryDictionary, queryEndCommands, queryProject } from '@/api/form'
 
-// const product = useProduct()
-const designer: any = inject('FormDesigner')
+const projectList = ref<any[]>([])
+const dic = ref<any[]>([])
+const end = ref<any[]>([])
 
 const props = defineProps({
   value: {
@@ -172,29 +187,6 @@ const emits = defineEmits(['change'])
 
 const data = reactive<any>({})
 
-watch(
-  () => props.value,
-  (newValue) => {
-    const obj = newValue || {
-      dictionary: undefined,
-      type: 'dic',
-    }
-    if (data.type === 'dic') {
-      data.dictionary = obj.dictionary
-      data.type = 'dic'
-    } else {
-      Object.assign(data, cloneDeep(obj))
-    }
-  },
-  {
-    deep: true,
-    immediate: true,
-  },
-)
-
-// const dic = ref<any[]>([])
-// const end = ref<any[]>([])
-
 const rulesDic = [
   {
     required: true,
@@ -202,7 +194,7 @@ const rulesDic = [
   },
   {
     validator(_rule: any, value: string) {
-      const item = designer.source.dictionary?.find((i) => i?.id === value)
+      const item = dic.value?.find((i) => i?.id === value)
       if (!item) {
         return Promise.reject(`数字字典已被删除或禁用`)
       }
@@ -228,6 +220,7 @@ const rulesComm = [
     trigger: 'change',
   },
 ]
+
 const rulesFunc = [
   {
     required: true,
@@ -236,6 +229,23 @@ const rulesFunc = [
   {
     validator(_rule: any, value: string) {
       const item = functionList.value?.find((i) => i?.value === value)
+      if (!item) {
+        return Promise.reject(`数据已被删除`)
+      }
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
+const rulesProject = [
+  {
+    required: true,
+    message: '请选择',
+  },
+  {
+    validator(_rule: any, value: string) {
+      const item = projectList.value?.find((i) => i?.value === value)
       if (!item) {
         return Promise.reject(`数据已被删除`)
       }
@@ -279,30 +289,43 @@ const rulesSource = [
   },
 ]
 
-// const getDictionary = () => {
-//   queryDictionary().then((resp) => {
-//     if (resp.success) {
-//       // 过滤掉没有启用的数据
-//       dic.value = resp.result?.filter((item) => item?.status) || []
-//       designer.dictionary.value = dic.value
-//     }
-//   })
-// }
+const getProject = () => {
+  queryProject().then((resp) => {
+    if (resp.success) {
+      projectList.value = resp.result.map((item) => {
+        return {
+          modules: item.modules || [],
+          label: item.name,
+          value: item.id,
+        }
+      })
+    }
+  })
+}
 
-// const getEnd = () => {
-//   const id = product.info?.draftId
-//   queryEndCommands(id, ['rdb-crud']).then((resp) => {
-//     if (resp.success) {
-//       end.value = resp.result || []
-//     }
-//   })
-// }
+const getDictionary = () => {
+  queryDictionary().then((resp) => {
+    if (resp.success) {
+      // 过滤掉没有启用的数据
+      dic.value = resp.result?.filter((item) => item?.status) || []
+    }
+  })
+}
+
+const getEnd = (id: string) => {
+  queryEndCommands(id, ['rdb-crud']).then((resp) => {
+    if (resp.success) {
+      end.value = resp.result || []
+    }
+  })
+}
 
 const onRadioChange = (e) => {
   if (e === 'end') {
     emits('change', {
       type: 'end',
       label: undefined,
+      projectId: undefined,
       name: undefined,
       isSource: false,
       functionId: undefined,
@@ -319,7 +342,7 @@ const onRadioChange = (e) => {
 
 const functionList = computed(() => {
   return (
-    (designer.source?.end || []).map((item) => {
+    (end.value || []).map((item) => {
       return {
         label: item.name + '.' + item.id,
         value: item.id,
@@ -330,7 +353,7 @@ const functionList = computed(() => {
 
 const commandList = computed(() => {
   return (
-    (designer.source?.end || [])
+    (end.value || [])
       .find((item) => data?.functionId === item.id)
       ?.command?.map((i) => {
         return {
@@ -386,10 +409,35 @@ const labelList = computed(() => {
   }
 })
 
-const onFunChange = (val: string) => {
+const onProjectChange = (val: string) => {
   const obj = {
     type: 'end',
+    projectId: val,
+    functionId: undefined,
+    fullId: undefined,
+    commandId: undefined,
+    source: undefined,
+    label: undefined,
+    value: undefined,
+    isSource: isSource.value,
+  }
+  end.value = []
+  emits('change', obj)
+}
+
+const _project = computed(() => {
+  return projectList.value.find((item) => {
+    return item?.value === data?.projectId
+  })
+})
+
+const onFunChange = (val: string) => {
+  const obj = {
+    projectId: data.projectId,
+    type: 'end',
     functionId: val,
+    fullId: _project.value?.modules?.[0]?.functions?.find((i) => i.id === val)
+      ?.fullId,
     commandId: undefined,
     source: undefined,
     label: undefined,
@@ -419,7 +467,40 @@ const onDataChange = () => {
   emits('change', data)
 }
 
-onMounted(() => {
-  designer.handleSearch()
-})
+watch(
+  () => data?.type,
+  (newVal) => {
+    if (newVal === 'dic') {
+      getDictionary()
+    } else {
+      getProject()
+    }
+  },
+  {
+    immediate: true,
+  },
+)
+
+watch(
+  () => props.value,
+  (newValue) => {
+    const obj = newValue || {
+      dictionary: undefined,
+      type: 'dic',
+    }
+    if (data.type === 'dic') {
+      data.dictionary = obj.dictionary
+      data.type = 'dic'
+    } else {
+      Object.assign(data, cloneDeep(obj))
+      if (data?.projectId && !end.value?.length) {
+        getEnd(data.projectId)
+      }
+    }
+  },
+  {
+    deep: true,
+    immediate: true,
+  },
+)
 </script>

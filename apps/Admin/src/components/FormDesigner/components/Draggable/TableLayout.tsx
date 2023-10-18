@@ -34,11 +34,14 @@ export default defineComponent({
         visible: {
             type: Boolean,
             default: true
+        },
+        editable: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
-        const product = useProduct()
 
         const { isEditModel, isDragArea, layoutPadStyle } = useTool()
 
@@ -138,11 +141,12 @@ export default defineComponent({
         const componentRender = (dt: any, __data: any) => {
             const _path1 = [...unref(__path), dt?.index, __data?.formItemProps.name]
             const TypeComponent = componentMap[__data?.type || 'input']
-            const _props = useProps(__data, unref(designer.formData), unref(designer.mode))
+            const _props = useProps(__data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
             const options = ref<any[]>(_props.componentProps.options)
             const treeData = ref<any[]>(_props.componentProps.treeData)
+
             if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(__data?.type)) {
-                queryOptions(__data.componentProps.source, product.info?.id).then(resp => {
+                queryOptions(__data.componentProps.source).then(resp => {
                     if (['select', 'select-card'].includes(__data?.type)) {
                         options.value = resp
                     } else {

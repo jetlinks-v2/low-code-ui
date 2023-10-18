@@ -10,7 +10,7 @@ import dayjs from 'dayjs'
 
 export default defineComponent({
     name: 'CommLayout',
-    inheritAttrs: false,
+    // inheritAttrs: false, 默认情况下父作用域的不被认作 props 的 attribute 绑定 (attribute bindings) 将会“回退”且作为普通的 HTML attribute 应用在子组件的根元素上。
     customOptions: {},
     props: {
         data: {
@@ -18,7 +18,7 @@ export default defineComponent({
             default: () => { }
         },
         parent: {
-            type: Array,
+            type: [Array, Object],
             default: () => []
         },
         path: {
@@ -32,19 +32,22 @@ export default defineComponent({
         visible: {
             type: Boolean,
             default: true
+        },
+        editable: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
         const { isEditModel } = useTool()
         const designer: any = inject('FormDesigner')
         const TypeComponent = componentMap?.[props?.data?.type] || 'div'
-        const _props = useProps(props.data, unref(designer.formData), unref(designer.mode))
+        const _path: string[] = cloneDeep(props?.path || []);
         const selectRef = ref<any>(null)
         const _formRef = ref<any>(null)
-        const options = ref<any[]>(_props.componentProps.options)
-        const treeData = ref<any[]>(_props.componentProps.treeData)
-
-        const _path: string[] = cloneDeep(props?.path || []);
+        const options = ref<any[]>(props.data?.componentProps.options || [])
+        const treeData = ref<any[]>(props.data?.componentProps.treeData || [])
+        const __value = ref<any>(get(designer.formState, _path))
 
         const _index = computed(() => {
             return isNumber(props?.index) ? props.index : 0
@@ -102,7 +105,7 @@ export default defineComponent({
         })
 
         if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(props.data?.type)) {
-            queryOptions(props.data?.componentProps.source, designer?.projectId).then(resp => {
+            queryOptions(props.data?.componentProps.source).then(resp => {
                 if (['select', 'select-card'].includes(props.data?.type)) {
                     options.value = resp
                 } else {
@@ -111,23 +114,26 @@ export default defineComponent({
             })
         }
 
-        let __value = get(designer.formState, _path)
-        // 时间组件处理
-        if (['date-picker', 'time-picker'].includes(props?.data.type)) {
-            if (typeof __value === 'number') {
-                __value = dayjs(__value).format(_props.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
+        watchEffect(() => {
+            // 时间组件处理
+            if (['date-picker', 'time-picker'].includes(props?.data.type)) {
+                if (typeof __value.value === 'number') {
+                    __value.value = dayjs(__value).format(props.data.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
+                }
+            } else if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && props.data?.componentProps?.mode !== "multiple") {
+                const obj = {}
+                props.data?.componentProps.keys?.forEach((i: any) => {
+                    const __path = _path.slice(0, _path.length - 1) || []
+                    __path.push(i?.config?.source)
+                    if(get(designer.formState, __path)){
+                        obj[i?.key] = get(designer.formState, __path)
+                    }
+                })
+                __value.value = obj
+            } else {
+                __value.value = get(designer.formState, _path)
             }
-        }
-
-        if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && props.data?.componentProps?.mode !== "multiple") {
-            const obj = {}
-            props.data?.componentProps.keys?.forEach((i: any) => {
-                const __path = _path.slice(0, _path.length - 1) || []
-                __path.push(i?.config?.source)
-                obj[i?.key] = get(designer.formState, __path)
-            })
-            __value = obj
-        }
+        })
 
         watchEffect(() => {
             if (props.data?.type === 'form' && _formRef.value && !unref(isEditModel) && props.data?.key) {
@@ -135,9 +141,11 @@ export default defineComponent({
             }
         })
         return () => {
+            const _props = useProps(props.data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
+
             return (
                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                    <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true}>
+                    <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true} extra={props.data?.componentProps?.description || ''}>
                         {
                             unref(isEditModel) ? <TypeComponent
                                 model={unref(designer.model)}
@@ -145,7 +153,7 @@ export default defineComponent({
                                 source={props.data?.type === 'form' ? props.data?.componentProps?.source : undefined}
                             ></TypeComponent> : <TypeComponent
                                 {..._props.componentProps}
-                                value={__value}
+                                value={__value.value}
                                 onUpdate:value={(newValue) => {
                                     if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && !Array.isArray(newValue)) {
                                         props.data?.componentProps.keys.forEach(i => {
@@ -169,7 +177,6 @@ export default defineComponent({
                                 ref={_formRef}
                             ></TypeComponent>
                         }
-                        <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{props.data?.componentProps?.description}</div>
                     </FormItem>
                 </Selection>
             )

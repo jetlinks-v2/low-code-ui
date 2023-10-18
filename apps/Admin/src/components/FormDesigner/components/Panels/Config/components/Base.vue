@@ -99,6 +99,7 @@
           <Storage
             v-model:value="target.componentProps.keys"
             @change="onStorageChange"
+            :type="target.type"
           />
         </j-form-item>
       </template>
@@ -301,20 +302,29 @@
             v-model:value="target.componentProps.name"
           />
         </j-form-item>
-        <j-form-item
-          label="标识"
-          :name="['children', 0, 'formItemProps', 'name']"
-          required
-          :validateFirst="true"
-          :rules="rules"
+        <template
+          v-if="
+            !['table-item-index', 'table-item-actions'].includes(
+              target.children?.[0]?.type,
+            )
+          "
         >
-          <j-input
-            placeholder="请输入"
-            :maxlength="64"
-            @change="onDataChange"
-            v-model:value="target.children[0].formItemProps.name"
-          />
-        </j-form-item>
+          <j-form-item
+            label="标识"
+            :name="['children', 0, 'formItemProps', 'name']"
+            required
+            :validateFirst="true"
+            :rules="rules"
+          >
+            <j-input
+              placeholder="请输入"
+              :maxlength="64"
+              @change="onDataChange"
+              v-model:value="target.children[0].formItemProps.name"
+            />
+          </j-form-item>
+        </template>
+
         <j-form-item
           label="表头跨列"
           :name="['componentProps', 'colSpan']"
@@ -344,18 +354,20 @@
             <j-select-option :value="'center'">中</j-select-option>
           </j-select>
         </j-form-item>
-        <j-form-item
-          :validateFirst="true"
-          label="组件类型"
-          :name="['children', 0, 'type']"
-        >
-          <j-select
-            v-model:value="target.children[0].type"
-            placeholder="请选择"
-            @change="onTypesChange"
-            :options="typeList"
-          />
-        </j-form-item>
+        <template v-if="!['table-item-index', 'table-item-actions'].includes(target?.children?.[0]?.type)">
+          <j-form-item
+            :validateFirst="true"
+            label="组件类型"
+            :name="['children', 0, 'type']"
+          >
+            <j-select
+              v-model:value="target.children[0].type"
+              placeholder="请选择"
+              @change="onTypesChange"
+              :options="typeList"
+            />
+          </j-form-item>
+        </template>
       </template>
       <template v-if="['grid', 'space'].includes(type)">
         <j-form-item
@@ -656,8 +668,10 @@ const onDataChange = () => {
 }
 
 const onStorageChange = () => {
-  if(!isShowName.value){
-    target.value.formItemProps.name = target.value.componentProps?.keys?.find(i => i?.config?.flag)?.config?.source || `${type.value}_${uid()}`
+  if (!isShowName.value) {
+    target.value.formItemProps.name =
+      target.value.componentProps?.keys?.find((i) => i?.config?.flag)?.config
+        ?.source || `${type.value}_${uid()}`
   }
   emits('refresh', target.value)
 }
