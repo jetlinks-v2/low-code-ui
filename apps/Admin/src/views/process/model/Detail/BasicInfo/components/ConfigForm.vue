@@ -229,6 +229,8 @@ const onSelectChange = (row: any) => {
       1,
     )
   } else {
+    // 如果已经存在, 则不做操作
+    if (selectedRow.value.some((item: any) => item.formId === row.id)) return
     // row没有formId字段, 则表示左侧表格选中
     selectedRow.value.push({
       formId: row.id,
