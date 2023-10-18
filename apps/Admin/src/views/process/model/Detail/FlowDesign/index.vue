@@ -6,16 +6,17 @@
     destroyOnClose
     placement="right"
     :width="600"
-    :title="title"
     :visible="showConfig"
+    :closable="false"
     @close="showConfig = false"
   >
-    <template #extra>
+    <!-- :title="title" -->
+    <!-- <template #extra>
       <j-space>
         <j-button @click="showConfig = false">取消</j-button>
         <j-button type="primary" @click="handleSubmit">确定</j-button>
       </j-space>
-    </template>
+    </template> -->
 
     <NodeConfig ref="nodeConfigRef" />
   </j-drawer>
@@ -30,11 +31,11 @@ import { findNodeById } from './components/utils'
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
 
-const title = computed(() => {
-  return ['CONDITIONS', 'CONCURRENTS'].includes(selectedNode.value?.type)
-    ? '高级配置'
-    : selectedNode.value?.name
-})
+// const title = computed(() => {
+//   return ['CONDITIONS', 'CONCURRENTS'].includes(selectedNode.value?.type)
+//     ? '高级配置'
+//     : selectedNode.value?.name
+// })
 
 const nodeConfigRef = ref()
 const showConfig = ref(false)
@@ -59,17 +60,17 @@ const nodeDel = (node) => {
   }
 }
 
-const handleSubmit = () => {
-  nodeConfigRef.value
-    .saveConfig()
-    .then((valid) => {
-      console.log('handleSubmit valid: ', valid)
-      showConfig.value = false
-    })
-    .catch((err) => {
-      console.log('handleSubmit err: ', err)
-    })
-}
+// const handleSubmit = () => {
+//   nodeConfigRef.value
+//     .saveConfig()
+//     .then((valid) => {
+//       console.log('handleSubmit valid: ', valid)
+//       showConfig.value = false
+//     })
+//     .catch((err) => {
+//       console.log('handleSubmit err: ', err)
+//     })
+// }
 
 /**
  * 下一步
