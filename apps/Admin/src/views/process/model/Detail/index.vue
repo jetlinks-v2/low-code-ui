@@ -80,7 +80,9 @@ const getFlowDetail = async () => {
  */
 const stepRef = ref()
 const handleNext = () => {
-  current.value++
+  stepRef.value.next().then(() => {
+    current.value++
+  })
 }
 
 /**

@@ -3,7 +3,7 @@
   <div>
     <j-button @click="handleClick" style="width: 200px">表单配置</j-button>
     <ul>
-      <li v-for="item of selectedRow">
+      <li v-for="(item, index) of selectedRow" :key="index">
         {{ item.formName || '-' }}
       </li>
     </ul>
@@ -93,7 +93,7 @@
                   <j-button
                     class="sort"
                     type="link"
-                    :disabled="selectedRow.length === 1"
+                    :disabled="selectedRow?.length === 1"
                   >
                     <!-- <AIcon type="DragOutlined" /> -->
                     移动
@@ -107,7 +107,7 @@
 
       <template #footer>
         <j-space>
-          <j-button @click="close">取消</j-button>
+          <j-button @click="visible = false">取消</j-button>
           <j-button type="primary" @click="submit">确认</j-button>
         </j-space>
       </template>
@@ -141,16 +141,11 @@ const handleClick = () => {
 }
 const drawerState = reactive({
   visible: false,
-  close: () => {
-    selectedRow.value = []
-    drawerState.visible = false
-  },
   /**
    * 保存数据
    */
   submit: () => {
-    drawerState.visible = true
-    if (selectedRow.value.length < 1) {
+    if (selectedRow.value?.length < 1) {
       onlyMessage('请至少选择一条数据', 'error')
       return
     } else {
@@ -160,7 +155,7 @@ const drawerState = reactive({
     }
   },
 })
-const { visible, close, submit } = toRefs(drawerState)
+const { visible, submit } = toRefs(drawerState)
 
 const searchText = ref('')
 const onSearch = (searchValue: string) => {
