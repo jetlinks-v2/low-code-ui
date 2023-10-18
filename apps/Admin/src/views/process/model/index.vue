@@ -1,3 +1,4 @@
+<!-- 流程模型 -->
 <template>
   <page-container>
     <pro-search :columns="columns" target="code" @search="handleSearch" />
@@ -6,19 +7,19 @@
       :columns="columns"
       :params="params"
       :request="getProcess_api"
-      :gridColumn="3"
+      :gridColumn="2"
       :defaultParams="{
         sorts: [{ name: 'createTime', order: 'desc' }],
       }"
     >
       <template #headerTitle>
         <PermissionButton type="primary" @click="handleSave(undefined)">
-          <AIcon type="PlusOutlined" />
+          <!-- <AIcon type="PlusOutlined" /> -->
           新增</PermissionButton
         >
       </template>
       <template #icon="{ icon }">
-        <j-image
+        <ProImage
           v-if="icon?.includes('http')"
           :width="50"
           :height="50"
@@ -27,13 +28,16 @@
         />
         <AIcon v-else :type="icon" :style="{ fontSize: '40px' }" />
       </template>
+      <template #classifiedId="{ classifiedId }">
+        {{ classifiedStore.getText(classifiedId) }}
+      </template>
       <template #state="{ state }">
         <BadgeStatus
           :status="state.value"
           :text="state.text"
           :statusNames="{
             undeployed: 'error',
-            deployed: 'success',
+            deployed: 'processing',
           }"
         />
       </template>
@@ -66,42 +70,55 @@
           :statusText="record.state.text"
           :statusNames="{
             undeployed: 'error',
-            deployed: 'success',
+            deployed: 'processing',
           }"
           @click="handleView(record)"
         >
           <template #content>
             <div class="card-item">
               <div class="title">
-                <j-ellipsis style="max-width: 200px">
-                  流程分类：{{ record.classifiedId }}
-                </j-ellipsis>
-                <div class="title-icon">
+                <div class="classification">
+                  <j-ellipsis style="max-width: 200px">
+                    {{ classifiedStore.getText(record.classifiedId) }}
+                  </j-ellipsis>
+                </div>
+                <div class="card-content">
                   <!-- 流程图标 -->
                   <!-- <AIcon :type="record.icon ? record.icon : 'DeleteOutlined'" /> -->
-                  <j-space align="start">
-                    <j-image
+                  <j-space :size="24" align="center">
+                    <ProImage
                       v-if="record.icon?.includes('http')"
-                      :width="80"
-                      :height="80"
+                      :width="64"
+                      :height="64"
                       :src="record.icon"
                       :preview="false"
                     />
-                    <AIcon v-else :type="record.icon" :style="{ fontSize: '40px' }" />
-                    <div>{{ record.name }}</div>
+                    <AIcon
+                      v-else
+                      :type="record.icon"
+                      :style="{ fontSize: '40px' }"
+                    />
+                    <div>
+                      <div class="name">{{ record.name }}</div>
+                      <div class="other">
+                        <j-ellipsis style="width: 200px">
+                          <span class="text">创建人：</span>
+                          <span class="value">{{ record.creatorName }}</span>
+                        </j-ellipsis>
+                        <div>
+                          <span class="text"> 创建时间： </span>
+                          <span class="value">
+                            {{
+                              dayjs(record.createTime).format(
+                                'YYYY-MM-DD HH:mm:ss',
+                              )
+                            }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </j-space>
                 </div>
-              </div>
-              <div style="display: flex">
-                <span>创建人：</span>
-                <j-ellipsis style="width: 200px">
-                  {{ record.creatorName }}
-                </j-ellipsis>
-              </div>
-              <div>
-                创建时间：{{
-                  dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss')
-                }}
               </div>
             </div>
           </template>
@@ -134,7 +151,9 @@ import {
   providerEnum,
 } from '@/api/process/model'
 import { useRequest } from '@jetlinks/hooks'
+import { useClassified } from '@/store'
 
+const classifiedStore = useClassified()
 const router = useRouter()
 const tableRef = ref()
 const params = ref({})
@@ -163,14 +182,13 @@ const columns = [
     dataIndex: 'classifiedId',
     key: 'classifiedId',
     ellipsis: true,
+    scopedSlots: true,
     search: {
       type: 'select',
-      rename: 'classifiedId',
       componentProps: {
         placeholder: '请选择流程分类',
-        fieldNames: { label: 'text', value: 'value' },
       },
-      options: useRequest(providerEnum).data,
+      options: classifiedStore.classified,
     },
   },
   {
@@ -255,7 +273,7 @@ const getActions = (record, type = 'card') => {
     {
       key: 'edit',
       text: '预览',
-      icon: 'MonitorOutlined',
+      icon: 'PlayCircleOutlined',
       permissionProps: (data) => ({
         tooltip: {
           title: '预览',
@@ -299,8 +317,9 @@ const getActions = (record, type = 'card') => {
       text: '部署',
       icon: 'DeploymentUnitOutlined',
       permissionProps: (data) => ({
+        disabled: data.state.value === 'deployed',
         tooltip: {
-          title: '部署',
+          title: data.state.value === 'deployed' ? '请勿重复部署' :'部署',
         },
         hasPermission: false,
         onClick: () => {
@@ -320,6 +339,7 @@ const getActions = (record, type = 'card') => {
       text: '删除',
       icon: 'DeleteOutlined',
       permissionProps: (data) => ({
+        disabled: data.state.value === 'deployed',
         tooltip: {
           title: '删除',
         },
@@ -409,8 +429,32 @@ const refresh = () => {
   flex-wrap: wrap;
 }
 .card-item {
-  .title-icon {
-    height: 80px;
+  .classification {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 20px;
+    color: #0a1b30;
+    height: 44px;
+  }
+  .card-content {
+    height: 64px;
+    .name {
+      margin-bottom: 16px;
+      font-size: 16px;
+      line-height: 16px;
+      font-weight: 500;
+      color: #333333;
+    }
+    .other {
+      display: inline-flex;
+
+      .text {
+        color: rgba(10, 27, 48, 0.6);
+      }
+      .value {
+        color: rgba(10, 27, 48, 0.4);
+      }
+    }
   }
 }
 </style>

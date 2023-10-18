@@ -15,7 +15,7 @@
       ref="formRef"
       :model="form"
       autocomplete="off"
-      :label-col="{ style: { width: '105px' } }"
+      layout="vertical"
     >
       <j-form-item
         name="name"
@@ -26,6 +26,7 @@
           v-model:value="form.name"
           :maxlength="64"
           placeholder="请假申请"
+          style="width: 320px"
         />
       </j-form-item>
 
@@ -37,8 +38,8 @@
         <a-select
           v-model:value="form.classifiedId"
           placeholder="请选择流程分类"
-          :options="providerOptions"
-          :fieldNames="{ label: 'text', value: 'value' }"
+          :options="classifiedStore.classified"
+          style="width: 320px"
         >
           <template #notFoundContent>
             <div>
@@ -54,30 +55,37 @@
         label="流程图标"
         :rules="[{ required: true, message: '请上传流程图标' }]"
       >
-        <j-space>
-          <div class="upload-icon" v-for="item of baseIcon">
-            <AIcon :type="item" />
+        <j-space :size="24">
+          <div class="base-icon" v-for="(item, index) of baseIcon"> 
+            <div class="upload-icon" >
+              <AIcon :type="item" />
+            </div>
+            <div>图标{{ index+1 }}</div>
           </div>
-          <div class="upload-icon">
-            <ImageUpload v-model:value="form.icon" :accept="accept">
-              <template #content="{ imageUrl }">
-                <div v-if="imageUrl">
-                  <j-image
-                    v-if="imageUrl?.includes('http')"
-                    :src="imageUrl"
-                    :width="98"
-                    :preview="false"
-                  />
-                  <AIcon
-                    v-else
-                    :type="form.icon"
-                    :style="{ fontSize: '40px' }"
-                  />
-                  <div class="upload-image-mask">更换</div>
-                </div>
-                <AIcon v-else type="PlusOutlined" style="font-size: 20px" />
-              </template>
-            </ImageUpload>
+          <div class="base-icon">
+            <div class="upload-icon">
+              <ImageUpload v-model:value="form.icon" :accept="accept">
+                <template #content="{ imageUrl }">
+                  <div v-if="imageUrl">
+                    <ProImage
+                      v-if="imageUrl?.includes('http')"
+                      :src="imageUrl"
+                      :width="48"
+                      :preview="false"
+                    />
+                    <AIcon
+                      v-else
+                      :type="form.icon"
+                      :style="{ fontSize: '16px' }"
+                    />
+                    <div class="upload-image-mask">更换</div>
+                  </div>
+                  <AIcon v-else type="PlusOutlined" style="font-size: 20px" />
+                </template>
+              </ImageUpload>
+              <!-- <div>自定义</div> -->
+            </div>
+            <div>自定义</div>
           </div>
         </j-space>
       </j-form-item>
@@ -89,7 +97,7 @@
 import { onlyMessage, randomString } from '@jetlinks/utils'
 import { saveProcess_api, providerEnum } from '@/api/process/model'
 import { useRequest } from '@jetlinks/hooks'
-import { _fileUpload } from '@/api/comm'
+import { useClassified } from '@/store'
 
 type FormType = {
   id?: string
@@ -117,6 +125,7 @@ const emits = defineEmits<{
   (e: 'refresh'): void
 }>()
 
+const classifiedStore = useClassified()
 const baseIcon = [
   'icon-shujumoni',
   'icon-tongzhiguanli',
@@ -135,7 +144,7 @@ const form = reactive<Partial<FormType>>({
   provider: 'wflow',
 })
 
-const { data: providerOptions } = useRequest(providerEnum)
+// const { data: providerOptions } = useRequest(providerEnum)
 
 const { loading, run } = useRequest(saveProcess_api, {
   immediate: false,
@@ -173,14 +182,19 @@ watch(
 </script>
 
 <style lang="less" scoped>
+.base-icon{
+  text-align: center;
+}
 .upload-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100px;
-  height: 100px;
-  font-size: 40px;
-  border: 1px dashed #ccc;
+  width: 48px;
+  height: 48px;
+  // font-size: 16px;
+  border-radius: 4px;
+  border: 1px dashed #DCDCDC;
+  background: #eeeeee;
 
   :deep(.upload-image-content) {
     &:hover .upload-image-mask {
