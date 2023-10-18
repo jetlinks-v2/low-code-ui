@@ -100,6 +100,7 @@ const confirmLoading = ref(false)
 const editValue = ref()
 
 const getInfo = async () => {
+  data.value = null
   const { projectId, parentId, id } = props.resource.callPage
   const res = await getResource(projectId, parentId, id)
   data.value = res
