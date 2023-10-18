@@ -88,7 +88,7 @@ const onSave = async () => {
          code,
          children: props.data.children || [],
          options: {
-            pageId: id,
+            pageId: props.data.options?.pageId || id,
             projectId: props.projectId,
             LowCode: true,
             show:true,
