@@ -1,7 +1,7 @@
 <!-- 基础信息配置表单 -->
 <template>
   <div>
-    <j-button @click="handleClick" style="width: 200px">表单配置</j-button>
+    <j-button @click="visible = true" style="width: 200px">表单配置</j-button>
     <ul>
       <li v-for="(item, index) of selectedRow" :key="index">
         {{ item.formName || '-' }}
@@ -14,7 +14,6 @@
       :closable="false"
       placement="right"
       width="50%"
-      @close="submit"
       :contentWrapperStyle="{
         // width: 'auto',
         minWidth: '50%',
@@ -104,13 +103,6 @@
           </draggable>
         </j-col>
       </j-row>
-
-      <template #footer>
-        <j-space>
-          <j-button @click="visible = false">取消</j-button>
-          <j-button type="primary" @click="submit">确认</j-button>
-        </j-space>
-      </template>
     </j-drawer>
   </div>
 </template>
@@ -131,33 +123,28 @@ const props = defineProps({
 const emits = defineEmits(['update:modelValue', 'change'])
 
 const drag = ref(true)
-// const moveable = (flag) => {
-//   console.log(`output->1`, 1)
-//   drag.value = flag
-// }
-
-const handleClick = () => {
-  visible.value = true
-}
-const drawerState = reactive({
-  visible: false,
-  /**
-   * 保存数据
-   */
-  submit: () => {
-    if (selectedRow.value?.length < 1) {
-      onlyMessage('请至少选择一条数据', 'error')
-      return
-    } else {
-      emits('update:modelValue', selectedRow.value)
-      emits('change', selectedRow.value)
-      drawerState.visible = false
-    }
-  },
-})
-const { visible, submit } = toRefs(drawerState)
-
+const visible = ref(false)
 const searchText = ref('')
+// 选中项
+const selectedRow = ref<any>([])
+// 是否选中
+const isActive = computed(() => (key) => {
+  return selectedRow.value?.map((i) => i.formId).includes(key)
+})
+
+const params = ref<any>({})
+const columns = [
+  {
+    title: '流程名称',
+    dataIndex: 'name',
+    key: 'name',
+    ellipsis: true,
+    scopedSlots: true,
+  },
+]
+/**
+ * 搜索
+ */
 const onSearch = (searchValue: string) => {
   params.value = {
     terms: [
@@ -171,53 +158,6 @@ const onSearch = (searchValue: string) => {
   }
 }
 
-const params = ref<any>({})
-const columns = [
-  {
-    title: '流程名称',
-    dataIndex: 'name',
-    key: 'name',
-    ellipsis: true,
-    scopedSlots: true,
-  },
-]
-const query = (params) => {
-  return new Promise<any>((resolve, reject) => {
-    resolve({
-      result: {
-        data: [
-          {
-            id: 1,
-            name: '表单1',
-            value1: 'form',
-            createTime: '2021-05-11 16:11:11',
-          },
-          {
-            id: 2,
-            name: '表单2',
-            createTime: '2021-05-11 16:11:11',
-          },
-          {
-            id: 3,
-            name: '表单3',
-            createTime: '2021-05-11 16:11:11',
-          },
-        ],
-        pageIndex: 0,
-        pageSize: 12,
-        total: 40,
-      },
-      status: 200,
-    })
-  })
-}
-
-// 是否选中
-const isActive = computed(() => (key) => {
-  return selectedRow.value?.map((i) => i.formId).includes(key)
-})
-// 选中项
-const selectedRow = ref<any>([])
 /**
  * 表格选中/右侧已选删除
  */
@@ -243,12 +183,30 @@ const onSelectChange = (row: any) => {
   //   console.log('selectedRow.value: ', selectedRow.value)
 }
 
+const submit = () => {
+  if (selectedRow.value?.length < 1) {
+    onlyMessage('请至少选择一条数据', 'error')
+    return
+  } else {
+    emits('update:modelValue', selectedRow.value)
+    emits('change', selectedRow.value)
+    visible.value = false
+  }
+}
+
 watch(
   () => props.modelValue,
   () => {
     selectedRow.value = props.modelValue
   },
   { immediate: true },
+)
+watch(
+  () => visible.value,
+  (val) => {
+    if (!val) submit()
+  },
+  { deep: true },
 )
 </script>
 <style scoped lang="less">
