@@ -15,7 +15,7 @@
                  v-if="myRelation.enabled">
               <div class="descriptions-item">
                 <div class="descriptions-title">
-                  关系标识
+                  关系对象标识
                 </div>
                 <div class="descriptions-content">
                   <j-form-item name="relationType"
@@ -28,7 +28,7 @@
               </div>
               <div class="descriptions-item">
                 <div class="descriptions-title">
-                  关系名称
+                  关系对象名称
                 </div>
                 <div class="descriptions-content">
                   <j-form-item name="relationTypeName"

@@ -215,7 +215,7 @@ watchEffect(() => {
   steps.value = [
     {
       title: '步骤1',
-      description: '选择后端功能作为列表页的数据来源',
+      description: '选择后端功能作为标准列表页的数据来源',
       placement: 'bottom',
       target: () => [
         {
@@ -225,7 +225,7 @@ watchEffect(() => {
     },
     {
       title: '步骤2',
-      description: '不同色块代表列表页的不同功能，你可以根据业务需要自由选配',
+      description: '不同色块代表标准列表页的不同功能，你可以根据业务需要自由选配',
       placement: 'top',
       target: () => [
         {
