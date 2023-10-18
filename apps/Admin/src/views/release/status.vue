@@ -36,10 +36,11 @@
                 <div v-else-if="status[node.id] === 1" @click="() => showModal(node.id)">
                   <AIcon style="color: #FF3333" type="CloseCircleFilled"/>
                   <span style="color: #FF3333;padding-left: 4px;">
-                    {{ statusMsg[node.id][0] }}
-                    <span v-if="statusMsg[node.id].length > 1">
-                      等{{ statusMsg[node.id].length }}个问题
-                    </span>
+                    未完成合规性校验
+<!--                    {{ statusMsg[node.id][0] }}-->
+<!--                    <span v-if="statusMsg[node.id].length > 1">-->
+<!--                      等{{ statusMsg[node.id].length }}个问题-->
+<!--                    </span>-->
                   </span>
                 </div>
                 <div v-else-if="status[node.id] === 2">
