@@ -130,6 +130,7 @@ const generatorData = (node: any) => {
 
     result.componentProps = {
         ...handleProps(node),
+        keys: [],
         visible: true,
         editable: true
     }

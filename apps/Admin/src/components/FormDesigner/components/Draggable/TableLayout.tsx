@@ -2,7 +2,7 @@ import Selection from '../Selection/index'
 import './index.less'
 import { withModifiers } from 'vue'
 import { Table, AIcon, Button, TableColumn, FormItem } from 'jetlinks-ui-components'
-import { cloneDeep, get, map, omit, set } from 'lodash-es'
+import { cloneDeep, get, omit, set } from 'lodash-es'
 import { useProps, useTool } from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import { uid } from '../../utils/uid'
@@ -30,11 +30,18 @@ export default defineComponent({
         index: {
             type: Number,
             default: 0
+        },
+        visible: {
+            type: Boolean,
+            default: true
+        },
+        editable: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
-        const product = useProduct()
 
         const { isEditModel, isDragArea, layoutPadStyle } = useTool()
 
@@ -78,7 +85,7 @@ export default defineComponent({
                     })
                 ]
             })
-            designer.onAddChild(_item, props.data, false)
+            designer.onAddChild(_item, props.data)
         }
 
         const onAddIndex = () => {
@@ -102,7 +109,7 @@ export default defineComponent({
                         align: 'left',
                     },
                 })
-                designer.onAddChild(_item, props.data, true)
+                designer.onAddChild(_item, props.data, 'start')
             }
         }
 
@@ -127,18 +134,19 @@ export default defineComponent({
                         })
                     ],
                 })
-                designer.onAddChild(_item, props.data)
+                designer.onAddChild(_item, props.data, 'end')
             }
         }
 
         const componentRender = (dt: any, __data: any) => {
             const _path1 = [...unref(__path), dt?.index, __data?.formItemProps.name]
             const TypeComponent = componentMap[__data?.type || 'input']
-            const _props = useProps(__data, unref(designer.formData), unref(designer.mode))
+            const _props = useProps(__data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
             const options = ref<any[]>(_props.componentProps.options)
             const treeData = ref<any[]>(_props.componentProps.treeData)
+
             if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(__data?.type)) {
-                queryOptions(__data.componentProps.source, product.info?.id).then(resp => {
+                queryOptions(__data.componentProps.source).then(resp => {
                     if (['select', 'select-card'].includes(__data?.type)) {
                         options.value = resp
                     } else {

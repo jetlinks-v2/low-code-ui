@@ -23,7 +23,7 @@
       :gridColumn="2"
       :gridColumns="[2]"
       :rowSelection="{
-        selectedRowKeys: _selectedRowKeys,
+        selectedRowKeys: map(_selectedRowKeys, 'id'),
         onSelect: onSelectChange,
         onSelectNone: onSelectNone,
         onSelectAll: onAllSelect,
@@ -36,7 +36,7 @@
           :status="
             type === 'product' ? slotProps.state : slotProps.state?.value
           "
-          :active="_selectedRowKeys.includes(slotProps.id)"
+          :active="map(_selectedRowKeys, 'id').includes(slotProps.id)"
           @click="() => onSelectChange(slotProps)"
           :statusText="
             type === 'product'
@@ -82,8 +82,16 @@
       </template>
       <template #state="slotProps">
         <BadgeStatus
-          :text="type === 'product' ? (slotProps.state === 1 ? '正常' : '禁用') : slotProps.state?.text"
-          :status="type === 'product' ? slotProps.state : slotProps.state?.value"
+          :text="
+            type === 'product'
+              ? slotProps.state === 1
+                ? '正常'
+                : '禁用'
+              : slotProps.state?.text
+          "
+          :status="
+            type === 'product' ? slotProps.state : slotProps.state?.value
+          "
           :statusNames="
             type === 'product'
               ? {
@@ -104,11 +112,12 @@
 
 <script lang="ts" setup>
 import { queryProductList, queryDeviceList } from '@/api/form'
-import { inject, ref } from 'vue'
+import { map } from 'lodash-es'
+import { inject, ref, watch } from 'vue'
 const props = defineProps({
   select: {
     type: Array,
-    default: [],
+    default: () => [],
   },
 })
 const type = inject('type')
@@ -164,24 +173,25 @@ const columns = [
     },
   },
 ]
-const _selectedRowKeys: any = ref(props.select)
-const emit = defineEmits(['close', 'updateData'])
+const _selectedRowKeys:any = ref<any[]>([])
+const emit = defineEmits(['close', 'save'])
+
 const params = ref()
+
 const handleSearch = (i: any) => {
   params.value = i
 }
+
 const onSelectChange = (row: any) => {
   if (mode !== 'multiple') {
-    _selectedRowKeys.value = [row.id]
+    _selectedRowKeys.value = [row]
   } else {
-    const arr = new Set(_selectedRowKeys.value)
-    const index = _selectedRowKeys.value.indexOf(row.id)
+    const index = _selectedRowKeys.value.findIndex((item) => row.id === item.id)
     if (index === -1) {
-      arr.add(row.id)
+      _selectedRowKeys.value.push(row)
     } else {
-      arr.delete(row.id)
+      _selectedRowKeys.value.splice(index, 1)
     }
-    _selectedRowKeys.value = [...arr.values()]
   }
 }
 
@@ -191,17 +201,18 @@ const onSelectNone = () => {
 
 const onAllSelect = (selected: Boolean, selectedRows: any, changeRows: any) => {
   if (selected) {
+    const _arr = map(_selectedRowKeys.value, 'id')
     changeRows.map((i: any) => {
-      if (!_selectedRowKeys.value.includes(i.id)) {
-        _selectedRowKeys.value.push(i.id)
+      if (!_arr.includes(i.id)) {
+        _selectedRowKeys.value.push(i)
       }
     })
   } else {
     const arr = changeRows.map((item: any) => item.id)
-    const _ids: string[] = []
+    const _ids: any[] = []
     _selectedRowKeys.value.map((i: any) => {
-      if (!arr.includes(i)) {
-        _ids.push(i.id)
+      if (!arr.includes(i.id)) {
+        _ids.push(i)
       }
     })
     _selectedRowKeys.value = _ids
@@ -212,19 +223,18 @@ const closeModal = () => {
 }
 
 const submitData = () => {
-  emit('updateData', _selectedRowKeys.value)
+  emit('save', _selectedRowKeys.value)
 }
 
-watch(() => JSON.stringify(props.select), () => {
-  _selectedRowKeys.value = props.select
-})
-
-// onMounted(() => {
-//   console.log(props.select)
-//   if (props.select.length) {
-//     _selectedRowKeys.value = props.select
-//   }
-// })
+watch(
+  () => props.select,
+  () => {
+    _selectedRowKeys.value = props?.select || []
+  },
+  {
+    deep: true,
+  },
+)
 </script>
 <style lang="less" scoped>
 .table {

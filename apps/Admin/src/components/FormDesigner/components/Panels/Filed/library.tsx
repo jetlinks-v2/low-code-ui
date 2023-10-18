@@ -1,6 +1,6 @@
 
 import { filedData } from '../../../utils/defaultData'
-import DragGableWrap from '../../Draggable/DragGableWrap'
+import DraggableWrap from '../../Draggable/DraggableWrap'
 import { IconWidget } from '../../Icons';
 import './index.less';
 import { onEnd } from '@/components/FormDesigner/components/Draggable/ControlInsertionPlugin';
@@ -50,7 +50,7 @@ const Library = defineComponent({
                                 <div class="filed-item-title">{element.name}</div>
                                 {
                                     element.children?.length && (
-                                        <DragGableWrap
+                                        <DraggableWrap
                                             list={element?.children || []}
                                             {...options}
                                             class={"filed-item-children"}
@@ -61,7 +61,7 @@ const Library = defineComponent({
                                             onEnd={(e) => {
                                                 onEnd(e, designer)
                                             }}
-                                        ></DragGableWrap>
+                                        ></DraggableWrap>
                                     )
                                 }
                             </div>

@@ -218,7 +218,7 @@
         </div>
       </template>
       <div class="api">
-        <AIcon type="BarsOutlined"></AIcon>
+        <AIcon type="icon-rongqi"></AIcon>
       </div>
     </j-popover>
   </div>

@@ -1,8 +1,16 @@
 import { uid } from "./uid"
 import componentMap from "./componentMap"
 import { ISchema } from "../typings"
-import { queryDictionaryData, queryRuntime } from "@/api/form"
+import { queryDictionary, queryDictionaryData, queryEndCommands, queryProject, queryRuntime } from "@/api/form"
 import { isObject, map, omit } from "lodash-es"
+
+// 查询数据字典或者项目列表
+let _source = {
+    end: [],
+    dictionary: []
+}
+// 查询command
+const _commandsMap = new Map()
 
 export const searchTree = (arr: any[], _item: any) => {
     let _data: any = undefined
@@ -51,7 +59,7 @@ export const generateOptions = (len: number) => {
 
 const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo', 'product', 'device', 'org', 'user', 'role']
 
-const checkedConfigItem = (node: ISchema, allData: any[], source: any, formList: any[]) => {
+const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], source: any, commandsMap: any) => {
     const obj = {
         key: node?.key,
         message: (node.formItemProps?.label || node.name) + '配置错误'
@@ -103,16 +111,19 @@ const checkedConfigItem = (node: ISchema, allData: any[], source: any, formList:
                             return obj
                         }
                     }
-
                 } else {
-                    if (!node?.componentProps.source?.functionId || !node?.componentProps.source?.commandId || !node?.componentProps.source?.label || !node?.componentProps.source?.value) {
+                    if (!node?.componentProps.source?.projectId || !node?.componentProps.source?.functionId || !node?.componentProps.source?.commandId || !node?.componentProps.source?.label || !node?.componentProps.source?.value) {
                         return obj
                     }
                     if (node?.componentProps.source?.isSource && !node?.componentProps.source?.source) {
                         return obj
                     }
                     // 数据是否被删除
-                    const _functions = (source.end || []).find(i => node?.componentProps.source?.functionId === i.id)
+                    const _projects = (source.end || []).find(i => node?.componentProps.source?.projectId === i.id)
+                    if (!_projects) {
+                        return obj
+                    }
+                    const _functions = (commandsMap.get(node?.componentProps.source?.projectId) || []).find(i => node?.componentProps.source?.functionId === i.id)
                     if (!_functions) {
                         return obj
                     }
@@ -131,21 +142,21 @@ const checkedConfigItem = (node: ISchema, allData: any[], source: any, formList:
                     if (node?.componentProps.source?.isSource) {
                         const _sourceList = getArray(list)
                         const _data = searchTree(_sourceList, node?.componentProps.source?.source)
-                        if(!_data){
+                        if (!_data) {
                             return obj
                         }
                         if (_data?.valueType?.type === 'array') {
                             _array = _data.valueType?.elementType?.properties?.map((item) => {
-                              return {
-                                label: item.name,
-                                value: item.id,
-                              }
+                                return {
+                                    label: item.name,
+                                    value: item.id,
+                                }
                             })
                         }
                     } else {
                         _array = [...list]
                     }
-                    if(!(map(_array, 'value').includes(node?.componentProps.source?.label) && map(_array, 'value').includes(node?.componentProps.source?.value))){
+                    if (!(map(_array, 'value').includes(node?.componentProps.source?.label) && map(_array, 'value').includes(node?.componentProps.source?.value))) {
                         return obj
                     }
                 }
@@ -174,28 +185,72 @@ const checkedConfigItem = (node: ISchema, allData: any[], source: any, formList:
         if (node?.formItemProps?.isLayout && !node.formItemProps?.label) {
             return obj
         }
+        if (['org', 'role', 'user', 'product', 'device'].includes(_type)) {
+            if (!node.componentProps?.keys?.length) {
+                return obj
+            }
+        }
     }
     return false
 }
 
-// 校验配置项必填
-const checkConfig = (node: ISchema, allData: any[], source: any, formList: any[]) => {
-    const _data: any = checkedConfigItem(node, allData, source, formList);
-    let _rules: any[] = []
-    if (_data) {
-        _rules.push(_data)
+// 后端能力
+const _valEndData = async (node: ISchema) => {
+    if (node.componentProps?.source?.type === 'dic' && !_source.dictionary?.length) {
+        const resp = await queryDictionary()
+        if (resp.success) {
+            _source = {
+                ..._source,
+                dictionary: resp?.result || []
+            }
+        }
     }
-    if (node.children && node.children?.length) {
-        node?.children.map(item => {
-            const arr = checkConfig(item, allData, source, formList)
-            _rules = [..._rules, ...arr]
-        })
+    if (node.componentProps?.source?.type === 'end' && !_source.end?.length) {
+        const resp = await queryProject()
+        if (resp.success) {
+            _source = {
+                ..._source,
+                end: resp?.result || []
+            }
+        }
     }
-    return _rules
+    if (node.componentProps?.source?.projectId && !_commandsMap.get(node.componentProps?.source?.projectId)) {
+        const resp = await queryEndCommands(node.componentProps?.source?.projectId, ['rdb-crud'])
+        if (resp.success) {
+            _commandsMap.set(node.componentProps?.source?.projectId, resp.result || [])
+        }
+    }
 }
 
-export const checkedConfig = (node: ISchema, source: any, formList: any[]) => {
-    return checkConfig(node, node?.children || [], source, formList)
+const errorMap = new Map()
+// 校验配置项必填
+const checkConfig = async (node: ISchema, allData: any[], formList: any[]) => {
+    if (['select', 'tree-select', 'select-card'].includes(node.type)) {
+        await _valEndData(node)
+    }
+    const _data: any = checkedConfigItem(node, allData, formList, _source, _commandsMap);
+    if (_data) {
+        errorMap.set(node.key, _data)
+    }
+    if (node.children && node.children?.length) {
+        for (let index = 0; index < node?.children?.length; index++) {
+            const element = node?.children[index];
+            await checkConfig(element, allData, formList)
+        }
+    }
+}
+
+export const checkedConfig = (node: ISchema, formList: any[]) => {
+    _commandsMap.clear()
+    errorMap.clear()
+    _source = {
+        end: [],
+        dictionary: []
+    }
+    return new Promise(async (resolve) => {
+        await checkConfig(node, node?.children || [], formList)
+        resolve([...errorMap.values()])
+    })
 }
 
 export const updateData = (list: ISchema[], item?: any) => {
@@ -296,14 +351,15 @@ export const getBrotherList = (value: string | number, arr: any[]) => {
 const getData = (key: string, obj: any) => {
     if (key) {
         const arr = Object.keys(obj) || []
-        return arr.find(item => {
+        let _item = undefined;
+        arr.map(item => {
             if (item === key) {
-                return obj?.[key]
-            }
-            if (isObject(obj[item])) {
-                return getData(key, obj[item])
+                _item = obj?.[key]
+            } else if (isObject(obj[item])) {
+                _item = getData(key, obj[item])
             }
         })
+        return _item
     }
     return obj
 }
@@ -344,7 +400,7 @@ const _getEndData = (arr: any[], source: any) => {
 }
 
 // 获取options
-export const queryOptions = async (source: any, id: string) => {
+export const queryOptions = async (source: any) => {
     if (source?.type === 'dic' && source?.dictionary) {
         const resp = await queryDictionaryData(source?.dictionary)
         if (resp.success) {
@@ -352,8 +408,8 @@ export const queryOptions = async (source: any, id: string) => {
             return bubbleSort(list)
         }
     }
-    if (id && source?.type === 'end' && source?.functionId && source?.commandId && source?.label && source?.value) {
-        const resp = await queryRuntime(id, id + '.' + source?.functionId, source?.commandId, {})
+    if (source?.projectId && source?.type === 'end' && source?.functionId && source?.commandId && source?.label && source?.value) {
+        const resp = await queryRuntime(source?.projectId, source?.fullId, source?.commandId, {})
         if (resp.success) {
             const arr = getData(source?.source, resp?.result || [])
             if (Array.isArray(arr) && arr?.length) {
@@ -406,15 +462,12 @@ export const copyDataByKey = (arr: any[], newData: any[], _item: any) => {
     }
 }
 
-// 添加子组件flag: true: 开头， undefined: 尾部，false: 中间
-export const appendChildItem = (arr: any[], newData: any, parent: any, flag?: boolean) => {
+// 添加子组件_flag: start: 开头， end: 尾部  undefined：中间
+export const appendChildItem = (arr: any[], newData: any, parent: any, _flag?: 'start' | 'end' | undefined) => {
     return arr.map(item => {
         let child: any[] = item?.children || []
         if (item.key === parent?.key) {
-            if (flag === undefined) {
-                child = [...child, newData]
-            }
-            if (flag === false) {
+            if (!_flag) {
                 const _f = child.find(item => item?.children?.[0]?.type === 'table-item-actions')
                 if (_f) {
                     child.splice(child.length - 1, 0, newData)
@@ -422,16 +475,18 @@ export const appendChildItem = (arr: any[], newData: any, parent: any, flag?: bo
                     child.push(newData)
                 }
             }
-            if (flag === true) {
+            if (_flag === 'end') {
+                child = [...child, newData]
+            }
+            if (_flag === 'start') {
                 child = [newData, ...child]
             }
             return {
                 ...item,
                 children: child
             }
-        }
-        if (item.children?.length) {
-            child = appendChildItem(item.children, newData, parent)
+        } else if (item.children?.length) {
+            child = appendChildItem(item.children, newData, parent, _flag)
         }
         return {
             ...item,
@@ -462,6 +517,14 @@ export const getFieldData = (data: ISchema) => {
             _obj[data?.formItemProps?.name] = [omit(obj, ['actions', 'index'])]
         } else if (data.type === 'switch') {
             _obj[data?.formItemProps?.name] = obj || false
+        } else if (['org', 'role', 'user', 'product', 'device'].includes(data.type)) {
+            if (data.componentProps?.mode === 'multiple') {
+                _obj[data?.formItemProps?.name] = obj
+            } else {
+                data.componentProps.keys.map(i => {
+                    _obj[i?.config?.source] = undefined
+                })
+            }
         } else {
             _obj[data?.formItemProps?.name] = obj
         }

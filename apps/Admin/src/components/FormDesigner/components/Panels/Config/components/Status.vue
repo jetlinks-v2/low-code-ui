@@ -2,7 +2,7 @@
   <div>
     <j-form-item
       :validateFirst="true"
-      v-if="type !== 'geo'"
+      v-if="!['geo', 'device', 'product', 'org', 'user', 'role'].includes(type)"
       label="css样式"
       :name="['componentProps', 'cssCode']"
     >
@@ -15,7 +15,7 @@
     </j-form-item>
     <j-form-item
       :validateFirst="true"
-      v-if="type !== 'geo'"
+      v-if="!['geo', 'device', 'product', 'org', 'user', 'role'].includes(type)"
       label="JS代码"
       :name="['componentProps', 'eventCode']"
     >
@@ -38,10 +38,6 @@
       ]"
       v-if="type !== 'root' && isShow"
     >
-      <!-- <j-radio-group @change="onDataChange" v-model:value="target.componentProps.visible" button-style="solid">
-        <j-radio-button :value="true">展示</j-radio-button>
-        <j-radio-button :value="false">隐藏</j-radio-button>
-      </j-radio-group> -->
       <CheckButton
         :options="[
           { label: '展示', value: true },
@@ -63,14 +59,6 @@
         },
       ]"
     >
-      <!-- <j-radio-group
-        @change="onDataChange"
-        v-model:value="target.componentProps.editable"
-        button-style="solid"
-      >
-        <j-radio-button :value="true">支持</j-radio-button>
-        <j-radio-button :value="false">不支持</j-radio-button>
-      </j-radio-group> -->
       <CheckButton
         :options="[
           { label: '支持', value: true },

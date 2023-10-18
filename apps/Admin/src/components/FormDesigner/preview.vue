@@ -3,10 +3,10 @@
     <Canvas></Canvas>
   </div>
 </template>
-  
+
 <script lang="ts" setup>
 import Canvas from './components/Panels/Canvas/index'
-import { provide, ref, reactive, PropType, watch, unref } from 'vue'
+import {provide, ref, reactive, PropType, watch} from 'vue'
 import { ISchema } from './typings'
 import { getFieldData, initData } from './utils/utils'
 import { proAll } from '../QuickEditTable/util'
@@ -15,7 +15,7 @@ const props = defineProps({
   value: {
     // 表单初始值
     type: Object,
-    default: () => {},
+    default: () => ({}),
   },
   mode: {
     type: String as PropType<'add' | 'edit'>,
@@ -23,6 +23,7 @@ const props = defineProps({
   },
   data: {
     type: Object,
+    default: () => ({}),
   },
   type: {
     // 判断是工作流还是低代码
@@ -31,6 +32,10 @@ const props = defineProps({
   },
   projectId: {
     type: String,
+  },
+  disabled: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -43,27 +48,19 @@ const refList = ref<any>({})
 const formRefList = ref<any>({})
 
 watch(
-  () => props.data,
-  (newVal) => {
-    formData.value = (newVal || initData) as ISchema
-    Object.assign(formState, getFieldData(formData.value) || {})
+  () => [JSON.stringify(props.value), JSON.stringify(props.data)],
+  () => {
+    if (props.data) {
+      formData.value = (props.data || initData) as ISchema
+      Object.assign(formState, getFieldData(formData.value) || {})
+    }
+    Object.assign(formState, props.value || {})
   },
   {
-    deep: true,
     immediate: true,
   },
 )
 
-watch(
-  () => props.value,
-  () => {
-    Object.assign(formState, props.value)
-  },
-  {
-    deep: true,
-    immediate: true,
-  },
-)
 
 provide('FormDesigner', {
   model: 'preview',
@@ -74,20 +71,11 @@ provide('FormDesigner', {
   formState,
   formRef,
   mode: props.mode,
-  projectId: props.projectId
+  projectId: props.projectId,
+  disabled: props.disabled
 })
 
 const onSave = () => {
-  // return new Promise((resolve, reject) => {
-  //   formRef.value
-  //     .validate()
-  //     .then((_data: any) => {
-  //       resolve({ ...unref(formState), ..._data })
-  //     })
-  //     .catch((err: any) => {
-  //       reject(err)
-  //     })
-  // })
   // 校验内嵌表单
   const _func = Object.keys(formRefList.value || {}).map((item) => {
       return formRefList.value[item]?.onSave()
@@ -97,6 +85,7 @@ const onSave = () => {
     return new Promise((resolve, reject) => {
       proAll(_func)
         .then(() => {
+          //
           resolve(formState)
         })
         .catch((err) => {
@@ -124,7 +113,7 @@ watch(
 
 defineExpose({ onSave })
 </script>
-  
+
 <style lang="less" scoped>
 .container {
   background-color: #fff;
