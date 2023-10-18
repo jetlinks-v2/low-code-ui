@@ -7,6 +7,9 @@ import { request } from '@jetlinks/core'
  */
 export const getMeProcessList = (data: any, type: string,todo:boolean) => request.post(`/process/runtime/processes/${type}/_query?history=${todo}`, data);
 
+//发起人
+export const getInitiatorList = (data?:any) => request.post(`/process/runtime/processes/to-claim/_query/no-paging?distinctBy=creatorId`, data);
+
 //签收
 export const _claim = (taskId: string, data: any) => request.post(`/process/runtime/task/${taskId}/_claim`, data);
 //保存
@@ -22,5 +25,11 @@ export const getProcessDetail = (id: string,todo:boolean) => request.get(`/proce
 //获取待办流程详情
 export const getProcessTodoDetail = (id: string,taskId:string) => request.get(`/process/runtime/process/todo/${id}/${taskId}`);
 
+//获取指定审批人列表
+export const getApprover = (taskId:string,data:any) => request.post(`/process/runtime/taskLink/${taskId}/_query`,data)
+
+//删除草稿流程
+
+export const _delete = (processId: string,data?:any) => request.put(`/process/runtime/${processId}/_delete`, data);
 //获取用户
 export const getUserList = (data: any) => request.post('/user/_query', data);
