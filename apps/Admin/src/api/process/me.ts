@@ -32,4 +32,4 @@ export const getApprover = (taskId:string,data:any) => request.post(`/process/ru
 
 export const _delete = (processId: string,data?:any) => request.put(`/process/runtime/${processId}/_delete`, data);
 //获取用户
-export const getUserList_api = (data: object) => request.post(`/user/detail/_query`, data);
+export const getUserList = (data: any) => request.post('/user/_query', data);
