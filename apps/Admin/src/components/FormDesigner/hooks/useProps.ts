@@ -28,13 +28,13 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
     //   }
     // }
 
-    const elementValueType = element?.formItemProps?.type || 'string'
+    // const elementValueType = element?.formItemProps?.type || 'string'
 
     return {
       trigger,
       validator(rule,value,cb) {
         const errorMessage: Array<string> = []
-        const len = elementValueType === 'number' ? value : value?.length
+        const len = element?.type === 'input-number' ? value : value?.length
         // validator
         let customFn = new Function('rule', 'value', 'callback', item?.validator)
         customFn(rule, value, cb)?.catch?.(err => {

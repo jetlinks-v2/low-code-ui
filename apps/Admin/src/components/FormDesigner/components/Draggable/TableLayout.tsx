@@ -155,6 +155,10 @@ export default defineComponent({
                 })
             }
 
+            const onChange = () => {
+                designer?.onChange?.()
+            }
+
             return <FormItem class="table-item" {...omit(__data?.formItemProps, 'label')} name={[unref(_formItemProps)?.name, dt.index, __data?.formItemProps?.name]}>
                 {
                     __data?.type === 'switch' ?
@@ -162,12 +166,14 @@ export default defineComponent({
                             {..._props?.componentProps}
                             checked={get(designer.formState, _path1)}
                             onUpdate:checked={(newValue) => set(designer.formState, _path1, newValue)}
+                            onChange={onChange}
                         /> : <TypeComponent
                             {..._props?.componentProps}
                             options={unref(options)}
                             treeData={unref(treeData)}
                             value={get(designer.formState, _path1)}
                             onUpdate:value={(newValue) => set(designer.formState, _path1, newValue)}
+                            onChange={onChange}
                         />
                 }
             </FormItem>

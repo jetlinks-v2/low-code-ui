@@ -42,7 +42,6 @@ const config = computed(() => {
 })
 
 const onValueChange = (e) => {
-  console.log(e, 'eeeee')
   emit('update:value', e)
 }
 

@@ -47,6 +47,10 @@ const formRef = ref<any>()
 const refList = ref<any>({})
 const formRefList = ref<any>({})
 
+const onChange = () => {
+  emit('stateChange', formState)
+}
+
 watch(
   () => [JSON.stringify(props.value), JSON.stringify(props.data)],
   () => {
@@ -71,8 +75,8 @@ provide('FormDesigner', {
   formState,
   formRef,
   mode: props.mode,
-  projectId: props.projectId,
-  disabled: props.disabled
+  disabled: props.disabled,
+  onChange
 })
 
 const onSave = () => {
@@ -98,16 +102,6 @@ watch(
   () => JSON.stringify(formData.value),
   () => {
     emit('valueChange', formData.value)
-  },
-)
-
-watch(
-  () => formState,
-  (newVal) => {
-    emit('stateChange', newVal)
-  },
-  {
-    deep: true,
   },
 )
 
