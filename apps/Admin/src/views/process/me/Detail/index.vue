@@ -6,7 +6,7 @@
         </j-select>
         <j-tabs v-model:activeKey="activeKey" type="card" v-if="type !== 'todo' || !!taskId">
             <j-tab-pane key="form" tab="表单">
-                <FlowForm :info="info" :nodeId="taskNodeId" :type="type"/>
+                <FlowForm :info="info" :nodeId="taskNodeId" :type="type" @close="closeDrawer"/>
             </j-tab-pane>
             <j-tab-pane key="chart" tab="流程图">
                 <FlowChart :info="info" />
@@ -56,6 +56,10 @@ const getDetail = async (taskId?: string) => {
 const onChange = (e, options) => {
     taskNodeId.value = options.nodeId
     getDetail(e)
+}
+
+const closeDrawer = ()=>{
+    emit('close')
 }
 
 onMounted(() => {
