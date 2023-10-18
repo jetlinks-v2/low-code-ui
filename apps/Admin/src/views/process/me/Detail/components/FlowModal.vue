@@ -1,6 +1,6 @@
 
 <template>
-    <j-modal visible @cancel="emit('close')" @ok="onSave" :title="title">
+    <j-modal visible @cancel="emit('close')" @ok="onSave" :title="title" :width="900">
         <j-form :layout="'vertical'" ref="formRef" :model="modelRef" v-if="type !== 'submit'">
             <div>
                 <!-- <div style="margin-bottom: 10px;" v-if="type === 'refuse'"> 驳回后将结束流程</div> -->

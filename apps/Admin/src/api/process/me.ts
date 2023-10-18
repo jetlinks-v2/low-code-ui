@@ -23,4 +23,4 @@ export const getProcessDetail = (id: string,todo:boolean) => request.get(`/proce
 export const getProcessTodoDetail = (id: string,taskId:string) => request.get(`/process/runtime/process/todo/${id}/${taskId}`);
 
 //获取用户
-export const getUserList_api = (data: object) => request.post(`/user/detail/_query`, data);
+export const getUserList = (data: any) => request.post('/user/_query', data);
