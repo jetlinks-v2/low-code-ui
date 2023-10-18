@@ -17,10 +17,12 @@
                   <div class="item-right">{{ dayjs(item.timestamp).format('YYYY-MM-DD HH:mm:ss') }}</div>
                </div>
                <div v-if="item.changed && item.nodeType !== 'ROOT'">
-                  <div v-for="e in item.changed" style="margin: 10px;">
-                     <a v-if="e.action !== 'taskCommentChanged'"  @click="toDetail(e)">查看办理详情</a>
-                     <j-input v-else style="width: 60%;" :value="e.others.afterComment"/>
-                  </div>
+                  <!-- <div v-for="e in item.changed" style="margin: 10px;">
+                     <a v-if="e.action !== 'taskCommentChanged'" @click="toDetail(e)">查看办理详情</a>
+                     <j-input v-else style="width: 60%;" :value="e.others.afterComment" />
+                  </div> -->
+                  <a v-if="showChanged(item.changed,'form').length" @click="toDetail(showChanged(item.changed,'form'))">查看办理详情</a>
+                  <j-input v-if="showChanged(item.changed,'taskCommentChanged')" style="width: 60%;" :value="showChanged(item.changed,'taskCommentChanged')?.others.afterComment" />
                </div>
                <div v-if="item.childrenNode" class="item-children">
                   <div style="margin-right: 10px;">{{ item.childrenNode.others.taskName }}</div>
@@ -181,6 +183,12 @@ const handleChange = (arr) => {
    console.log('change----------', showList, noShowList, result)
    return result
 
+}
+
+const showChanged = (val, type) => {
+   const res = val.find(item => item.action === 'taskCommentChanged')
+   const resp = val.filter(item => item.action !== 'taskCommentChanged')
+   return type === 'taskCommentChanged' ? res : resp
 }
 
 //处理时间轴

@@ -3,13 +3,24 @@
     <j-modal visible @cancel="emit('close')" title="办理详情" :width="700" @ok="emit('close')">
         <j-tabs v-model:activeKey="activeKey" type="card">
             <j-tab-pane v-for="item in tabs" :key="item.key" :tab="item.label">
-                <div v-if="formConfig?.multiple">
-                    <JProTable :columns="columns" model="table" :dataSource="dataSource" :noPagination="true" />
-                </div>
-                <div v-else>
-                    <div>{{ formConfig?.formName }}</div>
-                    <Preview :value="formValue" :data="formConfig?.configuration" />
-                </div>
+                <j-scrollbar style="height: calc(100vh - 350px)">
+                    <div v-for="item in formList">
+                        
+                        <div v-if="item.multiple">
+                            <div>{{ item?.config.formName }}</div>
+                            <JProTable :columns="item.columns" model="table" :scroll="{ x: 600 }"
+                                :dataSource="activeKey == 'before' ? item.beforeDataSource : item.afterDataSource"
+                                :noPagination="true" />
+                        </div>
+
+                        <div v-else>
+                            <div>{{ item?.config.formName }}</div>
+                            <Preview :value="activeKey == 'before' ? item.beforeData : item.afterData"
+                                :data="item?.config?.configuration" />
+                        </div>
+                    </div>
+                </j-scrollbar>
+
             </j-tab-pane>
         </j-tabs>
     </j-modal>
@@ -36,58 +47,54 @@ const tabs = [
 ]
 
 const activeKey = ref('before')
-const formConfig = ref<any>({})
-const formValue = ref<any>({})
-const columns = ref<any>([])
-const dataSource = ref<any>([])
-const init = reactive<any>({
-    columns: undefined,
-    data: undefined,
+const formMap = new Map()
+const formList = ref<any>([])
 
-})
+const handleBefore = (val, newVal) => {
+    const obj = {}
+    val?.forEach(item => {
+        obj[item.property] = item.before
+    })
+    return {
+        ...newVal,
+        ...obj
+    }
+}
 
 
 
 onMounted(() => {
-    const config = props.info?.form?.find(item => item.formId === props.current.others.formId)
-    formConfig.value = config
+    console.log('history--------', props.current)
 
-    // formValue.value = props.current.others.after
-    const obj = {}
-    props.current.others.diff.forEach(item => {
-        obj[item.property] = item.before
+    props.current.forEach(item => {
+        props.info?.form.forEach(it => {
+            if (item.others.formId === it.formId) {
+                formMap.set(
+                    item.others.formId,
+                    {
+                        ...item,
+                        config: it
+                    }
+                )
+            }
+        })
     })
-    formValue.value = obj
-    console.log('config----', config, props.current)
-    const arr = formConfig.value?.configuration.children?.map(item => ({
-        title: item.formItemProps.label,
-        dataIndex: item.formItemProps.name,
-        ellipsis: true,
+
+    const arr = [...formMap.values()].map(item => ({
+        ...item,
+        beforeData: handleBefore(item.others?.diff, item.others.after),
+        afterData: item.others.after,
+        columns: item.config.configuration?.children?.map(e => ({
+            title: e.formItemProps.label,
+            dataIndex: e.formItemProps.name,
+            ellipsis: true
+        })),
+        beforeDataSource: [handleBefore(item.others?.diff, item.others.after)],
+        afterDataSource: [item.others.after]
     }))
-
-    columns.value = arr
-    dataSource.value = [config.data]
-
-    init.columns = arr
-    init.data = obj
-    // console.log(columns.value, config.data)
+    formList.value = arr
+    console.log('arr--', arr)
 })
-
-watch(
-    () => activeKey.value,
-    (val) => {
-        if (val === 'after') {
-            dataSource.value = [props.current.others.after]
-            formValue.value = props.current.others.after
-        }
-        if (val === 'before') {
-            dataSource.value = [{ ...init.data }]
-            formValue.value = init.data
-        }
-    },
-    { deep: true, immediate: true }
-)
-
 </script>
 
 <style scoped lang='less'></style>
