@@ -26,10 +26,10 @@ export const updateState_api = (data: any) => request.put(`/process/deployment/$
  * 查询对应流程实例可发起成员
  * @returns 
  */
-export const getMembers_api = (id: string) => request.get(`/process/deployment/${id}/allowedMembers/_query`);
+export const getMembers_api = (id: string) => request.get(`/process/deployment/${id}/allowed-members`);
 
 /**
- * 查询对应流程实例可发起成员
+ * 全量修改流程实例可发起成员
  * @returns 
  */
-export const updateMembers_api = (id:string, data: any) => request.post(`/process/deployment/${id}/allowedMembers/_updata`, data);
+export const updateMembers_api = (id:string, data: any) => request.post(`/process/deployment/${id}/allowed-embers`, data);

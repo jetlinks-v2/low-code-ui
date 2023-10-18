@@ -8,7 +8,7 @@
           <j-col :span="2" v-for="item of data[key]">
             <div class="process" @click="handleDetail(item)">
               <div class="icon">
-                <j-image
+                <ProImage
                   v-if="item.icon?.includes('http')"
                   :width="50"
                   :height="50"

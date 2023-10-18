@@ -16,7 +16,6 @@
       ref="formRef"
       :model="form"
       autocomplete="off"
-      :label-col="{ style: { width: '105px' } }"
       layout="vertical"
     >
       <j-form-item
@@ -28,6 +27,7 @@
           v-model:value="form.name"
           :maxlength="64"
           placeholder="请输入流程名称"
+          style="width: 320px"
         />
       </j-form-item>
       <j-form-item
@@ -38,7 +38,8 @@
         <a-select
           v-model:value="form.classifiedId"
           placeholder="请选择流程分类"
-          :options="providerOptions"
+          :options="classifiedStore.classified"
+          style="width: 320px"
         >
           <template #notFoundContent>
             <div>
@@ -53,7 +54,7 @@
         :rules="[{ required: true, message: '请上传流程图标' }]"
       >
         <div class="upload-img-icon" @click="chooseIcon">
-          <j-image
+          <ProImage
             v-if="form.icon?.includes('http')"
             :width="40"
             :height="40"
@@ -63,7 +64,7 @@
           <AIcon
             v-else
             :type="form.icon ?? 'PlusOutlined'"
-            :style="{ fontSize: form.icon ? '40px' : '' }"
+            :style="{ fontSize: form.icon ? '16px' : '' }"
           />
         </div>
       </j-form-item>
@@ -78,6 +79,7 @@ import ChooseIcon from './ChooseIcon.vue'
 import { copy_api } from '@/api/process/instance'
 import { useRequest } from '@jetlinks/hooks'
 import { providerEnum } from '@/api/process/model'
+import { useClassified } from '@/store'
 
 type FormType = {
   id: string
@@ -102,6 +104,7 @@ const emits = defineEmits<{
   (e: 'refresh'): void
 }>()
 
+const classifiedStore = useClassified()
 const chooseIconRef = ref()
 const title = ref<string>('复制为模型')
 const showIcon = ref<boolean>(false)
@@ -113,7 +116,7 @@ const form = reactive({
   // icon: props.data.icon,
 } as FormType)
 
-const { data: providerOptions } = useRequest(providerEnum)
+// const { data: providerOptions } = useRequest(providerEnum)
 
 const { loading, run } = useRequest(copy_api, {
   immediate: false,
@@ -159,8 +162,10 @@ const cancel = () =>{
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100px;
-  height: 100px;
-  border: 2px solid #d9d9d9;
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  border: 1px dashed #DCDCDC;
+  background: #eeeeee;
 }
 </style>
