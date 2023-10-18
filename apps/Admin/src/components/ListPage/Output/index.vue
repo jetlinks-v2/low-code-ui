@@ -61,6 +61,13 @@
     :json="jsonData.value"
     @close="jsonData.previewVisible = false"
   />
+  <Relation 
+    v-model:open="relationVisible" 
+    :config="columnOperation"
+    :preview="false"
+    :data="popData" 
+    :projectId="projectId"
+  />
 </template>
 
 <script setup lang="ts" name="Preview">
@@ -69,6 +76,7 @@ import dayjs from 'dayjs'
 import Import from './components/Import.vue'
 import Export from './components/Export.vue'
 import CallPage from './components/CallPages.vue'
+import Relation from './components/Relation/index.vue'
 import JsonPreview from '../Preview/components/JsonPreview.vue'
 import { queryRuntime } from '@/api/form'
 import { onlyMessage } from '@jetlinks/utils'
@@ -89,9 +97,12 @@ const props = defineProps({
   },
 })
 
+const route = useRoute()
 const importVisible = ref<boolean>(false)
 const exportVisible = ref<boolean>(false)
 const addVisible = ref<boolean>(false)
+const relationVisible = ref(false)
+const sid = ref(route.params.sid)
 const target = computed(() => {
   return `${props.projectId}.${props.pageId}`
 })
@@ -181,6 +192,7 @@ const cardConfig = ref({
 })
 
 const popResource = ref<Record<string, any>>({})
+const columnOperation = ref<Record<string, any>>({})
 const commandType = ref<string>('')
 const popData = ref<Record<string, any>>({})
 
@@ -272,7 +284,6 @@ const componentPropsSwitch = (item: any) => {
 const searchData = () => {
   const cloumnS = allData.value?.searchData || []
   searchColumns.value = cloumnS?.map((item: any) => {
-    console.log(item)
     const placeholder = item.type === 'date' ? '请选择' : '请输入'
     const componentProps = componentPropsSwitch(item) || {}
     return {
@@ -349,7 +360,6 @@ const actionsBtnFormat = (data: any, type: string) => {
         tooltip: {
           title: item?.title,
         },
-        hasPermission: false,
         popConfirm:
           item?.command === 'Delete' && item?.title !== '批量删除'
             ? {
@@ -443,6 +453,7 @@ const handleActions = (
   data: Record<string, any>,
   config: Record<string, any>,
 ) => {
+  columnOperation.value = config
   popData.value = data
   if (
     config.type === 'Add' ||
@@ -467,8 +478,10 @@ const handleActions = (
     importVisible.value = data?.command === 'Import'
   }
   if (config.command === 'Export') {
-    console.log(config, data)
     exportVisible.value = data?.command === 'Export'
+  }
+  if(config.type === 'Relation') {
+    relationVisible.value = true
   }
 }
 //表头按钮
@@ -502,7 +515,6 @@ const reloadTable = () => {
 watch(
   () => JSON.stringify(allData.value),
   () => {
-    console.log(`output->allData.value`, allData.value)
     //分页
     pagingData()
     //卡片样式
@@ -519,6 +531,13 @@ watch(
   },
   { immediate: true },
 )
+
+
+provide('pageId', props.pageId)
+provide('projectId', props.projectId)
+provide('sid', sid)
+
+console.log();
 </script>
 
 <style lang="less" scoped>
