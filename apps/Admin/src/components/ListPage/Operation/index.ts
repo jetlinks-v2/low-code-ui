@@ -54,9 +54,17 @@ export const validOperationsBtn = (tree: OperationConfigTreeItem[], functionOpti
                 errorKey: 'functions',
                 message: '绑定功能已被删除，请重新选择',
               });
+            } else if(item.type === 'Relation') {
+              if(!result?.configuration?.relation?.enabled) {
+                errorItems.push({
+                  key: item.key,
+                  errorKey: 'functions',
+                  message: '当前调用的功能未开启关系',
+                });
+              }
             }
           }
-          if (!item.command) {
+          if (!item.command && item.type !== 'Relation') {
             errorItems.push({
               key: item.key,
               errorKey: 'command',
