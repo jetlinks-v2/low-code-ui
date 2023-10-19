@@ -8,9 +8,10 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
     //   return {
     //     ...omit(item, ['validator', 'key']),
     //     trigger,
-    //     validator(rule, value, callback) {
-    //       let customFn = new Function('rule', 'value', 'callback', item?.validator)
-    //       return customFn(rule, value, callback)
+    //     validator(rule, value) {
+    //       let customFn = new Function('rule', 'value', item?.validator)
+    //       customFn(rule, value)
+    //       return Promise.resolve()
     //     }
     //   }
     // }
@@ -20,7 +21,7 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
     //     _pattern = new RegExp(item?.pattern)
     //   } catch (error) {
     //   }
-    //
+
     //   return {
     //     ...omit(item, ['pattern', 'key']),
     //     trigger,
@@ -28,18 +29,22 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
     //   }
     // }
 
-    const elementValueType = element?.formItemProps?.type || 'string'
+    // const elementValueType = element?.formItemProps?.type || 'string'
 
     return {
       trigger,
-      validator(rule,value,cb) {
+      async validator(rule, value, cb) {
         const errorMessage: Array<string> = []
-        const len = elementValueType === 'number' ? value : value?.length
+        const len = element?.type === 'input-number' ? value : value?.length
         // validator
-        let customFn = new Function('rule', 'value', 'callback', item?.validator)
-        customFn(rule, value, cb)?.catch?.(err => {
-          errorMessage.push(err)
-        })
+        if (item?.validator) {
+          let customFn = new Function('rule', 'value', 'callback', item?.validator)
+          try {
+            await customFn(rule, value, cb)
+          } catch (err: any) {
+            errorMessage.push(err)
+          }
+        }
 
         // max
         if (item.max && len !== undefined && len > item.max) {
@@ -62,7 +67,6 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
           } catch (error) {
           }
         }
-
         if (errorMessage.length) {
           return Promise.reject(item.message || errorMessage.toString())
         }
