@@ -1,15 +1,15 @@
 <!-- 审批节点配置 -->
 <template>
   <j-tabs v-model:activeKey="activeKey" type="card">
-    <j-tab-pane key="basic" tab="基础配置">
+    <j-tab-pane key="basic" tab="基础配置" forceRender>
       <j-form ref="basicFormRef" :model="basicFormData" layout="vertical">
         <h3>表单配置</h3>
         <j-form-item
           label="请确认当前节点需要候选人办理的表单内容"
-          name="forms"
+          name="formBinds"
           :rules="[{ required: true, message: '请配置表单内容' }]"
         >
-          <ConfigureForm v-model:value="basicFormData.forms" />
+          <ConfigFormFields v-model:value="basicFormData.formBinds" />
         </j-form-item>
 
         <h3 style="margin-top: 20px">节点控制</h3>
@@ -36,20 +36,20 @@
         </j-form-item>
       </j-form>
     </j-tab-pane>
-    <j-tab-pane key="member" tab="成员配置">
+    <j-tab-pane key="member" tab="成员配置" forceRender>
       <j-form ref="memberFormRef" :model="memberFormData" layout="vertical">
         <h3>候选人配置</h3>
         <j-form-item
           label="请选择可参与审批的候选成员"
-          name="members"
+          name="candidates"
           :rules="[{ required: true, message: '请选择成员' }]"
         >
-          <ConfigureMembers v-model:members="memberFormData.members" />
+          <ConfigureMembers v-model:members="memberFormData.candidates" />
         </j-form-item>
 
         <h3 style="margin-top: 20px">权重控制</h3>
         <j-form-item
-          name="passWeight"
+          name="completeWeight"
           :rules="[{ required: true, message: '请输入通过权重' }]"
         >
           <template #label>
@@ -61,7 +61,7 @@
               <AIcon type="InfoCircleOutlined" />
             </j-tooltip>
           </template>
-          <j-input v-model:value="memberFormData.passWeight" />
+          <j-input v-model:value="memberFormData.completeWeight" />
         </j-form-item>
         <j-form-item
           name="rejectWeight"
@@ -92,25 +92,25 @@
         </j-form-item>
         <j-form-item
           label="驳回配置"
-          name="rejectConfig"
+          name="endProcessWhenReject"
           :rules="[{ required: true, message: '请选择驳回配置' }]"
         >
           <j-radio-group
-            v-model:value="memberFormData.rejectConfig"
+            v-model:value="memberFormData.endProcessWhenReject"
             button-style="solid"
           >
-            <j-radio-button value="node">驳回至节点</j-radio-button>
-            <j-radio-button value="end">结束流程</j-radio-button>
+            <j-radio-button :value="false">驳回至节点</j-radio-button>
+            <j-radio-button :value="true">结束流程</j-radio-button>
           </j-radio-group>
         </j-form-item>
         <j-form-item
           label="请选择驳回至哪个节点"
-          name="rejectToNode"
+          name="gotoWhenReject"
           :rules="[{ required: true, message: '请选择驳回至哪个节点' }]"
-          v-if="memberFormData.rejectConfig === 'node'"
+          v-if="!memberFormData.endProcessWhenReject"
         >
           <j-select
-            v-model:value="memberFormData.rejectToNode"
+            v-model:value="memberFormData.gotoWhenReject"
             :options="nodeList"
           />
         </j-form-item>
@@ -120,11 +120,15 @@
 </template>
 
 <script setup lang="ts">
-import ConfigureForm from './ConfigureForm.vue'
+import ConfigFormFields from './ConfigFormFields.vue'
+import { findNodeById } from './utils'
+import { useFlowStore } from '@/store/flow'
+
+const flowStore = useFlowStore()
 
 const activeKey = ref('basic')
 const props = defineProps({
-  config: {
+  node: {
     type: Object,
     default: () => ({}),
   },
@@ -132,24 +136,21 @@ const props = defineProps({
 
 // 基础配置
 const basicFormRef = ref()
-const basicFormData = ref({
-  forms: [],
-  autoPass: false,
-  dealRequired: false,
+const basicFormData = reactive({
+  formBinds: props.node?.props?.formBinds || {},
+  autoPass: props.node?.props?.autoPass,
+  dealRequired: props.node?.props?.dealRequired,
 })
 
 // 成员配置
 const memberFormRef = ref()
-const memberFormData = ref({
-  members: [],
-  passWeight: 0,
-  rejectWeight: 0,
-  authButtons: [],
-  rejectConfig: 'node',
-  rejectToNode: '',
-})
-watchEffect(() => {
-  console.log('memberFormData:', memberFormData.value)
+const memberFormData = reactive({
+  candidates: props.node?.props?.candidates,
+  completeWeight: props.node?.props?.completeWeight,
+  rejectWeight: props.node?.props?.rejectWeight,
+  authButtons: props.node?.props?.authButtons,
+  endProcessWhenReject: props.node?.props?.endProcessWhenReject,
+  gotoWhenReject: props.node?.props?.gotoWhenReject,
 })
 const allButtons = ref([
   { label: '通过', value: 'pass' },
@@ -159,6 +160,41 @@ const nodeList = ref([
   { label: '审批节点', value: 'approval' },
   { label: '处理节点', value: 'deal' },
 ])
+
+/**
+ * 将数据保存至pinia
+ */
+const saveConfigToPinia = () => {
+  return new Promise((resolve, reject) => {
+    basicFormRef.value
+      ?.validate()
+      .then((valid1) => {
+        memberFormRef.value
+          ?.validate()
+          .then((valid2) => {
+            const result = findNodeById(
+              flowStore.model.nodes,
+              flowStore.selectedNode.id,
+            )
+            result.props = {
+              ...result.props,
+              ...basicFormData,
+              ...memberFormData,
+            }
+            resolve({ ...valid1, ...valid2 })
+          })
+          .catch((err) => {
+            reject(err)
+          })
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
+}
+defineExpose({
+  saveConfigToPinia,
+})
 </script>
 
 <style lang="less" scoped></style>

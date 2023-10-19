@@ -38,6 +38,21 @@ export const update_api = (data: any) => request.put(`/process/definition/${data
  */
 export const queryForm_api = (data: any) => request.post(`/process/form/_query`, data)
 /**
+ * 查询表单列表不分页
+ */
+export const queryFormNoPage_api = (data: any) => request.post(`/process/form/_query/no-paging`, data)
+/**
  * 根据定义解析支持的变量
  */
 export const queryVariables_api = (data: any) => request.post(`/process/definition/parse-variables`, data)
+
+// 获取角色
+export const getRole_api = (data: any) => request.post(`/role/_query/no-paging`, data);
+// 获取组织
+export const getOrg_api = (data: any) => request.post(`/organization/_all/tree`, data);
+// 获取用户
+export const getUser_api = (data: any) => request.post(`/user/_query/no-paging`, data);
+// 获取产品
+export const getProduct_api = (data: any) => request.post(`/device-product/_query/no-paging`, data);
+// 获取设备
+export const getDevice_api = (data: any) => request.post(`/device-instance/_query/no-paging`, data);

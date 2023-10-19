@@ -9,16 +9,26 @@ export interface INode {
     branches?: INode[];
 }
 
+export interface IForms {
+    formId: string
+    multiple: boolean
+    formName?: string
+    // 仅前端使用
+    fullInfo?: any
+}
 export interface IConfig {
     nameGenerator: string;
     summaryGenerator: string;
     ccMember: Partial<ICandidate>;
-    forms: { formId: string; multiple: boolean }[];
+    forms: IForms[];
     // fields?: IVariables[];
     variables?: any[];
 }
 
 export interface INodeProps {
+    formBinds: {
+        formId: IFormFields[]
+    };
     // type === ROOT
     assignedUser: IIdentity[];
     // type === APPROVAL || type === DEAL
@@ -33,6 +43,12 @@ export interface INodeProps {
     // 以下字段前端使用
     isBranchNode: boolean;
     style: Record<string, any>;
+}
+
+export interface IFormFields {
+    id: string;
+    required: boolean;
+    accessModes: string[];
 }
 
 // 通用类型
@@ -56,7 +72,9 @@ export interface IBasic {
 }
 
 export interface IVar {
-
+    source: string;
+    value: string;
+    upperKey: string;
 }
 export interface IRelation {
     weight: number;

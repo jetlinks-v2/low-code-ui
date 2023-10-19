@@ -1,6 +1,14 @@
 <template>
   <div>
     <j-radio-group v-model:value="selected" class="radio" @change="change">
+      <j-radio-button :value="icon" :class="{ active: selected === icon }">
+        <ImageUpload
+          class="upload"
+          v-model:value="icon"
+          :accept="accept"
+          style="width: 60px; height: 60px"
+        />
+      </j-radio-button>
       <j-radio-button
         v-for="typeStr in iconKeys"
         :value="typeStr"
@@ -15,16 +23,23 @@
 <script setup>
 import iconKeys from './fields'
 const props = defineProps({
-  modelValue: {
+  value: {
     type: String,
     default: '',
   },
 })
-const emit = defineEmits(['update:modelValue'])
-const selected = ref()
-const change = (e) => {
-  emit('update:modelValue', e.target.value)
-}
+// 上传icon格式
+const accept = '.jpg,.jpeg,.png'
+const icon = ref('')
+const selected = ref(props.modelValue)
+
+const change = () => {}
+
+defineExpose({ selected })
+
+watch(icon, () => {
+  selected.value = icon.value
+})
 </script>
 <style scoped lang="less">
 .radio {

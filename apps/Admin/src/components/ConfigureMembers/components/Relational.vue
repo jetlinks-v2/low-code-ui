@@ -1,14 +1,14 @@
 <template>
   <div class="relational">
     <div class="subject">
-      <div>主体</div>
+      <div class="title">主体</div>
       <j-tree
         :multiple="multiple"
         block-node
         :tree-data="treeData"
         :selectedKeys="selectedKeys"
         :fieldNames="{ children: 'children', title: 'name', key: 'id' }"
-        :height="400"
+        :height="300"
         @select="onSelect"
       >
         <template #title="data">
@@ -20,7 +20,7 @@
       <j-empty v-if="treeData.length < 1" />
     </div>
     <div class="subject-rel">
-      <div>
+      <div class="title">
         主体的关系
         <j-button
           v-show="selectedKeys.length"
@@ -39,9 +39,9 @@
           :fieldNames="{
             children: 'children',
             title: 'name',
-            key: 'id',
+            key: 'relation',
           }"
-          :height="400"
+          :height="300"
           @select="onRelSelect"
         >
           <template #title="data">
@@ -106,14 +106,6 @@ const getRelationalData = (type: string) => {
   getRelation_api(param).then((res) => {
     if (res.success) {
       relData.value = res.result
-      // relData.value = [
-      //   {
-      //     relation: 'deviceManager', //关系标识
-      //     name: '设备管理员', //关系名称
-      //     reverseName: '所属设备', //反向关系名称
-      //     reverse: false, //是否为反转关系
-      //   },
-      // ]
     }
   })
 }
@@ -131,7 +123,8 @@ const onRelSelect = (
  */
 const relSubmit = () => {
   const flag = props.dataSource.some(
-    (i) => i.id === `${currentSub.value.fullId}-${intermediateData.value.id}`,
+    (i) =>
+      i.id === `${currentSub.value.fullId}-${intermediateData.value.relation}`,
   )
   if (flag) {
     onlyMessage('当前数据已添加', 'warning')
@@ -146,13 +139,43 @@ const relSubmit = () => {
 .relational {
   display: flex;
   height: 100%;
+
+  :deep(.ant-tree) {
+    .ant-tree-switcher{
+      height: 32px;
+      line-height: 32px;
+    }
+    .ant-tree-title {
+      height: 32px;
+      line-height: 32px;
+      &:hover {
+        color: #315efb;
+      }
+    }
+  }
   .subject {
     flex: 1;
-    border-right: 1px solid #d7d7d7;
+    border: 1px solid #e0e0e0;
+    .title {
+      padding: 0 12px;
+      height: 32px;
+      line-height: 32px;
+      background: #f2f2f2;
+    }
   }
   .subject-rel {
     flex: 1;
-    border-right: 1px solid #d7d7d7;
+    border: 1px solid #e0e0e0;
+    border-left: none;
+    .title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 12px;
+      height: 32px;
+      line-height: 32px;
+      background: #f2f2f2;
+    }
   }
 }
 </style>

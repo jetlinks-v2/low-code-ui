@@ -4,7 +4,7 @@
     <j-card style="margin-bottom: 10px">
       <div class="step-box">
         <div class="step">
-          <j-steps v-model:current="current">
+          <j-steps :current="current">
             <j-step title="基础信息" />
             <j-step title="流程设计" />
             <j-step title="展示及抄送" />
@@ -13,7 +13,7 @@
 
         <div class="btn">
           <j-button v-if="current > 0" @click="current--">上一步</j-button>
-          <j-button v-if="current < 2" @click="current++">下一步</j-button>
+          <j-button v-if="current < 2" @click="handleNext">下一步</j-button>
           <j-button type="primary" @click="save" :loading="saveLoading">
             保存
             <template #icon>
@@ -25,7 +25,7 @@
               </j-tooltip>
             </template>
           </j-button>
-          <j-button type="primary">
+          <j-button type="primary" @click="deploy">
             部署
             <template #icon>
               <j-tooltip placement="right">
@@ -38,7 +38,7 @@
       </div>
     </j-card>
     <j-card>
-      <component :is="componentsMap[current]" />
+      <component ref="stepRef" :is="componentsMap[current]" />
     </j-card>
   </page-container>
 </template>
@@ -48,7 +48,7 @@ import { ref } from 'vue'
 import BasicInfo from './BasicInfo/index.vue'
 import FlowDesign from './FlowDesign/index.vue'
 import ShowCopy from './ShowCopy/index.vue'
-import { detail_api, update_api } from '@/api/process/model'
+import { detail_api, update_api, deploy_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { onlyMessage } from '@jetlinks/utils'
 
@@ -69,14 +69,24 @@ const componentsMap = {
 const getFlowDetail = async () => {
   const { result } = await detail_api(route.query.id as string)
   const model = JSON.parse(result.model || '{}')
-  console.log('model: ', model);
+  //   console.log('model: ', model)
 
   flowStore.setModel(model)
   flowStore.setModelBaseInfo(result)
 }
 
 /**
- * 保存模型数据
+ * 下一步, 校验当前步骤的数据规范
+ */
+const stepRef = ref()
+const handleNext = () => {
+  stepRef.value?.next().then(() => {
+    current.value++
+  })
+}
+
+/**
+ * 保存模型数据, 无需校验数据
  */
 const saveLoading = ref(false)
 const save = () => {
@@ -95,6 +105,19 @@ const save = () => {
     .finally(() => {
       saveLoading.value = false
     })
+}
+
+/**
+ * 部署, 需要校验
+ */
+const deploy = () => {
+  //   deploy_api(route.query.id as string).then((res) => {
+  //     if (res.success) {
+  //       onlyMessage('操作成功')
+  //     } else {
+  //       onlyMessage('操作失败', 'error')
+  //     }
+  //   })
 }
 
 onMounted(() => {

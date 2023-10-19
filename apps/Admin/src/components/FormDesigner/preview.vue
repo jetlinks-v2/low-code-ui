@@ -127,7 +127,7 @@ watch(
   },
 )
 
-defineExpose({ onSave })
+defineExpose({ onSave, formState})
 </script>
 
 <style lang="less" scoped>

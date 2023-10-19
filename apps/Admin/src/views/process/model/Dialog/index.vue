@@ -15,7 +15,7 @@
       ref="formRef"
       :model="form"
       autocomplete="off"
-      :label-col="{ style: { width: '105px' } }"
+      layout="vertical"
     >
       <j-form-item
         name="name"
@@ -26,18 +26,20 @@
           v-model:value="form.name"
           :maxlength="64"
           placeholder="请假申请"
+          style="width: 320px"
         />
       </j-form-item>
 
       <j-form-item
-        name="classificationText"
+        name="classifiedId"
         label="流程分类"
         :rules="[{ required: true, message: '请选择流程分类' }]"
       >
         <a-select
-          v-model:value="form.classificationText"
+          v-model:value="form.classifiedId"
           placeholder="请选择流程分类"
-          :options="providerOptions"
+          :options="classifiedStore.classified"
+          style="width: 320px"
         >
           <template #notFoundContent>
             <div>
@@ -53,10 +55,37 @@
         label="流程图标"
         :rules="[{ required: true, message: '请上传流程图标' }]"
       >
-        <j-space>
-          <div v-for="item of 4">图标{{ item }}</div>
-          <div class="upload-icon">
-            <ImageUpload v-model:value="form.icon" :accept="accept" />
+        <j-space :size="24">
+          <div class="base-icon" v-for="(item, index) of baseIcon"> 
+            <div class="upload-icon" >
+              <AIcon :type="item" />
+            </div>
+            <div>图标{{ index+1 }}</div>
+          </div>
+          <div class="base-icon">
+            <div class="upload-icon">
+              <ImageUpload v-model:value="form.icon" :accept="accept">
+                <template #content="{ imageUrl }">
+                  <div v-if="imageUrl">
+                    <ProImage
+                      v-if="imageUrl?.includes('http')"
+                      :src="imageUrl"
+                      :width="48"
+                      :preview="false"
+                    />
+                    <AIcon
+                      v-else
+                      :type="form.icon"
+                      :style="{ fontSize: '16px' }"
+                    />
+                    <div class="upload-image-mask">更换</div>
+                  </div>
+                  <AIcon v-else type="PlusOutlined" style="font-size: 20px" />
+                </template>
+              </ImageUpload>
+              <!-- <div>自定义</div> -->
+            </div>
+            <div>自定义</div>
           </div>
         </j-space>
       </j-form-item>
@@ -68,16 +97,12 @@
 import { onlyMessage, randomString } from '@jetlinks/utils'
 import { saveProcess_api, providerEnum } from '@/api/process/model'
 import { useRequest } from '@jetlinks/hooks'
-import { _fileUpload } from '@/api/comm'
+import { useClassified } from '@/store'
 
 type FormType = {
-  id?: string
   key: string
-  name: string
   model: string
   provider: string
-  classificationText: string
-  icon: string
 }
 
 const props = defineProps({
@@ -88,15 +113,23 @@ const props = defineProps({
   visible: {
     type: Boolean,
     default: () => false,
-  }
+  },
 })
 
 const emits = defineEmits<{
-  (e: 'update:visible',flag: boolean ): void
+  (e: 'update:visible', flag: boolean): void
   (e: 'refresh'): void
 }>()
 
-//上传icon格式
+const classifiedStore = useClassified()
+const baseIcon = [
+  'icon-shujumoni',
+  'icon-tongzhiguanli',
+  'icon-rizhifuwu',
+  'icon-keshihua',
+]
+
+// 上传icon格式
 const accept = '.jpg,.jpeg,.png'
 const title = ref<string>('新增')
 const formRef = ref<any>()
@@ -107,7 +140,7 @@ const form = reactive<Partial<FormType>>({
   provider: 'wflow',
 })
 
-const { data: providerOptions } = useRequest(providerEnum)
+// const { data: providerOptions } = useRequest(providerEnum)
 
 const { loading, run } = useRequest(saveProcess_api, {
   immediate: false,
@@ -145,8 +178,37 @@ watch(
 </script>
 
 <style lang="less" scoped>
+.base-icon{
+  text-align: center;
+}
 .upload-icon {
-  width: 100px;
-  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  // font-size: 16px;
+  border-radius: 4px;
+  border: 1px dashed #DCDCDC;
+  background: #eeeeee;
+
+  :deep(.upload-image-content) {
+    &:hover .upload-image-mask {
+      display: flex;
+    }
+    .upload-image-mask {
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+      width: 100%;
+      height: 100%;
+      color: #fff;
+      font-size: 16px;
+      background-color: rgba(#000, 0.25);
+    }
+  }
 }
 </style>

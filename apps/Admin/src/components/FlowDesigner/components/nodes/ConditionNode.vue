@@ -117,9 +117,9 @@ const showError = ref(false)
 
 const active = computed(() => props?.config?.active)
 const content = computed(() => {
-  const groups = props.config.props.groups
+  const groups = props.config.props?.groups
   let confitions: any[] = []
-  groups.forEach((group) => {
+  groups?.forEach((group) => {
     let subConditions: any[] = []
     group.conditions.forEach((subCondition) => {
       let subConditionStr = ''
@@ -155,7 +155,7 @@ const content = computed(() => {
   //构建最终描述
   return String(confitions).replaceAll(
     ',',
-    props.config.props.groupsType === 'AND' ? ' 且 ' : ' 或 ',
+    props.config.props?.groupsType === 'AND' ? ' 且 ' : ' 或 ',
   )
 })
 
