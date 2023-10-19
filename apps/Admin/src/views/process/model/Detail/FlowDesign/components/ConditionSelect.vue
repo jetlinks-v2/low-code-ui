@@ -45,48 +45,11 @@
       placeholder="请选择"
       style="width: 90px"
     />
-
-    <j-input
-      v-if="getComponentsType(item) === 'input'"
-      v-model:value="item.value"
-      placeholder="请输入"
+    <ConditionValueItem
+      v-model:modelValue="item.value"
+      :itemType="getComponentsType(item)"
     />
-    <j-tree-select
-      v-if="getComponentsType(item) === 'select'"
-      v-model:value="item.value"
-      v-model:searchValue="item.searchValue"
-      show-search
-      placeholder="请选择"
-      allow-clear
-      tree-default-expand-all
-      tree-node-filter-prop="name"
-      :tree-data="conditionOptions"
-      :field-names="{ label: 'name', value: 'fullId' }"
-      :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-      :multiple="['eq', 'not'].includes(item.termsType as string) ? false : true"
-    >
-      <template #title="{ name }">
-        <template
-          v-for="(fragment, i) in name
-            ?.toString()
-            ?.split(
-              new RegExp(
-                `(?<=${item.searchValue})|(?=${item.searchValue})`,
-                'i',
-              ),
-            )"
-        >
-          <span
-            v-if="fragment.toLowerCase() === item.searchValue?.toLowerCase()"
-            :key="i"
-            style="color: #08c"
-          >
-            {{ fragment }}
-          </span>
-          <template v-else>{{ fragment }}</template>
-        </template>
-      </template>
-    </j-tree-select>
+
     <AIcon
       type="DeleteOutlined"
       style="color: red"
@@ -103,13 +66,14 @@
 import { queryVariables_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { findVariableById } from './utils'
+import ConditionValueItem from './ConditionValueItem.vue'
 
 const flowStore = useFlowStore()
 
 interface IConditionSelect {
   column: string | undefined
   termsType: string | undefined
-  value: string | string[] | undefined
+  value: string | string[] | number | undefined
   searchValue: string | undefined
 }
 
@@ -174,32 +138,8 @@ const termsOptions = ref([
  */
 const getComponentsType = (item) => {
   const _var = findVariableById(conditionOptions.value, item.column)
-  let _type = 'input'
-  //   console.log('_var?.others: ', _var?.others)
-  //   console.log('_var?.others?.type: ', _var?.others?.type)
-  switch (_var?.others?.type) {
-    case 'org':
-      _type = 'select'
-      break
-    case 'user':
-      _type = 'select'
-      break
-    case 'role':
-      _type = 'select'
-      break
-    case 'product':
-      _type = 'select'
-      break
-    case 'device':
-      _type = 'select'
-      break
-
-    default:
-      break
-  }
-
-  //   console.log('_type: ', _type)
-  return _type
+  console.log('_var?.others?.type: ', _var?.others?.type)
+  return _var?.others?.type
 }
 
 /**
