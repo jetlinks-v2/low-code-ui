@@ -1,8 +1,9 @@
+<!-- 基础信息配置表单 -->
 <template>
   <div>
-    <j-button @click="handleClick" style="width: 200px">表单配置</j-button>
+    <j-button @click="visible = true" style="width: 200px">表单配置</j-button>
     <ul>
-      <li v-for="item of selectedRow">
+      <li v-for="(item, index) of selectedRow" :key="index">
         {{ item.formName || '-' }}
       </li>
     </ul>
@@ -13,7 +14,6 @@
       :closable="false"
       placement="right"
       width="50%"
-      @close="submit"
       :contentWrapperStyle="{
         // width: 'auto',
         minWidth: '50%',
@@ -92,7 +92,7 @@
                   <j-button
                     class="sort"
                     type="link"
-                    :disabled="selectedRow.length === 1"
+                    :disabled="selectedRow?.length === 1"
                   >
                     <!-- <AIcon type="DragOutlined" /> -->
                     移动
@@ -103,13 +103,6 @@
           </draggable>
         </j-col>
       </j-row>
-
-      <template #footer>
-        <j-space>
-          <j-button @click="close">取消</j-button>
-          <j-button type="primary" @click="submit">确认</j-button>
-        </j-space>
-      </template>
     </j-drawer>
   </div>
 </template>
@@ -117,45 +110,41 @@
 import { onlyMessage } from '@jetlinks/utils'
 import draggable from 'vuedraggable'
 import { queryForm_api } from '@/api/process/model'
+import { useFlowStore } from '@/store/flow'
 
-const props = defineProps<{
-  modelValue: any
-}>()
+const flowStore = useFlowStore()
+
+const props = defineProps({
+  modelValue: {
+    type: Array as PropType<any[]>,
+    default: () => [],
+  },
+})
 const emits = defineEmits(['update:modelValue', 'change'])
 
 const drag = ref(true)
-// const moveable = (flag) => {
-//   console.log(`output->1`, 1)
-//   drag.value = flag
-// }
-
-const handleClick = () => {
-  visible.value = true
-}
-const drawerState = reactive({
-  visible: false,
-  close: () => {
-    selectedRow.value = []
-    drawerState.visible = false
-  },
-  /**
-   * 保存数据
-   */
-  submit: () => {
-    drawerState.visible = true
-    if (selectedRow.value.length < 1) {
-      onlyMessage('请至少选择一条数据', 'error')
-      return
-    } else {
-      emits('update:modelValue', selectedRow.value)
-      emits('change', selectedRow.value)
-      drawerState.visible = false
-    }
-  },
-})
-const { visible, close, submit } = toRefs(drawerState)
-
+const visible = ref(false)
 const searchText = ref('')
+// 选中项
+const selectedRow = ref<any>([])
+// 是否选中
+const isActive = computed(() => (key) => {
+  return selectedRow.value?.map((i) => i.formId).includes(key)
+})
+
+const params = ref<any>({})
+const columns = [
+  {
+    title: '流程名称',
+    dataIndex: 'name',
+    key: 'name',
+    ellipsis: true,
+    scopedSlots: true,
+  },
+]
+/**
+ * 搜索
+ */
 const onSearch = (searchValue: string) => {
   params.value = {
     terms: [
@@ -169,69 +158,40 @@ const onSearch = (searchValue: string) => {
   }
 }
 
-const params = ref<any>({})
-const columns = [
-  {
-    title: '流程名称',
-    dataIndex: 'name',
-    key: 'name',
-    ellipsis: true,
-    scopedSlots: true,
-  },
-]
-const query = (params) => {
-  return new Promise<any>((resolve, reject) => {
-    resolve({
-      result: {
-        data: [
-          {
-            id: 1,
-            name: '表单1',
-            value1: 'form',
-            createTime: '2021-05-11 16:11:11',
-          },
-          {
-            id: 2,
-            name: '表单2',
-            createTime: '2021-05-11 16:11:11',
-          },
-          {
-            id: 3,
-            name: '表单3',
-            createTime: '2021-05-11 16:11:11',
-          },
-        ],
-        pageIndex: 0,
-        pageSize: 12,
-        total: 40,
-      },
-      status: 200,
-    })
-  })
-}
-
-// 是否选中
-const isActive = computed(() => (key) => {
-  return selectedRow.value?.map((i) => i.id).includes(key)
-})
-// 选中项
-const selectedRow = ref<any>([])
 /**
- * 选中
+ * 表格选中/右侧已选删除
  */
 const onSelectChange = (row: any) => {
-  if (isActive.value(row.id)) {
-    selectedRow.value = selectedRow.value.filter(
-      (item: any) => item.id !== row.id,
+  if (row.formId) {
+    // row存在formId字段, 表示为右侧删除已选
+    selectedRow.value.splice(
+      selectedRow.value.findIndex((item: any) => item.formId === row.formId),
+      1,
     )
   } else {
+    // 如果已经存在, 则不做操作
+    if (selectedRow.value.some((item: any) => item.formId === row.id)) return
+    // row没有formId字段, 则表示左侧表格选中
     selectedRow.value.push({
       formId: row.id,
       formName: row.name,
       multiple: false,
+      // 表单完整信息: 仅供前端使用
+      fullInfo: row,
     })
   }
-  console.log('selectedRow.value: ', selectedRow.value)
+  //   console.log('selectedRow.value: ', selectedRow.value)
+}
+
+const submit = () => {
+  if (selectedRow.value?.length < 1) {
+    onlyMessage('请至少选择一条数据', 'error')
+    return
+  } else {
+    emits('update:modelValue', selectedRow.value)
+    emits('change', selectedRow.value)
+    visible.value = false
+  }
 }
 
 watch(
@@ -240,6 +200,13 @@ watch(
     selectedRow.value = props.modelValue
   },
   { immediate: true },
+)
+watch(
+  () => visible.value,
+  (val) => {
+    if (!val) submit()
+  },
+  { deep: true },
 )
 </script>
 <style scoped lang="less">

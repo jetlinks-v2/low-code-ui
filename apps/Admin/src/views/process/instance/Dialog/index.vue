@@ -4,7 +4,7 @@
     visible
     :title="title"
     width="55%"
-    @cancel="emits('update:visible', false)"
+    @cancel="cancel"
     @ok="confirm"
     class="edit-dialog-container"
     cancelText="取消"
@@ -16,7 +16,6 @@
       ref="formRef"
       :model="form"
       autocomplete="off"
-      :label-col="{ style: { width: '105px' } }"
       layout="vertical"
     >
       <j-form-item
@@ -27,18 +26,20 @@
         <j-input
           v-model:value="form.name"
           :maxlength="64"
-          :placeholder="`copy_${data.name}`"
+          placeholder="请输入流程名称"
+          style="width: 320px"
         />
       </j-form-item>
       <j-form-item
-        name="classificationText"
+        name="classifiedId"
         label="流程分类"
         :rules="[{ required: true, message: '请选择流程分类' }]"
       >
         <a-select
-          v-model:value="form.classificationText"
+          v-model:value="form.classifiedId"
           placeholder="请选择流程分类"
-          :options="providerOptions"
+          :options="classifiedStore.classified"
+          style="width: 320px"
         >
           <template #notFoundContent>
             <div>
@@ -53,15 +54,23 @@
         :rules="[{ required: true, message: '请上传流程图标' }]"
       >
         <div class="upload-img-icon" @click="chooseIcon">
+          <ProImage
+            v-if="form.icon?.includes('http')"
+            :width="40"
+            :height="40"
+            :src="form.icon"
+            :preview="false"
+          />
           <AIcon
+            v-else
             :type="form.icon ?? 'PlusOutlined'"
-            :style="{ fontSize: form.icon ? '40px' : '' }"
+            :style="{ fontSize: form.icon ? '16px' : '' }"
           />
         </div>
       </j-form-item>
     </j-form>
     <!-- 选择图标 -->
-    <ChooseIcon v-show="showIcon" v-model="form.icon"></ChooseIcon>
+    <ChooseIcon ref="chooseIconRef" v-show="showIcon" :value="form.icon" />
   </j-modal>
 </template>
 <script setup lang="ts">
@@ -70,11 +79,12 @@ import ChooseIcon from './ChooseIcon.vue'
 import { copy_api } from '@/api/process/instance'
 import { useRequest } from '@jetlinks/hooks'
 import { providerEnum } from '@/api/process/model'
+import { useClassified } from '@/store'
 
 type FormType = {
   id: string
   name: string
-  classificationText: string
+  classifiedId: string
   icon: string
 }
 
@@ -94,16 +104,19 @@ const emits = defineEmits<{
   (e: 'refresh'): void
 }>()
 
+const classifiedStore = useClassified()
+const chooseIconRef = ref()
 const title = ref<string>('复制为模型')
 const showIcon = ref<boolean>(false)
 const formRef = ref<any>()
 const form = reactive({
   id: props.data.id,
   name: `copy_${props.data.name}`,
-  classificationText: props.data.classificationText,
+  // classifiedId: props.data.classifiedId,
+  // icon: props.data.icon,
 } as FormType)
 
-const { data: providerOptions } = useRequest(providerEnum)
+// const { data: providerOptions } = useRequest(providerEnum)
 
 const { loading, run } = useRequest(copy_api, {
   immediate: false,
@@ -123,12 +136,23 @@ const chooseIcon = () => {
 
 const confirm = () => {
   if (showIcon.value) {
-    // 选择图标
-    form.icon ? (showIcon.value = false) : onlyMessage('请选择图标', 'error')
+    if(chooseIconRef.value.selected){
+      form.icon = chooseIconRef.value.selected
+      showIcon.value = false
+    }else{
+      onlyMessage('请选择图标', 'error')
+    }
   } else {
     formRef.value?.validate().then((_data: any) => {
       run(form)
     })
+  }
+}
+const cancel = () =>{
+  if(showIcon.value){
+    showIcon.value = false
+  }else{
+    emits('update:visible', false)
   }
 }
 </script>
@@ -138,8 +162,10 @@ const confirm = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100px;
-  height: 100px;
-  border: 2px solid #d9d9d9;
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  border: 1px dashed #DCDCDC;
+  background: #eeeeee;
 }
 </style>

@@ -28,7 +28,7 @@
             },
           ]"
         >
-          <j-input v-model:value="modelRef.id" placeholder="请输入表单标识" />
+          <j-input :disabled="props.data?.id" v-model:value="modelRef.id" placeholder="请输入表单标识" />
         </j-form-item>
         <j-form-item
           label="表单名称"

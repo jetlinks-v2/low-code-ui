@@ -1,20 +1,49 @@
 <!-- 流程监控 -->
 <template>
   <page-container>
+    <div class="tab">
+      <j-radio-group v-model:value="history" button-style="solid">
+        <j-space>
+          <j-radio-button :value="false">流转中</j-radio-button>
+          <j-radio-button :value="true">已完成</j-radio-button>
+        </j-space>
+      </j-radio-group>
+    </div>
     <pro-search :columns="columns" target="code" @search="handleSearch" />
     <JProTable
       ref="tableRef"
       model="table"
       :columns="columns"
-      :params="params"
+      :params="{
+        history,
+        ...params,
+      }"
       :request="getList_api"
       :defaultParams="{
         sorts: [{ name: 'createTime', order: 'desc' }],
       }"
     >
+      <template #classifiedId="{ classifiedId }">
+        {{ classifiedStore.getText(classifiedId) }}
+      </template>
+      <template #state="{ state }">
+        <!-- <BadgeStatus
+          :status="state.value"
+          :text="state.text"
+          :statusNames="{
+            undeployed: 'error',
+            running: 'running',
+          }"
+        /> -->
+        {{ state.text }}
+      </template>
       <template #createTime="{ createTime }">
         {{ dayjs(createTime).format('YYYY-MM-DD HH:mm:ss') }}
       </template>
+      <template #endTime="{ endTime }">
+        {{ endTime && dayjs(endTime).format('YYYY-MM-DD HH:mm:ss') }}
+      </template>
+      
 
       <template #action="slotProps">
         <PermissionButton
@@ -24,7 +53,7 @@
           }"
           @click="handleDetail(slotProps)"
         >
-          详情
+          <AIcon type="EyeOutlined" />
         </PermissionButton>
         <PermissionButton
           :hasPermission="false"
@@ -34,11 +63,11 @@
             title: '关闭',
           }"
           :popConfirm="{
-            title: `确认关闭？`,
+            title: `确认关闭该流程？`,
             onConfirm: () => handleDel(slotProps.id),
           }"
         >
-          关闭
+          <AIcon type="CloseCircleOutlined" />
         </PermissionButton>
       </template>
     </JProTable>
@@ -51,21 +80,26 @@
   </page-container>
 </template>
 <script setup>
-import Drawer from '../components/Drawer/index.vue'
-import { getList_api } from '@/api/process/instance'
+import Drawer from './Drawer/index.vue'
+import { getList_api } from '@/api/process/monitor'
 import dayjs from 'dayjs'
+import { useClassified } from '@/store'
 
+const classifiedStore = useClassified()
+const history = ref(false)
 const columns = [
   {
     title: '流程分类',
-    dataIndex: 'provider',
-    key: 'provider',
+    dataIndex: 'classifiedId',
+    key: 'classifiedId',
     ellipsis: true,
+    scopedSlots: true,
     search: {
-      type: 'string',
+      type: 'select',
       componentProps: {
-        placeholder: '请输入流程分类',
+        placeholder: '请选择流程分类',
       },
+      options: classifiedStore.classified,
     },
   },
   {
@@ -85,32 +119,24 @@ const columns = [
     dataIndex: 'name',
     key: 'name',
     ellipsis: true,
-    search: {
-      type: 'string',
-      componentProps: {
-        placeholder: '请输入流程名称',
-      },
-    },
   },
   {
     title: '摘要',
-    dataIndex: 'name',
-    key: 'name',
+    dataIndex: 'summary',
+    key: 'summary',
     ellipsis: true,
-    search: {
-      type: 'string',
-      componentProps: {
-        placeholder: '请输入流程名称',
-      },
-    },
   },
   {
     title: '状态',
-    dataIndex: 'name',
-    key: 'name',
+    dataIndex: 'state',
+    key: 'state',
     ellipsis: true,
+    scopedSlots: true,
     search: {
       type: 'select',
+      componentProps: {
+        placeholder: '请选择状态',
+      },
       options: [
         { label: '启用', value: 'enabled' },
         { label: '禁用', value: 'disabled' },
@@ -123,9 +149,26 @@ const columns = [
     key: 'creatorName',
     ellipsis: true,
     search: {
-      type: 'string',
+      type: 'select',
       componentProps: {
         placeholder: '请输入发起人',
+      },
+      options: async () => {
+        const resp = await getList_api({
+          paging: false,
+          sorts: [{ name: 'createTime', order: 'desc' }],
+        })
+        const listMap = new Map()
+        if (resp.status === 200) {
+          resp.result.data.forEach((item) => {
+            listMap.set(item.creatorId, {
+              label: item.creatorName,
+              value: item.creatorId,
+            })
+          })
+          return [...listMap.values()]
+        }
+        return []
       },
     },
   },
@@ -141,11 +184,10 @@ const columns = [
   },
   {
     title: '结束时间',
-    dataIndex: 'createTime',
-    key: 'createTime',
+    dataIndex: 'endTime',
+    key: 'endTime',
     ellipsis: true,
     scopedSlots: true,
-
     search: {
       type: 'date',
     },
@@ -178,4 +220,25 @@ const handleDetail = (row) => {
   drawer.visible = true
 }
 </script>
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.tab {
+  height: 48px;
+  border-bottom: 1px solid #d9d9d9;
+  padding: 10px 16px;
+  background: #ffffff;
+  :deep(.ant-radio-button-wrapper) {
+    border-radius: 4px;
+    border: none;
+    &:hover {
+      color: #315efb;
+      background: #e4eaff;
+      border: none;
+    }
+  }
+  :deep(.ant-radio-button-wrapper-checked) {
+    color: #315efb;
+    background: #e4eaff;
+    border: none;
+  }
+}
+</style>
