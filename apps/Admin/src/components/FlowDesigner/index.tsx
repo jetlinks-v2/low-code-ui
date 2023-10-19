@@ -483,7 +483,8 @@ const FlowDesigner = defineComponent({
      * @param node
      */
     const delNode = (node) => {
-      console.log('删除节点', node)
+      //   console.log('删除节点', node)
+      emit('delNode', node)
       // 获取该节点的父节点
       let parentNode = nodeMap.value.get(node.parentId)
       if (parentNode) {

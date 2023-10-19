@@ -11,64 +11,30 @@ export const APPROVAL_PROPS = {
     completeWeight: 1,
     rejectWeight: 1,
     autoClaim: false,
-    // assignedType: "ASSIGN_USER",
-    // mode: "AND",
-    // sign: false,
-    // nobody: {
-    //     handler: "TO_PASS",
-    //     assignedUser: []
-    // },
-    // timeLimit: {
-    //     timeout: {
-    //         unit: "H",
-    //         value: 0
-    //     },
-    //     handler: {
-    //         type: "REFUSE",
-    //         notify: {
-    //             once: true,
-    //             hour: 1
-    //         }
-    //     }
-    // },
-    // assignedUser: [],
-    // formPerms: [],
-    // selfSelect: {
-    //     multiple: false
-    // },
-    // leaderTop: {
-    //     endCondition: "TOP",
-    //     endLevel: 1,
-    // },
-    // leader: {
-    //     level: 1
-    // },
-    // role: [],
-    // refuse: {
-    //     type: 'TO_END', //驳回规则 TO_END  TO_NODE  TO_BEFORE
-    //     target: '' //驳回到指定ID的节点
-    // },
-    // formUser: ''
 }
 
 //根节点默认属性
 export const ROOT_PROPS = {
     assignedUser: [],
-    // assignedUser: [],
-    // formPerms: []
 }
 
 //条件节点默认属性
 export const CONDITION_PROPS = {
-    groupsType: "OR", //条件组逻辑关系 OR、AND
-    groups: [
-        {
-            groupType: "AND", //条件组内条件关系 OR、AND
-            cids: [], //条件ID集合
-            conditions: [] //组内子条件
+    // groupsType: "OR", //条件组逻辑关系 OR、AND
+    // groups: [
+    //     {
+    //         groupType: "AND", //条件组内条件关系 OR、AND
+    //         cids: [], //条件ID集合
+    //         conditions: [] //组内子条件
+    //     }
+    // ],
+    // expression: "" //自定义表达式，灵活构建逻辑关系
+    condition: {
+        type: 'reactorQL',
+        configuration: {
+            terms: []
         }
-    ],
-    expression: "" //自定义表达式，灵活构建逻辑关系
+    }
 }
 
 //抄送节点默认属性
@@ -84,9 +50,6 @@ export const DEAL_PROPS = {
     completeWeight: 1,
     rejectWeight: 1,
     autoClaim: false,
-    // shouldAdd: false,
-    // assignedUser: [],
-    // formPerms: []
 }
 
 //触发器节点默认属性

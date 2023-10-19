@@ -1,8 +1,9 @@
 <!-- 节点配置 -->
 <template>
   <component
+    ref="nodeConfigRef"
     :is="componentsMap[(selectedNode.type || '').toUpperCase()]"
-    :config="selectedNode.props"
+    :node="selectedNode"
   />
 </template>
 
@@ -16,15 +17,28 @@ import ConcurrentsConfig from './ConcurrentsConfig.vue'
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
-// console.log('selectedNode: ', selectedNode.value)
 
 const componentsMap = {
   APPROVAL: ApprovalNodeConfig,
   DEAL: DealNodeConfig,
+  ROOT: DealNodeConfig, // 根节点配置同处理节点
   CONDITION: ConditionNodeConfig,
   CONDITIONS: ConditionsConfig,
   CONCURRENTS: ConcurrentsConfig,
 }
+
+const nodeConfigRef = ref()
+
+/**
+ * 保存配置
+ */
+const saveConfig = () => {
+  return nodeConfigRef.value.saveConfigToPinia()
+}
+
+defineExpose({
+  saveConfig,
+})
 </script>
 
 <style lang="less" scoped></style>
