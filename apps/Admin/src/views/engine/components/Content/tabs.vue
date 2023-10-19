@@ -92,7 +92,7 @@ watch(
 .content-files {
   //border-top: 1px solid #515665;
   //border-bottom: 1px solid #515665;
-  height: calc(100% - 45px);
+  height: 100%;
   user-select: none;
 
   .content-tabs {
