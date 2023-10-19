@@ -371,7 +371,11 @@
     </template>
     <!-- 规则校验 -->
     <template v-if="rulesVisible">
-      <j-form-item :name="['formItemProps', 'rules']" :validateFirst="true">
+      <j-form-item
+        :rules="ruleRules"
+        :name="['formItemProps', 'rules']"
+        :validateFirst="true"
+      >
         <Rule
           :type="type"
           v-model:value="target.formItemProps.rules"
@@ -465,6 +469,21 @@ const minRules = [
       if (value === null || value === undefined) return Promise.resolve()
       if (value > target.value.componentProps.max)
         return Promise.reject(`最大值必须大于最小值`)
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
+const ruleRules = [
+  {
+    validator(_: any, value: any) {
+      const _value = (value || []).find((item) => {
+        return !item.trigger?.length
+      })
+      if (_value) {
+        return Promise.reject(`请正确填写规则配置`)
+      }
       return Promise.resolve()
     },
     trigger: 'change',

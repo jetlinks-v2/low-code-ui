@@ -6,7 +6,17 @@
       </j-button>
     </div>
     <j-form ref="formRef" :model="ruleModel" layout="vertical">
-      <j-form-item label="触发类型" name="trigger">
+      <j-form-item
+        label="触发类型"
+        name="trigger"
+        :rules="[
+          {
+            required: true,
+            message: '请选择触发类型',
+            trigger: ['change', 'blur'],
+          },
+        ]"
+      >
         <j-select
           placeholder="请选择"
           v-model:value="ruleModel.trigger"
@@ -93,7 +103,7 @@
 </template>
   
   <script lang="ts" setup>
-import { ref, reactive, unref, watch } from 'vue'
+import { ref, reactive, unref, watch, onBeforeUnmount, onErrorCaptured } from 'vue'
 import { patternList } from './index'
 import EditorBtn from '../EditorBtn.vue'
 
@@ -114,7 +124,7 @@ const ruleModel = reactive<any>({
   message: undefined,
   max: undefined,
   min: undefined,
-  trigger: ['change'],
+  trigger: [],
   pattern: undefined,
   validator: undefined,
 })
@@ -161,13 +171,39 @@ const onChange = () => {
   emits('change', unref(ruleModel))
 }
 
-const onBack = () => {
-  emits('change', unref(ruleModel))
-  emits('close')
+const onSave = () => {
+  return new Promise((resolve, reject) => {
+    formRef.value
+      ?.validate()
+      .then((_value) => {
+        resolve(_value)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
 }
+
+const onBack = async () => {
+  const resp = await onSave()
+  if (resp) {
+    emits('change', unref(ruleModel))
+    emits('close')
+  }
+}
+
+onBeforeUnmount(() => {
+  console.log(1111)
+})
+
+onErrorCaptured(() => {
+  console.log(2222)
+})
+
+defineExpose({ onSave })
 </script>
   
-  <style scoped lang="less">
+<style scoped lang="less">
 .box {
   position: absolute;
   top: 0;
