@@ -2,7 +2,12 @@
   <div class="table-actions" ref="tableActions">
     <j-space size="large">
       <PermissionButton
-        v-for="item in actions.slice(0, showLength < 4 || showLength >= actions.length ? showLength : showLength - 1)"
+        v-for="item in actions.slice(
+          0,
+          showLength < 4 || showLength >= actions.length
+            ? showLength
+            : showLength - 1,
+        )"
         :key="item.key"
         type="link"
         v-bind:="handleFunction(item.permissionProps, record)"
@@ -10,6 +15,9 @@
         :danger="item.command === 'Delete'"
         :popConfirm="handleFunction(item.permissionProps, record)?.popConfirm"
         :class="extractCssClass(item.style)"
+        :hasPermission="
+          route.params.sid ? `${route.params.sid}:${item.key}` : true
+        "
         :data-id="item.id"
       >
         <template v-if="item.icon">
@@ -43,6 +51,9 @@
                   handleFunction(item.permissionProps, record)?.popConfirm
                 "
                 :class="extractCssClass(item.style)"
+                :hasPermission="
+                  route.params.sid ? `${route.params.sid}:${item.key}` : true
+                "
                 :data-id="item.id"
               >
                 <template #icon v-if="item.icon || item.key === 'delete'">
@@ -83,10 +94,11 @@ const props = defineProps({
   },
 })
 
+const route = useRoute()
 const tableActions = ref()
 const showLength = ref(0)
 onMounted(() => {
-  console.log(Math.ceil(tableActions.value.clientWidth / 40));
+  console.log(Math.ceil(tableActions.value.clientWidth / 40))
   showLength.value = Math.floor(tableActions.value.clientWidth / 40)
 })
 

@@ -82,7 +82,7 @@ export const useMenuStore = defineStore('menu', () => {
               })
             }
 
-            // authStore.handlePermission(resp.result) // 处理按钮权限
+            authStore.handlePermission(resp.result) // 处理按钮权限
             menu.value = routes
             // handleMenusMap(routes, handleMenusMapById)
             // siderMenus.value = handleSiderMenu(cloneDeep(resp.result)) // 处理菜单
