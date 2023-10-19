@@ -1,7 +1,5 @@
 <template>
-  <router-view v-slot="Component">
-    <component :is="components || Component" />
-  </router-view>
+  <router-view />
 </template>
 
 <script setup name="BlankLayoutPage" lang="ts">

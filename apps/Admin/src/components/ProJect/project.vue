@@ -10,6 +10,7 @@
 import { useProduct, useEngine } from '@/store';
 import List from './List/index.vue'
 import dayjs from 'dayjs'
+import { cloneDeep } from 'lodash-es';
 
 
 const props = defineProps({
@@ -24,24 +25,28 @@ const engine = useEngine()
 const list = ref<any>([])
 
 const handleSort = (value) => {
-    
+
     const sortKey = product.getById(engine.activeFile)?.others?.sorts
 
-    const result = value?.sort((a,b)=>{
-        if(sortKey==='name' || sortKey==='type'){
-            return a[sortKey].localeCompare(b[sortKey],'zh-CN')
-        }else{
-            return  dayjs(b.others[sortKey]).valueOf() - dayjs(a.others[sortKey]).valueOf()
-        }
-    })
-    // console.log('result',result)
-    return result
+    if (sortKey === 'default') {
+        return value
+    } else {
+        const result = value?.sort((a, b) => {
+            if (sortKey === 'name' || sortKey === 'type') {
+                return a[sortKey].localeCompare(b[sortKey], 'zh-CN')
+            } else {
+                return dayjs(b.others[sortKey]).valueOf() - dayjs(a.others[sortKey]).valueOf()
+            }
+        })
+        return result
+    }
 }
 
 watchEffect(() => {
     if (props.data) {
-        // console.log('list', props.data)
-        list.value = handleSort(props.data)
+        console.log('list', props.data)
+        const arr = cloneDeep(props.data)
+        list.value = handleSort(arr)
     }
 })
 

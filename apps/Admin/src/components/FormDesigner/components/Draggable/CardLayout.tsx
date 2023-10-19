@@ -2,7 +2,7 @@ import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
 import { Card, FormItem } from 'jetlinks-ui-components'
 import './index.less'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, omit } from 'lodash-es'
 import { useTool } from '../../hooks'
 
 export default defineComponent({
@@ -25,6 +25,14 @@ export default defineComponent({
         index: {
             type: Number,
             default: 0
+        },
+        visible: {
+            type: Boolean,
+            default: true
+        },
+        editable: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
@@ -58,7 +66,7 @@ export default defineComponent({
                 return (
                     <Card
                         data-layout-type={'card'}
-                        {...unref(_data).componentProps}
+                        {...omit(unref(_data).componentProps, 'description')}
                     >
                         {
                             unref(list).map(element => {
@@ -77,6 +85,8 @@ export default defineComponent({
                                             parent={element}
                                             path={_path}
                                             index={_index + 1}
+                                            visible={props.visible}
+                                            editable={props.editable}
                                         />
                                     </Selection>
                                 )
@@ -89,12 +99,16 @@ export default defineComponent({
                 <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     {
                         unref(_isLayout) ?
-                            <FormItem {...unref(_formItemProps)}>
+                            <FormItem {...unref(_formItemProps)} validateFirst={true} extra={props.data?.componentProps?.description || ''}>
                                 {renderContent()}
                             </FormItem>
-                            : renderContent()
+                            : <>
+                                {renderContent()}
+                                <div class="description">
+                                    {props.data?.componentProps?.description}
+                                </div>
+                            </>
                     }
-
                 </Selection>
             )
         }

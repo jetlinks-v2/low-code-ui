@@ -1,11 +1,12 @@
 <template>
   <div class="btns-list">
-    <j-space v-if="type == 'columns'">
-      <span>展示</span>
-      <j-switch v-model:checked="showColumns"></j-switch>
-    </j-space>
+    <j-form layout="vertical" v-if="type === 'columns'">
+      <j-form-item label="展示">
+        <j-switch v-model:checked="showColumns"></j-switch>
+      </j-form-item>
+    </j-form>
     <template v-if="showColumns || type !== 'columns'">
-      <div v-if="!columnsTree?.length">
+      <div>
         <p>
           {{
             type == 'columns'
@@ -13,15 +14,25 @@
               : '请配置当前页面需要的操作按钮'
           }}
         </p>
-        <j-button class="add-btn" @click="handleAddBtn()" type="dashed">{{
-          type == 'columns' ? '添加操作' : '添加按钮'
-        }}</j-button>
+        <j-button
+          v-if="!columnsTree?.length"
+          class="add-btn"
+          @click="handleAddBtn()"
+          type="dashed"
+          >{{ type == 'columns' ? '添加操作' : '添加按钮' }}</j-button
+        >
       </div>
-      <div v-else>
+      <div v-if="columnsTree?.length">
         <BtnTree
           v-model:btn-list="columnsTree"
           :draggable="type === 'columns' ? false : true"
         >
+          <template #title="{ data }">
+            <span
+              :class="{ error: errorList!.find((item) => item.key == data.key) }"
+              >{{ data.title }}</span
+            >
+          </template>
           <template #config="{ data }">
             <j-space size="middle">
               <AIcon
@@ -35,11 +46,25 @@
               />
               <AIcon
                 type="EditOutlined"
+                :class="{ error: errorList!.find((item) => item.key == data.key && item.errorKey != 'level') }"
+                class="primary"
                 @click="handleEditBtn(data)"
-                :class="{ error: errorList!.find((item) => item.key == data.key) }"
               />
-              <AIcon type="DeleteOutlined" @click="handleDel(data.key)" />
+              <AIcon
+                type="DeleteOutlined"
+                @click="handleDel(data.key)"
+                class="danger"
+              />
             </j-space>
+            <span
+              style="position: absolute;right: -200px; color: #ff0000;"
+              v-if="errorList!.find((item) => item.key == data.key && item.errorKey == 'level')"
+              >{{
+                errorList!.find(
+                  (item) => item.key == data.key && item.errorKey == 'level',
+                )?.message
+              }}</span
+            >
           </template>
         </BtnTree>
         <j-button class="add-btn" type="dashed" @click="handleAddBtn()"
@@ -52,6 +77,7 @@
 <script setup lang="ts" name="BtnsList">
 import BtnTree from './BtnTree.vue'
 import { OperationConfigTreeItem } from '../type'
+import { ErrorItem } from '../..'
 import {
   columnsTreeKey,
   activeBtnKey,
@@ -112,6 +138,12 @@ const handleDel = (key: string) => {
   .add-btn {
     width: 100%;
   }
+  .danger {
+    color: #e50012;
+  }
+  .primary {
+    color: @primary-color;
+  }
 }
 .title {
   border-left: 1px solid;
@@ -119,7 +151,7 @@ const handleDel = (key: string) => {
   border-bottom: 1px solid;
 }
 .error {
-  color: red;
+  color: #e50012 !important;
 }
 :deep(.ant-tree-switcher-noop) {
   opacity: 0;

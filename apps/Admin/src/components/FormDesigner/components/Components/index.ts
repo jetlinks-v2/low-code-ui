@@ -7,6 +7,7 @@ import Device from './Device.vue'
 import Upload from './Upload/index.vue'
 import Geo from './Geo.vue'
 import Form from './Form.vue'
+import CardSelect from './CardSelect.vue'
 
 export {
     Text,
@@ -17,5 +18,6 @@ export {
     Device,
     Upload,
     Geo,
-    Form 
+    Form,
+    CardSelect
 }

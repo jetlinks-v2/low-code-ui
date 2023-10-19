@@ -246,6 +246,7 @@ function processFile(
 export function compileModulesForPreview(store: Store) {
   const seen: Set<File> = new Set()
   const processed: string[] = []
+
   processFile(store, store.state.files[store.state.mainFile], processed, seen)
 
   // also add css files that are not imported

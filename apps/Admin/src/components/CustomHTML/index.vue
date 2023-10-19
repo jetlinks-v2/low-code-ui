@@ -6,22 +6,24 @@ import Preview from './output/Preview.vue'
 import MenuList from '@/components/ListPage/MenuConfig/components/menu.vue'
 import { debounce } from './utils'
 import MonacoEditor from './editor/MonacoEditor.vue'
-import { ReplStore } from './store'
+import {defaultMainFile, ReplStore} from './store'
 import 'splitpanes/dist/splitpanes.css'
 import { useProduct } from '@/store/product'
 import { storeToRefs } from 'pinia'
-import { useEngine } from '@/store/engine'
 import { onlyMessage } from '@jetlinks/utils'
 import { BASE_INFO, MENU_CONFIG } from "@/components/ListPage/keys";
 
 const props = defineProps({
-  data: Object
+  data: Object,
+  showTip: {
+    type: Boolean,
+    default: true
+  }
 })
 
-const engineStore = useEngine()
+
 const productStore = useProduct()
-const { files, activeFile } = storeToRefs(engineStore)
-const store = new ReplStore(files.value[activeFile.value]?.configuration?.code)
+const store = new ReplStore(props.data?.configuration?.code)
 const vueMode = ref(true)
 store.init()
 provide('store', store)
@@ -35,24 +37,46 @@ enum OperType {
 
 const onChange = debounce((code: string) => {
   store.state.activeFile.code = code
+  productStore.update({
+    ...props.data,
+    configuration: {
+      type: 'html',
+      code
+    }
+  })
 }, 250)
 
-const onBlur = debounce(() => updateStoreCode(), 250)
+// const onBlur = debounce(() => updateStoreCode(), 250)
 
 const drawerVisible = ref(false)
 const $drawerWidth = ref('50%')
 const drawerTitle = ref('预览')
+const menuError = ref(0)
 
 const handleDbClickViewName = () => {
-  $drawerWidth.value = $drawerWidth.value === '98%' ? '50%' : '98%'
+  if (activeOper.value === OperType.View) {
+    $drawerWidth.value = $drawerWidth.value === 'calc(100% - 50px)' ? '50%' : 'calc(100% - 50px)'
+  }
+}
+
+const handleDbCLickEditor = () => {
+  if (activeOper.value === OperType.View) {
+    $drawerWidth.value = $drawerWidth.value === '50%' ? '0%' : '50%'
+  }
 }
 
 const activeOper = ref('')
 const menuListRef = ref()
 const menuFormData = ref({ pageName: '', main: true, name: '', icon: '' })
 const menuChangeValue = ref()
+const replRef = ref()
 const errors = ref([] as any)
 const handleOperClick = (type: OperType) => {
+  if (type === OperType.View && drawerVisible.value && $drawerWidth.value === '0%') {
+    $drawerWidth.value = '50%'
+    return
+  }
+
   if (type === activeOper.value) {
     drawerVisible.value = !drawerVisible.value
   } else {
@@ -84,35 +108,44 @@ const runCode = () => {
   previewRef.value.updatePreview()
   window.addEventListener('message', (ac) => {
     runLoading.value = false
-    if (ac.data.action === 'error') {
+    if (ac.data.action === 'error' && ac.data.error) {
       store.state.errors = [ac.data.error]
     }
   })
 }
 
-const handleValidate = () => {
-  if (errors.value.length > 0) {
-    onlyMessage(errors.value[0].errors[0], 'error')
-  } else if(!store.state.activeFile.code){
-    onlyMessage('页面代码为空', 'error')
-  } else if(store.state.errors?.length > 0) {
-    onlyMessage('运行日志报错', 'error');
-  } else {
-    onlyMessage('校验成功', 'success')
+const handleValidate = async () => {
+  const menuStatus = await validateMenu()
+  if (props.showTip) {
+    if (menuStatus) {
+      // onlyMessage(errors.value[0].errors[0], 'error')
+    } else if(!store.state.activeFile.code){
+      onlyMessage('页面代码为空', 'error')
+    } else if(store.state.errors?.length > 0) {
+      onlyMessage('运行日志报错', 'error');
+    } else {
+      onlyMessage('校验通过', 'success')
+    }
   }
-  updateStoreCode()
 }
 
 provide(BASE_INFO, props.data)
 provide(MENU_CONFIG, menuFormData)
 
+const validateMenu = async () => {
+  const resp = await menuListRef.value?.vaildate()
+  if (resp.errorFields) {
+    menuError.value = resp.errorFields.length
+    return true
+  } else {
+    menuError.value = 0
+    return false
+  }
+}
+
 const updateMenuFormData = (val) => {
   nextTick(() => {
-    menuListRef.value?.vaildate().then(vaild => {
-      if (vaild?.errorFields?.length > 0) {
-        errors.value = vaild.errorFields ?? []
-      }
-    })
+    validateMenu()
   })
 
   productStore.update({
@@ -125,19 +158,29 @@ const updateMenuFormData = (val) => {
 }
 
 const errorValidate = async () => {
-  const err = [];
+  const err: any[] = [];
+  const menuResp = await menuListRef.value?.vaildate()
+  if (menuResp.errorFields) {
+    menuError.value = menuResp.errorFields.length
+    menuResp.errorFields.forEach(item => {
+      const msg = item.errors[0]
+      err.push({ message: msg })
+    })
+  } else {
+    menuError.value = 0
+  }
   store.state.errors.forEach((error: any) => {
     err.push({
-      massage: error.message ?? error
+      message: error.message ?? error
     })
   })
   errors.value.forEach((error: any) => {
     err.push({
-      massage: error.errors[0]
+      message: error.errors[0]
     })
   })
   if (!store.state.activeFile.code) {
-    err.push({massage: '页面代码为空'})
+    err.push({message: '页面代码为空'})
   }
 
   return new Promise((resolve, reject) => {
@@ -149,12 +192,33 @@ const errorValidate = async () => {
   });
 }
 
-onMounted(() => {
+const cancel = () => {
+  drawerVisible.value = false
+  activeOper.value = ''
+}
+
+const submit = () => {
+  menuListRef.value?.vaildate()
+  cancel()
+}
+
+const editorFocus = () => {
+  if (activeOper.value === OperType.Menu) {
+    drawerVisible.value = false
+    activeOper.value = ''
+  }
+}
+
+const errorChange = (e) => {
+  console.log('errorChange', e)
+}
+
+watch(() => props.data?.title, () => {
   menuFormData.value = {
     ...props.data.others.menu,
-    pageName: props.data.pageName || props.data?.title || '',
+    pageName: props.data?.title || '',
   }
-})
+}, { immediate: true })
 
 defineExpose({
   validate: errorValidate
@@ -162,13 +226,13 @@ defineExpose({
 </script>
 
 <template>
-  <div class="jetlinks-repl">
-    <SplitPane class="split-pane">
+  <div class="jetlinks-repl" ref="replRef">
+    <SplitPane class="split-pane" @click="editorFocus">
       <template #editor>
-        <EditorContainer>
+        <EditorContainer @dbClick="handleDbCLickEditor">
           <MonacoEditor
             @change="onChange"
-            @blur="onBlur"
+            @errorChange="errorChange"
             :filename="store.state.activeFile.filename"
             :value="store.state.activeFile.code"
           />
@@ -198,19 +262,22 @@ defineExpose({
           :class="{ active: activeOper === OperType.View }"
           @click="handleOperClick(OperType.View)"
         >
-          预览
+          <AIcon type="CaretRightOutlined"/>
         </div>
+        <j-badge :count="menuError">
         <div
           class="list-item"
           :class="{ active: activeOper === OperType.Menu }"
           @click="handleOperClick(OperType.Menu)"
         >
-          菜单配置
+
+            <AIcon type="MenuOutlined"/>
+
         </div>
+        </j-badge>
       </div>
     </div>
-
-    <div class="drawer-content" v-show="drawerVisible">
+    <div class="drawer-content" :style="{ width: $drawerWidth }" v-show="drawerVisible">
       <div class="drawer-header">
         <div class="drawer-title" @dblclick="handleDbClickViewName">
           {{ drawerTitle }}
@@ -222,53 +289,65 @@ defineExpose({
             @dblclick.stop
             :loading="runLoading"
           >运行
-          </j-button
-          >
+          </j-button>
         </div>
       </div>
       <div class="drawer-body">
         <Preview v-if="activeOper === OperType.View" ref="previewRef" />
-        <MenuList
-          v-else-if="activeOper === OperType.Menu"
-          ref="menuListRef"
-          :form-data="menuFormData"
-          @update:form="updateMenuFormData"
-        />
+        <div v-show="activeOper === OperType.Menu">
+          <MenuList
+            ref="menuListRef"
+            @change="updateMenuFormData"
+          />
+        </div>
       </div>
+<!--      <div class="drawer-footer" v-show="activeOper === OperType.Menu">-->
+<!--        <j-button @click="cancel">取消</j-button>-->
+<!--        <j-button type="primary"  @click="submit">确认</j-button>-->
+<!--      </div>-->
     </div>
   </div>
 </template>
 
 <style lang="less" scoped>
 .jetlinks-repl {
-  height: calc(100vh - 48px);
+  height: 100%;
   display: flex;
   position: relative;
   .split-pane {
-    width: 98%;
+    width: calc(100% - 50px);
   }
   .right-oper {
-    width: 2%;
+    padding: 0 8px;
 
     .oper-list {
       width: 100%;
       text-align: center;
       display: grid;
       justify-content: center;
-      margin-top: 14px;
+      margin-top: 16px;
 
       .list-item {
         cursor: pointer;
-        writing-mode: vertical-rl;
-        text-orientation: upright;
-        padding-bottom: 18px;
-        font-size: 17px;
+        font-size: 16px;
         user-select: none;
+        border-radius: 4px;
+        background-color: #F6F6F6;
+        transition: all .3s ease-in;
+        width: 36px;
+        height: 36px;
+        line-height: 36px;
+
+        &:not(:last-child) {
+          margin-bottom: 16px;
+        }
+
         &:hover {
           color: var(--ant-primary-color);
         }
         &.active {
           color: var(--ant-primary-color);
+          background-color: #F0F0F0;
         }
       }
     }
@@ -276,13 +355,18 @@ defineExpose({
 }
 .drawer-content {
   position: absolute;
-  right: 2%;
+  right: 50px;
   top: 0;
-  width: v-bind('$drawerWidth');
+  width: 50%;
   height: 100%;
   margin: 0;
   background-color: #fff;
   overflow-y: auto;
+  border-right: 1px solid #f0f0f0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+
   .drawer-header {
     position: relative;
     padding: 16px 24px;
@@ -305,6 +389,14 @@ defineExpose({
     font-size: 14px;
     line-height: 1.5715;
     word-wrap: break-word;
+    flex: 1 1 auto;
+  }
+
+  .drawer-footer {
+    border-top: 1px solid #f0f0f0;
+    padding: 16px 24px;
+    display: flex;
+    gap: 24px;
   }
 }
 </style>

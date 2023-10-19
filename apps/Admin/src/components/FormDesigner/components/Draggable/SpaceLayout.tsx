@@ -27,6 +27,14 @@ export default defineComponent({
         index: {
             type: Number,
             default: 0
+        },
+        visible: {
+            type: Boolean,
+            default: true
+        },
+        editable: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
@@ -57,6 +65,7 @@ export default defineComponent({
             }
             return (
                 <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDrag={true} hasDel={true} hasCopy={true} data={props.data} parent={props.parent}>
+                    {/* <div style={{ overflowX: 'auto' }}> */}
                     {
                         unref(list).length ? <Space data-layout-type={'space'} {...props.data.componentProps}>
                             {
@@ -77,6 +86,8 @@ export default defineComponent({
                                                     parent={element}
                                                     path={_path}
                                                     index={_index + 1}
+                                                    visible={props.visible}
+                                                    editable={props.editable}
                                                 />
                                             </Selection>
                                         </div>
@@ -85,6 +96,7 @@ export default defineComponent({
                             }
                         </Space> : (unref(isEditModel) ? <div class="draggable-empty">弹性间距</div> : <div></div>)
                     }
+                    {/* </div> */}
                     {
                         unref(isEditModel) &&
                         <div class="draggable-add">

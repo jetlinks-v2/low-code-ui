@@ -15,12 +15,14 @@ const list = ref([])
 const getTree = () => {
   const maps = product.getDataMap()
   const copyData = JSON.parse(JSON.stringify([...maps.values()]))
+  console.log('copyData----',copyData)
   list.value = copyData.filter(item => {
     return item.others && item.others?.menu && item.others?.menu.main
   }).map(item => {
-    item.parentFullId = maps.get(item.parentId).fullId
+    item.parentFullId = maps.get(item.parentId).fullId || item.parentId
     return item
   })
+  console.log(list.value)
 }
 
 const change = (data) => {
