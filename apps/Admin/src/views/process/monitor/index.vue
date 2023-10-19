@@ -1,8 +1,8 @@
 <!-- 流程监控 -->
 <template>
   <page-container>
-    <div>
-      <j-radio-group v-model:value="history" button-style="solid" style="margin-bottom: 16px">
+    <div class="tab">
+      <j-radio-group v-model:value="history" button-style="solid">
         <j-space>
           <j-radio-button :value="false">流转中</j-radio-button>
           <j-radio-button :value="true">已完成</j-radio-button>
@@ -16,16 +16,34 @@
       :columns="columns"
       :params="{
         history,
-        ...params
+        ...params,
       }"
       :request="getList_api"
       :defaultParams="{
         sorts: [{ name: 'createTime', order: 'desc' }],
       }"
     >
+      <template #classifiedId="{ classifiedId }">
+        {{ classifiedStore.getText(classifiedId) }}
+      </template>
+      <template #state="{ state }">
+        <!-- <BadgeStatus
+          :status="state.value"
+          :text="state.text"
+          :statusNames="{
+            undeployed: 'error',
+            running: 'running',
+          }"
+        /> -->
+        {{ state.text }}
+      </template>
       <template #createTime="{ createTime }">
         {{ dayjs(createTime).format('YYYY-MM-DD HH:mm:ss') }}
       </template>
+      <template #endTime="{ endTime }">
+        {{ endTime && dayjs(endTime).format('YYYY-MM-DD HH:mm:ss') }}
+      </template>
+      
 
       <template #action="slotProps">
         <PermissionButton
@@ -35,7 +53,7 @@
           }"
           @click="handleDetail(slotProps)"
         >
-          详情
+          <AIcon type="EyeOutlined" />
         </PermissionButton>
         <PermissionButton
           :hasPermission="false"
@@ -49,7 +67,7 @@
             onConfirm: () => handleDel(slotProps.id),
           }"
         >
-          关闭
+          <AIcon type="CloseCircleOutlined" />
         </PermissionButton>
       </template>
     </JProTable>
@@ -65,9 +83,9 @@
 import Drawer from './Drawer/index.vue'
 import { getList_api } from '@/api/process/monitor'
 import dayjs from 'dayjs'
-import { providerEnum } from '@/api/process/model'
-import { useRequest } from '@jetlinks/hooks'
+import { useClassified } from '@/store'
 
+const classifiedStore = useClassified()
 const history = ref(false)
 const columns = [
   {
@@ -75,14 +93,13 @@ const columns = [
     dataIndex: 'classifiedId',
     key: 'classifiedId',
     ellipsis: true,
+    scopedSlots: true,
     search: {
       type: 'select',
-      rename: 'classifiedId',
       componentProps: {
         placeholder: '请选择流程分类',
-        fieldNames: { label: 'text', value: 'value' },
       },
-      options: useRequest(providerEnum).data,
+      options: classifiedStore.classified,
     },
   },
   {
@@ -105,15 +122,16 @@ const columns = [
   },
   {
     title: '摘要',
-    dataIndex: 'name',
-    key: 'name',
+    dataIndex: 'summary',
+    key: 'summary',
     ellipsis: true,
   },
   {
     title: '状态',
-    dataIndex: 'name',
-    key: 'name',
+    dataIndex: 'state',
+    key: 'state',
     ellipsis: true,
+    scopedSlots: true,
     search: {
       type: 'select',
       componentProps: {
@@ -166,8 +184,8 @@ const columns = [
   },
   {
     title: '结束时间',
-    dataIndex: 'createTime',
-    key: 'createTime',
+    dataIndex: 'endTime',
+    key: 'endTime',
     ellipsis: true,
     scopedSlots: true,
     search: {
@@ -202,4 +220,25 @@ const handleDetail = (row) => {
   drawer.visible = true
 }
 </script>
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.tab {
+  height: 48px;
+  border-bottom: 1px solid #d9d9d9;
+  padding: 10px 16px;
+  background: #ffffff;
+  :deep(.ant-radio-button-wrapper) {
+    border-radius: 4px;
+    border: none;
+    &:hover {
+      color: #315efb;
+      background: #e4eaff;
+      border: none;
+    }
+  }
+  :deep(.ant-radio-button-wrapper-checked) {
+    color: #315efb;
+    background: #e4eaff;
+    border: none;
+  }
+}
+</style>
