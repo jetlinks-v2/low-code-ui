@@ -1,6 +1,6 @@
 
 <template>
-    <j-modal visible @cancel="emit('close')" @ok="onSave" :title="title" :width="900">
+    <j-modal visible @cancel="emit('close')" @ok="onSave" :title="title" :width="type === 'submit' ? 900 : 400">
         <j-form :layout="'vertical'" ref="formRef" :model="modelRef" v-if="type !== 'submit'">
             <div>
                 <!-- <div style="margin-bottom: 10px;" v-if="type === 'refuse'"> 驳回后将结束流程</div> -->
@@ -36,7 +36,7 @@ const props = defineProps({
     },
     current: {
         type: Object,
-        default: {}
+        default: {} 
     },
     required: {
         type: Boolean,
@@ -100,7 +100,7 @@ const onSave = async () => {
     }
     if(props.type === 'submit' && JSON.stringify(user.value) !=='{}'){
         emit('save', user.value)
-    }else{
+    }else if(props.type === 'submit'){
         onlyMessage('请选择审批人','error')
     }
 }

@@ -1,10 +1,28 @@
 
 <template>
     <div>
-        <div class="title"> 王刚的请假审批单</div>
+       
         <div class="items">
             <j-scrollbar>
-                <FormPreview v-for="item in formValue" :value="item.data" :data="item.configuration" ref="formRef" />
+                <template  v-for="item in formValue">
+                    <div class="title"> {{item?.formName}}</div>
+                    <FormPreview v-if="!item.multiple" :value="item.data" :data="item.configuration" ref="formRef"/>
+                    <div  v-else style="background-color: #fff;">
+                        <QuickEditTable
+                        validate
+                        ref="tableRef"
+                        :data="item.data"
+                        :columns="item.configuration"
+                        :scroll="{x: 1300, y: 500}"
+                    >
+                        <template v-for="(i,index) in item.configuration" #[i.dataIndex]="{record, index, valueChange}">
+                            <!-- <slot :name="name" v-bind="slotData || {}" /> -->
+                            <ValueItem :itemType="i.type"  v-model:modelValue="record[i.dataIndex]" @change="()=>{valueChange(record[i.dataIndex])}"></ValueItem>
+                        </template>
+                        </QuickEditTable>
+                        <j-button @click="()=>addTableData(item)" block style="margin-top: 10px;">新增</j-button>
+                    </div>
+                </template>
             </j-scrollbar>
         </div>
         <div class="bottom" v-if="type === 'todo'">
@@ -50,6 +68,7 @@ const comment = ref()
 const formRef = ref()
 const submitData = ref([])
 const nodeType = ref()
+const tableRef= ref()
 //提交审批taskId 
 const nodes = ref()
 // 审批意见是否必填
@@ -65,6 +84,14 @@ const btnList = ref([])
 const btnLoading = ref(false)
 //提交可选审批人条件
 const candidates = ref()
+const addTableData = (item) =>{
+    let obj = {}
+    item.configuration.map((i)=>{
+        const key = i.dataIndex
+        obj[key] = undefined
+    })
+    item.data.push(obj)
+}
 const onSave = (value) => {
     // btnLoading.value = true
     switch (modalType.value) {
@@ -93,7 +120,6 @@ const onSave = (value) => {
             })
             break;
         case 'submit': 
-            
             const commands = [
             {
             commandId: "ClaimTask",
@@ -103,7 +129,6 @@ const onSave = (value) => {
             }
         }
             ]
-            console.log(commands)
             _complete(props.info.currentTaskId, {
                 form: submitData.value,
                 commands: commands
@@ -118,8 +143,8 @@ const onSave = (value) => {
 }
 
 const onClick = async (value) => {
-
     const promise = []
+    const tablePromise = []
     modalType.value = value
     if (modalType.value === 'save') {
         btnLoading.value = true
@@ -135,23 +160,27 @@ const onClick = async (value) => {
         formRef.value.forEach((i, index) => {
             promise.push(i.onSave())
         })
+        tableRef.value.forEach((i)=>{
+            promise.push(i.validates())
+        })
         Promise.all(promise).then((res) => {
+            let data = []
             res.forEach((i, index) => {
-                submitData.value.push({
+                data.push({
                     formId: formValue.value[index].formId,
-                    data: {
+                    data: Array.isArray(i) ? i : {
                         ...formValue.value[index].data,
                         ...i
                     }
                 })
             })
+            submitData.value = data
             visible.value = true
         })
     }
 }
 const submitForm = () => {
     if (freeChoiceUser.value) {
-        console.log(freeChoiceUser.value)
         props.info.tasks.forEach((i) => {
             i.nodeId === freeChoiceUser.value ? taskId.value = i.id : ''
         })
@@ -163,6 +192,26 @@ const submitForm = () => {
             form: submitData.value,
         })
     }
+}
+//根据配置项生成表格
+const dealTable = () =>{
+    const tableColumn = []
+    formValue.value.forEach((i)=>{
+        if(i.multiple){
+             i?.configuration?.children.map((item)=>{
+                const rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}`},...item?.formItemProps?.rules] : [...item?.formItemProps?.rules]
+               tableColumn.push({
+                    title: item.formItemProps?.label,
+                    dataIndex: item.formItemProps?.name,
+                    type: item?.type,
+                    form:{
+                        rules:rules
+                    }
+                })
+            })
+            i.configuration = tableColumn
+        }
+    })
 }
 // 列表接口数据nodeId 对应form表单ID处理数据
 const dealForm = (nodes) => {
@@ -184,7 +233,7 @@ const dealForm = (nodes) => {
             bindMap.set(item, nodes.props.formBinds[item])
         })
         //循环表单匹配对应节点表单ID
-        formValue.value.filter((item) => {
+        formValue.value = formValue.value.filter((item) => {
             if (bindMap.has(item.formId)) {
                 // 循环表单项 根据节点 配置表单项属性 过滤掉节点没有配置的表单项
                 item.configuration.children = item.configuration.children.filter((i) => {
@@ -204,6 +253,7 @@ const dealForm = (nodes) => {
                 return false
             }
         })
+        dealTable()
     } else {
         nodes?.children ? dealForm(nodes.children) : ''
         if (nodes?.branches) {
@@ -233,8 +283,9 @@ watch(() => props.info, () => {
 .title {
     width: 100%;
     text-align: center;
-    margin-bottom: 5px;
+    margin-top: 10px;
     font-size: 20px;
+    background-color: #fff;
 }
 
 .items {
