@@ -29,7 +29,7 @@
             )"
         >
           <span
-            v-if="fragment.toLowerCase() === item.searchValue.toLowerCase()"
+            v-if="fragment.toLowerCase() === item.searchValue?.toLowerCase()"
             :key="i"
             style="color: #08c"
           >
@@ -63,7 +63,7 @@
       :tree-data="conditionOptions"
       :field-names="{ label: 'name', value: 'fullId' }"
       :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-      :multiple="['eq', 'not'].includes(item.termsType) ? false : true"
+      :multiple="['eq', 'not'].includes(item.termsType as string) ? false : true"
     >
       <template #title="{ name }">
         <template
@@ -77,7 +77,7 @@
             )"
         >
           <span
-            v-if="fragment.toLowerCase() === item.searchValue.toLowerCase()"
+            v-if="fragment.toLowerCase() === item.searchValue?.toLowerCase()"
             :key="i"
             style="color: #08c"
           >
@@ -109,7 +109,7 @@ const flowStore = useFlowStore()
 interface IConditionSelect {
   column: string | undefined
   termsType: string | undefined
-  value: string | string[]
+  value: string | string[] | undefined
   searchValue: string | undefined
 }
 
