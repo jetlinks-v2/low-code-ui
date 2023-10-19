@@ -1,10 +1,14 @@
 <template>
   <div class="config-center">
     <div class="content" v-if="props.showSwitch">
-      <div class="title">开启表头排序 用于控制该列数据置顶/置底展示</div>
+      <p>
+        开启表头排序
+        <j-tooltip title="用于控制该列数据展示顺序">
+          <AIcon type="QuestionCircleOutlined" />
+        </j-tooltip>
+      </p>
       <j-switch v-model:checked="state.checked" />
     </div>
-
     <div class="content">
       <slot name="demonstrations"></slot>
     </div>
@@ -23,14 +27,15 @@
     <div class="content">
       <div class="title">特殊样式</div>
       <div style="width: 500px">
-        <EditorModal v-model:value="state.specialStyle" language="css" />
+        <EditorButton v-model:value="state.specialStyle" language="css" text="编写特殊样式">
+        </EditorButton>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import EditorModal from '@/components/EditorModal'
+import EditorButton from '@/components/EditorModal/EditorButton.vue'
 const props = defineProps({
   showSwitch: {
     type: Boolean,
@@ -46,9 +51,11 @@ interface Emit {
 }
 const emits = defineEmits<Emit>()
 const state = reactive({
-  checked: props.config?.type === 'object' ? false : true,
+  checked: props.config?.config?.checked,
   colLayout: props.config?.config?.colLayout || 'left',
-  specialStyle: props.config?.config?.specialStyle || '',
+  specialStyle: props.config?.config?.specialStyle || `/* .test {
+    color: red;
+  } */`,
 })
 
 watch(
@@ -72,6 +79,8 @@ watch(
   }
   .content {
     padding-top: 5px;
+    margin-bottom: 8px;
+    margin-bottom: 8px;
   }
 }
 </style>

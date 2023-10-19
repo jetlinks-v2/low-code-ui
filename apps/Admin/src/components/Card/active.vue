@@ -23,7 +23,7 @@ export default {
   width: @width;
   height: @width;
   color: #fff;
-  background-color: #2f54eb;
+  background-color: var(--ant-primary-color-active);
   transform: rotate(-45deg);
 
   .checked-icon-content {

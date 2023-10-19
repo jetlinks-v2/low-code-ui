@@ -86,18 +86,21 @@ const Template = defineComponent({
             return (
                 <div class="filed-container">
                     <div class="filed-item">
-                        <div class="filed-item-children">
-                            {
-                                list.value.length ?
-                                    list.value.map(item => {
-                                        return <div class={"filed-item-card"} onClick={() => onClick(item)}>
-                                            {renderContent(item)}
-                                            <div class="filed-item-card-text">{item?.name}</div>
-                                        </div>
-                                    })
-                                    : <Empty style={{ marginTop: '200px' }} />
-                            }
-                        </div>
+                        {
+                            list.value.length ?
+                                <div class="filed-item-children">
+                                    {
+
+                                        list.value.map(item => {
+                                            return <div class={"filed-item-card"} onClick={() => onClick(item)}>
+                                                {renderContent(item)}
+                                                <div class="filed-item-card-text">{item?.name}</div>
+                                            </div>
+                                        })
+
+                                    }
+                                </div> : <Empty style={{ marginTop: '200px' }} />
+                        }
                     </div>
 
                 </div>
@@ -109,36 +112,36 @@ const Template = defineComponent({
 export default Template;
 
 
- // const slots = {
-        //     item: ({ element }) => {
-        //         return renderContent(element)
-        //     }
-        // }
+// const slots = {
+//     item: ({ element }) => {
+//         return renderContent(element)
+//     }
+// }
 
-        // const options = {
-        //     animation: 150,
-        //     direction: 'horizontal',
-        //     scroll: false,
-        //     sort: false,
-        //     group: { name: "j-canvas", pull: 'clone', put: false },
-        //     ghostClass: 'ghost',
-        //     clone: handleClone
-        // }
-        // <DragGableWrap
-        //     list={list.value}
-        //     {...options}
-        //     class={"filed-item-children"}
-        //     tag={'div'}
-        //     v-slots={slots}
-        //     item-key="template"
-        //     data-layout-type={'filed-item'}
-        // ></DragGableWrap>
+// const options = {
+//     animation: 150,
+//     direction: 'horizontal',
+//     scroll: false,
+//     sort: false,
+//     group: { name: "j-canvas", pull: 'clone', put: false },
+//     ghostClass: 'ghost',
+//     clone: handleClone
+// }
+// <DragGableWrap
+//     list={list.value}
+//     {...options}
+//     class={"filed-item-children"}
+//     tag={'div'}
+//     v-slots={slots}
+//     item-key="template"
+//     data-layout-type={'filed-item'}
+// ></DragGableWrap>
 
 
-                // const handleClone = (element) => {
-        //     // TODO 多个数据拖拽
-        //     return cloneDeep({
-        //         ...element.template?.[0],
-        //         key: `${element.template?.[0]?.type}_${uid()}_template`
-        //     })
-        // }
+// const handleClone = (element) => {
+//     // TODO 多个数据拖拽
+//     return cloneDeep({
+//         ...element.template?.[0],
+//         key: `${element.template?.[0]?.type}_${uid()}_template`
+//     })
+// }

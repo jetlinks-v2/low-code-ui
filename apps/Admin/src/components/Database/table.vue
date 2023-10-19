@@ -7,122 +7,136 @@
         </j-form-item>
       </j-form>
     </div>
-    <QuickEditTable
-      serial
-      validate
-      ref="tableRef"
-      :data="dataSource"
-      :columns="myColumns"
-      :height="500"
-      :scroll="{x: 1300, y: 500}"
-    >
-      <template #serial="{record, index}">
-        <div class="serial">
-          <AIcon type="KeyOutlined" :class="{primary: index === 1}" />
-          <span>{{ index }}</span>
-        </div>
-      </template>
-      <template #name="{record, index, valueChange}" >
-        <span v-if="index <= maxLen">{{ record.name }}</span>
-        <j-input v-else v-model:value="record.name" @change="() => { valueChange(record.name); alias(record.name, record) }" />
-      </template>
-      <template #comment="{record, index}">
-        <span v-if="index <= maxLen">{{ record.comment }}</span>
-        <j-input v-else v-model:value="record.comment" :maxLength="16" @change="emitUpdateDataSource"/>
-      </template>
-      <template #javaType="{record, index, valueChange}">
-        <span v-if="index <= maxLen">{{record.javaType}}</span>
-        <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => { valueChange(record.javaType); JavaTypeChange(record)}" />
-      </template>
-      <template #jdbcType="{record, index, valueChange}">
-        <span v-if="index <= maxLen">{{record.jdbcType}}</span>
-        <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="() => { valueChange(record.jdbcType);emitUpdateDataSource()}" />
-      </template>
-      <template #length="{ record, index }">
-        <span v-if="index <= maxLen">{{record.length}}</span>
-        <span v-else-if="!['DECIMAL','VARCHAR','LONGVARCHAR'].includes(record.jdbcType)"></span>
-        <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
-      </template>
-      <template #scale="{ record, index }">
-        <span v-if="index <= maxLen || !['DECIMAL'].includes(record.jdbcType)">{{record.scale}}</span>
-        <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" />
-      </template>
-      <template #updatable="{ record, index }">
-        <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" :disabled="index <= maxLen" />
-      </template>
-      <template #setting="{ record, index }">
-        <span v-if="index <= maxLen"></span>
-        <template v-else>
-          <j-tooltip
-            v-if="!record.javaType || ['Boolean', 'DateTime'].includes(record.javaType)"
-            :title=" ['Boolean', 'DateTime'].includes(record.javaType) ? '该javaType不支持配置' : '请先选择javaType'"
-          >
-            <j-button disabled>
+    <div style="height: calc(100% - 60px)">
+      <QuickEditTable
+        serial
+        validate
+        ref="tableRef"
+        :data="dataSource"
+        :columns="myColumns"
+        :height="500"
+        :scroll="{x: 1600, y: 500}"
+      >
+        <template #serial="{record, index}">
+          <div class="serial">
+            <AIcon type="KeyOutlined" :class="{primary: index === 1}" />
+            <span>{{ index }}</span>
+          </div>
+        </template>
+        <template #name="{record, index, valueChange}" >
+          <span v-if="index <= maxLen">{{ record.name }}</span>
+          <j-input v-else v-model:value="record.name" @change="() => { valueChange(record.name); alias(record.name, record) }" />
+        </template>
+        <template #comment="{record, index, valueChange}">
+          <span v-if="index <= maxLen">{{ record.comment }}</span>
+          <j-input v-else v-model:value="record.comment" :maxLength="16" @change="() => { valueChange(record.comment); emitUpdateDataSource()}"/>
+        </template>
+        <template #javaType="{record, index, valueChange}">
+          <span v-if="index <= maxLen">{{record.javaType}}</span>
+          <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => { valueChange(record.javaType); JavaTypeChange(record)}" :disabled="publishColumns.includes(record.alias)"/>
+        </template>
+        <template #jdbcType="{record, index, valueChange}">
+          <span v-if="index <= maxLen">{{record.jdbcType}}</span>
+          <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="() => { valueChange(record.jdbcType);emitUpdateDataSource()}" :disabled="publishColumns.includes(record.alias)" />
+        </template>
+        <template #length="{ record, index }">
+          <span v-if="index <= maxLen">{{record.length}}</span>
+          <span v-else-if="!['DECIMAL','VARCHAR','LONGVARCHAR'].includes(record.jdbcType)"></span>
+          <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" :disabled="publishColumns.includes(record.alias)" />
+        </template>
+        <template #scale="{ record, index }">
+          <span v-if="index <= maxLen || !['DECIMAL'].includes(record.jdbcType)">{{record.scale}}</span>
+          <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" :disabled="publishColumns.includes(record.alias)" />
+        </template>
+        <template #updatable="{ record, index }">
+          <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" :disabled="index <= maxLen" />
+        </template>
+        <template #setting="{ record, index }">
+          <span v-if="index <= maxLen"></span>
+          <template v-else>
+            <j-tooltip
+              v-if="!record.javaType || ['Boolean', 'DateTime'].includes(record.javaType)"
+              :title=" ['Boolean', 'DateTime'].includes(record.javaType) ? '该javaType不支持配置' : '请先选择javaType'"
+            >
+              <j-button disabled>
+                配置
+              </j-button>
+            </j-tooltip>
+            <j-button v-else @click="() => settingClick(record, index)">
               配置
             </j-button>
-          </j-tooltip>
-          <j-button v-else @click="() => settingClick(record, index)">
-            配置
-          </j-button>
-        </template>
+          </template>
 
-      </template>
-      <template #action="{ record, index }">
-        <j-space>
-          <PermissionButton
-            v-if="index > (maxLen ? maxLen - 1 : maxLen)"
-            type="link"
-            class="action-btn"
-            :hasPermission="true"
-            :tooltip="{ title: '新增'}"
-            @click="() => add(index)"
-          >
-            <AIcon type="PlusSquareOutlined" />
-          </PermissionButton>
-          <PermissionButton
-            v-if="index > maxLen"
-            type="link"
-            class="action-btn"
-            :hasPermission="true"
-            :tooltip="{ title: '复制'}"
-            @click="() => copy(record, index)"
-          >
-            <AIcon type="CopyOutlined" />
-          </PermissionButton>
-          <PermissionButton
-            v-if="index > maxLen"
-            type="link"
-            class="action-btn"
-            :hasPermission="true"
-            :tooltip="{ title: '删除'}"
-            :popConfirm="{
-              title: '确认删除？',
-              onConfirm: () => deleteFn(index)
-            }"
-          >
-            <AIcon type="DeleteOutlined" />
-          </PermissionButton>
-        </j-space>
-      </template>
-    </QuickEditTable>
-    <SettingModal
-      v-if="setting.visible"
-      :data="setting.data"
-      @cancel="settingCancel"
-      @save="settingSave"
-    />
+        </template>
+        <template #action="{ record, index }">
+          <j-space>
+            <PermissionButton
+              v-if="index > (maxLen ? maxLen - 1 : maxLen)"
+              type="link"
+              class="action-btn"
+              :hasPermission="true"
+              :tooltip="{ title: '新增'}"
+              @click="() => add(index)"
+            >
+              <AIcon type="PlusCircleOutlined" />
+            </PermissionButton>
+            <PermissionButton
+              v-if="index > maxLen"
+              type="link"
+              class="action-btn"
+              :hasPermission="true"
+              :tooltip="{ title: '复制'}"
+              @click="() => copy(record, index)"
+            >
+              <AIcon type="CopyOutlined" />
+            </PermissionButton>
+            <PermissionButton
+              v-if="index > maxLen"
+              danger
+              type="link"
+              class="action-btn"
+              placement="topRight"
+              :hasPermission="true"
+              :tooltip="{ title: '删除'}"
+              :popConfirm="{
+                title: '确认删除？',
+                onConfirm: () => deleteFn(index)
+              }"
+            >
+              <AIcon type="DeleteOutlined" />
+            </PermissionButton>
+          </j-space>
+        </template>
+      </QuickEditTable>
+    </div>
   </div>
+  <SettingModal
+    v-if="setting.visible"
+    :data="setting.data"
+    :warp="WarpRef"
+    :publish="setting.data ? publishColumns.includes(setting.data.name) : false"
+    @cancel="settingCancel"
+    @save="settingSave"
+  />
 </template>
 
 <script setup name="CRUDTable">
 import { upperCase } from "@/utils/comm";
 import { executeReq } from '@/api/basis'
 import { cloneDeep, debounce, omit } from 'lodash-es'
-import { TYPE_PROVIDE, CRUD_COLUMNS } from "@/components/Database/util";
+import {
+  TYPE_PROVIDE,
+  CRUD_COLUMNS,
+  WARP_REF,
+  proAll,
+  formErrorFieldsToObj,
+  settingValidate
+} from "@/components/Database/util";
 import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly } from './components'
 import { provide } from 'vue'
 import { defaultSetting, defaultTreeSetting } from './setting'
 import { regular } from '@jetlinks/utils'
+import { useProduct } from '@/store'
 
 const props = defineProps({
   tree: {
@@ -130,6 +144,10 @@ const props = defineProps({
     default: false
   },
   columns: {
+    type: Array,
+    default: () => []
+  },
+  publishColumns: {
     type: Array,
     default: () => []
   },
@@ -144,6 +162,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update', 'update:columns'])
+
+const product = useProduct()
 
 const myColumns = [
   {
@@ -162,8 +182,15 @@ const myColumns = [
             if (!regular.isModalReg(value)) {
               return Promise.reject('请以小写字母开头，使用字母、数字和下划线完成命名')
             }
+            if (typesOptions.value.some(item =>
+              item.javaType === upperCase(value) ||
+              item.javaType === (value.charAt(0).toUpperCase() + value.slice(1))
+            )) {
+              return Promise.reject('不能与保留字重名')
+            }
 
             const someName = dataSource.value.filter(item => item.index !== source.record.index).some(item => item.name === value)
+
             if (someName) {
               return Promise.reject('有重复列名')
             }
@@ -184,6 +211,16 @@ const myColumns = [
   {
     title: '注释',
     dataIndex: 'comment',
+    form: {
+      rules: {
+        asyncValidator: (rule, value, cb, source) => {
+          if (!value && source.record.index > maxLen.value) {
+            return Promise.reject('请输入注释')
+          }
+          return Promise.resolve()
+        }
+      }
+    }
   },
   {
     title: 'javaType',
@@ -191,8 +228,8 @@ const myColumns = [
     width: 150,
     form: {
       rules: {
-        asyncValidator: (rule, value) => {
-          if (!value) {
+        asyncValidator: (rule, value, cb, source) => {
+          if (!value && source.record.index > maxLen.value) {
             return Promise.reject('请选择javaType')
           }
           return Promise.resolve()
@@ -206,8 +243,8 @@ const myColumns = [
     width: 150,
     form: {
       rules: {
-        asyncValidator: (rule, value) => {
-          if (!value) {
+        asyncValidator: (rule, value, cb, source) => {
+          if (!value && source.record.index > maxLen.value) {
             return Promise.reject('请选择jdbcType')
           }
           return Promise.resolve()
@@ -233,7 +270,18 @@ const myColumns = [
   {
     title: '其它配置',
     dataIndex: 'setting',
-    width: 100
+    width: 100,
+    form: {
+      watch: ['other', 'dictionary'],
+      rules: {
+        asyncValidator: (rule, value, cb, source) => {
+          if (source.record.index > maxLen.value) {
+            return settingValidate(source.record)
+          }
+          return Promise.resolve()
+        }
+      }
+    }
   },
   {
     title: '操作',
@@ -259,6 +307,7 @@ const setting = reactive({
 })
 
 const CrudColumns = inject(CRUD_COLUMNS)
+const WarpRef = inject(WARP_REF)
 
 const tableNameRule = [{
   trigger: 'blur',
@@ -287,6 +336,7 @@ provide(TYPE_PROVIDE, typesOptions)
 
 const dataSourceChange = () => {
   CrudColumns.value = dataSource.value.filter(item => item.name && item.javaType && item.jdbcType).map(item => ({
+    alias: item.alias,
     dataIndex: item.name,
     title: item.comment
   }))
@@ -298,7 +348,7 @@ const emitUpdateDataSource = () => {
   if (isTreeNow) { // 后端不需要defaultTreeSetting或者defaultSetting中的值，需要剔除
     myValue = myValue.slice(9, myValue.length )
   } else {
-    myValue = myValue.slice(9, myValue.length )
+    myValue = myValue.slice(5, myValue.length )
   }
   emit('update:columns', myValue)
   emit('update')
@@ -330,14 +380,17 @@ const copy = (record, index) => {
   const cloneRecord = cloneDeep(record)
   if (cloneRecord.name) {
     cloneRecord.name = `copy_${cloneRecord.name}`
+    cloneRecord.alias = upperCase(cloneRecord.name)
   }
 
   updateDataSource(cloneRecord, index)
 }
 
 const deleteFn = async (index) => {
+  const _value = dataSource.value[index-1]
   dataSource.value.splice(index-1, 1)
   // dataSourceChange()
+  // 删除
   emitUpdateDataSource()
 }
 
@@ -362,9 +415,10 @@ const JavaTypeChange = (record) => {
         },
         validator: {
           provider: undefined,
+          providerType: undefined,
           configuration: {
-            message: undefined,
-            group: []
+            message: '数据格式错误',
+            group: ['save', 'update', 'insert']
           }
         },
         spec: undefined
@@ -383,7 +437,7 @@ const JavaTypeChange = (record) => {
           provider: undefined,
           configuration: {
             message: '数据格式错误',
-            group: [],
+            group: ['save', 'update', 'insert'],
             classType: record.javaType,
             regexp: undefined,
             min: undefined,
@@ -431,10 +485,24 @@ const settingCancel = () => {
   setting.visible = false
 }
 
+const getKey = (type) => {
+  switch (type) {
+    case 'Enum':
+      return 'dictionary'
+    case 'List':
+    case 'Map':
+      return 'others'
+  }
+}
+
 const settingSave = (data) => {
   dataSource.value.splice(data.index - 1, 1, data)
+  const key = getKey(data.javaType)
   settingCancel()
   emitUpdateDataSource()
+  if (key) {
+    tableRef.value?.validateItem([data.index - 1, key])
+  }
 }
 
 const tableNameChange = debounce((e) => {
@@ -452,25 +520,26 @@ const getTypes = () => {
 }
 
 watch(() => props.tree, () => {
-  console.log('watch', props.columns)
+    const cloneTreeSetting = cloneDeep(defaultTreeSetting)
+    const cloneSetting = cloneDeep(defaultSetting)
   if (dataSource.value.length) {
     const isTreeNow = dataSource.value[1].name === 'parent_id'
     const arr = JSON.parse(JSON.stringify(dataSource.value))
-
     if (props.tree) {
       if (!isTreeNow) {
         const other = arr.slice(5, arr.length )
-        dataSource.value = defaultTreeSetting.concat(other)
+        dataSource.value = cloneTreeSetting.concat(other)
         maxLen.value = 9
       }
     } else {
       if (isTreeNow) {
-        dataSource.value = defaultSetting.concat(arr.slice(9, arr.length))
+        dataSource.value = cloneSetting.concat(arr.slice(9, arr.length))
         maxLen.value = 5
       }
     }
   } else { // 新增数据
-    dataSource.value = props.tree ? [...defaultTreeSetting, ...props.columns] : [...defaultSetting, ...props.columns]
+    maxLen.value = props.tree ? 9 : 5
+    dataSource.value = props.tree ? [...cloneTreeSetting, ...props.columns] : [...cloneSetting, ...props.columns]
   }
 
 }, { immediate: true })
@@ -486,13 +555,23 @@ watch(() => JSON.stringify(dataSource.value), () => {
 defineExpose({
   validates: () => {
     return new Promise(async (resolve, reject) => {
-      try {
-        const v = await tableRef.value?.validates()
-        const r = await queryForm.value?.validate()
-        resolve(v)
-      } catch (e) {
-        reject(e)
-      }
+      proAll([
+        tableRef.value?.validates,
+        queryForm.value?.validate
+      ]).then(r => {
+        resolve(r)
+      }).catch(e => {
+        const errorMsg = {}
+        console.log('table-validates',e)
+        e.forEach(item => {
+          if(item.errorFields) {
+            Object.assign(errorMsg, formErrorFieldsToObj(item.errorFields))
+          } else {
+            Object.assign(errorMsg, item)
+          }
+        })
+        reject(errorMsg)
+      })
     })
   }
 })
@@ -504,6 +583,11 @@ dataSourceChange()
 
 <style scoped lang="less">
 .crud-table {
+  height: 100%;
+
+  :deep(.quick-table-warp) {
+    height: 100%;
+  }
   .crud-query {
     width: 400px;
   }

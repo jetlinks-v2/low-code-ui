@@ -1,47 +1,32 @@
 <template>
-  <j-spin :spinning="spinning">
-    <div class="container">
-      <Header @save="onSave" :data="data" @validate="onValidate" />
-      <div class="box" :style="{ height: _height }">
-        <div class="left" v-if="model !== 'preview'"><Filed /></div>
-        <div
-          class="right"
-          :style="{
-            width: _width,
-          }"
-        >
-          <Canvas></Canvas>
-        </div>
-        <div class="config" v-if="isShowConfig && model !== 'preview'">
-          <Config ref="configRef" />
+  <div class="container">
+    <Header
+      @save="emits('saveData', formData)"
+      :type="type"
+      :data="data"
+      @validate="onValid"
+    />
+    <div class="box">
+      <div class="left" v-if="model !== 'preview'"><Filed /></div>
+      <div
+        class="right"
+        :style="{
+          width: _width,
+        }"
+      >
+        <div class="canvas-box">
+          <div class="canvas-box-container">
+            <Canvas></Canvas>
+          </div>
         </div>
       </div>
-      <div class="check" v-if="model === 'preview' && !mode">
-        <div class="check-btn">
-          <j-button
-            v-if="!checkVisible"
-            type="primary"
-            @click="checkVisible = true"
-            >数据校验</j-button
-          >
-          <j-space v-else>
-            <j-button class="btn" @click="checkVisible = false; editData = ''">取消</j-button>
-            <j-button class="btn" @click="onInput('get')"
-              >获取数据<j-tooltip title="将表单中填写的所有数据获取到代码框中">
-                <AIcon type="QuestionCircleOutlined" /> </j-tooltip
-            ></j-button>
-            <j-button class="btn" @click="onInput('set')"
-              >加载数据<j-tooltip title="将代码框输入的模拟数据显示到代码框中">
-                <AIcon type="QuestionCircleOutlined" /> </j-tooltip
-            ></j-button>
-          </j-space>
-        </div>
-        <div style="height: 200px" v-if="checkVisible">
-          <j-monaco-editor v-model="editData" :language="'json'" />
-        </div>
+      <div class="config" v-if="isShowConfig && model !== 'preview'">
+        <Config ref="configRef" />
       </div>
     </div>
-  </j-spin>
+    <Check v-if="model === 'preview' && !mode" />
+    <CheckSpin :spinning="spinning" />
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -57,9 +42,8 @@ import {
   unref,
   computed,
   reactive,
-  onMounted,
 } from 'vue'
-import { debounce, map } from 'lodash-es'
+import { cloneDeep, debounce, map } from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
 import { Modal } from 'jetlinks-ui-components'
 import {
@@ -72,6 +56,10 @@ import {
   handleCopyData,
 } from './utils/utils'
 import { uid } from './utils/uid'
+import Check from './components/Check/index.vue'
+import { onlyMessage } from '@jetlinks/utils'
+import { providerEnum } from '@/components/ProJect'
+import { proAll } from '../QuickEditTable/util'
 
 const props = defineProps({
   value: {
@@ -86,25 +74,30 @@ const props = defineProps({
   data: {
     type: Object,
   },
+  type: {
+    // 判断是工作流还是低代码
+    type: String as PropType<'workflow' | 'low-code'>,
+    default: 'low-code',
+  },
 })
 
+const emits = defineEmits(['saveData'])
 const model = ref<'preview' | 'edit'>(props.mode ? 'preview' : 'edit') // 预览；编辑
 const formData = ref<any>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
 const selected = ref<any[]>([]) // 被选择数据,需要多选
-const errorKey = ref<string[]>([])
+const errorKey = ref<any[]>([])
 const configRef = ref<any>()
 const refList = ref<any>({})
 const formRef = ref<any>()
+const formRefList = ref<any>({})
 const formState = reactive({})
-
 const collectVisible = ref<boolean>(false)
 const collectData = ref<any[]>([])
 const delVisible = ref<boolean>(false)
 const spinning = ref<boolean>(false)
-const checkVisible = ref<boolean>(false)
-const editData = ref<string>()
 const _ctrl = ref<boolean>(false)
+const _other = ref<boolean>(false)
 const focus = ref<boolean>(false)
 const focused = ref<boolean>(false)
 
@@ -123,19 +116,17 @@ const _width = computed(() => {
     : 'calc(100% - 584px)'
 })
 
-const _height = computed(() => {
-  return model.value !== 'preview'
-    ? 'calc(100% - 50px)'
-    : !unref(checkVisible)
-    ? 'calc(100% - 100px)'
-    : 'calc(100% - 300px)'
-})
-
 // 设置数据被选中
 const setSelection = (node: any) => {
-  if (['card-item', 'space-item'].includes(node.type)) return
-  if (_ctrl.value && model.value === 'edit') {
-    if (node === 'root') return
+  if (['card-item'].includes(node.type)) {
+    onSaveData()
+    return
+  }
+  if (_ctrl.value && model.value === 'edit' && !_other.value) {
+    if (node === 'root') {
+      onSaveData()
+      return
+    }
     if (map(selected.value, 'key').includes('root')) {
       selected.value = [node]
     } else {
@@ -151,7 +142,9 @@ const setSelection = (node: any) => {
       selected.value.push(node)
     }
   }
-  isShowConfig.value = !(selected.value?.length > 1)
+  isShowConfig.value =
+    !(selected.value?.length > 1) &&
+    !map(selected.value, 'type').includes('space-item')
   onSaveData()
 }
 
@@ -182,14 +175,23 @@ const onDelete = debounce(() => {
 
 // 复制
 const onCopy = () => {
+  const list = selected.value.filter((item) => {
+    return ![
+      'collapse-item',
+      'tabs-item',
+      'grid-item',
+      'table-item',
+      'space-item',
+    ].includes(item.type)
+  })
   if (unref(isSelectedRoot) || focused.value) return
-  formDesigner.setCopyData(selected.value || [])
+  formDesigner.setCopyData(props.data?.id, list || [])
 }
 
 // 剪切
 const onShear = debounce(() => {
   if (unref(isSelectedRoot) || focused.value) return
-  formDesigner.setCopyData(selected.value || [])
+  formDesigner.setCopyData(props.data?.id, selected.value || [])
   const _data: any = deleteDataByKey(formData.value.children, selected.value)
   formData.value = {
     ...formData.value,
@@ -201,13 +203,20 @@ const onShear = debounce(() => {
 // 粘贴
 const onPaste = () => {
   if (!selected.value?.length || focused.value) return
-  const _data = formDesigner.getCopyData()
-  const list = (_data || []).map((item) => {
+  const obj = formDesigner.getCopyData()
+  const list = (obj?.list || []).map((item) => {
     return {
       ...item,
       formItemProps: {
         ...item?.formItemProps,
-        name: item.formItemProps?.name + 'copy',
+        label:
+          obj.key === props.data?.id
+            ? 'copy_' + item.formItemProps?.label
+            : item.formItemProps?.label,
+        name:
+          obj.key === props.data?.id
+            ? 'copy_' + item.formItemProps?.name
+            : item.formItemProps?.name,
       },
       key: item.key + '_' + uid(),
       children: handleCopyData(item?.children || []),
@@ -239,8 +248,12 @@ const onCollect = () => {
 }
 
 // 添加子组件
-const onAddChild = (newData: any, parent: any, flag?: boolean) => {
-  const arr = appendChildItem(formData.value?.children, newData, parent, flag)
+const onAddChild = (
+  newData: any,
+  parent: any,
+  __flag?: 'start' | 'end' | undefined,
+) => {
+  const arr = appendChildItem(formData.value?.children, newData, parent, __flag)
   formData.value = {
     ...formData.value,
     children: arr || [],
@@ -252,23 +265,58 @@ const onAddChild = (newData: any, parent: any, flag?: boolean) => {
  * 保存数据
  */
 const onSaveData = () => {
-  const obj = {
-    ...props.data,
-    configuration: {
-      type: 'form',
-      code: JSON.stringify(unref(formData)),
-    },
+  if (props.type === 'low-code') {
+    const obj = {
+      ...props.data,
+      configuration: {
+        type: 'form',
+        code: JSON.stringify(unref(formData)),
+      },
+    }
+    product.update(obj)
   }
-  product.update(obj)
 }
 
 const setModel = (_type: 'preview' | 'edit') => {
   model.value = _type
 }
 
+const onSave = () => {
+  if (model.value === 'preview') {
+    // 校验内嵌表单
+    const _func = Object.keys(formRefList.value || {}).map((item) => {
+      return formRefList.value[item]?.onSave()
+    })
+    // 主表单
+    _func.push(formRef.value?.validate())
+    return new Promise((resolve, reject) => {
+      proAll(_func)
+        .then(() => {
+          resolve(formState)
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    })
+  }
+}
+
+const getFormList = computed(() => {
+  const list = product.getDataMapByType(providerEnum.FormPage)
+  //   过滤掉自身
+  const filterList = list.filter((item) => item.id !== props.data?.id)
+  return filterList.map((item) => {
+    return {
+      label: item.title,
+      value: item.id,
+      code: item.configuration?.code,
+    }
+  })
+})
+
 provide('FormDesigner', {
-  tabsId: props.data?.id,
   model,
+  type: props?.type || 'low-code',
   formData,
   formState,
   formRef,
@@ -277,12 +325,15 @@ provide('FormDesigner', {
   errorKey,
   mode: props?.mode,
   refList,
+  formRefList,
   collectVisible,
   collectData,
   delVisible,
   _ctrl,
+  _other,
   focus,
   focused, // 其他组件
+  formList: getFormList,
   setSelection,
   setModel,
   onSaveData,
@@ -292,22 +343,8 @@ provide('FormDesigner', {
   onShear,
   onCollect,
   onAddChild,
+  onSave,
 })
-
-const onSave = () => {
-  if (model.value === 'preview') {
-    return new Promise((resolve, inject) => {
-      formRef.value
-        .validate()
-        .then((_data: any) => {
-          resolve(_data)
-        })
-        .catch((err: any) => {
-          inject(err)
-        })
-    })
-  }
-}
 
 watch(
   () => model.value,
@@ -328,8 +365,11 @@ watch(
   () => props.data,
   (newVal) => {
     try {
-      formData.value = JSON.parse(newVal?.configuration?.code) || initData
-    } catch (error) {}
+      const obj = JSON.parse(newVal?.configuration?.code)
+      formData.value = Object.keys(obj).length ? obj : cloneDeep(initData)
+    } catch (error) {
+      formData.value = cloneDeep(initData)
+    }
   },
   {
     deep: true,
@@ -337,22 +377,15 @@ watch(
   },
 )
 
-onMounted(() => {
-  setSelection('root')
-})
-
 onUnmounted(() => {
   onSaveData()
 })
 
 // 校验
-const onValidate = () => {
-  spinning.value = true
-  setTimeout(() => {
-    errorKey.value = checkedConfig(unref(formData))
-    spinning.value = false
-  }, 100)
-  return new Promise((resolve, reject) => {
+const onValidate = async () => {
+  return new Promise(async (resolve, reject) => {
+    const resp: any = await checkedConfig(unref(formData), getFormList.value)
+    errorKey.value = resp
     if (errorKey.value?.length) {
       reject(errorKey.value)
     } else {
@@ -361,16 +394,14 @@ const onValidate = () => {
   })
 }
 
-// 获取数据
-const onInput = async (type: 'get' | 'set') => {
-  if (type === 'set') {
-    const obj = JSON.parse(editData?.value || '{}')
-    Object.assign(formState, obj)
-  } else {
-    const obj = await onSave().catch(() => {})
-    if (obj) {
-      editData.value = JSON.stringify(obj)
-    }
+const onValid = async () => {
+  spinning.value = true
+  const _val = await onValidate().catch(() => {
+    spinning.value = false
+  })
+  spinning.value = false
+  if (_val) {
+    onlyMessage('校验通过')
   }
 }
 
@@ -379,13 +410,16 @@ defineExpose({ onSave, validate: onValidate })
 
 <style lang="less" scoped>
 .container {
-  height: calc(100vh - 125px);
-  position: relative;
+  height: calc(100vh - 132px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
   .box {
     display: flex;
     width: 100%;
-    height: calc(100% - 68px);
     overflow: hidden;
+    flex: 1;
     .left {
       width: 200px;
       height: 100%;
@@ -393,31 +427,24 @@ defineExpose({ onSave, validate: onValidate })
 
     .right {
       width: 100%;
+      .canvas-box {
+        width: 100%;
+        height: 100%;
+        padding: 24px;
+        background-color: #f6f6f6;
+
+        .canvas-box-container {
+          height: 100%;
+          background-color: #fff;
+          border-radius: 8px;
+          // padding: 18px;
+          // box-sizing: content-box;
+        }
+      }
     }
 
     .config {
       width: 384px;
-    }
-  }
-
-  .check {
-    position: absolute;
-    background-color: #1b1f29;
-    width: 100%;
-    bottom: 10px;
-    .check-btn {
-      display: flex;
-      align-items: center;
-      height: 40px;
-      justify-content: flex-end;
-      padding-right: 24px;
-
-      .btn {
-        background-color: #404756;
-        box-shadow: 0px 2px 0px 0px rgba(0, 0, 0, 0.02);
-        border: none;
-        color: #CFCFD0;
-      }
     }
   }
 }

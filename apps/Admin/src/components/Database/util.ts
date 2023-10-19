@@ -4,6 +4,7 @@ export const SETTING_FORM_MODEL = Symbol('setting_form_model')
 export const SETTING_FORM_REF = Symbol('setting_form_ref')
 
 export const CRUD_COLUMNS = Symbol('crud_columns')
+export const WARP_REF = Symbol('warp_ref')
 
 export const DataActions = [
   {
@@ -117,3 +118,70 @@ export const AdvancedApiColumns = [
     width: 120
   },
 ]
+
+export const proAll = (array: Array<() => Promise<any>>) => {
+  return new Promise((resolve, reject) => {
+    const length = array.length
+    const error: any[] = []
+    const success: any[] = []
+    let count = 0
+
+    const jump = () => {
+      if (count >= length) {
+        error.length ? reject(error) : resolve(success)
+      }
+    }
+
+    for (let i=0;i<length;i++) {
+      array[i]().then(r => {
+        success.push(r)
+        count++
+        jump()
+      }, (e) => {
+        error.push(e)
+        count++
+        jump()
+      })
+    }
+  })
+}
+
+type ErrorField = {
+  name: string[]
+  errors: string[]
+}
+
+export const formErrorFieldsToObj = (errorFields: ErrorField[]) => {
+  const obj:any = {}
+  errorFields.forEach(item => {
+    const key = item.name[0]
+    obj[key] = [{ message: item.errors[0] }]
+  })
+  return obj
+}
+
+export const settingValidate = (record: any) => {
+  const type = record.javaType
+  switch (type) {
+    case 'Enum':
+      if (!record.dictionary.dictionaryId) {
+        return Promise.reject('请选择数据字典')
+      }
+      break;
+    case 'List':
+      if (!record.others.valueJavaType) {
+        return Promise.reject('请选择元素类型')
+      }
+      break;
+    case 'Map':
+      if (!record.others.valueJavaType) {
+        return Promise.reject('请选择value')
+      }
+      if (!record.others.keyJavaType) {
+        return Promise.reject('请选择key')
+      }
+      break;
+  }
+
+  return Promise.resolve()
+}

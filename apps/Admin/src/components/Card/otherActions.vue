@@ -17,9 +17,16 @@
             v-bind:="handleFunction(item.permissionProps)"
             :danger="item.key === 'delete' "
             type="link"
+            :data-id="item.key"
+            :class="extractCssClass(item.style)"
           >
             <template #icon v-if="item.icon || item.key === 'delete'">
-              <AIcon :type="item.icon ? item.icon : 'DeleteOutlined'" />
+              <img
+                :src="item.icon"
+                v-if="item.icon?.includes('http')"
+                class="image-icon"
+              />
+              <AIcon v-else :type="item.icon ? item.icon : 'DeleteOutlined'" />
             </template>
             <span>{{ item.text }}</span>
           </PermissionButton>
@@ -33,7 +40,7 @@
 </template>
 
 <script setup name="OtherActions">
-
+import { extractCssClass, insertCustomCssToHead } from '../FormDesigner/utils/utils';
 import {isFunction, isObject} from "lodash-es";
 
 const props = defineProps({
@@ -56,8 +63,17 @@ const handleFunction = (item) => {
   return undefined
 }
 
+watchEffect(() => {
+  props.actions?.forEach((item) => {
+    insertCustomCssToHead(item.style, item.key, 'dataid')
+  })
+})
 </script>
 
 <style scoped>
-
+.image-icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 10px;
+}
 </style>

@@ -1,11 +1,11 @@
 
 import { filedData } from '../../../utils/defaultData'
-import DragGableWrap from '../../Draggable/DragGableWrap'
+import DraggableWrap from '../../Draggable/DraggableWrap'
+import { IconWidget } from '../../Icons';
 import './index.less';
-import { Card, AIcon } from 'jetlinks-ui-components';
 import { onEnd } from '@/components/FormDesigner/components/Draggable/ControlInsertionPlugin';
 import generatorData from '@/components/FormDesigner/utils/generatorData';
-import { cloneDeep, omit } from 'lodash-es';
+import { cloneDeep } from 'lodash-es';
 
 const Library = defineComponent({
     name: 'Library',
@@ -14,7 +14,7 @@ const Library = defineComponent({
         const designer: any = inject('FormDesigner')
 
         const handleClone = (element) => {
-            const item = { ...generatorData(omit(element, ['icon'])) }
+            const item = { ...generatorData(element) }
             return cloneDeep(item)
         }
 
@@ -23,7 +23,7 @@ const Library = defineComponent({
                 return (
                     <div class="filed-item-card">
                         <div class="filed-item-card-icon">
-                            <AIcon type={element.icon} style={{ fontSize: '25px' }} />
+                            <span style="width: 50px; height: 30px;">{IconWidget(element.type)}</span>
                         </div>
                         <div class="filed-item-card-text">{element.name}</div>
                     </div>
@@ -50,7 +50,7 @@ const Library = defineComponent({
                                 <div class="filed-item-title">{element.name}</div>
                                 {
                                     element.children?.length && (
-                                        <DragGableWrap
+                                        <DraggableWrap
                                             list={element?.children || []}
                                             {...options}
                                             class={"filed-item-children"}
@@ -61,7 +61,7 @@ const Library = defineComponent({
                                             onEnd={(e) => {
                                                 onEnd(e, designer)
                                             }}
-                                        ></DragGableWrap>
+                                        ></DraggableWrap>
                                     )
                                 }
                             </div>

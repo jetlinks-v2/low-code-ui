@@ -8,7 +8,7 @@
       :closable="true"
       :visible="open"
       :getContainer="() => $refs.filterModuleRef"
-      :wrap-style="{ position: 'absolute', zIndex: 1 }"
+      :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
       :destroyOnClose="true"
       @close="emits('update:open', false)"
     >
@@ -23,7 +23,7 @@
         :modelActiveKey="activeKey"
         :show="show"
         tableType="filter"
-        :asyncData="asyncData"
+        v-model:asyncData="dataBinds.filterAsync"
         :errorList="errorList"
         :bindData="dataBinds.filterBind"
         :bind-function-id="dataBinds.data.function"
@@ -45,6 +45,7 @@
           v-if="type === 'enum'"
           :id="props.id"
           :data="configRow"
+          :errorList="errorList"
           @update:state="(newValue) => (subValue = newValue)"
         />
         <StringType
@@ -89,10 +90,11 @@ import {
   NumberType,
   DateType,
 } from '@/components/ListPage/FilterModule/components/index'
-import { getImage } from '@jetlinks/utils';
+import { getImage, randomString } from '@jetlinks/utils';
 
 import { validFilterModule } from './utils/valid'
 import { DATA_BIND } from '../keys'
+import { cloneDeep } from 'lodash-es';
 
 interface Emit {
   (e: 'update:open', value: boolean): void
@@ -130,7 +132,6 @@ const show = ref(false)
 //是否完成数据绑定
 const dataBind = ref(false)
 //是否同步数据
-const asyncData = ref(false)
 //数据是否有变动
 const dataChange = ref(false)
 //是否修改配置
@@ -168,29 +169,6 @@ const columns: any = [
     form: {
       isVerify: true,
       required: true,
-      rules: [
-        {
-          validator(data: any, value: any) {
-            if (!value) {
-              return Promise.reject('请输入标识')
-            } else {
-              const addId = data?.field.split('.')
-              if (Number(addId[1])) {
-                const same = dataSource.value?.findIndex(
-                  (i: any) => i?.id === value,
-                )
-                if (
-                  same !== -1 &&
-                  Number(addId[1]) > dataSource.value?.length - 1
-                ) {
-                  return Promise.reject('标识重复，请重新输入！')
-                }
-              }
-            }
-            return Promise.resolve()
-          },
-        },
-      ],
     },
     doubleClick(record) {
       return record?.mark === 'add'
@@ -207,16 +185,6 @@ const columns: any = [
     form: {
       isVerify: true,
       required: true,
-      rules: [
-        {
-          validator(_, value) {
-            if (!value) {
-              return Promise.reject('请输入名称')
-            }
-            return Promise.resolve()
-          },
-        },
-      ],
     },
   },
   {
@@ -257,6 +225,7 @@ const handleAdd = async (table: any) => {
     name: '',
     type: 'string',
     mark: 'add',
+    rowKey: randomString(8)
   })
 }
 
@@ -315,23 +284,31 @@ const submit = () => {
   type.value = ''
   show.value = true
   dataBind.value = true
-  asyncData.value = true
+  dataBinds.filterAsync = true
   configChange.value = true
 }
 const goBack = () => {
   type.value = ''
   show.value = true
   dataBind.value = true
-  asyncData.value = true
+  dataBinds.filterAsync = true
   configChange.value = false
 }
 /**
  * 校验筛选模块配置
  */
 const errorList: any = ref([])
-const valid = () => {
-  errorList.value = validFilterModule(dataSource.value)
-  return errorList.value.length ? [{message: '数据绑定配置错误'}] : []
+const valid = async () => {
+  return new Promise((resolve) => {
+    validFilterModule(dataSource.value).then(res => {
+      errorList.value = res;
+      if(errorList.value.length) {
+        resolve([{message: '筛选项配置错误'}])
+      } else {
+        resolve([])
+      }
+    })
+  })
   // return new Promise((resolve, reject) => {
   //   errorList.value = validFilterModule(dataSource.value)
   //   if (errorList.value.length) reject([{message: '数据绑定配置错误'}])
@@ -344,18 +321,18 @@ defineExpose({
   errorList,
 })
 
-watch(
-  () => dataBinds,
-  () => {
-    if (dataBinds.data.function) {
-      dataBind.value = true
-    } else {
-      dataBind.value = false
-      dataSource.value = [];
-    }
-  },
-  { immediate: true, deep: true },
-)
+// watch(
+//   () => dataBinds,
+//   () => {
+//     if (dataBinds.data.function) {
+//       dataBind.value = true
+//     } else {
+//       dataBind.value = false
+//       dataSource.value = [];
+//     }
+//   },
+//   { immediate: true, deep: true },
+// )
 
 </script>
 

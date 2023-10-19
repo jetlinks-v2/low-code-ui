@@ -56,7 +56,7 @@ const registrationTypescript = ref({
 })
 
 const getTSTips = async () => {
-  const modules = await project.getServerModulesData()
+  const modules = await project.getServerModulesData({ key: 'id', value: [props.id] })
   const resp = await executeReq(providerEnum.Function, 'CreateScriptCompletion', {
     modules: modules,
     extensions: []

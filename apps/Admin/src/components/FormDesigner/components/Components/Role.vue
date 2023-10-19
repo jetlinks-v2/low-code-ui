@@ -1,23 +1,28 @@
 <template>
-  <j-tree-select
-    :tree-data="data"
-    :value="_value"
-    @change="valueChange"
-    :multiple="mode === 'multiple'"
-    :disabled="disabled"
-    placeholder="请选择"
-  >
-  </j-tree-select>
+  <div>
+    <j-tree-select
+      :tree-data="options"
+      :value="_value"
+      @change="valueChange"
+      :multiple="mode === 'multiple'"
+      :disabled="disabled"
+      placeholder="请选择"
+      :size="size"
+      style="width: 100%"
+    >
+    </j-tree-select>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { getRoleList } from '@/api/form'
 import { useRequest } from '@jetlinks/hooks'
+import { map } from 'lodash-es'
 import { ref, watch } from 'vue'
 const props = defineProps({
   value: {
-    type: Array,
-    default: [],
+    type: [Array, String],
+    // default: [],
   },
   mode: {
     type: String,
@@ -31,11 +36,50 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  size: {
+    type: String,
+    default: '',
+  },
+  keys: {
+    type: Array,
+    default: () => []
+  }
 })
 const emit = defineEmits(['update:value'])
 const _value = ref()
+
+const _getObj = (value: any) => {
+  const obj = {}
+  props.keys.map((item: any) => {
+    if (item?.key) {
+      obj[item.key] = value?.[item?.key]
+    }
+  })
+  return obj
+}
+
+const getObj = (arr: any[], _item: string) => {
+  for (let index = 0; index < arr?.length; index++) {
+    const element = arr[index]
+    if (element?.value === _item) {
+      return element
+    } else {
+      if (element?.children?.length) {
+        return getObj(element?.children, _item)
+      }
+    }
+  }
+}
+
 const valueChange = (value: any) => {
-  emit('update:value', value)
+  if (props.mode !== 'multiple') {
+    emit('update:value', _getObj(getObj(options.value, value)))
+  } else {
+    const arr = value.map((i) => {
+      return _getObj(getObj(options.value, i))
+    })
+    emit('update:value', arr)
+  }
 }
 
 const dealTreeData = (tree: any) => {
@@ -44,8 +88,9 @@ const dealTreeData = (tree: any) => {
       label: item.groupName,
       value: item.groupId,
       disabled: true,
-      children: item?.roles?.map((i: any) => {
+      children: (item?.roles || [])?.map((i: any) => {
         return {
+          ...i,
           label: i.name,
           value: i.id,
         }
@@ -53,16 +98,22 @@ const dealTreeData = (tree: any) => {
     }
   })
 }
-const { data, run } = useRequest(getRoleList, {
+const { data: options, run } = useRequest(getRoleList, {
   onSuccess(res) {
-    return dealTreeData(res.result)
+    const arr = dealTreeData(res.result)
+    return arr
   },
   immediate: false,
 })
+
 watch(
   () => props.value,
   () => {
-    _value.value = props.value
+    if (props.mode !== 'multiple') {
+      _value.value = Array.isArray(props?.value) ? props.value?.[0]?.id : props.value?.id
+    } else {
+      _value.value = Array.isArray(props?.value) ? map(props?.value, 'id') : []
+    }
   },
   { deep: true, immediate: true },
 )
