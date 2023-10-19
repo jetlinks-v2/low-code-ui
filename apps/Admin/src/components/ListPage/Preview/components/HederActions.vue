@@ -8,7 +8,7 @@
           :class="className(item.style)"
           v-bind:="handleFunction(item.permissionProps, item, item)"
           :danger="item.command === 'Delete'"
-          :popConfirm="handleFunction(item.permissionProps)?.popConfirm"
+          :hasPermission="route.params.sid ? `${route.params.sid}:${item.key}` : true"
           :data-id="item.id"
         >
           <j-space>
@@ -26,12 +26,24 @@
             :actions="item?.children"
             v-else
         >
-          <j-button :dataid="item.id" :class="className(item.style)">
-            <template #icon>
-              <img v-if="item.icon?.includes('http')" :src="item.icon" class="image-icon">
-              <AIcon v-else :type="item.icon"/>
-            </template>
-            {{ item.title }} <AIcon type="DownOutlined" /></j-button>
+        <PermissionButton
+        :key="item.key"
+        :danger="item.command === 'Delete'"
+        :class="extractCssClass(item.style)"
+        :hasPermission="route.params.sid ? `${route.params.sid}:${item.key}` : true"
+        :data-id="item.id"
+      >
+        <template v-if="item.icon">
+          <img
+            :src="item.icon"
+            alt=""
+            v-if="item.icon.includes('http')"
+            class="image-icon"
+          />
+          <AIcon v-else :type="item?.icon" />
+        </template>
+        {{ item.title }} <AIcon type="DownOutlined" />
+      </PermissionButton>
         </BatchDropdown>
       </div>
     </j-space>
@@ -44,6 +56,7 @@ import { extractCssClass, insertCustomCssToHead } from '@/components/FormDesigne
 import BatchDropdown from './BatchDropdown/index.vue'
 
 const isCheck = ref(false)
+const route = useRoute()
 const props = defineProps({
   headerActions: {
     type: Array as PropType<Record<string, any>[]>,
