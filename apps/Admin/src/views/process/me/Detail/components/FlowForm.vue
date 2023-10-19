@@ -1,12 +1,13 @@
 
 <template>
     <div>
-        <!-- <div class="title"> 王刚的请假审批单</div> -->
+       
         <div class="items">
             <j-scrollbar>
                 <template  v-for="item in formValue">
+                    <div class="title"> {{item?.formName}}</div>
                     <FormPreview v-if="!item.multiple" :value="item.data" :data="item.configuration" ref="formRef"/>
-                    <div  v-else >
+                    <div  v-else style="background-color: #fff;">
                         <QuickEditTable
                         validate
                         ref="tableRef"
@@ -14,12 +15,12 @@
                         :columns="item.configuration"
                         :scroll="{x: 1300, y: 500}"
                     >
-                        <template v-for="(item,index) in item.configuration" #[item.dataIndex]="{record, index, valueChange}">
+                        <template v-for="(i,index) in item.configuration" #[i.dataIndex]="{record, index, valueChange}">
                             <!-- <slot :name="name" v-bind="slotData || {}" /> -->
-                            <ValueItem :itemType="item.type"  v-model:modelValue="record[item.dataIndex]" @change="()=>{valueChange(record[item.dataIndex])}"></ValueItem>
+                            <ValueItem :itemType="i.type"  v-model:modelValue="record[i.dataIndex]" @change="()=>{valueChange(record[i.dataIndex])}"></ValueItem>
                         </template>
                         </QuickEditTable>
-                        <j-button @click="()=>addTableData(item)">新增</j-button>
+                        <j-button @click="()=>addTableData(item)" block style="margin-top: 10px;">新增</j-button>
                     </div>
                 </template>
             </j-scrollbar>
@@ -119,7 +120,6 @@ const onSave = (value) => {
             })
             break;
         case 'submit': 
-            
             const commands = [
             {
             commandId: "ClaimTask",
@@ -129,7 +129,6 @@ const onSave = (value) => {
             }
         }
             ]
-            console.log(commands)
             _complete(props.info.currentTaskId, {
                 form: submitData.value,
                 commands: commands
@@ -165,24 +164,23 @@ const onClick = async (value) => {
             promise.push(i.validates())
         })
         Promise.all(promise).then((res) => {
-            console.log(res)
+            let data = []
             res.forEach((i, index) => {
-                submitData.value.push({
+                data.push({
                     formId: formValue.value[index].formId,
-                    data: Array.isArray(i) ? {
+                    data: Array.isArray(i) ? i : {
                         ...formValue.value[index].data,
                         ...i
-                    } : i
+                    }
                 })
             })
-            console.log(submitData.value)
+            submitData.value = data
             visible.value = true
         })
     }
 }
 const submitForm = () => {
     if (freeChoiceUser.value) {
-        console.log(freeChoiceUser.value)
         props.info.tasks.forEach((i) => {
             i.nodeId === freeChoiceUser.value ? taskId.value = i.id : ''
         })
@@ -214,7 +212,6 @@ const dealTable = () =>{
             i.configuration = tableColumn
         }
     })
-    console.log(formValue.value)
 }
 // 列表接口数据nodeId 对应form表单ID处理数据
 const dealForm = (nodes) => {
@@ -286,8 +283,9 @@ watch(() => props.info, () => {
 .title {
     width: 100%;
     text-align: center;
-    margin-bottom: 5px;
+    margin-top: 10px;
     font-size: 20px;
+    background-color: #fff;
 }
 
 .items {
