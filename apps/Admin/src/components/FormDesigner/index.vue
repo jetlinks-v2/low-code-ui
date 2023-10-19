@@ -364,11 +364,15 @@ watch(
 watch(
   () => props.data,
   (newVal) => {
-    try {
-      const obj = JSON.parse(newVal?.configuration?.code)
-      formData.value = Object.keys(obj).length ? obj : cloneDeep(initData)
-    } catch (error) {
-      formData.value = cloneDeep(initData)
+    if(props.type === 'workflow') {
+      formData.value = newVal || cloneDeep(initData)
+    } else {
+        try {
+        const obj = JSON.parse(newVal?.configuration?.code)
+        formData.value = Object.keys(obj).length ? obj : cloneDeep(initData)
+      } catch (error) {
+        formData.value = cloneDeep(initData)
+      }
     }
   },
   {
