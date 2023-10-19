@@ -83,7 +83,7 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
     path: '/list-page',
     name: 'ListPage',
     meta: {
-      title: '列表页',
+      title: '标准列表页',
     },
     component: () => import('@/components/ListPage/index.vue'),
   }
