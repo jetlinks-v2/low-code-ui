@@ -39,7 +39,7 @@
    <SaveIcon v-if="dialogVisible" v-model:visible="dialogVisible" @confirm="(typeStr: string) => choseIcon(typeStr)"
       :selected="modelRef.icon" />
 </template>
-   
+
 <script setup lang='ts' name="Save">
 import { randomString } from '@jetlinks/utils';
 import SaveIcon from './SaveIcon.vue'
@@ -80,15 +80,15 @@ const onSave = async () => {
       const code = props.data.code || randomString(8)
       const id = props.data.id || randomString(16)
       emit('ok', {
+         url: `/preview/${id}`,
          ...props.data,
          ...res,
          id,
          owner: 'iot',
          code,
-         url: `/preview/${id}`,
          children: props.data.children || [],
          options: {
-            pageId: id,
+            pageId: props.data.options?.pageId || id,
             projectId: props.projectId,
             LowCode: true,
             show:true,
@@ -102,7 +102,7 @@ const onSave = async () => {
 //    console.log('props',props.data)
 // })
 </script>
-   
+
 <style scoped lang='less'>
 :deep(.ant-form-item-control-input-content) {
    .icon-upload {

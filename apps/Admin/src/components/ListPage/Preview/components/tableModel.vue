@@ -34,6 +34,7 @@
             :max-tag-count="3"
             v-model:value="showColumns"
             :options="options"
+            @deselect="handleSelect"
           >
             <template #tagRender="{ label }">
               <span class="select-tag" :title="label">{{ label.length > 2 ? label.substring(0, 2) + '...' : label }}</span>
@@ -597,6 +598,11 @@ const handleClick = (dt: any) => {
   }
 }
 
+const handleSelect = (value) => {
+  if(showColumns.value.length < 1) {
+    showColumns.value = [value]
+  }
+}
 const valueFormat = (val: any) => {
   return props.dataColumns.find((item) => item.dataIndex === val)
 }

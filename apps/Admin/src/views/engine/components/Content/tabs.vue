@@ -22,17 +22,17 @@
       <Project v-else :data="activeData.children" />
     </div>
 
-    <div class="footer">
-      <j-scrollbar>
-        <div class="items">
-          <div v-for="(item, index) in path" class="item">
-            <div class="icon"><img :src="typeImages[item.type]"></div>
-            <div class="title" @click="onClick(item)">{{ item.title }}</div>
-            <div v-if="path.length !== index + 1" class="path"> > </div>
-          </div>
-        </div>
-      </j-scrollbar>
-    </div>
+<!--    <div class="footer">-->
+<!--      <j-scrollbar>-->
+<!--        <div class="items">-->
+<!--          <div v-for="(item, index) in path" class="item">-->
+<!--            <div class="icon"><img :src="typeImages[item.type]"></div>-->
+<!--            <div class="title" @click="onClick(item)">{{ item.title }}</div>-->
+<!--            <div v-if="path.length !== index + 1" class="path"> > </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </j-scrollbar>-->
+<!--    </div>-->
   </div>
 </template>
 
@@ -92,7 +92,7 @@ watch(
 .content-files {
   //border-top: 1px solid #515665;
   //border-bottom: 1px solid #515665;
-  height: calc(100% - 45px);
+  height: 100%;
   user-select: none;
 
   .content-tabs {
@@ -159,49 +159,50 @@ watch(
     overflow: hidden;
   }
 
-  .footer {
-    border-top: 1px solid #D9D9D9;
-    z-index: 3;
-    height: 44px;
-    line-height: 43px;
-    font-size: 16px;
-    width: 100%;
-    display: flex;
-    padding: 0 10px;
-    user-select: none;
+  //.footer {
+  //  border-top: 1px solid #D9D9D9;
+  //  z-index: 3;
+  //  height: 44px;
+  //  line-height: 43px;
+  //  font-size: 16px;
+  //  width: 100%;
+  //  display: flex;
+  //  padding: 0 10px;
+  //  user-select: none;
+  //
+  //  .items {
+  //    width: 100%;
+  //    display: flex;
+  //
+  //    .item {
+  //      display: flex;
+  //      white-space: nowrap;
+  //
+  //      .icon {
+  //        margin: 0 5px;
+  //        width: 22px;
+  //        height: 22px;
+  //
+  //        img {
+  //          width: 100%;
+  //          height: 100%;
+  //        }
+  //      }
+  //
+  //      .title {
+  //        cursor: pointer;
+  //        // &:hover{
+  //        //   color: #7595f3;
+  //        // }
+  //      }
+  //
+  //      .path {
+  //        margin: 0 16px;
+  //      }
+  //    }
+  //  }
 
-    .items {
-      width: 100%;
-      display: flex;
 
-      .item {
-        display: flex;
-        white-space: nowrap;
-
-        .icon {
-          margin: 0 5px;
-          width: 22px;
-          height: 22px;
-
-          img {
-            width: 100%;
-            height: 100%;
-          }
-        }
-
-        .title {
-          cursor: pointer;
-          // &:hover{
-          //   color: #7595f3;
-          // }
-        }
-
-        .path {
-          margin: 0 16px;
-        }
-      }
-    }
-
-
-  }
-}</style>
+  //}
+}
+</style>
