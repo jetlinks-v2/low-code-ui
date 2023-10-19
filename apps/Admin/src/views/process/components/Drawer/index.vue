@@ -18,10 +18,10 @@
           </div>
         </template>
         <div class="content">
-          <span v-for="item in formData">
+          <div v-for="item in formData">
             <div class="title">{{ item.name }}</div>
             <preview ref="previewRef" :data="item.configuration" />
-          </span>
+          </div>
         </div>
       </j-tab-pane>
       <j-tab-pane key="flow">
@@ -123,11 +123,11 @@ init()
     line-height: 22px;
     color: #333333;
   }
-  // :deep(.canvas-box) {
-  //   background: #fafafa;
-  //   .container {
-  //     background: #fafafa;
-  //   }
-  // }
+  :deep(.canvas-box) {
+    background: #fafafa;
+    .container {
+      background: #fafafa;
+    }
+  }
 }
 </style>

@@ -1,10 +1,16 @@
 <!-- 发起流程 -->
 <template>
   <page-container>
-    <FullPage>
-      <j-row :gutter="[24, 24]">
-        <span v-for="key of Object.keys(data)">
-          <TitleComponent data="日常管理" />
+    <FullPage class="page">
+      <div class="type-item" v-for="key of Object.keys(data)">
+        <j-row :gutter="[16, 16]">
+          <j-col :span="24">
+            <TitleComponent
+              :data="
+                classifiedStore.getText(key) ?? '流程分类已被删除，请重新添加'
+              "
+            />
+          </j-col>
           <j-col :span="2" v-for="item of data[key]">
             <div class="process" @click="handleDetail(item)">
               <div class="icon">
@@ -17,11 +23,13 @@
                 />
                 <AIcon v-else :type="item.icon" :style="{ fontSize: '40px' }" />
               </div>
-              {{ item.name }}
+              <j-ellipsis style="max-width: 200px">
+                {{ item.name }}
+              </j-ellipsis>
             </div>
           </j-col>
-        </span>
-      </j-row>
+        </j-row>
+      </div>
       <div class="empty" v-show="Object.keys(data).length < 1">
         <j-empty />
       </div>
@@ -29,26 +37,19 @@
   </page-container>
 </template>
 <script setup>
+import { groupBy } from 'lodash-es'
 import { getList_api } from '@/api/process/initiate'
+import { useClassified } from '@/store'
+
+const classifiedStore = useClassified()
 
 const router = useRouter()
 const data = reactive({})
 
-const groupedData = (arr, field) => {
-  return arr?.reduce((acc, curr) => {
-    let key = curr[field]
-    if (!acc[key]) {
-      acc[key] = []
-    }
-    acc[key].push({ ...curr })
-    return acc
-  }, {})
-}
-
 getList_api({
   paging: false,
 }).then((res) => {
-  Object.assign(data, groupedData(res.result.data, 'classifiedId'))
+  Object.assign(data, groupBy(res.result.data, 'classifiedId'))
 })
 
 const handleDetail = (data) => {
@@ -62,20 +63,28 @@ const handleDetail = (data) => {
 }
 </script>
 <style scoped lang="less">
-.process {
-  width: 100px;
-  height: 100px;
-  border: 1px solid #ccc;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  .icon {
-    font-size: 40px;
-  }
-}
+.page {
+  padding: 20px;
 
-.empty {
-  margin-top: 40px;
+  .type-item {
+    margin-bottom: 20px;
+    .process {
+      width: 100px;
+      height: 100px;
+      // border: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      .icon {
+        // background: #036a8a;
+        font-size: 40px;
+      }
+    }
+  }
+
+  .empty {
+    margin-top: 40px;
+  }
 }
 </style>
