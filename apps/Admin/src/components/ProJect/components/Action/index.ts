@@ -18,7 +18,7 @@ export const providerList = [
     },
     {
         value:'ListPage',
-        text:'列表页'
+        text:'标准列表页'
     },
     {
         value:'FormPage',
