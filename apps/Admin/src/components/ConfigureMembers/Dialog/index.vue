@@ -25,7 +25,8 @@
           >
             <j-space>
               <div class="icon">
-                <AIcon type="CheckSquareFilled" style="font-size: 40px"></AIcon>
+                <!-- <AIcon type="CheckSquareFilled" style="font-size: 40px"></AIcon> -->
+                <i class="iconfont" :class="iconType[item.value]" style="font-size: 40px"></i>
               </div>
               <div class="text">
                 <div class="left-item-title">
@@ -41,7 +42,7 @@
       </div>
       <!-- 配置 -->
       <MemberSelect
-        v-if="show || !isNode"
+        v-show="show || !isNode"
         ref="selectRef"
         :type="type"
         :showSearch="type === 'user' || type === 'role'"
@@ -51,6 +52,7 @@
   </j-modal>
 </template>
 <script setup lang="ts">
+import { PropType } from 'vue';
 import MemberSelect from '../components/MemberSelect.vue'
 import { DataSourceProps } from '../types'
 
@@ -62,6 +64,10 @@ const props = defineProps({
   isNode: {
     type: Boolean,
     default: false,
+  },
+  iconType: {
+    type: Object as PropType<any>,
+    default: () => {},
   },
 })
 
@@ -82,7 +88,7 @@ const dimensions = [
     value: 'org',
     description: '从组织维度划分可发起流程的成员',
     checked: true,
-    icon: 'ClusterOutlined',
+    // icon: 'icon-fl-zuzhi',
   },
   {
     id: '2',
@@ -90,7 +96,7 @@ const dimensions = [
     value: 'user',
     description: '从用户维度划分可发起流程的成员',
     checked: false,
-    icon: 'UserOutlined',
+    // icon: 'icon-pingzheng',
   },
   {
     id: '3',
@@ -98,7 +104,7 @@ const dimensions = [
     value: 'role',
     description: '从角色维度划分可发起流程的成员',
     checked: false,
-    icon: 'TeamOutlined',
+    // icon: 'icon-yonghu2',
   },
 ]
 // 选中的维度

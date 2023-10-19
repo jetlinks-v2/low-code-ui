@@ -11,7 +11,6 @@
           v-model:value="active"
           button-style="solid"
           class="radio"
-          @change="itemClick"
         >
           <j-radio-button
             v-for="item in leftData[type]"
@@ -28,7 +27,7 @@
                   {{ item.title }}
                 </div>
                 <span class="description">
-                  <j-ellipsis line-clamp="3">{{ item.description }}</j-ellipsis>
+                  <j-ellipsis line-clamp="4" style="line-height: 20px;">{{ item.description }}</j-ellipsis>
                 </span>
               </div>
             </j-space>
@@ -73,7 +72,7 @@
           v-else
           :type="type"
           :dataSource="dataSource"
-          :treeData="relData"
+          :treeData="treeData"
           @rel-submit="relSubmit"
         />
       </div>
@@ -107,9 +106,6 @@
         >
           <template #bodyCell="{ column, text, record }">
             <template v-if="column.key === 'name'">
-              <!-- <j-ellipsis style="width: 40px;">
-                {{ text }}
-              </j-ellipsis> -->
               <div class="name">
                 <div
                   v-if="infoState.isNode"
@@ -124,14 +120,16 @@
               </div>
             </template>
             <template v-if="column.key === 'weight'">
-              <j-input-number
-                :min="1"
-                :max="99"
-                :precision="0"
-                :controls="false"
-                v-model:value="record[column.dataIndex]"
-                style="margin: -5px 0"
-              />
+              <div>
+                <j-input-number
+                  :min="1"
+                  :max="99"
+                  :precision="0"
+                  :controls="false"
+                  v-model:value="record[column.dataIndex]"
+                  style="margin: -5px 0"
+                />
+              </div>
               <!-- :bordered="bordered"
                 @focus="bordered=true"
                 @blur="bordered=false" -->
@@ -189,17 +187,15 @@ const infoState: any = inject('infoState')
 // 筛选关键字
 const searchText = ref<string>('')
 const active = ref<string>('')
-// 树数据
-const treeData = ref<any[]>([])
 // const filterData = ref<any[]>([])
+// 固定/变量/关系数据
+const dataMap = ref<Map<string, any>>(new Map())
+// 变量关系初始数据
+const varRelTree = ref<any[]>([])
 // 选中的树节点
 const selectedKeys = ref<string[]>([])
 // 表格数据
 const dataSource = ref<DataSourceProps[]>([])
-// 固定数据/变量/关系
-const fixedData = ref<any[]>([])
-const varData = ref<any[]>([])
-const relData = ref<any[]>([])
 
 const columns = computed(() => {
   const _columns = defaultColumns(props.type)
@@ -216,6 +212,10 @@ const dimensionsColor = {
   relation: '#ba97fa',
 }
 
+const treeData = computed(() => {
+  return dataMap.value.get(active.value) ?? []
+})
+
 const treeDataCom = computed(() => {
   return searchText.value
     ? treeFilter(treeData.value, searchText.value, 'name')
@@ -229,7 +229,7 @@ const onSearch = (value: string) => {
 }
 
 onMounted(() => {
-  if (infoState.supCancel) {
+  if (infoState.isNode) {
     detail_api(route.query.id as string).then((res) => {
       if (res.success) {
         getTree(res.result)
@@ -252,8 +252,8 @@ const getTree = (data: any) => {
   }
   getVar_api(param).then((res) => {
     if (res.success) {
-      varData.value = treeFilter(setLevel(res.result), props.type, 'type')
-      relData.value = hasRelation(res.result)
+      varRelTree.value = res.result
+      dataMap.value.set('relation', hasRelation(varRelTree.value))
     }
   })
 }
@@ -267,6 +267,7 @@ const hasRelation = (data: any) => {
   function delTree(tree) {
     tree.forEach((item, index) => {
       if (item.children) {
+        item.disabled = true
         delTree(item.children)
       } else if (!item.others?.relation) {
         tree.splice(index, 1)
@@ -275,19 +276,6 @@ const hasRelation = (data: any) => {
   }
   delTree(cloneData)
   return cloneData
-}
-
-/**
- * 固定数据/变量/关系选择
- * @param key
- */
-const itemClick = (e: Event) => {
-  treeData.value =
-    active.value === 'var'
-      ? varData.value
-      : active.value === 'relation'
-      ? relData.value
-      : fixedData.value
 }
 
 /**
@@ -326,8 +314,8 @@ const onSelect = (keys: string[], { node, selected }) => {
       name: active.value === 'var' ? node.fullName : node.name,
       weight: infoState.hasWeight ? 1 : undefined,
       type: props.type,
-      // groupField: infoState.isNode ? active.value: undefined,
-      groupField: active.value,
+      groupField: infoState.isNode ? active.value : undefined,
+      // groupField: active.value,
       others:
         active.value === 'var'
           ? {
@@ -383,25 +371,27 @@ const handleDel = (id: string) => {
   dataSource.value = dataSource.value.filter((item) => item.id !== id)
 }
 
-const apiType = {
-  org: getDepartmentList_api,
-  user: getUserList_api,
-  role: getRoleList_api,
-}
 const getTreeData = () => {
-  if (!props.type) return
-  apiType[props.type](props.type === 'user' ? { paging: false } : {}).then(
-    (res) => {
-      fixedData.value = props.type === 'user' ? res.result.data : res.result
-      treeData.value = fixedData.value
-    },
-  )
+  const apiList = [
+    getDepartmentList_api(),
+    getUserList_api({ paging: false }),
+    getRoleList_api(),
+  ]
+  Promise.all(apiList).then((res) => {
+    dataMap.value.set('org', res[0].result)
+    dataMap.value.set('user', res[1].result.data)
+    dataMap.value.set('role', res[2].result)
+  })
 }
+getTreeData()
 watch(
   () => props.type,
   () => {
     active.value = props.type
-    getTreeData()
+    dataMap.value.set(
+      'var',
+      treeFilter(setLevel(varRelTree.value), props.type, 'type'),
+    )
   },
   { immediate: true },
 )
@@ -427,8 +417,6 @@ defineExpose({
   height: 100%;
 
   .content-left {
-    // width: 35%;
-    // width: 248px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -483,6 +471,10 @@ defineExpose({
       padding: 16px 27px 16px 13px;
       height: 100%;
       :deep(.ant-tree) {
+        .ant-tree-switcher {
+          height: 32px;
+          line-height: 32px;
+        }
         .ant-tree-title {
           // height: 32px;
           line-height: 32px;

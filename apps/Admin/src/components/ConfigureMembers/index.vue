@@ -1,7 +1,7 @@
 <template>
   <div class="member">
     <a-form-item-rest>
-      <j-button class="btn" @click="dialog.visible = true">
+      <j-button class="btn" @click="visible = true">
         <span>选择成员</span>
         <span class="icon"  v-show="list.length > 0">
           <img :src="getImage('/check.png')" />
@@ -27,9 +27,10 @@
         </j-list>
       </j-scrollbar>
       <Dialog
-        v-if="dialog.visible"
-        v-model:visible="dialog.visible"
+        v-if="visible"
+        v-model:visible="visible"
         :isNode="isNode"
+        :iconType="iconType"
         @get-data="getData"
       />
     </a-form-item-rest>
@@ -62,9 +63,13 @@ const emits = defineEmits<{
   (e: 'update:members', data: DataSourceProps[] | DataSourceProps): void
 }>()
 
-const dialog = reactive({
-  visible: false,
-})
+const visible = ref(false)
+
+const iconType = {
+  org: 'icon-fl-zuzhi',
+  user: 'icon-pingzheng',
+  role: 'icon-yonghu2'
+}
 
 const list = ref<DataSourceProps[]>([])
 const getData = (data: DataSourceProps[], type: string) => {
@@ -86,7 +91,7 @@ const groupedData = (arr: any[], field: string) => {
     if (!acc[key]) {
       acc[key] = []
     }
-    const { others, ...rest } = curr
+    const { others, groupField, ...rest } = curr
     acc[key].push({ ...rest, ...others })
     return acc
   }, {})

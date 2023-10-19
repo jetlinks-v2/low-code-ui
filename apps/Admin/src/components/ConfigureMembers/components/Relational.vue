@@ -123,7 +123,8 @@ const onRelSelect = (
  */
 const relSubmit = () => {
   const flag = props.dataSource.some(
-    (i) => i.id === `${currentSub.value.fullId}-${intermediateData.value.relation}`,
+    (i) =>
+      i.id === `${currentSub.value.fullId}-${intermediateData.value.relation}`,
   )
   if (flag) {
     onlyMessage('当前数据已添加', 'warning')
@@ -138,10 +139,24 @@ const relSubmit = () => {
 .relational {
   display: flex;
   height: 100%;
+
+  :deep(.ant-tree) {
+    .ant-tree-switcher{
+      height: 32px;
+      line-height: 32px;
+    }
+    .ant-tree-title {
+      height: 32px;
+      line-height: 32px;
+      &:hover {
+        color: #315efb;
+      }
+    }
+  }
   .subject {
     flex: 1;
     border: 1px solid #e0e0e0;
-    .title{
+    .title {
       padding: 0 12px;
       height: 32px;
       line-height: 32px;
@@ -152,7 +167,10 @@ const relSubmit = () => {
     flex: 1;
     border: 1px solid #e0e0e0;
     border-left: none;
-    .title{
+    .title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding: 0 12px;
       height: 32px;
       line-height: 32px;
