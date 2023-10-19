@@ -21,11 +21,11 @@ export const extraMenu = {
     name: '流程详情',
     url: '/detail'
   }],
-  // 'process/initiate': [{
-  //   code: 'process/initiate/Detail',
-  //   name: '流程详情',
-  //   url: '/initiate-detail'
-  // }],
+  'process/initiate': [{
+    code: 'process/initiate/Detail',
+    name: '流程详情',
+    url: '/initiate-detail'
+  }],
   'process/form': [{
     code: 'process/form/Detail',
     name: '我的表单',
