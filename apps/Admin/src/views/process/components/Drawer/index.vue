@@ -2,42 +2,37 @@
   <j-drawer
     visible
     class="custom-class"
-    title=""
+    title="流程详情"
     :closable="false"
     placement="right"
     @close="emits('update:visible', false)"
     :contentWrapperStyle="{ width: 'auto', minWidth: '50%', maxWidth: '66.6%' }"
   >
     <j-tabs v-model:activeKey="activeKey">
-      <j-tab-pane key="form" tab="表单">
-        <span v-for="item in formData">
-          <h3>{{ item.name }}</h3>
-          <preview ref="previewRef" :data="item.configuration" />
-        </span>
+      <j-tab-pane key="form">
+        <template #tab>
+          <div>
+            <j-button :type="activeKey === 'form' ? 'primary' : 'text'"
+              >表单</j-button
+            >
+          </div>
+        </template>
+        <div class="content">
+          <div v-for="item in formData">
+            <div class="title">{{ item.name }}</div>
+            <preview ref="previewRef" :data="item.configuration" />
+          </div>
+        </div>
       </j-tab-pane>
-      <j-tab-pane key="flow" tab="流程图">
+      <j-tab-pane key="flow">
+        <template #tab>
+          <div>
+            <j-button :type="activeKey === 'flow' ? 'primary' : 'text'"
+              >流程图</j-button
+            >
+          </div>
+        </template>
         <FlowDesigner readOnly :nodesData="nodesData" />
-      </j-tab-pane>
-      <j-tab-pane v-if="showRecords" key="records" tab="流转记录">
-        <j-timeline>
-          <j-timeline-item>
-            <div>
-              <div>发起流程 2023年9月21日15:16:35</div>
-              <div><AIcon type="UserOutlined" />发起人名称</div>
-            </div>
-          </j-timeline-item>
-          <j-timeline-item>
-            <div>
-              <div>审批结点 2023年9月21日15:16:35</div>
-              <div><AIcon type="UserOutlined" />发起人名称</div>
-              <div>审批意见</div>
-            </div>
-          </j-timeline-item>
-          <j-timeline-item>Technical testing 2015-09-01</j-timeline-item>
-          <j-timeline-item
-            >Network problems being solved 2015-09-01</j-timeline-item
-          >
-        </j-timeline>
       </j-tab-pane>
     </j-tabs>
   </j-drawer>
@@ -65,10 +60,6 @@ const props = defineProps({
     type: Boolean,
     default: () => false,
   },
-  showRecords: {
-    type: Boolean,
-    default: () => false,
-  },
 })
 
 const emits = defineEmits<EmitProps>()
@@ -85,13 +76,12 @@ const init = () => {
     const obj = JSON.parse(props.data.model)
     nodesData.value = obj.nodes
     getFormData(obj.config.forms)
-  } catch (error) {
-    console.error(error)
-  }
+  } catch (error) {}
 }
 
 const getFormData = (list: FormsProps[]) => {
   const param = {
+    paging: true,
     terms: [
       {
         type: 'and',
@@ -109,4 +99,35 @@ const getFormData = (list: FormsProps[]) => {
 }
 init()
 </script>
-<style scoped lang="less"></style>
+<style lang="less" scoped>
+:deep(.ant-tabs) {
+  border: 1px solid #f0f0f0;
+  .ant-tabs-nav {
+    padding-left: 16px;
+
+    background: #f9f9f9;
+  }
+  .ant-tabs-content {
+    padding: 0 24px 24px 24px;
+  }
+  .ant-tabs-ink-bar {
+    background-color: transparent;
+  }
+}
+.content {
+  background: #fafafa;
+  .title {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 22px;
+    color: #333333;
+  }
+  :deep(.canvas-box) {
+    background: #fafafa;
+    .container {
+      background: #fafafa;
+    }
+  }
+}
+</style>

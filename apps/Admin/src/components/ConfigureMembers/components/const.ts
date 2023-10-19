@@ -5,12 +5,14 @@ export const defaultColumns = (key: string) => {
       dataIndex: 'name',
       key: 'name',
       ellipsis: true,
+      width: 120,
     },
     {
       title: '权重',
       dataIndex: 'weight',
       key: 'weight',
       ellipsis: true,
+      width: 100,
     },
     {
       title: '操作',
@@ -18,6 +20,7 @@ export const defaultColumns = (key: string) => {
       key: 'action',
       ellipsis: true,
       scopedSlots: true,
+      width: 80,
     },
   ]
 }

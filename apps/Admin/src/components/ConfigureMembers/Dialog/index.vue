@@ -3,39 +3,56 @@
   <j-modal
     visible
     title="配置成员"
-    width="65%"
+    width="70vw"
     @ok="confirm"
     @cancel="emits('update:visible', false)"
   >
-    <!-- 组织维度 -->
-    <div class="dimensions" v-if="!show">
-      <j-space v-for="item of dimensions" :key="item.id">
-        <div
-          class="dimension-item"
-          :class="{ active: type === item.value }"
-          @click="handleClick(item.value)"
+    <div :class="{ 'men-body': !isNode }">
+      <!-- 组织维度 -->
+      <div class="dimensions" v-if="!show || !isNode">
+        <j-radio-group
+          v-model:value="type"
+          button-style="solid"
+          class="radio"
+          :style="isNode ? '' : radioStyle"
         >
-          <span class="dimension-item-title-icon">
-            <AIcon :type="item.icon" />
-          </span>
-          <div class="dimension-item-title">
-            {{ item.name }}
-          </div>
-          <span>{{ item.description }}</span>
-        </div>
-      </j-space>
+          <j-radio-button
+            v-for="item in dimensions"
+            :value="item.value"
+            :key="item.value"
+            :class="{ active: type === item.value }"
+            :style="{height: isNode ? '98px' : '117px'}"
+          >
+            <j-space>
+              <div class="icon">
+                <!-- <AIcon type="CheckSquareFilled" style="font-size: 40px"></AIcon> -->
+                <i class="iconfont" :class="iconType[item.value]" style="font-size: 40px"></i>
+              </div>
+              <div class="text">
+                <div class="left-item-title">
+                  {{ item.name }}
+                </div>
+                <span class="description">
+                  <j-ellipsis line-clamp="3">{{ item.description }}</j-ellipsis>
+                </span>
+              </div>
+            </j-space>
+          </j-radio-button>
+        </j-radio-group>
+      </div>
+      <!-- 配置 -->
+      <MemberSelect
+        v-show="show || !isNode"
+        ref="selectRef"
+        :type="type"
+        :showSearch="type === 'user' || type === 'role'"
+        @back="back"
+      />
     </div>
-    <!-- 配置 -->
-    <MemberSelect
-      ref="selectRef"
-      v-else
-      :type="type"
-      :showSearch="type === 'user' || type === 'role'"
-      @back="back"
-    />
   </j-modal>
 </template>
 <script setup lang="ts">
+import { PropType } from 'vue';
 import MemberSelect from '../components/MemberSelect.vue'
 import { DataSourceProps } from '../types'
 
@@ -44,6 +61,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isNode: {
+    type: Boolean,
+    default: false,
+  },
+  iconType: {
+    type: Object as PropType<any>,
+    default: () => {},
+  },
 })
 
 const emits = defineEmits<{
@@ -51,54 +76,61 @@ const emits = defineEmits<{
   (e: 'get-data', data: DataSourceProps[], key: string): void
 }>()
 
+const radioStyle = {
+  flexDirection: 'column',
+  width: '248px',
+  marginRight: '16px',
+}
 const dimensions = [
   {
     id: '1',
     name: '组织',
     value: 'org',
-    description: '从组织维度划分候选人范围',
+    description: '从组织维度划分可发起流程的成员',
     checked: true,
-    icon: 'ClusterOutlined',
+    // icon: 'icon-fl-zuzhi',
   },
   {
     id: '2',
     name: '用户',
     value: 'user',
-    description: '从用户维度划分候选人范围',
+    description: '从用户维度划分可发起流程的成员',
     checked: false,
-    icon: 'UserOutlined',
+    // icon: 'icon-pingzheng',
   },
   {
     id: '3',
     name: '角色',
     value: 'role',
-    description: '从角色维度划分候选人范围',
+    description: '从角色维度划分可发起流程的成员',
     checked: false,
-    icon: 'TeamOutlined',
+    // icon: 'icon-yonghu2',
   },
 ]
 // 选中的维度
-const type = ref<string>('')
+const type = ref<string>(props.isNode ? '' : 'org')
 const show = ref<boolean>(false)
 // 点击次数
 const count = ref<number>(0)
-/**
- *
- * @string key 维度值
- */
-const handleClick = (key: string) => {
-  type.value = key
-}
+
 const selectRef = ref<any>()
 const confirm = () => {
   if (!type.value) return
-  if (!count.value) {
-    show.value = true
+  if (props.isNode) {
+    if (count.value) {
+      submit()
+    } else {
+      show.value = true
+      count.value++
+    }
   } else {
-    emits('get-data', selectRef.value?.dataSource, type.value)
-    emits('update:visible', false)
+    submit()
   }
-  count.value++
+}
+
+const submit = () => {
+  emits('get-data', selectRef.value?.dataSource, type.value)
+  emits('update:visible', false)
 }
 
 /**
@@ -110,31 +142,51 @@ const back = () => {
 }
 </script>
 <style scoped lang="less">
+.men-body {
+  display: flex;
+}
 .dimensions {
   display: flex;
-  gap: 8px;
   justify-content: center;
-  min-height: 400px;
+  // min-height: 170px;
+  // height: 367px;
 
-  .dimension-item {
-    background: #f0f2f5;
+  .radio {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 0 10px;
-    cursor: pointer;
-    &:hover {
-      background: #bfe9fb;
-      transition: all 0.5s;
-    }
-    .dimension-item-title-icon {
-      font-size: 20px;
-    }
-  }
+    gap: 10px;
+    .ant-radio-button-wrapper {
+      flex-direction: column;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      // height: 98px;
+      // height: c;
+      padding: 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #f6f7f9;
+      &.active {
+        color: #fff;
+        background: #315efb;
+      }
+      &::before {
+        content: none;
+      }
 
-  .active {
-    background: #bfe9fb;
+      .text {
+        .left-item-title {
+          font-size: 18px;
+          font-weight: 500;
+          line-height: 24px;
+        }
+        .description {
+          line-height: 20px;
+        }
+      }
+    }
   }
 }
 </style>
