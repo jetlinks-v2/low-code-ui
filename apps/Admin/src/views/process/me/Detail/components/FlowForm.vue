@@ -4,9 +4,9 @@
        
         <div class="items">
             <j-scrollbar>
-                <template  v-for="item in formValue">
+                <template  v-for="(item,index) in formValue">
                     <div class="title"> {{item?.formName}}</div>
-                    <FormPreview v-if="!item.multiple" :value="item.data" :data="item.configuration" ref="formRef"/>
+                    <FormPreview v-if="!item.multiple" :value="item.data" :data="item.configuration" ref="formRef" @state-change="(data)=>getFormData(data,index)"/>
                     <div  v-else style="background-color: #fff;">
                         <QuickEditTable
                         validate
@@ -84,6 +84,8 @@ const btnList = ref([])
 const btnLoading = ref(false)
 //提交可选审批人条件
 const candidates = ref()
+//存放表单暂存数据
+const formData =  ref({})
 const addTableData = (item) =>{
     let obj = {}
     item.configuration.map((i)=>{
@@ -91,6 +93,9 @@ const addTableData = (item) =>{
         obj[key] = undefined
     })
     item.data.push(obj)
+}
+const getFormData = (data,index) =>{
+    formData.value[index] = data
 }
 const onSave = (value) => {
     // btnLoading.value = true
@@ -110,7 +115,6 @@ const onSave = (value) => {
         case 'refuse':
             comment.value = value
             _reject(props.info.currentTaskId, {
-                form: submitData.value,
                 variables: comment.value
             }).then((res) => {
                 if (res.status === 200) {
@@ -144,9 +148,17 @@ const onSave = (value) => {
 
 const onClick = async (value) => {
     const promise = []
-    const tablePromise = []
     modalType.value = value
     if (modalType.value === 'save') {
+        let data = []
+        formValue.value.map((i,index)=>{
+            data.push({
+                    formId: i.formId,
+                    data: Array.isArray(i.data) ? i.data : formData.value[index]
+                })
+        })
+        submitData.value = data
+        console.log(submitData.value)
         btnLoading.value = true
         _save(props.info.currentTaskId, {
             form: submitData.value
