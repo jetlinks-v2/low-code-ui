@@ -410,7 +410,9 @@ defineExpose({ onSave, validate: onValidate })
 
 <style lang="less" scoped>
 .container {
-  height: calc(100vh - 132px);
+  // height: calc(100vh - 132px);
+  height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
