@@ -1,6 +1,11 @@
 <template>
+  <j-select
+    v-if="normalSelectTypes.includes(conditionType)"
+    v-model:value="myValue"
+    :options="valueOptions"
+  />
   <j-tree-select
-    v-if="itemType === 'org'"
+    v-else-if="conditionType === 'org'"
     v-model:value="myValue"
     v-model:searchValue="searchValue"
     show-search
@@ -30,6 +35,14 @@
       </template>
     </template>
   </j-tree-select>
+  <j-date-picker
+    v-else-if="conditionType === 'date'"
+    :valueFormat="'YYYY-MM-DD HH:mm:ss'"
+    v-model:value="myValue"
+    allowClear
+    showTime
+    @change="onChange"
+  />
   <j-input
     v-else
     v-model:value="myValue"
@@ -46,12 +59,13 @@ import {
   getProduct_api,
   getDevice_api,
 } from '@/api/process/model'
+
 type Emits = {
   (e: 'update:modelValue', data: string | number | boolean): void
 }
 type Props = {
   modelValue: string | string[] | number | undefined
-  itemType: string
+  conditionType: string
   mode?: string
 }
 const emit = defineEmits<Emits>()
@@ -60,11 +74,12 @@ const props = defineProps<Props>()
 const myValue = ref<any>(undefined)
 const searchValue = ref<string>('')
 
-const roleOptions = ref([])
+// 普通下拉的类型
+const normalSelectTypes = ['role', 'user', 'product', 'device', 'switch']
+// 用户/角色/产品/设备 普通下拉数据
+const valueOptions = ref<{ label: string; value: string }[]>([])
+// 组织下拉树形数据
 const orgOptions = ref([])
-const userOptions = ref([])
-const productOptions = ref([])
-const deviceOptions = ref([])
 const publicParams = {
   paging: false,
   sorts: [
@@ -75,11 +90,43 @@ const publicParams = {
   ],
   terms: [],
 }
+const getRoleOptions = async () => {
+  const { result } = await getRole_api(publicParams)
+  valueOptions.value = result?.map((m) => ({
+    label: m.name,
+    value: m.id,
+  }))
+}
+
 const getOrgOptions = async () => {
   const { result } = await getOrg_api(publicParams)
-  console.log('getOrgOptions: ', result)
+  orgOptions.value = result
 }
-getOrgOptions()
+
+const getUserOptions = async () => {
+  const { result } = await getUser_api(publicParams)
+  valueOptions.value = result?.map((m) => ({
+    label: m.name,
+    value: m.id,
+  }))
+}
+
+const getProductOptions = async () => {
+  const { result } = await getProduct_api(publicParams)
+  valueOptions.value = result?.map((m) => ({
+    label: m.name,
+    value: m.id,
+  }))
+}
+
+const getDeviceOptions = async () => {
+  const { result } = await getDevice_api(publicParams)
+  valueOptions.value = result?.map((m) => ({
+    label: m.name,
+    value: m.id,
+  }))
+}
+
 const onChange = (e) => {
   emit('update:modelValue', myValue.value)
 }
@@ -88,6 +135,43 @@ watch(
   () => props.modelValue,
   () => {
     myValue.value = props.modelValue
+  },
+  { deep: true, immediate: true },
+)
+watch(
+  () => props.conditionType,
+  (val) => {
+    switch (val) {
+      case 'role':
+        getRoleOptions()
+        break
+      case 'org':
+        getOrgOptions()
+        break
+      case 'user':
+        getUserOptions()
+        break
+      case 'product':
+        getProductOptions()
+        break
+      case 'device':
+        getDeviceOptions()
+        break
+      case 'switch':
+        valueOptions.value = [
+          {
+            label: '是',
+            value: 'true',
+          },
+          {
+            label: '否',
+            value: 'false',
+          },
+        ]
+        break
+      default:
+        break
+    }
   },
   { deep: true, immediate: true },
 )
