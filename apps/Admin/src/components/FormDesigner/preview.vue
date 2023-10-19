@@ -6,7 +6,7 @@
 
 <script lang="ts" setup>
 import Canvas from './components/Panels/Canvas/index'
-import {provide, ref, reactive, PropType, watch} from 'vue'
+import { provide, ref, reactive, PropType, watch } from 'vue'
 import { ISchema } from './typings'
 import { getFieldData, initData } from './utils/utils'
 import { proAll } from '../QuickEditTable/util'
@@ -30,13 +30,16 @@ const props = defineProps({
     type: String as PropType<'workflow' | 'low-code'>,
     default: 'low-code',
   },
-  projectId: {
-    type: String,
-  },
+  // projectId: {
+  //   type: String,
+  // },
   disabled: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
+  formStyle: {
+    type: Object,
+  },
 })
 
 const emit = defineEmits(['valueChange', 'stateChange'])
@@ -65,6 +68,25 @@ watch(
   },
 )
 
+watch(
+  () => props.formStyle,
+  (val: any) => {
+    if (val) {
+      const obj = {
+        ...formData.value,
+        componentProps: {
+          ...formData.value.componentProps,
+          ...props.formStyle,
+        },
+      }
+      formData.value = obj
+    }
+  },
+  {
+    immediate: true,
+    deep: true,
+  },
+)
 
 provide('FormDesigner', {
   model: 'preview',
@@ -76,26 +98,26 @@ provide('FormDesigner', {
   formRef,
   mode: props.mode,
   disabled: props.disabled,
-  onChange
+  onChange,
 })
 
 const onSave = () => {
   // 校验内嵌表单
   const _func = Object.keys(formRefList.value || {}).map((item) => {
-      return formRefList.value[item]?.onSave()
-    })
-    // 主表单
-    _func.push(formRef.value?.validate())
-    return new Promise((resolve, reject) => {
-      proAll(_func)
-        .then(() => {
-          //
-          resolve(formState)
-        })
-        .catch((err) => {
-          reject(err)
-        })
-    })
+    return formRefList.value[item]?.onSave()
+  })
+  // 主表单
+  _func.push(formRef.value?.validate())
+  return new Promise((resolve, reject) => {
+    proAll(_func)
+      .then(() => {
+        //
+        resolve(formState)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
 }
 
 watch(

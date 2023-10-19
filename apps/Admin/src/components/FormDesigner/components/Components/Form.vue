@@ -7,13 +7,15 @@
       ref="formRef"
       :disabled="disabled"
       @stateChange="onValueChange"
+      :formStyle="formStyle"
     />
   </div>
 </template>
 <script lang="ts" setup>
 import FormPreview from '@/components/FormDesigner/preview.vue'
-import { watch, computed, ref } from 'vue'
+import { watch, computed, ref, inject } from 'vue'
 
+const designer: any = inject('FormDesigner')
 const props = defineProps({
   value: {
     type: Array,
@@ -45,6 +47,13 @@ const onValueChange = (e) => {
   emit('update:value', e)
 }
 
+const formStyle = computed(() => {
+  return {
+    layout: designer.formData.value?.componentProps?.layout,
+    size: designer.formData.value?.componentProps?.size,
+  }
+})
+
 watch(
   () => props.value,
   (newVal) => {
@@ -74,5 +83,6 @@ defineExpose({ onSave })
 <style scoped>
 .form-warp {
   border: 1px solid #e6e6e6;
+  padding-bottom: 18px;
 }
 </style>
