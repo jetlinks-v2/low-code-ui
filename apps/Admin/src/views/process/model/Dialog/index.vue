@@ -100,11 +100,7 @@ import { useRequest } from '@jetlinks/hooks'
 import { useClassified } from '@/store'
 
 type FormType = {
-  id?: string
   key: string
-  name: string
-  icon: string
-  classifiedId: string
   model: string
   provider: string
 }

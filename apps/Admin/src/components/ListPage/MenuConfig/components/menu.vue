@@ -3,7 +3,7 @@
     <div class="card">
       <h3>基本信息</h3>
       <p>页面名称</p>
-      <j-input v-model:value="baseInfo.title" disabled />
+      <j-input v-model:value="form.pageName" disabled />
 
       <h3 class="title">设置该页面为系统主菜单</h3>
       <j-form ref="basicFormRef" :model="form" class="basic-form">
@@ -16,7 +16,7 @@
             :rules="[
               {
                 required: true,
-                message: '建议设置2-16个字符',
+                message: errorData('name') ? '' : '请输入2-16个字符',
                 trigger: 'change',
               },
             ]"
@@ -35,7 +35,11 @@
               </span>
             </template>
             <ErrorItem :error-data="errorData('name')">
-              <j-input v-model:value="form!.name" />
+              <j-input
+                v-model:value="form!.name"
+                :maxLength="16"
+                placeholder="请输入菜单名称"
+              />
             </ErrorItem>
           </j-form-item>
           <j-form-item
@@ -44,29 +48,23 @@
             :rules="[
               {
                 required: true,
-                message: '请上传图标',
+                message: errorData('name') ? '' : '请配置图标',
                 trigger: 'change',
               },
             ]"
             style="flex: 0 0 186px"
           >
+          <ErrorItem :border="false" :error-data="errorData('icon')">
             <div class="icon-upload has-icon" v-if="form!.icon">
               <AIcon :type="form!.icon" style="font-size: 20px" />
               <span class="mark" @click="dialogVisible = true"></span>
             </div>
-
-            <div class="icon-upload no-icon" v-else>
-              <ErrorItem :error-data="errorData('icon')">
-                <div
-                  @click="dialogVisible = true"
-                  class="choose-icon"
-                >
-                  <span>
-                    <AIcon type="PlusOutlined" style="font-size: 20px" />
-                  </span>
-                </div>
-              </ErrorItem>
-            </div>
+              <div class="icon-upload no-icon" v-else @click="dialogVisible = true">
+                <span>
+                  <AIcon type="PlusOutlined" style="font-size: 20px" />
+                </span>
+              </div>
+            </ErrorItem>
           </j-form-item>
         </template>
       </j-form>
@@ -76,13 +74,13 @@
   <ChooseIconDialog
     v-model:visible="dialogVisible"
     @confirm="(typeStr:string)=>form!.icon = typeStr"
+    v-model:type="form!.icon"
     :refs="$refs.menuConfig"
   />
 </template>
 <script setup lang="ts">
 import ChooseIconDialog from '@/components/ListPage/MenuConfig/components/icon.vue'
-import { BASE_INFO, MENU_CONFIG } from '../../keys'
-import { useAllListDataStore } from '@/store/listForm'
+import { MENU_CONFIG } from '../../keys'
 import { ErrorItem } from '../..'
 
 const props = defineProps({
@@ -92,14 +90,12 @@ const props = defineProps({
   },
   refs: {
     type: Object,
-  }
+  },
 })
 
 const dialogVisible = ref<boolean>(false)
-const baseInfo = inject(BASE_INFO)
 const form = inject(MENU_CONFIG)
 const emits = defineEmits(['change', 'update:open', 'confirm'])
-const configurationStore = useAllListDataStore()
 
 const errorData = computed(() => {
   return (val: string): any => {
@@ -107,9 +103,6 @@ const errorData = computed(() => {
   }
 })
 
-watchEffect(() => {
-  configurationStore.setALLlistDataInfo('menu', form, baseInfo.id)
-})
 const basicFormRef = ref()
 
 const onCheck = async () => {
@@ -151,7 +144,7 @@ defineExpose({
 
     &::before {
       position: absolute;
-      top: 5px px;
+      top: 5px 0px;
       left: 0;
       width: 4px;
       height: calc(100% - 10px);

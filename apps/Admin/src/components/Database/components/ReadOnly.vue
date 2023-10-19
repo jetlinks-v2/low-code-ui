@@ -15,7 +15,7 @@ const emit = defineEmits(['update:value', 'change'])
 const myValue = ref(false)
 
 const change = (e) => {
-  myValue.value = e.checked
+  myValue.value = e.target.checked
   emit('update:value', !myValue.value)
   emit('change', !myValue.value)
 }

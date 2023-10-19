@@ -1,69 +1,71 @@
 <template>
   <div class="list-page">
     <Preview
-        :show="showPreview"
-        :id="props.data.id"
-        :data="props.data?.configuration?.code"
-        @back="() => (showPreview = false)"
-      />
-      <DataBind
-        ref="dataBindRef"
-        v-model:open="visibles.GuideVisible"
-        :id="props.data.id"
-        @valid="validate"
-      />
-      <ListSkeleton
-        :visibles="visibles"
-        @visibles="handleVisible"
-        @goPreview="goPreview"
-        :dataBindRef="dataBindRef"
-        :menuRef="menuRef"
-        :errorCount="errorCount"
-        :configDone="configDone"
-      />
-      <OperationColumns
-        v-model:open="visibles.OperationBtnsVisible"
-        type="btns"
-        v-model:columnsTree="buttonsConfig"
-        ref="btnTreeRef"
-      />
-      <OperationColumns
-        v-model:open="visibles.OperationColumnsVisible"
-        v-model:columnsTree="actionsConfig"
-        type="columns"
-        ref="columnsRef"
-      />
-      <FilterModule
-        v-model:open="visibles.FilterModuleVisible"
-        v-model:dataSource="searchData"
-        :id="props.data.id"
-        ref="filterModuleRef"
-      />
-      <ListData
-        v-model:open="visibles.ListDataVisible"
-        :id="props.data.id"
-        v-model:dataSource="dataSource"
-        ref="listDataRef"
-      />
-      <ListForm
-        v-model:open="visibles.ListFormVisible"
-        v-model:listFormInfo="listFormInfo"
-        v-model:state="showType"
-        :id="props.data.id"
-        ref="listFormRef"
-      />
-      <PagingConfig
-        v-model:open="visibles.PagingConfigVisible"
-        v-model:pagingData="pagingData"
-        :id="props.data.id"
-        ref="pagingConfigRef"
-      />
-      <MenuConfig
-        v-model:open="visibles.MenuConfigVisible"
-        v-model:menuConfig="menuConfig"
-        :data="props.data"
-        ref="menuConfigRef"
-      />
+      :show="showPreview"
+      :pageId="props.data.id"
+      :projectId="info.id"
+      :data="props.data?.configuration?.code"
+      @back="() => (showPreview = false)"
+    />
+    <DataBind
+      ref="dataBindRef"
+      v-model:open="visibles.GuideVisible"
+      :id="props.data.id"
+      @valid="validate"
+    />
+    <ListSkeleton
+      :visibles="visibles"
+      @visibles="handleVisible"
+      @goPreview="goPreview"
+      :dataBindRef="dataBindRef"
+      :menuRef="menuRef"
+      :errorCount="errorCount"
+      :configDone="configDone"
+    />
+    <OperationColumns
+      v-model:open="visibles.OperationBtnsVisible"
+      type="btns"
+      v-model:columnsTree="buttonsConfig"
+      ref="btnTreeRef"
+    />
+    <OperationColumns
+      v-model:open="visibles.OperationColumnsVisible"
+      v-model:columnsTree="actionsConfig"
+      type="columns"
+      ref="columnsRef"
+    />
+    <FilterModule
+      v-model:open="visibles.FilterModuleVisible"
+      v-model:dataSource="searchData"
+      :id="props.data.id"
+      ref="filterModuleRef"
+    />
+    <ListData
+      v-model:open="visibles.ListDataVisible"
+      :id="props.data.id"
+      v-model:dataSource="dataSource"
+      ref="listDataRef"
+    />
+    <ListForm
+      v-model:open="visibles.ListFormVisible"
+      v-model:listFormInfo="listFormInfo"
+      v-model:state="showType"
+      :id="props.data.id"
+      ref="listFormRef"
+    />
+    <PagingConfig
+      v-model:open="visibles.PagingConfigVisible"
+      v-model:pagingData="pagingData"
+      :id="props.data.id"
+      ref="pagingConfigRef"
+    />
+    <MenuConfig
+      v-model:open="visibles.MenuConfigVisible"
+      v-model:menuConfig="menuConfig"
+      :data="props.data"
+      ref="menuConfigRef"
+    />
+    <CheckSpin :spinning="spinning" />
   </div>
 </template>
 
@@ -87,11 +89,13 @@ import {
   LIST_FORM_INFO,
   DATA_SOURCE,
   showColumnsKey,
-  ACTION_CONFIG_KEY
+  ACTION_CONFIG_KEY,
+  SEARCH_DATA,
 } from './keys'
 import { useProduct } from '@/store'
-import { omit, debounce } from 'lodash-es'
+import { isEmpty, omit, throttle } from 'lodash-es'
 import { onlyMessage } from '@jetlinks/utils'
+import { storeToRefs } from 'pinia'
 
 const spinning = ref(false)
 const props = defineProps({
@@ -99,8 +103,13 @@ const props = defineProps({
     type: Object,
     default: () => {},
   },
+  showTip: {
+    type: Boolean,
+    default: true,
+  },
 })
 const productStore = useProduct()
+const { info } = storeToRefs(productStore)
 
 const showPreview = ref(false)
 const menuRef = ref()
@@ -135,7 +144,12 @@ const pagingData = ref<any[]>([
   { pageSize: 96 },
 ])
 const menuConfig = reactive({
-  pageName: props.data.title,
+  pageName: computed({
+    get() {
+      return props.data.title
+    },
+    set(val) {},
+  }),
   main: true,
   name: '',
   icon: '',
@@ -149,13 +163,18 @@ const listFormInfo = reactive({
   field2: '',
   field3: '',
   emphasisField: '',
-  specialStyle: ``,
+  specialStyle: `{
+      "error": "#ff0000",
+      "offline": "#999999",
+      "warning": "#13c2c2"
+    }`,
 })
 const showType = reactive({
   type: 'list',
   configured: ['list'],
   configurationShow: false,
   defaultForm: 'list',
+  showColumns: false,
 })
 const listPageData = computed(() => {
   return {
@@ -187,20 +206,26 @@ const validate = async () => {
   const errorList = [
     ...btnTreeRef.value?.valid(),
     ...columnsRef.value?.valid(),
-    ...filterModuleRef.value?.valid(),
     ...pagingConfigRef.value?.valid(),
     ...listFormRef.value?.valid(),
     ...listDataRef.value?.valid(),
     ...menuConfigRef.value?.valid(),
     ...dataBindRef.value?.valid(),
   ]
-  console.log(errorList);
+
   return new Promise((resolve, reject) => {
-    if(errorList.length) {
-      reject(errorList)
-    } else {
-      resolve([])
-    }
+    filterModuleRef.value?.valid().then((res) => {
+      errorList.push(...res)
+      if (errorList.length) {
+        reject(errorList)
+      } else {
+        if (props.showTip) {
+          onlyMessage('校验通过')
+        }
+        resolve([])
+      }
+      spinning.value = false
+    })
     // Promise.all(promiseArr)
     //   .then((res) => {
     //     resolve(res)
@@ -223,6 +248,7 @@ const errorCount = computed(() => {
     filterModule: filterModuleRef.value?.errorList.length,
     listData: listDataRef.value?.errorList.length,
     menuConfig: menuConfigRef.value?.errorList.length,
+    dataBind: dataBindRef.value?.errorList.length,
   }
 })
 
@@ -241,9 +267,10 @@ const dataBind = reactive({
   data: {
     function: null,
     command: null,
+    dataSource: [],
   },
-  filterBind: [],
-  columnBind: [],
+  dataFrom: null,
+  async: false,
 })
 
 provide(DATA_BIND, dataBind)
@@ -253,6 +280,7 @@ provide(MENU_CONFIG, menuConfig)
 provide(LIST_PAGE_DATA_KEY, listPageData)
 provide(LIST_FORM_INFO, listFormInfo)
 provide(DATA_SOURCE, dataSource)
+provide(SEARCH_DATA, searchData)
 provide(showColumnsKey, showColumns)
 provide(ACTION_CONFIG_KEY, actionsConfig)
 // watch(
@@ -308,12 +336,25 @@ onMounted(() => {
     actionsConfig.value = initData?.actionsButton || []
     searchData.value = initData?.searchData || []
     dataSource.value = initData?.dataSource || []
-    showColumns.value = initData?.showColumns
+    showColumns.value =
+      initData?.showColumns !== undefined
+        ? initData?.showColumns
+        : showColumns.value
   }
   setTimeout(() => {
     watch(
       () => JSON.stringify(listPageData.value),
       () => {
+        filterQuote()
+        if (!listPageData.value.dataBind.data.function) {
+          listFormInfo.field1 =
+            listFormInfo.field2 =
+            listFormInfo.field3 =
+            listFormInfo.emphasisField =
+            listFormInfo.field2Title =
+            listFormInfo.field3Title =
+              ''
+        }
         const record = {
           ...props.data,
           configuration: {
@@ -322,15 +363,21 @@ onMounted(() => {
           },
           others: {
             ...props?.data?.others,
-            menu: { ...menuConfig, buttons: [...arrFlat(buttonsConfig.value), ...arrFlat(actionsConfig.value)] },
-            useList: Array.from(new Set([
-              ...actionsConfig.value
-                .filter((item) => item.pages && item.pages !== '')
-                ?.map((item) => item.pages),
-              ...buttonsConfig.value
-                .filter((item) => item.pages && item.pages !== '')
-                ?.map((item) => item.pages),
-            ])) ,
+            menu: {
+              ...menuConfig,
+              buttons: [
+                ...arrFlat(buttonsConfig.value),
+                ...arrFlat(actionsConfig.value),
+              ],
+            },
+            useList: Array.from(
+              new Set([
+                ...actionsQuote(actionsConfig.value),
+                ...actionsQuote(buttonsConfig.value),
+                  ...filterQuote(),
+                  dataBindQuote()
+              ]),
+            ),
           },
         }
         onSave(record)
@@ -338,6 +385,36 @@ onMounted(() => {
     )
   })
 })
+
+const filterQuote = () => {
+  return searchData.value
+    .filter((item) => item.config?.abilityValue)
+    ?.map((item) => findFunctionId(item.config?.abilityValue)?.id)
+}
+
+const dataBindQuote = () => {
+  return findFunctionId(dataBind.data.function!)?.id
+}
+
+const actionsQuote = (arr: any[]) => {
+  let pages: string[] = [];
+  let functions: string[] = [];
+  arr.forEach((item) => {
+    if(!isEmpty(item.pages)) {
+      pages.push(item.pages)
+    }
+    if(!isEmpty(item.functions)) {
+      functions.push(findFunctionId(item.functions)?.id)
+    }
+  })
+  return [...pages, ...functions]
+}
+
+
+const findFunctionId = (fullId: string) => {
+  const functionArr = [...productStore.getDataMap().values()];
+  return functionArr.find(item => item.fullId === fullId)
+}
 
 // watch(() => JSON.stringify(allListData.value), () => {
 //   const record = {
@@ -356,7 +433,7 @@ onMounted(() => {
 //   productStore.update(record)
 // })
 
-const onSave = debounce((record) => {
+const onSave = throttle((record) => {
   productStore.update(record)
 }, 1000)
 
@@ -365,10 +442,13 @@ defineExpose({
 })
 </script>
 
-<style scoped lang="less">
+<style lang="less">
 .list-page {
   height: 100%;
   position: relative;
   background-color: #e9e9e9;
+}
+.options-img {
+  width: 20px;
 }
 </style>

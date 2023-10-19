@@ -24,6 +24,7 @@
         <div>配置可以使用该流程的成员</div>
         <ConfigureMembers
           :isNode="false"
+          :hasWeight="false"
           v-model:members="formData.assignedUser"
         />
       </j-form-item>

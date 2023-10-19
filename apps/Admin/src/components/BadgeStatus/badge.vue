@@ -1,8 +1,12 @@
 <template>
-  <j-badge
+  <!-- <j-badge
     :color="_color"
     :text="text"
-  ></j-badge>
+  ></j-badge> -->
+  <div style="display: flex;">
+    <j-badge :color="_color"></j-badge>
+    <j-ellipsis style="max-width: 70px">{{ text }}</j-ellipsis>
+  </div>
 </template>
 
 <script setup name="BadgeStatus">
@@ -44,7 +48,7 @@ const _color = computed(() => {
   const code = props.statusNames[props.status] || props.status
   const c = hexToRgb(badgeColor[code]) || badgeColor[code]
 
-  console.log(c)
+  // console.log(c)
   return `rgb(${c})`
 })
 </script>

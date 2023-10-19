@@ -5,7 +5,7 @@
   "main": "index.ts",
   "module": "index.ts",
   "scripts": {
-    "clean": "pnpm rimraf node_modules && pnpm rimraf dist && pnpm rimraf .turbo"
+    "clean": "pnpm rimraf node_modules && pnpm rimraf .turbo"
   },
   "keywords": [],
   "files": [
@@ -19,6 +19,7 @@
     "@jetlinks/stores": "workspace:^",
     "@jetlinks/types": "workspace:^",
     "@jetlinks/utils": "workspace:^",
+    "jetlinks-ui-components": "^1.0.33",
     "nprogress": "^0.2.0",
     "path-to-regexp": "^6.2.1",
     "vue": "^3.3.4",

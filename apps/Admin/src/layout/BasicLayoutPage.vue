@@ -21,9 +21,9 @@
       </div>
     </template>
 
-      <router-view v-slot="{ Component }">
-        <component :is="components || Component" />
-      </router-view>
+    <router-view v-slot="{ Component }">
+      <component :is="components || Component" />
+    </router-view>
   </j-pro-layout>
 </template>
 
@@ -61,6 +61,7 @@ const components = computed(() => {
 
 const config = computed(() => ({
   ...layout.value,
+  title: 'Jetlinks Code',
   theme: theme.value,
   menuData: menuStore.siderMenus,
   splitMenus: layout.value.layout === 'mix'

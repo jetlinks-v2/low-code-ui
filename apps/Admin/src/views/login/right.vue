@@ -7,7 +7,7 @@
                     class="logo"
                     :src="logo || logoImage"
                 />
-                <p class="desc">{{ title }}</p>
+                <p class="desc">Jetlinks Code</p>
             </div>
             <div class="main">
                 <j-form layout="vertical" :model="formData" :rules="rules" @finish="submit">

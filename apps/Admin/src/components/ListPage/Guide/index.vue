@@ -7,7 +7,7 @@
         <p>{{ description }}</p>
       </div>
     </div>
-    <div style="">
+    <div class="step-button" :style="{ bottom: steps == 2 ? '20%' : '40%' }">
       <j-space size="large">
         <p @click.stop="steps--" v-if="steps != 1">查看上一步</p>
         <p v-if="steps !== stepList.length">点击任意位置查看下一步</p>
@@ -124,10 +124,18 @@ watch(
     if (val > props.stepList.length || val == 0) {
       return
     }
-    info.value.style.left = position(
+    if(props.stepList[val - 1]?.placement == 'left') {
+      info.value.style.left = null;
+      info.value.style.right = position(
       props.stepList[val - 1].target?.()[0]?.el,
       props.stepList[val - 1]?.placement,
     )[1]
+    } else {
+      info.value.style.left = position(
+        props.stepList[val - 1].target?.()[0]?.el,
+        props.stepList[val - 1]?.placement,
+      )[1]
+    }
     info.value.style.top = position(
       props.stepList[val - 1].target?.()[0]?.el,
       props.stepList[val - 1]?.placement,
@@ -137,7 +145,7 @@ watch(
       item.el.style.backgroundColor = <string>item.backgroundColor
       item.el.style.pointerEvents = 'none'
       item.el.style.position = 'relative'
-      item.el.style.zIndex = '1001'
+      item.el.style.zIndex = '3'
       item.el.style.top = steps.value === 1 ? '10px' : '0px';
       const node = document.createElement('div')
       node.setAttribute('class', `temp-element`)
@@ -157,16 +165,13 @@ const handleJump = () => {
   steps.value = 0;
 }
 function position(el: HTMLElement, position?: string) {
-  console.log(el);
   let result: string[] = ['0px', '0px']
   switch (position) {
     case 'top':
       result = [
-        el.getBoundingClientRect().top -
-          el.offsetHeight -
-          maskRef.value?.getBoundingClientRect().top - 50 +
+        180 +
           'px',
-        el.getBoundingClientRect().left + 'px',
+        234 + 'px',
       ]
       break
     case 'right':
@@ -183,16 +188,15 @@ function position(el: HTMLElement, position?: string) {
           el.offsetHeight -
           maskRef.value?.getBoundingClientRect().top + 10 +
           'px',
-        el.getBoundingClientRect().left + 'px',
+          282 + 'px',
       ]
       break
     case 'left':
-      console.log(el.getBoundingClientRect().left - el.offsetWidth - info.value?.offsetWidth - 867 + 'px');
       result = [
         el.getBoundingClientRect().top -
           maskRef.value?.getBoundingClientRect().top +
           'px',
-        el.getBoundingClientRect().left - el.offsetWidth - info.value?.offsetWidth - 300 + 'px',
+        40 + 'px',
       ]
       break
     // (<HTMLElement>info.value).style.left = props.steps[val - 1].target()[0]?.el.getBoundingClientRect()?.left + 'px';
@@ -222,16 +226,20 @@ watch(
   top: 0;
   left: 0;
   color: #ffffff;
-  z-index: 1000;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  .step-button {
+    position: absolute;
+    bottom: 40%;
+  }
   .stop {
     position: absolute;
     right: 20px;
-    top: 72px;
-    z-index: 1001;
+    top: 92px;
+    z-index: 3;
   }
   .message {
     white-space: nowrap;

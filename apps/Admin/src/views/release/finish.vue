@@ -31,24 +31,40 @@
 </template>
 
 <script setup name="Finish">
-import { releaseDraft, validateDraft } from '@/api/project'
+import { releaseDraft } from '@/api/project'
 import { saveMenu } from '@/api/menu'
 import { useIntervalFn } from '@vueuse/core'
+import { useNetwork } from '@jetlinks/hooks'
+import { useProduct } from '@/store'
 
 const props = defineProps({
   tree: {
     type: Array,
     default: () => []
+  },
+  theme: {
+    type: String,
+    default: ''
   }
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value', 'statusChange'])
+
+useNetwork({
+  onLine() {
+    if (status.value !== 'success' && width.value !== 100) { // 网络重连，并且状态不是成功时
+      restart()
+    }
+  }
+})
 
 const width = ref(0)
-const status = ref('error')
+const status = ref('')
 const loading = ref(true)
-const errorMsg = ref('errorerrorerrorerrorerrorerrorerror')
+const errorMsg = ref('')
 const route = useRoute()
+const product = useProduct()
+
 let count = 0
 
 const { pause, resume } = useIntervalFn(() => {
@@ -57,21 +73,6 @@ const { pause, resume } = useIntervalFn(() => {
     width.value += 0.5
   }
 }, 100)
-
-// const validateDraftFn = (id) => {
-//   count = 33.333
-//   validateDraft(id).then(resp => {
-//     width.value = 33.33
-//     releaseDraftFn(id)
-//   }).catch((e) => {
-//     width.value = 33.33
-//     status.value = 'error'
-//     loading.value = true
-//     errorMsg.value = e?.response?.data?.message
-//     console.log(e)
-//     pause()
-//   })
-// }
 
 const releaseDraftFn = (id) => {
   count = 50
@@ -87,12 +88,54 @@ const releaseDraftFn = (id) => {
     pause()
   })
 }
+
+const themeChange = () =>{
+  const item = product.getById(product.info.id)
+
+  item.others = {
+    ...(item.others || {}),
+    theme: props.theme
+  }
+
+  product.update(item, () => {
+    const { id } = route.params
+
+    if (id) {
+      status.value = 'loading'
+      releaseDraftFn(id)
+    }
+  })
+}
+
+/**
+ * 更新crud中发的列
+ */
+// const updateCrudOther = (data) => {
+//   return data.map(item => {
+//     if (item.others.type === providerEnum.CRUD) {
+//       const columnsKeys = item.configuration.columns?.map(item => item.name)
+//       item.others = {
+//         ...item.others,
+//         columns: columnsKeys
+//       }
+//     }
+//
+//     if (item.children) {
+//       item.children = updateCrudOther(item.children)
+//     }
+//
+//     return item
+//   })
+// }
 const saveMenuFn = (id) => {
   count = 90
   saveMenu(props.tree).then(resp => {
     width.value = 100
     count = 100
     loading.value = true
+    status.value = 'success'
+    // const arr = updateCrudOther(product.data)
+    // product.update(arr[0])
     pause()
   }).catch((e) => {
     width.value = 90
@@ -103,14 +146,8 @@ const saveMenuFn = (id) => {
   })
 }
 
-
-
 const releaseStart = async () => {
-  const { id } = route.params
-
-  if (id) {
-    releaseDraftFn(id)
-  }
+  themeChange()
 }
 
 const restart = () => {
@@ -123,14 +160,18 @@ const restart = () => {
 const reset = () => {
   count = 0
   width.value = 0
-  status.value = 'success'
+  status.value = ''
   errorMsg.value = ''
   loading.value = false
   resume()
 }
 
-watch(() => width.value, () => {
-  emit('update:value', count)
+watch(() => loading.value, () => {
+  emit('update:value', loading.value)
+})
+
+watch(() => status.value, () => {
+  emit('statusChange', status.value)
 })
 
 onBeforeMount(() => {

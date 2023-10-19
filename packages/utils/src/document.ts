@@ -16,4 +16,3 @@ export const downloadFileByUrl = (url: string, name: string, type: string) => {
   downNode.click();
   document.body.removeChild(downNode);
 };
-

@@ -3,7 +3,7 @@
     <j-tree
       :tree-data="btnTree"
       :show-icon="false"
-      :draggable="draggable"
+      :draggable="true"
       show-line
       block-node
       :selectable="false"
@@ -14,8 +14,9 @@
         <AIcon type="CaretDownOutlined" :class="switcherCls"></AIcon>
       </template>
       <template #title="{ dataRef, title }">
-        <div class="title-config">
-          <span class="title">{{ title }}</span>
+        <div class="title-config" >
+          <slot name="title" :data="dataRef"></slot>
+          <span class="title" v-if="!slotsName.includes('title')">{{ slotsName }}</span>
           <slot name="config" :data="dataRef"></slot>
         </div>
       </template>
@@ -29,8 +30,10 @@ import type {
   TreeProps,
 } from 'ant-design-vue/es/tree';
 import { onlyMessage } from '@jetlinks/utils';
+import { useSlots } from 'vue';
 
-
+const slots = useSlots();
+const slotsName = Object.keys(slots)
 interface Emit {
   (e: 'update:btnList', value: any): void;
 }
@@ -42,7 +45,7 @@ const props = defineProps({
   draggable: {
     type: Boolean,
     default: true,
-  }
+  },
 })
 
 const btnTree = computed({
@@ -62,6 +65,10 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
   const dragKey = info.dragNode.key;
   const dropPos = info.node.pos?.split('-');
   const dropPosition = info.dropPosition - Number(dropPos?.[dropPos?.length - 1]);
+  if(!props.draggable && dropPosition === 0) {
+    onlyMessage('操作列支持1级按钮', 'error')
+    return
+  }
   if(info.node.type !== 'customer' && dropPosition === 0) {
     onlyMessage('常用按钮下方不可以添加2级按钮', 'error');
     return ;
@@ -82,7 +89,7 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
     return ;
   }
   if(info.dragNode.children?.length && (dropPosition === 0 || info.node.level === 1)) {
-    onlyMessage('该按钮下存在2级按钮', 'error');
+    onlyMessage('仅支持2级按钮', 'error');
     return
   }
   // Find dragObject

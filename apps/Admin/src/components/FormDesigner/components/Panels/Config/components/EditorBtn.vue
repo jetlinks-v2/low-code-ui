@@ -7,9 +7,15 @@
       v-model:visible="visible"
       :title="text"
       @ok="handleOk"
-      @cancel="visible = false"
+      @cancel="handleCancel"
     >
-      <div ref="target"><j-monaco-editor v-model="_value" :language="language" /></div>
+      <div ref="target" style="height: 300px;">
+        <j-monaco-editor
+          @errorChange="onErrorChange"
+          v-model="_value"
+          :language="language"
+        />
+      </div>
     </j-modal>
   </div>
 </template>
@@ -17,6 +23,7 @@
 <script lang="ts" setup>
 import { ref, watchEffect, watch, inject } from 'vue'
 import { useFocusWithin } from '@vueuse/core'
+import { onlyMessage } from '@jetlinks/utils'
 
 const designer: any = inject('FormDesigner')
 
@@ -38,6 +45,7 @@ const emits = defineEmits(['update:value', 'change'])
 const visible = ref<boolean>(false)
 const _value = ref<string>()
 const target = ref()
+const _error = ref<any[]>([])
 
 const { focused } = useFocusWithin(target)
 
@@ -49,10 +57,23 @@ const onBtn = () => {
   visible.value = true
 }
 
+const onErrorChange = (error: any[]) => {
+  _error.value = error
+}
+
 const handleOk = () => {
-  emits('update:value', _value.value)
-  emits('change', _value.value)
+  if (!_error.value?.length) {
+    emits('update:value', _value.value)
+    emits('change', _value.value)
+    visible.value = false
+  } else {
+    onlyMessage('代码有误，请检查','error')
+  }
+}
+
+const handleCancel = () => {
   visible.value = false
+  _value.value = ''
 }
 
 watch(

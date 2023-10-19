@@ -45,13 +45,13 @@
             onVisibleChange: setVisible,
         }" 
         :src="getImage('/menu/menu.png')" />
-    <Save v-if="visible" @close="visible = false" :data="treeItem" @ok="onOk" />
+    <Save v-if="visible" @close="visible = false" :data="treeItem" @ok="onOk" :projectId="projectId"/>
     <DelModal v-if="visibleDel" @close="visibleDel = false" @ok="onDel" :data="treeItem" />
 </template>
 
 <script setup lang='ts' name="TreeDrag">
 import { cloneDeep } from 'lodash-es';
-import { DeleteTreeById, getTreeLevel, handleTreeModal } from '../index'
+import { DeleteTreeById, getTreeLevel, handleSort, handleTreeModal } from '../index'
 import { AntTreeNodeDropEvent, TreeProps } from 'ant-design-vue/es/tree/Tree';
 import { onlyMessage, getImage } from '@jetlinks/utils';
 import Save from '../components/Save.vue'
@@ -86,11 +86,11 @@ const visibleImg = ref<boolean>(false)
 const countMap = ref(new Map())
 const expandMap = new Map()
 
+//引用关系
 const handleTree = (tree) => {
     const arr = cloneDeep(tree)
     arr.forEach(item => {
-        if (item.options) {
-            if (item.options?.pageId) {
+        if (item.options?.pageId) {
                 expandMap.set(item.id, item.options?.pageId)
                 if (countMap.value.has(item.options.pageId)) {
                     // debugger;
@@ -103,7 +103,6 @@ const handleTree = (tree) => {
             if (item.children) {
                 handleTree(item.children)
             }
-        }
         return;
     });
 }
@@ -117,11 +116,22 @@ const onAction = (data: any, option: string) => {
     }
 }
 
+//判断children下的pageId
+const deleteMap = (arr)=>{
+    arr.forEach(item=>{
+        if(item.options?.pageId){
+            countMap.value.set(item.options.pageId, countMap.value.get(item.options.pageId) - 1)
+        }
+        if(item.children){
+            deleteMap(item.children)
+        }
+        return;
+    })
+}
+
 const onDel = (item) => {
     treeData.value = DeleteTreeById(treeData.value, item.id)
-    if (item.options) {
-        countMap.value.set(item.options.pageId, countMap.value.get(item.options.pageId) - 1)
-    }
+    deleteMap([item])
     visibleDel.value = false
 }
 
@@ -137,7 +147,7 @@ const setVisible = (value) => {
 
 //拖拽
 const onDrop = (info: AntTreeNodeDropEvent) => {
-    // console.log('info-----------', info)
+    console.log('info-----------', info.dropToGap,info)
     const dropKey = info.node.key;
     const dragKey = info.dragNode.key;
     const dropPos: any = info.node.pos?.split('-');
@@ -154,12 +164,14 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
         });
     };
     const data = cloneDeep([...treeData.value]);
+    // const data = [...treeData.value]
     let dragObj: any;
     loop(data, dragKey, (item: TreeDataItem, index: number, arr: TreeProps['treeData']) => {
         arr?.splice(index, 1);
         dragObj = item;
     });
     if (!info.dropToGap) {
+       
         // Drop on the content
         loop(data, dropKey, (item: any) => {
             item.children = item.children || [];
@@ -171,10 +183,13 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
         info.node.expanded && // Is expanded
         dropPosition === 1 // On the bottom gap
     ) {
-        loop(data, dropKey, (item: any) => {
+        console.log('-----------',info,)
+        loop(data, dropKey, (item: any,index:number,arr:any) => {
             item.children = item.children || [];
             // where to insert 示例添加到头部，可以是随意位置
-            item.children.unshift(dragObj);
+            console.log('item--------',item)
+            arr.splice(index + 1, 0, dragObj);
+
         });
     } else {
         let ar: TreeProps['treeData'] = [];
@@ -189,7 +204,6 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
             ar.splice(i + 1, 0, dragObj);
         }
     }
-    // console.log('data',data)
     const level = getTreeLevel(data)
 
     if (level > 2) {
@@ -200,25 +214,27 @@ const onDrop = (info: AntTreeNodeDropEvent) => {
 }
 
 const onExpand = (keys) => {
-    console.log('keys', keys)
+    // console.log('keys', keys)
     autoExpandParent.value = false
 }
 
 const getKeyByValue = (arr) => {
     const keys: any = []
+    const ids = treeData.value.map(item=>item.id)
     for (const [key, value] of expandMap.entries()) {
         if (arr.includes(value)) {
             keys.push(key);
         }
     }
-    return keys
+    //父级不展开
+    return keys.filter(item=>!ids.includes(item))
 }
 
 watch(
     () => props.list,
     (val: any) => {
         countMap.value.clear()
-        treeData.value = [...treeData.value, ...val]
+        treeData.value = [...val,...treeData.value]
         handleTree(treeData.value)
     },
     { immediate: true }
@@ -235,7 +251,8 @@ watch(
 watch(
     () => treeData.value,
     (val) => {
-        emit('changeTree', val)
+        // console.log('----',handleSort(val))
+        emit('changeTree', handleSort(val))
     },
     { deep: true, immediate: true }
 )
@@ -244,11 +261,11 @@ watch(
 watch(
     () => props.checkedKey,
     (val) => {
-        console.log('val', val)
         const arr = getKeyByValue(val)
         expandedKeys.value = arr
         autoExpandParent.value = true
-    }
+    },
+    { deep: true, immediate: true }
 )
 
 const getTree = async () => {
@@ -262,10 +279,13 @@ const getTree = async () => {
                         termType: 'eq',
                         value: 'iot',
                     },
+                    {
 
+                    }
                 ],
             },
         ],
+        sorts: [{ name: 'sortIndex', order: 'asc' }],
     };
     const res = await getAllMenuTree(params)
     if (res.status === 200) {

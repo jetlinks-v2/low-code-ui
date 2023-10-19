@@ -14,6 +14,8 @@ export interface IConfig {
     summaryGenerator: string;
     ccMember: Partial<ICandidate>;
     forms: { formId: string; multiple: boolean }[];
+    // fields?: IVariables[];
+    variables?: any[];
 }
 
 export interface INodeProps {
@@ -25,7 +27,7 @@ export interface INodeProps {
     completeWeight: number;
     rejectWeight: number;
     autoClaim: boolean;
-    
+
     branchBy: string | null;
 
     // 以下字段前端使用
@@ -69,4 +71,28 @@ export interface IRelation {
         objectType: string;
         relation: string;
     }
+}
+
+export interface IModelBaseInfo {
+    id: string;
+    key: string;
+    name: string;
+    icon: string;
+    provider: string;
+    classifiedId: string;
+    model: string;
+    state: {
+        text: string;
+        value: string;
+    };
+    creatorId: string;
+    creatorName: string;
+    createTime: number;
+}
+
+export interface IVariables {
+    fullId: string;
+    fullName: string;
+    id: string;
+    name: string;
 }
