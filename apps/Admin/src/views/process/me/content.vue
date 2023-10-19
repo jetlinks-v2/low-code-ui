@@ -226,6 +226,7 @@ const columnsFinished = [
             options: [
                 { label: '运行中', value: 'running ' },
                 { label: '已完成', value: 'completed' },
+                { label: '已驳回', value: 'rejected' },
                 { label: '已撤销', value: 'repealed' },
             ],
         },
@@ -325,6 +326,7 @@ const columnsInitiate = [
             options: [
                 { label: '运行中', value: 'running ' },
                 { label: '已完成', value: 'completed' },
+                { label: '已驳回', value: 'rejected' },
                 { label: '已撤销', value: 'repealed' },
             ],
         },
@@ -428,6 +430,7 @@ const columnsCc = [
             options: [
                 { label: '运行中', value: 'running ' },
                 { label: '已完成', value: 'completed' },
+                { label: '已驳回', value: 'rejected' },
                 { label: '已撤销', value: 'repealed' },
             ],
         },

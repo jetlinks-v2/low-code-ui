@@ -71,6 +71,10 @@ onMounted(() => {
       position: absolute;
       right: 30px;
       cursor: pointer;
+      padding: 5px 10px;
+      background-color: #FFF;
+      border-radius: 4px;
+      
       &.active {
          background-color: #3174f1;
          padding:5px 12px;

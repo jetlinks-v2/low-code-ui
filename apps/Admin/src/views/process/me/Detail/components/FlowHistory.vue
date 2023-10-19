@@ -1,28 +1,30 @@
 
 <template>
-   <div>
+   <div class="content">
       <j-timeline>
-         <j-timeline-item v-for=" item in timelines">
-            <!-- <div class="title">
-               <div>{{ item.operator.name }}</div>
-            </div> -->
+         <j-timeline-item v-for=" item in timelines" color="#999999">
             <div class="items">
                <div class="item">
                   <div class="item-left">
                      <AIcon type="UserOutlined" />
-                     <div class="text">{{ item.operator.name }}</div>
-                     <j-tag :color="colorMap.get(item.actionColor)">{{ actionType.get(item.actionType) }}</j-tag>
+                     <div class="text">{{ item.operatorName || item.operator.name }}</div>
+                     <j-tag :color="colorMap.get(item.actionColor)">
+                        {{ actionType.get(item.actionType) }}
+                     </j-tag>
+                     <j-tag :color="colorMap.get('completed')" v-if="item.others.autoOperation">
+                        {{ actionType.get(item.actionType) }}
+                     </j-tag>
                      <j-tag :color="'default'" v-if="item.others.weight">权重{{ item.others.weight }}</j-tag>
                   </div>
                   <div class="item-right">{{ dayjs(item.timestamp).format('YYYY-MM-DD HH:mm:ss') }}</div>
                </div>
                <div v-if="item.changed && item.nodeType !== 'ROOT'">
-                  <!-- <div v-for="e in item.changed" style="margin: 10px;">
-                     <a v-if="e.action !== 'taskCommentChanged'" @click="toDetail(e)">查看办理详情</a>
-                     <j-input v-else style="width: 60%;" :value="e.others.afterComment" />
-                  </div> -->
-                  <a v-if="showChanged(item.changed,'form').length" @click="toDetail(showChanged(item.changed,'form'))">查看办理详情</a>
-                  <j-input v-if="showChanged(item.changed,'taskCommentChanged')" style="width: 60%;" :value="showChanged(item.changed,'taskCommentChanged')?.others.afterComment" />
+                  <a v-if="showChanged(item.changed, 'form').length"
+                     @click="toDetail(showChanged(item.changed, 'form'))">查看办理详情</a>
+                  <div v-if="showChanged(item.changed, 'taskCommentChanged')" class="comment">
+                     {{ showChanged(item.changed, 'taskCommentChanged')?.others.afterComment }}
+                  </div>
+                  <!-- <j-input v-if="showChanged(item.changed,'taskCommentChanged')" style="width: 60%;" :value="showChanged(item.changed,'taskCommentChanged')?.others.afterComment" /> -->
                </div>
                <div v-if="item.childrenNode" class="item-children">
                   <div style="margin-right: 10px;">{{ item.childrenNode.others.taskName }}</div>
@@ -53,16 +55,16 @@ typeMap.set('completed', '已完成')
 typeMap.set('rejected', '已拒绝')
 
 
-const nodeTypeMap = new Map()
-nodeTypeMap.set('ROOT', '发起流程')
-nodeTypeMap.set('APPROVAL', '审批节点')
-nodeTypeMap.set('DEAL', '办理节点')
-//网关节点
-nodeTypeMap.set('CONDITIONS', '条件组')
-nodeTypeMap.set('CONCURRENTS', '并行节点组')
-nodeTypeMap.set('EMPTY', '空节点')
-//不是网关节点
-nodeTypeMap.set('CONDITION', '条件子分支')
+// const nodeTypeMap = new Map()
+// nodeTypeMap.set('ROOT', '发起流程')
+// nodeTypeMap.set('APPROVAL', '审批节点')
+// nodeTypeMap.set('DEAL', '办理节点')
+// //网关节点
+// nodeTypeMap.set('CONDITIONS', '条件组')
+// nodeTypeMap.set('CONCURRENTS', '并行节点组')
+// nodeTypeMap.set('EMPTY', '空节点')
+// //不是网关节点
+// nodeTypeMap.set('CONDITION', '条件子分支')
 
 const actionType = new Map()
 actionType.set('sign', '签收')
@@ -111,8 +113,9 @@ const filterLine = (item, index) => {
       return {
          ...item,
          nodeType: nodeType,
+         operatorName: item.others.identity.name,
          actionType: 'sign',
-         actionColor: 'default',
+         actionColor: 'completed',
          show: true
       }
    } else if (item.action === 'taskLinkChanged') {
@@ -121,6 +124,7 @@ const filterLine = (item, index) => {
          return {
             ...item,
             nodeType: nodeType,
+            operatorName: item.others.identity.name,
             actionType: item.others.afterState === 'completed' ? 'pass' : 'error',
             actionColor: item.others.afterState === 'completed' ? 'completed' : 'error',
             show: true,
@@ -134,6 +138,7 @@ const filterLine = (item, index) => {
          return {
             ...item,
             nodeType: nodeType,
+            operatorName: item.operator.name,
             actionType: item.others.afterState === 'completed' ? 'pass' : 'error',
             actionColor: item.others.afterState === 'completed' ? 'completed' : 'error',
             show: false,
@@ -191,6 +196,10 @@ const showChanged = (val, type) => {
    return type === 'taskCommentChanged' ? res : resp
 }
 
+const isEnd = (val) => {
+   return task.value.get(val.taskId)?.nodeProvider === 'endEvent'
+}
+
 //处理时间轴
 const handleTimelines = () => {
    const arr: any = []
@@ -233,43 +242,66 @@ onMounted(() => {
 </script>
 
 <style scoped lang='less'>
-.title {
-   display: flex;
-   width: 100%;
-   justify-content: space-between;
-   font-size: 18px;
-}
-
-.items {
-   margin-top: 5px;
-
-   .top {
-      display: flex;
-      justify-content: space-between;
+.content {
+   :deep(.ant-timeline-item-tail) {
+      border-left: 3px solid #999999;
+      position: absolute;
+      top: 12px;
+      left: 4px;
    }
 
-   .item {
+   .title {
       display: flex;
+      width: 100%;
       justify-content: space-between;
-      margin-bottom: 5px;
+      font-size: 18px;
+   }
 
-      .item-left {
+   .items {
+      margin-top: 5px;
+
+      .top {
          display: flex;
-         align-items: center;
-
-         .text {
-            margin: 0 5px;
-         }
+         justify-content: space-between;
       }
 
+      .item {
+         display: flex;
+         justify-content: space-between;
+         margin-bottom: 5px;
 
-   }
+         .item-left {
+            display: flex;
+            align-items: center;
 
-   .item-children {
-      display: flex;
-      background-color: #f3edc640;
-      margin-top: 10px;
-      padding: 10px 10px;
+            .text {
+               margin: 0 5px;
+               color: #000000;
+               font-weight: 500;
+               font-size: 16px;
+            }
+         }
+
+         .item-right {
+            color: #9E9E9E;
+            font-size: 14px;
+         }
+
+
+      }
+
+      .comment {
+         background-color: #FAFAFA;
+         margin-top: 10px;
+         padding: 10px 10px;
+      }
+
+      .item-children {
+         display: flex;
+         background-color: #F6F9FF;
+         margin-top: 10px;
+         padding: 10px 10px;
+      }
    }
 }
 </style>
