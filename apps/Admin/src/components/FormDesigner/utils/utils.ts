@@ -545,7 +545,7 @@ export const getFieldData = (data: ISchema) => {
             if (data.componentProps?.mode === 'multiple') {
                 _obj[data?.formItemProps?.name] = obj
             } else {
-                data.componentProps.keys.map(i => {
+                (data.componentProps?.keys || []).map(i => {
                     _obj[i?.config?.source] = undefined
                 })
             }
