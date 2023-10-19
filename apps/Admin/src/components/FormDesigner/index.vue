@@ -1,6 +1,11 @@
 <template>
   <div class="container">
-    <Header @save="onSave" :type="type" :data="data" @validate="onValid" />
+    <Header
+      @save="emits('saveData', formData)"
+      :type="type"
+      :data="data"
+      @validate="onValid"
+    />
     <div class="box">
       <div class="left" v-if="model !== 'preview'"><Filed /></div>
       <div
@@ -10,7 +15,7 @@
         }"
       >
         <div class="canvas-box">
-          <div class="container">
+          <div class="canvas-box-container">
             <Canvas></Canvas>
           </div>
         </div>
@@ -76,6 +81,7 @@ const props = defineProps({
   },
 })
 
+const emits = defineEmits(['saveData'])
 const model = ref<'preview' | 'edit'>(props.mode ? 'preview' : 'edit') // 预览；编辑
 const formData = ref<any>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
@@ -259,14 +265,16 @@ const onAddChild = (
  * 保存数据
  */
 const onSaveData = () => {
-  const obj = {
-    ...props.data,
-    configuration: {
-      type: 'form',
-      code: JSON.stringify(unref(formData)),
-    },
+  if (props.type === 'low-code') {
+    const obj = {
+      ...props.data,
+      configuration: {
+        type: 'form',
+        code: JSON.stringify(unref(formData)),
+      },
+    }
+    product.update(obj)
   }
-  product.update(obj)
 }
 
 const setModel = (_type: 'preview' | 'edit') => {
@@ -307,7 +315,6 @@ const getFormList = computed(() => {
 })
 
 provide('FormDesigner', {
-  projectId: product.info?.id,
   model,
   type: props?.type || 'low-code',
   formData,
@@ -426,11 +433,12 @@ defineExpose({ onSave, validate: onValidate })
         padding: 24px;
         background-color: #f6f6f6;
 
-        .container {
+        .canvas-box-container {
           height: 100%;
           background-color: #fff;
           border-radius: 8px;
-          padding: 12px 0;
+          // padding: 18px;
+          // box-sizing: content-box;
         }
       }
     }

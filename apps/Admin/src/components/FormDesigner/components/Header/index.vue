@@ -1,19 +1,43 @@
 <template>
   <div class="header">
-    <div class="left" v-if="isEditModel && type === 'low-code'">
-      <j-space :size="12">
-        <span>提供多种方式帮助你快速添加表单页内容</span>
-        <QuickAdd :data="data" />
-      </j-space>
-    </div>
-    <div class="right">
+    <template v-if="type === 'low-code'">
+      <div class="left" v-if="isEditModel">
+        <j-space :size="12">
+          <span>提供多种方式帮助你快速添加表单页内容</span>
+          <QuickAdd :data="data" />
+        </j-space>
+      </div>
+      <div class="right">
+        <j-space>
+          <j-button v-if="isEditModel" type="primary" @click="onCheck"
+            >校验</j-button
+          >
+          <j-button
+            type="primary"
+            v-if="isEditModel"
+            @click="onPreview('preview')"
+            style="padding-left: 4px; padding-right: 4px"
+            ><AIcon style="font-size: 20px" type="CaretRightOutlined"
+          /></j-button>
+          <template v-else>
+            <j-button type="link" @click="onPreview('edit')"
+              ><AIcon type="LeftOutlined" />结束预览</j-button
+            >
+            <div>正在预览</div>
+          </template>
+        </j-space>
+      </div>
+    </template>
+    <template v-else>
+      <div class="left">
+        <template v-if="!isEditModel">
+          <j-button type="link" @click="onPreview('edit')"
+            ><AIcon type="LeftOutlined" />结束预览</j-button
+          >
+          <div>正在预览</div>
+        </template>
+      </div>
       <j-space>
-        <j-button
-          v-if="isEditModel && type === 'low-code'"
-          type="primary"
-          @click="onCheck"
-          >校验</j-button
-        >
         <j-button
           type="primary"
           v-if="isEditModel"
@@ -21,22 +45,13 @@
           style="padding-left: 4px; padding-right: 4px"
           ><AIcon style="font-size: 20px" type="CaretRightOutlined"
         /></j-button>
-        <template v-else>
-          <j-button type="link" @click="onPreview('edit')"
-            ><AIcon type="LeftOutlined" />结束预览</j-button
-          >
-          <div>正在预览</div>
-        </template>
-        <template v-if="type === 'workflow'">
-          <j-button type="primary" @click="onSave">保存</j-button>
-        </template>
+        <j-button type="primary" @click="onSave">保存</j-button>
       </j-space>
-    </div>
+    </template>
   </div>
 </template>
   
 <script lang="ts" setup>
-import { pick } from 'lodash-es'
 import { cloneDeep } from 'lodash-es'
 import { inject, computed, unref } from 'vue'
 import { getFieldData } from '../../utils/utils'
@@ -68,8 +83,8 @@ const onPreview = (_type: 'preview' | 'edit') => {
   const obj = cloneDeep(getFieldData(designer.formData.value))
   const path = Object.keys(obj)
   Object.assign(designer.formState, obj)
-  Object.keys(designer.formState).forEach(i => {
-    if(!path.includes(i)){
+  Object.keys(designer.formState).forEach((i) => {
+    if (!path.includes(i)) {
       delete designer.formState[i]
     }
   })
@@ -79,7 +94,9 @@ const onCheck = () => {
   emits('validate')
 }
 
-const onSave = () => {}
+const onSave = () => {
+  emits('save')
+}
 </script>
 
   <style lang="less" scoped>
@@ -92,5 +109,10 @@ const onSave = () => {}
   padding: 0 24px;
   margin-bottom: 1px;
   border-bottom: 1px solid #d9d9d9;
+
+  .left {
+    display: flex;
+    align-items: center;
+  }
 }
 </style>
