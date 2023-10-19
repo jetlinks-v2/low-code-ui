@@ -273,6 +273,9 @@ const onConfig = (_val: string) => {
   if (!projectList.value?.length) {
     getProject()
   }
+  if(config.value?.config?.projectId){
+    getEnd(config.value?.config?.projectId)
+  }
 }
 
 const handleOk = async () => {
