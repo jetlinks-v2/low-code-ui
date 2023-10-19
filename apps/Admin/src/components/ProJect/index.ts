@@ -23,7 +23,7 @@ export const providerMap = {
   [providerEnum.CRUD]: '增删改查',
   [providerEnum.Page]: '页面',
   [providerEnum.HtmlPage]: '自定义html',
-  [providerEnum.ListPage]: '列表页',
+  [providerEnum.ListPage]: '标准列表页',
   [providerEnum.FormPage]: '表单页',
   [providerEnum.Function]: '函数',
   'project': '项目'
@@ -79,7 +79,7 @@ export const projectList = [
       {
         type: providerEnum.ListPage,
         img: getImage('/project/list.png'),
-        text: '通用页面格式，5分钟快速完成数据列表页配置'
+        text: '通用页面格式，5分钟快速完成数据标准列表页配置'
       },
       {
         type: providerEnum.FormPage,
@@ -124,7 +124,7 @@ export const projectListMenu = [
   {
     type: providerEnum.ListPage,
     img: getImage('/project/list.svg'),
-    text: '通用页面格式，5分钟快速完成数据列表页配置'
+    text: '通用页面格式，5分钟快速完成数据标准列表页配置'
   },
   {
     type: providerEnum.FormPage,

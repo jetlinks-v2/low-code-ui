@@ -63,6 +63,10 @@ export default defineComponent({
         }
 
         const onChange = (...arg) => {
+            designer?.onChange?.()
+            if(isEditModel.value){
+                return 
+            }
             const _this = {
                 getWidgetRef: (path) => {
                     let foundRef = unref(designer.refList)?.[path]
@@ -151,6 +155,7 @@ export default defineComponent({
                                 model={unref(designer.model)}
                                 {...omit(_props.componentProps, ['disabled'])}
                                 source={props.data?.type === 'form' ? props.data?.componentProps?.source : undefined}
+                                onChange={onChange}
                             ></TypeComponent> : <TypeComponent
                                 {..._props.componentProps}
                                 value={__value.value}

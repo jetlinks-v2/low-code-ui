@@ -112,7 +112,7 @@ const Canvas = defineComponent({
       }
     )
 
-    const renderContent = () => {
+    const renderContent = (_layout: string) => {
       const Layout = (
         <DraggableLayout
           path={[]}
@@ -134,7 +134,8 @@ const Canvas = defineComponent({
         <Form
           ref={designer.formRef}
           model={designer.formState}
-          {...omit(designer.formData.value?.componentProps, ['size', 'cssCode', 'eventCode'])}
+          {...omit(designer.formData.value?.componentProps, ['size', 'cssCode', 'eventCode', 'layout'])}
+          layout={_layout}
           onClick={unref(isEditModel) && handleClick}
           class={[...unref(cssClassList)]}
           onValidate={(name, status, errorMsgs) => {
@@ -153,7 +154,7 @@ const Canvas = defineComponent({
       )
     }
 
-    const renderChildren = () => {
+    const renderChildren = (_layout: string) => {
       return <Dropdown
         trigger={['contextmenu']}
         onContextmenu={() => {
@@ -172,14 +173,15 @@ const Canvas = defineComponent({
           }
         }}
       >
-        {renderContent()}
+        {renderContent(_layout)}
       </Dropdown>
     }
 
     return () => {
+      const _layout = designer.formData.value?.componentProps?.layout || 'horizontal'
       return (
         <div class="subject" ref={canvasRef}>
-          {unref(isEditModel) ? renderChildren() : renderContent()}
+          {unref(isEditModel) ? renderChildren(_layout) : renderContent(_layout)}
           {unref(designer.collectVisible) && unref(isEditModel) && <CollectModal
             onSave={(name: string) => {
               const obj = {
