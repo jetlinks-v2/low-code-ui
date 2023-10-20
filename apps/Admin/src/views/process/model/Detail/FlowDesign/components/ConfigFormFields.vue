@@ -106,6 +106,7 @@ import { filterFormByName } from './utils'
 import { cloneDeep } from 'lodash-es'
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import TableFormPreview from './TableFormPreview.vue'
+import { PropType } from 'vue'
 
 const flowStore = useFlowStore()
 
@@ -116,7 +117,7 @@ type Emits = {
 const emits = defineEmits<Emits>()
 const props = defineProps({
   value: {
-    type: Array,
+    type: Array as PropType<any[]>,
     default: () => [],
   },
 })
@@ -137,8 +138,8 @@ const permissions = ref([
  */
 const loading = ref(false)
 const keywords = ref('')
-const filterFormList = ref([])
-const allFormList = ref([])
+const filterFormList = ref<any[] | undefined>([])
+const allFormList = ref<any[] | undefined>([])
 const getFormList = async () => {
   filterFormList.value = flowStore.model.config.forms?.map((m) => {
     const _fields = m.fullInfo.configuration?.children
@@ -146,7 +147,9 @@ const getFormList = async () => {
     const existFields = forms.value[m.formId]
     if (existFields && existFields.length) {
       _fields?.forEach((p) => {
-        const _currentField = existFields.find((f) => f.id === p.key)
+        const _currentField = existFields.find(
+          (f) => f.id === p.formItemProps.name,
+        )
         p['accessModes'] = _currentField ? _currentField.accessModes : []
         // 只有"写"权限时, 表单才可编辑
         p.componentProps.disabled = !p.accessModes.includes('write')
@@ -231,7 +234,7 @@ const handleOk = () => {
     _fields?.forEach((p) => {
       if (p.accessModes.length) {
         forms.value[item.formId].push({
-          id: p.key,
+          id: p.formItemProps.name,
           required: true,
           accessModes: p.accessModes,
         })
