@@ -104,7 +104,7 @@ export default defineComponent({
                             </FormItem>
                             : <>
                                 {renderContent()}
-                                <div class="description">
+                                <div class="form-designer-description">
                                     {props.data?.componentProps?.description}
                                 </div>
                             </>

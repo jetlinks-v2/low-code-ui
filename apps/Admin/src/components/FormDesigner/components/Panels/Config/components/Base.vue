@@ -494,10 +494,10 @@ import { computed, inject, unref } from 'vue'
 import { useTarget } from '../../../../hooks'
 import { basic } from '@/components/FormDesigner/utils/defaultData'
 import generatorData from '@/components/FormDesigner/utils/generatorData'
-import { getBrotherList, updateData } from '../../../../utils/utils'
+import { getBrotherList, queryKeys, updateData } from '../../../../utils/utils'
 import Storage from './Storage.vue'
 import { uid } from '@/components/FormDesigner/utils/uid'
-import { flatten, map } from 'lodash-es'
+import { cloneDeep, flatten, map } from 'lodash-es'
 
 const designer: any = inject('FormDesigner')
 
@@ -589,14 +589,15 @@ const rules = [
     message: '标识只能由数字、字母、下划线、中划线组成',
   },
   {
-    validator(_rule: any, value: string) {
+    validator(_: any, value: string) {
       if (!value) return Promise.resolve()
-      const arr = getBrotherList(
-        target.value.key,
-        designer.formData.value.children,
-      )
+      const _arr = cloneDeep(queryKeys(designer.formData.value.children))
+      let __key = ['table-item'].includes(target.value.type)
+        ? target.value.children?.[0]?.key
+        : target.value.key
+      const arr = getBrotherList(__key, _arr)
       const flag = arr
-        .filter((item) => item.key !== target.value.key)
+        .filter((item) => item.key !== __key)
         .find((i) => i?.formItemProps?.name === value)
       if (flag) return Promise.reject(`标识${value}已被占用`)
       return Promise.resolve()
@@ -616,10 +617,8 @@ const storageRules = [
       if (!value?.length) return Promise.reject(`请配置存储配置`)
       if (target.value.componentProps?.mode === 'multiple')
         return Promise.resolve()
-      const arr = getBrotherList(
-        target.value.key,
-        designer.formData.value.children,
-      )
+      const _arr = cloneDeep(queryKeys(designer.formData.value.children))
+      const arr = getBrotherList(target.value.key, _arr)
       const _keys = arr
         .filter((item) => {
           return (

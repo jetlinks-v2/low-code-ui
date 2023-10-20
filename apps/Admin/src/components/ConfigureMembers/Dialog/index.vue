@@ -25,8 +25,7 @@
           >
             <j-space>
               <div class="icon">
-                <!-- <AIcon type="CheckSquareFilled" style="font-size: 40px"></AIcon> -->
-                <i class="iconfont" :class="iconType[item.value]" style="font-size: 40px"></i>
+                <img :src="getImage(`/members/${item.value}.png`)" style="height: 18px;">
               </div>
               <div class="text">
                 <div class="left-item-title">
@@ -35,7 +34,7 @@
                 <span class="description">
                   <j-ellipsis line-clamp="3">{{ item.description }}</j-ellipsis>
                 </span>
-              </div>
+                </div>
             </j-space>
           </j-radio-button>
         </j-radio-group>
@@ -55,6 +54,7 @@
 import { PropType } from 'vue';
 import MemberSelect from '../components/MemberSelect.vue'
 import { DataSourceProps } from '../types'
+import { getImage } from '@jetlinks/utils';
 
 const props = defineProps({
   visible: {
@@ -169,11 +169,23 @@ const back = () => {
       cursor: pointer;
       background-color: #f6f7f9;
       &.active {
-        color: #fff;
+        color: #fff !important;
         background: #315efb;
+        .icon{
+          background: #fff;
+        }
       }
       &::before {
         content: none;
+      }
+      .icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: #dee2eb;
       }
 
       .text {
