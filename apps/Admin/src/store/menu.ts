@@ -7,7 +7,7 @@ import {handleMenus, handleMenusMap, handleSiderMenu} from '@/utils'
 import { getOwnMenuThree } from '@/api/menu'
 import { getGlobModules } from '@/router/globModules'
 import { extraMenu } from '@/router/extraMenu'
-import { BASIC_ROUTERS} from "@/router/basic";
+import {BASIC_ROUTER_DATA, BASIC_ROUTERS} from "@/router/basic";
 import { useAuthStore } from '@/store/auth'
 
 const defaultOwnParams = [
@@ -59,7 +59,7 @@ export const useMenuStore = defineStore('menu', () => {
         } else {
             onlyMessage('暂无权限，请联系管理员', 'error')
             console.warn(`没有找到对应的页面: ${name}`)
-        } 
+        }
     }
 
     const handleMenusMapById = (item: { name: string, path: string}) => {
@@ -73,8 +73,8 @@ export const useMenuStore = defineStore('menu', () => {
         menusMap.value.clear()
 
         if (resp.success) {
-            // const routes = handleMenus(cloneDeep(resp.result), extraMenu, asyncRoutes) // 处理路由
-            const routes: any[] = BASIC_ROUTERS
+            const routes = handleMenus(cloneDeep(BASIC_ROUTER_DATA), extraMenu, asyncRoutes) // 处理路由
+            // const routes: any[] = BASIC_ROUTERS
             if (routes.length) {
               routes.push({
                 path: '/',
@@ -82,10 +82,12 @@ export const useMenuStore = defineStore('menu', () => {
               })
             }
 
-            // authStore.handlePermission(resp.result) // 处理按钮权限
+            authStore.handlePermission(resp.result) // 处理按钮权限
             menu.value = routes
+
+            console.log('routes',routes)
             // handleMenusMap(routes, handleMenusMapById)
-            // siderMenus.value = handleSiderMenu(cloneDeep(resp.result)) // 处理菜单
+            siderMenus.value = handleSiderMenu(cloneDeep(BASIC_ROUTER_DATA)) // 处理菜单
         }
     }
 

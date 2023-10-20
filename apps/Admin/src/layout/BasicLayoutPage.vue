@@ -22,7 +22,7 @@
     </template>
 
     <router-view v-slot="{ Component }">
-      <component :is="Component" />
+      <component :is="components || Component" />
     </router-view>
   </j-pro-layout>
 </template>
