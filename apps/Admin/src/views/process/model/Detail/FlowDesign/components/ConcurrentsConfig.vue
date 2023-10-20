@@ -47,10 +47,16 @@
               message: `请输入通过权重`,
               trigger: 'blur',
             },
+            {
+              validator: rules.complexWeightValidator,
+              trigger: 'blur',
+            },
           ]"
         >
           <j-input-number
             v-model:value="basicFormData.complexWeight"
+            :min="1"
+            :max="99999"
             style="width: 100%"
           />
         </j-form-item>
@@ -76,11 +82,18 @@
               message: `请输入${item.label}权重`,
               trigger: 'blur',
             },
+            {
+              validator: rules.branchWeightValidator,
+              trigger: 'blur',
+            },
           ]"
           required
         >
           <j-input-number
             v-model:value="branchFormData[item.name]"
+            :min="1"
+            :max="99"
+            :precision="0"
             style="width: 100%"
           />
         </j-form-item>
@@ -90,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import { findNodeById, findBranchLastNode } from './utils'
+import { findNodeById, findBranchLastNode, sumValues } from './utils'
 import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
@@ -108,7 +121,7 @@ const basicFormRef = ref()
 const basicFormData = reactive({
   type: props.node?.props?.type || 'parallel',
   complexType: props.node?.props?.complexType || 'weight',
-  complexWeight: props.node?.props?.complexWeight || 1,
+  complexWeight: props.node?.props?.complexWeight || 2,
   inputNodeWeight: props.node?.props?.inputNodeWeight || {},
 })
 
@@ -117,6 +130,29 @@ const visible = ref(false)
 const branchFormRef = ref()
 const branchFormData = ref({})
 const branchFormItem = ref<any[]>([])
+
+// 校验规则
+const rules = {
+  // 通过权重验证
+  complexWeightValidator: (_: any, value: number) => {
+    // 分支权重之和
+    const branchTotal = sumValues(branchFormData.value)
+    if (value > branchTotal) {
+      return Promise.reject('通过权重不能大于所有分支的权重总和')
+    }
+    return Promise.resolve()
+  },
+  // 分支权重验证
+  branchWeightValidator: (_: any, value: number) => {
+    const branchTotal = sumValues(branchFormData.value)
+    if (branchTotal < basicFormData.complexWeight) {
+      return Promise.reject(
+        `所有分支的权重总和不能小于通过权重${basicFormData.complexWeight}`,
+      )
+    }
+    return Promise.resolve()
+  },
+}
 
 watch(
   () => flowStore.selectedNode.branches,
@@ -131,6 +167,14 @@ watch(
     })
   },
   { deep: true, immediate: true },
+)
+
+watch(
+  () => visible.value,
+  (val) => {
+    // 分支权重弹窗关闭, 触发基础配置表单验证
+    if (!val) basicFormRef.value.validate()
+  },
 )
 
 /**
