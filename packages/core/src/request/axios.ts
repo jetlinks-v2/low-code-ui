@@ -70,6 +70,7 @@ export class Axios {
   request(config: InternalAxiosRequestConfig) {
     this.mergeOptions()
     const token = getToken()
+    console.log('request', token, config.url)
     const filterUrl = this.options.filterUrl // 不需要token校验接口
     // 没有token，并且该接口需要token校验
     if (!token && !filterUrl?.some((url) => config.url?.includes(url))) {
@@ -167,7 +168,6 @@ export class Axios {
   }
 
   get<T = any>(url: string, params: any = undefined, ext?: any) {
-    console.log(ext)
     return this.axiosInstance<any, AxiosResponseRewrite<T>>({
       method: 'GET',
       url,

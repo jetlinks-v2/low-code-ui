@@ -11,6 +11,6 @@ export async function initStoreBus() {
     MenuStore: useMenuStore(),
     SystemStore: useSystemStore(),
     AuthStore: useAuthStore(),
-    Classified: useClassified()
+    // Classified: useClassified()
   })
 }
