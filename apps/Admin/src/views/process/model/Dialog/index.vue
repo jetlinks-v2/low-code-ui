@@ -38,7 +38,7 @@
         <a-select
           v-model:value="form.classifiedId"
           placeholder="请选择流程分类"
-          :options="classifiedStore.classified"
+          :options="classified"
           style="width: 320px"
         >
           <template #notFoundContent>
@@ -95,12 +95,15 @@
 
 <script setup lang="ts">
 import { onlyMessage, randomString } from '@jetlinks/utils'
-import { saveProcess_api, providerEnum } from '@/api/process/model'
+import { saveProcess_api } from '@/api/process/model'
 import { useRequest } from '@jetlinks/hooks'
-import { useClassified } from '@/store'
+import { useClassified } from '@/hooks/useClassified'
 
 type FormType = {
   key: string
+  name: string
+  classifiedId: string
+  icon: string
   model: string
   provider: string
 }
@@ -121,7 +124,7 @@ const emits = defineEmits<{
   (e: 'refresh'): void
 }>()
 
-const classifiedStore = useClassified()
+const { classified } = useClassified()
 const baseIcon = [
   'icon-shujumoni',
   'icon-tongzhiguanli',

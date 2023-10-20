@@ -24,7 +24,7 @@
       }"
     >
       <template #classifiedId="{ classifiedId }">
-        {{ classifiedStore.getText(classifiedId) }}
+        {{ getText(classifiedId) }}
       </template>
       <template #state="{ state }">
         <!-- <BadgeStatus
@@ -83,9 +83,9 @@
 import Drawer from './Drawer/index.vue'
 import { getList_api } from '@/api/process/monitor'
 import dayjs from 'dayjs'
-import { useClassified } from '@/store'
+import { useClassified } from '@/hooks/useClassified'
 
-const classifiedStore = useClassified()
+const { classified, getText } = useClassified()
 const history = ref(false)
 const columns = [
   {
@@ -99,7 +99,7 @@ const columns = [
       componentProps: {
         placeholder: '请选择流程分类',
       },
-      options: classifiedStore.classified,
+      options: classified,
     },
   },
   {

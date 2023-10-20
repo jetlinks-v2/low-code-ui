@@ -8,7 +8,6 @@ import generatorData from '../../utils/generatorData'
 import { uid } from '../../utils/uid'
 import componentMap from '../../utils/componentMap'
 import { queryOptions } from '../../utils/utils'
-import { useProduct } from '@/store'
 
 export default defineComponent({
     name: 'TableLayout',
@@ -66,7 +65,7 @@ export default defineComponent({
             return _path
         })
 
-        const data = ref<any[]>(get(designer.formState, __path.value) || [])
+        const data = ref<any[]>([])
 
         const handleAdd = () => {
             const _item = generatorData({
