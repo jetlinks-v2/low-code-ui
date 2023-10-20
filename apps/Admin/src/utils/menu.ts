@@ -10,6 +10,7 @@ type MenuItem = {
     url: string
     isShow?: boolean
     buttons?: Buttons
+    meta?: any
 }
 
 const hasAppID = (item: { appId?: string, url?: string }): { isApp: boolean, appUrl: string } => {
@@ -24,10 +25,11 @@ const handleButtons = (buttons?: Buttons) => {
 }
 
 const handleMeta = (item: MenuItem, isApp: boolean) => {
+    const meta = item.meta
     return {
         icon: item.icon,
-        title: item.name,
-        hideInMenu: item.isShow === false,
+        title: meta?.title || item.name,
+        hideInMenu: meta?.hideInMenu ?? item.isShow === false,
         buttons: handleButtons(item.buttons),
         isApp
     }
@@ -35,8 +37,9 @@ const handleMeta = (item: MenuItem, isApp: boolean) => {
 
 const findComponents = (code: string, level: number, isApp: boolean, components: any) => {
     const myComponents = components[code]
+  console.log(code)
     if (level === 1) { // BasicLayoutPage
-      return shallowRef(BasicLayoutPage)
+      return myComponents ? () => myComponents() : shallowRef(BasicLayoutPage)
     } else if (level === 2) { // BlankLayoutPage or components
       return myComponents ? () => myComponents() : BlankLayoutPage
     } else if (isApp){ // iframe
@@ -50,6 +53,7 @@ const findComponents = (code: string, level: number, isApp: boolean, components:
 
 const hasExtraChildren = (item: MenuItem, extraMenus: any ) => {
     const extraItem = extraMenus[item.code]
+
     if (extraItem) {
         return extraItem.map(e => ({
           ...e,
@@ -69,7 +73,7 @@ export const handleMenus = (menuData: any, extraMenus: any, components: any, lev
             const route: any = {
                 path: isApp ? appUrl : `${item.url}`,
                 name: isApp ? appUrl : item.code,
-                url: isApp ? appUrl : item.url,
+                // url: isApp ? appUrl : item.url,
                 meta: meta,
                 children: item.children
             }
@@ -116,7 +120,7 @@ const hideInMenu = (code: string) => {
 
 export const handleSiderMenu = (menuData: any) => {
   if (menuData && menuData.length) {
-    return menuData.map(item => {
+    return menuData.filter(item => !item.meta?.hideInMenu && !item.isShow).map(item => {
       const { isApp, appUrl } = hasAppID(item) // 是否为第三方程序
       const meta = handleMeta(item, isApp)
       const route: any = {
