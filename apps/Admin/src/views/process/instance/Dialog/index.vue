@@ -38,7 +38,7 @@
         <a-select
           v-model:value="form.classifiedId"
           placeholder="请选择流程分类"
-          :options="classifiedStore.classified"
+          :options="classified"
           style="width: 320px"
         >
           <template #notFoundContent>
@@ -78,8 +78,7 @@ import { onlyMessage } from '@jetlinks/utils'
 import ChooseIcon from './ChooseIcon.vue'
 import { copy_api } from '@/api/process/instance'
 import { useRequest } from '@jetlinks/hooks'
-import { providerEnum } from '@/api/process/model'
-import { useClassified } from '@/store'
+import { useClassified } from '@/hooks/useClassified'
 
 type FormType = {
   id: string
@@ -104,7 +103,7 @@ const emits = defineEmits<{
   (e: 'refresh'): void
 }>()
 
-const classifiedStore = useClassified()
+const { classified } = useClassified()
 const chooseIconRef = ref()
 const title = ref<string>('复制为模型')
 const showIcon = ref<boolean>(false)

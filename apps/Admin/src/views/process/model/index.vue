@@ -29,7 +29,7 @@
         <AIcon v-else :type="icon" :style="{ fontSize: '40px' }" />
       </template>
       <template #classifiedId="{ classifiedId }">
-        {{ classifiedStore.getText(classifiedId) }}
+        {{ getText(classifiedId) }}
       </template>
       <template #state="{ state }">
         <BadgeStatus
@@ -79,7 +79,7 @@
               <div class="title">
                 <div class="classification">
                   <j-ellipsis style="max-width: 200px">
-                    {{ classifiedStore.getText(record.classifiedId) }}
+                    {{ getText(record.classifiedId) }}
                   </j-ellipsis>
                 </div>
                 <div class="card-content">
@@ -148,12 +148,10 @@ import {
   getProcess_api,
   deploy_api,
   del_api,
-  providerEnum,
 } from '@/api/process/model'
-import { useRequest } from '@jetlinks/hooks'
-import { useClassified } from '@/store'
+import { useClassified } from '@/hooks/useClassified'
 
-const classifiedStore = useClassified()
+const { classified, getText } = useClassified()
 const router = useRouter()
 const tableRef = ref()
 const params = ref({})
@@ -188,7 +186,7 @@ const columns = [
       componentProps: {
         placeholder: '请选择流程分类',
       },
-      options: classifiedStore.classified,
+      options: classified,
     },
   },
   {
