@@ -1,6 +1,6 @@
 import Selection from '../Selection/index'
 import './index.less'
-import { FormItem } from 'jetlinks-ui-components'
+import { FormItem, Ellipsis } from 'jetlinks-ui-components'
 import { cloneDeep, get, isNumber, omit, set } from 'lodash-es'
 import componentMap from '../../utils/componentMap'
 import { useProps, useTool } from '../../hooks'
@@ -64,8 +64,8 @@ export default defineComponent({
 
         const onChange = (...arg) => {
             designer?.onChange?.()
-            if(isEditModel.value){
-                return 
+            if (isEditModel.value) {
+                return
             }
             const _this = {
                 getWidgetRef: (path) => {
@@ -129,7 +129,7 @@ export default defineComponent({
                 props.data?.componentProps.keys?.forEach((i: any) => {
                     const __path = _path.slice(0, _path.length - 1) || []
                     __path.push(i?.config?.source)
-                    if(get(designer.formState, __path)){
+                    if (get(designer.formState, __path)) {
                         obj[i?.key] = get(designer.formState, __path)
                     }
                 })
@@ -149,7 +149,7 @@ export default defineComponent({
 
             return (
                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                    <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true} extra={props.data?.componentProps?.description || ''}>
+                    <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true}>
                         {
                             unref(isEditModel) ? <TypeComponent
                                 model={unref(designer.model)}
@@ -183,6 +183,13 @@ export default defineComponent({
                             ></TypeComponent>
                         }
                     </FormItem>
+                    {props.data?.componentProps?.description &&
+                        <div class="form-designer-description">
+                            <div>
+                                <Ellipsis>{props.data?.componentProps?.description}</Ellipsis>
+                            </div>
+                        </div>
+                    }
                 </Selection>
             )
         }
