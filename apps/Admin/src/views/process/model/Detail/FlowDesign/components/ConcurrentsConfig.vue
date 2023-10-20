@@ -3,7 +3,7 @@
   <j-tabs v-model:activeKey="activeKey" type="card">
     <j-tab-pane key="basic" tab="基础配置">
       <j-form ref="basicFormRef" :model="basicFormData" layout="vertical">
-        <j-form-item name="type">
+        <j-form-item name="complexType">
           <template #label>
             请配置从并行分支进入下一个流程节点的条件
             <j-tooltip placement="right">
@@ -15,17 +15,17 @@
             </j-tooltip>
           </template>
           <j-radio-group
-            v-model:value="basicFormData.type"
+            v-model:value="basicFormData.complexType"
             button-style="solid"
           >
-            <j-radio-button value="parallel">全部分支完成</j-radio-button>
-            <j-radio-button value="complex">部分分支完成</j-radio-button>
+            <j-radio-button value="percent">全部分支完成</j-radio-button>
+            <j-radio-button value="weight">部分分支完成</j-radio-button>
           </j-radio-group>
         </j-form-item>
         <j-form-item
-          name="inputNodeWeight"
+          :name="['weight', 'inputNodeWeight']"
           label="请配置各分支的权重"
-          v-if="basicFormData.type === 'complex'"
+          v-if="basicFormData.complexType === 'weight'"
         >
           <j-button
             type="primary"
@@ -38,9 +38,9 @@
           </j-button>
         </j-form-item>
         <j-form-item
-          name="complexWeight"
+          :name="['weight', 'complexWeight']"
           label="请配置并行分支的通过权重"
-          v-if="basicFormData.type === 'complex'"
+          v-if="basicFormData.complexType === 'weight'"
           :rules="[
             {
               required: true,
@@ -54,7 +54,7 @@
           ]"
         >
           <j-input-number
-            v-model:value="basicFormData.complexWeight"
+            v-model:value="basicFormData.weight.complexWeight"
             :min="1"
             :max="99999"
             style="width: 100%"
@@ -119,10 +119,13 @@ const props = defineProps({
 // 基础配置
 const basicFormRef = ref()
 const basicFormData = reactive({
-  type: props.node?.props?.type || 'parallel',
-  complexType: props.node?.props?.complexType || 'weight',
-  complexWeight: props.node?.props?.complexWeight || 2,
-  inputNodeWeight: props.node?.props?.inputNodeWeight || {},
+  type: props.node?.props?.type || 'complex',
+  complexType: props.node?.props?.complexType || 'percent', // complexType: 'percent': 全部完成 | 'weight': 部分完成
+  complexPercent: props.node?.props?.complexPercent || 1, // 全部完成时才有的字段
+  weight: {
+    complexWeight: props.node?.props?.weight?.complexWeight || 2,
+    inputNodeWeight: props.node?.props?.weight?.inputNodeWeight || {},
+  },
 })
 
 // 分支权重配置
@@ -145,9 +148,9 @@ const rules = {
   // 分支权重验证
   branchWeightValidator: (_: any, value: number) => {
     const branchTotal = sumValues(branchFormData.value)
-    if (branchTotal < basicFormData.complexWeight) {
+    if (branchTotal < basicFormData.weight.complexWeight) {
       return Promise.reject(
-        `所有分支的权重总和不能小于通过权重${basicFormData.complexWeight}`,
+        `所有分支的权重总和不能小于通过权重${basicFormData.weight.complexWeight}`,
       )
     }
     return Promise.resolve()
@@ -159,7 +162,18 @@ watch(
   (val) => {
     val.forEach((item, index) => {
       const lastNode = findBranchLastNode(item)
-      branchFormData.value[lastNode.id] = 1
+
+      // 设置分支权重配置表单已存在的值
+      // 已经配置好的分支权重
+      const _inputNodeWeight = basicFormData.weight.inputNodeWeight
+      //  新增的并行分支, 默认权重为1
+      branchFormData.value[lastNode.id] = _inputNodeWeight.hasOwnProperty(
+        lastNode.id,
+      )
+        ? _inputNodeWeight[lastNode.id]
+        : 1
+
+      // 设置分支权重配置表单item项
       branchFormItem.value.push({
         name: lastNode.id,
         label: `分支${index + 1}权重`,
@@ -183,7 +197,7 @@ watch(
 const saveBranchWeight = () => {
   branchFormRef.value.validate().then((valid) => {
     Object.keys(valid).forEach((key: string) => {
-      basicFormData.inputNodeWeight[key] = valid[key]
+      basicFormData.weight.inputNodeWeight[key] = valid[key]
     })
     visible.value = false
   })
@@ -198,6 +212,18 @@ const saveConfigToPinia = () => {
       flowStore.model.nodes,
       flowStore.selectedNode.id,
     )
+
+    const { complexType } = basicFormData
+    if (complexType === 'weight') {
+      // 部分完成不需要 complexPercent 字段
+      delete basicFormData.complexPercent
+      delete result.props.complexPercent
+    } else {
+      // 全部完成不需要 weight 字段
+      // @ts-ignore
+      delete basicFormData.weight
+      delete result.props.weight
+    }
     result.props = { ...result.props, ...basicFormData }
     resolve(result)
     // basicFormRef.value
