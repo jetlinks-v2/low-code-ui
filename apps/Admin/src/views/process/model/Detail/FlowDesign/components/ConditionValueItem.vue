@@ -3,6 +3,7 @@
     v-if="normalSelectTypes.includes(conditionType)"
     v-model:value="myValue"
     :options="valueOptions"
+    @change="onChange"
   />
   <j-tree-select
     v-else-if="conditionType === 'org'"
@@ -16,6 +17,7 @@
     :tree-data="orgOptions"
     :field-names="{ label: 'name', value: 'id' }"
     :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+    @change="onChange"
   >
     <!-- :multiple="['eq', 'not'].includes(item.termsType as string) ? false : true" -->
     <template #title="{ name }">
