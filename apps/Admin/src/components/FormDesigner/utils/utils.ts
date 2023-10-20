@@ -2,7 +2,7 @@ import { uid } from "./uid"
 import componentMap from "./componentMap"
 import { ISchema } from "../typings"
 import { queryDictionary, queryDictionaryData, queryEndCommands, queryProject, queryRuntime } from "@/api/form"
-import { isObject, map, omit } from "lodash-es"
+import { flatten, isObject, map, omit } from "lodash-es"
 
 // 查询数据字典或者项目列表
 let _source = {
@@ -185,9 +185,33 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
         if (node?.formItemProps?.isLayout && !node.formItemProps?.label) {
             return obj
         }
+        if (['input', 'textarea', 'input-password', 'date-picker', 'time-picker'].includes(_type)) {
+            const ___item = (node?.formItemProps?.rules || []).find(item => {
+                return !item?.trigger?.length
+            })
+            if (___item) {
+                return obj
+            }
+        }
         if (['org', 'role', 'user', 'product', 'device'].includes(_type)) {
             if (!node.componentProps?.keys?.length) {
                 return obj
+            }
+            if (node?.componentProps?.mode !== 'multiple') {
+                const arr = getBrotherList(node?.key || '', allData)
+                const _keys = arr
+                    .filter((item) => {
+                        return item.key !== node.key && item.componentProps?.mode !== 'multiple'
+                    })
+                    .map((i) => {
+                        return i?.componentProps?.keys || []
+                    })
+                const flag = map(flatten(_keys), 'config.source')?.find((i) => {
+                    return map(node.componentProps?.keys || [], 'config.source')?.includes(i)
+                })
+                if (flag) {
+                    return obj
+                }
             }
         }
     }
@@ -521,7 +545,7 @@ export const getFieldData = (data: ISchema) => {
             if (data.componentProps?.mode === 'multiple') {
                 _obj[data?.formItemProps?.name] = obj
             } else {
-                data.componentProps.keys.map(i => {
+                (data.componentProps?.keys || []).map(i => {
                     _obj[i?.config?.source] = undefined
                 })
             }

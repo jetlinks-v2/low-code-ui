@@ -23,7 +23,7 @@ export const useSystemStore = defineStore('system', () => {
     collapsedWidth: 48,
     title: '物联网平台',
     logo: getImage('/login/logo.png'),
-    layout: 'mix'
+    layout: 'side'
   })
 
   /**

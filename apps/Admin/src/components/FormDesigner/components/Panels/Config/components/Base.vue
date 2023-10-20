@@ -88,12 +88,7 @@
           label="存储配置"
           :name="['componentProps', 'keys']"
           required
-          :rules="[
-            {
-              required: true,
-              message: '请配置存储配置',
-            },
-          ]"
+          :rules="storageRules"
           :validateFirst="true"
         >
           <Storage
@@ -354,7 +349,13 @@
             <j-select-option :value="'center'">中</j-select-option>
           </j-select>
         </j-form-item>
-        <template v-if="!['table-item-index', 'table-item-actions'].includes(target?.children?.[0]?.type)">
+        <template
+          v-if="
+            !['table-item-index', 'table-item-actions'].includes(
+              target?.children?.[0]?.type,
+            )
+          "
+        >
           <j-form-item
             :validateFirst="true"
             label="组件类型"
@@ -496,6 +497,7 @@ import generatorData from '@/components/FormDesigner/utils/generatorData'
 import { getBrotherList, updateData } from '../../../../utils/utils'
 import Storage from './Storage.vue'
 import { uid } from '@/components/FormDesigner/utils/uid'
+import { flatten, map } from 'lodash-es'
 
 const designer: any = inject('FormDesigner')
 
@@ -597,6 +599,41 @@ const rules = [
         .filter((item) => item.key !== target.value.key)
         .find((i) => i?.formItemProps?.name === value)
       if (flag) return Promise.reject(`标识${value}已被占用`)
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
+const storageRules = [
+  {
+    required: true,
+    message: '请配置存储配置',
+  },
+  {
+    validator(_rule: any, value: any[]) {
+      if (!value) return Promise.resolve()
+      if (!value?.length) return Promise.reject(`请配置存储配置`)
+      if (target.value.componentProps?.mode === 'multiple')
+        return Promise.resolve()
+      const arr = getBrotherList(
+        target.value.key,
+        designer.formData.value.children,
+      )
+      const _keys = arr
+        .filter((item) => {
+          return (
+            item.key !== target.value.key &&
+            item.componentProps?.mode !== 'multiple'
+          )
+        })
+        .map((i) => {
+          return i?.componentProps?.keys || []
+        })
+      const flag = map(flatten(_keys), 'config.source')?.find((i) => {
+        return map(value, 'config.source')?.includes(i)
+      })
+      if (flag) return Promise.reject(`标识${flag}已被占用`)
       return Promise.resolve()
     },
     trigger: 'change',

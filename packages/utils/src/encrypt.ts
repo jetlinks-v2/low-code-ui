@@ -5,3 +5,6 @@ export const encrypt =(txt:string,publicKey:string)=>{
     encryptor.setPublicKey(publicKey)
     return encryptor.encrypt(txt)
 }
+export {
+    JSEncrypt
+}
