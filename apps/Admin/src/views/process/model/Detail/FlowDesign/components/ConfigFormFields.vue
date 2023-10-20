@@ -179,7 +179,7 @@ const handleSearch = () => {
 const checkAll = ref(false)
 const handleAllCheck = () => {
   filterFormList.value?.forEach((item) => {
-    item.accessModes = checkAll.value ? ['read', 'write'] : []
+    item.accessModes = checkAll.value ? ['read', 'write'] : ['read']
     handleFormCheck(item)
   })
 }
@@ -191,6 +191,7 @@ const handleFormCheck = (form: any) => {
   const _fields = form.fullInfo.configuration?.children
   _fields?.forEach((p) => {
     p.accessModes = form.accessModes
+    p.componentProps.disabled = !p.accessModes.includes('write')
   })
 }
 
@@ -206,7 +207,7 @@ const handleFieldCheck = (field) => {
   field.componentProps.disabled = !field.accessModes.includes('write')
 }
 
-const tableData = ref([{}])
+const tableData = ref<any>([{}])
 const getTableColumns = (fields: any[]) => {
   //   console.log('getTableColumns: ', fields)
 
