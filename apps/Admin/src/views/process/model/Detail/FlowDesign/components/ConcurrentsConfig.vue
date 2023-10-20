@@ -116,7 +116,7 @@ const basicFormData = reactive({
 const visible = ref(false)
 const branchFormRef = ref()
 const branchFormData = ref({})
-const branchFormItem = ref([])
+const branchFormItem = ref<any[]>([])
 
 watch(
   () => flowStore.selectedNode.branches,

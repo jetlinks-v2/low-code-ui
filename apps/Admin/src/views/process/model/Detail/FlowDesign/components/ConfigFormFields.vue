@@ -129,7 +129,7 @@ const forms = computed({
 })
 
 const permissions = ref([
-  { label: '读', value: 'read' },
+  { label: '读', value: 'read', disabled: true },
   { label: '写', value: 'write' },
 ])
 
@@ -150,18 +150,18 @@ const getFormList = async () => {
         const _currentField = existFields.find(
           (f) => f.id === p.formItemProps.name,
         )
-        p['accessModes'] = _currentField ? _currentField.accessModes : []
+        p['accessModes'] = _currentField ? _currentField.accessModes : ['read']
         // 只有"写"权限时, 表单才可编辑
         p.componentProps.disabled = !p.accessModes.includes('write')
       })
-      return { accessModes: [], ...m }
+      return { accessModes: ['read'], ...m }
     } else {
       _fields?.forEach((p) => {
-        p['accessModes'] = []
+        p['accessModes'] = ['read']
         // 初始状态没有权限, 不可编辑
         p.componentProps.disabled = true
       })
-      return { accessModes: [], ...m }
+      return { accessModes: ['read'], ...m }
     }
   })
   //   所有表单数据
