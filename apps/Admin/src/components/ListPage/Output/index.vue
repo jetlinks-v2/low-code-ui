@@ -360,6 +360,7 @@ const actionsBtnFormat = (data: any, type: string) => {
         tooltip: {
           title: item?.title,
         },
+        hasPermission: route.params.sid ? `${route.params.sid}:${item.type === 'Delete' ? 'delete' : item?.key}` : true,
         popConfirm:
           item?.command === 'Delete' && item?.title !== '批量删除'
             ? {
