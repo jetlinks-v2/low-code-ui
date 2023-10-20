@@ -146,23 +146,29 @@ const saveBranchWeight = () => {
 }
 
 /**
- * 将数据保存至pinia
+ * 将数据保存至pinia, 不用校验数据
  */
 const saveConfigToPinia = () => {
   return new Promise((resolve, reject) => {
-    basicFormRef.value
-      .validate()
-      .then((valid) => {
-        const result = findNodeById(
-          flowStore.model.nodes,
-          flowStore.selectedNode.id,
-        )
-        result.props = { ...result.props, ...basicFormData }
-        resolve(valid)
-      })
-      .catch((err) => {
-        reject(err)
-      })
+    const result = findNodeById(
+      flowStore.model.nodes,
+      flowStore.selectedNode.id,
+    )
+    result.props = { ...result.props, ...basicFormData }
+    resolve(result)
+    // basicFormRef.value
+    //   .validate()
+    //   .then((valid) => {
+    //     const result = findNodeById(
+    //       flowStore.model.nodes,
+    //       flowStore.selectedNode.id,
+    //     )
+    //     result.props = { ...result.props, ...basicFormData }
+    //     resolve(valid)
+    //   })
+    //   .catch((err) => {
+    //     reject(err)
+    //   })
   })
 }
 defineExpose({

@@ -60,17 +60,20 @@ const nodeDel = (node) => {
   }
 }
 
-// const handleSubmit = () => {
-//   nodeConfigRef.value
-//     .saveConfig()
-//     .then((valid) => {
-//       console.log('handleSubmit valid: ', valid)
-//       showConfig.value = false
-//     })
-//     .catch((err) => {
-//       console.log('handleSubmit err: ', err)
-//     })
-// }
+/**
+ * 关闭抽屉, 保存数据
+ */
+const handleSubmit = () => {
+  nodeConfigRef.value
+    .saveConfig()
+    .then((valid) => {
+      console.log('handleSubmit valid: ', valid)
+      showConfig.value = false
+    })
+    .catch((err) => {
+      console.log('handleSubmit err: ', err)
+    })
+}
 
 /**
  * 下一步
@@ -81,6 +84,13 @@ const next = () => {
     resolve(true)
   })
 }
+
+watch(
+  () => showConfig.value,
+  (val) => {
+    if (!val) handleSubmit()
+  },
+)
 
 defineExpose({ next })
 </script>
