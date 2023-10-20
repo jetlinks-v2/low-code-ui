@@ -18,10 +18,12 @@
         >
           <template #renderItem="{ item }">
             <j-list-item>
-              <j-ellipsis line-clamp="1">
-                <AIcon type="CheckSquareFilled" style="font-size: 14px"></AIcon>
-                {{ item.name }}
-              </j-ellipsis>
+              <j-space>
+                <img :src="getImage(`/members/${item.type}.png`)" style="height: 16px;">
+                <j-ellipsis line-clamp="1">
+                  {{ item.name }}
+                </j-ellipsis>
+              </j-space>
             </j-list-item>
           </template>
         </j-list>

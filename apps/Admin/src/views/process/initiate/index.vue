@@ -6,9 +6,7 @@
         <j-row :gutter="[16, 16]">
           <j-col :span="24">
             <TitleComponent
-              :data="
-                classifiedStore.getText(key) ?? '流程分类已被删除，请重新添加'
-              "
+              :data="getText(key) ?? '流程分类已被删除，请重新添加'"
             />
           </j-col>
           <j-col :span="2" v-for="item of data[key]">
@@ -16,8 +14,8 @@
               <div class="icon">
                 <ProImage
                   v-if="item.icon?.includes('http')"
-                  :width="50"
-                  :height="50"
+                  :width="100"
+                  :height="100"
                   :src="item.icon"
                   :preview="false"
                 />
@@ -39,9 +37,9 @@
 <script setup>
 import { groupBy } from 'lodash-es'
 import { getList_api } from '@/api/process/initiate'
-import { useClassified } from '@/store'
+import { useClassified } from '@/hooks/useClassified'
 
-const classifiedStore = useClassified()
+const { getText } = useClassified()
 
 const router = useRouter()
 const data = reactive({})
@@ -77,7 +75,12 @@ const handleDetail = (data) => {
       justify-content: center;
       align-items: center;
       .icon {
+        width: 100px;
+        height: 100px;
+        overflow: hidden;
         // background: #036a8a;
+        border-radius: 4px;
+        border: 1px solid #000;
         font-size: 40px;
       }
     }
