@@ -388,7 +388,7 @@ onUnmounted(() => {
 // 校验
 const onValidate = async () => {
   return new Promise(async (resolve, reject) => {
-    const resp: any = await checkedConfig(unref(formData), getFormList.value)
+    const resp: any = await checkedConfig(product.info, unref(formData), getFormList.value)
     errorKey.value = resp
     if (errorKey.value?.length) {
       reject(errorKey.value)

@@ -379,7 +379,7 @@ const getProject = () => {
 }
 
 const getEnd = (id: string) => {
-  queryEndCommands(id, ['rdb-crud']).then((resp) => {
+  queryEndCommands(id, []).then((resp) => {
     if (resp.success) {
       end.value = resp.result || []
     }

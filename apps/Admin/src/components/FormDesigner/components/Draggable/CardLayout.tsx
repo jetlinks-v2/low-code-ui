@@ -1,6 +1,6 @@
 import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
-import { Card, FormItem } from 'jetlinks-ui-components'
+import { Card, FormItem, Ellipsis } from 'jetlinks-ui-components'
 import './index.less'
 import { cloneDeep, omit } from 'lodash-es'
 import { useTool } from '../../hooks'
@@ -99,15 +99,17 @@ export default defineComponent({
                 <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     {
                         unref(_isLayout) ?
-                            <FormItem {...unref(_formItemProps)} validateFirst={true} extra={props.data?.componentProps?.description || ''}>
+                            <FormItem {...unref(_formItemProps)} validateFirst={true}>
                                 {renderContent()}
                             </FormItem>
-                            : <>
-                                {renderContent()}
-                                <div class="form-designer-description">
-                                    {props.data?.componentProps?.description}
-                                </div>
-                            </>
+                            : renderContent()
+                    }
+                    {
+                        props.data?.componentProps?.description && <div class="form-designer-description">
+                            <div>
+                                <Ellipsis>{props.data?.componentProps?.description}</Ellipsis>
+                            </div>
+                        </div>
                     }
                 </Selection>
             )

@@ -1,7 +1,7 @@
 import { uid } from "./uid"
 import componentMap from "./componentMap"
 import { ISchema } from "../typings"
-import { queryDictionary, queryDictionaryData, queryEndCommands, queryProject, queryRuntime } from "@/api/form"
+import { queryDictionary, queryDictionaryData, queryEndCommand, queryEndCommands, queryProject, queryRuntime } from "@/api/form"
 import { cloneDeep, flatten, isObject, map, omit } from "lodash-es"
 
 // 查询数据字典或者项目列表
@@ -221,7 +221,7 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
 }
 
 // 后端能力
-const _valEndData = async (node: ISchema) => {
+const _valEndData = async (info: any, node: ISchema) => {
     if (node.componentProps?.source?.type === 'dic' && !_source.dictionary?.length) {
         const resp = await queryDictionary()
         if (resp.success) {
@@ -241,18 +241,23 @@ const _valEndData = async (node: ISchema) => {
         }
     }
     if (node.componentProps?.source?.projectId && !_commandsMap.get(node.componentProps?.source?.projectId)) {
-        const resp = await queryEndCommands(node.componentProps?.source?.projectId, ['rdb-crud'])
-        if (resp.success) {
-            _commandsMap.set(node.componentProps?.source?.projectId, resp.result || [])
+        let response: any = undefined
+        if(node.componentProps?.source?.projectId === info?.id){
+            response = await queryEndCommand(info?.draftId, [])
+        } else {
+            response = await queryEndCommands(node.componentProps?.source?.projectId, [])
+        }
+        if (response?.success) {
+            _commandsMap.set(node.componentProps?.source?.projectId, response.result || [])
         }
     }
 }
 
 const errorMap = new Map()
 // 校验配置项必填
-const checkConfig = async (node: ISchema, allData: any[], formList: any[]) => {
+const checkConfig = async (info: any, node: ISchema, allData: any[], formList: any[]) => {
     if (['select', 'tree-select', 'select-card'].includes(node.type)) {
-        await _valEndData(node)
+        await _valEndData(info, node)
     }
     const _data: any = checkedConfigItem(node, allData, formList, _source, _commandsMap);
     if (_data) {
@@ -261,12 +266,12 @@ const checkConfig = async (node: ISchema, allData: any[], formList: any[]) => {
     if (node.children && node.children?.length) {
         for (let index = 0; index < node?.children?.length; index++) {
             const element = node?.children[index];
-            await checkConfig(element, allData, formList)
+            await checkConfig(info, element, allData, formList)
         }
     }
 }
 
-export const checkedConfig = (node: ISchema, formList: any[]) => {
+export const checkedConfig = (info: any, node: ISchema, formList: any[]) => {
     _commandsMap.clear()
     errorMap.clear()
     _source = {
@@ -274,7 +279,7 @@ export const checkedConfig = (node: ISchema, formList: any[]) => {
         dictionary: []
     }
     return new Promise(async (resolve) => {
-        await checkConfig(node, node?.children || [], formList)
+        await checkConfig(info, node, node?.children || [], formList)
         resolve([...errorMap.values()])
     })
 }
