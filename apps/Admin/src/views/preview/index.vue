@@ -52,7 +52,7 @@ const getInfo = async () => {
   })
 }
 
-if (route.name === 'Preview') {
+if (route.name === 'preview') {
   getInfo()
 }
 

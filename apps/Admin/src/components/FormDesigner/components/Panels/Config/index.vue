@@ -150,6 +150,13 @@ watch(
 )
 
 watch(
+  () => target.value?.key,
+  () => {
+    visible.value = false
+  }
+)
+
+watch(
   () => target.value,
   (newVal) => {
     Object.assign(formState, newVal)

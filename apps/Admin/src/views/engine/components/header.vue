@@ -30,7 +30,7 @@ const router = useRouter()
 const route = useRoute()
 const onRelease = () => {
   router.replace({
-    name: 'Release',
+    name: 'release',
     params: {
       id: route.params.id
     }

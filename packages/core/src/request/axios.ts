@@ -167,7 +167,6 @@ export class Axios {
   }
 
   get<T = any>(url: string, params: any = undefined, ext?: any) {
-    console.log(ext)
     return this.axiosInstance<any, AxiosResponseRewrite<T>>({
       method: 'GET',
       url,

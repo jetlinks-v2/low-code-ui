@@ -1,8 +1,8 @@
 import { uid } from "./uid"
 import componentMap from "./componentMap"
 import { ISchema } from "../typings"
-import { queryDictionary, queryDictionaryData, queryEndCommands, queryProject, queryRuntime } from "@/api/form"
-import { flatten, isObject, map, omit } from "lodash-es"
+import { queryDictionary, queryDictionaryData, queryEndCommand, queryEndCommands, queryProject, queryRuntime } from "@/api/form"
+import { cloneDeep, flatten, isObject, map, omit } from "lodash-es"
 
 // 查询数据字典或者项目列表
 let _source = {
@@ -79,7 +79,8 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
             } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
                 return obj
             } else {
-                const arr = getBrotherList(node?.key || '', allData)
+                const _arr = cloneDeep(queryKeys(allData))
+                const arr = getBrotherList(node?.key || '', _arr)
                 const flag = arr.filter((item) => item.key !== node.key).find((i) => i?.formItemProps?.name === node?.formItemProps?.name)
                 if (flag) { // `标识${value}已被占用`
                     return obj
@@ -198,7 +199,8 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
                 return obj
             }
             if (node?.componentProps?.mode !== 'multiple') {
-                const arr = getBrotherList(node?.key || '', allData)
+                const _arr = cloneDeep(queryKeys(allData))
+                const arr = getBrotherList(node?.key || '', _arr)
                 const _keys = arr
                     .filter((item) => {
                         return item.key !== node.key && item.componentProps?.mode !== 'multiple'
@@ -219,7 +221,7 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
 }
 
 // 后端能力
-const _valEndData = async (node: ISchema) => {
+const _valEndData = async (info: any, node: ISchema) => {
     if (node.componentProps?.source?.type === 'dic' && !_source.dictionary?.length) {
         const resp = await queryDictionary()
         if (resp.success) {
@@ -239,18 +241,23 @@ const _valEndData = async (node: ISchema) => {
         }
     }
     if (node.componentProps?.source?.projectId && !_commandsMap.get(node.componentProps?.source?.projectId)) {
-        const resp = await queryEndCommands(node.componentProps?.source?.projectId, ['rdb-crud'])
-        if (resp.success) {
-            _commandsMap.set(node.componentProps?.source?.projectId, resp.result || [])
+        let response: any = undefined
+        if(node.componentProps?.source?.projectId === info?.id){
+            response = await queryEndCommand(info?.draftId, [])
+        } else {
+            response = await queryEndCommands(node.componentProps?.source?.projectId, [])
+        }
+        if (response?.success) {
+            _commandsMap.set(node.componentProps?.source?.projectId, response.result || [])
         }
     }
 }
 
 const errorMap = new Map()
 // 校验配置项必填
-const checkConfig = async (node: ISchema, allData: any[], formList: any[]) => {
+const checkConfig = async (info: any, node: ISchema, allData: any[], formList: any[]) => {
     if (['select', 'tree-select', 'select-card'].includes(node.type)) {
-        await _valEndData(node)
+        await _valEndData(info, node)
     }
     const _data: any = checkedConfigItem(node, allData, formList, _source, _commandsMap);
     if (_data) {
@@ -259,12 +266,12 @@ const checkConfig = async (node: ISchema, allData: any[], formList: any[]) => {
     if (node.children && node.children?.length) {
         for (let index = 0; index < node?.children?.length; index++) {
             const element = node?.children[index];
-            await checkConfig(element, allData, formList)
+            await checkConfig(info, element, allData, formList)
         }
     }
 }
 
-export const checkedConfig = (node: ISchema, formList: any[]) => {
+export const checkedConfig = (info: any, node: ISchema, formList: any[]) => {
     _commandsMap.clear()
     errorMap.clear()
     _source = {
@@ -272,7 +279,7 @@ export const checkedConfig = (node: ISchema, formList: any[]) => {
         dictionary: []
     }
     return new Promise(async (resolve) => {
-        await checkConfig(node, node?.children || [], formList)
+        await checkConfig(info, node, node?.children || [], formList)
         resolve([...errorMap.values()])
     })
 }
@@ -356,6 +363,27 @@ export const insertCustomCssToHead = (cssCode: string, formId: string, attrKey: 
     head.appendChild(newStyle)
 }
 
+export const queryKeys = (arr: any[]) => {
+    if (Array.isArray(arr) && arr?.length) {
+        let _arr: any[] = []
+        cloneDeep(arr).map(item => {
+            const child = item?.children || []
+            const _children = queryKeys(child)
+            if (item?.formItemProps?.name) {
+                const dt = {
+                    ...item,
+                    children: _children
+                }
+                _arr.push(dt)
+            } else {
+                _arr = [..._arr, ..._children]
+            }
+        })
+        return _arr
+    }
+    return []
+}
+
 // 查询数据
 export const getBrotherList = (value: string | number, arr: any[]) => {
     if (Array.isArray(arr) && arr?.length) {
@@ -363,12 +391,12 @@ export const getBrotherList = (value: string | number, arr: any[]) => {
             const element = arr[index];
             if (element.key === value) {
                 return arr
-            }
-            if (element?.children?.length) {
+            }else if (element?.children?.length) {
                 return getBrotherList(value, element?.children)
             }
         }
     }
+
     return []
 }
 
@@ -538,7 +566,7 @@ export const getFieldData = (data: ISchema) => {
     let _obj: any = {}
     if (data?.formItemProps?.name) {
         if (data.type === 'table') {
-            _obj[data?.formItemProps?.name] = [omit(obj, ['actions', 'index'])]
+            _obj[data?.formItemProps?.name] = [obj]
         } else if (data.type === 'switch') {
             _obj[data?.formItemProps?.name] = obj || false
         } else if (['org', 'role', 'user', 'product', 'device'].includes(data.type)) {

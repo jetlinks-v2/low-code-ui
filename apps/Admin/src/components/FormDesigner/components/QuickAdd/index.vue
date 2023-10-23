@@ -121,7 +121,7 @@
   <script lang="ts" setup>
 import { ref, reactive, computed, inject, unref, watch } from 'vue'
 import Editor from '@/components/EditorModal'
-import { queryEndCommands } from '@/api/form'
+import { queryEndCommand } from '@/api/form'
 import { useProduct } from '@/store'
 import { onlyMessage } from '@jetlinks/utils'
 import { providerEnum } from '@/components/ProJect'
@@ -163,7 +163,7 @@ const end = ref<any[]>([])
 
 const getEnd = () => {
   const id = product.info?.draftId
-  queryEndCommands(id, []).then((resp) => {
+  queryEndCommand(id, []).then((resp) => {
     if (resp.success) {
       const _map = product.getDataMap()
       end.value = (resp.result || []).map((item) => {
