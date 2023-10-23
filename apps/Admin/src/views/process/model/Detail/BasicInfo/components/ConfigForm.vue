@@ -7,89 +7,81 @@
         <img :src="getImage('/members/check.png')" />
       </span>
     </j-button>
-    <!-- <ul>
-      <li v-for="(item, index) of selectedRow" :key="index">
-        {{ item.formName || '-' }}
-      </li>
-    </ul> -->
-    <!-- 列表 -->
-    <j-scrollbar max-height="172px">
-      <j-list
-        v-show="selectedRow.length"
-        :grid="{ gutter: 8, column: 3 }"
-        :data-source="selectedRow"
-        size="small"
-        :split="false"
-      >
-        <template #renderItem="{ item }">
-          <j-list-item>
-            <j-space>
-              <img
-                :src="
-                  getImage(
-                    `/flow-designer/${item.multiple ? 'list' : 'form'}.png`,
-                  )
-                "
-                style="height: 16px"
-              />
-              <j-ellipsis line-clamp="1">
-                {{ item.formName }}
-              </j-ellipsis>
-            </j-space>
-          </j-list-item>
-        </template>
-      </j-list>
-    </j-scrollbar>
-    <j-drawer
-      v-model:visible="visible"
-      class="custom-class"
-      title="表单配置"
-      :closable="false"
-      placement="right"
-      width="50%"
-      :contentWrapperStyle="{
-        // width: 'auto',
-        minWidth: '50%',
-        maxWidth: '66.6%',
-      }"
-      :footerStyle="{ textAlign: 'right' }"
-    >
-      <j-row :gutter="[16, 16]">
-        <j-col :span="24">
-          <div>选择多个流程表单时将以流程表单名称隔开拼接整合为新表单</div>
-        </j-col>
-        <j-col :span="12">
+    <!-- 已选表单 -->
+    <div class="selected-form">
+      <j-scrollbar max-height="172px">
+        <j-list
+          v-show="selectedRow.length"
+          :grid="{ gutter: 8, column: 3 }"
+          :data-source="selectedRow"
+          size="small"
+          :split="false"
+        >
+          <template #renderItem="{ item }">
+            <j-list-item>
+              <j-space>
+                <img
+                  :src="
+                    getImage(
+                      `/flow-designer/${item.multiple ? 'list' : 'form'}.png`,
+                    )
+                  "
+                  style="height: 16px"
+                />
+                <j-ellipsis line-clamp="1">
+                  {{ item.formName }}
+                </j-ellipsis>
+              </j-space>
+            </j-list-item>
+          </template>
+        </j-list>
+      </j-scrollbar>
+    </div>
+  </div>
+  <j-drawer
+    v-model:visible="visible"
+    class="custom-class"
+    title="表单配置"
+    :closable="false"
+    placement="right"
+    width="50%"
+    :contentWrapperStyle="{
+      // width: 'auto',
+      minWidth: '50%',
+      maxWidth: '66.6%',
+    }"
+    :footerStyle="{ textAlign: 'right' }"
+  >
+    <div class="drawer-box">
+      <div class="header">
+        选择多个流程表单时将以流程表单名称隔开拼接整合为新表单
+      </div>
+      <div class="content">
+        <div class="left">
           <j-input-search
             v-model:value="searchText"
             placeholder="搜索流程表单名称"
             @search="onSearch"
           />
-          <JProTable
-            ref="tableRef"
-            model="list"
-            size="small"
-            :showHeader="false"
-            :columns="columns"
-            :params="params"
-            :request="queryForm_api"
-            :gridColumn="3"
-            :defaultParams="{
-              sorts: [{ name: 'createTime', order: 'desc' }],
-            }"
-          >
-            <template #name="slotProps">
+          <!-- 表单列表 -->
+          <j-scrollbar max-height="700">
+            <div class="form-list">
               <div
-                style="padding: 10px"
-                :class="{ active: isActive(slotProps.id) }"
-                @click="onSelectChange(slotProps)"
+                class="form-list-item"
+                :class="{ active: isActive(item.key) }"
+                v-for="(item, index) in formList"
+                :key="index"
+                @click="onSelectChange(item)"
               >
-                {{ slotProps.name }}
+                <j-ellipsis line-clamp="1">
+                  {{ item.name }}
+                </j-ellipsis>
               </div>
-            </template>
-          </JProTable>
-        </j-col>
-        <j-col :span="12">
-          <div>请配置表单展示样式</div>
+            </div>
+          </j-scrollbar>
+        </div>
+        <div class="right">
+          <h3>请配置表单展示样式</h3>
           <draggable
             v-model="selectedRow"
             handle=".sort"
@@ -98,7 +90,7 @@
             chosen-class="chosen-class"
             @start="drag = true"
             @end="drag = false"
-            item-key="id"
+            item-key="key"
           >
             <template #item="{ element }">
               <div>
@@ -134,15 +126,15 @@
               </div>
             </template>
           </draggable>
-        </j-col>
-      </j-row>
-    </j-drawer>
-  </div>
+        </div>
+      </div>
+    </div>
+  </j-drawer>
 </template>
 <script setup lang="ts">
 import { onlyMessage } from '@jetlinks/utils'
 import draggable from 'vuedraggable'
-import { queryForm_api } from '@/api/process/model'
+import { queryFormNoPage_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { getImage } from '@jetlinks/utils'
 
@@ -161,37 +153,43 @@ const visible = ref(false)
 const searchText = ref('')
 // 选中项
 const selectedRow = ref<any>([])
+// 表单列表
+const formList = ref<any>([])
 // 是否选中
 const isActive = computed(() => (key) => {
-  console.log('key: ', key)
-  console.log('selectedRow.value: ', selectedRow.value)
   return selectedRow.value?.map((i) => i.formId).includes(key)
 })
 
-const params = ref<any>({})
-const columns = [
-  {
-    title: '流程名称',
-    dataIndex: 'name',
-    key: 'name',
-    ellipsis: true,
-    scopedSlots: true,
-  },
-]
+const params = ref<any>({
+  paging: false,
+  terms: [
+    {
+      value: 'true',
+      termType: 'eq',
+      column: 'latest',
+    },
+  ],
+})
+
+/**
+ * 获取表单不分页列表
+ */
+const getFormList = async () => {
+  const { result } = await queryFormNoPage_api(params.value)
+  formList.value = result
+}
+
 /**
  * 搜索
  */
 const onSearch = (searchValue: string) => {
-  params.value = {
-    terms: [
-      {
-        type: 'or',
-        value: `%${searchValue}%`,
-        termType: 'like',
-        column: 'name',
-      },
-    ],
-  }
+  params.value.terms.push({
+    type: 'or',
+    value: `%${searchValue}%`,
+    termType: 'like',
+    column: 'name',
+  })
+  getFormList()
 }
 
 /**
@@ -206,10 +204,10 @@ const onSelectChange = (row: any) => {
     )
   } else {
     // 如果已经存在, 则不做操作
-    if (selectedRow.value.some((item: any) => item.formId === row.id)) return
+    if (selectedRow.value.some((item: any) => item.formId === row.key)) return
     // row没有formId字段, 则表示左侧表格选中
     selectedRow.value.push({
-      formId: row.id,
+      formId: row.key,
       formName: row.name,
       multiple: false,
       // 表单完整信息: 仅供前端使用
@@ -241,6 +239,7 @@ watch(
   () => visible.value,
   (val) => {
     if (!val) submit()
+    else getFormList()
   },
   { deep: true },
 )
@@ -250,10 +249,6 @@ watch(
   padding: 0 0 5px 0 !important;
 }
 
-.active {
-  background: #e5ebff;
-  color: #315efb;
-}
 .chosen-class {
   background-color: #eee;
   opacity: 1;
@@ -275,13 +270,60 @@ watch(
     }
   }
 
-  :deep(.ant-list) {
-    overflow: hidden;
-    .ant-list-item {
-      height: 40px;
-      line-height: 40px;
-      border-radius: 4px;
-      background: #f6f7f9;
+  .selected-form {
+    :deep(.ant-list) {
+      overflow: hidden;
+      .ant-list-item {
+        height: 40px;
+        line-height: 40px;
+        border-radius: 4px;
+        background: #f6f7f9;
+      }
+    }
+  }
+}
+
+.drawer-box {
+  .header {
+    margin-bottom: 10px;
+  }
+  .content {
+    display: flex;
+    justify-content: space-between;
+    // padding: 28px 15px;
+    border: 1px solid #e0e0e0;
+    .left {
+      flex: 1;
+      position: relative;
+      padding: 15px;
+      &::after {
+        content: '';
+        height: 100%;
+        width: 1px;
+        background: #e0e0e0;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+      .form-list {
+        .form-list-item {
+          height: 40px;
+          line-height: 40px;
+          border-radius: 4px;
+          background: #f6f7f9;
+          margin-top: 8px;
+          padding-left: 8px;
+          cursor: pointer;
+          &.active {
+            background: #e5ebff;
+            color: #315efb;
+          }
+        }
+      }
+    }
+    .right {
+      flex: 1;
+      padding: 15px;
     }
   }
 }
