@@ -243,6 +243,7 @@ const handleOk = () => {
     })
   })
   visible.value = false
+  //   console.log('forms.value: ', forms.value);
 }
 
 watch(
@@ -259,7 +260,7 @@ watch(
         (field) => field.accessModes,
       )
       // 当表单下, 每个字段都有"写"权限时, 对应表单也勾选"写"
-      form.accessModes = fieldAccessModes.every((e) => e.includes('write'))
+      form.accessModes = fieldAccessModes?.every((e) => e.includes('write'))
         ? ['read', 'write']
         : ['read']
     })
