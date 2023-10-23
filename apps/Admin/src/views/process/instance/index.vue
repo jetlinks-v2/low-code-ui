@@ -7,28 +7,43 @@
       :columns="columns"
       :params="params"
       :request="getList_api"
-      :gridColumn="3"
+      :gridColumn="2"
       :defaultParams="{
         sorts: [{ name: 'createTime', order: 'desc' }],
       }"
     >
+      <template #icon="{ icon }">
+        <ProImage
+          v-if="icon?.includes('http')"
+          :width="50"
+          :height="50"
+          :src="icon"
+          :preview="false"
+        />
+        <AIcon v-else :type="icon" :style="{ fontSize: '40px' }" />
+      </template>
+      <template #classifiedId="{ classifiedId }">
+        {{ getText(classifiedId) }}
+      </template>
       <template #state="{ state }">
         <BadgeStatus
           :status="state.value"
           :text="state.text"
           :statusNames="{
             disabled: 'error',
-            enabled: 'success',
+            enabled: 'processing',
           }"
         />
       </template>
-
+      <template #createTime="{ createTime }">
+        {{ dayjs(createTime).format('YYYY-MM-DD HH:mm:ss') }}
+      </template>
       <template #action="slotProps">
         <div class="table-action">
           <PermissionButton
             type="link"
             v-for="item of getActions(slotProps, 'table')"
-            v-bind:="handleFunction(item.permissionProps, slotProps)"
+            v-bind="handleFunction(item.permissionProps, slotProps)"
             :danger="item.key === 'delete'"
           >
             <template #icon v-if="item.icon || item.key === 'delete'">
@@ -48,24 +63,57 @@
           :statusText="record.state.text"
           :statusNames="{
             disabled: 'error',
-            enabled: 'success',
+            enabled: 'processing',
           }"
           @click="_view(record)"
         >
           <template #content>
             <div class="card-item">
               <div class="title">
-                <j-ellipsis style="max-width: 200px">
-                  流程分类：{{ record.name }}
-                </j-ellipsis>
-                <div class="title-icon">
+                <div class="classification">
+                  <j-ellipsis style="max-width: 200px">
+                    {{ getText(record.classifiedId) }}
+                  </j-ellipsis>
+                </div>
+                <div class="card-content">
                   <!-- 流程图标 -->
-                  {{ record.icon }}
-                  <AIcon :type="record.icon ? record.icon : 'DeleteOutlined'" />
+                  <j-space :size="24" align="center">
+                    <ProImage
+                      v-if="record.icon?.includes('http')"
+                      :width="64"
+                      :height="64"
+                      :src="record.icon"
+                      :preview="false"
+                    />
+                    <AIcon
+                      v-else
+                      :type="record.icon"
+                      :style="{ fontSize: '40px' }"
+                    />
+                    <div>
+                      <div class="name">{{ record.name }}</div>
+                      <div class="other">
+                        <j-ellipsis style="width: 200px">
+                          <span class="text">部署人：</span>
+                          <span class="value">{{ record.creatorName }}</span>
+                        </j-ellipsis>
+                        <div>
+                          <span class="text"> 部署时间： </span>
+                          <span class="value">
+                            {{
+                              dayjs(record.createTime).format(
+                                'YYYY-MM-DD HH:mm:ss',
+                              )
+                            }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </j-space>
                 </div>
               </div>
-              <div style="display: flex">
-                <span>部署人</span>
+              <!-- <div style="display: flex">
+                <span>部署人：</span>
                 <j-ellipsis style="width: 200px">
                   {{ record.creatorName }}
                 </j-ellipsis>
@@ -74,7 +122,7 @@
                 部署时间：{{
                   dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss')
                 }}
-              </div>
+              </div> -->
             </div>
           </template>
         </Card>
@@ -91,6 +139,12 @@
       v-model:visible="drawer.visible"
       :data="drawer.selectItem"
     />
+    <PermissionDialog
+      v-if="permission.visible"
+      v-model:visible="permission.visible"
+      :data="permission.selectItem"
+      @refresh="refresh"
+    />
   </page-container>
 </template>
 <script setup>
@@ -98,10 +152,12 @@ import { onlyMessage } from '@jetlinks/utils'
 import dayjs from 'dayjs'
 import Dialog from './Dialog/index.vue'
 import Drawer from '../components/Drawer/index.vue'
+import PermissionDialog from './PermissionDialog/index.vue'
 import { isFunction, isObject } from 'lodash-es'
-import { getList_api, del_api } from '@/api/process/instance'
-import { saveProcess_api } from '@/api/process/model'
+import { getList_api, del_api, updateState_api } from '@/api/process/instance'
+import { useClassified } from '@/hooks/useClassified'
 
+const { classified, getText } = useClassified()
 const tableRef = ref()
 const columns = [
   {
@@ -109,6 +165,7 @@ const columns = [
     dataIndex: 'icon',
     key: 'icon',
     ellipsis: true,
+    scopedSlots: true,
   },
   {
     title: '流程名称',
@@ -124,26 +181,16 @@ const columns = [
   },
   {
     title: '流程分类',
-    dataIndex: 'provider',
-    key: 'provider',
+    dataIndex: 'classifiedId',
+    key: 'classifiedId',
     ellipsis: true,
+    scopedSlots: true,
     search: {
-      type: 'string',
+      type: 'select',
       componentProps: {
-        placeholder: '请输入流程分类',
+        placeholder: '请选择流程分类',
       },
-    },
-  },
-  {
-    title: '版本号',
-    dataIndex: 'version',
-    key: 'version',
-    ellipsis: true,
-    search: {
-      type: 'string',
-      componentProps: {
-        placeholder: '请输入版本号',
-      },
+      options: classified,
     },
   },
   {
@@ -166,9 +213,27 @@ const columns = [
     key: 'creatorName',
     ellipsis: true,
     search: {
-      type: 'string',
+      type: 'select',
+      rename: 'creatorId',
       componentProps: {
-        placeholder: '请输入部署人',
+        placeholder: '请选择部署人',
+      },
+      options: async () => {
+        const resp = await getList_api({
+          paging: false,
+          sorts: [{ name: 'createTime', order: 'desc' }],
+        })
+        const listMap = new Map()
+        if (resp.success) {
+          resp.result.data.forEach((item) => {
+            listMap.set(item.creatorId, {
+              label: item.creatorName,
+              value: item.creatorId,
+            })
+          })
+          return [...listMap.values()]
+        }
+        return []
       },
     },
   },
@@ -177,6 +242,7 @@ const columns = [
     dataIndex: 'createTime',
     key: 'createTime',
     ellipsis: true,
+    scopedSlots: true,
     search: {
       type: 'date',
     },
@@ -197,6 +263,12 @@ const dialog = reactive({
 
 // 抽屉
 const drawer = reactive({
+  selectItem: {},
+  visible: false,
+})
+
+// 权限控制
+const permission = reactive({
   selectItem: {},
   visible: false,
 })
@@ -232,8 +304,8 @@ const getActions = (record, type = 'card') => {
         popConfirm: {
           title: `确认${record.state?.value !== 'disabled' ? '禁用' : '启用'}`,
           onConfirm: () => {
-            saveProcess_api({
-              ...data,
+            updateState_api({
+              id: data.id,
               state:
                 record.state?.value !== 'disabled' ? 'disabled' : 'enabled',
             }).then((res) => {
@@ -249,12 +321,29 @@ const getActions = (record, type = 'card') => {
       }),
     },
     {
+      key: 'permission',
+      text: '权限控制',
+      icon: 'TeamOutlined',
+      permissionProps: (data) => ({
+        tooltip: {
+          title: '权限控制',
+        },
+        hasPermission: false,
+        onClick: () => {
+          permission.selectItem = { ...data }
+          permission.visible = true
+        },
+      }),
+    },
+    {
       key: 'delete',
       text: '删除',
       icon: 'DeleteOutlined',
       permissionProps: (data) => ({
+        // 实例下有发起过的流程时，删除按钮置灰
+        disabled: record.state?.value !== 'disabled',
         tooltip: {
-          title: '删除',
+          title: record.state?.value !== 'disabled' ? '请先禁用再删除' : '删除',
         },
         hasPermission: false,
         popConfirm: {
@@ -339,5 +428,34 @@ const refresh = () => {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+.card-item {
+  .classification {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 20px;
+    color: #0a1b30;
+    height: 44px;
+  }
+  .card-content {
+    height: 64px;
+    .name {
+      margin-bottom: 16px;
+      font-size: 16px;
+      line-height: 16px;
+      font-weight: 500;
+      color: #333333;
+    }
+    .other {
+      display: inline-flex;
+
+      .text {
+        color: rgba(10, 27, 48, 0.6);
+      }
+      .value {
+        color: rgba(10, 27, 48, 0.4);
+      }
+    }
+  }
 }
 </style>

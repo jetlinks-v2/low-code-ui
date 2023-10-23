@@ -61,7 +61,6 @@ import {
   getProduct_api,
   getDevice_api,
 } from '@/api/process/model'
-
 type Emits = {
   (e: 'update:modelValue', data: string | number | boolean): void
 }

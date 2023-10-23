@@ -15,7 +15,7 @@ export const _delete = (id: string) => request.remove(`/process/form/${id}`);
  * @param id 设备id
  * @returns 
  */
-export const isExists = (id: string) => request.get(`/process/form/${id}/exists`)
+export const isExists = (id: string) => request.get(`/process/form/_exists?where=id is ${id}`)
 
 export const _detail = (id: string) => request.get(`/process/form/${id}`);
 

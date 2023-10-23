@@ -273,6 +273,9 @@ const onConfig = (_val: string) => {
   if (!projectList.value?.length) {
     getProject()
   }
+  if(config.value?.config?.projectId){
+    getEnd(config.value?.config?.projectId)
+  }
 }
 
 const handleOk = async () => {
@@ -376,7 +379,7 @@ const getProject = () => {
 }
 
 const getEnd = (id: string) => {
-  queryEndCommands(id, ['rdb-crud']).then((resp) => {
+  queryEndCommands(id, []).then((resp) => {
     if (resp.success) {
       end.value = resp.result || []
     }

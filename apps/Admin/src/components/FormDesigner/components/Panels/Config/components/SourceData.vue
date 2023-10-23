@@ -165,7 +165,10 @@
 import { watch, computed, reactive, ref } from 'vue'
 import { cloneDeep } from 'lodash-es'
 import { getArray, searchTree } from '@/components/FormDesigner/utils/utils'
-import { queryDictionary, queryEndCommands, queryProject } from '@/api/form'
+import { queryDictionary, queryEndCommand, queryEndCommands, queryProject } from '@/api/form'
+import { useProduct } from '@/store'
+
+const product = useProduct()
 
 const projectList = ref<any[]>([])
 const dic = ref<any[]>([])
@@ -313,11 +316,19 @@ const getDictionary = () => {
 }
 
 const getEnd = (id: string) => {
-  queryEndCommands(id, ['rdb-crud']).then((resp) => {
-    if (resp.success) {
-      end.value = resp.result || []
-    }
-  })
+  if (id === product.info?.id) {
+    queryEndCommand(product.info?.draftId, []).then((resp) => {
+      if (resp.success) {
+        end.value = resp.result || []
+      }
+    })
+  } else {
+    queryEndCommands(id, []).then((resp) => {
+      if (resp.success) {
+        end.value = resp.result || []
+      }
+    })
+  }
 }
 
 const onRadioChange = (e) => {

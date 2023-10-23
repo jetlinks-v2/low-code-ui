@@ -41,8 +41,8 @@ const Canvas = defineComponent({
       () => [keys?.['Ctrl+C']?.value, keys?.['Meta+C']?.value],
       ([v1, v2]) => {
         designer._other.value = v1 || v2
-        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
-          designer.onCopy()
+        if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
+          designer?.onCopy?.()
         }
       },
     )
@@ -51,8 +51,8 @@ const Canvas = defineComponent({
       () => [keys?.['Ctrl+X']?.value, keys?.['Meta+X']?.value],
       ([v1, v2]) => {
         designer._other.value = v1 || v2
-        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
-          designer.onShear()
+        if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
+          designer?.onShear?.()
         }
       },
     )
@@ -61,8 +61,8 @@ const Canvas = defineComponent({
       () => [keys?.['Ctrl+V']?.value, keys?.['Meta+V']?.value],
       ([v1, v2]) => {
         designer._other.value = v1 || v2
-        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
-          designer.onPaste()
+        if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
+          designer?.onPaste?.()
         }
       },
     )
@@ -73,8 +73,8 @@ const Canvas = defineComponent({
       ([v1, v2]) => {
         designer._other.value = v1 || v2
         if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
-          if (!designer.delVisible.value) {
-            designer.onDelete()
+          if (!designer?.delVisible?.value) {
+            designer?.onDelete?.()
           }
         }
       },
@@ -90,7 +90,7 @@ const Canvas = defineComponent({
     })
 
     const onPaste = () => {
-      designer.onPaste()
+      designer?.onPaste?.()
     }
 
     watchEffect(() => {

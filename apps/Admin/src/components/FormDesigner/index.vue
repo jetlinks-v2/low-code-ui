@@ -364,11 +364,15 @@ watch(
 watch(
   () => props.data,
   (newVal) => {
-    try {
-      const obj = JSON.parse(newVal?.configuration?.code)
-      formData.value = Object.keys(obj).length ? obj : cloneDeep(initData)
-    } catch (error) {
-      formData.value = cloneDeep(initData)
+    if(props.type === 'workflow') {
+      formData.value = newVal || cloneDeep(initData)
+    } else {
+        try {
+        const obj = JSON.parse(newVal?.configuration?.code)
+        formData.value = Object.keys(obj).length ? obj : cloneDeep(initData)
+      } catch (error) {
+        formData.value = cloneDeep(initData)
+      }
     }
   },
   {
@@ -384,7 +388,7 @@ onUnmounted(() => {
 // 校验
 const onValidate = async () => {
   return new Promise(async (resolve, reject) => {
-    const resp: any = await checkedConfig(unref(formData), getFormList.value)
+    const resp: any = await checkedConfig(product.info, unref(formData), getFormList.value)
     errorKey.value = resp
     if (errorKey.value?.length) {
       reject(errorKey.value)
@@ -410,7 +414,9 @@ defineExpose({ onSave, validate: onValidate })
 
 <style lang="less" scoped>
 .container {
-  height: calc(100vh - 132px);
+  // height: calc(100vh - 132px);
+  height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

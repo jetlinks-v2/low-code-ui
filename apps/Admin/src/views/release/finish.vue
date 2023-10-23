@@ -36,6 +36,7 @@ import { saveMenu } from '@/api/menu'
 import { useIntervalFn } from '@vueuse/core'
 import { useNetwork } from '@jetlinks/hooks'
 import { useProduct } from '@/store'
+import { updateButtons } from '@/components/Menu'
 
 const props = defineProps({
   tree: {
@@ -127,9 +128,24 @@ const themeChange = () =>{
 //     return item
 //   })
 // }
+
+const getTree = () => {
+  const maps = product.getDataMap()
+  const copyData = JSON.parse(JSON.stringify([...maps.values()]))
+
+  return copyData.filter(item => {
+    return item.others && item.others?.menu && item.others?.menu.main
+  }).map(item => {
+    item.parentFullId = maps.get(item.parentId).fullId || item.parentId
+    return item
+  })
+}
 const saveMenuFn = (id) => {
   count = 90
-  saveMenu(props.tree).then(resp => {
+  const sourceTree = getTree()
+  const _tree = updateButtons(sourceTree, props.tree)
+  console.log(_tree)
+  saveMenu(_tree).then(resp => {
     width.value = 100
     count = 100
     loading.value = true

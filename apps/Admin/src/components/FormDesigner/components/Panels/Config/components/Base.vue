@@ -88,12 +88,7 @@
           label="存储配置"
           :name="['componentProps', 'keys']"
           required
-          :rules="[
-            {
-              required: true,
-              message: '请配置存储配置',
-            },
-          ]"
+          :rules="storageRules"
           :validateFirst="true"
         >
           <Storage
@@ -354,7 +349,13 @@
             <j-select-option :value="'center'">中</j-select-option>
           </j-select>
         </j-form-item>
-        <template v-if="!['table-item-index', 'table-item-actions'].includes(target?.children?.[0]?.type)">
+        <template
+          v-if="
+            !['table-item-index', 'table-item-actions'].includes(
+              target?.children?.[0]?.type,
+            )
+          "
+        >
           <j-form-item
             :validateFirst="true"
             label="组件类型"
@@ -493,9 +494,10 @@ import { computed, inject, unref } from 'vue'
 import { useTarget } from '../../../../hooks'
 import { basic } from '@/components/FormDesigner/utils/defaultData'
 import generatorData from '@/components/FormDesigner/utils/generatorData'
-import { getBrotherList, updateData } from '../../../../utils/utils'
+import { getBrotherList, queryKeys, updateData } from '../../../../utils/utils'
 import Storage from './Storage.vue'
 import { uid } from '@/components/FormDesigner/utils/uid'
+import { cloneDeep, flatten, map } from 'lodash-es'
 
 const designer: any = inject('FormDesigner')
 
@@ -587,16 +589,50 @@ const rules = [
     message: '标识只能由数字、字母、下划线、中划线组成',
   },
   {
-    validator(_rule: any, value: string) {
+    validator(_: any, value: string) {
       if (!value) return Promise.resolve()
-      const arr = getBrotherList(
-        target.value.key,
-        designer.formData.value.children,
-      )
+      const _arr = cloneDeep(queryKeys(designer.formData.value.children))
+      let __key = ['table-item'].includes(target.value.type)
+        ? target.value.children?.[0]?.key
+        : target.value.key
+      const arr = getBrotherList(__key, _arr)
       const flag = arr
-        .filter((item) => item.key !== target.value.key)
+        .filter((item) => item.key !== __key)
         .find((i) => i?.formItemProps?.name === value)
       if (flag) return Promise.reject(`标识${value}已被占用`)
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
+const storageRules = [
+  {
+    required: true,
+    message: '请配置存储配置',
+  },
+  {
+    validator(_rule: any, value: any[]) {
+      if (!value) return Promise.resolve()
+      if (!value?.length) return Promise.reject(`请配置存储配置`)
+      if (target.value.componentProps?.mode === 'multiple')
+        return Promise.resolve()
+      const _arr = cloneDeep(queryKeys(designer.formData.value.children))
+      const arr = getBrotherList(target.value.key, _arr)
+      const _keys = arr
+        .filter((item) => {
+          return (
+            item.key !== target.value.key &&
+            item.componentProps?.mode !== 'multiple'
+          )
+        })
+        .map((i) => {
+          return i?.componentProps?.keys || []
+        })
+      const flag = map(flatten(_keys), 'config.source')?.find((i) => {
+        return map(value, 'config.source')?.includes(i)
+      })
+      if (flag) return Promise.reject(`标识${flag}已被占用`)
       return Promise.resolve()
     },
     trigger: 'change',

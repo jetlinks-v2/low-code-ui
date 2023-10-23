@@ -313,7 +313,7 @@ const arrFlat = (arr: any[]) => {
   const arr_: any[] = []
   function flat(arr: any[]) {
     arr.forEach((item) => {
-      arr_.push({ id: item.key, name: item.title })
+      arr_.push({ id: item.type === 'Delete' ? 'delete' : item.key, name: item.type === 'Delete' ? '删除' : item.title })
       if (item.children) {
         flat(item.children)
       }
@@ -368,7 +368,9 @@ onMounted(() => {
               buttons: [
                 ...arrFlat(buttonsConfig.value),
                 ...arrFlat(actionsConfig.value),
-              ],
+              ].filter((item, index) => {
+                return index === [...arrFlat(buttonsConfig.value), ...arrFlat(actionsConfig.value)].findIndex((obj) => obj.id === item.id)
+              }),
             },
             useList: Array.from(
               new Set([

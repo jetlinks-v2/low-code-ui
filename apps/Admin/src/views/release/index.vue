@@ -86,7 +86,7 @@ const treeChange = (data) => {
 
 const cancel = () => {
   router.replace({
-    name: 'Engine',
+    name: 'engine',
     params: {
       id: route.params.id
     }
