@@ -88,7 +88,7 @@
               :data="item.fullInfo?.configuration"
             />
             <TableFormPreview
-              :data-source="tableData"
+              v-model:data-source="tableData"
               :columns="getTableColumns(item.fullInfo?.configuration?.children)"
               v-else
             />
