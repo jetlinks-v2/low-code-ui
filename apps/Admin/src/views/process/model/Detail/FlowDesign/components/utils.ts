@@ -23,6 +23,44 @@ export function findNodeById(node, id) {
 }
 
 /**
+ * 获取条件分支下所有节点id
+ * @param branches 
+ * @returns 
+ */
+function getBranchNodeIds(branches: any[]) {
+    const branchNodeIds: string[] = []
+    branches.forEach((branchNode) => {
+        branchNodeIds.push(branchNode.id)
+        branchNodeIds.push(branchNode.children.id)
+        if (branchNode.children?.type === 'CONDITIONS' || branchNode.children?.type === 'CONDITIONS') {
+            branchNodeIds.push(...getBranchNodeIds(branchNode.children.branches))
+        } else {
+            setEmptyNodeProps(branchNode.children.children)
+        }
+    })
+    return branchNodeIds
+}
+/**
+ * 设置条件节点的children节点的props
+ */
+export function setEmptyNodeProps(nodes: any) {
+    if (nodes.type === 'ROOT') return
+    if (nodes?.type === 'CONDITIONS') {
+        const branchNodeIds: string[] = getBranchNodeIds(nodes.branches)
+
+        nodes.children.props = {
+            ...nodes.children.props,
+            type: 'complex',
+            complexType: 'allComplete',
+            allCompleteNodeId: branchNodeIds
+        }
+    } else {
+        setEmptyNodeProps(nodes.children)
+    }
+    console.log('setEmptyNodeProps: ', nodes);
+}
+
+/**
  * 通过变量id, 递归查找对应变量
  * @param vars 
  * @param id

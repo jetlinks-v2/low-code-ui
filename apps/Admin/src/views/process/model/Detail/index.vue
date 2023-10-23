@@ -95,6 +95,7 @@ const save = () => {
     state: 'undeployed',
     model: JSON.stringify(flowStore.model),
   }
+  console.log('flowStore.model: ', flowStore.model)
 
   saveLoading.value = true
   update_api(params)
