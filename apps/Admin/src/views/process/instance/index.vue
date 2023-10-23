@@ -194,18 +194,6 @@ const columns = [
     },
   },
   {
-    title: '版本号',
-    dataIndex: 'version',
-    key: 'version',
-    ellipsis: true,
-    search: {
-      type: 'string',
-      componentProps: {
-        placeholder: '请输入版本号',
-      },
-    },
-  },
-  {
     title: '状态',
     dataIndex: 'state',
     key: 'state',
