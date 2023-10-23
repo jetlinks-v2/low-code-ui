@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { findNodeById, handleStrToArr, handleArrToStr } from './utils'
+import { findNodeById, handleObjToArr, handleArrToObj } from './utils'
 import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
@@ -81,12 +81,12 @@ const basicFormData = reactive({
   type: nodeProps.value?.type || 'inclusive',
   inclusiveType: nodeProps.value?.inclusiveType || 'all',
   inclusiveCondition: nodeProps.value?.inclusiveCondition || {
-    condition: '',
+    condition: {},
     gotoNodes: [],
   },
   //   临时字段, 仅供前端使用
   condition:
-    handleStrToArr(nodeProps.value?.inclusiveCondition?.condition) || [],
+    handleObjToArr(nodeProps.value?.inclusiveCondition?.condition) || [],
   gotoNodes: nodeProps.value?.inclusiveCondition?.gotoNodes || [],
 })
 
@@ -120,7 +120,7 @@ const saveConfigToPinia = () => {
       type,
       inclusiveType,
       inclusiveCondition: {
-        condition: handleArrToStr(condition),
+        condition: handleArrToObj(condition),
         gotoNodes,
       },
     }
@@ -138,7 +138,7 @@ const saveConfigToPinia = () => {
     //       type,
     //       inclusiveType,
     //       inclusiveCondition: {
-    //         condition: handleArrToStr(condition),
+    //         condition: handleArrToObj(condition),
     //         gotoNodes,
     //       },
     //     }

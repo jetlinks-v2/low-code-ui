@@ -67,6 +67,41 @@ export function handleArrToStr(arr: string[] = []) {
 export function handleStrToArr(str: string = '') {
     return str.replace(/\[/g, '').replace(/\]/g, '').split('&')
 }
+/**
+ * 将对象数据里面节点id提取并处理为数组, 
+ * 如: {
+        "node1$eq": true,
+        "node2$eq": true,
+       } 
+       => [node1, node2]
+ * @param str 
+ * @returns 
+ */
+export function handleObjToArr(obj: { [key: string]: boolean }) {
+    const arr: string[] = []
+    for (let key in obj) {
+        const nodeId = key.split('$')[0]
+        arr.push(nodeId)
+    }
+    return arr
+}
+/**
+ * 将节点id数组处理为对象结构
+ * 如: [node1, node2] 
+       => {
+            "node1$eq": true,
+            "node2$eq": true,
+          } 
+ * @param str 
+ * @returns 
+ */
+export function handleArrToObj(arr: string[] = []) {
+    const obj: { [key: string]: boolean } = {}
+    arr.forEach(item => {
+        obj[`${item}$eq`] = true
+    })
+    return obj
+}
 
 /**
  * 前端筛选表单名称/字段名称/字段标识
