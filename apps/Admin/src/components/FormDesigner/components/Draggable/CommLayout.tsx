@@ -121,8 +121,13 @@ export default defineComponent({
         watchEffect(() => {
             // 时间组件处理
             if (['date-picker', 'time-picker'].includes(props?.data.type)) {
-                if (typeof __value.value === 'number') {
+                const val = get(designer.formState, _path)
+                if (typeof val === 'number') {
                     __value.value = dayjs(__value).format(props.data.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
+                } else if (typeof val === 'string') {
+                    __value.value = val
+                } else {
+                    __value.value = val
                 }
             } else if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && props.data?.componentProps?.mode !== "multiple") {
                 const obj = {}
@@ -134,6 +139,8 @@ export default defineComponent({
                     }
                 })
                 __value.value = obj
+            } else if (['form'].includes(props?.data.type)) {
+                // 会被置空
             } else {
                 __value.value = get(designer.formState, _path)
             }
@@ -146,7 +153,6 @@ export default defineComponent({
         })
         return () => {
             const _props = useProps(props.data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
-
             return (
                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                     <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true}>
@@ -156,31 +162,37 @@ export default defineComponent({
                                 {...omit(_props.componentProps, ['disabled'])}
                                 source={props.data?.type === 'form' ? props.data?.componentProps?.source : undefined}
                                 onChange={onChange}
-                            ></TypeComponent> : <TypeComponent
-                                {..._props.componentProps}
-                                value={__value.value}
-                                onUpdate:value={(newValue) => {
-                                    if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && !Array.isArray(newValue)) {
-                                        props.data?.componentProps.keys.forEach(i => {
-                                            const __path = _path.slice(0, _path.length - 1) || []
-                                            __path.push(i.config?.source)
-                                            set(designer.formState, __path, newValue?.[i?.key] || null)
-                                        })
-                                    } else {
-                                        set(designer.formState, _path, newValue || null)
-                                    }
-                                }}
-                                checked={get(designer.formState, _path)}
-                                onUpdate:checked={(newValue) => {
-                                    set(designer.formState, _path, newValue || false)
-                                }}
-                                options={unref(options)}
-                                treeData={unref(treeData)}
-                                source={props.data?.type === 'form' ? props.data?.componentProps?.source : undefined}
-                                mode={props.data?.type === 'form' ? unref(designer.mode) : _props.componentProps?.mode}
-                                onChange={onChange}
-                                ref={_formRef}
-                            ></TypeComponent>
+                            ></TypeComponent> : (
+                                props.data?.type === 'switch' ? <TypeComponent
+                                    {..._props.componentProps}
+                                    checked={get(designer.formState, _path)}
+                                    onUpdate: checked={(newValue) => {
+                                        set(designer.formState, _path, newValue || false)
+                                    }}
+                                    onChange={onChange}
+                                    ref={_formRef}
+                                ></TypeComponent> : <TypeComponent
+                                    {..._props.componentProps}
+                                    value={__value.value}
+                                    onUpdate: value={(newValue) => {
+                                        if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && !Array.isArray(newValue)) {
+                                            props.data?.componentProps.keys.forEach(i => {
+                                                const __path = _path.slice(0, _path.length - 1) || []
+                                                __path.push(i.config?.source)
+                                                set(designer.formState, __path, newValue?.[i?.key] || null)
+                                            })
+                                        } else {
+                                            set(designer.formState, _path, newValue || null)
+                                        }
+                                    }}
+                                    options={unref(options)}
+                                    treeData={unref(treeData)}
+                                    source={props.data?.type === 'form' ? props.data?.componentProps?.source : undefined}
+                                    mode={props.data?.type === 'form' ? unref(designer.mode) : _props.componentProps?.mode}
+                                    onChange={onChange}
+                                    ref={_formRef}
+                                ></TypeComponent>
+                            )
                         }
                     </FormItem>
                     {props.data?.componentProps?.description &&
