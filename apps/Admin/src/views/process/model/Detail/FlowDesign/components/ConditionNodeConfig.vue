@@ -39,21 +39,29 @@ const basicFormData = reactive({
  */
 const saveConfigToPinia = () => {
   return new Promise((resolve, reject) => {
-    basicFormRef.value
-      .validate()
-      .then((valid) => {
-        const result = findNodeById(
-          flowStore.model.nodes,
-          flowStore.selectedNode.id,
-        )
-        const { condition, terms } = basicFormData
-        condition.configuration.terms = terms
-        result.props = { ...result.props, condition }
-        resolve(valid)
-      })
-      .catch((err) => {
-        reject(err)
-      })
+    const result = findNodeById(
+      flowStore.model.nodes,
+      flowStore.selectedNode.id,
+    )
+    const { condition, terms } = basicFormData
+    condition.configuration.terms = terms
+    result.props = { ...result.props, condition }
+    resolve(result)
+    // basicFormRef.value
+    //   .validate()
+    //   .then((valid) => {
+    //     const result = findNodeById(
+    //       flowStore.model.nodes,
+    //       flowStore.selectedNode.id,
+    //     )
+    //     const { condition, terms } = basicFormData
+    //     condition.configuration.terms = terms
+    //     result.props = { ...result.props, condition }
+    //     resolve(valid)
+    //   })
+    //   .catch((err) => {
+    //     reject(err)
+    //   })
   })
 }
 defineExpose({
