@@ -1,32 +1,38 @@
 <!-- 基础信息 -->
 <template>
   <div class="base-info">
-    <j-form
-      ref="formRef"
-      :model="formData"
-      autocomplete="off"
-      layout="vertical"
-    >
-      <TitleComponent data="表单配置" />
-      <j-form-item
-        name="forms"
-        label="请选择该流程中需要使用的流程表单"
-        :rules="[
-          { required: true, validator: rules.checkFormList, trigger: 'change' },
-        ]"
+    <div class="form-box">
+      <j-form
+        ref="formRef"
+        :model="formData"
+        autocomplete="off"
+        layout="vertical"
       >
-        <ConfigForm v-model:modelValue="formData.forms" />
-      </j-form-item>
-      <TitleComponent data="权限控制" />
-      <j-form-item name="assignedUser" label="配置可以使用该流程的成员">
-        <ConfigureMembers
-          :isNode="false"
-          :hasWeight="false"
-          :supCancel="false"
-          v-model:members="formData.assignedUser"
-        />
-      </j-form-item>
-    </j-form>
+        <TitleComponent data="表单配置" />
+        <j-form-item
+          name="forms"
+          label="请选择该流程中需要使用的流程表单"
+          :rules="[
+            {
+              required: true,
+              validator: rules.checkFormList,
+              trigger: 'change',
+            },
+          ]"
+        >
+          <ConfigForm v-model:modelValue="formData.forms" />
+        </j-form-item>
+        <TitleComponent data="权限控制" />
+        <j-form-item name="assignedUser" label="配置可以使用该流程的成员">
+          <ConfigureMembers
+            :isNode="false"
+            :hasWeight="false"
+            :supCancel="false"
+            v-model:members="formData.assignedUser"
+          />
+        </j-form-item>
+      </j-form>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -100,5 +106,8 @@ watch(
   display: flex;
   justify-content: center;
   padding-top: 20px;
+  .form-box {
+    width: 50%;
+  }
 }
 </style>

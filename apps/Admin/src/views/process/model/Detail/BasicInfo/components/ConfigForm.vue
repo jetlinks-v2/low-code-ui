@@ -1,12 +1,45 @@
 <!-- 基础信息配置表单 -->
 <template>
-  <div>
-    <j-button @click="visible = true" style="width: 200px">表单配置</j-button>
-    <ul>
+  <div class="config-form">
+    <j-button class="btn" @click="visible = true">
+      <span>表单配置</span>
+      <span class="icon" v-show="selectedRow.length">
+        <img :src="getImage('/members/check.png')" />
+      </span>
+    </j-button>
+    <!-- <ul>
       <li v-for="(item, index) of selectedRow" :key="index">
         {{ item.formName || '-' }}
       </li>
-    </ul>
+    </ul> -->
+    <!-- 列表 -->
+    <j-scrollbar max-height="172px">
+      <j-list
+        v-show="selectedRow.length"
+        :grid="{ gutter: 8, column: 3 }"
+        :data-source="selectedRow"
+        size="small"
+        :split="false"
+      >
+        <template #renderItem="{ item }">
+          <j-list-item>
+            <j-space>
+              <img
+                :src="
+                  getImage(
+                    `/flow-designer/${item.multiple ? 'list' : 'form'}.png`,
+                  )
+                "
+                style="height: 16px"
+              />
+              <j-ellipsis line-clamp="1">
+                {{ item.formName }}
+              </j-ellipsis>
+            </j-space>
+          </j-list-item>
+        </template>
+      </j-list>
+    </j-scrollbar>
     <j-drawer
       v-model:visible="visible"
       class="custom-class"
@@ -111,6 +144,7 @@ import { onlyMessage } from '@jetlinks/utils'
 import draggable from 'vuedraggable'
 import { queryForm_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
+import { getImage } from '@jetlinks/utils'
 
 const flowStore = useFlowStore()
 
@@ -129,6 +163,8 @@ const searchText = ref('')
 const selectedRow = ref<any>([])
 // 是否选中
 const isActive = computed(() => (key) => {
+  console.log('key: ', key)
+  console.log('selectedRow.value: ', selectedRow.value)
   return selectedRow.value?.map((i) => i.formId).includes(key)
 })
 
@@ -213,13 +249,40 @@ watch(
 :deep(.ant-table-cell) {
   padding: 0 0 5px 0 !important;
 }
+
 .active {
-  background: #1890ff;
+  background: #e5ebff;
+  color: #315efb;
 }
 .chosen-class {
-  // background: #1890ff;
   background-color: #eee;
   opacity: 1;
   border: solid 1px red;
+}
+.config-form {
+  width: 100%;
+  .btn {
+    width: 100%;
+    margin-bottom: 8px;
+    .icon {
+      position: absolute;
+      top: -4px;
+      right: 0;
+      & > img {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+  :deep(.ant-list) {
+    overflow: hidden;
+    .ant-list-item {
+      height: 40px;
+      line-height: 40px;
+      border-radius: 4px;
+      background: #f6f7f9;
+    }
+  }
 }
 </style>
