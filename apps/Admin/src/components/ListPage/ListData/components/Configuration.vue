@@ -1,6 +1,6 @@
 <template>
   <div class="config-center">
-    <div class="content" v-if="props.showSwitch">
+    <div class="content" v-if="props.showSwitch && config.type !== 'object'">
       <p>
         开启表头排序
         <j-tooltip title="用于控制该列数据展示顺序">
