@@ -78,3 +78,34 @@ export const handleSort = (tree,parentId=null) => {
     return item
   })
 }
+
+export const updateButtons = (sourceData, targetData) => {
+  const buttonMap = new Map()
+  const getButtonMap = (data) => {
+    data.forEach(item => {
+      if (item.others?.menu?.buttons) {
+        buttonMap.set(item.id, item.others.menu.buttons)
+      }
+      if (item.children) {
+        getButtonMap(item.children)
+      }
+    })
+  }
+
+  getButtonMap(sourceData)
+
+  const setButtons = (data) => {
+    return data.map(item => {
+      if (item.options?.pageId && buttonMap.has(item.options.pageId)) {
+        item.buttons = buttonMap.get(item.options.pageId)
+      }
+      if (item.children) {
+        item.children = setButtons(item.children)
+      }
+      return item
+    })
+  }
+
+  return setButtons(targetData)
+}
+

@@ -20,14 +20,31 @@
           >
             <j-space>
               <div class="icon">
-                <AIcon type="CheckSquareFilled" style="font-size: 40px"></AIcon>
+                <img
+                  v-if="item.key === 'var' || item.key === 'relation'"
+                  :src="
+                    getImage(
+                      `/members/${item.key}-${
+                        active === item.key ? 'active' : 'nomal'
+                      }.png`,
+                    )
+                  "
+                  style="height: 16px"
+                />
+                <img
+                  v-else
+                  :src="getImage(`/members/fixed-nomal.png`)"
+                  style="height: 16px"
+                />
               </div>
               <div class="text">
                 <div class="left-item-title">
                   {{ item.title }}
                 </div>
                 <span class="description">
-                  <j-ellipsis line-clamp="4" style="line-height: 20px;">{{ item.description }}</j-ellipsis>
+                  <j-ellipsis line-clamp="4" style="line-height: 20px">{{
+                    item.description
+                  }}</j-ellipsis>
                 </span>
               </div>
             </j-space>
@@ -166,6 +183,7 @@ import {
 import { getVar_api } from '@/api/member'
 import { detail_api } from '@/api/process/model'
 import { cloneDeep } from 'lodash-es'
+import { getImage } from '@jetlinks/utils'
 
 const props = defineProps({
   type: {
@@ -438,6 +456,9 @@ defineExpose({
         &.selected {
           border: none;
           background: v-bind('dimensionsColor[active]');
+          .icon {
+            background: #fff;
+          }
           .text {
             .left-item-title,
             .description {
@@ -447,6 +468,17 @@ defineExpose({
         }
         &::before {
           content: none;
+        }
+
+        .icon {
+          // color: #315efb;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 40px;
+          height: 40px;
+          border-radius: 8px;
+          background: #dee2eb;
         }
         .text {
           .left-item-title {

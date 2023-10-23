@@ -106,7 +106,7 @@ export const createAuthRoute = (beforeEachFn?: Function) => {
         beforeEachFn?.(to, from, next)
         const token = getToken()
         const isLogin = to.path === LOGIN_ROUTE.path
-        console.log('router.beforeEach',isLogin, token)
+        console.log('router.beforeEach',isLogin, token, to.path)
         if (token) {
             if (isLogin) {
                 next({ path: '/'})

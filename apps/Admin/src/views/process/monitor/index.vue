@@ -24,7 +24,7 @@
       }"
     >
       <template #classifiedId="{ classifiedId }">
-        {{ classifiedStore.getText(classifiedId) }}
+        {{ getText(classifiedId) }}
       </template>
       <template #state="{ state }">
         <!-- <BadgeStatus
@@ -64,28 +64,38 @@
           }"
           :popConfirm="{
             title: `确认关闭该流程？`,
-            onConfirm: () => handleDel(slotProps.id),
+            onConfirm: () => handleClose(slotProps.id),
           }"
         >
           <AIcon type="CloseCircleOutlined" />
         </PermissionButton>
       </template>
     </JProTable>
-    <Drawer
+    <!-- <Drawer
       v-if="drawer.visible"
       v-model:visible="drawer.visible"
       :data="drawer.selectItem"
       :showRecords="true"
+    /> -->
+    <Drawer
+      v-if="drawer.visible"
+      type="card"
+      @close="drawer.visible = false" 
+      :current="drawer.selectItem"
+      :history="history"
     />
   </page-container>
 </template>
 <script setup>
-import Drawer from './Drawer/index.vue'
-import { getList_api } from '@/api/process/monitor'
+import { onlyMessage } from '@jetlinks/utils'
+// import Drawer from './Drawer/index.vue'
+import { getList_api, close_api } from '@/api/process/monitor'
 import dayjs from 'dayjs'
-import { useClassified } from '@/store'
+import { useClassified } from '@/hooks/useClassified'
+import Drawer from '@/views/process/me/Detail/index.vue'
 
-const classifiedStore = useClassified()
+const { classified, getText } = useClassified()
+const tableRef = ref()
 const history = ref(false)
 const columns = [
   {
@@ -99,13 +109,13 @@ const columns = [
       componentProps: {
         placeholder: '请选择流程分类',
       },
-      options: classifiedStore.classified,
+      options: classified,
     },
   },
   {
     title: '流程名称',
-    dataIndex: 'name',
-    key: 'name',
+    dataIndex: 'modelName',
+    key: 'modelName',
     ellipsis: true,
     search: {
       type: 'string',
@@ -212,7 +222,14 @@ const handleSearch = (data) => {
 }
 
 // 关闭
-const handleDel = (id) => {}
+const handleClose = (id) => {
+  close_api(id).then(res =>{
+    if(res.success){
+      onlyMessage('操作成功')
+      tableRef.value.reload()
+    }
+  })
+}
 
 // 详情
 const handleDetail = (row) => {

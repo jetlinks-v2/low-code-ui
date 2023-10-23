@@ -4,7 +4,7 @@
       <j-button class="btn" @click="visible = true">
         <span>选择成员</span>
         <span class="icon"  v-show="list.length > 0">
-          <img :src="getImage('/check.png')" />
+          <img :src="getImage('/members/check.png')" />
         </span>
       </j-button>
       <!-- 列表 -->
@@ -18,10 +18,12 @@
         >
           <template #renderItem="{ item }">
             <j-list-item>
-              <j-ellipsis line-clamp="1">
-                <AIcon type="CheckSquareFilled" style="font-size: 14px"></AIcon>
-                {{ item.name }}
-              </j-ellipsis>
+              <j-space>
+                <img :src="getImage(`/members/${item.type}.png`)" style="height: 16px;">
+                <j-ellipsis line-clamp="1">
+                  {{ item.name }}
+                </j-ellipsis>
+              </j-space>
             </j-list-item>
           </template>
         </j-list>

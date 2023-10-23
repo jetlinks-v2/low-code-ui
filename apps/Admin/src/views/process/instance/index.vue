@@ -23,7 +23,7 @@
         <AIcon v-else :type="icon" :style="{ fontSize: '40px' }" />
       </template>
       <template #classifiedId="{ classifiedId }">
-        {{ classifiedStore.getText(classifiedId) }}
+        {{ getText(classifiedId) }}
       </template>
       <template #state="{ state }">
         <BadgeStatus
@@ -72,7 +72,7 @@
               <div class="title">
                 <div class="classification">
                   <j-ellipsis style="max-width: 200px">
-                    {{ classifiedStore.getText(record.classifiedId) }}
+                    {{ getText(record.classifiedId) }}
                   </j-ellipsis>
                 </div>
                 <div class="card-content">
@@ -155,11 +155,9 @@ import Drawer from '../components/Drawer/index.vue'
 import PermissionDialog from './PermissionDialog/index.vue'
 import { isFunction, isObject } from 'lodash-es'
 import { getList_api, del_api, updateState_api } from '@/api/process/instance'
-import { providerEnum } from '@/api/process/model'
-import { useRequest } from '@jetlinks/hooks'
-import { useClassified } from '@/store'
+import { useClassified } from '@/hooks/useClassified'
 
-const classifiedStore = useClassified()
+const { classified, getText } = useClassified()
 const tableRef = ref()
 const columns = [
   {
@@ -192,19 +190,7 @@ const columns = [
       componentProps: {
         placeholder: '请选择流程分类',
       },
-      options: classifiedStore.classified,
-    },
-  },
-  {
-    title: '版本号',
-    dataIndex: 'version',
-    key: 'version',
-    ellipsis: true,
-    search: {
-      type: 'string',
-      componentProps: {
-        placeholder: '请输入版本号',
-      },
+      options: classified,
     },
   },
   {
