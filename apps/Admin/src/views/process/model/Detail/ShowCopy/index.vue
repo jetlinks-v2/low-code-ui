@@ -241,16 +241,32 @@ const summaryHtml = computed(() => {
  * 保存
  * @param type 默认save 不校验填写内容，submit 提交时校验
  */
-const submit = async (type = 'save') => {
-  // console.log(`output->type`,type)
-  // 仅保存配置数据，不校验填写内容的合规性。
-  if (type !== 'save') {
-    await formRef.value.validate()
-  }
-  return formData
+// const submit = async (type = 'save') => {
+//   // console.log(`output->type`,type)
+//   // 仅保存配置数据，不校验填写内容的合规性。
+//   if (type !== 'save') {
+//     await formRef.value.validate()
+//   }
+//   return formData
+// }
+
+/**
+ * 当前步骤校验方法
+ */
+const validateSteps = () => {
+  return new Promise((resolve, reject) => {
+    formRef.value
+      .validate()
+      .then((res) => {
+        resolve(res)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
 }
 
-defineExpose({ submit })
+defineExpose({ validateSteps })
 </script>
 
 <style lang="less" scoped>

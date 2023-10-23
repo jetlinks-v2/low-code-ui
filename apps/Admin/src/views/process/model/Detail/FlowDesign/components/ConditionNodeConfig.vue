@@ -35,9 +35,9 @@ const basicFormData = reactive({
 })
 
 /**
- * 将数据保存至pinia
+ * 将数据保存至store, 不用校验合法性
  */
-const saveConfigToPinia = () => {
+const saveConfigToStore = () => {
   return new Promise((resolve, reject) => {
     const result = findNodeById(
       flowStore.model.nodes,
@@ -65,7 +65,7 @@ const saveConfigToPinia = () => {
   })
 }
 defineExpose({
-  saveConfigToPinia,
+  saveConfigToStore,
 })
 </script>
 

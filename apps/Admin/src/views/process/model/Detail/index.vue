@@ -14,7 +14,7 @@
         <div class="btn">
           <j-button v-if="current > 0" @click="current--">上一步</j-button>
           <j-button v-if="current < 2" @click="handleNext">下一步</j-button>
-          <j-button type="primary" @click="save" :loading="saveLoading">
+          <j-button type="primary" @click="handleSave" :loading="saveLoading">
             保存
             <template #icon>
               <j-tooltip placement="right">
@@ -25,7 +25,7 @@
               </j-tooltip>
             </template>
           </j-button>
-          <j-button type="primary" @click="deploy">
+          <j-button type="primary" @click="handleDeploy">
             部署
             <template #icon>
               <j-tooltip placement="right">
@@ -89,7 +89,7 @@ const handleNext = () => {
  * 保存模型数据, 无需校验数据
  */
 const saveLoading = ref(false)
-const save = () => {
+const handleSave = () => {
   const params = {
     id: route.query.id,
     state: 'undeployed',
@@ -109,16 +109,24 @@ const save = () => {
 }
 
 /**
- * 部署, 需要校验
+ * 部署, 校验所有步骤数据规范
  */
-const deploy = () => {
-  //   deploy_api(route.query.id as string).then((res) => {
-  //     if (res.success) {
-  //       onlyMessage('操作成功')
-  //     } else {
-  //       onlyMessage('操作失败', 'error')
-  //     }
-  //   })
+const handleDeploy = () => {
+  //   stepRef.value
+  //     ?.validateSteps()
+  //     .then((res) => {
+  //       console.log('handleDeploy res: ', res)
+  //       //   deploy_api(route.query.id as string).then((res) => {
+  //       //     if (res.success) {
+  //       //       onlyMessage('操作成功')
+  //       //     } else {
+  //       //       onlyMessage('操作失败', 'error')
+  //       //     }
+  //       //   })
+  //     })
+  //     .catch((err) => {
+  //       console.log('handleDeploy err: ', err)
+  //     })
 }
 
 onMounted(() => {

@@ -68,19 +68,26 @@ const nodeDel = (node) => {
 }
 
 /**
- * 关闭抽屉, 保存数据
+ * 关闭抽屉, 保存节点数据至store
  */
-const handleSubmit = () => {
+const saveNodeConfig = () => {
   nodeConfigRef.value
     .saveConfig()
     .then((valid) => {
-      console.log('handleSubmit valid: ', valid)
+      console.log('saveNodeConfig valid: ', valid)
       showConfig.value = false
     })
     .catch((err) => {
-      console.log('handleSubmit err: ', err)
+      console.log('saveNodeConfig err: ', err)
     })
 }
+
+watch(
+  () => showConfig.value,
+  (val) => {
+    if (!val) saveNodeConfig()
+  },
+)
 
 /**
  * 下一步
@@ -92,14 +99,23 @@ const next = () => {
   })
 }
 
-watch(
-  () => showConfig.value,
-  (val) => {
-    if (!val) handleSubmit()
-  },
-)
+/**
+ * 当前步骤校验方法
+ */
+const validateSteps = () => {
+  return new Promise((resolve, reject) => {
+    // formRef.value
+    //   .validate()
+    //   .then((res) => {
+    //     resolve(res)
+    //   })
+    //   .catch((err) => {
+    //     reject(err)
+    //   })
+  })
+}
 
-defineExpose({ next })
+defineExpose({ next, validateSteps })
 </script>
 
 <style lang="less" scoped></style>

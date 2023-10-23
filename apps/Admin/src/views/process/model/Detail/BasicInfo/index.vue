@@ -78,7 +78,14 @@ const next = () => {
   })
 }
 
-defineExpose({ next })
+/**
+ * 当前步骤校验方法
+ */
+const validateSteps = () => {
+  return next()
+}
+
+defineExpose({ next, validateSteps })
 
 watch(
   () => formData.forms,
