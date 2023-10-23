@@ -108,30 +108,40 @@ const handleSwitchChange = () => {
  */
 const saveConfigToPinia = () => {
   return new Promise((resolve, reject) => {
-    basicFormRef.value
-      ?.validate()
-      .then((valid1) => {
-        memberFormRef.value
-          ?.validate()
-          .then((valid2) => {
-            const result = findNodeById(
-              flowStore.model.nodes,
-              flowStore.selectedNode.id,
-            )
-            result.props = {
-              ...result.props,
-              ...basicFormData,
-              ...memberFormData,
-            }
-            resolve({ ...valid1, ...valid2 })
-          })
-          .catch((err) => {
-            reject(err)
-          })
-      })
-      .catch((err) => {
-        reject(err)
-      })
+    const result = findNodeById(
+      flowStore.model.nodes,
+      flowStore.selectedNode.id,
+    )
+    result.props = {
+      ...result.props,
+      ...basicFormData,
+      ...memberFormData,
+    }
+    resolve(result)
+    // basicFormRef.value
+    //   ?.validate()
+    //   .then((valid1) => {
+    //     memberFormRef.value
+    //       ?.validate()
+    //       .then((valid2) => {
+    //         const result = findNodeById(
+    //           flowStore.model.nodes,
+    //           flowStore.selectedNode.id,
+    //         )
+    //         result.props = {
+    //           ...result.props,
+    //           ...basicFormData,
+    //           ...memberFormData,
+    //         }
+    //         resolve({ ...valid1, ...valid2 })
+    //       })
+    //       .catch((err) => {
+    //         reject(err)
+    //       })
+    //   })
+    //   .catch((err) => {
+    //     reject(err)
+    //   })
   })
 }
 defineExpose({

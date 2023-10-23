@@ -110,28 +110,43 @@ watch(
  */
 const saveConfigToPinia = () => {
   return new Promise((resolve, reject) => {
-    basicFormRef.value
-      .validate()
-      .then((valid) => {
-        const result = findNodeById(
-          flowStore.model.nodes,
-          flowStore.selectedNode.id,
-        )
-        const { type, inclusiveType, condition, gotoNodes } = basicFormData
-        result.props = {
-          ...result.props,
-          type,
-          inclusiveType,
-          inclusiveCondition: {
-            condition: handleArrToStr(condition),
-            gotoNodes,
-          },
-        }
-        resolve(valid)
-      })
-      .catch((err) => {
-        reject(err)
-      })
+    const result = findNodeById(
+      flowStore.model.nodes,
+      flowStore.selectedNode.id,
+    )
+    const { type, inclusiveType, condition, gotoNodes } = basicFormData
+    result.props = {
+      ...result.props,
+      type,
+      inclusiveType,
+      inclusiveCondition: {
+        condition: handleArrToStr(condition),
+        gotoNodes,
+      },
+    }
+    resolve(result)
+    // basicFormRef.value
+    //   .validate()
+    //   .then((valid) => {
+    //     const result = findNodeById(
+    //       flowStore.model.nodes,
+    //       flowStore.selectedNode.id,
+    //     )
+    //     const { type, inclusiveType, condition, gotoNodes } = basicFormData
+    //     result.props = {
+    //       ...result.props,
+    //       type,
+    //       inclusiveType,
+    //       inclusiveCondition: {
+    //         condition: handleArrToStr(condition),
+    //         gotoNodes,
+    //       },
+    //     }
+    //     resolve(valid)
+    //   })
+    //   .catch((err) => {
+    //     reject(err)
+    //   })
   })
 }
 defineExpose({

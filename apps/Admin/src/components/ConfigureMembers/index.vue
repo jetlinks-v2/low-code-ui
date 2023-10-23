@@ -4,7 +4,7 @@
       <j-button class="btn" @click="visible = true">
         <span>选择成员</span>
         <span class="icon"  v-show="list.length > 0">
-          <img :src="getImage('/check.png')" />
+          <img :src="getImage('/members/check.png')" />
         </span>
       </j-button>
       <!-- 列表 -->

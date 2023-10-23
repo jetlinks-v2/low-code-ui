@@ -3,12 +3,30 @@
     <FullPage>
       <j-row>
         <j-col :span="12">
-          <div class="form" v-for="(item, index) of formData">
+          <!-- <div class="form" v-for="(item, index) of formData">
             <preview
               ref="previewRef"
               :value="formValue[index]"
               :data="item.configuration"
             />
+          </div> -->
+          <div class="form">
+            <template v-for="(item, index) in formList" :key="index">
+              <div>{{ item.formName }}</div>
+              <FormPreview
+                v-if="!item.multiple"
+                ref="previewRef"
+                :value="formValue[index]"
+                :data="item.fullInfo?.configuration"
+              />
+              <TableFormPreview
+                :data-source="tableData"
+                :columns="
+                  getTableColumns(item.fullInfo?.configuration?.children, item.formId)
+                "
+                v-else
+              />
+            </template>
           </div>
           <div class="btn-list">
             <j-button class="btn" @click="cancel">取消</j-button>
@@ -34,9 +52,13 @@ import preview from '@/components/FormDesigner/preview.vue'
 import { Modal } from 'jetlinks-ui-components'
 import { start_api, getList_api } from '@/api/process/initiate'
 import { queryForm_api } from '@/api/process/model'
+import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
+import FormPreview from '@/components/FormDesigner/preview.vue'
 
 interface FormsProps {
   formId: string
+  formName: string
+  fullInfo: any
   multiple: boolean
 }
 
@@ -55,6 +77,33 @@ const previewRef = ref<any>()
 
 const formValue = ref<any[]>([])
 
+const formList = ref<FormsProps[]>([])
+
+// 草稿
+const draft = ref<any>({})
+
+const tableData = ref([{}])
+const getTableColumns = (fields: any[], id) => {
+  const draftData = getDraftData(id)
+  const _columns = fields?.map((m) => ({
+    title: m.formItemProps?.label,
+    dataIndex: m.formItemProps?.name,
+    ellipsis: true,
+    ...m,
+  }))
+  console.log('getTableColumns', _columns)
+  _columns?.forEach((item) => {
+    tableData.value[0][item.dataIndex] = draftData[item.dataIndex] || undefined
+  })
+  return _columns
+}
+
+// 获取草稿数据
+const getDraftData = (id: string) =>{
+  return draft.form?.filter(i => i.formId === id)[0] || {
+    ['input-number_c10eewdw5f0']: 12
+  }
+}
 /**
  * 判断数组对象中的属性是否有数据
  * @param array
@@ -103,6 +152,7 @@ const cancel = () => {
  */
 const submit = () => {
   const list = previewRef.value?.map((item) => item.onSave())
+
   Promise.all(list).then((res) => {
     startProcess(res).then((flag) => {
       // 跳转至我的流程-我发起的
@@ -143,8 +193,8 @@ const startProcess = async (list: any, start: boolean = true) => {
   const param = {
     id: route.query.id,
     start: start,
-    form: formData.value?.map((i, index) => ({
-      formId: i.id,
+    form: formList.value?.map((i, index) => ({
+      formId: i.formId,
       data: list[index],
     })),
   }
@@ -175,32 +225,41 @@ const getProcess = () => {
     Object.assign(currentProcess, res.result.data[0])
     try {
       const obj = JSON.parse(currentProcess.model)
-      getFormData(obj.config?.forms)
+      // getFormData(obj.config?.forms)
+
+      // formData.value = obj.config.forms
+      formList.value = obj.config.forms?.map((m) => {
+        const _fields = m.fullInfo.configuration?.children
+        _fields?.forEach((p) => {
+          p.componentProps.disabled = !p.accessModes.includes('write')
+        })
+        return { accessModes: [], ...m }
+      })
     } catch (error) {}
   })
 }
-/**
- * 获取当前流程的表单列表
- * @param list
- */
-const getFormData = (list: FormsProps[]) => {
-  const param = {
-    paging: true,
-    terms: [
-      {
-        type: 'and',
-        value: list.map((i) => i.formId),
-        termType: 'in',
-        column: 'id',
-      },
-    ],
-  }
-  queryForm_api(param).then((res) => {
-    if (res.success) {
-      formData.value = res.result.data
-    }
-  })
-}
+// /**
+//  * 获取当前流程的表单列表
+//  * @param list
+//  */
+// const getFormData = (list: FormsProps[]) => {
+//   const param = {
+//     paging: true,
+//     terms: [
+//       {
+//         type: 'and',
+//         value: list.map((i) => i.formId),
+//         termType: 'in',
+//         column: 'id',
+//       },
+//     ],
+//   }
+//   queryForm_api(param).then((res) => {
+//     if (res.success) {
+//       formData.value = res.result.data
+//     }
+//   })
+// }
 getProcess()
 </script>
 <style scoped lang="less">
