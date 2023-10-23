@@ -116,17 +116,18 @@ const handleDeploy = () => {
   //     ?.validateSteps()
   //     .then((res) => {
   //       console.log('handleDeploy res: ', res)
-  //       //   deploy_api(route.query.id as string).then((res) => {
-  //       //     if (res.success) {
-  //       //       onlyMessage('操作成功')
-  //       //     } else {
-  //       //       onlyMessage('操作失败', 'error')
-  //       //     }
-  //       //   })
   //     })
   //     .catch((err) => {
   //       console.log('handleDeploy err: ', err)
   //     })
+  deploy_api(route.query.id as string).then((res) => {
+    if (res.success) {
+      onlyMessage('部署成功', 'success')
+      router.go(-1)
+    } else {
+      onlyMessage('部署失败', 'error')
+    }
+  })
 }
 
 onMounted(() => {
