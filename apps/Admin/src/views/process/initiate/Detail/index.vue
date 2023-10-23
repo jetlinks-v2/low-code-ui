@@ -3,29 +3,16 @@
     <FullPage>
       <j-row>
         <j-col :span="12">
-          <!-- <div class="form" v-for="(item, index) of formData">
-            <preview
-              ref="previewRef"
-              :value="formValue[index]"
-              :data="item.configuration"
-            />
-          </div> -->
           <div class="form">
             <template v-for="(item, index) in formList" :key="index">
               <div>{{ item.formName }}</div>
               <FormPreview
                 v-if="!item.multiple"
                 ref="previewRef"
-                :value="formValue[index]"
+                :value="getDraftData(item.formId)['data']"
                 :data="item.fullInfo?.configuration"
               />
-              <!-- <TableFormPreview
-                v-else
-                v-model:data-source="tableData[item.formId]"
-                :columns="
-                  getTableColumns(item.fullInfo?.configuration?.children, item.formId)
-                "
-              /> -->
+              
               <TableFormPreview
                 v-else
                 v-model:data-source="tableData[item.formId]"
@@ -58,10 +45,8 @@
 <script setup lang="ts">
 import { onlyMessage } from '@jetlinks/utils'
 import FlowDesigner from '@/components/FlowDesigner'
-import preview from '@/components/FormDesigner/preview.vue'
 import { Modal } from 'jetlinks-ui-components'
 import { start_api, getList_api } from '@/api/process/initiate'
-import { queryForm_api } from '@/api/process/model'
 import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
 import FormPreview from '@/components/FormDesigner/preview.vue'
 
@@ -79,6 +64,15 @@ interface formDataProps {
   configuration: any
 }
 
+interface draftProps {
+  id: string
+  start: boolean
+  form: {
+    formId: string
+    data: any
+  }[]
+}
+
 const router = useRouter()
 const route = useRoute()
 const formData: Ref<formDataProps[]> = ref([])
@@ -90,24 +84,20 @@ const formValue = ref<any[]>([])
 const formList = ref<FormsProps[]>([])
 
 // 草稿
-const draft = ref<any>({})
+const draft = reactive<draftProps>({} as draftProps)
 
 const tableData = reactive({})
-// const tableData = ref<any>([{}])
 const getTableColumns = (fields: any[], formId: string) => {
-  const draftData = getDraftData(formId)
+  const draftData: any = getDraftData(formId)
   const _columns = fields?.map((m) => ({
     title: m.formItemProps?.label,
     dataIndex: m.formItemProps?.name,
     ellipsis: true,
     ...m,
   }))
-  console.log('getTableColumns', _columns)
-  tableData[formId] = [{}]
   _columns?.forEach((item) => {
-    // tableData.value[0][item.dataIndex] = draftData[item.dataIndex] || undefined
     tableData[formId][0][item.dataIndex] =
-      draftData[item.dataIndex] || undefined
+      draftData.data?.[item.dataIndex] || undefined
   })
   return _columns
 }
@@ -168,7 +158,7 @@ const submit = () => {
   Promise.all(list).then((res) => {
     startProcess(res).then((flag) => {
       // 跳转至我的流程-我发起的
-      flag ? router.push('') : ''
+      flag ? router.push('/flow-engine/me/initiate') : ''
     })
   })
 }
@@ -177,10 +167,9 @@ const submit = () => {
  */
 const save = () => {
   const list = previewRef.value.map((item) => item.formState)
-  console.log('save保存', list)
   startProcess(list, false).then((flag) => {
     // 跳转至我的流程-我的待办
-    flag ? router.push('') : ''
+    flag ? router.push('/flow-engine/me/todo') : ''
   })
 }
 onMounted(() => {
@@ -242,41 +231,20 @@ const getProcess = () => {
     Object.assign(currentProcess, res.result.data[0])
     try {
       const obj = JSON.parse(currentProcess.model)
-      // getFormData(obj.config?.forms)
-
-      // formData.value = obj.config.forms
       formList.value = obj.config.forms?.map((m) => {
+        if (m.multiple) {
+          tableData[m.formId] = [{}]
+        }
         const _fields = m.fullInfo.configuration?.children
         _fields?.forEach((p) => {
           p.componentProps.disabled = !p.accessModes.includes('write')
         })
+
         return { accessModes: [], ...m }
       })
     } catch (error) {}
   })
 }
-// /**
-//  * 获取当前流程的表单列表
-//  * @param list
-//  */
-// const getFormData = (list: FormsProps[]) => {
-//   const param = {
-//     paging: true,
-//     terms: [
-//       {
-//         type: 'and',
-//         value: list.map((i) => i.formId),
-//         termType: 'in',
-//         column: 'id',
-//       },
-//     ],
-//   }
-//   queryForm_api(param).then((res) => {
-//     if (res.success) {
-//       formData.value = res.result.data
-//     }
-//   })
-// }
 getProcess()
 </script>
 <style scoped lang="less">
@@ -287,8 +255,5 @@ getProcess()
   .btn {
     width: 20%;
   }
-}
-.flow-chart {
-  // border: 1px solid #ccc;
 }
 </style>
