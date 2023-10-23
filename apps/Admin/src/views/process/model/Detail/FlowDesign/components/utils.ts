@@ -83,3 +83,18 @@ export function filterFormByName(list, name) {
         return item.formName.includes(name)
     })
 }
+
+/**
+ * 对象求和
+ * @param data 
+ * @returns 
+ */
+export function sumValues(data: { [key: string]: number }) {
+    let sum = 0;
+    for (let key in data) {
+        if (typeof data[key] === 'number') {
+            sum += data[key];
+        }
+    }
+    return sum;
+}
