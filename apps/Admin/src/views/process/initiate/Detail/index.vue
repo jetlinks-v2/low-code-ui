@@ -19,12 +19,22 @@
                 :value="formValue[index]"
                 :data="item.fullInfo?.configuration"
               />
-              <TableFormPreview
-                :data-source="tableData"
+              <!-- <TableFormPreview
+                v-else
+                v-model:data-source="tableData[item.formId]"
                 :columns="
                   getTableColumns(item.fullInfo?.configuration?.children, item.formId)
                 "
+              /> -->
+              <TableFormPreview
                 v-else
+                v-model:data-source="tableData[item.formId]"
+                :columns="
+                  getTableColumns(
+                    item.fullInfo?.configuration?.children,
+                    item.formId,
+                  )
+                "
               />
             </template>
           </div>
@@ -82,9 +92,10 @@ const formList = ref<FormsProps[]>([])
 // 草稿
 const draft = ref<any>({})
 
-const tableData = ref([{}])
-const getTableColumns = (fields: any[], id) => {
-  const draftData = getDraftData(id)
+const tableData = reactive({})
+// const tableData = ref<any>([{}])
+const getTableColumns = (fields: any[], formId: string) => {
+  const draftData = getDraftData(formId)
   const _columns = fields?.map((m) => ({
     title: m.formItemProps?.label,
     dataIndex: m.formItemProps?.name,
@@ -92,17 +103,18 @@ const getTableColumns = (fields: any[], id) => {
     ...m,
   }))
   console.log('getTableColumns', _columns)
+  tableData[formId] = [{}]
   _columns?.forEach((item) => {
-    tableData.value[0][item.dataIndex] = draftData[item.dataIndex] || undefined
+    // tableData.value[0][item.dataIndex] = draftData[item.dataIndex] || undefined
+    tableData[formId][0][item.dataIndex] =
+      draftData[item.dataIndex] || undefined
   })
   return _columns
 }
 
 // 获取草稿数据
-const getDraftData = (id: string) =>{
-  return draft.form?.filter(i => i.formId === id)[0] || {
-    ['input-number_c10eewdw5f0']: 12
-  }
+const getDraftData = (id: string) => {
+  return draft.form?.find((i) => i.formId === id) || {}
 }
 /**
  * 判断数组对象中的属性是否有数据
@@ -165,6 +177,7 @@ const submit = () => {
  */
 const save = () => {
   const list = previewRef.value.map((item) => item.formState)
+  console.log('save保存', list)
   startProcess(list, false).then((flag) => {
     // 跳转至我的流程-我的待办
     flag ? router.push('') : ''
@@ -195,9 +208,13 @@ const startProcess = async (list: any, start: boolean = true) => {
     start: start,
     form: formList.value?.map((i, index) => ({
       formId: i.formId,
-      data: list[index],
+      data: tableData.hasOwnProperty(i.formId)
+        ? tableData[i.formId][0]
+        : list[index],
     })),
+    variables: {},
   }
+  console.log('param', param)
   return start_api(param).then((resp) => {
     if (resp.success) {
       onlyMessage(`${start ? '提交' : '保存'}成功`)
