@@ -7,7 +7,7 @@
         <img :src="getImage('/members/check.png')" />
       </span>
     </j-button>
-    <!-- 已选表单 -->
+    <!-- 已选表单回显 -->
     <div class="selected-form">
       <j-scrollbar max-height="172px">
         <j-list
@@ -68,7 +68,7 @@
             <div class="form-list">
               <div
                 class="form-list-item"
-                :class="{ active: isActive(item.key) }"
+                :class="{ active: isActive(item.id) }"
                 v-for="(item, index) in formList"
                 :key="index"
                 @click="onSelectChange(item)"
@@ -90,39 +90,60 @@
             chosen-class="chosen-class"
             @start="drag = true"
             @end="drag = false"
-            item-key="key"
+            item-key="id"
           >
             <template #item="{ element }">
-              <div>
-                <div>{{ element.formName || '-' }}</div>
-                <j-space>
+              <div class="selected-item">
+                <div class="name">
+                  <j-ellipsis line-clamp="1">
+                    {{ element.formName }}
+                  </j-ellipsis>
+                </div>
+                <div class="type">
                   <j-radio-group
                     v-model:value="element.multiple"
                     button-style="solid"
+                    size="small"
                   >
                     <j-space>
                       <j-radio-button :value="false">
-                        <AIcon type="FormOutlined" />
+                        <img
+                          :src="getImage(`/flow-designer/form.png`)"
+                          style="height: 14px"
+                        />
                         表单
                       </j-radio-button>
                       <j-radio-button :value="true">
-                        <AIcon type="OrderedListOutlined" />
+                        <img
+                          :src="getImage(`/flow-designer/list.png`)"
+                          style="height: 14px"
+                        />
                         列表
                       </j-radio-button>
                     </j-space>
                   </j-radio-group>
-                  <j-button type="link" @click="onSelectChange(element)"
-                    >删除</j-button
+                </div>
+                <div class="opt">
+                  <PermissionButton
+                    size="small"
+                    type="link"
+                    danger
+                    :popConfirm="{
+                      title: `确认删除？`,
+                      onConfirm: () => onSelectChange(element),
+                    }"
                   >
-                  <j-button
+                    <AIcon type="DeleteOutlined" />
+                  </PermissionButton>
+                  <PermissionButton
+                    size="small"
                     class="sort"
                     type="link"
                     :disabled="selectedRow?.length === 1"
                   >
-                    <!-- <AIcon type="DragOutlined" /> -->
-                    移动
-                  </j-button>
-                </j-space>
+                    <AIcon type="HolderOutlined" />
+                  </PermissionButton>
+                </div>
               </div>
             </template>
           </draggable>
@@ -204,10 +225,10 @@ const onSelectChange = (row: any) => {
     )
   } else {
     // 如果已经存在, 则不做操作
-    if (selectedRow.value.some((item: any) => item.formId === row.key)) return
+    if (selectedRow.value.some((item: any) => item.formId === row.id)) return
     // row没有formId字段, 则表示左侧表格选中
     selectedRow.value.push({
-      formId: row.key,
+      formId: row.id,
       formName: row.name,
       multiple: false,
       // 表单完整信息: 仅供前端使用
@@ -290,7 +311,6 @@ watch(
   .content {
     display: flex;
     justify-content: space-between;
-    // padding: 28px 15px;
     border: 1px solid #e0e0e0;
     .left {
       flex: 1;
@@ -324,6 +344,24 @@ watch(
     .right {
       flex: 1;
       padding: 15px;
+      .selected-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f6f7f9;
+        margin-bottom: 16px;
+        padding: 9px 16px;
+        .name {
+          flex: 1;
+        }
+        .type {
+          width: 140px;
+        }
+        .opt {
+          width: 66px;
+          text-align: right;
+        }
+      }
     }
   }
 }
