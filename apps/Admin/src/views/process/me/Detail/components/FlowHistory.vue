@@ -2,7 +2,7 @@
 <template>
    <div class="content">
       <j-timeline>
-         <j-timeline-item v-for=" item in timelines" color="#999999">
+         <j-timeline-item v-for=" (item,index) in timelines" :color="getColor(index)?'#333333':'#315EFB'">
             <div class="items">
                <div class="item">
                   <div class="item-left">
@@ -12,7 +12,7 @@
                         {{ actionType.get(item.actionType) }}
                      </j-tag>
                      <j-tag :color="colorMap.get('completed')" v-if="item.others.autoOperation">
-                        {{ actionType.get(item.actionType) }}
+                        {{ actionType.get('auto') }}
                      </j-tag>
                      <j-tag :color="'default'" v-if="item.others.weight">权重{{ item.others.weight }}</j-tag>
                   </div>
@@ -31,6 +31,9 @@
                   <j-tag :color="colorMap.get(item.childrenNode.others.afterState)">
                      {{ typeMap.get(item.childrenNode.others.afterState) }}
                   </j-tag>
+               </div>
+               <div v-if="item.childrenNode.others.afterState === 'rejected'" class="item-children">
+                  <div style="margin-right: 10px;">{{ item.others.taskName }} 已驳回至 {{ item.childrenNode.others.taskName }}</div>
                </div>
             </div>
          </j-timeline-item>
@@ -86,6 +89,8 @@ const modal = ref(new Map())
 const task = ref(new Map())
 const visible = ref(false)
 const current = ref<any>({})
+const isEnd = ref(false)
+
 
 
 //节点类型
@@ -102,9 +107,15 @@ const handleModal = (obj) => {
 const handleTask = (arr) => {
    arr?.forEach(item => {
       task.value.set(item.id, item)
+      if(item.nodeProvider ==='endEvent'){
+         isEnd.value = true
+      }
    })
 }
 
+const getColor = (index)=>{
+   return isEnd && index === timelines.value.length - 1
+}
 
 //判断节点是否在时间线上
 const filterLine = (item, index) => {
@@ -163,7 +174,7 @@ const handleChange = (arr) => {
    const noShowList = arr.filter(i => !i.show)
 
    const result = showList.map(item => {
-
+      //评论及表单
       const arr = noShowList.filter(e => {
          if (item.action === 'taskLinkChanged') {
             if (e.action === 'taskCommentChanged' || e.action === 'formAdd' || e.action === 'formUpdate') {
@@ -171,11 +182,13 @@ const handleChange = (arr) => {
             }
          }
       })
+      //节点状态
       const childrenNode = noShowList.find(e => {
          if (e.action === 'taskStateChanged' && item.action === 'taskLinkChanged') {
             return e.traceId === item.traceId
          }
       })
+
       if (arr || childrenNode) {
          return {
             ...item,
@@ -196,9 +209,6 @@ const showChanged = (val, type) => {
    return type === 'taskCommentChanged' ? res : resp
 }
 
-const isEnd = (val) => {
-   return task.value.get(val.taskId)?.nodeProvider === 'endEvent'
-}
 
 //处理时间轴
 const handleTimelines = () => {
