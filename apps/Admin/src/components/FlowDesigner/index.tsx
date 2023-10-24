@@ -417,7 +417,7 @@ const FlowDesigner = defineComponent({
      * @param type (CONDITIONS: 条件分支  APPROVAL:审批节点 DEAL:办理节点)
      */
     const addBranchNode = (node, type) => {
-      if (node.branches.length < 8) {
+      if (node.branches.length < 99) {
         switch (type) {
           case 'CONDITIONS':
             node.branches.push({
@@ -470,7 +470,7 @@ const FlowDesigner = defineComponent({
             break
         }
       } else {
-        onlyMessage('最多只能添加 8 项😥', 'warning')
+        onlyMessage('最多只能添加99个分支', 'warning')
       }
     }
 
