@@ -165,7 +165,7 @@ const props = defineProps({
 }
 .node-error-state {
   .node-body {
-    box-shadow: 0px 0px 5px 0px #f56c6c !important;
+    box-shadow: 0px 0px 5px 1px #f56c6c !important;
   }
 }
 .node {
@@ -198,7 +198,7 @@ const props = defineProps({
     // }
   }
   .node-body {
-    overflow: hidden;
+    // overflow: hidden;
     cursor: pointer;
     min-height: 80px;
     max-height: 120px;
@@ -278,9 +278,9 @@ const props = defineProps({
     }
     .node-error {
       position: absolute;
-      right: -40px;
-      top: 20px;
-      font-size: 25px;
+      right: -30px;
+      top: 30px;
+      font-size: 20px;
       color: #f56c6c;
     }
   }
