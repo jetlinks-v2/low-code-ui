@@ -63,7 +63,7 @@
               <j-switch
                 size="small"
                 v-model:checked="memberFormData.freeChoiceUser"
-                :checkedValue="flowStore.selectedNode.children.id"
+                :checkedValue="flowStore.selectedNode.children?.id"
                 :unCheckedValue="undefined"
                 @change="handleSwitchChange"
               ></j-switch>
