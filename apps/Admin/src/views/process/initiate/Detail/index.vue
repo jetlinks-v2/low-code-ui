@@ -35,7 +35,7 @@
           <!-- 流程图 -->
           <div class="flow-chart">
             <span>审批流程</span>
-            <FlowDesigner readOnly :treeData="{}" />
+            <FlowDesigner readOnly :nodesData="nodesData" />
           </div>
         </j-col>
       </j-row>
@@ -76,12 +76,12 @@ interface draftProps {
 
 const router = useRouter()
 const route = useRoute()
-const formData: Ref<formDataProps[]> = ref([])
 const currentProcess = reactive<any>({})
 const previewRef = ref<any>()
 const formRef = ref<any>()
 
-const formValue = ref<any[]>([])
+// 流程图
+const nodesData = ref<any>({})
 
 const formList = ref<FormsProps[]>([])
 // 表单版本
@@ -103,7 +103,6 @@ const getTableColumns = (fields: any[], formId: string) => {
     tableData[formId][0][item.dataIndex] =
       draftData.data?.[item.dataIndex] || undefined
   })
-  console.log(_columns)
   return _columns
 }
 
@@ -181,7 +180,7 @@ const save = () => {
 }
 onMounted(() => {
   // 草稿
-  if (route.query.draft) {
+  if (route.query.isDraft) {
     Modal.confirm({
       title: '继续编辑草稿？',
       okText: '是',
@@ -199,6 +198,7 @@ onMounted(() => {
  * @param list 表单数据
  */
 const startProcess = async (list: any, start: boolean = true) => {
+  console.log('发起流程处理',list )
   const param = {
     id: route.query.id,
     start: start,
@@ -238,6 +238,7 @@ const getProcess = () => {
     Object.assign(formVersion, currentProcess.others?.formVersion)
     try {
       const obj = JSON.parse(currentProcess.model)
+      nodesData.value = obj.nodes
       //详情接口nodeId
       const bindMap = new Map()
       Object.keys(obj.nodes.props.formBinds).forEach((item) => {

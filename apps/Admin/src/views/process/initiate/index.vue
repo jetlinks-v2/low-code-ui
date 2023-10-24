@@ -55,7 +55,7 @@ const handleDetail = (data) => {
     path: '/flow-engine/initiate/initiate-detail',
     query: {
       id: data.id,
-      // draft: true,
+      // isDraft: true,
     },
   })
 }
