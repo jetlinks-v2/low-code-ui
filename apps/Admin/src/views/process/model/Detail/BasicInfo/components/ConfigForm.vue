@@ -68,7 +68,7 @@
             <div class="form-list">
               <div
                 class="form-list-item"
-                :class="{ active: isActive(item.id) }"
+                :class="{ active: isActive(item.key) }"
                 v-for="(item, index) in formList"
                 :key="index"
                 @click="onSelectChange(item)"
@@ -90,7 +90,7 @@
             chosen-class="chosen-class"
             @start="drag = true"
             @end="drag = false"
-            item-key="id"
+            item-key="key"
           >
             <template #item="{ element }">
               <div class="selected-item">
@@ -225,10 +225,10 @@ const onSelectChange = (row: any) => {
     )
   } else {
     // 如果已经存在, 则不做操作
-    if (selectedRow.value.some((item: any) => item.formId === row.id)) return
+    if (selectedRow.value.some((item: any) => item.formId === row.key)) return
     // row没有formId字段, 则表示左侧表格选中
     selectedRow.value.push({
-      formId: row.id,
+      formId: row.key,
       formName: row.name,
       multiple: false,
       // 表单完整信息: 仅供前端使用
