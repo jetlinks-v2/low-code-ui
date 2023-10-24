@@ -66,6 +66,8 @@ import Export from './Export.vue'
 import Add from './Add.vue'
 import Relation from '../../Output/components/Relation/index.vue'
 import JsonPreview from './JsonPreview.vue'
+import { request } from '@jetlinks/core'
+import { onlyMessage } from '@jetlinks/utils'
 
 const props = defineProps({
   data: {
@@ -336,6 +338,15 @@ const handleActions = (
   data: Record<string, any>,
   config: Record<string, any>,
 ) => {
+  if(config.script) {
+    const _this = {
+      request: request,
+      onlyMessage: onlyMessage
+    }
+    let customFn = new Function('data', 'callback', config.script)
+    customFn.call(_this, data, () => {
+    })
+  }
   columnOperation.value = config
   popTitle.value = config?.title
   if (

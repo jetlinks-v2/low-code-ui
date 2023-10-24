@@ -14,10 +14,23 @@ export const _delete = (id: string) => request.remove(`/process/form/${id}`);
 
 /**
  * 验证设备ID是否重复
- * @param id 设备id
+ * @param key 表单key
  * @returns 
  */
-export const isExists = (id: string) => request.get(`/process/form/_exists?where=id is ${id}`)
+export const isExists = (key: string) => request.post(`/process/form/_exists`, {
+    terms: [
+        {
+            value: 'true',
+            termType: 'eq',
+            column: 'latest',
+        },
+        {
+            value: key,
+            termType: 'eq',
+            column: 'key',
+        }
+    ],
+})
 
 export const _detail = (id: string) => request.get(`/process/form/${id}`);
 

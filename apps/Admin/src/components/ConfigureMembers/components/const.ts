@@ -83,3 +83,12 @@ export const leftData = {
     },
   ],
 }
+
+export const iconType = {
+  org: 'icon-zuzhi1',
+  user: 'icon-yonghu',
+  role: 'icon-icon-xitongquanxian',
+  fixed: 'icon-gudingzuzhi',
+  var: 'icon-bianliang',
+  relation: 'icon-a-fenchadashujushujujiegouguanxiguanxifenxiguanxiwangzuzhi'
+}
