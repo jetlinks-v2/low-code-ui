@@ -11,8 +11,8 @@
     @delNode="emits('delNode')"
     @insertNode="(type) => emits('insertNode', type)"
     placeholder="请设置办理人"
-    header-bgc="#caf982"
-    header-icon="SendOutlined"
+    header-bgc="#4FC971"
+    header-icon="CarryOutOutlined"
   />
 </template>
 

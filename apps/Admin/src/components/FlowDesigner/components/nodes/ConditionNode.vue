@@ -13,25 +13,17 @@
       <div class="node-body-main" @click="emits('selected')">
         <div class="node-body-main-header">
           <span class="title">
+            <AIcon type="FunnelPlotOutlined" style="font-size: 12px" />
             <j-ellipsis>
               {{ config.name ? config.name : '条件' + level }}
             </j-ellipsis>
-          </span>
-          <span
-            class="level"
-            :style="{ display: readOnly ? 'inline-block !important' : '' }"
-          >
-            优先级{{ level }}
           </span>
           <span
             class="option"
             :style="{ display: readOnly ? 'none !important' : '' }"
           >
             <j-space>
-              <!-- <j-tooltip title="复制条件" placement="top">
-                <AIcon type="CopyOutlined" @click="emits('copy')" />
-              </j-tooltip> -->
-              <AIcon type="CloseOutlined" @click="emits('delNode')" />
+              <AIcon type="CloseCircleFilled" @click="emits('delNode')" />
             </j-space>
           </span>
         </div>
@@ -311,21 +303,25 @@ const validate = (err) => {
     }
 
     .node-body-main {
-      //position: absolute;
-      width: 188px;
-      margin-left: 17px;
+      width: 100%;
       display: inline-block;
 
       .node-body-main-header {
-        padding: 10px 0px 5px;
+        padding: 5px 15px;
         font-size: xx-small;
         position: relative;
+        background: #ab62ee;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
         .title {
-          color: #15bca3;
-          display: inline-block;
-          height: 14px;
-          width: 125px;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          gap: 8px;
         }
 
         .level {
@@ -337,21 +333,20 @@ const validate = (err) => {
 
         .option {
           position: absolute;
-          right: 0;
-          top: 5px;
+          right: 20px;
+          top: 0px;
           display: none;
-          font-size: 14px;
-          color: #888888;
+          font-size: 18px;
 
           .anticon {
-            color: #888888;
-            padding: 0 3px;
+            color: #fff;
+            font-size: medium;
           }
         }
       }
 
       .node-body-main-content {
-        padding: 6px;
+        padding: 18px;
         color: #656363;
         font-size: 14px;
 
@@ -386,6 +381,11 @@ const validate = (err) => {
       height: 70px;
       padding: 20px 0 32px;
       justify-content: center;
+      &:deep(.ant-btn) {
+        border-radius: 50%;
+        background: #1890ff;
+        border-color: #1890ff;
+      }
       &.readonly:deep(.ant-btn) {
         display: none;
       }
