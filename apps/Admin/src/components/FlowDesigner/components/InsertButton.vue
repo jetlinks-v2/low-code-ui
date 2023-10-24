@@ -4,19 +4,27 @@
     <template #content>
       <div class="node-select">
         <div class="node-select-item approval" @click="handleAddApproval">
-          <AIcon type="ShareAltOutlined" />
+          <div class="node-icon">
+            <AIcon type="UserOutlined" />
+          </div>
           <span>审批节点</span>
         </div>
         <div class="node-select-item deal" @click="handleAddDeal">
-          <AIcon type="SendOutlined" />
+          <div class="node-icon">
+            <AIcon type="CarryOutOutlined" />
+          </div>
           <span>办理节点</span>
         </div>
         <div class="node-select-item conditions" @click="handleAddConditions">
-          <AIcon type="ShareAltOutlined" />
+          <div class="node-icon">
+            <AIcon type="FunnelPlotOutlined" />
+          </div>
           <span>条件分支</span>
         </div>
         <div class="node-select-item concurrents" @click="handleAddConcurrents">
-          <AIcon type="MenuOutlined" />
+          <div class="node-icon">
+            <AIcon type="ShareAltOutlined" />
+          </div>
           <span>并行分支</span>
         </div>
       </div>
@@ -68,23 +76,51 @@ const handleAddConcurrents = () => {
     cursor: pointer;
     padding: 5px 15px;
     border: 1px solid #f8f9f9;
-    background-color: #f8f9f9;
+    background: #f2f3f5;
     border-radius: 5px;
+    .node-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      border-radius: 6px;
+    }
     &:hover {
-      background-color: #fff;
+      //   background-color: #fff;
       box-shadow: 0 0 8px 2px #d6d6d6;
     }
     &.approval {
-      background: #facd91;
+      .node-icon {
+        background: #fcab34;
+      }
     }
     &.deal {
-      background: #caf982;
+      .node-icon {
+        background: #4fc971;
+      }
     }
     &.conditions {
-      background: #debaff;
+      .node-icon {
+        background: #ab62ee;
+      }
     }
     &.concurrents {
-      background: #ffffbb;
+      .node-icon {
+        background: #1890ff;
+      }
+    }
+    &.disabled {
+      cursor: not-allowed;
+      background: #f2f3f5;
+      color: #999999;
+      .node-icon {
+        background: #999999;
+      }
+      &:hover {
+        box-shadow: none;
+      }
     }
   }
 }

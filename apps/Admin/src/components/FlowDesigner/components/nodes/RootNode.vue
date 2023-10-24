@@ -7,8 +7,8 @@
     @selected="emits('selected')"
     @insertNode="(type) => emits('insertNode', type)"
     placeholder="系统自动匹配参与人"
-    header-bgc="#aaaaaa"
-    header-icon="UserOutlined"
+    header-bgc="#485468"
+    header-icon="SendOutlined"
   />
 </template>
 

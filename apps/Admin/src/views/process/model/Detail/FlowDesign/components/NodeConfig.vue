@@ -33,7 +33,7 @@ const nodeConfigRef = ref()
  * 保存配置
  */
 const saveConfig = () => {
-  return nodeConfigRef.value.saveConfigToPinia()
+  return nodeConfigRef.value.saveConfigToStore()
 }
 
 defineExpose({
@@ -41,4 +41,22 @@ defineExpose({
 })
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+:deep(
+    .ant-collapse-icon-position-right
+      > .ant-collapse-item
+      > .ant-collapse-header
+  ) {
+  background: #fafafa;
+  padding: 10px 20px;
+}
+:deep(.ant-collapse-borderless > .ant-collapse-item > .ant-collapse-content) {
+  background-color: #fff;
+}
+:deep(.title) {
+  margin-bottom: 0;
+}
+:deep(.ant-collapse-borderless > .ant-collapse-item) {
+  border-bottom: none;
+}
+</style>
