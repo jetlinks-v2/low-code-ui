@@ -19,7 +19,7 @@
           <template #renderItem="{ item }">
             <j-list-item>
               <j-space>
-                <img :src="getImage(`/members/${item.type}.png`)" style="height: 16px;">
+                <AIcon :type="iconType[item.type]" class="a-icon" />
                 <j-ellipsis line-clamp="1">
                   {{ item.name }}
                 </j-ellipsis>
@@ -32,7 +32,6 @@
         v-if="visible"
         v-model:visible="visible"
         :isNode="isNode"
-        :iconType="iconType"
         @get-data="getData"
       />
     </a-form-item-rest>
@@ -43,6 +42,7 @@ import Dialog from './Dialog/index.vue'
 import { DataSourceProps } from './types'
 import { isArray, isObject, pick } from 'lodash-es'
 import { getImage } from '@jetlinks/utils'
+import { iconType } from './components/const'
 
 const props = withDefaults(
   defineProps<{
@@ -66,12 +66,6 @@ const emits = defineEmits<{
 }>()
 
 const visible = ref(false)
-
-const iconType = {
-  org: 'icon-fl-zuzhi',
-  user: 'icon-pingzheng',
-  role: 'icon-yonghu2'
-}
 
 const list = ref<DataSourceProps[]>([])
 const getData = (data: DataSourceProps[], type: string) => {
@@ -158,6 +152,11 @@ watch(
       line-height: 40px;
       border-radius: 4px;
       background: #f6f7f9;
+
+      .a-icon {
+        font-size: 16px;
+        color: #226aff;
+      }
     }
   }
 }
