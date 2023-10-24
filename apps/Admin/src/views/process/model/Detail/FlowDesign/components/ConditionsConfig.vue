@@ -9,13 +9,15 @@
             button-style="solid"
             size="small"
           >
-            <j-radio-button value="exclusive">
-              执行第一个满足条件
-            </j-radio-button>
-            <j-radio-button value="all">所有条件下的流程通过</j-radio-button>
-            <j-radio-button value="condition">
-              部分条件下的流程通过
-            </j-radio-button>
+            <j-space>
+              <j-radio-button value="exclusive">
+                执行第一个满足条件
+              </j-radio-button>
+              <j-radio-button value="all">所有条件下的流程通过</j-radio-button>
+              <j-radio-button value="condition">
+                部分条件下的流程通过
+              </j-radio-button>
+            </j-space>
           </j-radio-group>
         </j-form-item>
         <j-form-item
