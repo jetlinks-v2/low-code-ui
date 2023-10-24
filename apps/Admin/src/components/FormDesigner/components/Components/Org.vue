@@ -1,7 +1,7 @@
 <template>
   <div>
     <j-tree-select
-      :tree-data="data"
+      :tree-data="options"
       :value="__value"
       @change="valueChange"
       :multiple="mode === 'multiple'"
@@ -18,7 +18,7 @@
 import { getDepartmentList_api } from '@/api/user'
 import { useRequest } from '@jetlinks/hooks'
 import { map } from 'lodash-es'
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, unref } from 'vue'
 
 const props = defineProps({
   value: {
@@ -64,9 +64,10 @@ const getObj = (arr: any[], _item: string) => {
     const element = arr[index]
     if (element?.id === _item) {
       return element
-    } else {
-      if (element?.children?.length) {
-        return getObj(element?.children, _item)
+    } else if (element?.children?.length) {
+      const obj = getObj(element?.children, _item)
+      if (obj) {
+        return obj
       }
     }
   }
@@ -84,10 +85,11 @@ const _getObj = (value: any) => {
 
 const valueChange = (value: any) => {
   if (props.mode !== 'multiple') {
-    emit('update:value', _getObj(getObj(data, value)))
+    emit('update:value', _getObj(getObj(unref(options), value)))
   } else {
     const arr = value.map((i) => {
-      return _getObj(getObj(data, i))
+      const a = getObj(unref(options), i)
+      return _getObj(a)
     })
     emit('update:value', arr)
   }
@@ -111,7 +113,7 @@ const dealTreeData = (tree: any[]) => {
     }
   })
 }
-const { data, run } = useRequest(getDepartmentList_api, {
+const { data: options, run } = useRequest(getDepartmentList_api, {
   onSuccess(res) {
     return dealTreeData(res.result)
   },
@@ -120,7 +122,13 @@ const { data, run } = useRequest(getDepartmentList_api, {
 watch(
   () => props.value,
   () => {
-    _value.value = props.value
+    if (props.mode !== 'multiple') {
+      _value.value = Array.isArray(props?.value)
+        ? props.value?.[0]?.id
+        : props.value?.id
+    } else {
+      _value.value = Array.isArray(props?.value) ? map(props?.value, 'id') : []
+    }
   },
   { deep: true, immediate: true },
 )

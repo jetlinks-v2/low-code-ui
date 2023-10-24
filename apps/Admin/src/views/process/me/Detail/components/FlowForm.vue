@@ -8,7 +8,7 @@
                     <div class="title"> {{item?.formName}}</div>
                     <FormPreview v-if="!item.multiple" :value="item.data" :data="item.configuration" ref="formRef" @state-change="(data)=>getFormData(data,index)"/>
                     <div  v-else style="background-color: #fff;">
-                        <QuickEditTable
+                    <QuickEditTable
                         validate
                         ref="tableRef"
                         :data="item.data"
@@ -17,10 +17,10 @@
                     >
                         <template v-for="(i,index) in item.configuration" #[i.dataIndex]="{record, index, valueChange}">
                             <!-- <slot :name="name" v-bind="slotData || {}" /> -->
-                            <ValueItem :itemType="i.type"  v-model:modelValue="record[i.dataIndex]" @change="()=>{valueChange(record[i.dataIndex])}"></ValueItem>
+                            <ValueItem :itemType="i.type"  v-model:modelValue="record[i.dataIndex]" @change="()=>{valueChange(record[i.dataIndex])}" :disabled="i?.disabled"></ValueItem>
                         </template>
                         </QuickEditTable>
-                        <j-button @click="()=>addTableData(item)" block style="margin-top: 10px;">新增</j-button>
+                        <j-button @click="()=>addTableData(item)" block style="margin-top: 10px;" v-if="type=='todo'">新增</j-button>
                     </div>
                 </template>
             </j-scrollbar>
@@ -169,10 +169,10 @@ const onClick = async (value) => {
             }
         })
     } else {
-        formRef.value.forEach((i, index) => {
+        formRef.value?.forEach((i, index) => {
             promise.push(i.onSave())
         })
-        tableRef.value.forEach((i)=>{
+        tableRef.value?.forEach((i)=>{
             promise.push(i.validates())
         })
         Promise.all(promise).then((res) => {
@@ -206,7 +206,7 @@ const submitForm = () => {
     }
 }
 //根据配置项生成表格
-const dealTable = () =>{
+const dealTable = (disabled) =>{
     const tableColumn = []
     formValue.value.forEach((i)=>{
         if(i.multiple){
@@ -216,6 +216,7 @@ const dealTable = () =>{
                     title: item.formItemProps?.label,
                     dataIndex: item.formItemProps?.name,
                     type: item?.type,
+                    disabled:disabled?true:false,
                     form:{
                         rules:rules
                     }
@@ -241,7 +242,8 @@ const dealForm = (nodes) => {
         btnList.value = nodes?.props?.authButtons
         //详情接口nodeId
         const bindMap = new Map()
-        Object.keys(nodes.props.formBinds).forEach((item) => {
+        console.log('-----------',nodes.props?.formBinds)
+        Object.keys(nodes.props?.formBinds).forEach((item) => {
             bindMap.set(item, nodes.props.formBinds[item])
         })
         //循环表单匹配对应节点表单ID
@@ -281,11 +283,18 @@ watch(() => props.info, () => {
     if (props.type === 'todo') {
         dealForm(nodes.value)
     } else {
-        formValue.value.map((i) => {
-            i.configuration.children.map((item) => {
+        // dealTable(true)
+        formValue.value?.map((i) => {
+            if(i.multiple){
+                dealTable(true)
+            }else{
+                i.configuration.children?.map((item) => {
                 item.componentProps.disabled = true
             })
+            }
+            
         })
+        console.log('formValue.value',formValue.value)
     }
 })
 

@@ -36,7 +36,7 @@
             <j-ellipsis class="name">{{ title }}</j-ellipsis>
           </div>
           <AIcon
-            type="CloseOutlined"
+            type="CloseCircleFilled"
             v-if="!isRoot"
             @click="emits('delNode')"
             :style="{ display: readOnly ? 'none !important' : '' }"
@@ -216,7 +216,7 @@ const props = defineProps({
         }
       }
       .node-body-header {
-        .anticon-close {
+        .anticon {
           display: inline;
           font-size: medium;
         }
@@ -256,7 +256,7 @@ const props = defineProps({
         align-items: center;
         gap: 5px;
       }
-      .anticon-close {
+      .anticon-close-circle {
         display: none;
       }
       .name {
@@ -292,6 +292,11 @@ const props = defineProps({
       display: flex;
       padding: 20px 0 32px;
       justify-content: center;
+      &:deep(.ant-btn) {
+        border-radius: 50%;
+        background: #1890ff;
+        border-color: #1890ff;
+      }
       &.readonly:deep(.ant-btn) {
         display: none;
       }

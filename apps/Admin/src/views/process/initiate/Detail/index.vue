@@ -103,6 +103,7 @@ const getTableColumns = (fields: any[], formId: string) => {
     tableData[formId][0][item.dataIndex] =
       draftData.data?.[item.dataIndex] || undefined
   })
+  console.log(_columns)
   return _columns
 }
 
