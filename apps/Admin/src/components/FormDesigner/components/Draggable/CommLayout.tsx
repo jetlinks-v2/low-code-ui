@@ -123,7 +123,7 @@ export default defineComponent({
             if (['date-picker', 'time-picker'].includes(props?.data.type)) {
                 const val = get(designer.formState, _path)
                 if (typeof val === 'number') {
-                    __value.value = dayjs(__value).format(props.data.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
+                    __value.value = dayjs(val).format(props.data.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
                 } else if (typeof val === 'string') {
                     __value.value = val
                 } else {
@@ -139,8 +139,11 @@ export default defineComponent({
                     }
                 })
                 __value.value = obj
-            } else if (['form'].includes(props?.data.type)) {
-                // 会被置空
+            } else if (['form'].includes(props?.data.type)) {// 会被置空
+                __value.value = get(designer.formState, _path)
+            } else if (['switch'].includes(props?.data.type)) {// 会被置空
+                const val = get(designer.formState, _path)
+                __value.value = val === 'true' ? true : val
             } else {
                 __value.value = get(designer.formState, _path)
             }
@@ -165,8 +168,8 @@ export default defineComponent({
                             ></TypeComponent> : (
                                 props.data?.type === 'switch' ? <TypeComponent
                                     {..._props.componentProps}
-                                    checked={get(designer.formState, _path)}
-                                    onUpdate: checked={(newValue) => {
+                                    checked={__value}
+                                    onUpdate:checked={(newValue) => {
                                         set(designer.formState, _path, newValue || false)
                                     }}
                                     onChange={onChange}
@@ -174,7 +177,7 @@ export default defineComponent({
                                 ></TypeComponent> : <TypeComponent
                                     {..._props.componentProps}
                                     value={__value.value}
-                                    onUpdate: value={(newValue) => {
+                                    onUpdate:value={(newValue) => {
                                         if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && !Array.isArray(newValue)) {
                                             props.data?.componentProps.keys.forEach(i => {
                                                 const __path = _path.slice(0, _path.length - 1) || []
