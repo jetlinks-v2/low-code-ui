@@ -1,6 +1,15 @@
 <!-- 表格表单预览 -->
 <template>
-  <j-table :data-source="myDataSource" :columns="columns" :pagination="false">
+  <j-table :scroll="{ x: true }" :data-source="myDataSource" :columns="columns" :pagination="false">
+    <template #headerCell="{ column, title }">
+      <template v-if="column.formItemProps.required">
+        <span>
+          <div class="title">
+            {{ title }}
+          </div>
+        </span>
+      </template>
+    </template>
     <template #bodyCell="{ column, text, record }">
       <j-form-item 
         :name="[column.formId, 0, column.dataIndex]"
@@ -57,4 +66,15 @@ watch(
 )
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.title::after{
+  position: absolute;
+  top: 35%;
+  left: 8px;
+  color: #ff4d4f;
+  font-size: 14px;
+  font-family: SimSun, sans-serif;
+  line-height: 1;
+  content: '*';
+}
+</style>
