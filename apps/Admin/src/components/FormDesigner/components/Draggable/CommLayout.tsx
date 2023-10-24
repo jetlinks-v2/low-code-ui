@@ -139,9 +139,11 @@ export default defineComponent({
                     }
                 })
                 __value.value = obj
-            } else if (['form'].includes(props?.data.type)) {// 会被置空
-                __value.value = get(designer.formState, _path)
-            } else if (['switch'].includes(props?.data.type)) {// 会被置空
+            } 
+            // else if (['form'].includes(props?.data.type)) {// 会被置空
+            //     __value.value = get(designer.formState, _path)
+            // } 
+            else if (['switch'].includes(props?.data.type)) {// 会被置空
                 const val = get(designer.formState, _path)
                 __value.value = val === 'true' ? true : val
             } else {
@@ -168,7 +170,7 @@ export default defineComponent({
                             ></TypeComponent> : (
                                 props.data?.type === 'switch' ? <TypeComponent
                                     {..._props.componentProps}
-                                    checked={__value}
+                                    checked={__value.value}
                                     onUpdate:checked={(newValue) => {
                                         set(designer.formState, _path, newValue || false)
                                     }}
