@@ -7,16 +7,17 @@
 </template>
 
 <script lang="ts" setup>
-import { _detail, _save } from '@/api/process/form'
+import { _detail, _update } from '@/api/process/form'
 import { onlyMessage } from '@jetlinks/utils'
 import { onMounted, ref } from 'vue'
 import { router } from '@jetlinks/router'
+import { omit } from 'lodash-es'
 
 const route = useRoute()
 const data = ref<any>()
 
 const queryDetail = (id) => {
-    _detail(route.params.id).then(resp => {
+    _detail(id).then(resp => {
         if(resp.success){
             data.value = resp.result
         }
@@ -24,8 +25,8 @@ const queryDetail = (id) => {
 }
 
 const onSave = (dt: any) => {
-    _save({
-        ...data.value,
+    _update({
+        ...omit(data.value, 'id'),
         configuration: dt
     }).then(resp => {
         if(resp.success){
@@ -43,5 +44,6 @@ onMounted(() => {
 <style lang="less" scoped>
 .box {
   background-color: #fff;
+  height: calc(100vh - 122px);
 }
 </style>

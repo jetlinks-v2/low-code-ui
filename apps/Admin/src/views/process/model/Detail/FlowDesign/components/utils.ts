@@ -23,6 +23,44 @@ export function findNodeById(node, id) {
 }
 
 /**
+ * 获取条件分支下所有节点id
+ * @param branches 
+ * @returns 
+ */
+function getBranchNodeIds(branches: any[]) {
+    const branchNodeIds: string[] = []
+    branches.forEach((branchNode) => {
+        branchNodeIds.push(branchNode.id)
+        branchNodeIds.push(branchNode.children.id)
+        if (branchNode.children?.type === 'CONDITIONS' || branchNode.children?.type === 'CONDITIONS') {
+            branchNodeIds.push(...getBranchNodeIds(branchNode.children.branches))
+        } else {
+            setEmptyNodeProps(branchNode.children.children)
+        }
+    })
+    return branchNodeIds
+}
+/**
+ * 设置条件节点的children节点的props
+ */
+export function setEmptyNodeProps(nodes: any) {
+    if (nodes.type === 'ROOT') return
+    if (nodes?.type === 'CONDITIONS') {
+        const branchNodeIds: string[] = getBranchNodeIds(nodes.branches)
+
+        nodes.children.props = {
+            ...nodes.children.props,
+            type: 'complex',
+            complexType: 'allComplete',
+            allCompleteNodeId: branchNodeIds
+        }
+    } else {
+        setEmptyNodeProps(nodes.children)
+    }
+    console.log('setEmptyNodeProps: ', nodes);
+}
+
+/**
  * 通过变量id, 递归查找对应变量
  * @param vars 
  * @param id
@@ -67,6 +105,41 @@ export function handleArrToStr(arr: string[] = []) {
 export function handleStrToArr(str: string = '') {
     return str.replace(/\[/g, '').replace(/\]/g, '').split('&')
 }
+/**
+ * 将对象数据里面节点id提取并处理为数组, 
+ * 如: {
+        "node1$eq": true,
+        "node2$eq": true,
+       } 
+       => [node1, node2]
+ * @param str 
+ * @returns 
+ */
+export function handleObjToArr(obj: { [key: string]: boolean }) {
+    const arr: string[] = []
+    for (let key in obj) {
+        const nodeId = key.split('$')[0]
+        arr.push(nodeId)
+    }
+    return arr
+}
+/**
+ * 将节点id数组处理为对象结构
+ * 如: [node1, node2] 
+       => {
+            "node1$eq": true,
+            "node2$eq": true,
+          } 
+ * @param str 
+ * @returns 
+ */
+export function handleArrToObj(arr: string[] = []) {
+    const obj: { [key: string]: boolean } = {}
+    arr.forEach(item => {
+        obj[`${item}$eq`] = true
+    })
+    return obj
+}
 
 /**
  * 前端筛选表单名称/字段名称/字段标识
@@ -82,4 +155,19 @@ export function filterFormByName(list, name) {
         // }
         return item.formName.includes(name)
     })
+}
+
+/**
+ * 对象求和
+ * @param data 
+ * @returns 
+ */
+export function sumValues(data: { [key: string]: number }) {
+    let sum = 0;
+    for (let key in data) {
+        if (typeof data[key] === 'number') {
+            sum += data[key];
+        }
+    }
+    return sum;
 }

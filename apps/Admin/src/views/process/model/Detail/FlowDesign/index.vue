@@ -10,13 +10,13 @@
     :closable="false"
     @close="showConfig = false"
   >
-    <!-- :title="title" -->
-    <!-- <template #extra>
-      <j-space>
-        <j-button @click="showConfig = false">取消</j-button>
-        <j-button type="primary" @click="handleSubmit">确定</j-button>
-      </j-space>
-    </template> -->
+    <template v-if="isAdvanceConfig" #title> 高级配置 </template>
+    <j-input
+      v-if="!isAdvanceConfig"
+      v-model:value="nodeName"
+      placeholder="请输入"
+      style="margin-bottom: 10px"
+    />
 
     <NodeConfig ref="nodeConfigRef" />
   </j-drawer>
@@ -31,11 +31,18 @@ import { findNodeById } from './components/utils'
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
 
-// const title = computed(() => {
-//   return ['CONDITIONS', 'CONCURRENTS'].includes(selectedNode.value?.type)
-//     ? '高级配置'
-//     : selectedNode.value?.name
-// })
+// 是否高级配置
+const isAdvanceConfig = computed(() => {
+  return ['CONDITIONS', 'CONCURRENTS'].includes(selectedNode.value?.type)
+})
+
+// 节点名称
+const nodeName = computed({
+  get: () => selectedNode.value?.name,
+  set: (val) => {
+    flowStore.selectedNode.name = val
+  },
+})
 
 const nodeConfigRef = ref()
 const showConfig = ref(false)
@@ -60,17 +67,27 @@ const nodeDel = (node) => {
   }
 }
 
-// const handleSubmit = () => {
-//   nodeConfigRef.value
-//     .saveConfig()
-//     .then((valid) => {
-//       console.log('handleSubmit valid: ', valid)
-//       showConfig.value = false
-//     })
-//     .catch((err) => {
-//       console.log('handleSubmit err: ', err)
-//     })
-// }
+/**
+ * 关闭抽屉, 保存节点数据至store
+ */
+const saveNodeConfig = () => {
+  nodeConfigRef.value
+    .saveConfig()
+    .then((valid) => {
+      console.log('saveNodeConfig valid: ', valid)
+      showConfig.value = false
+    })
+    .catch((err) => {
+      console.log('saveNodeConfig err: ', err)
+    })
+}
+
+watch(
+  () => showConfig.value,
+  (val) => {
+    if (!val) saveNodeConfig()
+  },
+)
 
 /**
  * 下一步
@@ -82,7 +99,23 @@ const next = () => {
   })
 }
 
-defineExpose({ next })
+/**
+ * 当前步骤校验方法
+ */
+const validateSteps = () => {
+  return new Promise((resolve, reject) => {
+    // formRef.value
+    //   .validate()
+    //   .then((res) => {
+    //     resolve(res)
+    //   })
+    //   .catch((err) => {
+    //     reject(err)
+    //   })
+  })
+}
+
+defineExpose({ next, validateSteps })
 </script>
 
 <style lang="less" scoped></style>

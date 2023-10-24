@@ -1,11 +1,14 @@
 <!-- 节点-配置表单/字段 -->
 <template>
-  <j-button type="primary" block size="small" ghost @click="visible = true">
-    配置表单内容
+  <j-button class="btn" block @click="visible = true">
+    <span>配置表单内容</span>
+    <span class="icon">
+      <img :src="getImage('/members/check.png')" />
+    </span>
   </j-button>
-  <div v-for="(fields, index) in forms" :key="index">
+  <!-- <div v-for="(fields, index) in forms" :key="index">
     <div v-for="(field, idx) in fields">{{ field }}</div>
-  </div>
+  </div> -->
   <j-modal
     v-model:visible="visible"
     width="900px"
@@ -88,7 +91,7 @@
               :data="item.fullInfo?.configuration"
             />
             <TableFormPreview
-              :data-source="tableData"
+              v-model:data-source="tableData"
               :columns="getTableColumns(item.fullInfo?.configuration?.children)"
               v-else
             />
@@ -106,6 +109,8 @@ import { filterFormByName } from './utils'
 import { cloneDeep } from 'lodash-es'
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import TableFormPreview from './TableFormPreview.vue'
+import { PropType } from 'vue'
+import { getImage } from '@jetlinks/utils'
 
 const flowStore = useFlowStore()
 
@@ -116,7 +121,7 @@ type Emits = {
 const emits = defineEmits<Emits>()
 const props = defineProps({
   value: {
-    type: Array,
+    type: Array as PropType<any[]>,
     default: () => [],
   },
 })
@@ -128,7 +133,7 @@ const forms = computed({
 })
 
 const permissions = ref([
-  { label: '读', value: 'read' },
+  { label: '读', value: 'read', disabled: true },
   { label: '写', value: 'write' },
 ])
 
@@ -137,8 +142,8 @@ const permissions = ref([
  */
 const loading = ref(false)
 const keywords = ref('')
-const filterFormList = ref([])
-const allFormList = ref([])
+const filterFormList = ref<any[] | undefined>([])
+const allFormList = ref<any[] | undefined>([])
 const getFormList = async () => {
   filterFormList.value = flowStore.model.config.forms?.map((m) => {
     const _fields = m.fullInfo.configuration?.children
@@ -146,19 +151,21 @@ const getFormList = async () => {
     const existFields = forms.value[m.formId]
     if (existFields && existFields.length) {
       _fields?.forEach((p) => {
-        const _currentField = existFields.find((f) => f.id === p.key)
-        p['accessModes'] = _currentField ? _currentField.accessModes : []
+        const _currentField = existFields.find(
+          (f) => f.id === p.formItemProps.name,
+        )
+        p['accessModes'] = _currentField ? _currentField.accessModes : ['read']
         // 只有"写"权限时, 表单才可编辑
         p.componentProps.disabled = !p.accessModes.includes('write')
       })
-      return { accessModes: [], ...m }
+      return { accessModes: ['read'], ...m }
     } else {
       _fields?.forEach((p) => {
-        p['accessModes'] = []
+        p['accessModes'] = ['read']
         // 初始状态没有权限, 不可编辑
         p.componentProps.disabled = true
       })
-      return { accessModes: [], ...m }
+      return { accessModes: ['read'], ...m }
     }
   })
   //   所有表单数据
@@ -176,7 +183,7 @@ const handleSearch = () => {
 const checkAll = ref(false)
 const handleAllCheck = () => {
   filterFormList.value?.forEach((item) => {
-    item.accessModes = checkAll.value ? ['read', 'write'] : []
+    item.accessModes = checkAll.value ? ['read', 'write'] : ['read']
     handleFormCheck(item)
   })
 }
@@ -188,6 +195,7 @@ const handleFormCheck = (form: any) => {
   const _fields = form.fullInfo.configuration?.children
   _fields?.forEach((p) => {
     p.accessModes = form.accessModes
+    p.componentProps.disabled = !p.accessModes.includes('write')
   })
 }
 
@@ -203,7 +211,7 @@ const handleFieldCheck = (field) => {
   field.componentProps.disabled = !field.accessModes.includes('write')
 }
 
-const tableData = ref([{}])
+const tableData = ref<any>([{}])
 const getTableColumns = (fields: any[]) => {
   //   console.log('getTableColumns: ', fields)
 
@@ -231,7 +239,7 @@ const handleOk = () => {
     _fields?.forEach((p) => {
       if (p.accessModes.length) {
         forms.value[item.formId].push({
-          id: p.key,
+          id: p.formItemProps.name,
           required: true,
           accessModes: p.accessModes,
         })
@@ -239,6 +247,7 @@ const handleOk = () => {
     })
   })
   visible.value = false
+  //   console.log('forms.value: ', forms.value);
 }
 
 watch(
@@ -247,9 +256,37 @@ watch(
     if (val) getFormList()
   },
 )
+watch(
+  () => filterFormList.value,
+  (val) => {
+    val?.forEach((form) => {
+      const fieldAccessModes = form.fullInfo?.configuration?.children?.map(
+        (field) => field.accessModes,
+      )
+      // 当表单下, 每个字段都有"写"权限时, 对应表单也勾选"写"
+      form.accessModes = fieldAccessModes?.every((e) => e.includes('write'))
+        ? ['read', 'write']
+        : ['read']
+    })
+  },
+  { deep: true, immediate: true },
+)
 </script>
 
 <style lang="less" scoped>
+.btn {
+  width: 100%;
+  margin-bottom: 8px;
+  .icon {
+    position: absolute;
+    top: -4px;
+    right: 0;
+    & > img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
 .form-box {
   max-height: 600px;
   overflow: auto;

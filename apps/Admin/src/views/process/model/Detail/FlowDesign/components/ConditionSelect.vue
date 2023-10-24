@@ -1,61 +1,69 @@
 <template>
-  <div
-    class="condition-select"
-    v-for="(item, index) in conditionSelect"
-    :key="index"
-  >
-    <j-tree-select
-      v-model:value="item.column"
-      v-model:searchValue="item.searchValue"
-      show-search
-      placeholder="请选择"
-      allow-clear
-      tree-default-expand-all
-      tree-node-filter-prop="name"
-      :tree-data="conditionOptions"
-      :field-names="{ label: 'name', value: 'fullId' }"
-      :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-      style="width: 400px"
-    >
-      <template #title="{ name }">
-        <template
-          v-for="(fragment, i) in name
-            ?.toString()
-            ?.split(
-              new RegExp(
-                `(?<=${item.searchValue})|(?=${item.searchValue})`,
-                'i',
-              ),
-            )"
-        >
-          <span
-            v-if="fragment.toLowerCase() === item.searchValue?.toLowerCase()"
-            :key="i"
-            style="color: #08c"
-          >
-            {{ fragment }}
-          </span>
-          <template v-else>{{ fragment }}</template>
-        </template>
-      </template>
-    </j-tree-select>
+  <div v-for="(item, index) in conditionSelect" :key="index">
     <j-select
-      v-model:value="item.termsType"
-      :options="termsOptions"
+      v-if="index > 0"
+      v-model:value="item.type"
+      :options="[
+        { label: '或者', value: 'or' },
+        { label: '并且', value: 'and' },
+      ]"
       placeholder="请选择"
-      style="width: 90px"
+      style="width: 90px; margin-bottom: 10px"
     />
-    <ConditionValueItem
-      v-model:modelValue="item.value"
-      :itemType="getComponentsType(item)"
-    />
+    <div class="condition-select">
+      <j-tree-select
+        v-model:value="item.column"
+        v-model:searchValue="item.searchValue"
+        show-search
+        placeholder="请选择"
+        allow-clear
+        tree-default-expand-all
+        tree-node-filter-prop="name"
+        :tree-data="conditionOptions"
+        :field-names="{ label: 'name', value: 'fullId' }"
+        :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+        style="width: 400px"
+      >
+        <template #title="{ name }">
+          <template
+            v-for="(fragment, i) in name
+              ?.toString()
+              ?.split(
+                new RegExp(
+                  `(?<=${item.searchValue})|(?=${item.searchValue})`,
+                  'i',
+                ),
+              )"
+          >
+            <span
+              v-if="fragment.toLowerCase() === item.searchValue?.toLowerCase()"
+              :key="i"
+              style="color: #08c"
+            >
+              {{ fragment }}
+            </span>
+            <template v-else>{{ fragment }}</template>
+          </template>
+        </template>
+      </j-tree-select>
+      <j-select
+        v-model:value="item.termType"
+        :options="operatorMap[conditionType(item) || 'default']"
+        placeholder="请选择"
+        style="width: 90px"
+      />
+      <ConditionValueItem
+        v-model:modelValue="item.value"
+        :conditionType="conditionType(item)"
+      />
 
-    <AIcon
-      type="DeleteOutlined"
-      style="color: red"
-      @click="handleRemove(index)"
-      v-if="index !== 0"
-    />
+      <AIcon
+        type="DeleteOutlined"
+        style="color: red"
+        @click="handleRemove(index)"
+        v-if="index !== 0"
+      />
+    </div>
   </div>
   <j-button type="primary" block size="small" ghost @click="handleAdd">
     +
@@ -65,15 +73,17 @@
 <script setup lang="ts">
 import { queryVariables_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
-import { findVariableById } from './utils'
 import ConditionValueItem from './ConditionValueItem.vue'
+import { operatorMap } from './const'
+import { findVariableById } from './utils'
 
 const flowStore = useFlowStore()
 
 interface IConditionSelect {
   column: string | undefined
-  termsType: string | undefined
+  termType: string | undefined
   value: string | string[] | number | undefined
+  type?: string
   searchValue: string | undefined
 }
 
@@ -95,7 +105,7 @@ watch(
         : [
             {
               column: undefined,
-              termsType: undefined,
+              termType: undefined,
               value: undefined,
               searchValue: '',
             },
@@ -103,44 +113,8 @@ watch(
   },
   { deep: true, immediate: true },
 )
-// const conditionSelect = computed({
-//   get: () => props.value,
-//   set: (val) => {
-//     console.log('conditionSelect.value1: ', val)
-//     emit('update:value', val)
-//   },
-// })
 
 const conditionOptions = ref([])
-
-const termsOptions = ref([
-  {
-    label: '=',
-    value: 'eq',
-  },
-  {
-    label: '!=',
-    value: 'not',
-  },
-  {
-    label: '包含',
-    value: 'in',
-  },
-  {
-    label: '不包含',
-    value: 'nin',
-  },
-])
-
-/**
- * 变量列表的others.type = 组织org、用户user、角色role、产品product、设备device时,
- * 取下拉值为下拉单选/多选框, 否则为输入框
- */
-const getComponentsType = (item) => {
-  const _var = findVariableById(conditionOptions.value, item.column)
-  console.log('_var?.others?.type: ', _var?.others?.type)
-  return _var?.others?.type
-}
 
 /**
  * 获取条件下拉数据
@@ -161,6 +135,17 @@ const getFormFields = async () => {
   conditionOptions.value = result
 }
 
+/**
+ * 所选条件(变量/表单字段)类型
+ * 变量列表的others.type = 组织org、用户user、角色role、产品product、设备device时,
+ * 取下拉值为下拉单选/多选框, 否则为输入框
+ */
+const conditionType = (item) => {
+  const _var = findVariableById(conditionOptions.value, item?.column)
+  //   console.log('_var: ', _var)
+  return _var?.others?.type
+}
+
 const handleRemove = (index: number) => {
   conditionSelect.value.splice(index, 1)
 }
@@ -168,8 +153,9 @@ const handleRemove = (index: number) => {
 const handleAdd = () => {
   conditionSelect.value.push({
     column: undefined,
-    termsType: undefined,
+    termType: undefined,
     value: undefined,
+    type: undefined,
     searchValue: '',
   })
 }

@@ -22,6 +22,7 @@ import DefaultProps from './DefaultNodeProps'
 import { onlyMessage } from '@jetlinks/utils'
 import { useMouseEvent } from './hooks/useMouseEvent'
 import type { INode } from '@/views/process/model/Detail/typings.d.ts'
+import { setEmptyNodeProps } from '@/views/process/model/Detail/FlowDesign/components/utils'
 
 const componentsMap = {
   NODE: Node,
@@ -316,6 +317,7 @@ const FlowDesigner = defineComponent({
       parentNode.children.props = {
         branchBy: parentNode.props.branchBy || null,
       }
+
       parentNode.children.children = {
         id: getRandomId(),
         parentId: parentNode.children.id,
@@ -612,6 +614,7 @@ const FlowDesigner = defineComponent({
         ]),
       )
       console.log('dom.value: ', dom.value)
+      // setEmptyNodeProps(dom.value)
 
       return h(
         'div',
