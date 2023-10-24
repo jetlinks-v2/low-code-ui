@@ -614,7 +614,7 @@ const FlowDesigner = defineComponent({
         ]),
       )
       console.log('dom.value: ', dom.value)
-      // setEmptyNodeProps(dom.value)
+      setEmptyNodeProps(dom.value)
 
       return h(
         'div',

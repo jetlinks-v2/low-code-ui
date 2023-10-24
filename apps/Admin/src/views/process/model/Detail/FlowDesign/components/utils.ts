@@ -28,23 +28,23 @@ export function findNodeById(node, id) {
  * @returns 
  */
 function getBranchNodeIds(branches: any[]) {
-    const branchNodeIds: string[] = []
+    let branchNodeIds: string[] = []
     branches.forEach((branchNode) => {
         branchNodeIds.push(branchNode.id)
         branchNodeIds.push(branchNode.children.id)
-        if (branchNode.children?.type === 'CONDITIONS' || branchNode.children?.type === 'CONDITIONS') {
-            branchNodeIds.push(...getBranchNodeIds(branchNode.children.branches))
+        if (branchNode.children?.type === 'CONDITIONS' || branchNode.children?.type === 'CONCURRENTS') {
+            branchNodeIds = [...branchNodeIds, ...getBranchNodeIds(branchNode.children.branches)]
         } else {
-            setEmptyNodeProps(branchNode.children.children)
+            // setEmptyNodeProps(branchNode.children)
         }
     })
+    // console.log('branchNodeIds: ', branchNodeIds);
     return branchNodeIds
 }
 /**
  * 设置条件节点的children节点的props
  */
 export function setEmptyNodeProps(nodes: any) {
-    if (nodes.type === 'ROOT') return
     if (nodes?.type === 'CONDITIONS') {
         const branchNodeIds: string[] = getBranchNodeIds(nodes.branches)
 
@@ -55,9 +55,9 @@ export function setEmptyNodeProps(nodes: any) {
             allCompleteNodeId: branchNodeIds
         }
     } else {
-        setEmptyNodeProps(nodes.children)
+        setEmptyNodeProps(nodes?.children)
     }
-    console.log('setEmptyNodeProps: ', nodes);
+    // console.log('setEmptyNodeProps: ', nodes);
 }
 
 /**
