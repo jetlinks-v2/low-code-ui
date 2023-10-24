@@ -74,13 +74,12 @@ const params = ref<any>({})
 const tableRef = ref<Record<string, any>>({})
 const current = ref({})
 const visible = ref<boolean>(false)
-const visibleMenu = ref<boolean>(false)
 
 const columns = [
   {
     title: '表单标识',
-    dataIndex: 'id',
-    key: 'id',
+    dataIndex: 'key',
+    key: 'key',
     ellipsis: true,
     search: {
       type: 'string',
