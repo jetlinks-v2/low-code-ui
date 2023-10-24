@@ -10,6 +10,7 @@ import { provide, ref, reactive, PropType, watch } from 'vue'
 import { ISchema } from './typings'
 import { getFieldData, initData } from './utils/utils'
 import { proAll } from '../QuickEditTable/util'
+import { cloneDeep } from 'lodash-es'
 
 const props = defineProps({
   value: {
@@ -30,9 +31,6 @@ const props = defineProps({
     type: String as PropType<'workflow' | 'low-code'>,
     default: 'low-code',
   },
-  // projectId: {
-  //   type: String,
-  // },
   disabled: {
     type: Boolean,
     default: false,
@@ -58,7 +56,17 @@ watch(
   () => [JSON.stringify(props.value), JSON.stringify(props.data)],
   () => {
     if (props.data) {
-      formData.value = (props.data || initData) as ISchema
+      let obj = cloneDeep(props.data)
+      if (props.formStyle) {
+        obj = {
+          ...obj,
+          componentProps: {
+            ...obj.componentProps,
+            ...props.formStyle,
+          },
+        }
+      }
+      formData.value = obj as ISchema
       Object.assign(formState, getFieldData(formData.value) || {})
     }
     Object.assign(formState, props.value || {})
@@ -76,15 +84,14 @@ watch(
         ...formData.value,
         componentProps: {
           ...formData.value.componentProps,
-          ...props.formStyle,
+          ...val,
         },
       }
-      formData.value = obj
+      formData.value = cloneDeep(obj)
     }
   },
   {
     immediate: true,
-    deep: true,
   },
 )
 
@@ -127,7 +134,7 @@ watch(
   },
 )
 
-defineExpose({ onSave, formState})
+defineExpose({ onSave, formState })
 </script>
 
 <style lang="less" scoped>

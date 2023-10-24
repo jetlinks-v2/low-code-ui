@@ -4,6 +4,8 @@ import { request } from '@jetlinks/core'
 // 保存
 export const _save = (data: any) => request.patch('/process/form', data);
 
+export const _update = (data: any) => request.post('/process/form/new-version/_insert', data);
+
 // 查询
 export const _query = (data: any) => request.post('/process/form/_query', data);
 
