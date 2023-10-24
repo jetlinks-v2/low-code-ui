@@ -35,7 +35,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value', 'change'])
 
 const myValue = ref(props.value)
 const formRef = ref<any>(null)
@@ -45,6 +45,7 @@ const config = computed(() => {
 
 const onValueChange = (e) => {
   emit('update:value', e)
+  emit('change', e)
 }
 
 const formStyle = computed(() => {

@@ -9,6 +9,13 @@
       :request="_query"
       :defaultParams="{
         sorts: [{ name: 'createTime', order: 'desc' }],
+        terms: [
+          {
+            value: 'true',
+            termType: 'eq',
+            column: 'latest',
+          },
+        ],
       }"
     >
       <template #headerTitle>

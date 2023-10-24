@@ -53,7 +53,7 @@ export default defineComponent({
         type: props.data?.type + '-item',
         children: [],
         formItemProps: {
-          name: uid(6)
+          name: props.data?.type + '-item' + '_' + uid(6)
         },
         componentProps: {
           name: 'Title'
@@ -89,6 +89,8 @@ export default defineComponent({
           unref(list)?.length ? <Collapse data-layout-type={'collapse'} {...props.data.componentProps}>
             {
               unref(list).map((element) => {
+                const __path = [..._path, element.formItemProps?.name]
+
                 return (
                   <CollapsePanel key={element.key} {...omit(element.componentProps, 'header')} header={element.componentProps?.name}>
                     <Selection
@@ -106,8 +108,8 @@ export default defineComponent({
                         data={element.children}
                         data-layout-type={'item'}
                         parent={element}
-                        path={_path}
-                        index={_index + 1}
+                        path={__path}
+                        index={_index + 2}
                         visible={props.visible}
                         editable={props.editable}
                       />

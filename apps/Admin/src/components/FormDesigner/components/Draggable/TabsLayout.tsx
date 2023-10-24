@@ -54,7 +54,7 @@ export default defineComponent({
                     name: 'Title'
                 },
                 formItemProps: {
-                    name: uid(6)
+                    name: props.data?.type + '-item' + '_' + uid(6)
                 }
             })
             designer.onAddChild(_item, props.data)
@@ -69,7 +69,7 @@ export default defineComponent({
         })
 
         return () => {
-            const _path = cloneDeep(props?.path || []);
+            let _path = cloneDeep(props?.path || []);
             const _index = props?.index || 0;
             if (props.data?.formItemProps?.name) {
                 _path[_index] = props.data.formItemProps.name
@@ -81,6 +81,7 @@ export default defineComponent({
                         unref(list).length ? <Tabs data-layout-type={'tabs'} {...props.data.componentProps}>
                             {
                                 unref(list).map((element) => {
+                                    const __path = [..._path, element.formItemProps?.name]
                                     return (
                                         <TabPane key={element.key} {...omit(element.componentProps, 'name')} tab={element.componentProps.name}>
                                             <Selection
@@ -98,8 +99,8 @@ export default defineComponent({
                                                     data-layout-type={'tabs-item'}
                                                     data={element.children}
                                                     parent={element}
-                                                    path={_path}
-                                                    index={_index + 1}
+                                                    path={__path}
+                                                    index={_index + 2}
                                                     visible={props.visible}
                                                     editable={props.editable}
                                                 />
