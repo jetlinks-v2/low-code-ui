@@ -25,7 +25,9 @@
           >
             <j-space>
               <div class="icon">
-                <img :src="getImage(`/members/${item.value}.png`)" style="height: 18px;">
+                <AIcon :type="iconType[item.value]" class="a-icon" />
+
+                <!-- <img :src="getImage(`/members/${item.value}.png`)" style="height: 18px;"> -->
               </div>
               <div class="text">
                 <div class="left-item-title">
@@ -51,10 +53,9 @@
   </j-modal>
 </template>
 <script setup lang="ts">
-import { PropType } from 'vue';
 import MemberSelect from '../components/MemberSelect.vue'
 import { DataSourceProps } from '../types'
-import { getImage } from '@jetlinks/utils';
+import { iconType } from '../components/const'
 
 const props = defineProps({
   visible: {
@@ -64,10 +65,6 @@ const props = defineProps({
   isNode: {
     type: Boolean,
     default: false,
-  },
-  iconType: {
-    type: Object as PropType<any>,
-    default: () => {},
   },
 })
 
@@ -88,7 +85,6 @@ const dimensions = [
     value: 'org',
     description: '从组织维度划分可发起流程的成员',
     checked: true,
-    // icon: 'icon-fl-zuzhi',
   },
   {
     id: '2',
@@ -96,7 +92,6 @@ const dimensions = [
     value: 'user',
     description: '从用户维度划分可发起流程的成员',
     checked: false,
-    // icon: 'icon-pingzheng',
   },
   {
     id: '3',
@@ -104,7 +99,6 @@ const dimensions = [
     value: 'role',
     description: '从角色维度划分可发起流程的成员',
     checked: false,
-    // icon: 'icon-yonghu2',
   },
 ]
 // 选中的维度
@@ -148,8 +142,6 @@ const back = () => {
 .dimensions {
   display: flex;
   justify-content: center;
-  // min-height: 170px;
-  // height: 367px;
 
   .radio {
     display: flex;
@@ -161,8 +153,6 @@ const back = () => {
       display: flex;
       align-items: center;
       justify-content: center;
-      // height: 98px;
-      // height: c;
       padding: 16px;
       border: none;
       border-radius: 4px;
@@ -186,6 +176,11 @@ const back = () => {
         height: 40px;
         border-radius: 8px;
         background: #dee2eb;
+
+        .a-icon {
+          font-size: 18px;
+          color: #226aff;
+        }
       }
 
       .text {

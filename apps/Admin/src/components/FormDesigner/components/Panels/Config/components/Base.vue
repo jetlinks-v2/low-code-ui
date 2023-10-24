@@ -495,7 +495,7 @@ import { useTarget } from '../../../../hooks'
 import { basic } from '@/components/FormDesigner/utils/defaultData'
 import generatorData from '@/components/FormDesigner/utils/generatorData'
 import { getBrotherList, queryKeys, updateData } from '../../../../utils/utils'
-import Storage from './Storage.vue'
+import Storage from './Storage/index.vue'
 import { uid } from '@/components/FormDesigner/utils/uid'
 import { cloneDeep, flatten, map } from 'lodash-es'
 

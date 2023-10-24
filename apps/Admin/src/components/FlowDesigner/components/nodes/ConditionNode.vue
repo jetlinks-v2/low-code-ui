@@ -13,25 +13,17 @@
       <div class="node-body-main" @click="emits('selected')">
         <div class="node-body-main-header">
           <span class="title">
+            <AIcon type="FunnelPlotOutlined" style="font-size: 12px" />
             <j-ellipsis>
               {{ config.name ? config.name : '条件' + level }}
             </j-ellipsis>
-          </span>
-          <span
-            class="level"
-            :style="{ display: readOnly ? 'inline-block !important' : '' }"
-          >
-            优先级{{ level }}
           </span>
           <span
             class="option"
             :style="{ display: readOnly ? 'none !important' : '' }"
           >
             <j-space>
-              <!-- <j-tooltip title="复制条件" placement="top">
-                <AIcon type="CopyOutlined" @click="emits('copy')" />
-              </j-tooltip> -->
-              <AIcon type="CloseOutlined" @click="emits('delNode')" />
+              <AIcon type="CloseCircleFilled" @click="emits('delNode')" />
             </j-space>
           </span>
         </div>
@@ -117,46 +109,50 @@ const showError = ref(false)
 
 const active = computed(() => props?.config?.active)
 const content = computed(() => {
-  const groups = props.config.props?.groups
-  let confitions: any[] = []
-  groups?.forEach((group) => {
-    let subConditions: any[] = []
-    group.conditions.forEach((subCondition) => {
-      let subConditionStr = ''
-      switch (subCondition.valueType) {
-        case ValueType.dept:
-        case ValueType.user:
-          subConditionStr = `${subCondition.title}属于[${String(
-            subCondition.value?.map((u) => u.name),
-          ).replaceAll(',', '. ')}]之一`
-          break
-        case ValueType.number:
-        case ValueType.string:
-          subConditionStr = getOrdinaryConditionContent(subCondition)
-          break
-      }
-      subConditions.push(subConditionStr)
-    })
-    //根据子条件关系构建描述
-    let subConditionsStr = String(subConditions).replaceAll(
-      ',',
-      subConditions.length > 1
-        ? group.groupType === 'AND'
-          ? ') 且 ('
-          : ') 或 ('
-        : group.groupType === 'AND'
-        ? ' 且 '
-        : ' 或 ',
-    )
-    confitions.push(
-      subConditions.length > 1 ? `(${subConditionsStr})` : subConditionsStr,
-    )
-  })
-  //构建最终描述
-  return String(confitions).replaceAll(
-    ',',
-    props.config.props?.groupsType === 'AND' ? ' 且 ' : ' 或 ',
-  )
+  const terms = props.config.props?.condition?.configuration?.terms
+  console.log('terms: ', terms);
+ 
+  return '请配置条件'
+  //   const groups = props.config.props?.groups
+  //   let confitions: any[] = []
+  //   groups?.forEach((group) => {
+  //     let subConditions: any[] = []
+  //     group.conditions.forEach((subCondition) => {
+  //       let subConditionStr = ''
+  //       switch (subCondition.valueType) {
+  //         case ValueType.dept:
+  //         case ValueType.user:
+  //           subConditionStr = `${subCondition.title}属于[${String(
+  //             subCondition.value?.map((u) => u.name),
+  //           ).replaceAll(',', '. ')}]之一`
+  //           break
+  //         case ValueType.number:
+  //         case ValueType.string:
+  //           subConditionStr = getOrdinaryConditionContent(subCondition)
+  //           break
+  //       }
+  //       subConditions.push(subConditionStr)
+  //     })
+  //     //根据子条件关系构建描述
+  //     let subConditionsStr = String(subConditions).replaceAll(
+  //       ',',
+  //       subConditions.length > 1
+  //         ? group.groupType === 'AND'
+  //           ? ') 且 ('
+  //           : ') 或 ('
+  //         : group.groupType === 'AND'
+  //         ? ' 且 '
+  //         : ' 或 ',
+  //     )
+  //     confitions.push(
+  //       subConditions.length > 1 ? `(${subConditionsStr})` : subConditionsStr,
+  //     )
+  //   })
+  //   //构建最终描述
+  //   return String(confitions).replaceAll(
+  //     ',',
+  //     props.config.props?.groupsType === 'AND' ? ' 且 ' : ' 或 ',
+  //   )
 })
 
 const getDefault = (val, df) => {
@@ -311,21 +307,25 @@ const validate = (err) => {
     }
 
     .node-body-main {
-      //position: absolute;
-      width: 188px;
-      margin-left: 17px;
+      width: 100%;
       display: inline-block;
 
       .node-body-main-header {
-        padding: 10px 0px 5px;
+        padding: 5px 15px;
         font-size: xx-small;
         position: relative;
+        background: #ab62ee;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
         .title {
-          color: #15bca3;
-          display: inline-block;
-          height: 14px;
-          width: 125px;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          gap: 8px;
         }
 
         .level {
@@ -337,21 +337,20 @@ const validate = (err) => {
 
         .option {
           position: absolute;
-          right: 0;
-          top: 5px;
+          right: 20px;
+          top: 0px;
           display: none;
-          font-size: 14px;
-          color: #888888;
+          font-size: 18px;
 
           .anticon {
-            color: #888888;
-            padding: 0 3px;
+            color: #fff;
+            font-size: medium;
           }
         }
       }
 
       .node-body-main-content {
-        padding: 6px;
+        padding: 18px;
         color: #656363;
         font-size: 14px;
 
@@ -386,6 +385,11 @@ const validate = (err) => {
       height: 70px;
       padding: 20px 0 32px;
       justify-content: center;
+      &:deep(.ant-btn) {
+        border-radius: 50%;
+        background: #1890ff;
+        border-color: #1890ff;
+      }
       &.readonly:deep(.ant-btn) {
         display: none;
       }

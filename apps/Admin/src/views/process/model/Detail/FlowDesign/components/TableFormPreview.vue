@@ -2,12 +2,20 @@
 <template>
   <j-table :data-source="myDataSource" :columns="columns" :pagination="false">
     <template #bodyCell="{ column, text, record }">
-      <component
-        :is="componentMap[column.type]"
-        :data="record"
-        v-model:value="record[column.dataIndex]"
-        :disabled="column.componentProps.disabled"
-      />
+      <j-form-item 
+        :name="[column.formId, 0, column.dataIndex]"
+        :rules="[...column.formItemProps.rules,{
+              required: column.formItemProps.required,
+              message: `请输入${column.formItemProps.label}`,
+            }]"
+        >
+        <component
+          :is="componentMap[column.type]"
+          :data="record"
+          v-model:value="record[column.dataIndex]"
+          :disabled="column.componentProps.disabled"
+        />
+      </j-form-item>
     </template>
   </j-table>
 </template>
@@ -31,7 +39,7 @@ const props = defineProps({
   },
 })
 
-const myDataSource = ref<any>()
+const myDataSource = ref<any>([])
 
 watch(
   () => props.dataSource,
