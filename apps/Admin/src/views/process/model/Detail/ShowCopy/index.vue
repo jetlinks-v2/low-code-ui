@@ -1,7 +1,8 @@
 <!-- 展示及抄送 -->
 <template>
-  <div>
+  <div class="page-box">
     <j-form
+      class="form-box"
       ref="formRef"
       :model="formData"
       autocomplete="off"
@@ -15,23 +16,30 @@
             <span>表单字段</span>
           </j-button>
         </div>
-        <j-space>
-          <div
-            class="variable-item"
-            :style="{ background: item.color }"
-            v-for="(item, index) of formData.variables"
-          >
-            <span>{{ item.label }}</span>
-            <AIcon
-              class="close"
-              type="CloseOutlined"
-              v-if="
-                item.value !== '1' && item.value !== '2' && item.value !== '3'
-              "
-              @click="formData.variables.splice(index, 1)"
-            />
-          </div>
-        </j-space>
+        <div
+          class="variable-item"
+          v-for="(item, index) of formData.variables"
+          :key="index"
+          :style="{
+            color: item.color,
+            border: '1px solid ' + item.color,
+            borderRadius: '3px',
+            paddingRight: index > 2 ? '30px' : '10px',
+          }"
+        >
+          <span>{{ item.label }}</span>
+          <AIcon
+            class="close"
+            type="CloseOutlined"
+            :style="{
+              color: item.color,
+            }"
+            v-if="
+              item.value !== '1' && item.value !== '2' && item.value !== '3'
+            "
+            @click="formData.variables.splice(index, 1)"
+          />
+        </div>
         <FormFields
           v-model:visible="visible"
           v-model:variables="formData.variables"
@@ -127,9 +135,9 @@ const flowStore = useFlowStore()
 
 // 固定变量
 const fixedVariables = [
-  { label: '流程名称', value: '1', color: '#d7faa1' },
-  { label: '发起人', value: '2', color: '#fce3c1' },
-  { label: '发起人所属组织', value: '3', color: '#ddb8ff' },
+  { label: '流程名称', value: '1', color: '#208CFF' },
+  { label: '发起人', value: '2', color: '#F7AD1A' },
+  { label: '发起人所属组织', value: '3', color: '#EB5B22' },
   //   { label: '111', value: 'process.var', color: '#ddb8ff' },
 ]
 const visible = ref(false)
@@ -270,33 +278,42 @@ defineExpose({ validateSteps })
 </script>
 
 <style lang="less" scoped>
-.variable-item {
-  margin-top: 10px;
-  padding: 2px 10px;
-  position: relative;
-  .close {
-    position: absolute;
-    right: -6px;
-    top: -8px;
-    color: #919180;
-  }
-}
-.title-template {
-  padding: 10px;
-  position: relative;
-  width: 100%;
-  border: 1px solid #d9d9d9;
+.page-box {
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+  .form-box {
+    width: 50%;
+    .variable-item {
+      display: inline-block;
+      margin-top: 10px;
+      margin-right: 5px;
+      padding: 2px 10px;
+      position: relative;
+      .close {
+        position: absolute;
+        right: 3px;
+        top: 6px;
+      }
+    }
+    .title-template {
+      padding: 10px;
+      position: relative;
+      width: 100%;
+      border: 1px solid #d9d9d9;
 
-  .html {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 4px 11px;
-    pointer-events: none;
-  }
+      .html {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 4px 11px;
+        pointer-events: none;
+      }
 
-  .select {
-    text-align: end;
+      .select {
+        text-align: end;
+      }
+    }
   }
 }
 </style>
