@@ -308,7 +308,7 @@ const handleSubmit = () => {
     return {
       rowKey: randomString(8),
       ...item,
-      type: javaType[item.type],
+      type: filterType[item.type],
     }
   })]
   // columnData.value = [...columnData.value.filter(item => item.mark === 'add'), ...dataBind.data.dataSource.map(item => {

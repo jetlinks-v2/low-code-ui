@@ -9,13 +9,15 @@
             button-style="solid"
             size="small"
           >
-            <j-radio-button value="exclusive">
-              执行第一个满足条件
-            </j-radio-button>
-            <j-radio-button value="all">所有条件下的流程通过</j-radio-button>
-            <j-radio-button value="condition">
-              部分条件下的流程通过
-            </j-radio-button>
+            <j-space>
+              <j-radio-button value="exclusive">
+                执行第一个满足条件
+              </j-radio-button>
+              <j-radio-button value="all">所有条件下的流程通过</j-radio-button>
+              <j-radio-button value="condition">
+                部分条件下的流程通过
+              </j-radio-button>
+            </j-space>
           </j-radio-group>
         </j-form-item>
         <j-form-item
@@ -54,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { findNodeById, handleStrToArr, handleArrToStr } from './utils'
+import { findNodeById, handleObjToArr, handleArrToObj } from './utils'
 import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
@@ -81,12 +83,12 @@ const basicFormData = reactive({
   type: nodeProps.value?.type || 'inclusive',
   inclusiveType: nodeProps.value?.inclusiveType || 'all',
   inclusiveCondition: nodeProps.value?.inclusiveCondition || {
-    condition: '',
+    condition: {},
     gotoNodes: [],
   },
   //   临时字段, 仅供前端使用
   condition:
-    handleStrToArr(nodeProps.value?.inclusiveCondition?.condition) || [],
+    handleObjToArr(nodeProps.value?.inclusiveCondition?.condition) || [],
   gotoNodes: nodeProps.value?.inclusiveCondition?.gotoNodes || [],
 })
 
@@ -106,9 +108,9 @@ watch(
 )
 
 /**
- * 将数据保存至pinia
+ * 将数据保存至store, 不用校验合法性
  */
-const saveConfigToPinia = () => {
+const saveConfigToStore = () => {
   return new Promise((resolve, reject) => {
     const result = findNodeById(
       flowStore.model.nodes,
@@ -120,7 +122,7 @@ const saveConfigToPinia = () => {
       type,
       inclusiveType,
       inclusiveCondition: {
-        condition: handleArrToStr(condition),
+        condition: handleArrToObj(condition),
         gotoNodes,
       },
     }
@@ -138,7 +140,7 @@ const saveConfigToPinia = () => {
     //       type,
     //       inclusiveType,
     //       inclusiveCondition: {
-    //         condition: handleArrToStr(condition),
+    //         condition: handleArrToObj(condition),
     //         gotoNodes,
     //       },
     //     }
@@ -150,7 +152,7 @@ const saveConfigToPinia = () => {
   })
 }
 defineExpose({
-  saveConfigToPinia,
+  saveConfigToStore,
 })
 </script>
 

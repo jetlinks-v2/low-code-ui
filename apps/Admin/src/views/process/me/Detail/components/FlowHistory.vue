@@ -2,11 +2,14 @@
 <template>
    <div class="content">
       <j-timeline>
-         <j-timeline-item v-for=" (item,index) in timelines" :color="getColor(index)?'#333333':'#315EFB'">
+         <j-timeline-item v-for=" (item, index) in timelines" :color="getColor(index) ? '#315EFB' : '#999999'">
             <div class="items">
                <div class="item">
                   <div class="item-left">
-                     <AIcon type="UserOutlined" />
+                     <!-- <AIcon type="UserOutlined" /> -->
+                     <div class="item-img">
+                        <img :src="getImage('/me/user.svg')">
+                     </div>
                      <div class="text">{{ item.operatorName || item.operator.name }}</div>
                      <j-tag :color="colorMap.get(item.actionColor)">
                         {{ actionType.get(item.actionType) }}
@@ -28,12 +31,13 @@
                </div>
                <div v-if="item.childrenNode" class="item-children">
                   <div style="margin-right: 10px;">{{ item.childrenNode.others.taskName }}</div>
-                  <j-tag :color="colorMap.get(item.childrenNode.others.afterState)">
+                  <j-tag
+                     :color="colorMap.get(item.childrenNode.others.afterState === 'completed' ? 'children_completed' : 'children_rejected')">
                      {{ typeMap.get(item.childrenNode.others.afterState) }}
                   </j-tag>
                </div>
-               <div v-if="item.childrenNode.others.afterState === 'rejected'" class="item-children">
-                  <div style="margin-right: 10px;">{{ item.others.taskName }} 已驳回至 {{ item.childrenNode.others.taskName }}</div>
+               <div v-if="item.childrenNode?.others.afterState === 'rejected'" class="item-children">
+                  <div style="margin-right: 10px;">{{ item.others.taskName }} 已驳回至 {{ task.get(item.childrenNode?.taskId)}}</div>
                </div>
             </div>
          </j-timeline-item>
@@ -45,12 +49,15 @@
 <script setup lang='ts'>
 import dayjs from 'dayjs';
 import FlowUpdate from './FlowUpdate.vue';
+import { getImage } from '@jetlinks/utils';
 
 const colorMap = new Map()
 colorMap.set('todo', 'processing')
-colorMap.set('completed', 'success')
-colorMap.set('rejected', 'error')
+colorMap.set('children_completed', 'success')
+colorMap.set('children_rejected', 'error')
+colorMap.set('rejected', '#E50012')
 colorMap.set('default', 'processing')
+colorMap.set('completed', '#4FC971')
 
 const typeMap = new Map()
 typeMap.set('todo', '待办')
@@ -107,14 +114,15 @@ const handleModal = (obj) => {
 const handleTask = (arr) => {
    arr?.forEach(item => {
       task.value.set(item.id, item)
-      if(item.nodeProvider ==='endEvent'){
+      if (item.nodeProvider === 'endEvent') {
          isEnd.value = true
       }
    })
 }
 
-const getColor = (index)=>{
-   return isEnd && index === timelines.value.length - 1
+const getColor = (index) => {
+   // console.log('isend',isEnd.value,timelines.value.length,index,isEnd.value && index === timelines.value.length - 1)
+   return isEnd.value && index === timelines.value.length - 1
 }
 
 //判断节点是否在时间线上
@@ -151,7 +159,7 @@ const filterLine = (item, index) => {
             nodeType: nodeType,
             operatorName: item.operator.name,
             actionType: item.others.afterState === 'completed' ? 'pass' : 'error',
-            actionColor: item.others.afterState === 'completed' ? 'completed' : 'error',
+            // actionColor: item.others.afterState === 'completed' ? 'children_completed' : 'children_rejected',
             show: false,
             // isBranch: handleBranch(item),
             // branchStartIndex: handleBranch(item) ? index : undefined,
@@ -284,8 +292,19 @@ onMounted(() => {
             display: flex;
             align-items: center;
 
+            .item-img {
+               width: 14px;
+               line-height: 16px;
+               height: 16px;
+
+               img {
+                  width: 100%;
+                  height: 100%;
+               }
+            }
+
             .text {
-               margin: 0 5px;
+               margin: 0 10px;
                color: #000000;
                font-weight: 500;
                font-size: 16px;
@@ -313,5 +332,4 @@ onMounted(() => {
          padding: 10px 10px;
       }
    }
-}
-</style>
+}</style>

@@ -5,10 +5,11 @@
          <div v-for="item in types" :class="{ 'item': true, 'active': item.key === activeKey }" @click="onClick(item.key)">
             {{ item.value }}
          </div>
-         <div v-if="type==='initiate'" :class="{ 'draft': true, 'active': 'draft' === activeKey }" @click="onClick('draft')">草稿箱</div>
+         <div v-if="type === 'initiate'" :class="{ 'draft': true, 'active': 'draft' === activeKey }"
+            @click="onClick('draft')">草稿箱</div>
       </div>
       <div class="content">
-         <Content :history="activeKey === 'completed'" :type="type" :activeKey="activeKey"/>
+         <Content :history="activeKey === 'completed'" :type="type" :activeKey="activeKey" />
       </div>
    </page-container>
 </template>
@@ -48,15 +49,22 @@ onMounted(() => {
 <style scoped lang='less'>
 .header {
    display: flex;
-   margin-bottom: 20px;
+   align-items: center;
+   background: #FFFFFF;
 
-  
+   box-sizing: border-box;
+   border-width: 0px 0px 1px 0px;
+   border-style: solid;
+   border-color: #D9D9D9;
+   height: 48px;
+   padding-left: 30px;
+
 
    .item {
       background-color: #FFF;
       height: 30px;
       line-height: 30px;
-      padding: 0 12px;
+      padding: 0 24px;
       margin-right: 24px;
       cursor: pointer;
 
@@ -74,10 +82,10 @@ onMounted(() => {
       padding: 5px 10px;
       background-color: #FFF;
       border-radius: 4px;
-      
+
       &.active {
          background-color: #3174f1;
-         padding:5px 12px;
+         padding: 5px 12px;
          border-radius: 4px;
          color: #FFF;
       }

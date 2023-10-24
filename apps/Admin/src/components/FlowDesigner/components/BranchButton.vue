@@ -8,7 +8,7 @@
           @click="handleAddBranch"
           v-if="isConditionNode"
         >
-          <AIcon type="ShareAltOutlined" />
+          <AIcon type="FunnelPlotOutlined" />
           <span>添加分支</span>
         </div>
         <div
@@ -16,7 +16,7 @@
           @click="handleAddApproval"
           v-if="!isConditionNode"
         >
-          <AIcon type="ShareAltOutlined" />
+          <AIcon type="UserOutlined" />
           <span>审批节点</span>
         </div>
         <div
@@ -24,7 +24,7 @@
           @click="handleAddDeal"
           v-if="!isConditionNode"
         >
-          <AIcon type="SendOutlined" />
+          <AIcon type="CarryOutOutlined" />
           <span>办理节点</span>
         </div>
         <div class="node-select-item config" @click="handleOpenConfig">

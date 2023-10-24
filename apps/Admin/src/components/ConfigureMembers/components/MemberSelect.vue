@@ -20,22 +20,8 @@
           >
             <j-space>
               <div class="icon">
-                <img
-                  v-if="item.key === 'var' || item.key === 'relation'"
-                  :src="
-                    getImage(
-                      `/members/${item.key}-${
-                        active === item.key ? 'active' : 'nomal'
-                      }.png`,
-                    )
-                  "
-                  style="height: 16px"
-                />
-                <img
-                  v-else
-                  :src="getImage(`/members/fixed-nomal.png`)"
-                  style="height: 16px"
-                />
+                <AIcon v-if="item.key === 'var' || item.key === 'relation'" :type="iconType[item.key]" />
+                <AIcon v-else :type="iconType['fixed']" />
               </div>
               <div class="text">
                 <div class="left-item-title">
@@ -173,17 +159,16 @@
 <script setup lang="ts">
 import Relational from './Relational.vue'
 import { treeFilter } from 'jetlinks-ui-components/es/Tree'
-import { defaultColumns, leftData } from './const'
+import { defaultColumns, leftData, iconType } from './const'
 import { DataSourceProps } from '../types'
 import {
   getDepartmentList_api,
-  getUserList_api,
+  getAllUser_api,
   getRoleList_api,
 } from '@/api/user'
 import { getVar_api } from '@/api/member'
 import { detail_api } from '@/api/process/model'
 import { cloneDeep } from 'lodash-es'
-import { getImage } from '@jetlinks/utils'
 
 const props = defineProps({
   type: {
@@ -392,12 +377,12 @@ const handleDel = (id: string) => {
 const getTreeData = () => {
   const apiList = [
     getDepartmentList_api(),
-    getUserList_api({ paging: false }),
+    getAllUser_api({ paging: false }),
     getRoleList_api(),
   ]
   Promise.all(apiList).then((res) => {
     dataMap.value.set('org', res[0].result)
-    dataMap.value.set('user', res[1].result.data)
+    dataMap.value.set('user', res[1].result)
     dataMap.value.set('role', res[2].result)
   })
 }
@@ -457,6 +442,7 @@ defineExpose({
           border: none;
           background: v-bind('dimensionsColor[active]');
           .icon {
+            color: v-bind('dimensionsColor[active]');
             background: #fff;
           }
           .text {
@@ -471,7 +457,6 @@ defineExpose({
         }
 
         .icon {
-          // color: #315efb;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -479,6 +464,8 @@ defineExpose({
           height: 40px;
           border-radius: 8px;
           background: #dee2eb;
+          color: #226aff;
+          font-size: 20px;
         }
         .text {
           .left-item-title {
@@ -508,7 +495,6 @@ defineExpose({
           line-height: 32px;
         }
         .ant-tree-title {
-          // height: 32px;
           line-height: 32px;
           &:hover {
             color: #315efb;
