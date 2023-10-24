@@ -3,10 +3,20 @@
   <j-tabs v-model:activeKey="activeKey" type="card">
     <j-tab-pane key="basic" tab="基础配置">
       <j-form ref="basicFormRef" :model="basicFormData" layout="vertical">
-        <h3>条件配置</h3>
-        <j-form-item label="请配置进入下方节点的条件" name="terms">
-          <ConditionSelect v-model:value="basicFormData.terms" />
-        </j-form-item>
+        <j-collapse
+          v-model:activeKey="collapseActive"
+          expand-icon-position="right"
+          :bordered="false"
+        >
+          <j-collapse-panel key="1">
+            <template #header>
+              <TitleComponent data="条件配置"></TitleComponent>
+            </template>
+            <j-form-item label="请配置进入下方节点的条件" name="terms">
+              <ConditionSelect v-model:value="basicFormData.terms" />
+            </j-form-item>
+          </j-collapse-panel>
+        </j-collapse>
       </j-form>
     </j-tab-pane>
   </j-tabs>
@@ -33,6 +43,7 @@ const basicFormData = reactive({
   //   此字段仅用于前端
   terms: props.node?.props?.condition?.configuration?.terms || [],
 })
+const collapseActive = ref(['1'])
 
 /**
  * 将数据保存至store, 不用校验合法性

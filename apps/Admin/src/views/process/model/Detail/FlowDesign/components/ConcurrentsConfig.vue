@@ -30,7 +30,6 @@
           <j-button
             type="primary"
             block
-            size="small"
             ghost
             @click="visible = true"
           >
