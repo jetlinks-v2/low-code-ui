@@ -42,8 +42,8 @@ const props = defineProps({
   },
   keys: {
     type: Array,
-    default: () => []
-  }
+    default: () => [],
+  },
 })
 const emit = defineEmits(['update:value'])
 const _value = ref()
@@ -63,9 +63,10 @@ const getObj = (arr: any[], _item: string) => {
     const element = arr[index]
     if (element?.value === _item) {
       return element
-    } else {
-      if (element?.children?.length) {
-        return getObj(element?.children, _item)
+    } else if (element?.children?.length) {
+      const obj = getObj(element?.children, _item)
+      if (obj) {
+        return obj
       }
     }
   }
@@ -110,7 +111,9 @@ watch(
   () => props.value,
   () => {
     if (props.mode !== 'multiple') {
-      _value.value = Array.isArray(props?.value) ? props.value?.[0]?.id : props.value?.id
+      _value.value = Array.isArray(props?.value)
+        ? props.value?.[0]?.id
+        : props.value?.id
     } else {
       _value.value = Array.isArray(props?.value) ? map(props?.value, 'id') : []
     }

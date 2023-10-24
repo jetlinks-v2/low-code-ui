@@ -12,7 +12,7 @@
       <j-form :layout="'vertical'" ref="formRef" :model="modelRef">
         <j-form-item
           label="表单标识"
-          name="id"
+          name="key"
           :rules="[
             {
               pattern: /^[a-zA-Z0-9_\-]+$/,
@@ -28,7 +28,11 @@
             },
           ]"
         >
-          <j-input :disabled="props.data?.id" v-model:value="modelRef.id" placeholder="请输入表单标识" />
+          <j-input
+            :disabled="props.data?.key"
+            v-model:value="modelRef.key"
+            placeholder="请输入表单标识"
+          />
         </j-form-item>
         <j-form-item
           label="表单名称"
@@ -85,13 +89,13 @@ const loading = ref<boolean>(false)
 const formRef = ref()
 
 const modelRef = reactive({
-  id: undefined,
+  key: undefined,
   name: '',
   description: '',
 })
 
 const vailId = async (_: Record<string, any>, value: string) => {
-  if (!props?.data?.id && value) {
+  if (!props?.data?.key && value) {
     const resp = await isExists(value)
     if (resp.status === 200 && resp.result) {
       return Promise.reject('ID重复')
@@ -121,14 +125,14 @@ const handleSave = () => {
     .validate()
     .then(async (_data: any) => {
       loading.value = true
-      if (!_data.id) {
-        delete _data.id
+      if (!_data.key) {
+        delete _data.key
       }
       const obj = { ...props.data, ..._data, provider: 'custom' }
-      const resp = await _save(obj).finally(() => {
-        loading.value = false
-      })
-      if (resp.status === 200) {
+      const resp: any = await _save(obj).finally(() => {
+          loading.value = false
+        })
+      if (resp?.status === 200) {
         onlyMessage('操作成功！')
         emit('save')
         formRef.value.resetFields()
