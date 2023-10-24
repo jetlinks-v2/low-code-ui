@@ -47,12 +47,12 @@ const FlowDesigner = defineComponent({
       default: false,
     },
   },
-  setup(props, { emit }) {
+  setup(props, { emit, expose }) {
     const { nodesData, readOnly } = props
     const { proxy } = getCurrentInstance() as ComponentInternalInstance
 
     const flowStore = useFlowStore()
-    // const valid = ref(true)
+    const valid = ref(true)
 
     const nodeMap = computed(() => flowStore.nodeMap)
     const dom = computed(() => nodesData || flowStore.model.nodes)
@@ -534,16 +534,16 @@ const FlowDesigner = defineComponent({
       }
     }
 
-    // const validateProcess = () => {
-    //   valid.value = true
-    //   let err = []
-    //   validate(err, dom.value)
-    //   return err
-    // }
+    const validateProcess = () => {
+      valid.value = true
+      let err = []
+      validate(err, dom.value)
+      return err
+    }
     const validateNode = (err, node) => {
-      //   if (proxy?.$refs[node.id].validate) {
-      //     valid.value = proxy?.$refs[node.id].validate(err)
-      //   }
+        if (proxy?.$refs[node.id].validate) {
+          valid.value = proxy?.$refs[node.id].validate(err)
+        }
     }
     //更新指定节点的dom
     const nodeDomUpdate = (node) => {
@@ -587,7 +587,7 @@ const FlowDesigner = defineComponent({
         validate(err, node.children)
       }
     }
-
+    expose({ validateProcess })
     // 鼠标事件
     const {
       scale,
