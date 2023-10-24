@@ -3,50 +3,73 @@
   <j-tabs v-model:activeKey="activeKey" type="card">
     <j-tab-pane key="basic" tab="基础配置" forceRender>
       <j-form ref="basicFormRef" :model="basicFormData" layout="vertical">
-        <h3>表单配置</h3>
-        <j-form-item
-          label="请确认当前节点需要候选人办理的表单内容"
-          name="formBinds"
-          :rules="[{ required: true, message: '请配置表单内容' }]"
+        <j-collapse
+          v-model:activeKey="collapseActive"
+          expand-icon-position="right"
+          :bordered="false"
         >
-          <ConfigFormFields v-model:value="basicFormData.formBinds" />
-        </j-form-item>
+          <j-collapse-panel key="1">
+            <template #header>
+              <TitleComponent data="表单配置"></TitleComponent>
+            </template>
+            <j-form-item
+              label="请确认当前节点需要候选人办理的表单内容"
+              name="formBinds"
+              :rules="[{ required: true, message: '请配置表单内容' }]"
+            >
+              <ConfigFormFields v-model:value="basicFormData.formBinds" />
+            </j-form-item>
+          </j-collapse-panel>
+        </j-collapse>
       </j-form>
     </j-tab-pane>
     <j-tab-pane key="member" tab="成员配置" forceRender>
       <j-form ref="memberFormRef" :model="memberFormData" layout="vertical">
-        <h3>候选人配置</h3>
-        <j-form-item
-          label="请选择可参与办理的候选成员"
-          name="candidates"
-          :rules="[{ required: true, message: '请选择成员' }]"
+        <j-collapse
+          v-model:activeKey="collapseActive"
+          expand-icon-position="right"
+          :bordered="false"
         >
-          <ConfigureMembers v-model:members="memberFormData.candidates" />
-        </j-form-item>
-
-        <h3 style="margin-top: 20px">成员权限</h3>
-        <j-form-item
-          label="办理成员可以使用哪些按钮"
-          name="authButtons"
-          :rules="[{ required: true, message: '请选择按钮' }]"
-        >
-          <j-checkbox-group
-            v-model:value="memberFormData.authButtons"
-            :options="allButtons"
-          />
-        </j-form-item>
-        <j-form-item
-          label="办理成员可以自由选择下一节点办理人"
-          name="freeChoiceUser"
-        >
-          <j-switch
-            size="small"
-            v-model:checked="memberFormData.freeChoiceUser"
-            :checkedValue="flowStore.selectedNode.children.id"
-            :unCheckedValue="undefined"
-            @change="handleSwitchChange"
-          ></j-switch>
-        </j-form-item>
+          <j-collapse-panel key="1">
+            <template #header>
+              <TitleComponent data="候选人配置"></TitleComponent>
+            </template>
+            <j-form-item
+              label="请选择可参与办理的候选成员"
+              name="candidates"
+              :rules="[{ required: true, message: '请选择成员' }]"
+            >
+              <ConfigureMembers v-model:members="memberFormData.candidates" />
+            </j-form-item>
+          </j-collapse-panel>
+          <j-collapse-panel key="2">
+            <template #header>
+              <TitleComponent data="成员权限"></TitleComponent>
+            </template>
+            <j-form-item
+              label="办理成员可以使用哪些按钮"
+              name="authButtons"
+              :rules="[{ required: true, message: '请选择按钮' }]"
+            >
+              <j-checkbox-group
+                v-model:value="memberFormData.authButtons"
+                :options="allButtons"
+              />
+            </j-form-item>
+            <j-form-item
+              label="办理成员可以自由选择下一节点办理人"
+              name="freeChoiceUser"
+            >
+              <j-switch
+                size="small"
+                v-model:checked="memberFormData.freeChoiceUser"
+                :checkedValue="flowStore.selectedNode.children.id"
+                :unCheckedValue="undefined"
+                @change="handleSwitchChange"
+              ></j-switch>
+            </j-form-item>
+          </j-collapse-panel>
+        </j-collapse>
       </j-form>
     </j-tab-pane>
   </j-tabs>
@@ -72,12 +95,13 @@ const basicFormRef = ref()
 const basicFormData = reactive({
   formBinds: props.node?.props?.formBinds || {},
 })
+const collapseActive = ref(['1', '2'])
 
 // 成员配置
 const memberFormRef = ref()
 const memberFormData = reactive({
   candidates: props.node?.props?.candidates, // 候选人配置
-  authButtons: props.node?.props?.authButtons,
+  authButtons: props.node?.props?.authButtons || ['submit'],
   freeChoiceUser: props.node?.props?.freeChoiceUser,
 })
 
