@@ -44,7 +44,7 @@
                 </div>
             </template>
         </JProTable>
-        <Detail v-if="visible" @close="visible = false" :current="current" :type="type" :history="history" />
+        <Detail v-if="visible" @close="onCancel" :current="current" :type="type" :history="history" />
         <j-modal v-model:visible="visibleModel" :closable="false" :width="300" @cancel="onCancel" @ok="onCancel">
             <div class="content">
                 <div class="title">共签收{{ sign.length }}个任务</div>
