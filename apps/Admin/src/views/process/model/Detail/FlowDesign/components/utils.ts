@@ -45,7 +45,8 @@ function getBranchNodeIds(branches: any[]) {
  * 设置条件节点的children节点的props
  */
 export function setEmptyNodeProps(nodes: any) {
-    if (nodes?.type === 'CONDITIONS') {
+    if (!nodes) return
+    if (nodes.type === 'CONDITIONS') {
         const branchNodeIds: string[] = getBranchNodeIds(nodes.branches)
 
         nodes.children.props = {
@@ -55,7 +56,7 @@ export function setEmptyNodeProps(nodes: any) {
             allCompleteNodeId: branchNodeIds
         }
     } else {
-        setEmptyNodeProps(nodes?.children)
+        setEmptyNodeProps(nodes.children)
     }
     // console.log('setEmptyNodeProps: ', nodes);
 }

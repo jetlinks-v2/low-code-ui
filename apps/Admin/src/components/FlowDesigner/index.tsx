@@ -541,9 +541,9 @@ const FlowDesigner = defineComponent({
       return err
     }
     const validateNode = (err, node) => {
-        if (proxy?.$refs[node.id].validate) {
-          valid.value = proxy?.$refs[node.id].validate(err)
-        }
+      if (proxy?.$refs[node.id].validate) {
+        valid.value = proxy?.$refs[node.id].validate(err)
+      }
     }
     //更新指定节点的dom
     const nodeDomUpdate = (node) => {
@@ -613,7 +613,7 @@ const FlowDesigner = defineComponent({
           }),
         ]),
       )
-      console.log('dom.value: ', dom.value)
+      //   console.log('dom.value: ', dom.value)
       setEmptyNodeProps(dom.value)
 
       return h(
