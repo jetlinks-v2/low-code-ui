@@ -1,135 +1,126 @@
 <template>
-  <div>
-    <j-button style="width: 100%" @click="visible = true">配置</j-button>
-    <j-modal
-      v-model:visible="visible"
-      title="存储配置"
-      @cancel="visible = false"
-    >
-      <div v-if="configVisible">
-        <div>请选择{{ config?.key }}存储位置</div>
-        <div class="box">
-          <j-form ref="formRef" :model="config" layout="vertical">
-            <j-form-item
-              :validateFirst="true"
-              :name="['config', 'projectId']"
-              :rules="rulesProject"
-            >
-              <j-select
-                v-model:value="config.config.projectId"
-                placeholder="请选择"
-                :options="projectList"
-                allowClear
-                showSearch
-                @change="onProjectChange"
-              >
-              </j-select>
-            </j-form-item>
-            <j-form-item
-              :validateFirst="true"
-              :name="['config', 'functionId']"
-              :rules="[
-                {
-                  message: '请选择',
-                  required: true,
-                },
-              ]"
-            >
-              <j-select
-                allowClear
-                showSearch
-                :options="functionList"
-                placeholder="后端功能"
-                v-model:value="config.config.functionId"
-                style="width: 100%"
-                @change="onFunChange"
-              />
-            </j-form-item>
-            <j-form-item
-              :validateFirst="true"
-              :name="['config', 'commandId']"
-              :rules="[
-                {
-                  message: '请选择',
-                  required: true,
-                },
-              ]"
-            >
-              <j-select
-                allowClear
-                showSearch
-                :options="commandList"
-                v-model:value="config.config.commandId"
-                placeholder="功能下指令"
-                @change="onCommandChange"
-              />
-            </j-form-item>
-            <j-form-item
-              :validateFirst="true"
-              :name="['config', 'source']"
-              :rules="[
-                {
-                  message: '请选择',
-                  required: true,
-                },
-              ]"
-            >
-              <j-tree-select
-                allowClear
-                showSearch
-                :tree-data="sourceList"
-                v-model:value="config.config.source"
-                placeholder="数据选择"
-              />
-            </j-form-item>
-          </j-form>
-        </div>
-      </div>
-      <div class="box" v-else>
-        <div>请配置设备选择组件需要存储的字段</div>
-        <div class="box-search">
-          <j-input-search
-            placeholder="请输入"
-            style="width: 100%"
-            @search="onSearch"
-          />
-        </div>
-        <div class="box-item" v-for="item in dataList" :key="item">
-          <div
-            class="box-item-content"
-            @click="onClick(item)"
-            :class="{
-              'box-item-content': true,
-              active: getKeys.includes(item),
-            }"
+  <j-modal :visible="true" title="存储配置" @cancel="onCancel">
+    <div v-if="configVisible">
+      <div>请选择{{ config?.key }}存储位置</div>
+      <div class="box">
+        <j-form ref="formRef" :model="config" layout="vertical">
+          <j-form-item
+            :validateFirst="true"
+            :name="['config', 'projectId']"
+            :rules="rulesProject"
           >
-            <span>{{ item }}</span>
-            <template v-if="getKeys.includes(item)">
-              <j-space
-                v-if="_value.find((i) => i.key === item)?.config?.source"
-              >
-                <span>{{
-                  _value.find((i) => i.key === item)?.config?.source
-                }}</span>
-                <span @click.stop="onConfig(item)">修改</span>
-              </j-space>
-              <span @click.stop="onConfig(item)" v-else>配置</span>
-            </template>
-          </div>
-          <div class="error" v-if="error.includes(item)">请配置存储位置</div>
-        </div>
+            <j-select
+              v-model:value="config.config.projectId"
+              placeholder="请选择"
+              :options="projectList"
+              allowClear
+              showSearch
+              @change="onProjectChange"
+            >
+            </j-select>
+          </j-form-item>
+          <j-form-item
+            :validateFirst="true"
+            :name="['config', 'functionId']"
+            :rules="[
+              {
+                message: '请选择',
+                required: true,
+              },
+            ]"
+          >
+            <j-select
+              allowClear
+              showSearch
+              :options="functionList"
+              placeholder="后端功能"
+              v-model:value="config.config.functionId"
+              style="width: 100%"
+              @change="onFunChange"
+            />
+          </j-form-item>
+          <j-form-item
+            :validateFirst="true"
+            :name="['config', 'commandId']"
+            :rules="[
+              {
+                message: '请选择',
+                required: true,
+              },
+            ]"
+          >
+            <j-select
+              allowClear
+              showSearch
+              :options="commandList"
+              v-model:value="config.config.commandId"
+              placeholder="功能下指令"
+              @change="onCommandChange"
+            />
+          </j-form-item>
+          <j-form-item
+            :validateFirst="true"
+            :name="['config', 'source']"
+            :rules="[
+              {
+                message: '请选择',
+                required: true,
+              },
+            ]"
+          >
+            <j-tree-select
+              allowClear
+              showSearch
+              :tree-data="sourceList"
+              v-model:value="config.config.source"
+              placeholder="数据选择"
+            />
+          </j-form-item>
+        </j-form>
       </div>
-      <template #footer>
-        <j-space>
-          <j-button @click="handleCancel">取消</j-button>
-          <j-button @click="handleOk" type="primary">确认</j-button>
-        </j-space>
-      </template>
-    </j-modal>
-  </div>
+    </div>
+    <div class="box" v-else>
+      <div>请配置设备选择组件需要存储的字段</div>
+      <div class="box-search">
+        <j-input-search
+          placeholder="请输入"
+          style="width: 100%"
+          @search="onSearch"
+        />
+      </div>
+      <div class="box-item" v-for="item in dataList" :key="item">
+        <div
+          class="box-item-content"
+          @click="onClick(item)"
+          :class="{
+            'box-item-content': true,
+            active: getKeys.includes(item),
+          }"
+        >
+          <span>{{ item }}</span>
+          <template v-if="getKeys.includes(item)">
+            <j-space v-if="_value.find((i) => i.key === item)?.config?.source">
+              <span>{{
+                _value.find((i) => i.key === item)?.config?.source
+              }}</span>
+              <span @click.stop="onConfig(item)">修改</span>
+            </j-space>
+            <span @click.stop="onConfig(item)" v-else>配置</span>
+          </template>
+        </div>
+        <div class="error" v-if="error.includes(item)">请配置存储位置</div>
+      </div>
+    </div>
+    <template #footer>
+      <j-space>
+        <j-button @click="handleCancel">取消</j-button>
+        <j-button @click="handleOk" type="primary">确认</j-button>
+      </j-space>
+    </template>
+  </j-modal>
 </template>
-
-<script lang="ts" setup>
+  
+  <script lang="ts" setup>
 import { ref, computed, unref, watch } from 'vue'
 import { map } from 'lodash-es'
 import { onlyMessage } from '@jetlinks/utils'
@@ -147,8 +138,7 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['update:value', 'change'])
-const visible = ref<boolean>(false)
+const emits = defineEmits(['cancel', 'change'])
 const configVisible = ref<boolean>(false)
 const error = ref<string[]>([])
 const formRef = ref<any>()
@@ -164,24 +154,54 @@ const _value = ref<any[]>(
 
 const config = ref<any>({})
 
-const list = computed(() => {
-  switch (props.type) {
+const list = ref<any[]>([])
+
+const getList = (type: string) => {
+  switch (type) {
     case 'product':
-      return product
+      list.value = product
+      break
     case 'org':
-      return org
+      list.value = org
+      break
     case 'role':
-      return role
+      list.value = role
+      break
     case 'user':
-      return user
+      list.value = user
+      break
     default:
-      return device
+      list.value = device
+      break
   }
-})
+}
+
+watch(
+  () => props.type,
+  (newVal: string) => {
+    if (newVal) {
+      getList(newVal)
+    }
+  },
+  {
+    immediate: true,
+    deep: true,
+  },
+)
 
 const dataList = ref<any[]>([...list.value])
 const projectList = ref<any[]>([])
 const end = ref<any[]>([])
+
+watch(
+  () => list.value,
+  () => {
+    dataList.value = list.value
+  },
+  {
+    deep: true,
+  },
+)
 
 const rulesProject = [
   {
@@ -273,7 +293,7 @@ const onConfig = (_val: string) => {
   if (!projectList.value?.length) {
     getProject()
   }
-  if(config.value?.config?.projectId){
+  if (config.value?.config?.projectId) {
     getEnd(config.value?.config?.projectId)
   }
 }
@@ -298,9 +318,8 @@ const handleOk = async () => {
       onlyMessage('请配置存储位置', 'error')
       error.value = map(_arr, 'key')
     } else {
-      emits('update:value', unref(_value))
       emits('change', unref(_value))
-      visible.value = false
+      emits('cancel')
       error.value = []
     }
   }
@@ -311,9 +330,13 @@ const handleCancel = () => {
     configVisible.value = false
     config.value = {}
   } else {
-    visible.value = false
+    emits('cancel')
     error.value = []
   }
+}
+
+const onCancel = () => {
+  emits('cancel')
 }
 
 const onFunChange = (val: string | undefined) => {
@@ -329,7 +352,7 @@ const onFunChange = (val: string | undefined) => {
 }
 
 const onProjectChange = (val: string | undefined) => {
-  if(val){
+  if (val) {
     getEnd(val)
   }
   config.value = {
@@ -405,8 +428,8 @@ watch(
   },
 )
 </script>
-
-<style lang="less" scoped>
+  
+  <style lang="less" scoped>
 .box {
   background-color: #bfbfbf33;
   padding: 10px;

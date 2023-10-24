@@ -81,6 +81,7 @@ import JsonPreview from '../Preview/components/JsonPreview.vue'
 import { queryRuntime } from '@/api/form'
 import { onlyMessage } from '@jetlinks/utils'
 import { dictionaryItemList } from '@/api/list'
+import { request } from '@jetlinks/core'
 
 const props = defineProps({
   data: {
@@ -454,6 +455,16 @@ const handleActions = (
   data: Record<string, any>,
   config: Record<string, any>,
 ) => {
+  if(config.script) {
+    const _this = {
+      request: request,
+      onlyMessage: onlyMessage
+    }
+    let customFn = new Function('data', 'callback', config.script)
+    customFn.call(_this, data, () => {
+      tableRef.value.reload()
+    })
+  }
   columnOperation.value = config
   popData.value = data
   if (

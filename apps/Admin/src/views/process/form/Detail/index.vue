@@ -11,6 +11,7 @@ import { _detail, _update } from '@/api/process/form'
 import { onlyMessage } from '@jetlinks/utils'
 import { onMounted, ref } from 'vue'
 import { router } from '@jetlinks/router'
+import { omit } from 'lodash-es'
 
 const route = useRoute()
 const data = ref<any>()
@@ -25,7 +26,7 @@ const queryDetail = (id) => {
 
 const onSave = (dt: any) => {
     _update({
-        ...data.value,
+        ...omit(data.value, 'id'),
         configuration: dt
     }).then(resp => {
         if(resp.success){

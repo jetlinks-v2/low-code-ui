@@ -1,11 +1,14 @@
 <!-- 节点-配置表单/字段 -->
 <template>
-  <j-button type="primary" block size="small" ghost @click="visible = true">
-    配置表单内容
+  <j-button class="btn" block @click="visible = true">
+    <span>配置表单内容</span>
+    <span class="icon">
+      <img :src="getImage('/members/check.png')" />
+    </span>
   </j-button>
-  <div v-for="(fields, index) in forms" :key="index">
+  <!-- <div v-for="(fields, index) in forms" :key="index">
     <div v-for="(field, idx) in fields">{{ field }}</div>
-  </div>
+  </div> -->
   <j-modal
     v-model:visible="visible"
     width="900px"
@@ -107,6 +110,7 @@ import { cloneDeep } from 'lodash-es'
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import TableFormPreview from './TableFormPreview.vue'
 import { PropType } from 'vue'
+import { getImage } from '@jetlinks/utils'
 
 const flowStore = useFlowStore()
 
@@ -270,6 +274,19 @@ watch(
 </script>
 
 <style lang="less" scoped>
+.btn {
+  width: 100%;
+  margin-bottom: 8px;
+  .icon {
+    position: absolute;
+    top: -4px;
+    right: 0;
+    & > img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
 .form-box {
   max-height: 600px;
   overflow: auto;

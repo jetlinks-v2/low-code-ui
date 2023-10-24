@@ -11,8 +11,8 @@
     @delNode="emits('delNode')"
     @insertNode="(type) => emits('insertNode', type)"
     placeholder="请设置办理人"
-    header-bgc="#caf982"
-    header-icon="SendOutlined"
+    header-bgc="#4FC971"
+    header-icon="CarryOutOutlined"
   />
 </template>
 
@@ -33,16 +33,15 @@ const errorInfo = ref('')
 const active = computed(() => props?.config?.active)
 const style = computed(() => props?.config?.props?.style)
 const content = computed(() => {
-  return '未配置'
-  //   if (props.config.props.shouldAdd) {
-  //     return '由发起人指定'
-  //   } else if (props.config.props.assignedUser.length > 0) {
-  //     let texts = []
-  //     props.config.props.assignedUser.forEach((org) => texts.push(org.name))
-  //     return String(texts).replaceAll(',', '、')
-  //   } else {
-  //     return ''
-  //   }
+  const config = props.config.props
+  let result: any[] = []
+  Object.keys(config.candidates).forEach((key) => {
+    if (config.candidates[key].length) {
+      result = [...result, ...config.candidates[key]]
+    }
+  })
+  const _names = result.map((item) => item.name)
+  return _names.length ? String(_names).replaceAll(',', '、') : '未配置'
 })
 
 //校验数据配置的合法性

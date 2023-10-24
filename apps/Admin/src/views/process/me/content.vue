@@ -26,10 +26,13 @@
                     </PermissionButton>
                 </div>
                 <div v-else>
-                    <PermissionButton type="link" :tooltip="{
+                    <PermissionButton type="link" v-if="activeKey !== 'draft'" :tooltip="{
                         title: '详情',
                     }" @click="onSave(record)">
                         详情
+                    </PermissionButton>
+                    <PermissionButton v-if="type === 'initiate' && activeKey === 'draft'" :hasPermission="true" type="link" @click="onDraft(record)">
+                        编辑
                     </PermissionButton>
                     <PermissionButton v-if="type === 'initiate' && activeKey === 'draft'" :hasPermission="true" type="link"
                         danger :popConfirm="{
@@ -570,6 +573,10 @@ const onDel = async (item) => {
 const onSave = (item) => {
     current.value = item
     visible.value = true
+}
+
+const onDraft = (record)=>{
+    console.log('record--',record)
 }
 
 //todo待办
