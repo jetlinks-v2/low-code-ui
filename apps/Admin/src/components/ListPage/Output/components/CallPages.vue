@@ -34,6 +34,7 @@ import { getResource } from '@/api/basis'
 import { providerEnum } from '@/components/ProJect'
 import { ReplStore } from '@/components/CustomHTML/store'
 import { queryRuntime } from '@/api/form'
+import { clone, cloneDeep } from 'lodash-es'
 
 const data = ref<any>()
 
@@ -155,9 +156,9 @@ watch(
       for(const key in val) {
         const result = props.dataColumns.find(item => item.dataIndex === key)
         if(result && result.config?.type === 'enum') {
-          editValue.value[key] = Array.isArray(val[key]) ? val?.[key]?.map(item => item.value) : val?.[key]?.value
+          editValue.value[key] = cloneDeep(Array.isArray(val[key]) ? val?.[key]?.map(item => item.value) : val?.[key]?.value)
         } else {
-          editValue.value[key] = val[key]
+          editValue.value[key] = cloneDeep(val[key])
         }
       }
     } else{

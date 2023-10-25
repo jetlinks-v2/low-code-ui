@@ -51,7 +51,6 @@
 </template>
 <script setup lang="ts">
 import FlowDesigner from '@/components/FlowDesigner'
-import { queryForm_api } from '@/api/process/model'
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
 
