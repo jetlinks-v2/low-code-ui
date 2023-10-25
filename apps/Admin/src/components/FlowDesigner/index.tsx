@@ -541,6 +541,7 @@ const FlowDesigner = defineComponent({
       return err
     }
     const validateNode = (err, node) => {
+      if (node.type === 'ROOT') return
       if (proxy?.$refs[node.id].validate) {
         valid.value = proxy?.$refs[node.id].validate(err)
       }
