@@ -14,7 +14,10 @@
 </template>
 <script setup>
 import MyCard from '../components/MyCard/index.vue'
+import { useMenuStore } from '@/store/menu'
 import { getMeProcessList } from '@/api/process/me'
+
+const menuStore = useMenuStore()
 
 const processBuild = [
   { name: '流程模型', icon: '/process/model.png', path: '/flow-engine/model' },
@@ -37,7 +40,31 @@ const myProcess = [
     icon: '/process/initiate.png',
     path: '/flow-engine/initiate',
   },
-  { name: '待办事项', icon: '/process/todo.png', path: '/flow-engine/me/todo' },
+  {
+    key: 'todo',
+    name: '待办事项',
+    icon: '/process/todo.png',
+    path: '/flow-engine/me/todo',
+    fun: () =>
+      new Promise((resolve, reject) => {
+        getMeProcessList(
+          {
+            paging: false,
+            terms: [
+              {
+                value: 'ready',
+                termType: 'not',
+                column: 'state',
+              },
+            ],
+          },
+          'todo',
+          false,
+        ).then((res) => {
+          resolve({ data: res.result.total })
+        })
+      }),
+  },
   {
     name: '已办事项',
     icon: '/process/finished.png',
@@ -48,7 +75,31 @@ const myProcess = [
     icon: '/process/me-initiate.png',
     path: '/flow-engine/me/initiate',
   },
-  { name: '抄送给我', icon: '/process/cc.png', path: '/flow-engine/me/cc' },
+  {
+    key: 'cc',
+    name: '抄送给我',
+    icon: '/process/cc.png',
+    path: '/flow-engine/me/cc',
+    fun: () =>
+      new Promise((resolve, reject) => {
+        getMeProcessList(
+          {
+            paging: false,
+            terms: [
+              {
+                value: 'ready',
+                termType: 'not',
+                column: 'state',
+              },
+            ],
+          },
+          'cc',
+          false,
+        ).then((res) => {
+          resolve({ data: res.result.total })
+        })
+      }),
+  },
 ]
 </script>
 <style scoped lang="less">

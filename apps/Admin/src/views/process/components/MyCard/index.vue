@@ -1,6 +1,6 @@
 <template>
   <div class="my-card" @click="handleClick">
-    <j-badge :count="getCount()">
+    <j-badge :count="getCount">
       <div class="center">
         <div class="icon">
           <ProImage :src="getImage(`${data.icon}`)" :preview="false" />
@@ -27,9 +27,16 @@ const handleClick = () => {
   })
 }
 
-const getCount = () => {
-  return 0
-}
+const count = reactive({})
+
+const getCount = computed(() => {
+  if (props.data.key) {
+    props.data.fun().then((res) => {
+      count[props.data.key] = res.data
+    })
+  }
+  return count[props.data.key] || 0
+})
 </script>
 <style scoped lang="less">
 .my-card {
