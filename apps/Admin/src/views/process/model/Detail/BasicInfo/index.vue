@@ -69,9 +69,9 @@ const rules = {
 }
 
 /**
- * 下一步
+ * 当前步骤校验方法
  */
-const next = () => {
+const validateSteps = () => {
   return new Promise((resolve, reject) => {
     formRef.value
       .validate()
@@ -84,14 +84,7 @@ const next = () => {
   })
 }
 
-/**
- * 当前步骤校验方法
- */
-const validateSteps = () => {
-  return next()
-}
-
-defineExpose({ next, validateSteps })
+defineExpose({ validateSteps })
 
 watch(
   () => formData.forms,
