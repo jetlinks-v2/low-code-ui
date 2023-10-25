@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { cloneDeep } from 'lodash-es'
 import type { INode, IConfig, IModelBaseInfo } from '@/views/process/model/Detail/typings.d.ts'
 interface IModel {
     config: Partial<IConfig>;
@@ -41,7 +42,7 @@ export const useFlowStore = defineStore('flow', () => {
      * @param data 
      */
     const setModel = (data: any) => {
-        model.value = !Object.keys(data).length ? defaultModel : data
+        model.value = !Object.keys(data).length ? cloneDeep(defaultModel) : data
     }
     /**
      * 设置模型基础信息
