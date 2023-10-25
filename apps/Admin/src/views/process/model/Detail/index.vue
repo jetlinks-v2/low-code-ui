@@ -108,9 +108,17 @@ const getFlowDetail = async () => {
  * 下一步, 校验当前步骤的数据规范
  */
 const handleNext = () => {
-  stepRef.value?.validateSteps().then(() => {
-    current.value++
-  })
+  stepRef.value
+    ?.validateSteps()
+    .then((idx) => {
+      // 校验通过, 对应步骤恢复正常状态, 并进入下一步骤
+      stepStatus.value[idx] = ''
+      current.value++
+    })
+    .catch((idx) => {
+      // 步骤校验失败, 返回的当前步骤序号, 直接将对应步骤标红提示
+      stepStatus.value[idx] = 'error'
+    })
 }
 
 /**
@@ -142,7 +150,7 @@ const handleSave = () => {
 const validLoading = ref(false)
 const handleDeploy = () => {
   validLoading.value = true
-  stepRef.value?.validateSteps()
+  //   stepRef.value?.validateSteps()
   Promise.allSettled([
     step1.value?.validateSteps(),
     step2.value?.validateSteps(),

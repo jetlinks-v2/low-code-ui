@@ -266,10 +266,13 @@ const validateSteps = () => {
     formRef.value
       .validate()
       .then((res) => {
-        resolve(res)
+        // resolve(res)
+        resolve(2)
       })
       .catch((err) => {
-        reject(err)
+        // reject(err)
+        // 返回当前步骤序号
+        reject(2)
       })
   })
 }

@@ -113,13 +113,14 @@ watch(
 const validateSteps = () => {
   return new Promise((resolve, reject) => {
     const err = flowDesignerRef.value.validateProcess()
-    !err.length ? resolve(true) : reject(err)
+    // reject时 返回当前步骤序号
+    !err.length ? resolve(1) : reject(1)
   })
 }
 
 defineExpose({ validateSteps })
 onMounted(() => {
-  validateSteps()
+  //   validateSteps()
 })
 </script>
 
