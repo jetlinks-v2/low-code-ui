@@ -110,9 +110,12 @@ const showError = ref(false)
 const active = computed(() => props?.config?.active)
 const content = computed(() => {
   const terms = props.config.props?.condition?.configuration?.terms
-  console.log('terms: ', terms);
- 
-  return '请配置条件'
+  //   console.log('terms: ', terms)
+  const _termsName = terms.map((item) => item.column)
+  return _termsName.length
+    ? String(_termsName).replaceAll(',', '、')
+    : '请配置条件'
+
   //   const groups = props.config.props?.groups
   //   let confitions: any[] = []
   //   groups?.forEach((group) => {
@@ -155,85 +158,106 @@ const content = computed(() => {
   //   )
 })
 
-const getDefault = (val, df) => {
-  return val && val !== '' ? val : df
-}
-const getOrdinaryConditionContent = (subCondition) => {
-  switch (subCondition.compare) {
-    case 'IN':
-      return `${subCondition.title}为[${String(subCondition.value).replaceAll(
-        ',',
-        '、',
-      )}]中之一`
-    case 'B':
-      return `${subCondition.value[0]} < ${subCondition.title} < ${subCondition.value[1]}`
-    case 'AB':
-      return `${subCondition.value[0]} ≤ ${subCondition.title} < ${subCondition.value[1]}`
-    case 'BA':
-      return `${subCondition.value[0]} < ${subCondition.title} ≤ ${subCondition.value[1]}`
-    case 'ABA':
-      return `${subCondition.value[0]} ≤ ${subCondition.title} ≤ ${subCondition.value[1]}`
-    case '<=':
-      return `${subCondition.title} ≤ ${getDefault(
-        subCondition.value[0],
-        ' ?',
-      )}`
-    case '>=':
-      return `${subCondition.title} ≥ ${getDefault(
-        subCondition.value[0],
-        ' ?',
-      )}`
-    default:
-      return `${subCondition.title}${subCondition.compare}${getDefault(
-        subCondition.value[0],
-        ' ?',
-      )}`
-  }
-}
-//校验数据配置的合法性
+/**
+ * 校验节点
+ */
 const validate = (err) => {
-  const _props = props.config.props
-  if (_props.groups.length <= 0) {
-    showError.value = true
-    errorInfo.value = '请设置分支条件'
-    err.push(`${_props.config.name} 未设置条件`)
+  const { terms } = props.config.props?.condition?.configuration
+
+  showError.value = true
+  errorInfo.value = '未填写必填配置项'
+  if (!terms || !terms.length) {
+    err.push({
+      errors: ['请配置进入下方节点的条件'],
+      name: ['condition', 'configuration', 'terms'],
+    })
   } else {
-    for (let i = 0; i < _props.groups.length; i++) {
-      if (_props.groups[i].cids.length === 0) {
-        showError.value = true
-        errorInfo.value = `请设置条件组${groupNames.value[i]}内的条件`
-        err.push(
-          `条件 ${_props.config.name} 条件组${groupNames.value[i]}内未设置条件`,
-        )
-        break
-      } else {
-        let conditions = _props.groups[i].conditions
-        for (let ci = 0; ci < conditions.length; ci++) {
-          let subc = conditions[ci]
-          if (subc.value.length === 0) {
-            showError.value = true
-          } else {
-            showError.value = false
-          }
-          if (showError.value) {
-            errorInfo.value = `请完善条件组${groupNames.value[i]}内的${subc.title}条件`
-            err.push(
-              `条件 ${props.config.name} 条件组${groupNames.value[i]}内${subc.title}条件未完善`,
-            )
-            return false
-          }
-        }
-      }
-    }
+    showError.value = false
+    errorInfo.value = ''
   }
-  return !showError.value
 }
+
+defineExpose({ validate })
+
+// const getDefault = (val, df) => {
+//   return val && val !== '' ? val : df
+// }
+// const getOrdinaryConditionContent = (subCondition) => {
+//   switch (subCondition.compare) {
+//     case 'IN':
+//       return `${subCondition.title}为[${String(subCondition.value).replaceAll(
+//         ',',
+//         '、',
+//       )}]中之一`
+//     case 'B':
+//       return `${subCondition.value[0]} < ${subCondition.title} < ${subCondition.value[1]}`
+//     case 'AB':
+//       return `${subCondition.value[0]} ≤ ${subCondition.title} < ${subCondition.value[1]}`
+//     case 'BA':
+//       return `${subCondition.value[0]} < ${subCondition.title} ≤ ${subCondition.value[1]}`
+//     case 'ABA':
+//       return `${subCondition.value[0]} ≤ ${subCondition.title} ≤ ${subCondition.value[1]}`
+//     case '<=':
+//       return `${subCondition.title} ≤ ${getDefault(
+//         subCondition.value[0],
+//         ' ?',
+//       )}`
+//     case '>=':
+//       return `${subCondition.title} ≥ ${getDefault(
+//         subCondition.value[0],
+//         ' ?',
+//       )}`
+//     default:
+//       return `${subCondition.title}${subCondition.compare}${getDefault(
+//         subCondition.value[0],
+//         ' ?',
+//       )}`
+//   }
+// }
+// //校验数据配置的合法性
+// const validate = (err) => {
+//   const _props = props.config.props
+//   if (_props.groups.length <= 0) {
+//     showError.value = true
+//     errorInfo.value = '请设置分支条件'
+//     err.push(`${_props.config.name} 未设置条件`)
+//   } else {
+//     for (let i = 0; i < _props.groups.length; i++) {
+//       if (_props.groups[i].cids.length === 0) {
+//         showError.value = true
+//         errorInfo.value = `请设置条件组${groupNames.value[i]}内的条件`
+//         err.push(
+//           `条件 ${_props.config.name} 条件组${groupNames.value[i]}内未设置条件`,
+//         )
+//         break
+//       } else {
+//         let conditions = _props.groups[i].conditions
+//         for (let ci = 0; ci < conditions.length; ci++) {
+//           let subc = conditions[ci]
+//           if (subc.value.length === 0) {
+//             showError.value = true
+//           } else {
+//             showError.value = false
+//           }
+//           if (showError.value) {
+//             errorInfo.value = `请完善条件组${groupNames.value[i]}内的${subc.title}条件`
+//             err.push(
+//               `条件 ${props.config.name} 条件组${groupNames.value[i]}内${subc.title}条件未完善`,
+//             )
+//             return false
+//           }
+//         }
+//       }
+//     }
+//   }
+//   return !showError.value
+// }
 </script>
 
 <style lang="less" scoped>
 .node-error-state {
   .node-body {
-    box-shadow: 0px 0px 5px 0px #f56c6c !important;
+    box-shadow: 0px 0px 5px 1px #f56c6c !important;
   }
 }
 
@@ -369,9 +393,9 @@ const validate = (err) => {
 
     .node-error {
       position: absolute;
-      right: -40px;
-      top: 20px;
-      font-size: 25px;
+      right: -30px;
+      top: 30px;
+      font-size: 20px;
       color: #f56c6c;
     }
   }

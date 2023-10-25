@@ -47,12 +47,12 @@ const FlowDesigner = defineComponent({
       default: false,
     },
   },
-  setup(props, { emit }) {
+  setup(props, { emit, expose }) {
     const { nodesData, readOnly } = props
     const { proxy } = getCurrentInstance() as ComponentInternalInstance
 
     const flowStore = useFlowStore()
-    // const valid = ref(true)
+    const valid = ref(true)
 
     const nodeMap = computed(() => flowStore.nodeMap)
     const dom = computed(() => nodesData || flowStore.model.nodes)
@@ -417,7 +417,7 @@ const FlowDesigner = defineComponent({
      * @param type (CONDITIONS: 条件分支  APPROVAL:审批节点 DEAL:办理节点)
      */
     const addBranchNode = (node, type) => {
-      if (node.branches.length < 8) {
+      if (node.branches.length < 99) {
         switch (type) {
           case 'CONDITIONS':
             node.branches.push({
@@ -470,7 +470,7 @@ const FlowDesigner = defineComponent({
             break
         }
       } else {
-        onlyMessage('最多只能添加 8 项😥', 'warning')
+        onlyMessage('最多只能添加99个分支', 'warning')
       }
     }
 
@@ -534,16 +534,16 @@ const FlowDesigner = defineComponent({
       }
     }
 
-    // const validateProcess = () => {
-    //   valid.value = true
-    //   let err = []
-    //   validate(err, dom.value)
-    //   return err
-    // }
+    const validateProcess = () => {
+      valid.value = true
+      let err = []
+      validate(err, dom.value)
+      return err
+    }
     const validateNode = (err, node) => {
-      //   if (proxy?.$refs[node.id].validate) {
-      //     valid.value = proxy?.$refs[node.id].validate(err)
-      //   }
+      if (proxy?.$refs[node.id].validate) {
+        valid.value = proxy?.$refs[node.id].validate(err)
+      }
     }
     //更新指定节点的dom
     const nodeDomUpdate = (node) => {
@@ -587,7 +587,7 @@ const FlowDesigner = defineComponent({
         validate(err, node.children)
       }
     }
-
+    expose({ validateProcess })
     // 鼠标事件
     const {
       scale,
@@ -613,8 +613,8 @@ const FlowDesigner = defineComponent({
           }),
         ]),
       )
-      console.log('dom.value: ', dom.value)
-      // setEmptyNodeProps(dom.value)
+      //   console.log('dom.value: ', dom.value)
+      setEmptyNodeProps(dom.value)
 
       return h(
         'div',

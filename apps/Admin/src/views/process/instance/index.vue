@@ -323,7 +323,7 @@ const getActions = (record, type = 'card') => {
     {
       key: 'permission',
       text: '权限控制',
-      icon: 'TeamOutlined',
+      icon: 'DeploymentUnitOutlined',
       permissionProps: (data) => ({
         tooltip: {
           title: '权限控制',
