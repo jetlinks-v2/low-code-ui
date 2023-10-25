@@ -41,7 +41,7 @@ const data = ref<any>()
 const vueMode = ref(true)
 const store = new ReplStore(JSON.stringify(data.value))
 const modalWidth = computed(() => {
-  if(props.resource.modalWidth) {
+  if (props.resource.modalWidth) {
     return props.resource.modalWidth + props.resource.modalWidthUnit
   } else {
     return '520px'
@@ -73,8 +73,8 @@ const props = defineProps({
   },
   projectId: {
     type: String,
-    default: ''
-  }
+    default: '',
+  },
 })
 
 const mode = computed(() => {
@@ -86,7 +86,7 @@ const mode = computed(() => {
 })
 
 const title = computed(() => {
-  if(props.type === 'Detail') {
+  if (props.type === 'Detail') {
     return '查看详情'
   } else if (mode.value === 'add') {
     return '新增'
@@ -108,22 +108,27 @@ const getInfo = async () => {
 }
 
 const handleSubmit = async () => {
-  if(!['Add', 'Update'].includes(props.type)) {
+  if (!['Add', 'Update'].includes(props.type)) {
     emit('close', true)
     return
   }
-  const data = await formPage.value.onSave()
-  confirmLoading.value = true;
+  let data = {}
+  if (props.resource.callPage.type === providerEnum.FormPage) {
+    data = await formPage.value.onSave()
+  } else {
+    data =
+      (<any>document.getElementById('previewFrame'))?.contentWindow?.onSave() ||
+      {}
+  }
+  confirmLoading.value = true
   const params = {
     data,
   }
-  if(mode.value == 'edit') {
+  if (mode.value == 'edit') {
     params['terms'] = [
       {
-        terms: [
-          { column: 'id', termType: 'eq', value: props.popData.id }
-        ]
-      }
+        terms: [{ column: 'id', termType: 'eq', value: props.popData.id }],
+      },
     ]
   }
   const res = await queryRuntime(
@@ -131,7 +136,7 @@ const handleSubmit = async () => {
     props.resource.function,
     props.resource.command,
     params,
-  ).finally(() => confirmLoading.value = false)
+  ).finally(() => (confirmLoading.value = false))
   emit('reload')
 }
 
@@ -151,21 +156,45 @@ watch(
 watch(
   () => props.popData,
   (val) => {
-    if(props.type !== 'Add') {
-      editValue.value = {};
-      for(const key in val) {
-        const result = props.dataColumns.find(item => item.dataIndex === key)
-        if(result && result.config?.type === 'enum') {
-          editValue.value[key] = cloneDeep(Array.isArray(val[key]) ? val?.[key]?.map(item => item.value) : val?.[key]?.value)
+    if (props.type !== 'Add') {
+      editValue.value = {}
+      for (const key in val) {
+        const result = props.dataColumns.find((item) => item.dataIndex === key)
+        if (result && result.config?.type === 'enum') {
+          editValue.value[key] = cloneDeep(
+            Array.isArray(val[key])
+              ? val?.[key]?.map((item) => item.value)
+              : val?.[key]?.value,
+          )
         } else {
           editValue.value[key] = cloneDeep(val[key])
         }
       }
-    } else{
-      editValue.value = {};
+    } else {
+      editValue.value = {}
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
+
+watchEffect(() => {
+  if (props.type !== 'add' && visible.value) {
+    editValue.value = {}
+    for (const key in props.popData) {
+      const result = props.dataColumns.find((item) => item.dataIndex === key)
+      if (result && result.config?.type === 'enum') {
+        editValue.value[key] = cloneDeep(
+          Array.isArray(props.popData[key])
+            ? props.popData?.[key]?.map((item) => item.value)
+            : props.popData?.[key]?.value,
+        )
+      } else {
+        editValue.value[key] = cloneDeep(props.popData[key])
+      }
+    }
+  } else {
+    editValue.value = {}
+  }
+})
 </script>
 <style lang="less" scoped></style>
