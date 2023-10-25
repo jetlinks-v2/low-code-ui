@@ -48,6 +48,66 @@ const content = computed(() => {
   return _names.length ? String(_names).replaceAll(',', '、') : '未配置'
 })
 
+/**
+ * 校验节点
+ */
+const validate = (err) => {
+  const { name } = props.config
+  // 节点配置信息校验
+  const {
+    formBinds,
+    candidates,
+    completeWeight,
+    rejectWeight,
+    authButtons,
+    endProcessWhenReject,
+    gotoWhenReject,
+  } = props.config.props
+
+  showError.value = true
+  errorInfo.value = '未填写必填配置项'
+  if (!name) {
+    err.push({
+      errors: ['审批节点名称不能为空'],
+      name: ['name'],
+    })
+  } else if (!formBinds || !Object.keys(formBinds).length) {
+    err.push({
+      errors: ['请确认当前节点需要候选人办理的表单内容'],
+      name: ['formBinds'],
+    })
+  } else if (
+    !candidates ||
+    !Object.keys(candidates).length ||
+    Object.values(candidates).every((item: any) => !item.length)
+  ) {
+    err.push({
+      errors: ['请选择可参与审批的候选成员'],
+      name: ['candidates'],
+    })
+  } else if (completeWeight === '' || rejectWeight === '') {
+    err.push({
+      errors: ['请输入权重'],
+      name: ['completeWeight', 'rejectWeight'],
+    })
+  } else if (!authButtons || !authButtons.length) {
+    err.push({
+      errors: ['审批成员可以使用哪些按钮'],
+      name: ['authButtons'],
+    })
+  } else if (!gotoWhenReject) {
+    err.push({
+      errors: ['请选择驳回至哪个节点'],
+      name: ['gotoWhenReject'],
+    })
+  } else {
+    showError.value = false
+    errorInfo.value = ''
+  }
+}
+
+defineExpose({ validate })
+
 //校验数据配置的合法性
 // const validate = (err) => {
 //   try {

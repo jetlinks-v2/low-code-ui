@@ -12,8 +12,8 @@
         </div>
 
         <div class="btn">
-          <j-button v-if="current > 0" @click="current--">上一步</j-button>
-          <j-button v-if="current < 2" @click="handleNext">下一步</j-button>
+          <j-button :disabled="current === 0" @click="current--">上一步</j-button>
+          <j-button :disabled="current === 2" @click="handleNext">下一步</j-button>
           <j-button type="primary" @click="handleSave" :loading="saveLoading">
             保存
             <template #icon>

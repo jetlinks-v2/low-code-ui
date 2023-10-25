@@ -9,7 +9,7 @@
               :data="getText(key) ?? '流程分类已被删除，请重新添加'"
             />
           </j-col>
-          <j-col :span="2" v-for="item of data[key]">
+          <j-col :xs="20" :sm="10" :md="6" :lg="6" :xl="2" v-for="item of data[key]">
             <div class="process" @click="handleDetail(item)">
               <div class="icon">
                 <ProImage
@@ -55,7 +55,7 @@ const handleDetail = (data) => {
     path: '/flow-engine/initiate/initiate-detail',
     query: {
       id: data.id,
-      // draft: true,
+      // isDraft: true,
     },
   })
 }

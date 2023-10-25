@@ -1,44 +1,52 @@
 <template>
   <page-container>
     <FullPage>
-      <j-row>
-        <j-col :span="12">
-          <div class="form">
-            <j-form ref="formRef" :model="tableData" autocomplete="off">
-              <template v-for="(item, index) in formList" :key="index">
-                <div>{{ item.formName }}</div>
-                <FormPreview
-                  v-if="!item.multiple"
-                  ref="previewRef"
-                  :value="getDraftData(item.formId)['data']"
-                  :data="item.fullInfo?.configuration"
-                />
-                <TableFormPreview
-                  v-model:data-source="tableData[item.formId]"
-                  :columns="
-                    getTableColumns(
-                      item.fullInfo?.configuration?.children,
-                      item.formId,
-                    )
-                  "
-                />
-              </template>
-            </j-form>
-          </div>
-          <div class="btn-list">
-            <j-button class="btn" @click="cancel">取消</j-button>
-            <j-button class="btn" type="primary" @click="submit">提交</j-button>
-            <j-button class="btn" type="primary" @click="save">保存</j-button>
-          </div>
-        </j-col>
-        <j-col :span="12">
-          <!-- 流程图 -->
-          <div class="flow-chart">
-            <span>审批流程</span>
-            <FlowDesigner readOnly :treeData="{}" />
-          </div>
-        </j-col>
-      </j-row>
+      <div class="detail">
+        <div class="spin" v-if="spinning">
+          <j-spin :spinning="spinning" />
+        </div>
+        <j-row v-else>
+          <j-col :span="12">
+            <div class="form">
+              <j-form ref="formRef" :model="tableData" autocomplete="off">
+                <template v-for="(item, index) in formList" :key="index">
+                  <div>{{ item.formName }}</div>
+                  <FormPreview
+                    v-if="!item.multiple"
+                    ref="previewRef"
+                    :value="getDraftData(item.formId)['data']"
+                    :data="item.fullInfo?.configuration"
+                  />
+                  <TableFormPreview
+                    v-else
+                    v-model:data-source="tableData[item.formId]"
+                    :columns="
+                      getTableColumns(
+                        item.fullInfo?.configuration?.children,
+                        item.formId,
+                      )
+                    "
+                  />
+                </template>
+              </j-form>
+            </div>
+            <div class="btn-list">
+              <j-button class="btn" @click="cancel">取消</j-button>
+              <j-button class="btn" type="primary" @click="submit"
+                >提交</j-button
+              >
+              <j-button class="btn" type="primary" @click="save">保存</j-button>
+            </div>
+          </j-col>
+          <j-col :span="12">
+            <!-- 流程图 -->
+            <div class="flow-chart">
+              <span>审批流程</span>
+              <FlowDesigner readOnly :nodesData="nodesData" />
+            </div>
+          </j-col>
+        </j-row>
+      </div>
     </FullPage>
   </page-container>
 </template>
@@ -76,12 +84,13 @@ interface draftProps {
 
 const router = useRouter()
 const route = useRoute()
-const formData: Ref<formDataProps[]> = ref([])
 const currentProcess = reactive<any>({})
 const previewRef = ref<any>()
 const formRef = ref<any>()
 
-const formValue = ref<any[]>([])
+const spinning = ref<boolean>(false)
+// 流程图
+const nodesData = ref<any>({})
 
 const formList = ref<FormsProps[]>([])
 // 表单版本
@@ -99,11 +108,13 @@ const getTableColumns = (fields: any[], formId: string) => {
     formId,
     ...m,
   }))
+
   _columns?.forEach((item) => {
-    tableData[formId][0][item.dataIndex] =
-      draftData.data?.[item.dataIndex] || undefined
+    if (tableData[formId]) {
+      tableData[formId][0][item.dataIndex] =
+        draftData.data?.[item.dataIndex] || undefined
+    }
   })
-  console.log(_columns)
   return _columns
 }
 
@@ -158,16 +169,14 @@ const cancel = () => {
  * 提交
  */
 const submit = async () => {
-  const tableRes = await formRef.value.validate()
-  if(tableRes){  
-    const list = previewRef.value?.map((item) => item.onSave())
-    Promise.all(list).then((res) => {
-      startProcess(res).then((flag) => {
-        // 跳转至我的流程-我发起的
-        flag ? router.push('/flow-engine/me/initiate') : ''
-      })
+  const list = previewRef.value?.map((item) => item.onSave()) || []
+  Promise.all([...list, formRef.value.validate()]).then((res) => {
+    startProcess(res).then((flag) => {
+      // 跳转至我的流程-我发起的
+      flag ? router.push('/flow-engine/me/initiate') : ''
     })
-  }
+  })
+  // }
 }
 /**
  * 保存
@@ -181,14 +190,12 @@ const save = () => {
 }
 onMounted(() => {
   // 草稿
-  if (route.query.draft) {
+  if (route.query.isDraft) {
     Modal.confirm({
       title: '继续编辑草稿？',
       okText: '是',
       cancelText: '否',
-      onOk() {
-        
-      },
+      onOk() {},
       onCancel() {},
     })
   }
@@ -199,16 +206,17 @@ onMounted(() => {
  * @param list 表单数据
  */
 const startProcess = async (list: any, start: boolean = true) => {
+  let flag = 0
   const param = {
-    id: route.query.id,
-    start: start,
-    form: formList.value?.map((i, index) => ({
-      formId: md5(i.formId + '|' + formVersion[i.formId]),
-      data: tableData.hasOwnProperty(i.formId)
-        ? tableData[i.formId][0]
-        : list[index],
-    })),
-    variables: {},
+    data: {
+      id: route.query.id,
+      form: formList.value?.map((i) => ({
+        formId: md5(i.formId + '|' + formVersion[i.formId]),
+        data: i.multiple ? tableData[i.formId][0] : list[flag++],
+      })),
+      variables: {},
+    },
+    start,
   }
   return start_api(param).then((resp) => {
     if (resp.success) {
@@ -224,6 +232,7 @@ const startProcess = async (list: any, start: boolean = true) => {
  * 获取当前流程
  */
 const getProcess = () => {
+  spinning.value = true
   getList_api({
     terms: [
       {
@@ -238,6 +247,7 @@ const getProcess = () => {
     Object.assign(formVersion, currentProcess.others?.formVersion)
     try {
       const obj = JSON.parse(currentProcess.model)
+      nodesData.value = obj.nodes
       //详情接口nodeId
       const bindMap = new Map()
       Object.keys(obj.nodes.props.formBinds).forEach((item) => {
@@ -258,18 +268,30 @@ const getProcess = () => {
 
         return { accessModes: [], ...m }
       })
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      spinning.value = false
+    }
   })
 }
 getProcess()
 </script>
 <style scoped lang="less">
-.btn-list {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  .btn {
-    width: 20%;
+.detail {
+  // text-align: center;
+  padding: 20px;
+  .spin {
+    margin-top: 100px;
+    text-align: center;
+  }
+  .btn-list {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    .btn {
+      width: 20%;
+    }
   }
 }
 </style>

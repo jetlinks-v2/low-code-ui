@@ -3,6 +3,8 @@
   <Node
     title="发起申请"
     :is-root="true"
+    :show-error="showError"
+    :error-info="errorInfo"
     :content="content"
     @selected="emits('selected')"
     @insertNode="(type) => emits('insertNode', type)"
@@ -23,6 +25,9 @@ const props = defineProps({
   },
 })
 
+const showError = ref(false)
+const errorInfo = ref('')
+
 const content = computed(() => {
   if (props?.config?.props?.assignedUser.length) {
     let texts: string[] = []
@@ -32,6 +37,25 @@ const content = computed(() => {
     return '系统自动匹配参与人'
   }
 })
+
+/**
+ * 校验节点
+ */
+const validate = (err) => {
+  if (!props.config.props.assignedUser.length) {
+    showError.value = true
+    errorInfo.value = '请在基础信息中配置成员'
+    err.push({
+        errors: [errorInfo.value],
+        name: ['assignedUser'],
+    })
+  } else {
+    showError.value = false
+    errorInfo.value = ''
+  }
+}
+
+defineExpose({ validate })
 </script>
 
 <style scoped></style>
