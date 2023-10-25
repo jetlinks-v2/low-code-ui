@@ -73,13 +73,15 @@ const nodeDel = (node) => {
 }
 
 /**
- * 关闭抽屉, 保存节点数据至store
+ * 保存节点数据至store
  */
 const saveNodeConfig = () => {
   nodeConfigRef.value
-    .saveConfig()
+    .saveConfigToStore()
     .then((valid) => {
       console.log('saveNodeConfig valid: ', valid)
+      // 关闭前校验一次流程图节点
+      validateSteps()
       showConfig.value = false
     })
     .catch((err) => {
@@ -87,10 +89,21 @@ const saveNodeConfig = () => {
     })
 }
 
+/**
+ * 校验节点数据是否合法
+ */
+const validateNodeConfig = () => {
+  // 延时等待组件渲染后, 再出发校验方法
+  setTimeout(() => {
+    nodeConfigRef.value.validateConfig()
+  }, 200)
+}
+
 watch(
   () => showConfig.value,
   (val) => {
-    if (!val) saveNodeConfig()
+    // 关闭抽屉, 保存数据 打开抽屉, 校验数据
+    !val ? saveNodeConfig() : validateNodeConfig()
   },
 )
 

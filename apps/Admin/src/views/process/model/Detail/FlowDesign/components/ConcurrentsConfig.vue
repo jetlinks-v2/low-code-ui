@@ -27,12 +27,7 @@
           label="请配置各分支的权重"
           v-if="basicFormData.complexType === 'weight'"
         >
-          <j-button
-            type="primary"
-            block
-            ghost
-            @click="visible = true"
-          >
+          <j-button type="primary" block ghost @click="visible = true">
             配置
           </j-button>
         </j-form-item>
@@ -225,23 +220,32 @@ const saveConfigToStore = () => {
     }
     result.props = { ...result.props, ...basicFormData }
     resolve(result)
-    // basicFormRef.value
-    //   .validate()
-    //   .then((valid) => {
-    //     const result = findNodeById(
-    //       flowStore.model.nodes,
-    //       flowStore.selectedNode.id,
-    //     )
-    //     result.props = { ...result.props, ...basicFormData }
-    //     resolve(valid)
-    //   })
-    //   .catch((err) => {
-    //     reject(err)
-    //   })
+  })
+}
+
+/**
+ * 校验配置数据
+ */
+const validateConfig = () => {
+  return new Promise((resolve, reject) => {
+    basicFormRef.value
+      .validate()
+      .then((valid) => {
+        const result = findNodeById(
+          flowStore.model.nodes,
+          flowStore.selectedNode.id,
+        )
+        result.props = { ...result.props, ...basicFormData }
+        resolve(valid)
+      })
+      .catch((err) => {
+        reject(err)
+      })
   })
 }
 defineExpose({
   saveConfigToStore,
+  validateConfig,
 })
 </script>
 
