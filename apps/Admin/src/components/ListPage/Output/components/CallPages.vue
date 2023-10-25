@@ -155,7 +155,7 @@ watch(
 )
 
 watchEffect(() => {
-  if (props.type !== 'add' && visible.value) {
+  if (props.type !== 'Add' && visible.value) {
     editValue.value = {}
     for (const key in props.popData) {
       const result = props.dataColumns.find((item) => item.dataIndex === key)
