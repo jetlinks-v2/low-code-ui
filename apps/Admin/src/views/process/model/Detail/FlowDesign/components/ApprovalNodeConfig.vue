@@ -75,7 +75,10 @@
               name="candidates"
               :rules="[{ required: true, message: '请选择成员' }]"
             >
-              <ConfigureMembers v-model:members="memberFormData.candidates" />
+              <ConfigureMembers
+                v-model:members="memberFormData.candidates"
+                :nodeId="flowStore.selectedNode.id"
+              />
             </j-form-item>
           </j-collapse-panel>
           <j-collapse-panel key="2">
