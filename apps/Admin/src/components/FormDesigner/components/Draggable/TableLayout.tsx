@@ -67,6 +67,10 @@ export default defineComponent({
 
         const data = ref<any[]>([])
 
+        watchEffect(() => {
+            data.value = get(designer.formState, __path.value) || []
+        })
+
         const handleAdd = () => {
             const _item = generatorData({
                 type: props.data?.type + '-item',

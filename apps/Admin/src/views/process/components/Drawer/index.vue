@@ -19,8 +19,8 @@
         </template>
         <div class="content">
           <div v-for="item in formData">
-            <div class="title">{{ item.name }}</div>
-            <preview ref="previewRef" :data="item.configuration" />
+            <div class="title">{{ item.formName }}</div>
+            <preview ref="previewRef" :data="item.fullInfo.configuration" />
           </div>
         </div>
       </j-tab-pane>
@@ -75,28 +75,10 @@ const init = () => {
   try {
     const obj = JSON.parse(props.data.model)
     nodesData.value = obj.nodes
-    getFormData(obj.config.forms)
+    formData.value = obj.config.forms
   } catch (error) {}
 }
 
-const getFormData = (list: FormsProps[]) => {
-  const param = {
-    paging: true,
-    terms: [
-      {
-        type: 'and',
-        value: list.map((i) => i.formId),
-        termType: 'in',
-        column: 'id',
-      },
-    ],
-  }
-  queryForm_api(param).then((res) => {
-    if (res.success) {
-      formData.value = res.result.data
-    }
-  })
-}
 init()
 </script>
 <style lang="less" scoped>

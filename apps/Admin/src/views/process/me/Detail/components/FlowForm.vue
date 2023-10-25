@@ -166,6 +166,7 @@ const onClick = async (value) => {
             if (res.status === 200) {
                 onlyMessage('保存成功')
                 btnLoading.value = false
+                emit('close')
             }
         })
     } else {
@@ -228,6 +229,7 @@ const dealTable = (disabled) =>{
 }
 // 列表接口数据nodeId 对应form表单ID处理数据
 const dealForm = (nodes) => {
+    console.log('nodes---',nodes,props.nodeId)
     if (nodes.id === props.nodeId) {
         //获取节点类型
         nodeType.value = nodes.type
@@ -242,10 +244,14 @@ const dealForm = (nodes) => {
         btnList.value = nodes?.props?.authButtons
         //详情接口nodeId
         const bindMap = new Map()
-        console.log('-----------',nodes.props?.formBinds)
+        // console.log('md5-----------',nodes.props?.formBinds)
         Object.keys(nodes.props?.formBinds).forEach((item) => {
-            bindMap.set(item, nodes.props.formBinds[item])
+            //formid + formVersion
+            const id = md5(item+'|'+props.info.others?.formVersion[item])
+            bindMap.set(id, nodes.props.formBinds[item])
         })
+        console.log('bindMap',bindMap)
+        console.log('formValue.value',formValue.value)
         //循环表单匹配对应节点表单ID
         formValue.value = formValue.value.filter((item) => {
             if (bindMap.has(item.formId)) {
@@ -267,6 +273,7 @@ const dealForm = (nodes) => {
                 return false
             }
         })
+        // console.log('formValue.value',formValue.value)
         dealTable()
     } else {
         nodes?.children ? dealForm(nodes.children) : ''
@@ -279,6 +286,7 @@ const dealForm = (nodes) => {
 }
 watch(() => props.info, () => {
     formValue.value = cloneDeep(props.info?.form)
+   
     nodes.value = JSON.parse(props.info.modelContent)?.nodes
     if (props.type === 'todo') {
         dealForm(nodes.value)
