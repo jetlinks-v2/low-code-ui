@@ -24,7 +24,7 @@
             <template #header>
               <TitleComponent data="节点控制"></TitleComponent>
             </template>
-            <j-form-item name="autoPass">
+            <j-form-item name="autoComplete">
               <template #label>
                 自动通过
                 <j-tooltip placement="right">
@@ -36,7 +36,7 @@
               </template>
               <j-switch
                 size="small"
-                v-model:checked="basicFormData.autoPass"
+                v-model:checked="basicFormData.autoComplete"
               ></j-switch>
             </j-form-item>
             <j-form-item label="审批意见必填" name="dealRequired">
@@ -44,6 +44,15 @@
                 size="small"
                 v-model:checked="basicFormData.dealRequired"
               ></j-switch>
+            </j-form-item>
+            <j-form-item
+              label="审批意见默认值"
+              :name="['others', 'defaultComment']"
+            >
+              <j-input
+                v-model:value="basicFormData.others.defaultComment"
+                placeholder="请输入审批意见默认值"
+              />
             </j-form-item>
           </j-collapse-panel>
         </j-collapse>
@@ -169,8 +178,9 @@ const props = defineProps({
 const basicFormRef = ref()
 const basicFormData = reactive({
   formBinds: props.node?.props?.formBinds || {},
-  autoPass: props.node?.props?.autoPass,
+  autoComplete: props.node?.props?.autoComplete || false,
   dealRequired: props.node?.props?.dealRequired,
+  others: props.node?.props?.others || { defaultComment: '同意' },
 })
 const collapseActive = ref(['1', '2', '3'])
 
@@ -202,6 +212,9 @@ const saveConfigToStore = () => {
       flowStore.model.nodes,
       flowStore.selectedNode.id,
     )
+    if (!basicFormData.others.defaultComment) {
+      delete basicFormData.others.defaultComment
+    }
     result.props = {
       ...result.props,
       ...basicFormData,
