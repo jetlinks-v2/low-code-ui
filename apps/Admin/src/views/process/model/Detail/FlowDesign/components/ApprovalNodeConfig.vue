@@ -48,6 +48,7 @@
             <j-form-item
               label="审批意见默认值"
               :name="['others', 'defaultComment']"
+              :rules="[{ max: 64, message: '最多输入64个字符' }]"
             >
               <j-input
                 v-model:value="basicFormData.others.defaultComment"
@@ -94,7 +95,12 @@
                   <AIcon type="InfoCircleOutlined" />
                 </j-tooltip>
               </template>
-              <j-input v-model:value="memberFormData.completeWeight" />
+              <j-input-number
+                :min="1"
+                :max="99999"
+                v-model:value="memberFormData.completeWeight"
+                style="width: 100%"
+              />
             </j-form-item>
             <j-form-item
               name="rejectWeight"
@@ -109,7 +115,12 @@
                   <AIcon type="InfoCircleOutlined" />
                 </j-tooltip>
               </template>
-              <j-input v-model:value="memberFormData.rejectWeight" />
+              <j-input-number
+                :min="1"
+                :max="99999"
+                v-model:value="memberFormData.rejectWeight"
+                style="width: 100%"
+              />
             </j-form-item>
           </j-collapse-panel>
           <j-collapse-panel key="3">
