@@ -46,8 +46,16 @@ export const BASIC_ROUTER_DATA: any[] = [
     code: 'process',
     name: '流程引擎',
     url: '/flow-engine',
-    redirect: '/flow-engine/model',
+    redirect: '/flow-engine/home',
     children: [
+      {
+        code: 'process/home',
+        name: '流程模型',
+        url: '/flow-engine/home',
+        meta: {
+          hideInMenu: true
+        }
+      },
       {
         code: 'process/model',
         name: '流程模型',

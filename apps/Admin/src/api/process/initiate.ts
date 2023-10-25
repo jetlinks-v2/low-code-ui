@@ -11,5 +11,12 @@ export const getList_api = (data: any) =>
  * 发起流程
  * @returns
  */
-export const start_api = ({data, start}: any) =>
-  request.postParams(`/process/runtime/${data.id}/_create`, data, {start})
+export const start_api = ({ data, start }: any) =>
+  request.postParams(`/process/runtime/${data.id}/_create`, data, { start })
+
+/**
+ * 获取流程详情
+ * @returns
+ */
+export const processDetail_api = (id: string) =>
+  request.get(`/process/runtime/process/detail/${id}`)

@@ -1,6 +1,6 @@
 <!-- 表格表单预览 -->
 <template>
-  <j-table :scroll="{ x: true }" :data-source="myDataSource" :columns="columns" :pagination="false">
+  <j-table bordered :scroll="{ x: true }" :data-source="myDataSource" :columns="columns" :pagination="false">
     <template #headerCell="{ column, title }">
       <template v-if="column.formItemProps.required">
         <span>
@@ -10,9 +10,9 @@
         </span>
       </template>
     </template>
-    <template #bodyCell="{ column, text, record }">
+    <template #bodyCell="{ column, text, record, index }">
       <j-form-item 
-        :name="[column.formId, 0, column.dataIndex]"
+        :name="[column.formId, index, column.dataIndex]"
         :rules="[...column.formItemProps.rules,{
               required: column.formItemProps.required,
               message: `请输入${column.formItemProps.label}`,
