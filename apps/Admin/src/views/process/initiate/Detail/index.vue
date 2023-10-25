@@ -25,6 +25,7 @@
                         item.fullInfo?.configuration?.children,
                         item.formId,
                         item.data,
+                        item.multiple
                       )
                     "
                   />
@@ -59,11 +60,13 @@ import {
   start_api,
   getList_api,
   processDetail_api,
+  save_api,
 } from '@/api/process/initiate'
 import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import md5 from 'md5'
 import { getMeProcessList } from '@/api/process/me'
+import { isArray, isObject, pick } from 'lodash-es'
 
 interface FormsProps {
   formId: string
@@ -73,14 +76,14 @@ interface FormsProps {
   data?: any
 }
 
-interface draftProps {
-  id: string
-  start: boolean
-  form: {
-    formId: string
-    data: any
-  }[]
-}
+// interface draftProps {
+//   id: string
+//   start: boolean
+//   form: {
+//     formId: string
+//     data: any
+//   }[]
+// }
 
 const router = useRouter()
 const route = useRoute()
@@ -95,24 +98,29 @@ const formList = ref<FormsProps[]>([])
 // 表单版本
 const formVersion = reactive({})
 // 草稿
-const draft = reactive<draftProps>({} as draftProps)
+// const draft = reactive<draftProps>({} as draftProps)
 const hasDraft = ref<Boolean>(false)
+const draftId = ref<string>('')
 
 const tableData = reactive({})
-const getTableColumns = (fields: any[], formId: string, data: any = {}) => {
+const getTableColumns = (fields: any[], formId: string, data: any = {}, multiple: boolean) => {
+  console.log('fields', fields)
   const _columns = fields?.map((m) => ({
     title: m.formItemProps?.label,
     dataIndex: m.formItemProps?.name,
     ellipsis: true,
     formId,
+    multiple,
     ...m,
   }))
 
   _columns?.forEach((item) => {
     if (tableData[formId]) {
-      tableData[formId][0][item.dataIndex] =
-        // draftData.data?.[item.dataIndex] || undefined
-        data[0][item.dataIndex] ?? undefined
+      if(multiple && data[0]){
+        tableData[formId][0][item.dataIndex] = data[0][item.dataIndex] 
+      }else {
+        tableData[formId][0][item.dataIndex] = data[item.dataIndex]
+      }
     }
   })
   return _columns
@@ -189,6 +197,7 @@ onMounted(() => {
   // 草稿箱进入
   if (route.query.isDraft === 'true') {
     hasDraft.value = true
+    draftId.value = route.query.id as string
     getDetail(route.query.id as string)
   } else {
     const param = {
@@ -215,6 +224,7 @@ onMounted(() => {
           cancelText: '否',
           onOk() {
             hasDraft.value = true
+            draftId.value = res.result.data[0].id
             getDetail(res.result.data[0].id)
           },
           onCancel() {
@@ -241,8 +251,8 @@ const getDetail = (id: string) => {
 const startProcess = async (list: any, start: boolean = true) => {
   let flag = 0
   const param = {
+    id: hasDraft.value ? draftId.value : route.query.id,
     data: {
-      id: route.query.id,
       form: formList.value?.map((i) => ({
         formId: hasDraft.value
           ? i.formId
@@ -253,14 +263,21 @@ const startProcess = async (list: any, start: boolean = true) => {
     },
     start,
   }
-  return start_api(param).then((resp) => {
-    if (resp.success) {
-      onlyMessage(`${start ? '提交' : '保存'}成功`)
-      return true
-    } else {
-      return false
-    }
-  })
+  const resp = hasDraft.value ? await save_api(param) : await start_api(param)
+  if (resp.success) {
+    onlyMessage(`${start ? '提交' : '保存'}成功`)
+    return true
+  } else {
+    return false
+  }
+  // return start_api(param).then((resp) => {
+  //   if (resp.success) {
+  //     onlyMessage(`${start ? '提交' : '保存'}成功`)
+  //     return true
+  //   } else {
+  //     return false
+  //   }
+  // })
 }
 
 // 处理数据
@@ -278,7 +295,6 @@ const handleData = (data: any, model: string) => {
         obj.nodes.props.formBinds[item],
       )
     })
-
     const forms = hasDraft.value ? data.form : obj.config.forms
 
     formList.value = forms?.map((m) => {

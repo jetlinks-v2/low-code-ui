@@ -32,4 +32,4 @@ export const getMembers_api = (id: string) => request.get(`/process/deployment/$
  * 全量修改流程实例可发起成员
  * @returns 
  */
-export const updateMembers_api = (id:string, data: any) => request.post(`/process/deployment/${id}/allowed-embers`, data);
+export const updateMembers_api = (id:string, data: any) => request.put(`/process/deployment/${id}/allowed-members`, data);
