@@ -169,6 +169,8 @@ const handleDeploy = () => {
       ) {
         // 所有步骤验证通过, 开始部署
         saveAndDeploy()
+      } else {
+        onlyMessage('部署失败，流程配置内容不合规', 'error')
       }
     })
     .catch((err) => {

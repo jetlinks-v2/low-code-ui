@@ -105,6 +105,9 @@ const validateSteps = () => {
 }
 
 defineExpose({ validateSteps })
+onMounted(() => {
+  validateSteps()
+})
 </script>
 
 <style lang="less" scoped></style>

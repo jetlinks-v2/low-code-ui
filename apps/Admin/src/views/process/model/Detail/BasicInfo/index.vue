@@ -93,6 +93,9 @@ watch(
   },
   { deep: true },
 )
+onMounted(() => {
+  validateSteps()
+})
 </script>
 <style scoped lang="less">
 .base-info {
