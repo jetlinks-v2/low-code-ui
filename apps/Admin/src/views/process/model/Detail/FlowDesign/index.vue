@@ -95,32 +95,16 @@ watch(
 )
 
 /**
- * 下一步
+ * 当前步骤校验方法
  */
-const next = () => {
+const validateSteps = () => {
   return new Promise((resolve, reject) => {
     const err = flowDesignerRef.value.validateProcess()
     !err.length ? resolve(true) : reject(err)
   })
 }
 
-/**
- * 当前步骤校验方法
- */
-const validateSteps = () => {
-  return new Promise((resolve, reject) => {
-    // formRef.value
-    //   .validate()
-    //   .then((res) => {
-    //     resolve(res)
-    //   })
-    //   .catch((err) => {
-    //     reject(err)
-    //   })
-  })
-}
-
-defineExpose({ next, validateSteps })
+defineExpose({ validateSteps })
 </script>
 
 <style lang="less" scoped></style>
