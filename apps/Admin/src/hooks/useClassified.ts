@@ -7,10 +7,10 @@ export function useClassified() {
     immediate: true,
     onSuccess(res) {
       return res.result.map((item) => {
-        map.value.set(item.value, item)
+        map.value.set(item.id, item)
         return {
           label: item.text,
-          value: item.value,
+          value: item.id,
         }
       })
     },
