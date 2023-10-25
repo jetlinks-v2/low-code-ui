@@ -66,6 +66,7 @@ import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import md5 from 'md5'
 import { getMeProcessList } from '@/api/process/me'
+import { isArray, isObject, pick } from 'lodash-es'
 
 interface FormsProps {
   formId: string

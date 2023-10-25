@@ -580,8 +580,16 @@ const onSave = (item) => {
     visible.value = true
 }
 
+const router = useRouter()
 const onDraft = (record)=>{
     console.log('record--',record)
+    router.push({
+        path:'/flow-engine/initiate/initiate-detail',
+        query: {
+        id: record.id,
+        isDraft: true,
+        }
+    })
 }
 
 //todo待办
