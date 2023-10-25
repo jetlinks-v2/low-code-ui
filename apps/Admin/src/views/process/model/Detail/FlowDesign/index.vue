@@ -1,6 +1,10 @@
 <!-- 流程设计 -->
 <template>
-  <FlowDesigner @selectNode="nodeSelected" @delNode="nodeDel" />
+  <FlowDesigner
+    ref="flowDesignerRef"
+    @selectNode="nodeSelected"
+    @delNode="nodeDel"
+  />
 
   <j-drawer
     destroyOnClose
@@ -44,6 +48,7 @@ const nodeName = computed({
   },
 })
 
+const flowDesignerRef = ref()
 const nodeConfigRef = ref()
 const showConfig = ref(false)
 const nodeSelected = (node) => {
@@ -90,32 +95,16 @@ watch(
 )
 
 /**
- * 下一步
- */
-const next = () => {
-  // 流程设计步骤, 无直接验证, 只有节点高级配置有验证
-  return new Promise((resolve, reject) => {
-    resolve(true)
-  })
-}
-
-/**
  * 当前步骤校验方法
  */
 const validateSteps = () => {
   return new Promise((resolve, reject) => {
-    // formRef.value
-    //   .validate()
-    //   .then((res) => {
-    //     resolve(res)
-    //   })
-    //   .catch((err) => {
-    //     reject(err)
-    //   })
+    const err = flowDesignerRef.value.validateProcess()
+    !err.length ? resolve(true) : reject(err)
   })
 }
 
-defineExpose({ next, validateSteps })
+defineExpose({ validateSteps })
 </script>
 
 <style lang="less" scoped></style>

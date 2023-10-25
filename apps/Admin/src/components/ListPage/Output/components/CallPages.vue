@@ -153,29 +153,6 @@ watch(
     visible.value = val
   },
 )
-watch(
-  () => props.popData,
-  (val) => {
-    if (props.type !== 'Add') {
-      editValue.value = {}
-      for (const key in val) {
-        const result = props.dataColumns.find((item) => item.dataIndex === key)
-        if (result && result.config?.type === 'enum') {
-          editValue.value[key] = cloneDeep(
-            Array.isArray(val[key])
-              ? val?.[key]?.map((item) => item.value)
-              : val?.[key]?.value,
-          )
-        } else {
-          editValue.value[key] = cloneDeep(val[key])
-        }
-      }
-    } else {
-      editValue.value = {}
-    }
-  },
-  { immediate: true },
-)
 
 watchEffect(() => {
   if (props.type !== 'add' && visible.value) {
