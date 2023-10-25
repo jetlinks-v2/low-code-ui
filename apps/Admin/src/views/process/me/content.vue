@@ -90,6 +90,7 @@ const sign = reactive({
     success:0,
     error:0
 })
+const router = useRouter()
 
 
 const columnsTodo = [
@@ -582,6 +583,13 @@ const onSave = (item) => {
 
 const onDraft = (record)=>{
     console.log('record--',record)
+    router.push({
+    path: '/flow-engine/initiate/initiate-detail',
+    query: {
+      id: record.modelId,
+      // isDraft: true,
+    },
+  })
 }
 
 //todo待办
