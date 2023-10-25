@@ -1,4 +1,4 @@
-<!-- 表单字段 / 配置表单 -->
+<!-- 表单变量 -->
 <template>
   <j-modal
     v-model:visible="_visible"

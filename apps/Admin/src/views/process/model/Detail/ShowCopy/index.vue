@@ -40,7 +40,7 @@
             @click="formData.variables.splice(index, 1)"
           />
         </div>
-        <FormFields
+        <FormVariables
           v-model:visible="visible"
           v-model:variables="formData.variables"
         />
@@ -128,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import FormFields from '../components/FormFields.vue'
+import FormVariables from './components/FormVariables.vue'
 import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
