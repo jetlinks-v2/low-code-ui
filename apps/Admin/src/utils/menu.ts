@@ -89,10 +89,14 @@ export const handleMenus = (menuData: any, extraMenus: any, components: any, lev
               route.children = handleMenus(route.children, extraMenus, components, level + 1)
             }
 
-            const showChildren = route.children?.filter(r => !r.meta?.hideInMenu) || []
+            if (item.redirect) {
+              route.redirect = item.redirect
+            } else {
+              const showChildren = route.children?.filter(r => !r.meta?.hideInMenu) || []
 
-            if (route.children && route.children.length && showChildren.length) {
-              route.redirect = showChildren[0].path
+              if (route.children && route.children.length && showChildren.length) {
+                route.redirect = showChildren[0].path
+              }
             }
 
             return route
@@ -117,9 +121,21 @@ const hideInMenu = (code: string) => {
   return ['account-center', 'message-subscribe'].includes(code)
 }
 
+const handleUrl = (item: any, isApp: boolean, appUrl?: string) => {
+  if (isApp) {
+    return appUrl
+  }
+
+}
+
 export const handleSiderMenu = (menuData: any) => {
   if (menuData && menuData.length) {
-    return menuData.filter(item => !item.meta?.hideInMenu && !item.isShow).map(item => {
+    return menuData.filter(item => {
+      if (('isShow' in item && item.isShow === false) || item.meta?.hideInMenu === true) {
+        return false
+      }
+      return true
+    }).map(item => {
       const { isApp, appUrl } = hasAppID(item) // 是否为第三方程序
       const meta = handleMeta(item, isApp)
       const route: any = {

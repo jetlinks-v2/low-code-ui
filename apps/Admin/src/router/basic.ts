@@ -6,11 +6,15 @@ export const BASIC_ROUTER_DATA: any[] = [
     code: 'delivery',
     name: 'WEB IDE',
     url: '/delivery',
+    redirect: '/delivery/center',
     children: [
       {
         code: 'center',
-        name: '交付中心',
-        url: '/delivery/center'
+        name: '',
+        url: '/delivery/center',
+        meta: {
+          hideInMenu: true
+        }
       },
     ]
   },
@@ -42,52 +46,80 @@ export const BASIC_ROUTER_DATA: any[] = [
     code: 'process',
     name: '流程引擎',
     url: '/flow-engine',
+    redirect: '/flow-engine/model',
     children: [
       {
         code: 'process/model',
         name: '流程模型',
         url: '/flow-engine/model',
+        meta: {
+          hideInMenu: true
+        }
       },
       {
         code: 'process/instance',
         name: '流程实例',
-        url: '/flow-engine/instance'
+        url: '/flow-engine/instance',
+        meta: {
+          hideInMenu: true
+        }
       },
       {
         code: 'process/monitor',
         name: '流程监控',
-        url: '/flow-engine/monitor'
+        url: '/flow-engine/monitor',
+        meta: {
+          hideInMenu: true
+        }
       },
       {
         code: 'process/initiate',
         name: '发起流程',
-        url: '/flow-engine/initiate'
+        url: '/flow-engine/initiate',
+        meta: {
+          hideInMenu: true
+        }
       },
       {
         code: 'process/form',
         name: '流程表单',
-        url: '/flow-engine/form'
+        url: '/flow-engine/form',
+        meta: {
+          hideInMenu: true
+        }
       },
       {
-        
+
         code: 'process/me/todo',
         name: '待办事项',
-        url: '/flow-engine/me/todo'
+        url: '/flow-engine/me/todo',
+        meta: {
+          hideInMenu: true
+        }
       },
       {
         code: 'process/me',
         name: '已办事项',
-        url: '/flow-engine/me/finished'
+        url: '/flow-engine/me/finished',
+        meta: {
+          hideInMenu: true
+        }
       },
       {
         code: 'process/me/cc',
         name: '抄送给我',
-        url: '/flow-engine/me/cc'
+        url: '/flow-engine/me/cc',
+        meta: {
+          hideInMenu: true
+        }
       },
       {
         code: 'process/me/initiate',
         name: '我发起的',
-        url: '/flow-engine/me/initiate'
+        url: '/flow-engine/me/initiate',
+        meta: {
+          hideInMenu: true
+        }
       }
     ]
   },
