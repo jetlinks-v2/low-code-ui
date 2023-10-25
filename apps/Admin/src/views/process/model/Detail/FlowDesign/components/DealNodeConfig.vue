@@ -23,7 +23,12 @@
         </j-collapse>
       </j-form>
     </j-tab-pane>
-    <j-tab-pane key="member" tab="成员配置" forceRender>
+    <j-tab-pane
+      key="member"
+      tab="成员配置"
+      forceRender
+      v-if="flowStore.selectedNode.type !== 'ROOT'"
+    >
       <j-form ref="memberFormRef" :model="memberFormData" layout="vertical">
         <j-collapse
           v-model:activeKey="collapseActive"
