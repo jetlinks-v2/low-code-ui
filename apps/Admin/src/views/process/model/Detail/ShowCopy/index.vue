@@ -134,12 +134,11 @@ import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
 
-// 固定变量
-const fixedVariables = [
+// 初始变量
+const initVariables = [
   { label: '流程名称', value: '1', color: '#208CFF' },
   { label: '发起人', value: '2', color: '#F7AD1A' },
   { label: '发起人所属组织', value: '3', color: '#EB5B22' },
-  //   { label: '111', value: 'process.var', color: '#ddb8ff' },
 ]
 const visible = ref(false)
 const formRef = ref()
@@ -148,9 +147,9 @@ const formData = reactive({
     get: () =>
       flowStore.model.config.variables?.length
         ? flowStore.model.config.variables
-        : fixedVariables,
+        : initVariables,
     set: (val) => {
-      flowStore.model.config.variables = [...fixedVariables, ...val]
+      flowStore.model.config.variables = [...initVariables, ...val]
     },
   }),
   nameGenerator: computed({
