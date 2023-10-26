@@ -115,14 +115,14 @@ import { getImage } from '@jetlinks/utils'
 const flowStore = useFlowStore()
 
 type Emits = {
-  (e: 'update:value', data: any[]): void
+  (e: 'update:value', data: any): void
 }
 
 const emits = defineEmits<Emits>()
 const props = defineProps({
   value: {
-    type: Array as PropType<any[]>,
-    default: () => [],
+    type: Object as PropType<any>,
+    default: () => ({}),
   },
 })
 
@@ -171,7 +171,6 @@ const getFormList = async () => {
   //   所有表单数据
   allFormList.value = cloneDeep(filterFormList.value)
 }
-getFormList()
 
 const handleSearch = () => {
   filterFormList.value = filterFormByName(allFormList.value, keywords.value)
