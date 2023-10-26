@@ -37,10 +37,6 @@
           <template #title="node">
             <div style="display: flex; justify-content: space-between">
               <span style="margin-right: 20px">{{ node.name }}</span>
-              <!-- <j-checkbox-group
-                v-model:value="node.permission"
-                :options="permissions"
-              /> -->
             </div>
           </template>
         </j-tree>
@@ -61,6 +57,7 @@ import {
 import { queryVariables_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { treeFilter } from 'jetlinks-ui-components/es/Tree'
+import { randomColor } from '../utils'
 
 type Emits = {
   (e: 'update:visible', data: boolean): void
@@ -74,6 +71,11 @@ const props = defineProps({
     default: false,
   },
   variables: {
+    type: Array as PropType<any[]>,
+    default: () => [],
+  },
+  // 所有的表单变量
+  allFormVariables: {
     type: Array as PropType<any[]>,
     default: () => [],
   },
@@ -104,11 +106,6 @@ const treeDataFilter = computed(() => {
     ? treeFilter(treeData.value, searchValue.value, 'name')
     : treeData.value
 })
-
-const permissions = ref([
-  { label: '读', value: 'read' },
-  { label: '写', value: 'write' },
-])
 
 /**
  * 获取表单字段
@@ -142,30 +139,6 @@ const handleCheck = (_, { checkedNodes }) => {
       value: m.fullId,
       color: randomColor(),
     }))
-}
-
-// 生成随机背景色，并且保证黑色文字可读性
-const randomColor = () => {
-  // const color = '#' + Math.floor(Math.random() * 0xffffff).toString(16)
-  // return color
-  const letters = '0123456789ABCDEF'
-  let color = '#'
-  do {
-    color = '#'
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)]
-    }
-  } while (isDarkColor(color))
-
-  return color
-}
-// 判断是否是深色
-const isDarkColor = (hexColor) => {
-  const r = parseInt(hexColor.slice(1, 3), 16)
-  const g = parseInt(hexColor.slice(3, 5), 16)
-  const b = parseInt(hexColor.slice(5, 7), 16)
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000
-  return brightness < 128
 }
 
 /**
