@@ -255,21 +255,21 @@ watch(
     if (val) getFormList()
   },
 )
-watch(
-  () => filterFormList.value,
-  (val) => {
-    val?.forEach((form) => {
-      const fieldAccessModes = form.fullInfo?.configuration?.children?.map(
-        (field) => field.accessModes,
-      )
-      // 当表单下, 每个字段都有"写"权限时, 对应表单也勾选"写"
-      form.accessModes = fieldAccessModes?.every((e) => e.includes('write'))
-        ? ['read', 'write']
-        : ['read']
-    })
-  },
-  { deep: true, immediate: true },
-)
+// watch(
+//   () => filterFormList.value,
+//   (val) => {
+//     val?.forEach((form) => {
+//       const fieldAccessModes = form.fullInfo?.configuration?.children?.map(
+//         (field) => field.accessModes,
+//       )
+//       // 当表单下, 每个字段都有"写"权限时, 对应表单也勾选"写"
+//       form.accessModes = fieldAccessModes?.every((e) => e.includes('write'))
+//         ? ['read', 'write']
+//         : ['read']
+//     })
+//   },
+//   { deep: true, immediate: true },
+// )
 </script>
 
 <style lang="less" scoped>

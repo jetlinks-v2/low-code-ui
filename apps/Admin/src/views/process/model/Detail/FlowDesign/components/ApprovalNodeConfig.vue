@@ -218,6 +218,18 @@ const nodeList = ref([
 ])
 
 /**
+ * 驳回的节点
+ * 获取当前节点之前的所有审批和办理节点
+ */
+const getRejectNodes = () => {
+  const _parentNode = findNodeById(flowStore.model.nodes, props.node?.parentId)
+  console.log('_parentNode: ', _parentNode)
+}
+onMounted(() => {
+  getRejectNodes()
+})
+
+/**
  * 将数据保存至store, 不用校验合法性
  */
 const saveConfigToStore = () => {
