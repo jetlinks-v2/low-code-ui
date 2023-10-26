@@ -24,24 +24,33 @@
             <AIcon type="SearchOutlined" />
           </template>
         </j-input>
-        <j-tree
-          checkable
-          blockNode
-          defaultExpandAll
-          :tree-data="treeDataFilter"
-          :field-names="{ key: 'fullId', title: 'name' }"
-          v-model:checkedKeys="checkedKeys"
-          v-if="treeDataFilter.length"
-          @check="handleCheck"
-        >
-          <template #title="node">
-            <div style="display: flex; justify-content: space-between">
-              <span style="margin-right: 20px">{{ node.name }}</span>
-            </div>
-          </template>
-        </j-tree>
+        <j-scrollbar max-height="600">
+          <j-tree
+            checkable
+            blockNode
+            defaultExpandAll
+            :tree-data="treeDataFilter"
+            :field-names="{ key: 'fullId', title: 'name' }"
+            v-model:checkedKeys="checkedKeys"
+            v-if="treeDataFilter.length"
+            @check="handleCheck"
+          >
+            <template #title="node">
+              <div style="display: flex; justify-content: space-between">
+                <span style="margin-right: 20px">{{ node.name }}</span>
+              </div>
+            </template>
+          </j-tree>
+        </j-scrollbar>
       </j-col>
-      <j-col :span="14"> 表单名称 </j-col>
+      <j-col :span="14">
+        <j-scrollbar max-height="600">
+          <template v-for="(item, index) in previewData" :key="index">
+            <div>{{ item.name }}</div>
+            <FormPreview :data="item.configuration" />
+          </template>
+        </j-scrollbar>
+      </j-col>
     </j-row>
   </j-modal>
 </template>
@@ -54,7 +63,7 @@ import {
   getCurrentInstance,
   ComponentInternalInstance,
 } from 'vue'
-import { queryVariables_api } from '@/api/process/model'
+import { queryFormNoPage_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { treeFilter } from 'jetlinks-ui-components/es/Tree'
 import { randomColor } from '../utils'
@@ -74,8 +83,8 @@ const props = defineProps({
     type: Array as PropType<any[]>,
     default: () => [],
   },
-  // 所有的表单变量
-  allFormVariables: {
+  // 左侧树形数据
+  treeData: {
     type: Array as PropType<any[]>,
     default: () => [],
   },
@@ -98,32 +107,31 @@ const checkedLeafNode = ref<any[]>([])
 
 // 搜索字段
 const searchValue = ref('')
-// 接口返回的原始数据
-const treeData = ref([])
+// 表单预览数据
+const previewData = ref<any[]>([])
 // 页面渲染的数据(可能是筛选过后的)
 const treeDataFilter = computed(() => {
   return searchValue.value
-    ? treeFilter(treeData.value, searchValue.value, 'name')
-    : treeData.value
+    ? treeFilter(props.treeData, searchValue.value, 'name')
+    : props.treeData
 })
 
 /**
  * 获取表单字段
  */
 const getFormFields = async () => {
-  const { id, name, key, model, provider } = flowStore.modelBaseInfo
   const params = {
-    definition: {
-      id,
-      name,
-      key,
-      model: JSON.stringify(flowStore.model), // model不能取modelBaseInfo(接口保存才会有值), 直接取动态值flowStore.model
-      provider,
-    },
-    nodeId: flowStore.model.nodes.id, // 展示及抄送直接传根节点id
+    paging: false,
+    terms: [
+      {
+        column: 'id',
+        termType: 'in',
+        value: props.treeData?.map((m) => m.id),
+      },
+    ],
   }
-  const { result } = await queryVariables_api(params)
-  treeData.value = result
+  const { result } = await queryFormNoPage_api(params)
+  previewData.value = result
 }
 
 /**

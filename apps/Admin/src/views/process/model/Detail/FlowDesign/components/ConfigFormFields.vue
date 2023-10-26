@@ -44,7 +44,7 @@
         >
           全部内容
         </j-checkbox>
-        <div class="form-box">
+        <j-scrollbar max-height="600">
           <div v-if="loading" style="text-align: center">
             <j-spin />
           </div>
@@ -80,10 +80,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </j-scrollbar>
       </j-col>
       <j-col :span="16">
-        <div class="preview-box">
+        <j-scrollbar max-height="600">
           <template v-for="(item, index) in filterFormList" :key="index">
             <div>{{ item.formName }}</div>
             <FormPreview
@@ -96,7 +96,7 @@
               v-else
             />
           </template>
-        </div>
+        </j-scrollbar>
       </j-col>
     </j-row>
   </j-modal>
@@ -286,27 +286,19 @@ watch(
     }
   }
 }
-.form-box {
-  max-height: 600px;
-  overflow: auto;
-  .form-item {
-    .form-title {
+.form-item {
+  .form-title {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
+  .form-fields {
+    padding-left: 30px;
+    .field-title {
       display: flex;
       justify-content: space-between;
       margin-bottom: 5px;
     }
-    .form-fields {
-      padding-left: 30px;
-      .field-title {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 5px;
-      }
-    }
   }
-}
-.preview-box {
-  max-height: 600px;
-  overflow: auto;
 }
 </style>

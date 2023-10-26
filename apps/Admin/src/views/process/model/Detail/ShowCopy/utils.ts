@@ -33,31 +33,23 @@ export function isDarkColor(hexColor) {
  * @param treeData 
  * @returns 
  */
-export function separateData(treeData: any[]) {
-    const formFields: any[] = []
-    const otherFields: any[] = []
+export function separateData(treeData: any[], result: { formList?: any[]; otherFields?: any[] }) {
+    if (!result.otherFields) result.otherFields = []
     treeData.forEach(item => {
         if (item.children && item.children.length) {
-            separateData(item.children)
-        } else {
             if (item.fullId === 'process.form') {
-                formFields.push({
-                    label: item.name,
-                    value: item.fullId,
-                    color: randomColor()
-                })
-            } else  {
-                otherFields.push({
-                    label: item.name,
-                    value: item.fullId,
-                    color: randomColor()
-                })
+                result.formList = item.children
+            } else {
+                separateData(item.children, result)
             }
+        } else {
+            result.otherFields?.push({
+                label: item.name,
+                value: item.fullId,
+                color: randomColor(),
+                isOther: true // 非表单字段, 不能删除
+            })
         }
     })
-    return {
-        formFields,
-        otherFields
-    }
-
+    return result
 }
