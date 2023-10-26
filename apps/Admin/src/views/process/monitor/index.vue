@@ -148,8 +148,11 @@ const columns = [
         placeholder: '请选择状态',
       },
       options: [
-        { label: '启用', value: 'enabled' },
-        { label: '禁用', value: 'disabled' },
+        { label: '已准备', value: 'ready' },
+        { label: '运行中', value: 'running' },
+        { label: '已完成', value: 'completed' },
+        { label: '已拒绝', value: 'rejected' },
+        { label: '已撤销', value: 'repealed' },
       ],
     },
   },

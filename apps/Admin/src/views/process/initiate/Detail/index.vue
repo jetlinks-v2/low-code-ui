@@ -143,12 +143,13 @@ const hasData = (array: any[] = []) => {
     for (const i of array) {
       const arr = Object.values(i).filter((key: any) => key && key.length > 0)
       if (arr.length > 0) {
+        console.log('arr', arr)
         flag = true
         break
       }
     }
     tableList?.forEach((item: any) => {
-      if (Object.values(item[0]).length > 0) {
+      if (Object.values(item[0]).filter((j) => j).length > 0) {
         flag = true
       }
     })
