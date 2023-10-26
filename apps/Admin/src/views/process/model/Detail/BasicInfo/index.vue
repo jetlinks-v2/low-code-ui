@@ -76,10 +76,13 @@ const validateSteps = () => {
     formRef.value
       .validate()
       .then((res) => {
-        resolve(res)
+        // resolve(res)
+        resolve(0)
       })
       .catch((err) => {
-        reject(err)
+        // reject(err)
+        // 返回当前步骤序号
+        reject(0)
       })
   })
 }
@@ -93,6 +96,9 @@ watch(
   },
   { deep: true },
 )
+onMounted(() => {
+  validateSteps()
+})
 </script>
 <style scoped lang="less">
 .base-info {

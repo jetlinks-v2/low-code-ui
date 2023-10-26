@@ -40,7 +40,7 @@
             @click="formData.variables.splice(index, 1)"
           />
         </div>
-        <FormFields
+        <FormVariables
           v-model:visible="visible"
           v-model:variables="formData.variables"
         />
@@ -128,7 +128,8 @@
 </template>
 
 <script setup lang="ts">
-import FormFields from '../components/FormFields.vue'
+import { queryVariables_api } from '@/api/process/model'
+import FormVariables from './components/FormVariables.vue'
 import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
@@ -180,6 +181,27 @@ watch(
     deep: true,
   },
 )
+
+/**
+ * 获取变量数据
+ * 表单内的变量展示到弹窗
+ * 其他变量展示到外面
+ */
+const getVariables = async () => {
+  const { id, name, key, model, provider } = flowStore.modelBaseInfo
+  const params = {
+    definition: {
+      id,
+      name,
+      key,
+      model: JSON.stringify(flowStore.model), // model不能取modelBaseInfo(接口保存才会有值), 直接取动态值flowStore.model
+      provider,
+    },
+    nodeId: flowStore.model.nodes.id, // 展示及抄送直接传根节点id
+  }
+  const { result } = await queryVariables_api(params)
+  console.log('result: ', result)
+}
 
 /**
  * 接收时格式转换, 用于展示:
@@ -246,19 +268,6 @@ const summaryHtml = computed(() => {
 })
 
 /**
- * 保存
- * @param type 默认save 不校验填写内容，submit 提交时校验
- */
-// const submit = async (type = 'save') => {
-//   // console.log(`output->type`,type)
-//   // 仅保存配置数据，不校验填写内容的合规性。
-//   if (type !== 'save') {
-//     await formRef.value.validate()
-//   }
-//   return formData
-// }
-
-/**
  * 当前步骤校验方法
  */
 const validateSteps = () => {
@@ -266,15 +275,22 @@ const validateSteps = () => {
     formRef.value
       .validate()
       .then((res) => {
-        resolve(res)
+        // resolve(res)
+        resolve(2)
       })
       .catch((err) => {
-        reject(err)
+        // reject(err)
+        // 返回当前步骤序号
+        reject(2)
       })
   })
 }
 
 defineExpose({ validateSteps })
+onMounted(() => {
+  getVariables()
+  validateSteps()
+})
 </script>
 
 <style lang="less" scoped>

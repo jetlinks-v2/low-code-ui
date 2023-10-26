@@ -24,7 +24,7 @@
             <template #header>
               <TitleComponent data="节点控制"></TitleComponent>
             </template>
-            <j-form-item name="autoPass">
+            <j-form-item name="autoComplete">
               <template #label>
                 自动通过
                 <j-tooltip placement="right">
@@ -36,7 +36,7 @@
               </template>
               <j-switch
                 size="small"
-                v-model:checked="basicFormData.autoPass"
+                v-model:checked="basicFormData.autoComplete"
               ></j-switch>
             </j-form-item>
             <j-form-item label="审批意见必填" name="dealRequired">
@@ -44,6 +44,16 @@
                 size="small"
                 v-model:checked="basicFormData.dealRequired"
               ></j-switch>
+            </j-form-item>
+            <j-form-item
+              label="审批意见默认值"
+              :name="['others', 'defaultComment']"
+              :rules="[{ max: 64, message: '最多输入64个字符' }]"
+            >
+              <j-input
+                v-model:value="basicFormData.others.defaultComment"
+                placeholder="请输入审批意见默认值"
+              />
             </j-form-item>
           </j-collapse-panel>
         </j-collapse>
@@ -65,7 +75,10 @@
               name="candidates"
               :rules="[{ required: true, message: '请选择成员' }]"
             >
-              <ConfigureMembers v-model:members="memberFormData.candidates" />
+              <ConfigureMembers
+                v-model:members="memberFormData.candidates"
+                :nodeId="flowStore.selectedNode.id"
+              />
             </j-form-item>
           </j-collapse-panel>
           <j-collapse-panel key="2">
@@ -85,7 +98,12 @@
                   <AIcon type="InfoCircleOutlined" />
                 </j-tooltip>
               </template>
-              <j-input v-model:value="memberFormData.completeWeight" />
+              <j-input-number
+                :min="1"
+                :max="99999"
+                v-model:value="memberFormData.completeWeight"
+                style="width: 100%"
+              />
             </j-form-item>
             <j-form-item
               name="rejectWeight"
@@ -100,7 +118,12 @@
                   <AIcon type="InfoCircleOutlined" />
                 </j-tooltip>
               </template>
-              <j-input v-model:value="memberFormData.rejectWeight" />
+              <j-input-number
+                :min="1"
+                :max="99999"
+                v-model:value="memberFormData.rejectWeight"
+                style="width: 100%"
+              />
             </j-form-item>
           </j-collapse-panel>
           <j-collapse-panel key="3">
@@ -169,8 +192,9 @@ const props = defineProps({
 const basicFormRef = ref()
 const basicFormData = reactive({
   formBinds: props.node?.props?.formBinds || {},
-  autoPass: props.node?.props?.autoPass,
+  autoComplete: props.node?.props?.autoComplete || false,
   dealRequired: props.node?.props?.dealRequired,
+  others: props.node?.props?.others || { defaultComment: '同意' },
 })
 const collapseActive = ref(['1', '2', '3'])
 
@@ -202,41 +226,53 @@ const saveConfigToStore = () => {
       flowStore.model.nodes,
       flowStore.selectedNode.id,
     )
+    if (!basicFormData.others.defaultComment) {
+      delete basicFormData.others.defaultComment
+    }
     result.props = {
       ...result.props,
       ...basicFormData,
       ...memberFormData,
     }
     resolve(result)
-    // basicFormRef.value
-    //   ?.validate()
-    //   .then((valid1) => {
-    //     memberFormRef.value
-    //       ?.validate()
-    //       .then((valid2) => {
-    //         const result = findNodeById(
-    //           flowStore.model.nodes,
-    //           flowStore.selectedNode.id,
-    //         )
-    //         result.props = {
-    //           ...result.props,
-    //           ...basicFormData,
-    //           ...memberFormData,
-    //         }
-    //         resolve({ ...valid1, ...valid2 })
-    //       })
-    //       .catch((err) => {
-    //         reject(err)
-    //       })
-    //   })
-    //   .catch((err) => {
-    //     reject(err)
-    //   })
+  })
+}
+
+/**
+ * 校验配置数据
+ */
+const validateConfig = () => {
+  return new Promise((resolve, reject) => {
+    basicFormRef.value
+      ?.validate()
+      .then((valid1) => {
+        memberFormRef.value
+          ?.validate()
+          .then((valid2) => {
+            const result = findNodeById(
+              flowStore.model.nodes,
+              flowStore.selectedNode.id,
+            )
+            result.props = {
+              ...result.props,
+              ...basicFormData,
+              ...memberFormData,
+            }
+            resolve({ ...valid1, ...valid2 })
+          })
+          .catch((err) => {
+            reject(err)
+          })
+      })
+      .catch((err) => {
+        reject(err)
+      })
   })
 }
 
 defineExpose({
   saveConfigToStore,
+  validateConfig,
 })
 </script>
 
