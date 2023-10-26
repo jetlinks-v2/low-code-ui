@@ -5,7 +5,7 @@ import {
   ComponentInternalInstance,
   PropType,
 } from 'vue'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, debounce } from 'lodash-es'
 import { useFlowStore } from '@/store/flow'
 import './index.less'
 
@@ -615,7 +615,9 @@ const FlowDesigner = defineComponent({
         ]),
       )
       //   console.log('dom.value: ', dom.value)
-      setEmptyNodeProps(dom.value)
+      debounce(() => {
+        setEmptyNodeProps(dom.value)
+      }, 300)
 
       return h(
         'div',

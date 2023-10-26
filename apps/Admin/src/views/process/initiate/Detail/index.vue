@@ -14,7 +14,7 @@
                   <FormPreview
                     v-if="!item.multiple"
                     ref="previewRef"
-                    :value="getDraftData(item.formId)['data']"
+                    :value="item.data"
                     :data="item.fullInfo?.configuration"
                   />
                   <TableFormPreview
@@ -24,6 +24,8 @@
                       getTableColumns(
                         item.fullInfo?.configuration?.children,
                         item.formId,
+                        item.data,
+                        item.multiple,
                       )
                     "
                   />
@@ -54,37 +56,36 @@
 import { onlyMessage } from '@jetlinks/utils'
 import FlowDesigner from '@/components/FlowDesigner'
 import { Modal } from 'jetlinks-ui-components'
-import { start_api, getList_api } from '@/api/process/initiate'
+import {
+  start_api,
+  getList_api,
+  processDetail_api,
+  save_api,
+} from '@/api/process/initiate'
 import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import md5 from 'md5'
+import { getMeProcessList } from '@/api/process/me'
 
 interface FormsProps {
   formId: string
   formName: string
   fullInfo: any
   multiple: boolean
+  data?: any
 }
 
-interface formDataProps {
-  id: string
-  name: string
-  provider: string
-  configuration: any
-}
-
-interface draftProps {
-  id: string
-  start: boolean
-  form: {
-    formId: string
-    data: any
-  }[]
-}
+// interface draftProps {
+//   id: string
+//   start: boolean
+//   form: {
+//     formId: string
+//     data: any
+//   }[]
+// }
 
 const router = useRouter()
 const route = useRoute()
-const currentProcess = reactive<any>({})
 const previewRef = ref<any>()
 const formRef = ref<any>()
 
@@ -96,54 +97,70 @@ const formList = ref<FormsProps[]>([])
 // 表单版本
 const formVersion = reactive({})
 // 草稿
-const draft = reactive<draftProps>({} as draftProps)
+// const draft = reactive<draftProps>({} as draftProps)
+const hasDraft = ref<Boolean>(false)
+const draftId = ref<string>('')
 
 const tableData = reactive({})
-const getTableColumns = (fields: any[], formId: string) => {
-  const draftData: any = getDraftData(formId)
+const getTableColumns = (
+  fields: any[],
+  formId: string,
+  data: any = {},
+  multiple: boolean,
+) => {
   const _columns = fields?.map((m) => ({
     title: m.formItemProps?.label,
     dataIndex: m.formItemProps?.name,
     ellipsis: true,
     formId,
+    multiple,
     ...m,
   }))
 
   _columns?.forEach((item) => {
     if (tableData[formId]) {
-      tableData[formId][0][item.dataIndex] =
-        draftData.data?.[item.dataIndex] || undefined
+      if (multiple && data[0]) {
+        tableData[formId][0][item.dataIndex] = data[0][item.dataIndex]
+      } else {
+        tableData[formId][0][item.dataIndex] = data[item.dataIndex]
+      }
     }
   })
   return _columns
 }
 
-// 获取草稿数据
-const getDraftData = (id: string) => {
-  return draft.form?.find((i) => i.formId === id) || {}
-}
 /**
  * 判断数组对象中的属性是否有数据
  * @param array
  */
-const hasData = (array: any[]) => {
-  if (array?.length < 1) return false
-  let flag = false
-  for (const i of array) {
-    const arr = Object.values(i).filter((key: any) => key && key.length > 0)
-    if (arr.length > 0) {
-      flag = true
-      break
+const hasData = (array: any[] = []) => {
+  const tableList = Object.values(tableData)
+
+  if (tableList.length < 1 && array?.length < 1) {
+    return false
+  } else {
+    let flag = false
+    for (const i of array) {
+      const arr = Object.values(i).filter((key: any) => key && key.length > 0)
+      if (arr.length > 0) {
+        flag = true
+        break
+      }
     }
+    tableList?.forEach((item: any) => {
+      if (Object.values(item[0]).length > 0) {
+        flag = true
+      }
+    })
+    return flag
   }
-  return flag
 }
 
 /**
  * 取消
  */
 const cancel = () => {
-  const list = previewRef.value.map((item) => item.formState)
+  const list = previewRef.value?.map((item) => item.formState)
   if (hasData(list)) {
     Modal.confirm({
       title: '是否保存申请表单为草稿？',
@@ -189,17 +206,56 @@ const save = () => {
   })
 }
 onMounted(() => {
-  // 草稿
-  if (route.query.isDraft) {
-    Modal.confirm({
-      title: '继续编辑草稿？',
-      okText: '是',
-      cancelText: '否',
-      onOk() {},
-      onCancel() {},
+  spinning.value = true
+  // 草稿箱进入
+  if (route.query.isDraft === 'true') {
+    hasDraft.value = true
+    draftId.value = route.query.id as string
+    getDetail(route.query.id as string)
+  } else {
+    const param = {
+      paging: false,
+      terms: [
+        {
+          value: 'ready',
+          termType: 'eq',
+          column: 'state',
+        },
+        {
+          value: route.query.id,
+          termType: 'eq',
+          column: 'modelId',
+        },
+      ],
+    }
+    getMeProcessList(param, 'initiate', false).then((res) => {
+      if (res.result.total > 0) {
+        // 有草稿
+        Modal.confirm({
+          title: '继续编辑草稿？',
+          okText: '是',
+          cancelText: '否',
+          onOk() {
+            hasDraft.value = true
+            draftId.value = res.result.data[0].id
+            getDetail(res.result.data[0].id)
+          },
+          onCancel() {
+            getProcess()
+          },
+        })
+      } else {
+        getProcess()
+      }
     })
   }
 })
+
+const getDetail = (id: string) => {
+  processDetail_api(id).then((res) => {
+    handleData(res.result, res.result.modelContent)
+  })
+}
 
 /**
  * 发起流程处理
@@ -208,31 +264,82 @@ onMounted(() => {
 const startProcess = async (list: any, start: boolean = true) => {
   let flag = 0
   const param = {
+    id: hasDraft.value ? draftId.value : route.query.id,
     data: {
-      id: route.query.id,
       form: formList.value?.map((i) => ({
-        formId: md5(i.formId + '|' + formVersion[i.formId]),
+        formId: hasDraft.value
+          ? i.formId
+          : md5(i.formId + '|' + formVersion[i.formId]),
         data: i.multiple ? tableData[i.formId][0] : list[flag++],
       })),
       variables: {},
     },
     start,
   }
-  return start_api(param).then((resp) => {
-    if (resp.success) {
-      onlyMessage(`${start ? '提交' : '保存'}成功`)
-      return true
-    } else {
-      return false
-    }
-  })
+  const resp = hasDraft.value ? await save_api(param) : await start_api(param)
+  if (resp.success) {
+    onlyMessage(`${start ? '提交' : '保存'}成功`)
+    return true
+  } else {
+    return false
+  }
+  // return start_api(param).then((resp) => {
+  //   if (resp.success) {
+  //     onlyMessage(`${start ? '提交' : '保存'}成功`)
+  //     return true
+  //   } else {
+  //     return false
+  //   }
+  // })
+}
+
+// 处理数据
+const handleData = (data: any, model: string) => {
+  Object.assign(formVersion, data.others?.formVersion)
+  try {
+    const obj = JSON.parse(model)
+    nodesData.value = obj.nodes
+
+    //详情接口nodeId
+    const bindMap = new Map()
+    Object.keys(obj.nodes.props.formBinds).forEach((item) => {
+      bindMap.set(
+        hasDraft.value ? md5(item + '|' + formVersion[item]) : item,
+        obj.nodes.props.formBinds[item],
+      )
+    })
+    const forms = hasDraft.value ? data.form : obj.config.forms
+
+    formList.value = forms?.map((m) => {
+      if (m.multiple) {
+        tableData[m.formId] = [{}]
+      }
+      const _fields = hasDraft.value
+        ? m.configuration?.children
+        : m.fullInfo.configuration?.children
+      _fields?.forEach((p) => {
+        const accessModes = bindMap
+          .get(m.formId)
+          ?.find((k) => k.id === p.key)?.accessModes
+        p.componentProps.disabled = !accessModes?.includes('write')
+      })
+
+      return {
+        accessModes: [],
+        fullInfo: { configuration: m.configuration },
+        ...m,
+      }
+    })
+  } catch (error) {
+  } finally {
+    spinning.value = false
+  }
 }
 
 /**
  * 获取当前流程
  */
 const getProcess = () => {
-  spinning.value = true
   getList_api({
     terms: [
       {
@@ -243,38 +350,10 @@ const getProcess = () => {
       },
     ],
   }).then((res) => {
-    Object.assign(currentProcess, res.result.data[0])
-    Object.assign(formVersion, currentProcess.others?.formVersion)
-    try {
-      const obj = JSON.parse(currentProcess.model)
-      nodesData.value = obj.nodes
-      //详情接口nodeId
-      const bindMap = new Map()
-      Object.keys(obj.nodes.props.formBinds).forEach((item) => {
-        bindMap.set(item, obj.nodes.props.formBinds[item])
-      })
-
-      formList.value = obj.config.forms?.map((m) => {
-        if (m.multiple) {
-          tableData[m.formId] = [{}]
-        }
-        const _fields = m.fullInfo.configuration?.children
-        _fields?.forEach((p) => {
-          const accessModes = bindMap
-            .get(m.formId)
-            .find((k) => k.id === p.key)?.accessModes
-          p.componentProps.disabled = !accessModes?.includes('write')
-        })
-
-        return { accessModes: [], ...m }
-      })
-    } catch (error) {
-    } finally {
-      spinning.value = false
-    }
+    const data = res.result.data[0]
+    handleData(data, data.model)
   })
 }
-getProcess()
 </script>
 <style scoped lang="less">
 .detail {

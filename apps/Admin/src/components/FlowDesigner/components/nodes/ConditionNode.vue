@@ -111,51 +111,13 @@ const active = computed(() => props?.config?.active)
 const content = computed(() => {
   const terms = props.config.props?.condition?.configuration?.terms
   //   console.log('terms: ', terms)
-  const _termsName = terms.map((item) => item.column)
-  return _termsName.length
-    ? String(_termsName).replaceAll(',', '、')
+  // 条件描述
+  const _conditionDesc = terms.map(
+    (item) => `${item.columnName}${item.termTypeName}${item.value}`,
+  )
+  return _conditionDesc.length
+    ? String(_conditionDesc).replaceAll(',', '、')
     : '请配置条件'
-
-  //   const groups = props.config.props?.groups
-  //   let confitions: any[] = []
-  //   groups?.forEach((group) => {
-  //     let subConditions: any[] = []
-  //     group.conditions.forEach((subCondition) => {
-  //       let subConditionStr = ''
-  //       switch (subCondition.valueType) {
-  //         case ValueType.dept:
-  //         case ValueType.user:
-  //           subConditionStr = `${subCondition.title}属于[${String(
-  //             subCondition.value?.map((u) => u.name),
-  //           ).replaceAll(',', '. ')}]之一`
-  //           break
-  //         case ValueType.number:
-  //         case ValueType.string:
-  //           subConditionStr = getOrdinaryConditionContent(subCondition)
-  //           break
-  //       }
-  //       subConditions.push(subConditionStr)
-  //     })
-  //     //根据子条件关系构建描述
-  //     let subConditionsStr = String(subConditions).replaceAll(
-  //       ',',
-  //       subConditions.length > 1
-  //         ? group.groupType === 'AND'
-  //           ? ') 且 ('
-  //           : ') 或 ('
-  //         : group.groupType === 'AND'
-  //         ? ' 且 '
-  //         : ' 或 ',
-  //     )
-  //     confitions.push(
-  //       subConditions.length > 1 ? `(${subConditionsStr})` : subConditionsStr,
-  //     )
-  //   })
-  //   //构建最终描述
-  //   return String(confitions).replaceAll(
-  //     ',',
-  //     props.config.props?.groupsType === 'AND' ? ' 且 ' : ' 或 ',
-  //   )
 })
 
 /**
@@ -178,80 +140,6 @@ const validate = (err) => {
 }
 
 defineExpose({ validate })
-
-// const getDefault = (val, df) => {
-//   return val && val !== '' ? val : df
-// }
-// const getOrdinaryConditionContent = (subCondition) => {
-//   switch (subCondition.compare) {
-//     case 'IN':
-//       return `${subCondition.title}为[${String(subCondition.value).replaceAll(
-//         ',',
-//         '、',
-//       )}]中之一`
-//     case 'B':
-//       return `${subCondition.value[0]} < ${subCondition.title} < ${subCondition.value[1]}`
-//     case 'AB':
-//       return `${subCondition.value[0]} ≤ ${subCondition.title} < ${subCondition.value[1]}`
-//     case 'BA':
-//       return `${subCondition.value[0]} < ${subCondition.title} ≤ ${subCondition.value[1]}`
-//     case 'ABA':
-//       return `${subCondition.value[0]} ≤ ${subCondition.title} ≤ ${subCondition.value[1]}`
-//     case '<=':
-//       return `${subCondition.title} ≤ ${getDefault(
-//         subCondition.value[0],
-//         ' ?',
-//       )}`
-//     case '>=':
-//       return `${subCondition.title} ≥ ${getDefault(
-//         subCondition.value[0],
-//         ' ?',
-//       )}`
-//     default:
-//       return `${subCondition.title}${subCondition.compare}${getDefault(
-//         subCondition.value[0],
-//         ' ?',
-//       )}`
-//   }
-// }
-// //校验数据配置的合法性
-// const validate = (err) => {
-//   const _props = props.config.props
-//   if (_props.groups.length <= 0) {
-//     showError.value = true
-//     errorInfo.value = '请设置分支条件'
-//     err.push(`${_props.config.name} 未设置条件`)
-//   } else {
-//     for (let i = 0; i < _props.groups.length; i++) {
-//       if (_props.groups[i].cids.length === 0) {
-//         showError.value = true
-//         errorInfo.value = `请设置条件组${groupNames.value[i]}内的条件`
-//         err.push(
-//           `条件 ${_props.config.name} 条件组${groupNames.value[i]}内未设置条件`,
-//         )
-//         break
-//       } else {
-//         let conditions = _props.groups[i].conditions
-//         for (let ci = 0; ci < conditions.length; ci++) {
-//           let subc = conditions[ci]
-//           if (subc.value.length === 0) {
-//             showError.value = true
-//           } else {
-//             showError.value = false
-//           }
-//           if (showError.value) {
-//             errorInfo.value = `请完善条件组${groupNames.value[i]}内的${subc.title}条件`
-//             err.push(
-//               `条件 ${props.config.name} 条件组${groupNames.value[i]}内${subc.title}条件未完善`,
-//             )
-//             return false
-//           }
-//         }
-//       }
-//     }
-//   }
-//   return !showError.value
-// }
 </script>
 
 <style lang="less" scoped>

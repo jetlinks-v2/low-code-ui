@@ -8,39 +8,51 @@
     @close="emits('update:visible', false)"
     :contentWrapperStyle="{ width: 'auto', minWidth: '50%', maxWidth: '66.6%' }"
   >
-    <j-tabs v-model:activeKey="activeKey">
-      <j-tab-pane key="form">
-        <template #tab>
-          <div>
-            <j-button :type="activeKey === 'form' ? 'primary' : 'text'"
-              >表单</j-button
-            >
+    <j-scrollbar>
+      <j-tabs v-model:activeKey="activeKey">
+        <j-tab-pane key="form">
+          <template #tab>
+            <div>
+              <j-button :type="activeKey === 'form' ? 'primary' : 'text'"
+                >表单</j-button
+              >
+            </div>
+          </template>
+          <div class="content">
+            <div v-for="item in formData">
+              <div class="title">{{ item.formName }}</div>
+              <FormPreview
+                v-if="!item.multiple"
+                :data="item.fullInfo.configuration"
+              />
+              <TableFormPreview
+                v-else
+                v-model:data-source="tableData"
+                :columns="
+                  getTableColumns(item.fullInfo?.configuration?.children)
+                "
+              />
+            </div>
           </div>
-        </template>
-        <div class="content">
-          <div v-for="item in formData">
-            <div class="title">{{ item.formName }}</div>
-            <preview ref="previewRef" :data="item.fullInfo.configuration" />
-          </div>
-        </div>
-      </j-tab-pane>
-      <j-tab-pane key="flow">
-        <template #tab>
-          <div>
-            <j-button :type="activeKey === 'flow' ? 'primary' : 'text'"
-              >流程图</j-button
-            >
-          </div>
-        </template>
-        <FlowDesigner readOnly :nodesData="nodesData" />
-      </j-tab-pane>
-    </j-tabs>
+        </j-tab-pane>
+        <j-tab-pane key="flow">
+          <template #tab>
+            <div>
+              <j-button :type="activeKey === 'flow' ? 'primary' : 'text'"
+                >流程图</j-button
+              >
+            </div>
+          </template>
+          <FlowDesigner readOnly :nodesData="nodesData" />
+        </j-tab-pane>
+      </j-tabs>
+    </j-scrollbar>
   </j-drawer>
 </template>
 <script setup lang="ts">
 import FlowDesigner from '@/components/FlowDesigner'
-import { queryForm_api } from '@/api/process/model'
-import preview from '@/components/FormDesigner/preview.vue'
+import FormPreview from '@/components/FormDesigner/preview.vue'
+import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
 
 interface EmitProps {
   (e: 'update:visible', flag: boolean): void
@@ -71,6 +83,21 @@ const formData = ref<any[]>([])
 // 流程图
 const nodesData = ref<any>({})
 
+const tableData = ref<any>([{}])
+const getTableColumns = (fields: any[]) => {
+  const _columns = fields?.map((m) => ({
+    title: m.formItemProps?.label,
+    dataIndex: m.formItemProps?.name,
+    ellipsis: true,
+    // formId,
+    ...m,
+  }))
+  _columns?.forEach((item) => {
+    tableData.value[0][item.dataIndex] = undefined
+  })
+  return _columns
+}
+
 const init = () => {
   try {
     const obj = JSON.parse(props.data.model)
@@ -90,7 +117,7 @@ init()
     background: #f9f9f9;
   }
   .ant-tabs-content {
-    padding: 0 24px 24px 24px;
+    padding: 0 12px 12px 12px;
   }
   .ant-tabs-ink-bar {
     background-color: transparent;
@@ -99,17 +126,15 @@ init()
 .content {
   background: #fafafa;
   .title {
-    text-align: center;
+    padding: 16px;
+    // text-align: center;
     font-size: 16px;
     font-weight: 500;
     line-height: 22px;
     color: #333333;
   }
-  :deep(.canvas-box) {
-    background: #fafafa;
-    .container {
+  :deep(.container) {
       background: #fafafa;
     }
-  }
 }
 </style>

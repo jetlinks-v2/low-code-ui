@@ -10,7 +10,11 @@ export const APPROVAL_PROPS = {
     gotoWhenReject: [],
     completeWeight: 1,
     rejectWeight: 1,
-    autoClaim: false,
+    autoClaim: true,
+    autoComplete: false,
+    others: {
+        defaultComment: '同意'
+    }
 }
 
 //根节点默认属性
@@ -49,7 +53,7 @@ export const DEAL_PROPS = {
     gotoWhenReject: [],
     completeWeight: 1,
     rejectWeight: 1,
-    autoClaim: false,
+    autoClaim: true,
 }
 
 //触发器节点默认属性
