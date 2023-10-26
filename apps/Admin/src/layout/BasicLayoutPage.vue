@@ -80,7 +80,7 @@ const state = reactive<StateType>({
 const breadcrumb = computed(() =>
   {
     const paths = router.currentRoute.value.matched
-    return paths.map((item, index) => {
+    return paths.filter(item => (item.meta as any).title).map((item, index) => {
       return {
         index,
         isLast: index === (paths.length -1),

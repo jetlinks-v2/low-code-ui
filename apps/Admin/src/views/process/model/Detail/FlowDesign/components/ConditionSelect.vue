@@ -12,9 +12,10 @@
     />
     <div class="condition-select">
       <j-tree-select
-        v-model:value="item.column"
+        v-model:value="item.selectedColumn"
         v-model:searchValue="item.searchValue"
         show-search
+        label-in-value
         placeholder="请选择"
         allow-clear
         tree-default-expand-all
@@ -23,6 +24,7 @@
         :field-names="{ label: 'name', value: 'fullId' }"
         :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
         style="width: 400px"
+        @change="handleConditionChange(item)"
       >
         <template #title="{ name }">
           <template
@@ -47,10 +49,12 @@
         </template>
       </j-tree-select>
       <j-select
-        v-model:value="item.termType"
+        v-model:value="item.selectedTermType"
         :options="operatorMap[conditionType(item) || 'default']"
+        label-in-value
         placeholder="请选择"
         style="width: 90px"
+        @change="handleTermTypeChange(item)"
       />
       <ConditionValueItem
         v-model:modelValue="item.value"
@@ -83,8 +87,14 @@ interface IConditionSelect {
   column: string | undefined
   termType: string | undefined
   value: string | string[] | number | undefined
-  type?: string
   searchValue: string | undefined
+  type?: string
+
+  selectedColumn?: any // 下拉条件树选中的值, 设置了label-in-value, 选中的值为object
+  columnName?: string | undefined
+  selectedTermType?: any
+  termTypeName?: string | undefined
+  valueName?: string | undefined
 }
 
 const emit = defineEmits(['update:value'])
@@ -107,7 +117,13 @@ watch(
               column: undefined,
               termType: undefined,
               value: undefined,
+
+              // 前端筛选需要
               searchValue: '',
+              // 存起来, 节点回显需要
+              columnName: undefined,
+              termTypeName: undefined,
+              valueName: undefined,
             },
           ]
   },
@@ -136,6 +152,20 @@ const getFormFields = async () => {
 }
 
 /**
+ * 条件选择改变 设置column和columnName
+ * @param item
+ */
+const handleConditionChange = (item) => {
+  item.column = item.selectedColumn.value
+  item.columnName = item.selectedColumn.label
+}
+
+const handleTermTypeChange = (item) => {
+  item.termType = item.selectedTermType.value
+  item.termTypeName = item.selectedTermType.label
+}
+
+/**
  * 所选条件(变量/表单字段)类型
  * 变量列表的others.type = 组织org、用户user、角色role、产品product、设备device时,
  * 取下拉值为下拉单选/多选框, 否则为输入框
@@ -156,7 +186,13 @@ const handleAdd = () => {
     termType: undefined,
     value: undefined,
     type: undefined,
+
+    // 前端筛选需要
     searchValue: '',
+    // 存起来, 节点回显需要
+    columnName: undefined,
+    termTypeName: undefined,
+    valueName: undefined,
   })
 }
 
