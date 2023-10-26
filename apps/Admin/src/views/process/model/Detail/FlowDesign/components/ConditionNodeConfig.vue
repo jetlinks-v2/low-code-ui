@@ -58,25 +58,34 @@ const saveConfigToStore = () => {
     condition.configuration.terms = terms
     result.props = { ...result.props, condition }
     resolve(result)
-    // basicFormRef.value
-    //   .validate()
-    //   .then((valid) => {
-    //     const result = findNodeById(
-    //       flowStore.model.nodes,
-    //       flowStore.selectedNode.id,
-    //     )
-    //     const { condition, terms } = basicFormData
-    //     condition.configuration.terms = terms
-    //     result.props = { ...result.props, condition }
-    //     resolve(valid)
-    //   })
-    //   .catch((err) => {
-    //     reject(err)
-    //   })
+  })
+}
+
+/**
+ * 校验配置数据
+ */
+const validateConfig = () => {
+  return new Promise((resolve, reject) => {
+    basicFormRef.value
+      .validate()
+      .then((valid) => {
+        const result = findNodeById(
+          flowStore.model.nodes,
+          flowStore.selectedNode.id,
+        )
+        const { condition, terms } = basicFormData
+        condition.configuration.terms = terms
+        result.props = { ...result.props, condition }
+        resolve(valid)
+      })
+      .catch((err) => {
+        reject(err)
+      })
   })
 }
 defineExpose({
   saveConfigToStore,
+  validateConfig,
 })
 </script>
 

@@ -32,12 +32,20 @@ const nodeConfigRef = ref()
 /**
  * 保存配置
  */
-const saveConfig = () => {
+const saveConfigToStore = () => {
   return nodeConfigRef.value.saveConfigToStore()
 }
 
+/**
+ * 校验配置
+ */
+const validateConfig = () => {
+  return nodeConfigRef.value.validateConfig()
+}
+
 defineExpose({
-  saveConfig,
+  saveConfigToStore,
+  validateConfig,
 })
 </script>
 
