@@ -63,6 +63,9 @@ watch(icon, () => {
       color: #415ed1;
       border-color: #415ed1;
     }
+    :deep(.ant-upload.ant-upload-select-picture-card){
+      margin: 0;
+    }
   }
 }
 </style>
