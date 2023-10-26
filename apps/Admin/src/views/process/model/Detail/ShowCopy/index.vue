@@ -189,6 +189,7 @@ watch(
  */
 const getVariables = async () => {
   const { id, name, key, model, provider } = flowStore.modelBaseInfo
+  if (!id) return
   const params = {
     definition: {
       id,
@@ -197,10 +198,10 @@ const getVariables = async () => {
       model: JSON.stringify(flowStore.model), // model不能取modelBaseInfo(接口保存才会有值), 直接取动态值flowStore.model
       provider,
     },
-    nodeId: flowStore.model.nodes.id, // 展示及抄送直接传根节点id
+    nodeId: flowStore.model.nodes.id || 'ROOT_1', // 展示及抄送直接传根节点id
   }
   const { result } = await queryVariables_api(params)
-  console.log('result: ', result)
+  //   console.log('result: ', result)
 }
 
 /**
