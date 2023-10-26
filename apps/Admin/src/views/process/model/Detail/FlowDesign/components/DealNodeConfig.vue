@@ -52,6 +52,31 @@
           </j-collapse-panel>
           <j-collapse-panel key="2">
             <template #header>
+              <TitleComponent data="权重控制"></TitleComponent>
+            </template>
+            <j-form-item
+              name="completeWeight"
+              :rules="[{ required: true, message: '请输入通过权重' }]"
+            >
+              <template #label>
+                通过权重
+                <j-tooltip placement="right">
+                  <template #title>
+                    “提交”的办理成员权重总和达到设定值时，办理节点通过
+                  </template>
+                  <AIcon type="InfoCircleOutlined" />
+                </j-tooltip>
+              </template>
+              <j-input-number
+                :min="1"
+                :max="99999"
+                v-model:value="memberFormData.completeWeight"
+                style="width: 100%"
+              />
+            </j-form-item>
+          </j-collapse-panel>
+          <j-collapse-panel key="3">
+            <template #header>
               <TitleComponent data="成员权限"></TitleComponent>
             </template>
             <j-form-item
@@ -103,23 +128,16 @@ const basicFormRef = ref()
 const basicFormData = reactive({
   formBinds: props.node?.props?.formBinds || {},
 })
-const collapseActive = ref(['1', '2'])
+const collapseActive = ref(['1', '2', '3'])
 
 // 成员配置
 const memberFormRef = ref()
 const memberFormData = reactive({
   candidates: props.node?.props?.candidates, // 候选人配置
+  completeWeight: props.node?.props?.completeWeight,
   authButtons: props.node?.props?.authButtons || ['submit'],
   freeChoiceUser: props.node?.props?.freeChoiceUser,
 })
-
-// watch(
-//   () => memberFormData,
-//   (val) => {
-//     console.log('memberFormData: ', val)
-//   },
-//   { deep: true },
-// )
 
 const allButtons = ref([{ label: '提交', value: 'submit' }])
 const nodeList = ref([
