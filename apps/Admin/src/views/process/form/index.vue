@@ -1,6 +1,6 @@
 <template>
   <page-container>
-    <pro-search :columns="columns" target="code" @search="handleSearch" />
+    <pro-search :columns="columns" target="engine-form" @search="handleSearch" />
     <JProTable
       ref="tableRef"
       :columns="columns"
@@ -14,6 +14,7 @@
             value: 'true',
             termType: 'eq',
             column: 'latest',
+            type: 'and'
           },
         ],
       }"
@@ -109,9 +110,12 @@ const columns = [
   },
   {
     title: '创建人',
-    dataIndex: 'creatorId',
-    key: 'creatorId',
+    dataIndex: 'creatorName',
+    key: 'creatorName',
     ellipsis: true,
+    search: {
+      type: 'string',
+    },
   },
   {
     title: '创建时间',
@@ -185,7 +189,11 @@ const getActions = (record) => {
 }
 
 const handleSearch = (data: any) => {
-  params.value = data
+  params.value = {
+    terms: [
+      {...data}
+    ]
+  }
 }
 
 const handleSave = (type: string, data?: any) => {
