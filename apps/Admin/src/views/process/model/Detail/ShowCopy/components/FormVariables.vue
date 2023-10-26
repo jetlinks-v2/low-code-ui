@@ -1,4 +1,4 @@
-<!-- 表单字段 / 配置表单 -->
+<!-- 表单变量 -->
 <template>
   <j-modal
     v-model:visible="_visible"
@@ -120,7 +120,7 @@ const getFormFields = async () => {
       id,
       name,
       key,
-      model,
+      model: JSON.stringify(flowStore.model), // model不能取modelBaseInfo(接口保存才会有值), 直接取动态值flowStore.model
       provider,
     },
     nodeId: flowStore.model.nodes.id, // 展示及抄送直接传根节点id

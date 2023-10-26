@@ -21,7 +21,6 @@ export const start_api = ({ id, data, start }: any) =>
 export const processDetail_api = (id: string) =>
   request.get(`/process/runtime/process/detail/${id}`)
 
-
   /**
  * 有草稿时保存
  * @returns
