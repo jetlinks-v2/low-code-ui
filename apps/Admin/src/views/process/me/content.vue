@@ -3,7 +3,18 @@
     <div>
         <pro-search :columns="columns" target="code" @search="handleSearch" />
         <JProTable ref="tableRef" :request="(e) => _query(e)" :columns="columns" :params="params" model="table"
-            :defaultParams="defaultParams">
+            :defaultParams="defaultParams" :rowSelection="isCheck
+                ? {
+                    selectedRowKeys: _selectedRowKeys,
+                    onSelect: onSelectChange,
+                    onSelectAll: selectAll,
+                    onSelectNone: () => _selectedRowKeys = []
+                }
+                : false
+                ">
+            <template #headerTitle v-if="type === 'todo'">
+                <BatchDropdown v-model:isCheck="isCheck" :actions="batchActions" @change="onCheckChange" />
+            </template>
             <template #createTime="record">
                 {{ record.createTime ? dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}
             </template>
@@ -31,7 +42,8 @@
                     }" @click="onSave(record)">
                         详情
                     </PermissionButton>
-                    <PermissionButton v-if="type === 'initiate' && activeKey === 'draft'" :hasPermission="true" type="link" @click="onDraft(record)">
+                    <PermissionButton v-if="type === 'initiate' && activeKey === 'draft'" :hasPermission="true" type="link"
+                        @click="onDraft(record)">
                         编辑
                     </PermissionButton>
                     <PermissionButton v-if="type === 'initiate' && activeKey === 'draft'" :hasPermission="true" type="link"
@@ -52,6 +64,8 @@
                 <div>签收失败：{{ sign.error }}</div>
             </div>
         </j-modal>
+        <ActionModal v-if="actionRef.visible" :type="actionRef.visible" @save="getActionData"
+            @close="actionRef.visible = false" />
     </div>
 </template>
 
@@ -59,7 +73,10 @@
 import { onlyMessage } from '@jetlinks/utils';
 import dayjs from 'dayjs';
 import Detail from './Detail/index.vue'
-import { getMeProcessList, _claim, _delete ,getInitiatorList} from '@/api/process/me'
+import { getMeProcessList, _claim, _delete, getInitiatorList, _claimBatch, _rejectBatch, _completeBatch } from '@/api/process/me'
+import BatchDropdown from '@/components/BatchDropdown/index.vue';
+import ActionModal from './ActionModal.vue';
+
 
 const props = defineProps({
     history: {
@@ -86,11 +103,19 @@ const defaultParams = ref({
 })
 const options = ref([])
 const sign = reactive({
-    length:0,
-    success:0,
-    error:0
+    length: 0,
+    success: 0,
+    error: 0
 })
 const router = useRouter()
+const isCheck = ref(false);
+const _selectedRowKeys = ref([]);
+const _selectedRow = ref([])
+const actionRef = reactive({
+    visible: false,
+    type: undefined,
+    data: undefined
+})
 
 
 const columnsTodo = [
@@ -536,34 +561,178 @@ const columns = computed(() => {
     }
 })
 
+const batchActions = [
+    {
+        key: 'sign',
+        text: '批量签收',
+        permission: true,
+        // icon: 'ExportOutlined',
+        selected: {
+            popConfirm: {
+                title: '确认批量签收?',
+                onConfirm: () => onAction('sign'),
+            },
+        },
+    },
+    {
+        key: 'reject',
+        text: '批量驳回',
+        permission: true,
+        // icon: 'ImportOutlined',
+        selected: {
+            popConfirm: {
+                title: '确认批量驳回?',
+                onConfirm: () => onAction('reject'),
+            },
+        },
+    },
+    {
+        key: 'pass',
+        text: '批量通过',
+        // danger: true,
+        // icon: 'StopOutlined',
+        permission: true,
+        selected: {
+            popConfirm: {
+                title: '确认批量通过?',
+                onConfirm: () => onAction('pass'),
+            },
+        },
+    },
+];
+
+const onCheckChange = () => {
+    _selectedRowKeys.value = [];
+    _selectedRow.value = []
+}
+
+const onSelectChange = (item, state) => {
+    const arr = new Set(_selectedRowKeys.value);
+    const arrs = new Set(_selectedRow.value);
+    // console.log(item, state);
+    if (state) {
+        arr.add(item.id);
+        arrs.add(item)
+    } else {
+        arr.delete(item.id);
+        arrs.delete(item)
+    }
+    _selectedRowKeys.value = [...arr.values()];
+    _selectedRow.value = [...arrs.values()];
+};
+
+
+const selectAll = (selected, selectedRows, changeRows) => {
+    if (selected) {
+        changeRows.forEach((i) => {
+            if (!_selectedRowKeys.value.includes(i.id)) {
+                _selectedRowKeys.value.push(i.id)
+                _selectedRow.value.push(i)
+            }
+        })
+    } else {
+        console.log('----', changeRows)
+        const arr = changeRows.map((item) => item.id)
+
+        const _ids = [];
+        const _items = []
+        _selectedRowKeys.value.map((i) => {
+            if (!arr.includes(i)) {
+                _ids.push(i)
+                const item = changeRows.find(it => it.id === i)
+                _items.push(item)
+            }
+        })
+
+        _selectedRowKeys.value = _ids
+        _selectedRow.value = _items
+    }
+}
+
 const handleSearch = (value) => {
     params.value = value
+}
+
+const onAction = async (key) => {
+    console.log('key---', key)
+    if (_selectedRowKeys.value.length === 0) {
+        onlyMessage('请勾选至少一项流程', 'warning')
+        return;
+    }
+    if (key !== 'sign') {
+        actionRef.visible = true
+        actionRef.type = key
+    } else {
+        // const res =await _claimBatch()
+        const taskIds = []
+        _selectedRow.value.forEach(item => {
+            const task = item.identityLinks?.filter(it => it.linkType.value === 'candidate')?.map(i => i.taskId)
+            if (task && task.length !== 0) {
+                taskIds.push(task)
+            }
+        })
+        console.log('sign-----', taskIds.flat(), _selectedRow.value)
+        const res = await _claimBatch({
+            taskIds: taskIds.flat()
+        })
+        if (res.status === 200) {
+            onlyMessage('操作成功')
+            _selectedRowKeys.value = [];
+            tableRef.value?.reload()
+        }
+    }
+
+}
+
+const getActionData = async (value) => {
+    if (value) {
+        const taskIds = []
+        _selectedRow.value.forEach(item => {
+            const task = item.identityLinks?.filter(it => it.linkType.value === 'assignee' && it.state.value === 'todo')?.map(i => i.taskId)
+            if (task && task.length !== 0) {
+                taskIds.push(task)
+            }
+        })
+        const param = {
+            taskIds: taskIds.flat(),
+            variables: {
+                comment: value
+            }
+        }
+        console.log('---------', param)
+        const res = actionRef.type === 'pass' ? await _completeBatch(param) : await _rejectBatch(param)
+        if (res.status === 200) {
+            onlyMessage('操作成功')
+            _selectedRowKeys.value = [];
+            tableRef.value?.reload()
+        }
+    }
 }
 
 const onConfirm = (item) => {
     // console.log('item', item)
     const task = item.identityLinks?.filter(item => item.linkType.value === 'candidate')
     sign.length = task.length
-  
-    
+
+
     task?.forEach(async (el) => {
         const res = await _claim(el.taskId)
         if (res.status === 200) {
             // onlyMessage('签收成功')
             sign.success = sign.success + 1
-        }else{
+        } else {
             sign.error = sign.error + 1
         }
     })
     visibleModel.value = true
     // tableRef.value?.reload()
 }
-const onCancel = ()=>{
+const onCancel = () => {
     visibleModel.value = false
     tableRef.value?.reload()
 }
 
-const onCancelDrawer = ()=>{
+const onCancelDrawer = () => {
     visible.value = false
     tableRef.value?.reload()
 }
@@ -581,15 +750,15 @@ const onSave = (item) => {
     visible.value = true
 }
 
-const onDraft = (record)=>{
-    console.log('record--',record)
+const onDraft = (record) => {
+    // console.log('record--', record)
     router.push({
-    path: '/flow-engine/initiate/initiate-detail',
-    query: {
-      id: record.modelId,
-      // isDraft: true,
-    },
-  })
+        path: '/flow-engine/initiate/initiate-detail',
+        query: {
+            id: record.modelId,
+            isDraft: true,
+        },
+    })
 }
 
 //todo待办
@@ -616,9 +785,9 @@ const _query = (e) => {
 const getUser = async () => {
     const res = await getInitiatorList({})
     if (res.status === 200) {
-       
-        options.value = res.result.map(item=>({
-            label:item.creatorName,
+
+        options.value = res.result.map(item => ({
+            label: item.creatorName,
             value: item.creatorId,
         }))
     }
@@ -640,10 +809,11 @@ watch(
 </script>
 
 <style scoped lang='less'>
-.content{
+.content {
     text-align: center;
     padding: 24px 0;
-    .title{
+
+    .title {
         font-size: 18px;
         margin-bottom: 20px;
     }
