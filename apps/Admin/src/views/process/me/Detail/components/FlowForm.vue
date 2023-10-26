@@ -192,7 +192,7 @@ const onClick = async (value) => {
         })
     }
 }
-const submitForm = () => {
+const submitForm = async() => {
     if (freeChoiceUser.value) {
         props.info.tasks.forEach((i) => {
             i.nodeId === freeChoiceUser.value ? taskId.value = i.id : ''
@@ -201,9 +201,12 @@ const submitForm = () => {
         onClick('submit')
     }
     else {
-        _complete(props.info.currentTaskId, {
+        const res = await _complete(props.info.currentTaskId, {
             form: submitData.value,
         })
+        if(res.status === 200){
+            emit('close')
+        }
     }
 }
 //根据配置项生成表格

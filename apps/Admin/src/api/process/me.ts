@@ -33,3 +33,10 @@ export const getApprover = (taskId:string,data:any) => request.post(`/process/ru
 export const _delete = (processId: string,data?:any) => request.put(`/process/runtime/${processId}/_delete`, data);
 //获取用户
 export const getUserList = (data: any) => request.post('/user/_query', data);
+
+//批量签收
+export const _claimBatch = ( data: any) => request.post(`/process/runtime/task/batch-claim`, data);
+//批量完成
+export const _completeBatch = ( data: any) => request.post(`/process/runtime/task/batch-complete`, data);
+//批量驳回
+export const _rejectBatch= ( data: any) => request.post(`/process/runtime/task/batch-reject`, data);
