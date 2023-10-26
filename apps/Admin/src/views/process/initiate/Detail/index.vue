@@ -25,7 +25,7 @@
                         item.fullInfo?.configuration?.children,
                         item.formId,
                         item.data,
-                        item.multiple
+                        item.multiple,
                       )
                     "
                   />
@@ -103,8 +103,12 @@ const hasDraft = ref<Boolean>(false)
 const draftId = ref<string>('')
 
 const tableData = reactive({})
-const getTableColumns = (fields: any[], formId: string, data: any = {}, multiple: boolean) => {
-  console.log('fields', fields)
+const getTableColumns = (
+  fields: any[],
+  formId: string,
+  data: any = {},
+  multiple: boolean,
+) => {
   const _columns = fields?.map((m) => ({
     title: m.formItemProps?.label,
     dataIndex: m.formItemProps?.name,
@@ -116,9 +120,9 @@ const getTableColumns = (fields: any[], formId: string, data: any = {}, multiple
 
   _columns?.forEach((item) => {
     if (tableData[formId]) {
-      if(multiple && data[0]){
-        tableData[formId][0][item.dataIndex] = data[0][item.dataIndex] 
-      }else {
+      if (multiple && data[0]) {
+        tableData[formId][0][item.dataIndex] = data[0][item.dataIndex]
+      } else {
         tableData[formId][0][item.dataIndex] = data[item.dataIndex]
       }
     }
@@ -130,24 +134,34 @@ const getTableColumns = (fields: any[], formId: string, data: any = {}, multiple
  * 判断数组对象中的属性是否有数据
  * @param array
  */
-const hasData = (array: any[]) => {
-  if (array?.length < 1) return false
-  let flag = false
-  for (const i of array) {
-    const arr = Object.values(i).filter((key: any) => key && key.length > 0)
-    if (arr.length > 0) {
-      flag = true
-      break
+const hasData = (array: any[] = []) => {
+  const tableList = Object.values(tableData)
+
+  if (tableList.length < 1 && array?.length < 1) {
+    return false
+  } else {
+    let flag = false
+    for (const i of array) {
+      const arr = Object.values(i).filter((key: any) => key && key.length > 0)
+      if (arr.length > 0) {
+        flag = true
+        break
+      }
     }
+    tableList?.forEach((item: any) => {
+      if (Object.values(item[0]).length > 0) {
+        flag = true
+      }
+    })
+    return flag
   }
-  return flag
 }
 
 /**
  * 取消
  */
 const cancel = () => {
-  const list = previewRef.value.map((item) => item.formState)
+  const list = previewRef.value?.map((item) => item.formState)
   if (hasData(list)) {
     Modal.confirm({
       title: '是否保存申请表单为草稿？',
