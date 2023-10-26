@@ -254,6 +254,8 @@ watchEffect(() => {
 
       .content-item {
         display: flex;
+        position: relative;
+        z-index: 4;
       }
 
       .item-avatar {
@@ -313,6 +315,7 @@ watchEffect(() => {
 
       .bg-gradient {
         position: absolute;
+        z-index: 2;
         top: 0;
         right: -5%;
         height: 100%;

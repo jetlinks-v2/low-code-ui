@@ -169,7 +169,7 @@ export default defineComponent({
                         <TypeComponent
                             {..._props?.componentProps}
                             checked={__value.value}
-                            onUpdate:checked={(newValue) => {
+                            onUpdate: checked={(newValue) => {
                                 set(designer.formState, _path1, newValue)
                             }}
                             onChange={onChange}
@@ -178,7 +178,7 @@ export default defineComponent({
                             options={unref(options)}
                             treeData={unref(treeData)}
                             value={__value.value}
-                            onUpdate:value={(newValue) => {
+                            onUpdate: value={(newValue) => {
                                 set(designer.formState, _path1, newValue)
                             }}
                             onChange={onChange}
@@ -192,7 +192,9 @@ export default defineComponent({
                 return (dt?.index || 0) + 1
             } else if (element.children?.[0]?.type === 'table-item-actions') {
                 return <Button onClick={() => {
-                    data.value.splice(dt?.index, 1)
+                    const arr = cloneDeep(get(designer.formState, __path.value) || [])
+                    arr.splice(dt?.index, 1)
+                    set(designer.formState, __path.value, arr)
                 }} type="link" danger><AIcon type="DeleteOutlined" /></Button>
             } else {
                 return componentRender(dt, element?.children?.[0])
@@ -245,7 +247,8 @@ export default defineComponent({
                             </Table>
                             {
                                 !unref(isEditModel) && <Button onClick={() => {
-                                    data.value.push({})
+                                    const arr = get(designer.formState, __path.value) || []
+                                    set(designer.formState, __path.value, [...arr, {}])
                                 }} style={{ width: '100%', marginTop: '10px' }}><AIcon type="PlusOutlined" />新增</Button>
                             }
                             {

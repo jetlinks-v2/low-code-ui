@@ -115,14 +115,14 @@ import { getImage } from '@jetlinks/utils'
 const flowStore = useFlowStore()
 
 type Emits = {
-  (e: 'update:value', data: any[]): void
+  (e: 'update:value', data: any): void
 }
 
 const emits = defineEmits<Emits>()
 const props = defineProps({
   value: {
-    type: Array as PropType<any[]>,
-    default: () => [],
+    type: Object as PropType<any>,
+    default: () => ({}),
   },
 })
 
@@ -171,7 +171,6 @@ const getFormList = async () => {
   //   所有表单数据
   allFormList.value = cloneDeep(filterFormList.value)
 }
-getFormList()
 
 const handleSearch = () => {
   filterFormList.value = filterFormByName(allFormList.value, keywords.value)
@@ -256,21 +255,21 @@ watch(
     if (val) getFormList()
   },
 )
-watch(
-  () => filterFormList.value,
-  (val) => {
-    val?.forEach((form) => {
-      const fieldAccessModes = form.fullInfo?.configuration?.children?.map(
-        (field) => field.accessModes,
-      )
-      // 当表单下, 每个字段都有"写"权限时, 对应表单也勾选"写"
-      form.accessModes = fieldAccessModes?.every((e) => e.includes('write'))
-        ? ['read', 'write']
-        : ['read']
-    })
-  },
-  { deep: true, immediate: true },
-)
+// watch(
+//   () => filterFormList.value,
+//   (val) => {
+//     val?.forEach((form) => {
+//       const fieldAccessModes = form.fullInfo?.configuration?.children?.map(
+//         (field) => field.accessModes,
+//       )
+//       // 当表单下, 每个字段都有"写"权限时, 对应表单也勾选"写"
+//       form.accessModes = fieldAccessModes?.every((e) => e.includes('write'))
+//         ? ['read', 'write']
+//         : ['read']
+//     })
+//   },
+//   { deep: true, immediate: true },
+// )
 </script>
 
 <style lang="less" scoped>
