@@ -2,8 +2,9 @@
 <template>
   <j-modal
     visible
+    :maskClosable="false"
     :title="title"
-    width="55%"
+    :width="552"
     @cancel="cancel"
     @ok="confirm"
     class="edit-dialog-container"
@@ -21,11 +22,16 @@
       <j-form-item
         name="name"
         label="流程名称"
-        :rules="[{ required: true, message: '请输入流程名称' }]"
+        :rules="[
+          { required: true, message: '请输入流程名称' },
+          {
+            max: 64,
+            message: '最多输入64个字符',
+          },
+        ]"
       >
         <j-input
           v-model:value="form.name"
-          :maxlength="64"
           placeholder="请输入流程名称"
           style="width: 320px"
         />
@@ -55,7 +61,7 @@
       >
         <div class="upload-img-icon" @click="chooseIcon">
           <ProImage
-            v-if="form.icon?.includes('http')"
+            v-if="isImg(form.icon)"
             :width="40"
             :height="40"
             :src="form.icon"
@@ -79,6 +85,7 @@ import ChooseIcon from './ChooseIcon.vue'
 import { copy_api } from '@/api/process/instance'
 import { useRequest } from '@jetlinks/hooks'
 import { useClassified } from '@/hooks/useClassified'
+import { isImg } from '@/utils/comm'
 
 type FormType = {
   id: string
@@ -135,10 +142,10 @@ const chooseIcon = () => {
 
 const confirm = () => {
   if (showIcon.value) {
-    if(chooseIconRef.value.selected){
+    if (chooseIconRef.value.selected) {
       form.icon = chooseIconRef.value.selected
       showIcon.value = false
-    }else{
+    } else {
       onlyMessage('请选择图标', 'error')
     }
   } else {
@@ -147,10 +154,10 @@ const confirm = () => {
     })
   }
 }
-const cancel = () =>{
-  if(showIcon.value){
+const cancel = () => {
+  if (showIcon.value) {
     showIcon.value = false
-  }else{
+  } else {
     emits('update:visible', false)
   }
 }
@@ -164,7 +171,7 @@ const cancel = () =>{
   width: 48px;
   height: 48px;
   border-radius: 4px;
-  border: 1px dashed #DCDCDC;
+  border: 1px dashed #dcdcdc;
   background: #eeeeee;
 }
 </style>
