@@ -49,6 +49,7 @@
           <div v-if="loading" style="text-align: center">
             <j-spin />
           </div>
+          <j-empty v-if="!filterFormList?.length" />
           <div
             class="form-item"
             v-for="(form, index) in filterFormList"
