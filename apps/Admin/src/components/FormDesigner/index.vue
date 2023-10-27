@@ -5,6 +5,7 @@
       :type="type"
       :data="data"
       @validate="onValid"
+      @back="emits('back')"
     />
     <div class="box">
       <div class="left" v-if="model !== 'preview'"><Filed /></div>
@@ -81,7 +82,7 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['saveData'])
+const emits = defineEmits(['saveData', 'back'])
 const model = ref<'preview' | 'edit'>(props.mode ? 'preview' : 'edit') // 预览；编辑
 const formData = ref<any>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置

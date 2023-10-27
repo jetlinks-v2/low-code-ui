@@ -81,6 +81,7 @@
 import { _save, isExists } from '@/api/process/form'
 import { onlyMessage } from '@/utils/comm'
 import { ref, reactive, watch } from 'vue'
+import { uid } from '../../../../components/FormDesigner/utils/uid'
 
 const emit = defineEmits(['close', 'save'])
 
@@ -133,7 +134,7 @@ const handleSave = () => {
       if (!_data.key) {
         delete _data.key
       }
-      const obj = { ...props.data, ..._data, provider: 'custom' }
+      const obj = { key: _data.key ? _data.key : uid(10), ...props.data, ..._data, provider: 'custom' }
       const resp: any = await _save(obj).finally(() => {
           loading.value = false
         })

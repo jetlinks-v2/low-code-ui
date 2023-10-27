@@ -1,7 +1,7 @@
 <template>
   <page-container>
     <div class="box">
-      <FormDesigner @saveData="onSave" type="workflow" :data="data?.configuration" :value="{}" :mode="undefined" />
+      <FormDesigner @back="onBack" @saveData="onSave" type="workflow" :data="data?.configuration" :value="{}" :mode="undefined" />
     </div>
   </page-container>
 </template>
@@ -26,7 +26,7 @@ const queryDetail = (id) => {
 
 const onSave = (dt: any) => {
     _update({
-        ...omit(data.value, 'id'),
+        ...omit(data.value, ['id', 'createTime', 'creatorId', 'creatorName', 'modifierId', 'modifyTime']),
         configuration: dt
     }).then(resp => {
         if(resp.success){
@@ -39,6 +39,10 @@ const onSave = (dt: any) => {
 onMounted(() => {
     queryDetail(route.params.id)
 })
+
+const onBack = () => {
+  router.replace(`/flow-engine/form`)
+}
 </script>
 
 <style lang="less" scoped>
