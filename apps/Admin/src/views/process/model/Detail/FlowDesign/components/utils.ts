@@ -178,7 +178,7 @@ export function sumValues(data: { [key: string]: number }) {
  * 表单字段全部默认有"读"权限, 设置formBinds字段初始值
  */
 export function setDefaultFormBinds(forms) {
-    const res = {}
+    const res = {};
     forms?.forEach((item) => {
         const _fields = item.fullInfo.configuration?.children
         res[item.formId] = []
@@ -191,4 +191,21 @@ export function setDefaultFormBinds(forms) {
         })
     })
     return res
+}
+
+
+/**
+ * 校验是否配置成员
+ * @param _
+ * @param value
+ */
+export const isSelectMember = async (_, value) => {
+    if (
+        !Object.keys(value).length ||
+        Object.values(value)?.every((e: any) => !e.length)
+    ) {
+        return Promise.reject(`请选择可参与审批的候选成员`)
+    } else {
+        return Promise.resolve()
+    }
 }

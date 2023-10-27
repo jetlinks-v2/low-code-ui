@@ -88,7 +88,9 @@ const nodeDel = (node) => {
 const handleClose = () => {
   // 关闭前校验一次节点名称
   nameRef.value.validate().then(() => {
-    showConfig.value = false
+    nodeConfigRef.value.validateConfig().then(() => {
+      showConfig.value = false
+    })
   })
 }
 

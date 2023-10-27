@@ -42,7 +42,10 @@
             <j-form-item
               label="请选择可参与办理的候选成员"
               name="candidates"
-              :rules="[{ required: true, message: '请选择成员' }]"
+              :rules="[
+                { required: true, message: '请选择成员' },
+                { validator: isSelectMember, trigger: 'change' },
+              ]"
             >
               <ConfigureMembers
                 v-model:members="memberFormData.candidates"
@@ -110,7 +113,7 @@
 
 <script setup lang="ts">
 import ConfigFormFields from './ConfigFormFields.vue'
-import { findNodeById, setDefaultFormBinds } from './utils'
+import { findNodeById, setDefaultFormBinds, isSelectMember } from './utils'
 import { useFlowStore } from '@/store/flow'
 import { onlyMessage } from '@jetlinks/utils'
 
