@@ -98,8 +98,9 @@ const formList = ref<FormsProps[]>([])
 const formVersion = reactive({})
 // 草稿
 // const draft = reactive<draftProps>({} as draftProps)
-const hasDraft = ref<Boolean>(false)
+// const hasDraft = ref<Boolean>(false)
 const draftId = ref<string>('')
+const editDraft = ref<Boolean>(false)
 
 const tableData = reactive({})
 const getTableColumns = (
@@ -148,7 +149,7 @@ const hasData = (array: any[] = []) => {
       }
     }
     tableList?.forEach((item: any) => {
-      if (Object.values(item[0]).length > 0) {
+      if (Object.values(item[0]).filter((j) => j).length > 0) {
         flag = true
       }
     })
@@ -209,7 +210,7 @@ onMounted(() => {
   spinning.value = true
   // 草稿箱进入
   if (route.query.isDraft === 'true') {
-    hasDraft.value = true
+    editDraft.value = true
     draftId.value = route.query.id as string
     getDetail(route.query.id as string)
   } else {
@@ -231,13 +232,13 @@ onMounted(() => {
     getMeProcessList(param, 'initiate', false).then((res) => {
       if (res.result.total > 0) {
         // 有草稿
+        draftId.value = res.result.data[0].id
         Modal.confirm({
           title: '继续编辑草稿？',
           okText: '是',
           cancelText: '否',
           onOk() {
-            hasDraft.value = true
-            draftId.value = res.result.data[0].id
+            editDraft.value = true
             getDetail(res.result.data[0].id)
           },
           onCancel() {
@@ -264,10 +265,10 @@ const getDetail = (id: string) => {
 const startProcess = async (list: any, start: boolean = true) => {
   let flag = 0
   const param = {
-    id: hasDraft.value ? draftId.value : route.query.id,
+    id: draftId.value || route.query.id,
     data: {
       form: formList.value?.map((i) => ({
-        formId: hasDraft.value
+        formId: editDraft.value
           ? i.formId
           : md5(i.formId + '|' + formVersion[i.formId]),
         data: i.multiple ? tableData[i.formId][0] : list[flag++],
@@ -276,7 +277,10 @@ const startProcess = async (list: any, start: boolean = true) => {
     },
     start,
   }
-  const resp = hasDraft.value ? await save_api(param) : await start_api(param)
+  const resp =
+    editDraft.value || draftId.value
+      ? await save_api(param)
+      : await start_api(param)
   if (resp.success) {
     onlyMessage(`${start ? '提交' : '保存'}成功`)
     return true
@@ -304,17 +308,17 @@ const handleData = (data: any, model: string) => {
     const bindMap = new Map()
     Object.keys(obj.nodes.props.formBinds).forEach((item) => {
       bindMap.set(
-        hasDraft.value ? md5(item + '|' + formVersion[item]) : item,
+        editDraft.value ? md5(item + '|' + formVersion[item]) : item,
         obj.nodes.props.formBinds[item],
       )
     })
-    const forms = hasDraft.value ? data.form : obj.config.forms
+    const forms = editDraft.value ? data.form : obj.config.forms
 
     formList.value = forms?.map((m) => {
       if (m.multiple) {
         tableData[m.formId] = [{}]
       }
-      const _fields = hasDraft.value
+      const _fields = editDraft.value
         ? m.configuration?.children
         : m.fullInfo.configuration?.children
       _fields?.forEach((p) => {
@@ -323,7 +327,6 @@ const handleData = (data: any, model: string) => {
           ?.find((k) => k.id === p.key)?.accessModes
         p.componentProps.disabled = !accessModes?.includes('write')
       })
-
       return {
         accessModes: [],
         fullInfo: { configuration: m.configuration },

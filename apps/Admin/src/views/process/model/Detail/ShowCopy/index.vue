@@ -34,15 +34,14 @@
             :style="{
               color: item.color,
             }"
-            v-if="
-              item.value !== '1' && item.value !== '2' && item.value !== '3'
-            "
+            v-if="!item.isOther"
             @click="formData.variables.splice(index, 1)"
           />
         </div>
         <FormVariables
           v-model:visible="visible"
           v-model:variables="formData.variables"
+          :treeData="treeData"
         />
       </j-form-item>
       <j-form-item
@@ -131,15 +130,14 @@
 import { queryVariables_api } from '@/api/process/model'
 import FormVariables from './components/FormVariables.vue'
 import { useFlowStore } from '@/store/flow'
+import { separateData } from './utils'
 
 const flowStore = useFlowStore()
 
 // 初始变量
-const initVariables = [
-  { label: '流程名称', value: '1', color: '#208CFF' },
-  { label: '发起人', value: '2', color: '#F7AD1A' },
-  { label: '发起人所属组织', value: '3', color: '#EB5B22' },
-]
+const initVariables = ref<any[]>([])
+// 表单树形数据, 用于弹窗左侧数据展示
+const treeData = ref<any[]>([])
 const visible = ref(false)
 const formRef = ref()
 const formData = reactive({
@@ -147,9 +145,9 @@ const formData = reactive({
     get: () =>
       flowStore.model.config.variables?.length
         ? flowStore.model.config.variables
-        : initVariables,
+        : initVariables.value,
     set: (val) => {
-      flowStore.model.config.variables = [...initVariables, ...val]
+      flowStore.model.config.variables = [...initVariables.value, ...val]
     },
   }),
   nameGenerator: computed({
@@ -171,15 +169,6 @@ const formData = reactive({
     },
   }),
 })
-watch(
-  () => formData.ccMember,
-  (val) => {
-    console.log('formData.ccMember: ', val)
-  },
-  {
-    deep: true,
-  },
-)
 
 /**
  * 获取变量数据
@@ -200,7 +189,10 @@ const getVariables = async () => {
     nodeId: flowStore.model.nodes.id || 'ROOT_1', // 展示及抄送直接传根节点id
   }
   const { result } = await queryVariables_api(params)
-  //   console.log('result: ', result)
+  
+  const { formList, otherFields } = separateData(result, {})
+  treeData.value = formList || []
+  initVariables.value = otherFields || []
 }
 
 /**

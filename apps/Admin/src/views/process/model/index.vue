@@ -20,7 +20,7 @@
       </template>
       <template #icon="{ icon }">
         <ProImage
-          v-if="icon?.includes('http')"
+          v-if="isImg(icon)"
           :width="50"
           :height="50"
           :src="icon"
@@ -87,7 +87,7 @@
                   <!-- <AIcon :type="record.icon ? record.icon : 'DeleteOutlined'" /> -->
                   <j-space :size="24" align="center">
                     <ProImage
-                      v-if="record.icon?.includes('http')"
+                      v-if="isImg(record.icon)"
                       :width="64"
                       :height="64"
                       :src="record.icon"
@@ -98,8 +98,10 @@
                       :type="record.icon"
                       :style="{ fontSize: '40px' }"
                     />
-                    <div>
-                      <div class="name">{{ record.name }}</div>
+                    <div class="right">
+                      <j-ellipsis style="max-width: 200px">
+                        <div class="name">{{ record.name }}</div>
+                      </j-ellipsis>
                       <div class="other">
                         <j-ellipsis style="width: 200px">
                           <span class="text">创建人：</span>
@@ -144,12 +146,9 @@ import dayjs from 'dayjs'
 import Dialog from './Dialog/index.vue'
 import Drawer from '../components/Drawer/index.vue'
 import { isFunction, isObject } from 'lodash-es'
-import {
-  getProcess_api,
-  deploy_api,
-  del_api,
-} from '@/api/process/model'
+import { getProcess_api, deploy_api, del_api } from '@/api/process/model'
 import { useClassified } from '@/hooks/useClassified'
+import { isImg } from '@/utils/comm'
 
 const { classified, getText } = useClassified()
 const router = useRouter()
@@ -317,7 +316,7 @@ const getActions = (record, type = 'card') => {
       permissionProps: (data) => ({
         disabled: data.state.value === 'deployed',
         tooltip: {
-          title: data.state.value === 'deployed' ? '请勿重复部署' :'部署',
+          title: data.state.value === 'deployed' ? '请勿重复部署' : '部署',
         },
         hasPermission: false,
         onClick: () => {
@@ -337,7 +336,7 @@ const getActions = (record, type = 'card') => {
       text: '删除',
       icon: 'DeleteOutlined',
       permissionProps: (data) => ({
-        disabled: data.state.value === 'deployed',
+        // disabled: data.state.value === 'deployed',
         tooltip: {
           title: '删除',
         },
@@ -436,21 +435,28 @@ const refresh = () => {
   }
   .card-content {
     height: 64px;
-    .name {
-      margin-bottom: 16px;
-      font-size: 16px;
-      line-height: 16px;
-      font-weight: 500;
-      color: #333333;
-    }
-    .other {
-      display: inline-flex;
 
-      .text {
-        color: rgba(10, 27, 48, 0.6);
+    .right {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 64px;
+      .name {
+        margin-bottom: 16px;
+        font-size: 16px;
+        line-height: 16px;
+        font-weight: 500;
+        color: #333333;
       }
-      .value {
-        color: rgba(10, 27, 48, 0.4);
+      .other {
+        display: inline-flex;
+
+        .text {
+          color: rgba(10, 27, 48, 0.6);
+        }
+        .value {
+          color: rgba(10, 27, 48, 0.4);
+        }
       }
     }
   }

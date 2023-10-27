@@ -10,7 +10,12 @@
                      <div class="item-img">
                         <img :src="getImage('/me/user.svg')">
                      </div>
-                     <div class="text">{{ item.operatorName || item.operator.name }}</div>
+                     <div class="text">
+                        <j-ellipsis>
+                           {{ item.operatorName || item.operator.name }}
+                        </j-ellipsis>
+
+                     </div>
                      <j-tag :color="colorMap.get(item.actionColor)">
                         {{ actionType.get(item.actionType) }}
                      </j-tag>
@@ -37,7 +42,8 @@
                   </j-tag>
                </div>
                <div v-if="item.childrenNode?.others.afterState === 'rejected'" class="item-children">
-                  <div style="margin-right: 10px;">{{ item.others.taskName }} 已驳回至 {{ task.get(item.childrenNode?.taskId)}}</div>
+                  <div style="margin-right: 10px;">{{ item.others.taskName }} 已驳回至 {{ task.get(item.childrenNode?.taskId) }}
+                  </div>
                </div>
             </div>
          </j-timeline-item>
@@ -308,6 +314,7 @@ onMounted(() => {
                color: #000000;
                font-weight: 500;
                font-size: 16px;
+               max-width: 400px;
             }
          }
 
@@ -332,4 +339,5 @@ onMounted(() => {
          padding: 10px 10px;
       }
    }
-}</style>
+}
+</style>

@@ -8,7 +8,7 @@
     @close="emits('update:visible', false)"
     :contentWrapperStyle="{ width: 'auto', minWidth: '50%', maxWidth: '66.6%' }"
   >
-    <j-scrollbar>
+    <!-- <j-scrollbar> -->
       <j-tabs v-model:activeKey="activeKey">
         <j-tab-pane key="form">
           <template #tab>
@@ -46,7 +46,7 @@
           <FlowDesigner readOnly :nodesData="nodesData" />
         </j-tab-pane>
       </j-tabs>
-    </j-scrollbar>
+    <!-- </j-scrollbar> -->
   </j-drawer>
 </template>
 <script setup lang="ts">
@@ -95,6 +95,7 @@ const getTableColumns = (fields: any[]) => {
   _columns?.forEach((item) => {
     tableData.value[0][item.dataIndex] = undefined
   })
+  console.log('_columns', _columns)
   return _columns
 }
 
