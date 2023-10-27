@@ -62,10 +62,12 @@
             v-model:value="searchText"
             placeholder="搜索流程表单名称"
             @search="onSearch"
+            style="margin-bottom: 10px"
           />
           <!-- 表单列表 -->
           <j-scrollbar max-height="700">
             <div class="form-list">
+              <j-empty v-if="!formList.length" />
               <div
                 class="form-list-item"
                 :class="{ active: isActive(item.key) }"
@@ -82,71 +84,73 @@
         </div>
         <div class="right">
           <h3>请配置表单展示样式</h3>
-          <draggable
-            v-model="selectedRow"
-            handle=".sort"
-            group="form"
-            animation="500"
-            chosen-class="chosen-class"
-            @start="drag = true"
-            @end="drag = false"
-            item-key="key"
-          >
-            <template #item="{ element }">
-              <div class="selected-item">
-                <div class="name">
-                  <j-ellipsis line-clamp="1">
-                    {{ element.formName }}
-                  </j-ellipsis>
+          <j-scrollbar max-height="700">
+            <draggable
+              v-model="selectedRow"
+              handle=".sort"
+              group="form"
+              animation="500"
+              chosen-class="chosen-class"
+              @start="drag = true"
+              @end="drag = false"
+              item-key="key"
+            >
+              <template #item="{ element }">
+                <div class="selected-item">
+                  <div class="name">
+                    <j-ellipsis line-clamp="1">
+                      {{ element.formName }}
+                    </j-ellipsis>
+                  </div>
+                  <div class="type">
+                    <j-radio-group
+                      v-model:value="element.multiple"
+                      button-style="solid"
+                      size="small"
+                    >
+                      <j-space>
+                        <j-radio-button :value="false">
+                          <img
+                            :src="getImage(`/flow-designer/form.png`)"
+                            style="height: 14px"
+                          />
+                          表单
+                        </j-radio-button>
+                        <j-radio-button :value="true">
+                          <img
+                            :src="getImage(`/flow-designer/list.png`)"
+                            style="height: 14px"
+                          />
+                          列表
+                        </j-radio-button>
+                      </j-space>
+                    </j-radio-group>
+                  </div>
+                  <div class="opt">
+                    <PermissionButton
+                      size="small"
+                      type="link"
+                      danger
+                      :popConfirm="{
+                        title: `确认删除？`,
+                        onConfirm: () => onSelectChange(element),
+                      }"
+                    >
+                      <AIcon type="DeleteOutlined" />
+                    </PermissionButton>
+                    <PermissionButton
+                      size="small"
+                      class="sort"
+                      type="link"
+                      :disabled="selectedRow?.length === 1"
+                    >
+                      <AIcon type="HolderOutlined" />
+                    </PermissionButton>
+                  </div>
                 </div>
-                <div class="type">
-                  <j-radio-group
-                    v-model:value="element.multiple"
-                    button-style="solid"
-                    size="small"
-                  >
-                    <j-space>
-                      <j-radio-button :value="false">
-                        <img
-                          :src="getImage(`/flow-designer/form.png`)"
-                          style="height: 14px"
-                        />
-                        表单
-                      </j-radio-button>
-                      <j-radio-button :value="true">
-                        <img
-                          :src="getImage(`/flow-designer/list.png`)"
-                          style="height: 14px"
-                        />
-                        列表
-                      </j-radio-button>
-                    </j-space>
-                  </j-radio-group>
-                </div>
-                <div class="opt">
-                  <PermissionButton
-                    size="small"
-                    type="link"
-                    danger
-                    :popConfirm="{
-                      title: `确认删除？`,
-                      onConfirm: () => onSelectChange(element),
-                    }"
-                  >
-                    <AIcon type="DeleteOutlined" />
-                  </PermissionButton>
-                  <PermissionButton
-                    size="small"
-                    class="sort"
-                    type="link"
-                    :disabled="selectedRow?.length === 1"
-                  >
-                    <AIcon type="HolderOutlined" />
-                  </PermissionButton>
-                </div>
-              </div>
-            </template>
-          </draggable>
+              </template>
+            </draggable>
+          </j-scrollbar>
         </div>
       </div>
     </div>
@@ -183,12 +187,15 @@ const isActive = computed(() => (key) => {
 
 const params = ref<any>({
   paging: false,
+  sorts: [{ name: 'createTime', order: 'desc' }],
   terms: [
     {
       value: 'true',
       termType: 'eq',
+      type: 'and',
       column: 'latest',
     },
+    { terms: [] },
   ],
 })
 
@@ -204,12 +211,18 @@ const getFormList = async () => {
  * 搜索
  */
 const onSearch = (searchValue: string) => {
-  params.value.terms.push({
-    type: 'or',
-    value: `%${searchValue}%`,
-    termType: 'like',
-    column: 'name',
-  })
+  params.value.terms[1].terms = [
+    {
+      terms: [
+        {
+          type: 'or',
+          value: `%${searchValue}%`,
+          termType: 'like',
+          column: 'name',
+        },
+      ],
+    },
+  ]
   getFormList()
 }
 
