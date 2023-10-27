@@ -4,7 +4,7 @@ import { request } from '@jetlinks/core'
  * 条件查询实例
  * @returns 
  */
-export const getList_api = (data: any) => request.post(`/process/deployment/_query`,data);
+export const getList_api = (data: any) => request.post(`/process/deployment/detail/_query`,data);
 
 /**
  * 复制为模型

@@ -98,8 +98,8 @@
 import { onlyMessage, randomString } from '@jetlinks/utils'
 import { saveProcess_api } from '@/api/process/model'
 import { useRequest } from '@jetlinks/hooks'
-import { useClassified } from '@/hooks/useClassified'
 import { isImg } from '@/utils/comm'
+import { providerEnum } from '@/api/process/model'
 
 type FormType = {
   key: string
@@ -126,7 +126,7 @@ const emits = defineEmits<{
   (e: 'refresh'): void
 }>()
 
-const { classified, getText } = useClassified()
+// const { classified, getText } = useClassified()
 const baseIcon = [
   'icon-shujumoni',
   'icon-tongzhiguanli',
@@ -145,7 +145,19 @@ const form = reactive<Partial<FormType>>({
   provider: 'wflow',
 })
 
-// const { data: providerOptions } = useRequest(providerEnum)
+const { data: classified } = useRequest(providerEnum, {
+  immediate: true,
+  onSuccess(res) {
+    const op = res.result.map((item) => {
+      return {
+        label: item.text,
+        value: item.id,
+      }
+    })
+    op.some(i => i.value === form.classifiedId) ? '' : form.classifiedId = ''
+    return op
+  },
+})
 
 const { loading, run } = useRequest(saveProcess_api, {
   immediate: false,
@@ -167,7 +179,6 @@ const confirm = () => {
 const init = () => {
   title.value = '编辑'
   Object.assign(form, props.data)
-  getText(form.classifiedId) ? '' : form.classifiedId = ''
 }
 
 watch(

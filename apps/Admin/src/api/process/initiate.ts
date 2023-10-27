@@ -5,7 +5,7 @@ import { request } from '@jetlinks/core'
  * @returns
  */
 export const getList_api = (data: any) =>
-  request.post(`/process/runtime/startable/_query`, data)
+  request.post(`/process/runtime/startable/_query/no-paging`, data)
 
 /**
  * 发起流程
