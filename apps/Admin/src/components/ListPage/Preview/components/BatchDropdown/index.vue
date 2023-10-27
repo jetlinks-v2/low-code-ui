@@ -110,7 +110,7 @@ const secondLevelBtn = ref()
 
 const handleMenuClick = (e: any) => {
   const val = props.actions.find((item) => item.key === e.key)
-  if(!store.AuthStore.hasPermission(route.params.sid + ':' + val?.key)) {
+  if(!store.AuthStore.hasPermission(route.params.sid + ':' + val?.key) && route.params.sid) {
     return
   }
   if (!(val?.popConfirm || val?.onClick)) {

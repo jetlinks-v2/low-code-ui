@@ -10,31 +10,27 @@
     >
       <j-tabs v-model:activeKey="activeKey" type="card" :destroyInactiveTabPane="true">
         <j-tab-pane v-for="item in typeList" :key="item.id" :tab="item.name">
-          <Product
-            v-if="item.id === 'product'"
+          <CardType
+            v-if="['device', 'product'].includes(item.id)"
             :relationList="relationList"
             :relations="relations"
             :id="data?.id"
+            :targetType="item.id"
             :relation="props.config.relation"
             :preview="preview"
+            @update="() => getRelation()"
           />
-          <Device
-            v-else-if="item.id === 'device'"
-            :relationList="relationList"
-            :relations="relations"
-            :id="data?.id"
-            :relation="props.config.relation"
-            :preview="preview"
-          />
-          <User
+          <ListType
             v-else
             :relationList="relationList"
             :relations="relations"
             :id="data?.id"
+            :typeId="item.id"
             :query="query(item.id)"
             :params="params(item.id)"
             :relation="props.config.relation"
             :preview="preview"
+            @update="() => getRelation()"
           />
         </j-tab-pane>
         <!-- <j-tab-pane tab="用户" key="user">
@@ -57,9 +53,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import User from './User.vue'
-import Device from './Device.vue'
-import Product from './Product.vue'
+import ListType from './ListType.vue'
+import CardType from './CardType.vue'
 import { relationListApi, relationApi, relationTypeListApi, userList } from '@/api/list'
 import { queryRuntime } from '@/api/form'
 import { getRoleList_api, getDepartmentList_api } from '@/api/user'
@@ -160,7 +155,7 @@ const getTypeList = async () => {
 }
 getTypeList()
 watchEffect(() => {
-  if (props.config && !props.config.preview) {
+  if (props.config?.relation && !props.config.preview) {
     getRelationList(props.config.relation, activeKey.value)
     getRelation()
   }
