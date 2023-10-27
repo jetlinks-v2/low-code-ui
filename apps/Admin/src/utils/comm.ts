@@ -29,3 +29,11 @@ export const upperCase = (str: string, reg?: RegExp) => {
     return char.toUpperCase();
   });
 }
+
+/**
+ * 判断是否为图片地址
+ */
+export const isImg = (str: string) => {
+  const _reg = /\.(jpg|jpeg|png|gif).*$/i
+  return _reg.test(str)
+}
