@@ -20,7 +20,7 @@
       }"
     >
       <template #headerTitle>
-        <j-button type="primary" @click="handleSave('add')">新增</j-button>
+        <j-button type="primary" @click="handleAdd()">新增</j-button>
       </template>
       <template #createTime="slotProps">
         <span>{{
@@ -56,7 +56,7 @@
     </JProTable>
     <Save
       v-if="visible"
-      @save="handleClose"
+      @save="handleSave"
       @close="handleClose"
       :data="current"
     />
@@ -167,7 +167,7 @@ const getActions = (record) => {
       hasPermission: false,
       icon: 'EditOutlined',
       onClick: () => {
-        handleSave('edit', record)
+        handleAdd(record)
       },
     },
     {
@@ -196,14 +196,18 @@ const handleSearch = (data: any) => {
   }
 }
 
-const handleSave = (type: string, data?: any) => {
+const handleAdd = (data?: any) => {
   visible.value = true
   current.value = data
 }
 
-const handleClose = () => {
+const handleSave = () => {
   visible.value = false
   tableRef.value?.reload()
+}
+
+const handleClose = () => {
+  visible.value = false
 }
 
 const _del = async (id: string) => {
