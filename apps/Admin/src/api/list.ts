@@ -20,3 +20,6 @@ export const saveRelationApi = (type: string, id: string, data: any) => request.
 
 /**获取所有的关系对象类型 */
 export const relationTypeListApi = () => request.get(`/relation/types`)
+
+/**查询关系结构体数据 */
+export const relationStructureApi = (typeId: string) => request.post(`/relation/object/${typeId}/_query/no-paging`, {})

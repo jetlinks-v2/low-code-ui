@@ -4,6 +4,7 @@ export const commonUseBtn = [
   { title: '批量导入', type: 'Import', icon: 'ImportOutlined' },
   { title: '批量删除', type: 'Delete', icon: 'DeleteOutlined' },
   { title: '批量导出', type: 'Export', icon: 'ExportOutlined' },
+  { title: '关系配置', type: 'Relation', icon: 'LinkOutlined' },
   { title: '查看详情', type: 'Detail', icon: 'EyeOutlined' },
   { title: '编辑', type: 'Update', icon: 'EditOutlined' },
   { title: '删除', type: 'Delete', icon: 'DeleteOutlined' },
