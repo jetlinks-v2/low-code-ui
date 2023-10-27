@@ -9,7 +9,7 @@
         </j-space>
       </j-radio-group>
     </div>
-    <pro-search :columns="columns" target="code" @search="handleSearch" />
+    <pro-search :columns="columns" target="monitor" @search="handleSearch" />
     <JProTable
       ref="tableRef"
       model="table"
