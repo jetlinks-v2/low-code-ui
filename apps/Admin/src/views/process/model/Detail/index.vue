@@ -27,7 +27,10 @@
           <j-button :disabled="current === 0" @click="current--"
             >上一步</j-button
           >
-          <j-button :disabled="current === 2" @click="handleNext"
+          <j-button
+            :disabled="current === 2"
+            @click="handleNext"
+            :loading="nextLoading"
             >下一步</j-button
           >
           <j-button type="primary" @click="handleSave" :loading="saveLoading">
@@ -53,9 +56,11 @@
         </div>
       </div>
     </j-card>
-    <j-card>
-      <component ref="stepRef" :is="componentsMap[current]" />
-    </j-card>
+    <FullPage>
+      <j-card :bordered="false">
+        <component ref="stepRef" :is="componentsMap[current]" />
+      </j-card>
+    </FullPage>
 
     <!-- 隐藏域, 用于部署校验每一步数据 -->
     <div class="validate-box">
@@ -91,6 +96,8 @@ const stepRef = ref()
 const step1 = ref()
 const step2 = ref()
 const step3 = ref()
+const nextLoading = ref(false)
+const saveLoading = ref(false)
 
 /**
  * 获取模型详情
@@ -108,6 +115,8 @@ const getFlowDetail = async () => {
  * 下一步, 校验当前步骤的数据规范
  */
 const handleNext = () => {
+  // 点击下一步先保存数据, 再校验->#19300
+  handleSave('next')
   stepRef.value
     ?.validateSteps()
     .then((idx) => {
@@ -124,23 +133,29 @@ const handleNext = () => {
 /**
  * 保存模型数据, 无需校验数据
  */
-const saveLoading = ref(false)
-const handleSave = () => {
+const handleSave = (type?: string) => {
   const params = {
     id: route.query.id,
     state: 'undeployed',
     model: JSON.stringify(flowStore.model),
   }
   //   console.log('flowStore.model: ', flowStore.model)
-
-  saveLoading.value = true
+  //   type !== 'next' ? (saveLoading.value = true) : (nextLoading.value = true)
+  if (type !== 'next') {
+    saveLoading.value = true
+  } else {
+    nextLoading.value = true
+  }
   update_api(params)
     .then(() => {
-      onlyMessage('保存成功', 'success')
-      router.go(-1)
+      if (type !== 'next') {
+        onlyMessage('保存成功', 'success')
+        router.go(-1)
+      }
     })
     .finally(() => {
       saveLoading.value = false
+      nextLoading.value = false
     })
 }
 

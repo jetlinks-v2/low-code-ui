@@ -189,13 +189,18 @@ const params = ref<any>({
   paging: false,
   sorts: [{ name: 'createTime', order: 'desc' }],
   terms: [
+    { terms: [] },
     {
       value: 'true',
       termType: 'eq',
       type: 'and',
       column: 'latest',
     },
-    { terms: [] },
+    {
+      value: '',
+      termType: 'notnull',
+      column: 'configuration',
+    },
   ],
 })
 
@@ -211,7 +216,7 @@ const getFormList = async () => {
  * 搜索
  */
 const onSearch = (searchValue: string) => {
-  params.value.terms[1].terms = [
+  params.value.terms[0].terms = [
     {
       terms: [
         {
