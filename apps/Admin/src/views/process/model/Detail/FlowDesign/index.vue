@@ -86,12 +86,12 @@ const nodeDel = (node) => {
 }
 
 const handleClose = () => {
-  // 关闭前校验一次节点名称
-  nameRef.value.validate().then(() => {
-    nodeConfigRef.value.validateConfig().then(() => {
-      showConfig.value = false
-    })
-  })
+  // 关闭前校验节点名称
+  nameRef.value.validate()
+  // 校验配置内容
+  nodeConfigRef.value.validateConfig()
+  // 不论校验结果如何, 都关闭弹窗继续后续操作
+  showConfig.value = false
 }
 
 /**
@@ -102,7 +102,7 @@ const saveNodeConfig = () => {
     .saveConfigToStore()
     .then((valid) => {
       console.log('saveNodeConfig valid: ', valid)
-      // 关闭前校验一次流程图节点
+      // 保存数据后校验一次流程图节点
       validateSteps()
       //   showConfig.value = false
     })
