@@ -8,7 +8,9 @@
         :title="`配置${item.name}`"
         :visible="visible"
         width="50%"
-        @cancel="visible = false"
+        destroyOnClose
+        :maskClosable="false"
+        @cancel="handleCancel(index, item)"
         @ok="submit(index, item)"
       >
         <ListChoose
@@ -28,7 +30,7 @@
 <script setup lang="ts">
 import Content from './Content.vue'
 import ListChoose from './ListChoose.vue'
-import { saveRelationApi } from '@/api/list'
+import { saveRelationApi, relationStructureApi } from '@/api/list'
 
 const props = defineProps({
   relationList: {
@@ -57,12 +59,18 @@ const props = defineProps({
   preview: {
     type: Boolean,
     default: true,
+  },
+  typeId: {
+    type: String,
+    default: ''
   }
 })
 
+const emit = defineEmits(['update'])
+
 const columns = [
   {
-    title: '用户',
+    title: '名称',
     dataIndex: 'name',
     key: 'name',
     ellipsis: true,
@@ -80,20 +88,24 @@ const visible = ref(false)
 
 const list = ref([])
 const getUserList = async () => {
-  const res = await props.query?.(...props.params)
+  const res = await relationStructureApi(props.typeId)
   if (res.success) {
     list.value = res.result
   }
 }
 
+const handleCancel = (_index: number, _item:any) => {
+  visible.value = false
+  // listChoose.value[_index].chosenArr = props.relations.find((val) => val.relation === _item.relation)?.related
+}
 const submit = async (index: number, _item: any) => {
-  if(!props.preview) {
+  if(props.preview) {
     visible.value = false
     return
   }
   const data = [
     {
-      relatedType: 'user',
+      relatedType: props.typeId,
       relation: _item.relation,
       related: listChoose.value?.[index].chosenArr,
     },
@@ -101,6 +113,7 @@ const submit = async (index: number, _item: any) => {
   const res = await saveRelationApi(props.relation, props.id, data)
   if (res.success) {
     visible.value = false
+    emit('update')
   }
 }
 

@@ -152,6 +152,19 @@ defineExpose({ validate })
 .node {
   margin: 30px;
   width: 220px;
+  &:before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+    width: 0;
+    border-style: solid;
+    border-width: 8px 6px 4px;
+    border-color: #cacaca transparent transparent;
+    background: #fff;
+  }
   &.active {
     &::before {
       border-color: #3056df transparent transparent;

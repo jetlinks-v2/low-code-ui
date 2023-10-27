@@ -3,7 +3,7 @@
   <j-modal
     visible
     title="配置成员"
-    width="70vw"
+    :width="1076"
     @ok="confirm"
     @cancel="emits('update:visible', false)"
   >
@@ -147,7 +147,7 @@ const back = () => {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     .ant-radio-button-wrapper {
       flex-direction: column;
       display: flex;
