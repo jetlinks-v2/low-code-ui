@@ -13,14 +13,17 @@
         <j-form-item
           label="表单标识"
           name="key"
+          :validateFirst="true"
           :rules="[
             {
               pattern: /^[a-zA-Z0-9_\-]+$/,
               message: '请输入英文或者数字或者-或者_',
+              trigger: ['blur', 'change'],
             },
             {
               max: 64,
               message: '最多输入64个字符',
+              trigger: ['blur', 'change'],
             },
             {
               validator: vailId,
@@ -37,6 +40,7 @@
         <j-form-item
           label="表单名称"
           name="name"
+          :validateFirst="true"
           :rules="[
             {
               required: true,
@@ -53,6 +57,7 @@
         <j-form-item
           label="说明"
           name="description"
+          :validateFirst="true"
           :rules="[
             {
               max: 200,

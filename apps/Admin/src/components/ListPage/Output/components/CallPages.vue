@@ -117,7 +117,7 @@ const handleSubmit = async () => {
     data = await formPage.value.onSave()
   } else {
     data =
-      (<any>document.getElementById('previewFrame'))?.contentWindow?.onSave() ||
+      (<any>document.getElementById('previewFrame'))?.contentWindow?.onSave?.() ||
       {}
   }
   confirmLoading.value = true
@@ -172,6 +172,11 @@ watchEffect(() => {
   } else {
     editValue.value = {}
   }
+  window.addEventListener('message', (e) => {
+    if(e.data === 'loaded') {
+      (<any>document.getElementById('previewFrame')).contentWindow.postMessage(JSON.stringify(editValue.value))
+    }
+  })
 })
 </script>
 <style lang="less" scoped></style>

@@ -50,8 +50,8 @@ const onValueChange = (e) => {
 
 const formStyle = computed(() => {
   return {
-    layout: designer.formData.value?.componentProps?.layout,
-    size: designer.formData.value?.componentProps?.size,
+    layout: designer?.formData.value?.componentProps?.layout,
+    size: designer?.formData.value?.componentProps?.size,
   }
 })
 

@@ -157,12 +157,12 @@
             </j-form-item>
             <j-form-item
               label="请选择驳回至哪个节点"
-              name="gotoWhenReject"
+              name="rejectTo"
               :rules="[{ required: true, message: '请选择驳回至哪个节点' }]"
               v-if="!memberFormData.endProcessWhenReject"
             >
               <j-select
-                v-model:value="memberFormData.gotoWhenReject"
+                v-model:value="memberFormData.rejectTo"
                 :options="nodeList"
               />
             </j-form-item>
@@ -207,27 +207,32 @@ const memberFormData = reactive({
   authButtons: props.node?.props?.authButtons || ['pass', 'reject'],
   endProcessWhenReject: props.node?.props?.endProcessWhenReject || false,
   gotoWhenReject: props.node?.props?.gotoWhenReject,
+
+  // 前端使用
+  rejectTo: props.node?.props?.gotoWhenReject[0] || undefined,
 })
 const allButtons = ref([
   { label: '通过', value: 'pass' },
   { label: '驳回', value: 'reject' },
 ])
-const nodeList = ref([
-  { label: '审批节点', value: 'approval' },
-  { label: '处理节点', value: 'deal' },
+const nodeList = ref<{ label: string; value: string }[]>([
+  //   { label: '审批节点', value: 'approval' },
+  //   { label: '处理节点', value: 'deal' },
 ])
 
 /**
  * 驳回的节点
  * 获取当前节点之前的所有审批和办理节点
  */
-const getRejectNodes = () => {
-  const _parentNode = findNodeById(flowStore.model.nodes, props.node?.parentId)
-  console.log('_parentNode: ', _parentNode)
+const getRejectNodes = (nodeId) => {
+  const _parentNode = findNodeById(flowStore.model.nodes, nodeId)
+  if (_parentNode.type === 'APPROVAL' || _parentNode.type === 'DEAL') {
+    nodeList.value.push({ label: _parentNode.name, value: _parentNode.id })
+  }
+  // 父节点存在, 并且可以驳回的节点没有找到 继续查找
+  if (_parentNode.parentId && !nodeList.value.length)
+    getRejectNodes(_parentNode.parentId)
 }
-onMounted(() => {
-  getRejectNodes()
-})
 
 /**
  * 将数据保存至store, 不用校验合法性
@@ -241,10 +246,12 @@ const saveConfigToStore = () => {
     if (!basicFormData.others.defaultComment) {
       delete basicFormData.others.defaultComment
     }
+    const { rejectTo, ...others } = memberFormData
+    others.gotoWhenReject = [rejectTo]
     result.props = {
       ...result.props,
       ...basicFormData,
-      ...memberFormData,
+      ...others,
     }
     resolve(result)
   })
@@ -285,6 +292,9 @@ const validateConfig = () => {
 defineExpose({
   saveConfigToStore,
   validateConfig,
+})
+onMounted(() => {
+  getRejectNodes(props.node?.parentId)
 })
 </script>
 
