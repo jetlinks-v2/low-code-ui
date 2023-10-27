@@ -15,8 +15,8 @@
             <j-form-item
               label="请确认当前节点需要候选人办理的表单内容"
               name="formBinds"
-              :rules="[{ required: true, message: '请配置表单内容' }]"
             >
+              <!-- :rules="[{ required: true, message: '请配置表单内容' }]" -->
               <ConfigFormFields v-model:value="basicFormData.formBinds" />
             </j-form-item>
           </j-collapse-panel>

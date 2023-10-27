@@ -29,6 +29,7 @@ const showError = ref(false)
 const errorInfo = ref('')
 
 const content = computed(() => {
+  return '系统自动匹配参与人' // #19303
   if (props?.config?.props?.assignedUser.length) {
     let texts: string[] = []
     props.config.props.assignedUser.forEach((item) => texts.push(item.name))
@@ -46,8 +47,8 @@ const validate = (err) => {
     showError.value = true
     errorInfo.value = '请在基础信息中配置成员'
     err.push({
-        errors: [errorInfo.value],
-        name: ['assignedUser'],
+      errors: [errorInfo.value],
+      name: ['assignedUser'],
     })
   } else {
     showError.value = false

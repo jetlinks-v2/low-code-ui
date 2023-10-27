@@ -142,7 +142,7 @@ const getFormFields = async () => {
       id,
       name,
       key,
-      model,
+      model: JSON.stringify(flowStore.model), // model不能取modelBaseInfo(接口保存才会有值), 直接取动态值flowStore.model
       provider,
     },
     nodeId: flowStore.selectedNode.props.branchBy, // 条件节点配置, id传当前条件节点的branchBy

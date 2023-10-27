@@ -12,15 +12,25 @@
     :width="600"
     :visible="showConfig"
     :closable="false"
-    @close="showConfig = false"
+    @close="handleClose"
   >
     <template v-if="isAdvanceConfig" #title> 高级配置 </template>
-    <j-input
-      v-if="!isAdvanceConfig"
-      v-model:value="nodeName"
-      placeholder="请输入"
-      style="margin-bottom: 10px"
-    />
+    <j-form ref="nameRef" :model="formData">
+      <j-form-item
+        name="nodeName"
+        :rules="[
+          { required: true, trigger: 'blur', message: '请输入节点名称' },
+          { max: 64, trigger: 'blur', message: '最多输入64个字符' },
+        ]"
+      >
+        <j-input
+          v-if="!isAdvanceConfig"
+          v-model:value="formData.nodeName"
+          placeholder="请输入"
+          style="margin-bottom: 10px"
+        />
+      </j-form-item>
+    </j-form>
 
     <NodeConfig ref="nodeConfigRef" />
   </j-drawer>
@@ -41,14 +51,17 @@ const isAdvanceConfig = computed(() => {
 })
 
 // 节点名称
-const nodeName = computed({
-  get: () => selectedNode.value?.name,
-  set: (val) => {
-    flowStore.selectedNode.name = val
-  },
+const formData = reactive({
+  nodeName: computed({
+    get: () => selectedNode.value?.name,
+    set: (val) => {
+      flowStore.selectedNode.name = val
+    },
+  }),
 })
 
 const flowDesignerRef = ref()
+const nameRef = ref()
 const nodeConfigRef = ref()
 const showConfig = ref(false)
 const nodeSelected = (node) => {
@@ -72,6 +85,13 @@ const nodeDel = (node) => {
   }
 }
 
+const handleClose = () => {
+  // 关闭前校验一次节点名称
+  nameRef.value.validate().then(() => {
+    showConfig.value = false
+  })
+}
+
 /**
  * 保存节点数据至store
  */
@@ -82,7 +102,7 @@ const saveNodeConfig = () => {
       console.log('saveNodeConfig valid: ', valid)
       // 关闭前校验一次流程图节点
       validateSteps()
-      showConfig.value = false
+      //   showConfig.value = false
     })
     .catch((err) => {
       console.log('saveNodeConfig err: ', err)
