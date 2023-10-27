@@ -21,8 +21,8 @@
               trigger: ['blur', 'change'],
             },
             {
-              max: 64,
-              message: '最多输入64个字符',
+              max: 20,
+              message: '最多输入20个字符',
               trigger: ['blur', 'change'],
             },
             {
