@@ -110,7 +110,7 @@
 
 <script setup lang="ts">
 import ConfigFormFields from './ConfigFormFields.vue'
-import { findNodeById } from './utils'
+import { findNodeById, setDefaultFormBinds } from './utils'
 import { useFlowStore } from '@/store/flow'
 import { onlyMessage } from '@jetlinks/utils'
 
@@ -126,7 +126,9 @@ const props = defineProps({
 // 基础配置
 const basicFormRef = ref()
 const basicFormData = reactive({
-  formBinds: props.node?.props?.formBinds || {},
+  formBinds:
+    props.node?.props?.formBinds ||
+    setDefaultFormBinds(flowStore.model.config?.forms),
 })
 const collapseActive = ref(['1', '2', '3'])
 

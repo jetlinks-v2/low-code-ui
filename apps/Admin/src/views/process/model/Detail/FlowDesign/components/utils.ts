@@ -172,3 +172,23 @@ export function sumValues(data: { [key: string]: number }) {
     }
     return sum;
 }
+
+
+/**
+ * 表单字段全部默认有"读"权限, 设置formBinds字段初始值
+ */
+export function setDefaultFormBinds(forms) {
+    const res = {}
+    forms?.forEach((item) => {
+        const _fields = item.fullInfo.configuration?.children
+        res[item.formId] = []
+        _fields?.forEach((p) => {
+            res[item.formId].push({
+                id: p.formItemProps.name,
+                required: true,
+                accessModes: ['read'],
+            })
+        })
+    })
+    return res
+}
