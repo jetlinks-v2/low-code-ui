@@ -2,13 +2,11 @@
   <div class="list-choose">
     <j-row>
       <j-col :span="15">
-        <j-input-search v-model:value="searchValue" placeholder="" />
+        <j-input-search v-model:value="searchValue" placeholder="" allowClear style="margin-bottom: 10px;"/>
         <j-scrollbar height="400">
-          <j-tree :tree-data="filterValue" :field-names="fieldNames" @select="selectNode">
-            <template #title="{ name, id }">
-              <j-ellipsis style="width: 100%;">
-                <span :class="{ checked: chosenArr.find(item => item.id === id) }">{{ name }}</span>
-              </j-ellipsis>
+          <j-tree :tree-data="filterValue" :field-names="fieldNames" block-node multiple v-model:selectedKeys="selectedKeys" @select="selectNode">
+            <template #title="{ name }">
+              <span>{{ name }}</span>
             </template>
           </j-tree>
       </j-scrollbar>
@@ -21,10 +19,10 @@
             </a-alert>
           </j-col>
           <j-col :span="6">
-            <j-button @click="chosenArr = []">清空</j-button>
+            <j-button @click="chosenArr = []; selectedKeys = []">清空</j-button>
           </j-col>
         </j-row>
-        <j-table :columns="columns" :dataSource="chosenArr" :pagination="false" :scroll="{ y: 345 }">
+        <j-table ref="tableRef" :columns="columns" :dataSource="chosenArr" :pagination="false" :scroll="{ y: 345 }">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'action'">
               <j-button type="text" danger @click="deleteItem(record)">删除</j-button>
@@ -37,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { pick } from 'lodash-es';
+import { cloneDeep, omit, pick } from 'lodash-es';
 import { PropType } from 'vue';
 
 const props = defineProps({
@@ -59,6 +57,7 @@ const props = defineProps({
   }
 })
 
+const tableRef = ref()
 const searchValue = ref()
 const chosenArr = ref<any[]>([])
 
@@ -71,19 +70,26 @@ const filterValue = computed(() => {
   })
 })
 
-const selectNode = (selectedKeys, {selectedNodes, node}) => {
-  if(chosenArr.value.find(item => item.id === selectedKeys?.[0])) {
-    return
+const selectedKeys = ref<any[]>([])
+const selectNode = (selectedKey, {selected, selectedNodes, node}) => {
+  if(!selected) {
+    selectedKeys.value = [...selectedKeys.value, node.key]
+  } else {
+    chosenArr.value = [...chosenArr.value, pick(node, ['id', 'name'])]
   }
-  chosenArr.value.push(...selectedNodes.map(item => pick(item, ['id', 'name'])))
+  nextTick(() => {
+    tableRef.value.$el.getElementsByTagName('tbody')?.[0].scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
+  })
 }
 
 const deleteItem = (data) => {
   chosenArr.value = chosenArr.value.filter(item => item.id !== data.id)
+  selectedKeys.value = selectedKeys.value.filter(item => item !== data.id)
 }
 
 watchEffect(() => {
-  chosenArr.value = props.dataSource
+  chosenArr.value = cloneDeep(props.dataSource)
+  selectedKeys.value = cloneDeep(props.dataSource.map(item => item.id))
 })
 
 defineExpose({

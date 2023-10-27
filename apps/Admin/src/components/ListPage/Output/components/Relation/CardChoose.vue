@@ -99,6 +99,7 @@
 </template>
 <script setup lang="ts">
 import { queryProductList, queryDeviceList } from '@/api/form'
+import { cloneDeep } from 'lodash-es';
 const props = defineProps({
   type: {
     type: String,
@@ -212,7 +213,7 @@ const handleSearch = (i: any) => {
 }
 
 watchEffect(() => {
-  _selectedRows.value = props.dataSource
+  _selectedRows.value = cloneDeep(props.dataSource)
   _selectedRowKeys.value = props.dataSource.map(item => item.id)
 })
 

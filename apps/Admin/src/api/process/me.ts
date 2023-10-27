@@ -8,7 +8,7 @@ import { request } from '@jetlinks/core'
 export const getMeProcessList = (data: any, type: string,todo:boolean) => request.post(`/process/runtime/processes/${type}/_query?history=${todo}`, data);
 
 //发起人
-export const getInitiatorList = (data?:any) => request.post(`/process/runtime/processes/to-claim/_query/no-paging?distinctBy=creatorId`, data);
+export const getInitiatorList = (type:string,todo:boolean,data?:any) => request.post(`/process/runtime/processes/${type}/_query/no-paging?history=${todo}&distinctBy=creatorId`, data);
 
 //签收
 export const _claim = (taskId: string, data: any) => request.post(`/process/runtime/task/${taskId}/_claim`, data);
