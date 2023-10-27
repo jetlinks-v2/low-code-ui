@@ -16,7 +16,7 @@ export function useClassified() {
     },
   })
 
-  const getText = (key: string) => {
+  const getText = (key: string | undefined) => {
     return map.value.get(key)?.text
   }
   return {

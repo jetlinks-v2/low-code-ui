@@ -2,8 +2,9 @@
 <template>
   <j-modal
     visible
+    :maskClosable="false"
     :title="title"
-    width="55%"
+    :width="700"
     @cancel="emits('update:visible', false)"
     @ok="confirm"
     class="edit-dialog-container"
@@ -11,22 +12,22 @@
     okText="确定"
     :confirmLoading="loading"
   >
-    <j-form
-      ref="formRef"
-      :model="form"
-      autocomplete="off"
-      layout="vertical"
-    >
+    <j-form ref="formRef" :model="form" autocomplete="off" layout="vertical">
       <j-form-item
         name="name"
         label="流程名称"
-        :rules="[{ required: true, message: '请输入流程名称' }]"
+        :rules="[
+          { required: true, message: '请输入流程名称' },
+          {
+            max: 64,
+            message: '最多输入64个字符',
+          },
+        ]"
       >
         <j-input
           v-model:value="form.name"
-          :maxlength="64"
           placeholder="请假申请"
-          style="width: 320px"
+          style="width: 576px"
         />
       </j-form-item>
 
@@ -39,7 +40,7 @@
           v-model:value="form.classifiedId"
           placeholder="请选择流程分类"
           :options="classified"
-          style="width: 320px"
+          style="width: 576px"
         >
           <template #notFoundContent>
             <div>
@@ -56,11 +57,11 @@
         :rules="[{ required: true, message: '请上传流程图标' }]"
       >
         <j-space :size="24">
-          <div class="base-icon" v-for="(item, index) of baseIcon"> 
-            <div class="upload-icon" >
+          <div class="base-icon" v-for="(item, index) of baseIcon">
+            <div class="upload-icon">
               <AIcon :type="item" />
             </div>
-            <div>图标{{ index+1 }}</div>
+            <div>图标{{ index + 1 }}</div>
           </div>
           <div class="base-icon">
             <div class="upload-icon">
@@ -68,7 +69,7 @@
                 <template #content="{ imageUrl }">
                   <div v-if="imageUrl">
                     <ProImage
-                      v-if="imageUrl?.includes('http')"
+                      v-if="isImg(imageUrl)"
                       :src="imageUrl"
                       :width="48"
                       :preview="false"
@@ -98,6 +99,7 @@ import { onlyMessage, randomString } from '@jetlinks/utils'
 import { saveProcess_api } from '@/api/process/model'
 import { useRequest } from '@jetlinks/hooks'
 import { useClassified } from '@/hooks/useClassified'
+import { isImg } from '@/utils/comm'
 
 type FormType = {
   key: string
@@ -124,7 +126,7 @@ const emits = defineEmits<{
   (e: 'refresh'): void
 }>()
 
-const { classified } = useClassified()
+const { classified, getText } = useClassified()
 const baseIcon = [
   'icon-shujumoni',
   'icon-tongzhiguanli',
@@ -165,6 +167,7 @@ const confirm = () => {
 const init = () => {
   title.value = '编辑'
   Object.assign(form, props.data)
+  getText(form.classifiedId) ? '' : form.classifiedId = ''
 }
 
 watch(
@@ -181,7 +184,7 @@ watch(
 </script>
 
 <style lang="less" scoped>
-.base-icon{
+.base-icon {
   text-align: center;
 }
 .upload-icon {
@@ -192,7 +195,7 @@ watch(
   height: 48px;
   // font-size: 16px;
   border-radius: 4px;
-  border: 1px dashed #DCDCDC;
+  border: 1px dashed #dcdcdc;
   background: #eeeeee;
 
   :deep(.upload-image-content) {

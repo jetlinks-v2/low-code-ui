@@ -29,19 +29,27 @@ export function isDarkColor(hexColor) {
 }
 
 /**
- * 提取变量数据中的表单数据
+ * 分离变量数据中的表单数据(弹窗展示), 和其他变量数据(页面展示)
  * @param treeData 
  * @returns 
  */
-export function getForms(treeData: any[]) {
-    // const formFields: any[] = []
-    // data.forEach(item => {
-    //     formFields.push({
-    //         id: item.id,
-    //         required: item.required,
-    //         accessModes: item.accessModes
-    //     })
-    // })
-    // return formFields
-
+export function separateData(treeData: any[], result: { formList?: any[]; otherFields?: any[] }) {
+    if (!result.otherFields) result.otherFields = []
+    treeData.forEach(item => {
+        if (item.children && item.children.length) {
+            if (item.fullId === 'process.form') {
+                result.formList = item.children
+            } else {
+                separateData(item.children, result)
+            }
+        } else {
+            result.otherFields?.push({
+                label: item.name,
+                value: item.fullId,
+                color: randomColor(),
+                isOther: true // 非表单字段, 不能删除
+            })
+        }
+    })
+    return result
 }

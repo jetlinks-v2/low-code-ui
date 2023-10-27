@@ -1,8 +1,14 @@
 <!-- 表格表单预览 -->
 <template>
-  <j-table bordered :scroll="{ x: true }" :data-source="myDataSource" :columns="columns" :pagination="false">
+  <j-table
+    bordered
+    :scroll="{ x: true}"
+    :data-source="myDataSource"
+    :columns="columns"
+    :pagination="false"
+  >
     <template #headerCell="{ column, title }">
-      <template v-if="column.formItemProps.required">
+      <template v-if="column.formItemProps?.required">
         <span>
           <div class="title">
             {{ title }}
@@ -11,19 +17,24 @@
       </template>
     </template>
     <template #bodyCell="{ column, text, record, index }">
-      <j-form-item 
+      <j-form-item
         :name="[column.formId, index, column.dataIndex]"
-        :rules="[...column.formItemProps.rules,{
-              required: column.formItemProps.required,
-              message: `请输入${column.formItemProps.label}`,
-            }]"
-        >
+        :rules="[
+          ...(column.formItemProps?.rules ?? []),
+          {
+            required: column.formItemProps?.required,
+            message: `请输入${column.formItemProps?.label}`,
+          },
+        ]"
+      >
+      <div style="min-width: 120px">
         <component
           :is="componentMap[column.type]"
           :data="record"
           v-model:value="record[column.dataIndex]"
           :disabled="column.componentProps.disabled"
         />
+      </div>
       </j-form-item>
     </template>
   </j-table>
@@ -67,7 +78,7 @@ watch(
 </script>
 
 <style lang="less" scoped>
-.title::after{
+.title::after {
   position: absolute;
   top: 35%;
   left: 8px;

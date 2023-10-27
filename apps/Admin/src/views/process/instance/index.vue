@@ -14,7 +14,7 @@
     >
       <template #icon="{ icon }">
         <ProImage
-          v-if="icon?.includes('http')"
+          v-if="isImg(icon)"
           :width="50"
           :height="50"
           :src="icon"
@@ -79,7 +79,7 @@
                   <!-- 流程图标 -->
                   <j-space :size="24" align="center">
                     <ProImage
-                      v-if="record.icon?.includes('http')"
+                      v-if="isImg(record.icon)"
                       :width="64"
                       :height="64"
                       :src="record.icon"
@@ -156,6 +156,7 @@ import PermissionDialog from './PermissionDialog/index.vue'
 import { isFunction, isObject } from 'lodash-es'
 import { getList_api, del_api, updateState_api } from '@/api/process/instance'
 import { useClassified } from '@/hooks/useClassified'
+import { isImg } from '@/utils/comm'
 
 const { classified, getText } = useClassified()
 const tableRef = ref()
