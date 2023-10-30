@@ -12,7 +12,7 @@ const defaultModel = {
         id: 'ROOT_1',
         parentId: null,
         type: 'ROOT',
-        name: '发起人',
+        name: '发起申请',
         active: false,
         props: { assignedUser: [] },
     }

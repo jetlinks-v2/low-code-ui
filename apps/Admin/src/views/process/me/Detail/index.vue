@@ -17,7 +17,7 @@
                 <j-tab-pane key="chart" tab="流程图">
                     <FlowChart :info="info" />
                 </j-tab-pane>
-                <j-tab-pane key="history" tab="流程记录">
+                <j-tab-pane key="history" tab="流转记录">
                     <FlowHistory :info="info" />
                 </j-tab-pane>
             </j-tabs>
