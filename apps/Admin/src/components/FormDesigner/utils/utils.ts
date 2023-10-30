@@ -566,7 +566,7 @@ export const getFieldData = (data: ISchema) => {
     let _obj: any = {}
     if (data?.formItemProps?.name) {
         if (data.type === 'table') {
-            _obj[data?.formItemProps?.name] = []
+            _obj[data?.formItemProps?.name] = null // 19208
         } else if (data.type === 'switch') {
             _obj[data?.formItemProps?.name] = obj || false
         } else if (['org', 'role', 'user', 'product', 'device'].includes(data.type)) {

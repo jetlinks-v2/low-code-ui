@@ -169,7 +169,7 @@ export default defineComponent({
                         <TypeComponent
                             {..._props?.componentProps}
                             checked={__value.value}
-                            onUpdate: checked={(newValue) => {
+                            onUpdate:checked={(newValue) => {
                                 set(designer.formState, _path1, newValue)
                             }}
                             onChange={onChange}
@@ -178,7 +178,7 @@ export default defineComponent({
                             options={unref(options)}
                             treeData={unref(treeData)}
                             value={__value.value}
-                            onUpdate: value={(newValue) => {
+                            onUpdate:value={(newValue) => {
                                 set(designer.formState, _path1, newValue)
                             }}
                             onChange={onChange}

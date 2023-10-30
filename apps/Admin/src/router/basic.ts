@@ -2,21 +2,20 @@ import { RouteRecordItem } from '@jetlinks/types'
 import { BasicLayoutPage } from '@/layout'
 
 export const BASIC_ROUTER_DATA: any[] = [
+  // {
+  //   code: 'delivery',
+  //   name: 'WEB IDE',
+  //   url: '/delivery',
+  //   redirect: '/delivery/center',
+  //   children: [
+  //
+  //     },
+  //   ]
+  // },
   {
-    code: 'delivery',
+    code: 'center',
     name: 'WEB IDE',
-    url: '/delivery',
-    redirect: '/delivery/center',
-    children: [
-      {
-        code: 'center',
-        name: '',
-        url: '/delivery/center',
-        meta: {
-          hideInMenu: true
-        }
-      },
-    ]
+    url: '/delivery/center',
   },
   {
     code: 'engine',

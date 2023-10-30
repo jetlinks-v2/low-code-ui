@@ -273,8 +273,8 @@ watchEffect(() => {
 
       .item-state {
         position: absolute;
-        top: 30px;
-        right: -20px;
+        top: -24px;
+        right: -26px;
         display: flex;
         justify-content: center;
         width: 110px;
