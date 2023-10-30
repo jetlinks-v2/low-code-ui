@@ -5,7 +5,7 @@
         <div class="spin" v-if="spinning">
           <j-spin :spinning="spinning" />
         </div>
-        <j-row v-else>
+        <j-row :gutter="[16, 16]" v-else>
           <j-col :span="12">
             <div class="form">
               <j-form ref="formRef" :model="tableData" autocomplete="off">
@@ -306,7 +306,7 @@ const handleData = (data: any, model: string) => {
 
     //详情接口nodeId
     const bindMap = new Map()
-    Object.keys(obj.nodes.props.formBinds).forEach((item) => {
+    Object.keys(obj.nodes.props.formBinds || {}).forEach((item) => {
       bindMap.set(
         editDraft.value ? md5(item + '|' + formVersion[item]) : item,
         obj.nodes.props.formBinds[item],
@@ -334,6 +334,7 @@ const handleData = (data: any, model: string) => {
       }
     })
   } catch (error) {
+    // console.error(`output->error`,error)
   } finally {
     spinning.value = false
   }
@@ -344,6 +345,7 @@ const handleData = (data: any, model: string) => {
  */
 const getProcess = () => {
   getList_api({
+    paging: false,
     terms: [
       {
         type: 'and',
@@ -353,7 +355,7 @@ const getProcess = () => {
       },
     ],
   }).then((res) => {
-    const data = res.result.data[0]
+    const data = res.result[0]
     handleData(data, data.model)
   })
 }

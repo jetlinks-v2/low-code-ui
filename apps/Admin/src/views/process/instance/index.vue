@@ -1,7 +1,7 @@
 <!-- 流程实例 -->
 <template>
   <page-container>
-    <pro-search :columns="columns" target="code" @search="handleSearch" />
+    <pro-search :columns="columns" target="instance" @search="handleSearch" />
     <JProTable
       ref="tableRef"
       :columns="columns"
