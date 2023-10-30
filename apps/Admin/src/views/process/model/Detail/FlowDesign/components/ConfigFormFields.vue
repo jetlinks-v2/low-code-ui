@@ -32,7 +32,7 @@
         <j-input
           v-model:value="keywords"
           @keyup.enter="handleSearch"
-          placeholder="请输入表单名称"
+          placeholder="搜索字段名称"
         >
           <template #suffix>
             <AIcon type="SearchOutlined" />

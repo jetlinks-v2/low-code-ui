@@ -143,19 +143,31 @@ export function handleArrToObj(arr: string[] = []) {
 }
 
 /**
- * 前端筛选表单名称/字段名称/字段标识
+ * 前端筛选字段名称
  * @param list 
  * @param name 
  * @returns 
  */
 export function filterFormByName(list, name) {
-    console.log('list: ', list);
-    return list?.filter(item => {
-        // if (item.configuration) {
-        //     item.configuration.children = filterFormByName(item.configuration.children, name)
-        // }
-        return item.formName.includes(name)
+    // console.log('list: ', list);
+    const _res = []
+    list?.forEach(item => {
+        const _fields = item.fullInfo?.configuration?.children || []
+        const _filterFields = _fields.filter(f => f.formItemProps.label.includes(name))
+        if (_filterFields.length) {
+            _res.push({
+                ...item,
+                fullInfo: {
+                    ...item.fullInfo,
+                    configuration: {
+                        ...item.fullInfo.configuration,
+                        children: _filterFields
+                    }
+                }
+            })
+        }
     })
+    return _res
 }
 
 /**
