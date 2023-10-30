@@ -11,10 +11,10 @@
         sorts: [{ name: 'createTime', order: 'desc' }],
         terms: [
           {
-            value: 'true',
+            value: true,
             termType: 'eq',
+            type: 'and',
             column: 'latest',
-            type: 'and'
           },
         ],
       }"

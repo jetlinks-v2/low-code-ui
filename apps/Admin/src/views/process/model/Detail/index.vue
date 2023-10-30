@@ -24,15 +24,8 @@
         </div>
 
         <div class="btn">
-          <j-button :disabled="current === 0" @click="current--"
-            >上一步</j-button
-          >
-          <j-button
-            :disabled="current === 2"
-            @click="handleNext"
-            :loading="nextLoading"
-            >下一步</j-button
-          >
+          <j-button :disabled="current === 0" @click="current--">上一步</j-button>
+          <j-button :disabled="current === 2" @click="handleNext" :loading="nextLoading">下一步</j-button>
           <j-button type="primary" @click="handleSave" :loading="saveLoading">
             保存
             <template #icon>
@@ -79,6 +72,7 @@ import ShowCopy from './ShowCopy/index.vue'
 import { detail_api, update_api, deploy_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { onlyMessage } from '@jetlinks/utils'
+import { Modal } from 'ant-design-vue'
 
 const flowStore = useFlowStore()
 const route = useRoute()
@@ -225,6 +219,43 @@ const saveAndDeploy = () => {
 onMounted(() => {
   getFlowDetail()
 })
+
+//离开路由改变路由
+const routerChange = (next?:Function)=>{
+  const modal = Modal.confirm({
+    content: '页面改动数据未保存',
+      okText: '保存',
+      cancelText: '不保存',
+      zIndex: 1400,
+      closable: true,
+      onOk: () => {
+        const params = {
+          id: route.query.id,
+          state: 'undeployed',
+          model: JSON.stringify(flowStore.model),
+        }
+        update_api(params).then((res)=>{
+          if(res.status === 200){
+            onlyMessage('保存成功')
+            modal.destroy();
+            (next as Function)?.()
+          }
+        })
+      },
+      onCancel: (e: any) => {
+        modal.destroy();
+        (next as Function)?.()
+      }
+  })
+}
+
+onBeforeRouteLeave((to, form, next) => {
+  routerChange(next)
+})
+onBeforeRouteUpdate((to, from, next)=>{
+  routerChange(next)
+})
+
 </script>
 
 <style lang="less" scoped>
@@ -232,9 +263,11 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   gap: 40px;
+
   .step {
     flex: 1;
   }
+
   .btn {
     width: 350px;
     display: flex;
@@ -242,6 +275,7 @@ onMounted(() => {
     gap: 10px;
   }
 }
+
 .validate-box {
   width: 0;
   height: 0;

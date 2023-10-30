@@ -25,9 +25,10 @@ const queryDetail = (id) => {
 }
 
 const onSave = (dt: any) => {
+  const obj = dt?.children?.length ? dt : {}
     _update({
-        ...omit(data.value, ['id', 'createTime', 'creatorId', 'creatorName', 'modifierId', 'modifyTime']),
-        configuration: dt
+        ...omit(data.value, ['id', 'creatorId', 'creatorName', 'modifierId', 'modifyTime']),
+        configuration: obj
     }).then(resp => {
         if(resp.success){
             onlyMessage('操作成功！')
