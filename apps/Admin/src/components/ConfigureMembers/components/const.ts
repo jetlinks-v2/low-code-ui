@@ -5,7 +5,7 @@ export const defaultColumns = (key: string, isNode: boolean) => {
       dataIndex: 'name',
       key: 'name',
       ellipsis: true,
-      width: 120,
+      // width: 120,
     },
     {
       title: '权重',

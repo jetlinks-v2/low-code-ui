@@ -20,6 +20,7 @@
                   <TableFormPreview
                     v-else
                     v-model:data-source="tableData[item.formId]"
+                    :hasRules="true"
                     :columns="
                       getTableColumns(
                         item.fullInfo?.configuration?.children,

@@ -132,9 +132,9 @@
                   :min="1"
                   :max="99"
                   :precision="0"
-                  :controls="false"
                   v-model:value="record[column.dataIndex]"
                   style="margin: -5px 0"
+                  :parser="(num)=>!num ? 1 : Number(num)"
                 />
               </div>
               <!-- :bordered="bordered"
