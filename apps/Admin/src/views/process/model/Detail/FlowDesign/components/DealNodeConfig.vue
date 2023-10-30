@@ -42,7 +42,10 @@
             <j-form-item
               label="请选择可参与办理的候选成员"
               name="candidates"
-              :rules="[{ required: true, message: '请选择成员' }]"
+              :rules="[
+                { required: true, message: '请选择成员' },
+                { validator: isSelectMember, trigger: 'change' },
+              ]"
             >
               <ConfigureMembers
                 v-model:members="memberFormData.candidates"
@@ -71,6 +74,7 @@
                 :min="1"
                 :max="99999"
                 v-model:value="memberFormData.completeWeight"
+                :precision="0"
                 style="width: 100%"
               />
             </j-form-item>
@@ -87,6 +91,7 @@
               <j-checkbox-group
                 v-model:value="memberFormData.authButtons"
                 :options="allButtons"
+                disabled
               />
             </j-form-item>
             <j-form-item
@@ -110,7 +115,7 @@
 
 <script setup lang="ts">
 import ConfigFormFields from './ConfigFormFields.vue'
-import { findNodeById } from './utils'
+import { findNodeById, setDefaultFormBinds, isSelectMember } from './utils'
 import { useFlowStore } from '@/store/flow'
 import { onlyMessage } from '@jetlinks/utils'
 
@@ -126,7 +131,9 @@ const props = defineProps({
 // 基础配置
 const basicFormRef = ref()
 const basicFormData = reactive({
-  formBinds: props.node?.props?.formBinds || {},
+  formBinds:
+    props.node?.props?.formBinds ||
+    setDefaultFormBinds(flowStore.model.config?.forms),
 })
 const collapseActive = ref(['1', '2', '3'])
 
@@ -147,7 +154,7 @@ const nodeList = ref([
 
 const handleSwitchChange = () => {
   const child = flowStore.selectedNode.children
-  if (!Object.keys(child).length || child.type !== 'APPROVAL') {
+  if (!child || !Object.keys(child).length || child.type !== 'APPROVAL') {
     onlyMessage('下一节点为审批节点时可配置', 'warning')
     memberFormData.freeChoiceUser = undefined
   }
