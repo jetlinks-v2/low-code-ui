@@ -289,6 +289,7 @@ const getTableColumns = (fields: any[]) => {
     title: m.formItemProps?.label,
     dataIndex: m.formItemProps?.name,
     ellipsis: true,
+    width: 200,
     ...m,
   }))
 
