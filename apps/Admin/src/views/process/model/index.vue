@@ -1,7 +1,7 @@
 <!-- 流程模型 -->
 <template>
   <page-container>
-    <pro-search :columns="columns" target="code" @search="handleSearch" />
+    <pro-search :columns="columns" target="model" @search="handleSearch" />
     <JProTable
       ref="tableRef"
       :columns="columns"

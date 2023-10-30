@@ -1,5 +1,5 @@
 import { BasicLayoutPage, BlankLayoutPage, Iframe } from '@/layout'
-import { shallowRef } from 'vue'
+import { shallowRef, h, defineAsyncComponent } from 'vue'
 
 type Buttons = Array<{ id: string }>
 
@@ -38,7 +38,13 @@ const handleMeta = (item: MenuItem, isApp: boolean) => {
 const findComponents = (code: string, level: number, isApp: boolean, components: any) => {
     const myComponents = components[code]
     if (level === 1) { // BasicLayoutPage
-      return myComponents ? () => myComponents() : shallowRef(BasicLayoutPage)
+      if (myComponents) {
+        return h(BasicLayoutPage, {}, () => [h(defineAsyncComponent(() => myComponents()), {})])
+      }
+      if (isApp) {
+        return h(BasicLayoutPage, {}, () => [h(Iframe, {})])
+      }
+      return shallowRef(BasicLayoutPage)
     } else if (level === 2) { // BlankLayoutPage or components
       return myComponents ? () => myComponents() : BlankLayoutPage
     } else if (isApp){ // iframe

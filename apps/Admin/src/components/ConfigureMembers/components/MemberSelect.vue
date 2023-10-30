@@ -205,7 +205,7 @@ const selectedKeys = ref<string[]>([])
 const dataSource = ref<DataSourceProps[]>([])
 
 const columns = computed(() => {
-  const _columns = defaultColumns(props.type)
+  const _columns = defaultColumns(props.type, infoState.isNode)
   return infoState.hasWeight
     ? _columns
     : _columns.filter((item) => item.key !== 'weight')
@@ -406,6 +406,7 @@ watch(
 watch(
   () => [props.type, infoState.members],
   () => {
+    if(!infoState.isNode) return
     dataSource.value = infoState.members.value.filter(
       (i) => i.type === props.type,
     )
@@ -413,6 +414,13 @@ watch(
   },
   { immediate: true },
 )
+
+watch(() => infoState.members, (val) => {
+  if(!infoState.isNode){
+    dataSource.value = [...val.value]
+    selectedKeys.value = dataSource.value.map((item) => item.id)
+  }
+}, { immediate: true })
 
 defineExpose({
   dataSource,
@@ -544,8 +552,9 @@ defineExpose({
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        max-width: 100%;
+        width: 100%;
         .name-text {
+          width: 90%;
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;

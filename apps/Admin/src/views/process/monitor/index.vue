@@ -9,7 +9,7 @@
         </j-space>
       </j-radio-group>
     </div>
-    <pro-search :columns="columns" target="code" @search="handleSearch" />
+    <pro-search :columns="columns" target="monitor" @search="handleSearch" />
     <JProTable
       ref="tableRef"
       model="table"
@@ -97,7 +97,7 @@ import Drawer from '@/views/process/me/Detail/index.vue'
 const { classified, getText } = useClassified()
 const tableRef = ref()
 const history = ref(false)
-const columns = [
+const columns = computed(()=>[
   {
     title: '流程分类',
     dataIndex: 'classifiedId',
@@ -142,19 +142,20 @@ const columns = [
     key: 'state',
     ellipsis: true,
     scopedSlots: true,
-    search: {
-      type: 'select',
-      componentProps: {
-        placeholder: '请选择状态',
-      },
-      options: [
-        { label: '已准备', value: 'ready' },
-        { label: '运行中', value: 'running' },
-        { label: '已完成', value: 'completed' },
-        { label: '已驳回', value: 'rejected' },
-        { label: '已撤销', value: 'repealed' },
-      ],
-    },
+    hideInTable: !history.value,
+    // search: {
+    //   type: 'select',
+    //   componentProps: {
+    //     placeholder: '请选择状态',
+    //   },
+    //   options: [
+    //     { label: '已准备', value: 'ready' },
+    //     { label: '运行中', value: 'running' },
+    //     { label: '已完成', value: 'completed' },
+    //     { label: '已驳回', value: 'rejected' },
+    //     { label: '已撤销', value: 'repealed' },
+    //   ],
+    // },
   },
   {
     title: '发起人',
@@ -163,8 +164,9 @@ const columns = [
     ellipsis: true,
     search: {
       type: 'select',
+      rename: 'creatorId',
       componentProps: {
-        placeholder: '请输入发起人',
+        placeholder: '请选择发起人',
       },
       options: async () => {
         const resp = await getList_api({
@@ -196,21 +198,11 @@ const columns = [
     },
   },
   {
-    title: '结束时间',
-    dataIndex: 'endTime',
-    key: 'endTime',
-    ellipsis: true,
-    scopedSlots: true,
-    search: {
-      type: 'date',
-    },
-  },
-  {
     title: '操作',
     key: 'action',
     scopedSlots: true,
   },
-]
+])
 
 const params = ref({})
 
