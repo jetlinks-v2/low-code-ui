@@ -26,7 +26,7 @@ const queryDetail = (id) => {
 
 const onSave = (dt: any) => {
     _update({
-        ...omit(data.value, ['id', 'createTime', 'creatorId', 'creatorName', 'modifierId', 'modifyTime']),
+        ...omit(data.value, ['id', 'creatorId', 'creatorName', 'modifierId', 'modifyTime']),
         configuration: dt
     }).then(resp => {
         if(resp.success){
