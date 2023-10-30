@@ -1,7 +1,7 @@
 <!-- 流程实例 -->
 <template>
   <page-container>
-    <pro-search :columns="columns" target="code" @search="handleSearch" />
+    <pro-search :columns="columns" target="instance" @search="handleSearch" />
     <JProTable
       ref="tableRef"
       :columns="columns"
@@ -21,9 +21,6 @@
           :preview="false"
         />
         <AIcon v-else :type="icon" :style="{ fontSize: '40px' }" />
-      </template>
-      <template #classifiedId="{ classifiedId }">
-        {{ getText(classifiedId) }}
       </template>
       <template #state="{ state }">
         <BadgeStatus
@@ -72,7 +69,7 @@
               <div class="title">
                 <div class="classification">
                   <j-ellipsis style="max-width: 200px">
-                    {{ getText(record.classifiedId) }}
+                    {{ record.classifiedName }}
                   </j-ellipsis>
                 </div>
                 <div class="card-content">
@@ -158,7 +155,7 @@ import { getList_api, del_api, updateState_api } from '@/api/process/instance'
 import { useClassified } from '@/hooks/useClassified'
 import { isImg } from '@/utils/comm'
 
-const { classified, getText } = useClassified()
+const { classified } = useClassified()
 const tableRef = ref()
 const columns = [
   {
@@ -182,12 +179,13 @@ const columns = [
   },
   {
     title: '流程分类',
-    dataIndex: 'classifiedId',
-    key: 'classifiedId',
+    dataIndex: 'classifiedName',
+    key: 'classifiedName',
     ellipsis: true,
     scopedSlots: true,
     search: {
       type: 'select',
+      rename: 'classifiedId',
       componentProps: {
         placeholder: '请选择流程分类',
       },

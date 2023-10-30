@@ -54,9 +54,9 @@ const router = useRouter()
 const data = reactive({})
 const loading = ref(true)
 getList_api({
-  paging: false,
+  paging: false
 }).then((res) => {
-  Object.assign(data, groupBy(res.result.data, 'classifiedId'))
+  Object.assign(data, groupBy(res.result, 'classifiedId'))
   loading.value = false
 })
 

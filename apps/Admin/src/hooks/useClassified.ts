@@ -9,7 +9,7 @@ export function useClassified() {
       return res.result.map((item) => {
         map.value.set(item.id, item)
         return {
-          label: item.text,
+          label: item.value,
           value: item.id,
         }
       })
@@ -17,7 +17,7 @@ export function useClassified() {
   })
 
   const getText = (key: string | undefined) => {
-    return map.value.get(key)?.text
+    return map.value.get(key)?.value
   }
   return {
     classified,

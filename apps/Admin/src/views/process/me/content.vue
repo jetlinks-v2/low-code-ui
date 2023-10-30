@@ -253,7 +253,7 @@ const columnsFinished = [
         search: {
             type: 'select',
             options: [
-                { label: '运行中', value: 'running ' },
+                // { label: '审办中', value: 'running ' },
                 { label: '已完成', value: 'completed' },
                 { label: '已驳回', value: 'rejected' },
                 { label: '已撤销', value: 'repealed' },
@@ -353,7 +353,7 @@ const columnsInitiate = [
         search: {
             type: 'select',
             options: [
-                { label: '运行中', value: 'running ' },
+                // { label: '审办中', value: 'running ' },
                 { label: '已完成', value: 'completed' },
                 { label: '已驳回', value: 'rejected' },
                 { label: '已撤销', value: 'repealed' },
@@ -457,7 +457,7 @@ const columnsCc = [
         search: {
             type: 'select',
             options: [
-                { label: '运行中', value: 'running ' },
+                // { label: '审办中', value: 'running ' },
                 { label: '已完成', value: 'completed' },
                 { label: '已驳回', value: 'rejected' },
                 { label: '已撤销', value: 'repealed' },
@@ -553,11 +553,13 @@ const columns = computed(() => {
     if (props.type === 'todo') {
         return columnsTodo
     } else if (props.type === 'finished') {
-        return columnsFinished
+        return props.activeKey === "running" ? columnsFinished.filter(item => item.dataIndex !== 'state') : columnsFinished
     } else if (props.type === 'initiate') {
-        return props.activeKey === 'draft' ? columnDraft : columnsInitiate
+        return props.activeKey === 'draft'? columnDraft :
+            props.activeKey === "running" ? columnsInitiate.filter(item => item.dataIndex !== 'state'): columnsInitiate
+
     } else {
-        return columnsCc
+        return props.activeKey === "running" ? columnsCc.filter(item => item.dataIndex !== 'state') : columnsCc
     }
 })
 
@@ -750,12 +752,12 @@ const onSave = (item) => {
     visible.value = true
 }
 
-const onDraft = (record)=>{
+const onDraft = (record) => {
     router.push({
-        path:'/flow-engine/initiate/initiate-detail',
+        path: '/flow-engine/initiate/initiate-detail',
         query: {
-        id: record.id,
-        isDraft: true,
+            id: record.id,
+            isDraft: true,
         }
     })
 }
@@ -781,10 +783,11 @@ const _query = (e) => {
     return getMeProcessList(item, props.type, props.history)
 }
 
-const getUser = async () => {
-    const res = await getInitiatorList({})
+const getUser = async (type) => {
+    const res = await getInitiatorList(type,props.history,{
+        paging:false
+    })
     if (res.status === 200) {
-
         options.value = res.result.map(item => ({
             label: item.creatorName,
             value: item.creatorId,
@@ -792,13 +795,18 @@ const getUser = async () => {
     }
 }
 
-onMounted(() => {
-    getUser()
-})
+
+watch(
+    ()=>props.type,
+    ()=>{
+        getUser(props.type)
+    }
+)
 
 watch(
     () => props.activeKey,
     () => {
+        getUser(props.type)
         tableRef?.value?.reload()
     }
 )

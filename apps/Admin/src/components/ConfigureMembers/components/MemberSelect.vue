@@ -20,7 +20,10 @@
           >
             <j-space>
               <div class="icon">
-                <AIcon v-if="item.key === 'var' || item.key === 'relation'" :type="iconType[item.key]" />
+                <AIcon
+                  v-if="item.key === 'var' || item.key === 'relation'"
+                  :type="iconType[item.key]"
+                />
                 <AIcon v-else :type="iconType['fixed']" />
               </div>
               <div class="text">
@@ -57,12 +60,11 @@
               title: 'name',
               key: 'id',
             }"
-            :height="showSearch && active === type ? 294 : 333"
             @select="onSelect"
           >
             <template #title="data">
               <j-ellipsis>
-                <span>
+                <span style="margin-right: 80px;">
                   {{ data.name }}
                 </span>
               </j-ellipsis>
@@ -117,9 +119,11 @@
                     background: dimensionsColor[record.groupField],
                   }"
                 ></div>
-                <div class="name-text">
-                  {{ text }}
-                </div>
+                <j-tooltip :title="text">
+                  <div class="name-text">
+                    {{ text }}
+                  </div>
+                </j-tooltip>
               </div>
             </template>
             <template v-if="column.key === 'weight'">
@@ -201,7 +205,7 @@ const selectedKeys = ref<string[]>([])
 const dataSource = ref<DataSourceProps[]>([])
 
 const columns = computed(() => {
-  const _columns = defaultColumns(props.type)
+  const _columns = defaultColumns(props.type, infoState.isNode)
   return infoState.hasWeight
     ? _columns
     : _columns.filter((item) => item.key !== 'weight')
@@ -402,6 +406,7 @@ watch(
 watch(
   () => [props.type, infoState.members],
   () => {
+    if(!infoState.isNode) return
     dataSource.value = infoState.members.value.filter(
       (i) => i.type === props.type,
     )
@@ -409,6 +414,13 @@ watch(
   },
   { immediate: true },
 )
+
+watch(() => infoState.members, (val) => {
+  if(!infoState.isNode){
+    dataSource.value = [...val.value]
+    selectedKeys.value = dataSource.value.map((item) => item.id)
+  }
+}, { immediate: true })
 
 defineExpose({
   dataSource,
@@ -427,7 +439,7 @@ defineExpose({
     .radio {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       width: 248px;
       .ant-radio-button-wrapper {
         display: flex;
@@ -483,10 +495,14 @@ defineExpose({
   }
 
   .content-center {
-    width: 60%;
-    min-width: 200px;
+    // width: 60%;
+    width: 472px;
+    height: 366px;
+    overflow: auto;
+    // min-width: 200px;
+    border: 1px solid #e0e0e0;
     .center-tree {
-      border: 1px solid #e0e0e0;
+
       padding: 16px 27px 16px 13px;
       height: 100%;
       :deep(.ant-tree) {
@@ -496,6 +512,7 @@ defineExpose({
         }
         .ant-tree-title {
           line-height: 32px;
+          // margin-right: 80px;
           &:hover {
             color: #315efb;
           }
@@ -507,7 +524,9 @@ defineExpose({
   .content-right {
     border: 1px solid #e0e0e0;
     border-left: none;
-    width: 40%;
+    // width: 40%;
+    width: 306px;
+    height: 366px;
     .right-top {
       display: inline-flex;
       justify-content: space-between;
@@ -533,8 +552,9 @@ defineExpose({
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        max-width: 100%;
+        width: 100%;
         .name-text {
+          width: 90%;
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
