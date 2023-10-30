@@ -163,6 +163,14 @@ const columnsTodo = [
         key: 'creatorName',
         ellipsis: true,
         scopedSlots: true,
+    },
+    {
+        title: '发起人',
+        dataIndex: 'creatorId',
+        key: 'creatorId',
+        ellipsis: true,
+        scopedSlots: true,
+        hideInTable:true,
         search: {
             type: 'select',
             options: options,
@@ -240,6 +248,14 @@ const columnsFinished = [
         key: 'creatorName',
         ellipsis: true,
         scopedSlots: true,
+    },
+    {
+        title: '发起人',
+        dataIndex: 'creatorId',
+        key: 'creatorId',
+        ellipsis: true,
+        scopedSlots: true,
+        hideInTable:true,
         search: {
             type: 'select',
             options: options,
@@ -444,6 +460,14 @@ const columnsCc = [
         key: 'creatorName',
         ellipsis: true,
         scopedSlots: true,
+    },
+    {
+        title: '发起人',
+        dataIndex: 'creatorId',
+        key: 'creatorId',
+        ellipsis: true,
+        scopedSlots: true,
+        hideInTable:true,
         search: {
             type: 'select',
             options: options,
