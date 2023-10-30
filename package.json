@@ -10,7 +10,7 @@
     "clean": "pnpm turbo run clean && rimraf node_modules",
     "changeset": "changeset",
     "version": "pnpm run changeset version",
-    "release:only": "changeset publish --registry=https://registry.jetlinks.cn/"
+    "release:only": "changeset publish --registry=https://registry.npmmirror.com/"
   },
   "devDependencies": {
     "@jetlinks/lint": "workspace:^",
