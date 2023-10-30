@@ -53,7 +53,9 @@ const { getText } = useClassified()
 const router = useRouter()
 const data = reactive({})
 const loading = ref(true)
-getList_api({}).then((res) => {
+getList_api({
+  paging: false
+}).then((res) => {
   Object.assign(data, groupBy(res.result, 'classifiedId'))
   loading.value = false
 })
