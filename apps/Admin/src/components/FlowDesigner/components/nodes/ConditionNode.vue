@@ -103,7 +103,7 @@ const ValueType = ref({
   dateRange: 'DateRange',
 })
 const groupNames = ref(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'])
-const placeholder = ref('请设置条件')
+const placeholder = ref('请配置条件')
 const errorInfo = ref('')
 const showError = ref(false)
 
@@ -113,7 +113,7 @@ const content = computed(() => {
   //   console.log('terms: ', terms)
   // 条件描述
   const _conditionDesc = terms.map(
-    (item) => `${item.columnName}${item.termTypeName}${item.value}`,
+    (item) => `${item.columnName || ''}${item.termTypeName || ''}${item.value || ''}`,
   )
   return _conditionDesc.length
     ? String(_conditionDesc).replaceAll(',', '、')
@@ -128,7 +128,7 @@ const validate = (err) => {
 
   showError.value = true
   errorInfo.value = '未填写必填配置项'
-  if (!terms || !terms.length) {
+  if (!terms || !terms.length || !terms.some(item => Boolean(Object.keys(item).length))) {
     err.push({
       errors: ['请配置进入下方节点的条件'],
       name: ['condition', 'configuration', 'terms'],
