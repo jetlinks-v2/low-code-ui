@@ -138,6 +138,7 @@ const props = defineProps({
   valueFormat: String,
   action: [String, Promise],
   headers: Object,
+  disabled:Boolean
 })
 
 const typeMap = new Map(Object.entries(componentsType))

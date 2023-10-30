@@ -27,14 +27,17 @@ const LicenseModal = () => {
 export const initPackages = async () => {
   // 初始化axios,获取环境变量中的代理标识
   const _initRequest = async () => {
-    await initRequest(() => ({
+    initRequest(() => ({
       errorHandler(error) { // 自定义请求错误处理
-        if (error.response) {
-          const { data } = error.response.data as any
-          if (data?.code === 'license required') {
-            LicenseModal()
-          }
-        }
+        // if (error.response) {
+        //   const { data } = error.response.data as any
+        //   if (data?.code === 'license required') {
+        //     LicenseModal()
+        //   }
+        // }
+      },
+      exit() {
+        window.parent.postMessage({ token: 'LOSE' }, '*')
       }
     }))
   }

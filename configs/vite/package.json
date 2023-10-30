@@ -40,7 +40,7 @@
     "vue": "^3.3.4"
   },
   "dependencies": {
-    "ant-design-vue": "^3.2.20",
-    "jetlinks-ui-components": "^1.0.26"
+    "ant-design-vue": "^3.2.15",
+    "jetlinks-ui-components": "^1.0.33"
   }
 }

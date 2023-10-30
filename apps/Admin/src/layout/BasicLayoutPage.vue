@@ -8,6 +8,7 @@
     :pure="state.pure"
   >
     <template #breadcrumbRender="slotProps">
+      {{ slotProps.route.breadcrumbName }}
       <a v-if="slotProps.route.index !== 0 && !slotProps.route.isLast" @click="() => jumpPage(slotProps.route)" >
         {{ slotProps.route.breadcrumbName }}
       </a>
@@ -20,10 +21,11 @@
         <User />
       </div>
     </template>
-
+    <slot>
       <router-view v-slot="{ Component }">
         <component :is="components || Component" />
       </router-view>
+    </slot>
   </j-pro-layout>
 </template>
 
@@ -61,6 +63,7 @@ const components = computed(() => {
 
 const config = computed(() => ({
   ...layout.value,
+  title: 'Jetlinks Code',
   theme: theme.value,
   menuData: menuStore.siderMenus,
   splitMenus: layout.value.layout === 'mix'
@@ -79,7 +82,7 @@ const state = reactive<StateType>({
 const breadcrumb = computed(() =>
   {
     const paths = router.currentRoute.value.matched
-    return paths.map((item, index) => {
+    const breadcrumbs = paths.filter(item => (item.meta as any).title).map((item, index) => {
       return {
         index,
         isLast: index === (paths.length -1),
@@ -87,6 +90,8 @@ const breadcrumb = computed(() =>
         breadcrumbName: (item.meta as any).title || '',
       }
     })
+    console.log('breadcrumbs',breadcrumbs)
+    return breadcrumbs
   }
 );
 

@@ -4,7 +4,8 @@ export let context: ContextOptions = {
     filterUrl: [],
     handleRequest: undefined,
     handleResponse: undefined,
-    errorHandler: undefined
+    errorHandler: undefined,
+    exit: undefined
 }
 
 export const initRequest = (func: () => ContextOptions) => {

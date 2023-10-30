@@ -84,7 +84,7 @@ function createWebSocket() {
   }
 
   if (!ws) {
-    console.log(webSocketUrl)
+    // console.log(webSocketUrl)
     ws = new WebSocket(webSocketUrl)
 
     ws.onopen = () => {

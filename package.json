@@ -10,7 +10,7 @@
     "clean": "pnpm turbo run clean && rimraf node_modules",
     "changeset": "changeset",
     "version": "pnpm run changeset version",
-    "release:only": "changeset publish --registry=http://registry.jetlinks.cn/"
+    "release:only": "changeset publish --registry=https://registry.npmmirror.com/"
   },
   "devDependencies": {
     "@jetlinks/lint": "workspace:^",
@@ -34,7 +34,11 @@
   "dependencies": {
     "@changesets/cli": "^2.26.2",
     "@jetlinks/utils": "workspace:^",
-    "jetlinks-ui-components": "^1.0.27",
-    "lodash-es": "^4.17.21"
+    "async-validator": "^4.2.5",
+    "latest": "^0.2.0",
+    "lodash-es": "^4.17.21",
+    "pinia-plugin-persistedstate": "^3.2.0",
+    "pubsub-js": "^1.9.4",
+    "vuedraggable": "^4.1.0"
   }
 }

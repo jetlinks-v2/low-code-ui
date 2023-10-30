@@ -1,0 +1,237 @@
+import { ISchema } from "../typings";
+
+// 基础组件
+export const basic: ISchema[] = [
+    {
+        type: 'input',
+        name: '文本框',
+    },
+    {
+        type: 'text',
+        name: '文本',
+        componentProps: {
+            value: '文本'
+        },
+    },
+    {
+        type: 'textarea',
+        name: '文本域',
+    },
+    {
+        type: 'input-number',
+        name: '数字输入',
+    },
+    {
+        type: 'select-card',
+        name: '选项',
+        componentProps: {
+            options: [
+                {
+                    value: '1',
+                    label: '选项1'
+                },
+                {
+                    value: '2',
+                    label: '选项2'
+                }
+            ],
+            showImage: false
+        },
+    },
+    {
+        type: 'input-password',
+        name: '密码框',
+    },
+    {
+        type: 'upload',
+        name: '上传',
+    },
+    {
+        type: 'switch',
+        name: '开关',
+    },
+    {
+        type: 'form',
+        name: '内嵌表单',
+    },
+    {
+        type: 'select',
+        name: '下拉框',
+    },
+    {
+        type: 'tree-select',
+        name: '树选择',
+    },
+    // {
+    //     type: 'tree',
+    //     name: '左侧树',
+    // },
+    {
+        type: 'date-picker',
+        name: '日期选择',
+    },
+    // {
+    //     type: 'range-picker',
+    //     name: '日期范围',
+    // },
+    {
+        type: 'time-picker',
+        name: '时间选择',
+    },
+    // {
+    //     type: 'time-range-picker',
+    //     name: '时间范围',
+    // },
+    {
+        type: 'table',
+        name: '表格',
+        componentProps: {
+            align: 'left'
+        },
+        children: []
+    },
+]
+
+export const layout: ISchema[] = [
+    {
+        type: 'card',
+        name: '卡片',
+        componentProps: {
+            title: 'Title',
+            extra: ''
+        },
+        formItemProps: {
+            isLayout: false
+        },
+        children: [
+            {
+                type: 'card-item',
+                children: [],
+            },
+        ]
+    },
+    {
+        type: 'grid',
+        name: '网格布局',
+        componentProps: {
+            inlineMax: 10,
+            rowSpan: 5,
+            colSpan: 10
+        },
+        children: [
+            {
+                componentProps: {
+                    span: 1,
+                },
+                type: 'grid-item',
+                children: []
+            },
+            {
+                componentProps: {
+                    span: 1,
+                },
+                type: 'grid-item',
+                children: []
+            },
+            {
+                componentProps: {
+                    span: 1,
+                },
+                type: 'grid-item',
+                children: []
+            },
+            {
+                componentProps: {
+                    span: 1,
+                },
+                type: 'grid-item',
+                children: []
+            },
+        ]
+    },
+    {
+        type: 'tabs',
+        name: '选项卡',
+        children: [],
+        formItemProps: {
+            isLayout: false
+        },
+        componentProps: {
+            type: 'line',
+            tabPosition: 'top',
+            align: 'top',
+            hidden: false
+        }
+    },
+    {
+        type: 'collapse',
+        name: '折叠面板',
+        icon: 'CopyOutlined',
+        children: [],
+        formItemProps: {
+            isLayout: false
+        },
+        componentProps: {}
+    },
+    {
+        type: 'space',
+        name: '弹性间距',
+        children: [],
+        componentProps: {
+            align: 'start',
+            direction: 'horizontal',
+            size: 8
+        }
+    },
+]
+// 高级组件
+export const pro: ISchema[] = [
+    {
+        type: 'org',
+        name: '组织选择',
+    },
+    {
+        type: 'user',
+        name: '用户选择',
+    },
+    {
+        type: 'role',
+        name: '角色选择',
+    },
+    // { // 需求未定
+    //     type: 'geo',
+    //     name: '地区',
+    // },
+]
+
+const iot: ISchema[] = [
+    {
+        type: 'product',
+        name: '产品选择',
+    },
+    {
+        type: 'device',
+        name: '设备选择',
+    }
+]
+export const filedData = [
+    {
+        id: 'basic',
+        name: '基础组件',
+        children: [...basic]
+    },
+    {
+        id: 'layout',
+        name: '布局组件',
+        children: [...layout]
+    },
+    {
+        id: 'pro',
+        name: '高级组件',
+        children: [...pro]
+    },{
+        id: 'iot',
+        name: 'iot组件',
+        children: [...iot]
+    }
+]
