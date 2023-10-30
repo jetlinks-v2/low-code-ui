@@ -2,14 +2,15 @@
 <template>
   <j-button class="btn" block @click="visible = true">
     <span>配置表单内容</span>
-    <span class="icon">
+    <!-- <span class="icon">
       <img :src="getImage('/members/check.png')" />
-    </span>
+    </span> -->
   </j-button>
   <!-- <div v-for="(fields, index) in forms" :key="index">
     <div v-for="(field, idx) in fields">{{ field }}</div>
   </div> -->
   <j-modal
+    :maskClosable="false"
     v-model:visible="visible"
     width="900px"
     @ok="handleOk"

@@ -28,9 +28,6 @@
         />
         <AIcon v-else :type="icon" :style="{ fontSize: '40px' }" />
       </template>
-      <template #classifiedId="{ classifiedId }">
-        {{ getText(classifiedId) }}
-      </template>
       <template #state="{ state }">
         <BadgeStatus
           :status="state.value"
@@ -79,7 +76,7 @@
               <div class="title">
                 <div class="classification">
                   <j-ellipsis style="max-width: 200px">
-                    {{ getText(record.classifiedId) }}
+                    {{ record.classifiedName }}
                   </j-ellipsis>
                 </div>
                 <div class="card-content">
@@ -150,7 +147,7 @@ import { getProcess_api, deploy_api, del_api } from '@/api/process/model'
 import { useClassified } from '@/hooks/useClassified'
 import { isImg } from '@/utils/comm'
 
-const { classified, getText } = useClassified()
+const { classified } = useClassified()
 const router = useRouter()
 const tableRef = ref()
 const params = ref({})
@@ -176,12 +173,13 @@ const columns = [
   },
   {
     title: '流程分类',
-    dataIndex: 'classifiedId',
-    key: 'classifiedId',
+    dataIndex: 'classifiedName',
+    key: 'classifiedName',
     ellipsis: true,
     scopedSlots: true,
     search: {
       type: 'select',
+      rename: 'classifiedId',
       componentProps: {
         placeholder: '请选择流程分类',
       },

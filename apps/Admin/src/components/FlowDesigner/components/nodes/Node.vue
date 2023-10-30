@@ -182,7 +182,7 @@ const props = defineProps({
     border-style: solid;
     border-width: 8px 6px 4px;
     border-color: #cacaca transparent transparent;
-    background: #f5f5f7;
+    background: #fff;
   }
   &.active {
     //  节点上方的三角形 激活高亮状态

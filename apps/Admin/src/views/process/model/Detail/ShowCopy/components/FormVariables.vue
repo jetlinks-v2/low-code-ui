@@ -120,6 +120,7 @@ const treeDataFilter = computed(() => {
  * 获取表单字段
  */
 const getFormFields = async () => {
+  if (!props.treeData?.length) return
   const params = {
     paging: false,
     terms: [
