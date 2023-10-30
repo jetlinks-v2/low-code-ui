@@ -196,9 +196,15 @@ const params = ref<any>({
       type: 'and',
       column: 'latest',
     },
+    // 过滤未配置的表单
     {
       value: '',
       termType: 'notnull',
+      column: 'configuration',
+    },
+    {
+      value: [],
+      termType: 'not',
       column: 'configuration',
     },
   ],
