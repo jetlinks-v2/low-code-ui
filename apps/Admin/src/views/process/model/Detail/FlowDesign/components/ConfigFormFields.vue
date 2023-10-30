@@ -38,67 +38,98 @@
             <AIcon type="SearchOutlined" />
           </template>
         </j-input>
-        <j-checkbox
-          v-model:checked="checkAll"
-          @change="handleAllCheck"
-          style="margin: 5px 0"
-        >
-          全部内容
-        </j-checkbox>
-        <j-scrollbar max-height="600">
-          <div v-if="loading" style="text-align: center">
-            <j-spin />
-          </div>
-          <j-empty v-if="!filterFormList?.length" />
-          <div
-            class="form-item"
-            v-for="(form, index) in filterFormList"
-            :key="'form' + index"
-          >
-            <div class="form-title">
-              <div class="name">{{ form.formName }}</div>
-              <div class="permission">
-                <j-checkbox-group
-                  v-model:value="form.accessModes"
-                  :options="permissions"
-                  @change="handleFormCheck(form)"
-                />
-              </div>
-            </div>
-            <div
-              class="form-fields"
-              v-for="(field, idx) in form.fullInfo.configuration?.children"
-              :key="'field' + idx"
+        <div class="fields-box">
+          <div class="check-all">
+            <j-checkbox
+              v-model:checked="checkAll"
+              @change="handleAllCheck"
+              style="margin: 5px 0"
             >
-              <div class="field-title">
-                <div class="name">{{ field.formItemProps?.label }}</div>
-                <div class="permission">
-                  <j-checkbox-group
-                    v-model:value="field.accessModes"
-                    :options="permissions"
-                    @change="handleFieldCheck(field)"
-                  />
-                </div>
-              </div>
-            </div>
+              全部内容
+            </j-checkbox>
           </div>
-        </j-scrollbar>
+          <j-scrollbar height="500">
+            <div v-if="loading" style="text-align: center">
+              <j-spin />
+            </div>
+            <j-empty v-if="!filterFormList?.length" />
+            <j-collapse v-model:activeKey="collapseActive" :bordered="false">
+              <template #expandIcon="{ isActive }">
+                <AIcon type="CaretRightOutlined" v-show="!isActive" />
+                <AIcon type="CaretDownOutlined" v-show="isActive" />
+              </template>
+              <j-collapse-panel
+                v-for="(form, index) in filterFormList"
+                :key="index"
+              >
+                <template #header>
+                  <div class="form-title">
+                    <div class="name">{{ form.formName }}</div>
+                    <div class="permission">
+                      <j-checkbox-group
+                        v-model:value="form.accessModes"
+                        :options="permissions"
+                        @change="handleFormCheck(form)"
+                        @click="(event) => event.stopPropagation()"
+                      />
+                    </div>
+                  </div>
+                </template>
+                <div
+                  class="form-fields"
+                  v-for="(field, idx) in form.fullInfo.configuration?.children"
+                  :key="'field' + idx"
+                >
+                  <div class="field-title">
+                    <div class="name">{{ field.formItemProps?.label }}</div>
+                    <div class="permission">
+                      <j-checkbox-group
+                        v-model:value="field.accessModes"
+                        :options="permissions"
+                        @change="handleFieldCheck(field)"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </j-collapse-panel>
+            </j-collapse>
+          </j-scrollbar>
+        </div>
       </j-col>
       <j-col :span="16">
-        <j-scrollbar max-height="600">
-          <template v-for="(item, index) in filterFormList" :key="index">
-            <div>{{ item.formName }}</div>
-            <FormPreview
-              v-if="!item.multiple"
-              :data="item.fullInfo?.configuration"
-            />
-            <TableFormPreview
-              v-model:data-source="tableData"
-              :columns="getTableColumns(item.fullInfo?.configuration?.children)"
-              v-else
-            />
-          </template>
-        </j-scrollbar>
+        <h1 class="preview-title">标题模板</h1>
+        <div class="preview-box">
+          <j-scrollbar height="525">
+            <div
+              class="preview-item"
+              v-for="(item, index) in filterFormList"
+              :key="index"
+            >
+              <div class="name">
+                <img
+                  :src="
+                    getImage(
+                      `/flow-designer/${item.multiple ? 'list' : 'form'}.png`,
+                    )
+                  "
+                  style="height: 16px"
+                />
+                <span>{{ item.formName }}</span>
+              </div>
+              <FormPreview
+                v-if="!item.multiple"
+                :data="item.fullInfo?.configuration"
+              />
+              <TableFormPreview
+                v-model:data-source="tableData"
+                :columns="
+                  getTableColumns(item.fullInfo?.configuration?.children)
+                "
+                v-else
+              />
+            </div>
+          </j-scrollbar>
+        </div>
       </j-col>
     </j-row>
   </j-modal>
@@ -128,6 +159,7 @@ const props = defineProps({
   },
 })
 
+const collapseActive = ref([0, 1, 2, 3])
 const visible = ref(false)
 const forms = computed({
   get: () => props.value,
@@ -288,8 +320,18 @@ watch(
     }
   }
 }
-.form-item {
+
+.fields-box {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  margin-top: 10px;
+  .check-all {
+    margin-bottom: 10px;
+    background: #f8f8f8;
+    padding-left: 10px;
+  }
   .form-title {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     margin-bottom: 5px;
@@ -302,5 +344,41 @@ watch(
       margin-bottom: 5px;
     }
   }
+}
+
+.preview-title {
+  text-align: center;
+}
+.preview-box {
+  background: #fafafa;
+  .preview-item {
+    padding: 16px;
+    .name {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  }
+}
+
+:deep(.ant-collapse > .ant-collapse-item > .ant-collapse-header) {
+  background: #fff;
+}
+:deep(.ant-collapse-borderless > .ant-collapse-item > .ant-collapse-content) {
+  background-color: #fff;
+}
+:deep(
+    .ant-collapse-borderless > .ant-collapse-item,
+    .ant-collapse-borderless > .ant-collapse-item .ant-collapse-header
+  ) {
+  border: none;
+}
+:deep(.ant-collapse-borderless > .ant-collapse-item .ant-collapse-header) {
+  background: #fff;
+  padding: 0px 10px;
+}
+:deep(.ant-collapse-content > .ant-collapse-content-box) {
+  padding: 10px;
 }
 </style>

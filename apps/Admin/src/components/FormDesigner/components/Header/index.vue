@@ -30,6 +30,7 @@
     </template>
     <template v-else>
       <div class="left">
+        <j-button @click="emits('back')">返回</j-button>
         <template v-if="!isEditModel">
           <j-button type="link" @click="onPreview('edit')"
             ><AIcon type="LeftOutlined" />结束预览</j-button
@@ -71,7 +72,7 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['save', 'validate'])
+const emits = defineEmits(['save', 'validate', 'back'])
 
 const isEditModel = computed(() => {
   return unref(designer?.model) === 'edit'

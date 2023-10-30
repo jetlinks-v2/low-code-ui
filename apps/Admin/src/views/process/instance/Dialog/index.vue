@@ -4,7 +4,7 @@
     visible
     :maskClosable="false"
     :title="title"
-    :width="552"
+    :width="!showIcon ? 552 : '50%'"
     @cancel="cancel"
     @ok="confirm"
     class="edit-dialog-container"

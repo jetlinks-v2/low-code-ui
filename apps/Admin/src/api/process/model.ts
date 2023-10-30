@@ -4,7 +4,7 @@ import { request } from '@jetlinks/core'
  * 条件查询流程模型
  * @returns 
  */
-export const getProcess_api = (data: any) => request.post(`/process/definition/_query`, data);
+export const getProcess_api = (data: any) => request.post(`/process/definition/detail/_query`, data);
 
 /**
  * 保存模型

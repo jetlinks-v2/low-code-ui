@@ -1,7 +1,7 @@
-export const defaultColumns = (key: string) => {
+export const defaultColumns = (key: string, isNode: boolean) => {
   return [
     {
-      title: key === 'org' ? '组织' : key === 'user' ? '用户' : '角色',
+      title: !isNode ? '维度' : key === 'org' ? '组织' : key === 'user' ? '用户' : '角色',
       dataIndex: 'name',
       key: 'name',
       ellipsis: true,
