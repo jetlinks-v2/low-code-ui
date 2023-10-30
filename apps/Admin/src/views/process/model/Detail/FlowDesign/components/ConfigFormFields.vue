@@ -64,7 +64,11 @@
               >
                 <template #header>
                   <div class="form-title">
-                    <div class="name">{{ form.formName }}</div>
+                    <div class="name">
+                      <j-ellipsis line-clamp="1">
+                        {{ form.formName }}
+                      </j-ellipsis>
+                    </div>
                     <div class="permission">
                       <j-checkbox-group
                         v-model:value="form.accessModes"
@@ -81,7 +85,11 @@
                   :key="'field' + idx"
                 >
                   <div class="field-title">
-                    <div class="name">{{ field.formItemProps?.label }}</div>
+                    <div class="name">
+                      <j-ellipsis line-clamp="1">
+                        {{ field.formItemProps?.label }}
+                      </j-ellipsis>
+                    </div>
                     <div class="permission">
                       <j-checkbox-group
                         v-model:value="field.accessModes"
@@ -107,11 +115,7 @@
             >
               <div class="name">
                 <img
-                  :src="
-                    getImage(
-                      `/flow-designer/${item.multiple ? 'list' : 'form'}.png`,
-                    )
-                  "
+                  :src="getImage(`/flow-designer/preview-form.png`)"
                   style="height: 16px"
                 />
                 <span>{{ item.formName }}</span>
@@ -368,6 +372,9 @@ watch(
     display: flex;
     justify-content: space-between;
     margin-bottom: 5px;
+    .name {
+      max-width: 100px;
+    }
   }
   .form-fields {
     padding-left: 30px;
@@ -375,6 +382,9 @@ watch(
       display: flex;
       justify-content: space-between;
       margin-bottom: 5px;
+      .name {
+        max-width: 100px;
+      }
     }
   }
 }
