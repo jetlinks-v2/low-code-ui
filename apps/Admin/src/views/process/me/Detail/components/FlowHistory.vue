@@ -19,9 +19,9 @@
                      <j-tag :color="colorMap.get(item.actionColor)">
                         {{ actionType.get(item.actionType) }}
                      </j-tag>
-                     <j-tag :color="colorMap.get('completed')" v-if="item.others.autoOperation">
+                     <!-- <j-tag :color="colorMap.get('completed')" v-if="item.others.autoOperation">
                         {{ actionType.get('auto') }}
-                     </j-tag>
+                     </j-tag> -->
                      <j-tag :color="'default'" v-if="item.others.weight">权重{{ item.others.weight }}</j-tag>
                   </div>
                   <div class="item-right">{{ dayjs(item.timestamp).format('YYYY-MM-DD HH:mm:ss') }}</div>
@@ -42,8 +42,7 @@
                   </j-tag>
                </div>
                <div v-if="item.childrenNode?.others.afterState === 'rejected'" class="item-children">
-                  <div style="margin-right: 10px;">{{ item.others.taskName }} 已驳回至 {{ task.get(item.childrenNode?.taskId) }}
-                  </div>
+                  <div style="margin-right: 10px;">{{ item.others.taskName }} 已驳回至 {{ findRejectNode(item.childrenNode?.traceId) }}</div>
                </div>
             </div>
          </j-timeline-item>
@@ -61,14 +60,15 @@ const colorMap = new Map()
 colorMap.set('todo', 'processing')
 colorMap.set('children_completed', 'success')
 colorMap.set('children_rejected', 'error')
-colorMap.set('rejected', '#E50012')
+colorMap.set('reject', '#E50012')
 colorMap.set('default', 'processing')
 colorMap.set('completed', '#4FC971')
 
 const typeMap = new Map()
 typeMap.set('todo', '待办')
 typeMap.set('completed', '已完成')
-typeMap.set('rejected', '已拒绝')
+typeMap.set('reject', '已驳回')
+typeMap.set('rejected', '已驳回')
 
 
 // const nodeTypeMap = new Map()
@@ -86,7 +86,8 @@ const actionType = new Map()
 actionType.set('sign', '签收')
 actionType.set('pass', '通过')
 actionType.set('auto', '自动通过')
-actionType.set('error', '驳回')
+actionType.set('reject', '驳回')
+actionType.set('submit', '提交')
 actionType.set('initiate', '发起申请')
 
 
@@ -130,6 +131,16 @@ const getColor = (index) => {
    // console.log('isend',isEnd.value,timelines.value.length,index,isEnd.value && index === timelines.value.length - 1)
    return isEnd.value && index === timelines.value.length - 1
 }
+//判断节点类型
+const nodeState = (nodeType,auto)=>{
+   if(nodeType === 'APPROVAL'){
+      return auto?'pass':'pass'
+   }
+   if(nodeType === 'DEAL'){
+      return 'submit'
+   }
+   return 'pass'
+}
 
 //判断节点是否在时间线上
 const filterLine = (item, index) => {
@@ -141,17 +152,17 @@ const filterLine = (item, index) => {
          operatorName: item.others.identity.name,
          actionType: 'sign',
          actionColor: 'completed',
-         show: true
+         show:item.others.autoOperation? false:true
       }
    } else if (item.action === 'taskLinkChanged') {
       //完成
-      if (item.others.afterState === 'completed' || item.others.afterState === 'rejected') {
+      if (item.others.afterState === 'completed' || item.others.afterState === 'reject') {
          return {
             ...item,
             nodeType: nodeType,
             operatorName: item.others.identity.name,
-            actionType: item.others.afterState === 'completed' ? 'pass' : 'error',
-            actionColor: item.others.afterState === 'completed' ? 'completed' : 'error',
+            actionType: item.others.afterState === 'completed' ? nodeState(nodeType,item.others.autoOperation) : 'reject',
+            actionColor: item.others.afterState === 'completed' ? 'completed' : 'reject',
             show: true,
          }
       }
@@ -216,13 +227,21 @@ const handleChange = (arr) => {
    return result
 
 }
-
+//判断展示表单还是评论
 const showChanged = (val, type) => {
    const res = val.find(item => item.action === 'taskCommentChanged')
    const resp = val.filter(item => item.action !== 'taskCommentChanged')
    return type === 'taskCommentChanged' ? res : resp
 }
 
+
+//找驳回至的节点
+const findRejectNode = (traceId)=>{
+   const nodeId = props.info.timelines?.find(item=>item.action === 'taskFallback' && item.traceId === traceId)?.others.nodeIds?.[0]
+   const obj = props.info.tasks?.find(item=>item.nodeId === nodeId)
+   // console.log('------',nodeId,obj)
+   return obj?.nodeName
+}
 
 //处理时间轴
 const handleTimelines = () => {
