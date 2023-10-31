@@ -35,13 +35,14 @@ const handleMeta = (item: MenuItem, isApp: boolean) => {
     }
 }
 
-const findComponents = (code: string, level: number, isApp: boolean, components: any) => {
+const findComponents = (code: string, level: number, isApp: boolean, components: any, mate: any, hasChildren) => {
     const myComponents = components[code]
     if (level === 1) { // BasicLayoutPage
-      if (myComponents) {
-        return h(BasicLayoutPage, {}, () => [h(defineAsyncComponent(() => myComponents()), {})])
+
+      if (myComponents && !hasChildren) {
+        return mate?.hasLayout === false ? () => myComponents() : h(BasicLayoutPage, {}, () => [h(defineAsyncComponent(() => myComponents()), {})])
       }
-      if (isApp) {
+      if (isApp && !hasChildren) {
         return h(BasicLayoutPage, {}, () => [h(Iframe, {})])
       }
       return shallowRef(BasicLayoutPage)
@@ -83,7 +84,7 @@ export const handleMenus = (menuData: any, extraMenus: any, components: any, lev
                 children: item.children
             }
 
-            route.component = findComponents(item.code, level, isApp, components)
+            route.component = findComponents(item.code, level, isApp, components, item.meta, !!item.chidlren?.length)
 
             const extraRoute = hasExtraChildren(item, extraMenus)
 

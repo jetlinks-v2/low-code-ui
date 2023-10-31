@@ -76,29 +76,9 @@ const myProcess = [
     path: '/flow-engine/me/initiate',
   },
   {
-    key: 'cc',
     name: '抄送给我',
     icon: '/process/cc.png',
     path: '/flow-engine/me/cc',
-    fun: () =>
-      new Promise((resolve, reject) => {
-        getMeProcessList(
-          {
-            paging: false,
-            terms: [
-              {
-                value: 'ready',
-                termType: 'not',
-                column: 'state',
-              },
-            ],
-          },
-          'cc',
-          false,
-        ).then((res) => {
-          resolve({ data: res.result.total })
-        })
-      }),
   },
 ]
 </script>

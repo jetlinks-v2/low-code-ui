@@ -92,7 +92,7 @@ const step2 = ref()
 const step3 = ref()
 const nextLoading = ref(false)
 const saveLoading = ref(false)
-
+const isModal = ref(false)
 /**
  * 获取模型详情
  */
@@ -144,6 +144,7 @@ const handleSave = (type?: string) => {
     .then(() => {
       if (type !== 'next') {
         onlyMessage('保存成功', 'success')
+        isModal.value = true
         router.go(-1)
       }
     })
@@ -208,6 +209,7 @@ const saveAndDeploy = () => {
     deploy_api(route.query.id as string).then((res) => {
       if (res.success) {
         onlyMessage('部署成功', 'success')
+        isModal.value = true
         router.go(-1)
       } else {
         onlyMessage('部署失败', 'error')
@@ -250,10 +252,19 @@ const routerChange = (next?:Function)=>{
 }
 
 onBeforeRouteLeave((to, form, next) => {
-  routerChange(next)
+  if(!isModal.value){
+    routerChange(next)
+  }else{
+    next()
+  }
+  
 })
 onBeforeRouteUpdate((to, from, next)=>{
-  routerChange(next)
+  if(!isModal.value){
+    routerChange(next)
+  }else{
+    next()
+  }
 })
 
 </script>
