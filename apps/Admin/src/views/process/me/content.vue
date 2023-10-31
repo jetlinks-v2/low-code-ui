@@ -18,8 +18,7 @@
             <template #createTime="record">
                 {{ record.createTime ? dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}
             </template>
-            <template #endTime="record">{{ record.createTime ? dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '--'
-            }}</template>
+            <template #endTime="record">{{ record.endTime ? dayjs(record.endTime).format('YYYY-MM-DD HH:mm:ss') : '--'}}</template>
             <!-- <template #modifyTime="record">{{ record.modifyTime ? dayjs(record.modifyTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}</template> -->
             <template #state="record">{{ record.state.text }}</template>
             <template #action="record">
