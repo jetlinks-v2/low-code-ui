@@ -8,7 +8,13 @@ export const BASIC_ROUTER_DATA: any[] = [
   //   url: '/delivery',
   //   redirect: '/delivery/center',
   //   children: [
-  //
+  //     {
+  //       code: 'center',
+  //       name: 'WEB IDE',
+  //       url: '/delivery/center',
+  //       meta: {
+  //         hideInMenu: true
+  //       }
   //     },
   //   ]
   // },

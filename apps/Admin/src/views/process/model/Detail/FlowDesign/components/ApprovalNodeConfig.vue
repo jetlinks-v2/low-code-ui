@@ -73,7 +73,10 @@
             <j-form-item
               label="请选择可参与审批的候选成员"
               name="candidates"
-              :rules="[{ required: true, message: '请选择成员' }]"
+              :rules="[
+                { required: true, message: '请选择成员' },
+                { validator: isSelectMember, trigger: 'change' },
+              ]"
             >
               <ConfigureMembers
                 v-model:members="memberFormData.candidates"
@@ -100,8 +103,10 @@
               </template>
               <j-input-number
                 :min="1"
-                :max="99999"
+                :max="999999"
                 v-model:value="memberFormData.completeWeight"
+                :precision="0"
+                :defaultValue="1"
                 style="width: 100%"
               />
             </j-form-item>
@@ -113,15 +118,16 @@
                 驳回权重
                 <j-tooltip placement="right">
                   <template #title>
-                    审批意见为“通过”的成员权重总和达到设定值时，审批通过
+                    审批意见为“驳回”的成员权重总和达到设定值时，审批驳回
                   </template>
                   <AIcon type="InfoCircleOutlined" />
                 </j-tooltip>
               </template>
               <j-input-number
                 :min="1"
-                :max="99999"
+                :max="999999"
                 v-model:value="memberFormData.rejectWeight"
+                :precision="0"
                 style="width: 100%"
               />
             </j-form-item>
@@ -175,7 +181,7 @@
 
 <script setup lang="ts">
 import ConfigFormFields from './ConfigFormFields.vue'
-import { findNodeById } from './utils'
+import { findNodeById, setDefaultFormBinds, isSelectMember } from './utils'
 import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
@@ -191,9 +197,11 @@ const props = defineProps({
 // 基础配置
 const basicFormRef = ref()
 const basicFormData = reactive({
-  formBinds: props.node?.props?.formBinds || {},
-  autoComplete: props.node?.props?.autoComplete || false,
-  dealRequired: props.node?.props?.dealRequired,
+  formBinds:
+    props.node?.props?.formBinds ||
+    setDefaultFormBinds(flowStore.model.config?.forms),
+  autoComplete: props.node?.props?.autoComplete || true,
+  dealRequired: props.node?.props?.dealRequired || true,
   others: props.node?.props?.others || { defaultComment: '同意' },
 })
 const collapseActive = ref(['1', '2', '3'])
@@ -212,7 +220,7 @@ const memberFormData = reactive({
   rejectTo: props.node?.props?.gotoWhenReject[0] || undefined,
 })
 const allButtons = ref([
-  { label: '通过', value: 'pass' },
+  { label: '通过', value: 'pass', disabled:true},
   { label: '驳回', value: 'reject' },
 ])
 const nodeList = ref<{ label: string; value: string }[]>([
