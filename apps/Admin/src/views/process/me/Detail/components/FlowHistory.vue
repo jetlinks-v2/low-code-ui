@@ -146,6 +146,7 @@ const nodeState = (nodeType, auto) => {
    return 'pass'
 }
 
+
 //判断节点是否在时间线上
 const filterLine = (item, index) => {
    const nodeType = modal.value.get(task.value.get(item.taskId)?.nodeId)

@@ -61,10 +61,32 @@
         </template>
         <TemplateText
           placeholder="{发起人}的{流程名称}"
-          :value="formData.nameGenerator"
+          v-model:value="formData.nameGenerator"
           :variables="formData.variables"
-          @change="onNameChange"
+          @change="onChange"
         />
+        <!-- <div class="title-template">
+          <j-textarea
+            v-model:value="formData.nameGenerator"
+            placeholder="{发起人}的{流程名称}"
+            :auto-size="{ minRows: 4 }"
+            :bordered="false"
+          />
+          <div class="html">
+            <span v-html="titleHtml"></span>
+          </div>
+          <div class="select">
+            <j-form-item-rest>
+              <j-select
+                style="width: 120px; text-align: left"
+                placeholder="添加变量"
+                :options="formData.variables"
+                @select="selectVariable"
+              >
+              </j-select>
+            </j-form-item-rest>
+          </div>
+        </div> -->
       </j-form-item>
       <j-form-item
         name="summaryGenerator"
@@ -77,10 +99,32 @@
         </template>
         <TemplateText
           placeholder="{请假人}的{请假类型}"
-          :value="formData.summaryGenerator"
+          v-model:value="formData._summaryGenerator"
           :variables="formData.variables"
-          @change="onSummaryChange"
+          @change="onChange"
         />
+        <!-- <div class="title-template">
+          <j-textarea
+            v-model:value="formData.summaryGenerator"
+            placeholder="{请假人}的{请假类型}"
+            :auto-size="{ minRows: 4 }"
+            :bordered="false"
+          />
+          <div class="html">
+            <span v-html="summaryHtml"></span>
+          </div>
+          <div class="select">
+            <j-form-item-rest>
+              <j-select
+                style="width: 120px; text-align: left"
+                placeholder="添加变量"
+                :options="formData.variables"
+                @select="selectSummary"
+              >
+              </j-select>
+            </j-form-item-rest>
+          </div>
+        </div> -->
       </j-form-item>
       <TitleComponent data="抄送配置" />
       <j-form-item name="ccMember" label="配置该流程需要抄送的成员">
@@ -102,13 +146,6 @@ import { separateData } from './utils'
 import TemplateText from './components/TemplateText.vue'
 
 const flowStore = useFlowStore()
-
-const props = defineProps({
-  noQuery: {
-    type: Boolean,
-    default: false
-  }
-})
 
 // 初始变量
 const initVariables = ref<any[]>([])
@@ -132,14 +169,67 @@ const formatToName = (val: string = '') => {
     })
 }
 
+const formData = reactive({
+  variables: [],
+  // computed({
+  //   get: () =>
+  //     flowStore.model.config.variables?.length
+  //       ? flowStore.model.config.variables
+  //       : initVariables.value,
+  //   set: (val) => {
+  //     flowStore.model.config.variables = [...initVariables.value, ...val]
+  //   },
+  // }),
+  nameGenerator: '',
+  // computed({
+  //   get: () => formatToName(flowStore.model.config.nameGenerator),
+  //   set: (val) => {
+  //     flowStore.model.config.nameGenerator = formatToVariable(val)
+  //   },
+  // }),
+  summaryGenerator: '',
+  _summaryGenerator: '',
+  // computed({
+  //   get: () => formatToName(flowStore.model.config.summaryGenerator),
+  //   set: (val) => {
+  //     flowStore.model.config.summaryGenerator = formatToVariable(val)
+  //   },
+  // }),
+  ccMember: undefined,
+  // computed({
+  //   get: () => flowStore.model.config.ccMember,
+  //   set: (val) => {
+  //     flowStore.model.config.ccMember = val
+  //   },
+  // }),
+})
+
+watch(
+  () => flowStore.model.config,
+  (newVal) => {
+    formData.variables = newVal.variables?.length
+      ? newVal?.variables
+      : initVariables.value
+    formData.nameGenerator = formatToName(newVal?.nameGenerator)
+    formData.summaryGenerator = formatToName(newVal?.summaryGenerator)
+    formData._nameGenerator = formatToName(newVal?.nameGenerator)
+    formData._summaryGenerator = formatToName(newVal?.summaryGenerator)
+    formData.ccMember = newVal?.ccMember
+  },
+  {
+    deep: true,
+    immediate: true,
+  },
+)
+
 /**
  * 获取变量数据
  * 表单内的变量展示到弹窗
  * 其他变量展示到外面
  */
- const getVariables = async () => {
+const getVariables = async () => {
   const { id, name, key, model, provider } = flowStore.modelBaseInfo
-  if (!id || props.noQuery) return
+  if (!id) return
   const params = {
     definition: {
       id,
@@ -174,45 +264,40 @@ const formatToVariable = (val: string = '') => {
     })
 }
 
-const formData = reactive({
-  variables: computed({
-    get: () =>
-      flowStore.model.config.variables?.length
-        ? flowStore.model.config.variables
-        : initVariables.value,
-    set: (val) => {
-      flowStore.model.config.variables = [...initVariables.value, ...val]
-    },
-  }),
-  nameGenerator: '',
-  summaryGenerator: '',
-  ccMember: computed({
-    get: () => flowStore.model.config.ccMember,
-    set: (val) => {
-      flowStore.model.config.ccMember = val
-    },
-  }),
-})
-
-watch(
-  () => flowStore.model.config,
-  (newVal) => {
-    formData.nameGenerator = formatToName(newVal?.nameGenerator)
-    formData.summaryGenerator = formatToName(newVal?.summaryGenerator)
-  },
-  {
-    deep: true,
-    immediate: true,
-  },
-)
-
-const onSummaryChange = (val) => {
-  flowStore.model.config.summaryGenerator = formatToVariable(val)
+const onChange = () => {
+  
 }
+/**
+ * 选中变量
+ * @param value
+ */
+// const selectVariable = (_, { label }) => {
+//   formData.nameGenerator += `{${label}}`
+// }
+// const selectSummary = (_, { label }) => {
+//   formData.summaryGenerator += `{${label}}`
+// }
 
-const onNameChange = (val) => {
-  flowStore.model.config.nameGenerator = formatToVariable(val)
-}
+// 正则匹配{}中间内容，并替换成<span style="color: 随机颜色"></span>
+// const replace = (str: string) => {
+//   return str.replace(/\n/g, '<br/>').replace(/\{(.*?)\}/g, ($1, $2) => {
+//     return `<span style="color: ${getColor($2)}">${$1}</span>`
+//   })
+// }
+
+// 根据选择的变量找出颜色
+// const getColor = (str: string) => {
+//   return formData.variables?.filter((item) => item.label === str)[0]?.color
+// }
+
+// // 标题
+// const titleHtml = computed(() => {
+//   return replace(formData.nameGenerator || '')
+// })
+// // 摘要
+// const summaryHtml = computed(() => {
+//   return replace(formData.summaryGenerator || '')
+// })
 
 /**
  * 当前步骤校验方法
@@ -233,13 +318,11 @@ const validateSteps = () => {
   })
 }
 
-
+defineExpose({ validateSteps })
 onMounted(() => {
   getVariables()
   validateSteps()
 })
-
-defineExpose({ validateSteps })
 </script>
 
 <style lang="less" scoped>
@@ -261,6 +344,24 @@ defineExpose({ validateSteps })
         top: 6px;
       }
     }
+    // .title-template {
+    //   padding: 10px;
+    //   position: relative;
+    //   width: 100%;
+    //   border: 1px solid #d9d9d9;
+
+    //   .html {
+    //     position: absolute;
+    //     top: 10px;
+    //     left: 10px;
+    //     padding: 4px 11px;
+    //     pointer-events: none;
+    //   }
+
+    //   .select {
+    //     text-align: end;
+    //   }
+    // }
   }
 }
 </style>

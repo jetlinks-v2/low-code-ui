@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { shallowRef, watch, onBeforeUnmount, watchEffect, computed } from 'vue'
+import { shallowRef, watch, onBeforeUnmount, ref } from 'vue'
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import { Editor } from '@wangeditor/editor-for-vue'
 
@@ -39,8 +39,7 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['update:value'])
-
+const emits = defineEmits(['update:value', 'change'])
 const editorRef = shallowRef()
 
 // // 正则匹配{}中间内容，并替换成<span style="color: 随机颜色"></span>
@@ -60,11 +59,12 @@ const handleCreated = (editor) => {
 }
 
 watch(
-  () => props.value,
+  () => [props.value, editorRef.value],
   () => {
-    console.log(props.value, 'props.value')
-    const _val = replace(props.value || '')
-    editorRef.value?.setHtml(_val)
+    if (editorRef.value) {
+      const _val = replace(props.value || '')
+      editorRef.value?.setHtml('<p>' + _val + '</p>')
+    }
   },
   {
     immediate: true,
@@ -72,12 +72,12 @@ watch(
 )
 
 const selectVariable = (_, { label }) => {
-  const val = (props?.value || '') + `{${label}}`
-  emits('update:value', val)
+    const val = (props?.value || '') + `{${label}}`
+    emits('change', val)
 }
 
 const onChange = () => {
-  emits('update:value', editorRef.value?.getText())
+  emits('change', editorRef.value?.getText())
 }
 
 onBeforeUnmount(() => {
