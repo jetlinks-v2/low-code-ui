@@ -57,11 +57,15 @@
         :rules="[{ required: true, message: '请上传流程图标' }]"
       >
         <j-space :size="24">
-          <div class="base-icon" v-for="(item, index) of baseIcon">
+          <div class="base-icon" v-for="item of 4">
             <div class="upload-icon">
-              <AIcon :type="item" />
+              <ProImage
+                :src="getImage(`/process/model/icon${item}.png`)"
+                :width="24"
+                :preview="false"
+              />
             </div>
-            <div>图标{{ index + 1 }}</div>
+            <div>图标{{ item }}</div>
           </div>
           <div class="base-icon">
             <div class="upload-icon">
@@ -100,6 +104,7 @@ import { saveProcess_api } from '@/api/process/model'
 import { useRequest } from '@jetlinks/hooks'
 import { isImg } from '@/utils/comm'
 import { providerEnum } from '@/api/process/model'
+import { getImage } from '@jetlinks/utils'
 
 type FormType = {
   key: string

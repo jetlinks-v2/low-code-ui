@@ -2,6 +2,7 @@
 <template>
   <j-modal
     visible
+    :maskClosable="false"
     title="配置成员"
     :width="1076"
     @ok="confirm"
