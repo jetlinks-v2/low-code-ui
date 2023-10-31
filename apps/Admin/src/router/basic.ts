@@ -58,7 +58,7 @@ export const BASIC_ROUTER_DATA: any[] = [
     children: [
       {
         code: 'process/home',
-        name: '流程模型',
+        name: '',
         url: '/flow-engine/home',
         meta: {
           hideInMenu: true
