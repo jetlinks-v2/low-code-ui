@@ -35,7 +35,7 @@ const handleMeta = (item: MenuItem, isApp: boolean) => {
     }
 }
 
-const findComponents = (code: string, level: number, isApp: boolean, components: any, mate: any, hasChildren) => {
+const findComponents = (code: string, level: number, isApp: boolean, components: any, mate: any, hasChildren: boolean) => {
     const myComponents = components[code]
     if (level === 1) { // BasicLayoutPage
 
