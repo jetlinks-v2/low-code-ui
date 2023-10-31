@@ -292,7 +292,7 @@ watch(
       list.value = val
     } else if (isObject(val)) {
       let arr = []
-      relationList.value = val['relation'].map((i) => i.related?.relation)
+      relationList.value = val['relation']?.map((i) => i.related?.relation) || []
       getRelation()
       Object.keys(val).forEach((i) => {
         arr = arr.concat(
