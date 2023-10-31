@@ -73,7 +73,10 @@
             <j-form-item
               label="请选择可参与审批的候选成员"
               name="candidates"
-              :rules="[{ required: true, message: '请选择成员' }]"
+              :rules="[
+                { required: true, message: '请选择成员' },
+                { validator: isSelectMember, trigger: 'change' },
+              ]"
             >
               <ConfigureMembers
                 v-model:members="memberFormData.candidates"
@@ -178,7 +181,7 @@
 
 <script setup lang="ts">
 import ConfigFormFields from './ConfigFormFields.vue'
-import { findNodeById } from './utils'
+import { findNodeById, setDefaultFormBinds, isSelectMember } from './utils'
 import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
@@ -194,7 +197,9 @@ const props = defineProps({
 // 基础配置
 const basicFormRef = ref()
 const basicFormData = reactive({
-  formBinds: props.node?.props?.formBinds || {},
+  formBinds:
+    props.node?.props?.formBinds ||
+    setDefaultFormBinds(flowStore.model.config?.forms),
   autoComplete: props.node?.props?.autoComplete || true,
   dealRequired: props.node?.props?.dealRequired || true,
   others: props.node?.props?.others || { defaultComment: '同意' },

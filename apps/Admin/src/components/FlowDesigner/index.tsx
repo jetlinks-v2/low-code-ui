@@ -470,7 +470,7 @@ const FlowDesigner = defineComponent({
             break
         }
       } else {
-        onlyMessage('最多只能添加99个分支', 'warning')
+        onlyMessage('条件数量已达到上限', 'warning')
       }
     }
 

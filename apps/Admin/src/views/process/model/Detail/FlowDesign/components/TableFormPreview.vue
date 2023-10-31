@@ -2,7 +2,6 @@
 <template>
   <j-table
     bordered
-    :scroll="{ x: true}"
     :data-source="myDataSource"
     :columns="columns"
     :pagination="false"
@@ -27,14 +26,14 @@
           },
         ]"
       >
-      <div style="min-width: 120px">
-        <component
-          :is="componentMap[column.type]"
-          :data="record"
-          v-model:value="record[column.dataIndex]"
-          :disabled="column.componentProps.disabled"
-        />
-      </div>
+        <div style="min-width: 120px">
+          <component
+            :is="componentMap[column.type]"
+            :data="record"
+            v-model:value="record[column.dataIndex]"
+            :disabled="column.componentProps.disabled"
+          />
+        </div>
       </j-form-item>
     </template>
   </j-table>
