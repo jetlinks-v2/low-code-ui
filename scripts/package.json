@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "pnpm esno ./src/dev.ts",
     "build": "pnpm esno ./src/build.ts",
-    "clean": "pnpm rimraf node_modules && pnpm rimraf dist && pnpm rimraf .turbo"
+    "clean": "pnpm rimraf node_modules"
   },
   "keywords": [],
   "author": "",
