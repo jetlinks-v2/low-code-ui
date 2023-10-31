@@ -15,7 +15,7 @@
       :closable="false"
       @close="handleClose"
     >
-      <template v-show="isAdvanceConfig" #title> 高级配置 </template>
+      <template v-if="isAdvanceConfig" #title> 高级配置 </template>
       <j-form v-show="!isAdvanceConfig" ref="nameRef" :model="formData">
         <j-form-item
           name="nodeName"
