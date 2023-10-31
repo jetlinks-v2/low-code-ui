@@ -170,6 +170,7 @@
               <j-select
                 v-model:value="memberFormData.rejectTo"
                 :options="nodeList"
+                showSearch
               />
             </j-form-item>
           </j-collapse-panel>
@@ -234,13 +235,13 @@ const nodeList = ref<{ label: string; value: string }[]>([
  */
 const getRejectNodes = (nodeId) => {
   const _parentNode = findNodeById(flowStore.model.nodes, nodeId)
-  if (_parentNode.type === 'APPROVAL' || _parentNode.type === 'DEAL') {
+  if (_parentNode?.type === 'APPROVAL' || _parentNode?.type === 'DEAL') {
     nodeList.value.push({ label: _parentNode.name, value: _parentNode.id })
   }
   // 父节点存在, 并且可以驳回的节点没有找到 继续查找
-  if (_parentNode.parentId)
+  if (_parentNode?.parentId)
     getRejectNodes(_parentNode.parentId)
-    memberFormData.rejectTo = nodeList.value?.[0]?.value
+    memberFormData.rejectTo = memberFormData.rejectTo ? memberFormData.rejectTo : nodeList.value?.[0]?.value
 }
 
 /**
@@ -262,6 +263,7 @@ const saveConfigToStore = () => {
       ...basicFormData,
       ...others,
     }
+    console.log(result.props);
     resolve(result)
   })
 }
@@ -304,6 +306,9 @@ defineExpose({
 })
 onMounted(() => {
   getRejectNodes(props.node?.parentId)
+  if(!nodeList.value.find(item => item.value === memberFormData.rejectTo)) {
+    memberFormData.rejectTo = null
+  }
 })
 </script>
 
