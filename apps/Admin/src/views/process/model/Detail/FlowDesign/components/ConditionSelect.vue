@@ -7,6 +7,7 @@
         { label: '或者', value: 'or' },
         { label: '并且', value: 'and' },
       ]"
+      class="operator-select"
       placeholder="请选择"
       style="width: 90px; margin-bottom: 10px"
     />
@@ -24,6 +25,8 @@
         :field-names="{ label: 'name', value: 'fullId' }"
         :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
         style="width: 400px"
+        class="variable-select"
+        @clear="handleConditionClear(item, index)"
         @change="handleConditionChange(item)"
       >
         <template #title="{ name }">
@@ -53,24 +56,25 @@
         :options="operatorMap[conditionType(item) || 'default']"
         label-in-value
         placeholder="请选择"
-        style="width: 90px"
+        style="width: 200px"
+        class="operator-select"
         @change="handleTermTypeChange(item)"
       />
       <ConditionValueItem
         v-model:modelValue="item.value"
+        :full-id="findVariableById(conditionOptions, item?.column)?.fullId"
         :conditionType="conditionType(item)"
       />
-
       <AIcon
-        type="DeleteOutlined"
-        style="color: red"
+        type="CloseCircleFilled"
+        style="color: red;position: absolute;right: -8px;top: -4px;"
         @click="handleRemove(index)"
         v-if="index !== 0"
       />
     </div>
   </div>
-  <j-button type="primary" block size="small" ghost @click="handleAdd">
-    +
+  <j-button type="default" style="width: 84px;background-color: #EBEDF3;" @click="handleAdd">
+    <AIcon type="PlusOutlined"/>
   </j-button>
 </template>
 
@@ -160,6 +164,10 @@ const handleConditionChange = (item) => {
   item.columnName = item.selectedColumn.label
 }
 
+const handleConditionClear = (item, index) => {
+  conditionSelect.value[index] = {} as any
+}
+
 const handleTermTypeChange = (item) => {
   item.termType = item.selectedTermType.value
   item.termTypeName = item.selectedTermType.label
@@ -172,8 +180,8 @@ const handleTermTypeChange = (item) => {
  */
 const conditionType = (item) => {
   const _var = findVariableById(conditionOptions.value, item?.column)
-  //   console.log('_var: ', _var)
-  return _var?.others?.type
+    console.log('_var: ', _var)
+  return _var?.others?.type || _var?.others?.relation 
 }
 
 const handleRemove = (index: number) => {
@@ -216,5 +224,45 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   margin-bottom: 10px;
+  position: relative;
+  .variable-select{
+    border: 1px solid #15C4FF;
+    color: #15C4FF;
+    :deep(.ant-select-selector) {
+      background-color: #EEFBFF;
+    }
+    :deep(.ant-select-arrow) {
+      color: #15C4FF;
+    }
+    :deep(.ant-select-clear) {
+      color: #15C4FF;
+    }
+    :deep(.ant-select-selection-placeholder) {
+      color: #15C4FF;
+    }
+  }
+}
+.operator-select{
+  border: 1px solid #208CFF;
+  color: #208CFF;
+  :deep(.ant-select-selector) {
+    background-color: #F0F7FF;
+  }
+  :deep(.ant-select-arrow) {
+    color: #208CFF;
+  }
+  :deep(.ant-select-clear) {
+    color: #208CFF;
+  }
+  :deep(.ant-select-selection-placeholder) {
+      color: #208CFF;
+    }
+}
+input{
+  color: #CE29DD !important;
+  background-color: #FEF5FF;
+  &::placeholder{
+    color: #CE29DD !important;
+  }
 }
 </style>

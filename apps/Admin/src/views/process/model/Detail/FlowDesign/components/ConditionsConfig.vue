@@ -13,10 +13,10 @@
               <j-radio-button value="exclusive">
                 执行第一个满足条件
               </j-radio-button>
-              <j-radio-button value="all">所有条件下的流程通过</j-radio-button>
               <j-radio-button value="condition">
                 部分条件下的流程通过
               </j-radio-button>
+              <j-radio-button value="all">所有条件下的流程通过</j-radio-button>
             </j-space>
           </j-radio-group>
         </j-form-item>
@@ -43,11 +43,12 @@
             mode="multiple"
             placeholder="请选择"
             v-model:value="basicFormData.gotoNodes"
-            :options="
-              allConditionBranches.filter((f) =>
+            :options="[
+              { label: '任意节点', value: '@exclusive' },
+              ...allConditionBranches.filter((f) =>
                 basicFormData.condition.includes(f.value),
-              )
-            "
+              ),
+            ]"
           />
         </j-form-item>
       </j-form>
@@ -73,11 +74,12 @@ const props = defineProps({
 const basicFormRef = ref()
 const nodeProps = computed(() => props.node?.props)
 // 临时变量, 用于radio展示 仅供前端使用
-const tempType = ref(
-  nodeProps.value?.type === 'exclusive'
-    ? 'exclusive'
-    : nodeProps.value?.inclusiveType,
-)
+// const tempType = ref(
+//   nodeProps.value?.type === 'exclusive'
+//     ? 'exclusive'
+//     : nodeProps.value?.inclusiveType,
+// )
+const tempType = ref('exclusive')
 
 const basicFormData = reactive({
   type: nodeProps.value?.type || 'inclusive',
