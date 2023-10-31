@@ -3,24 +3,30 @@
     <a-form-item-rest>
       <j-button class="btn" @click="visible = true">
         <span>选择成员</span>
-        <span class="icon"  v-show="list.length > 0">
+        <span class="icon" v-show="initList.length > 0">
           <img :src="getImage('/members/check.png')" />
         </span>
       </j-button>
       <!-- 列表 -->
       <j-scrollbar max-height="172px">
         <j-list
-          v-show="list.length > 0"
+          v-show="initList.length > 0"
           :grid="{ gutter: 8, column: column }"
-          :data-source="list"
+          :data-source="initList"
           size="small"
           :split="false"
         >
           <template #renderItem="{ item }">
-            <j-list-item>
+            <j-list-item :class="{ 'is-del': item.isDel }">
               <j-space>
                 <AIcon :type="iconType[item.type]" class="a-icon" />
-                <j-ellipsis line-clamp="1">
+                <!-- v-if="isDel(item)" -->
+                <j-tooltip v-if="item.isDel">
+                  <template #title>用户不存在</template>
+                  {{ item.name }}
+                </j-tooltip>
+
+                <j-ellipsis line-clamp="1" v-else>
                   {{ item.name }}
                 </j-ellipsis>
               </j-space>
@@ -43,6 +49,15 @@ import { DataSourceProps } from './types'
 import { isArray, isObject, pick, uniqBy } from 'lodash-es'
 import { getImage } from '@jetlinks/utils'
 import { iconType } from './components/const'
+import {
+  getAllDepartment_api,
+  getAllUser_api,
+  getAllRole_api,
+} from '@/api/user'
+import { getVar_api, getAllRelation_api } from '@/api/member'
+import { detail_api } from '@/api/process/model'
+import { cloneDeep, omit } from 'lodash-es'
+import { useFlowStore } from '@/store/flow'
 
 const props = withDefaults(
   defineProps<{
@@ -65,18 +80,32 @@ const emits = defineEmits<{
   (e: 'update:members', data: DataSourceProps[] | DataSourceProps): void
 }>()
 
+const route = useRoute()
+const flowStore = useFlowStore()
+
 const visible = ref(false)
 
 const list = ref<DataSourceProps[]>([])
+const initList = computed(() => {
+  return list.value?.map((i) => ({ ...i, isDel: isDel(i) }))
+})
+// 固定/变量/关系数据
+const dataMap = ref<Map<string, any>>(new Map())
+// 成员中的关系数据
+const relationList = ref<string[]>([])
+// 查询到的现存关系数据
+const existingRel = ref<any[]>([])
+
 const getData = (data: DataSourceProps[], type: string) => {
-  if(props.isNode){
+  if (props.isNode) {
     // 暂存其他维度数据
     const newList = list.value.filter((item) => item.type != type)
-    list.value = uniqBy([...data, ...newList],'id')
+    list.value = uniqBy([...data, ...newList], 'id')
     emits('update:members', groupedData(list.value, 'groupField'))
-  }else {
+  } else {
     // 基础信息
-    list.value = uniqBy([...data],'id')
+    const arr = data.map((i) => omit(i, ['isDel']))
+    list.value = uniqBy([...arr], 'id')
     emits('update:members', list.value)
   }
 }
@@ -91,13 +120,164 @@ const groupedData = (arr: any[], field: string) => {
     if (!acc[key]) {
       acc[key] = []
     }
-    const { others, groupField, ...rest } = curr
-    acc[key].push({ ...rest, ...others })
+    const { others, groupField, isDel, ...rest } = curr
+    acc[key].push({ ...others, ...rest })
     return acc
   }, {})
 }
 
+/**
+ * 判断是否删除
+ * @param row 行数据
+ */
+const isDel = (row) => {
+  const key = props.isNode ? 'groupField' : 'type'
+  if (!dataMap.value.get(row[key])) return false
+  return !searchIdInTree(dataMap.value.get(row[key]), row.id, row[key])
+}
+// 查是否存在
+const searchIdInTree = (tree: any, id: string, type: string) => {
+  const arr = id.split('-')
+  // 遍历每个节点
+  for (const node of tree) {
+    if (
+      type === 'relation' &&
+      node.fullId === arr[0] &&
+      existingRel.value.some((item) => item === arr[1])
+    ) {
+      return true
+    } else if (node.id === id || node.fullId === id) {
+      return true
+    }
+    if (node.children && node.children.length > 0) {
+      const found = searchIdInTree(node.children, id, type)
+      if (found) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+const getTreeData = () => {
+  const apiList = [
+    getAllDepartment_api({
+      paging: false,
+      sorts: [
+        {
+          name: 'sortIndex',
+          order: 'asc',
+        },
+      ],
+    }),
+    getAllUser_api({
+      paging: false,
+      sorts: [
+        {
+          name: 'createTime',
+          order: 'desc',
+        },
+      ],
+    }),
+    getAllRole_api({
+      paging: false,
+      sorts: [
+        {
+          name: 'createTime',
+          order: 'desc',
+        },
+        {
+          name: 'id',
+          order: 'desc',
+        },
+      ],
+    }),
+  ]
+  Promise.all(apiList).then((res) => {
+    dataMap.value.set(
+      'org',
+      res[0].result.sort((a: any, b: any) =>
+        a.sortIndex === b.sortIndex
+          ? b.createTime - a.createTime
+          : a.sortIndex - b.sortIndex,
+      ),
+    )
+    dataMap.value.set('user', res[1].result)
+    dataMap.value.set('role', res[2].result)
+  })
+}
+
+onMounted(() => {
+  if (props.nodeId) {
+    detail_api(route.query.id as string).then((res) => {
+      if (res.success) {
+        getTree(res.result)
+      }
+    })
+  }
+})
+
+/**
+ * 获取变量，关系的树
+ */
+const getTree = (data: any) => {
+  const param = {
+    definition: {
+      ...data,
+      model: JSON.stringify(flowStore.model),
+    },
+    nodeId: props.nodeId,
+    containThisNode: true,
+  }
+  getVar_api(param).then((res) => {
+    if (res.success) {
+      dataMap.value.set('var', res.result)
+      dataMap.value.set('relation', hasRelation(res.result))
+    }
+  })
+}
+/**
+ * 遍历树，如果当前结点对象不包含relation属性，删除当前结点
+ * @param data
+ */
+const hasRelation = (data: any) => {
+  const cloneData = cloneDeep(data)
+  function delTree(tree) {
+    tree.forEach((item, index) => {
+      if (item.children) {
+        item.disabled = true
+        delTree(item.children)
+      } else if (!item.others?.relation) {
+        tree.splice(index, 1)
+      }
+    })
+  }
+  delTree(cloneData)
+  return cloneData
+}
+
+const getRelation = async () => {
+  if (relationList.value.length < 1) return
+  const res = await getAllRelation_api({
+    paging: false,
+    terms: [
+      {
+        value: relationList.value,
+        termType: 'in',
+        column: 'relation',
+      },
+    ],
+  })
+
+  if (res.success) {
+    existingRel.value = res.result.map((i) => i.relation)
+  }
+}
+
+getTreeData()
+
 provide('infoState', {
+  dataMap: dataMap,
   members: list,
   nodeId: props.nodeId,
   isNode: props.isNode,
@@ -112,6 +292,8 @@ watch(
       list.value = val
     } else if (isObject(val)) {
       let arr = []
+      relationList.value = val['relation'].map((i) => i.related?.relation)
+      getRelation()
       Object.keys(val).forEach((i) => {
         arr = arr.concat(
           val[i]?.map((j) => ({
@@ -160,6 +342,13 @@ watch(
       .a-icon {
         font-size: 16px;
         color: #226aff;
+      }
+    }
+    .is-del {
+      background: #fde8ea;
+      color: #e50012;
+      .a-icon {
+        color: #e50012;
       }
     }
   }

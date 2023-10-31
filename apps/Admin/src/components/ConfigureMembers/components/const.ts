@@ -12,7 +12,7 @@ export const defaultColumns = (key: string, isNode: boolean) => {
       dataIndex: 'weight',
       key: 'weight',
       ellipsis: true,
-      width: 100,
+      width: 80,
     },
     {
       title: '操作',
