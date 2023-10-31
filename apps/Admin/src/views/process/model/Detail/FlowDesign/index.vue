@@ -1,39 +1,41 @@
 <!-- 流程设计 -->
 <template>
-  <FlowDesigner
-    ref="flowDesignerRef"
-    @selectNode="nodeSelected"
-    @delNode="nodeDel"
-  />
+  <div>
+    <FlowDesigner
+      ref="flowDesignerRef"
+      @selectNode="nodeSelected"
+      @delNode="nodeDel"
+    />
 
-  <j-drawer
-    destroyOnClose
-    placement="right"
-    :width="600"
-    :visible="showConfig"
-    :closable="false"
-    @close="handleClose"
-  >
-    <template v-if="isAdvanceConfig" #title> 高级配置 </template>
-    <j-form ref="nameRef" :model="formData">
-      <j-form-item
-        name="nodeName"
-        :rules="[
-          { required: true, trigger: 'blur', message: '请输入节点名称' },
-          { max: 64, trigger: 'blur', message: '最多输入64个字符' },
-        ]"
-      >
-        <j-input
-          v-if="!isAdvanceConfig"
-          v-model:value="formData.nodeName"
-          placeholder="请输入"
-          style="margin-bottom: 10px"
-        />
-      </j-form-item>
-    </j-form>
+    <j-drawer
+      destroyOnClose
+      placement="right"
+      :width="600"
+      :visible="showConfig"
+      :closable="false"
+      @close="handleClose"
+    >
+      <template v-if="isAdvanceConfig" #title> 高级配置 </template>
+      <j-form ref="nameRef" :model="formData">
+        <j-form-item
+          name="nodeName"
+          :rules="[
+            { required: true, trigger: 'blur', message: '请输入节点名称' },
+            { max: 64, trigger: 'blur', message: '最多输入64个字符' },
+          ]"
+        >
+          <j-input
+            v-if="!isAdvanceConfig"
+            v-model:value="formData.nodeName"
+            placeholder="请输入"
+            style="margin-bottom: 10px"
+          />
+        </j-form-item>
+      </j-form>
 
-    <NodeConfig ref="nodeConfigRef" />
-  </j-drawer>
+      <NodeConfig ref="nodeConfigRef" />
+    </j-drawer>
+  </div>
 </template>
 
 <script setup lang="ts">
