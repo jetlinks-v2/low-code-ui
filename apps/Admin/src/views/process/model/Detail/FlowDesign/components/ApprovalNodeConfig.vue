@@ -235,8 +235,9 @@ const getRejectNodes = (nodeId) => {
     nodeList.value.push({ label: _parentNode.name, value: _parentNode.id })
   }
   // 父节点存在, 并且可以驳回的节点没有找到 继续查找
-  if (_parentNode.parentId && !nodeList.value.length)
+  if (_parentNode.parentId)
     getRejectNodes(_parentNode.parentId)
+    memberFormData.rejectTo = nodeList.value?.[0]?.value
 }
 
 /**
