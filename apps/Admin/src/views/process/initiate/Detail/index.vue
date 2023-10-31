@@ -7,37 +7,46 @@
         </div>
         <j-row :gutter="[16, 16]" v-else>
           <j-col :span="10">
-            <div class="form">
-              <j-form ref="formRef" :model="tableData" autocomplete="off">
-                <template v-for="(item, index) in formList" :key="index">
-                  <div>{{ item.formName }}</div>
-                  <FormPreview
-                    v-if="!item.multiple"
-                    ref="previewRef"
-                    :value="item.data"
-                    :data="item.fullInfo?.configuration"
-                  />
-                  <TableFormPreview
-                    v-else
-                    v-model:data-source="tableData[item.formId]"
-                    :hasRules="true"
-                    :columns="
-                      getTableColumns(
-                        item.fullInfo?.configuration?.children,
-                        item.formId,
-                        item.data,
-                        item.multiple,
-                      )
-                    "
-                  />
-                </template>
-              </j-form>
-            </div>
-
+            <j-scrollbar style="height: calc(100vh - 225px)">
+              <div class="form">
+                <j-form ref="formRef" :model="tableData" autocomplete="off">
+                  <template v-for="(item, index) in formList" :key="index">
+                    <j-space>
+                      <img
+                        :src="getImage(`/flow-designer/preview-form.png`)"
+                        style="height: 16px"
+                      />
+                      <span>
+                        {{ item.formName }}
+                      </span>
+                    </j-space>
+                    <FormPreview
+                      v-if="!item.multiple"
+                      ref="previewRef"
+                      :value="item.data"
+                      :data="item.fullInfo?.configuration"
+                    />
+                    <TableFormPreview
+                      v-else
+                      v-model:data-source="tableData[item.formId]"
+                      :hasRules="true"
+                      :columns="
+                        getTableColumns(
+                          item.fullInfo?.configuration?.children,
+                          item.formId,
+                          item.data,
+                          item.multiple,
+                        )
+                      "
+                    />
+                  </template>
+                </j-form>
+              </div>
+            </j-scrollbar>
           </j-col>
           <j-col :span="10" :offset="4">
             <!-- 流程图 -->
-            <div class="flow-chart">
+            <div class="flow-chart" style="height: calc(100vh - 225px)">
               <div class="flow-title">审批流程</div>
               <FlowDesigner readOnly :nodesData="nodesData" />
             </div>
@@ -46,8 +55,12 @@
             <j-affix :offset-bottom="24">
               <div class="btn-list">
                 <j-button class="btn" @click="cancel">取消</j-button>
-                <j-button class="btn" type="primary" @click="submit">提交</j-button>
-                <j-button class="btn" type="primary" @click="save">保存</j-button>
+                <j-button class="btn" type="primary" :loading="loading" @click="submit"
+                  >提交</j-button
+                >
+                <!-- <j-button class="btn" type="primary" @click="save"
+                  >保存</j-button
+                >-->
               </div>
             </j-affix>
           </j-col>
@@ -70,6 +83,7 @@ import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import md5 from 'md5'
 import { getMeProcessList } from '@/api/process/me'
+import { getImage } from '@jetlinks/utils'
 
 interface FormsProps {
   formId: string
@@ -88,6 +102,7 @@ interface FormsProps {
 //   }[]
 // }
 
+const loading = ref<boolean>(false)
 const router = useRouter()
 const route = useRoute()
 const previewRef = ref<any>()
@@ -146,16 +161,11 @@ const hasData = (array: any[] = []) => {
   } else {
     let flag = false
     for (const i of array) {
-      const arr = Object.values(i).filter((key: any) => key && key.length > 0)
-      if (arr.length > 0) {
-        flag = true
-        break
-      }
+      flag = Object.values(i).some((key: any) => key || key?.length > 0)
+      if (flag) break
     }
     tableList?.forEach((item: any) => {
-      if (Object.values(item[0]).filter((j) => j).length > 0) {
-        flag = true
-      }
+      flag = Object.values(item[0]).some((key: any) => key || key?.length > 0)
     })
     return flag
   }
@@ -175,7 +185,14 @@ const cancel = () => {
         // 不校验必填项保存已填数据，toast提示“保存成功”并返回发起申请页；
         // 再次发起该流程时横幅提示“继续编辑草稿”
         startProcess(list, false).then((flag) => {
-          flag ? router.back() : ''
+          flag
+            ? router.push({
+                path: '/flow-engine/me/initiate',
+                query: {
+                  state: 'ready',
+                },
+              })
+            : ''
         })
       },
       onCancel() {
@@ -191,25 +208,27 @@ const cancel = () => {
  * 提交
  */
 const submit = async () => {
+  loading.value = true
   const list = previewRef.value?.map((item) => item.onSave()) || []
   Promise.all([...list, formRef.value.validate()]).then((res) => {
     startProcess(res).then((flag) => {
       // 跳转至我的流程-我发起的
       flag ? router.push('/flow-engine/me/initiate') : ''
     })
-  })
-  // }
-}
-/**
- * 保存
- */
-const save = () => {
-  const list = previewRef.value?.map((item) => item.formState)
-  startProcess(list, false).then((flag) => {
-    // 跳转至我的流程-我的待办
-    flag ? router.push('/flow-engine/me/todo') : ''
+  }).finally(() =>{
+    loading.value = false
   })
 }
+// /**
+//  * 保存
+//  */
+// const save = () => {
+//   const list = previewRef.value?.map((item) => item.formState)
+//   startProcess(list, false).then((flag) => {
+//     // 跳转至我的流程-我的待办
+//     flag ? router.push('/flow-engine/me/todo') : ''
+//   })
+// }
 onMounted(() => {
   spinning.value = true
   // 草稿箱进入
@@ -374,7 +393,7 @@ const getProcess = () => {
     text-align: center;
   }
 
-  .flow-chart{
+  .flow-chart {
     border-left: 1px solid #f0f0f0;
 
     .flow-title {
@@ -391,7 +410,7 @@ const getProcess = () => {
     // width: 276px;
     height: 44px;
     display: flex;
-    justify-content:space-evenly;
+    justify-content: space-evenly;
     gap: 8px;
     margin-top: 10px;
     // .btn {

@@ -1,7 +1,7 @@
 <template>
   <div class="member">
     <a-form-item-rest>
-      <j-button class="btn" @click="visible = true">
+      <j-button class="btn"  type="text" @click="visible = true">
         <span>选择成员</span>
         <span class="icon" v-show="initList.length > 0">
           <img :src="getImage('/members/check.png')" />
@@ -18,17 +18,19 @@
         >
           <template #renderItem="{ item }">
             <j-list-item :class="{ 'is-del': item.isDel }">
-              <j-space>
+              <j-space class="item-item">
                 <AIcon :type="iconType[item.type]" class="a-icon" />
                 <!-- v-if="isDel(item)" -->
-                <j-tooltip v-if="item.isDel">
+                <!-- <j-tooltip v-if="item.isDel">
                   <template #title>用户不存在</template>
                   {{ item.name }}
-                </j-tooltip>
+                  <AIcon type="ExclamationCircleFilled" style="color: #EB636F;" />
+                </j-tooltip> -->
 
-                <j-ellipsis line-clamp="1" v-else>
+                <j-ellipsis line-clamp="1">
                   {{ item.name }}
                 </j-ellipsis>
+                <AIcon v-if="item.isDel" type="ExclamationCircleFilled" class="war-icon" style="font-size: 16px; color: #EB636F;" />
               </j-space>
             </j-list-item>
           </template>
@@ -227,7 +229,7 @@ const getTree = (data: any) => {
       model: JSON.stringify(flowStore.model),
     },
     nodeId: props.nodeId,
-    containThisNode: true,
+    containThisNode: false,
   }
   getVar_api(param).then((res) => {
     if (res.success) {
@@ -278,7 +280,7 @@ getTreeData()
 
 provide('infoState', {
   dataMap: dataMap,
-  members: list,
+  members: initList,
   nodeId: props.nodeId,
   isNode: props.isNode,
   hasWeight: props.hasWeight,
@@ -311,6 +313,10 @@ watch(
   },
   { immediate: true },
 )
+
+// watch(()=>[list.value,dataMap.value],()=>{
+
+// })
 </script>
 <style scoped lang="less">
 .member {
@@ -320,6 +326,7 @@ watch(
     position: relative;
     // width: 496px;
     margin-bottom: 8px;
+    background: #F3F3F3;
   }
   .icon {
     position: absolute;
@@ -334,21 +341,27 @@ watch(
   :deep(.ant-list) {
     overflow: hidden;
     .ant-list-item {
+      cursor: pointer;
+      position: relative;
       height: 40px;
       line-height: 40px;
       border-radius: 4px;
       background: #f6f7f9;
-
+      .war-icon{
+        position: absolute;
+        top: 13px;
+        right: 8px;
+      }
       .a-icon {
         font-size: 16px;
         color: #226aff;
       }
     }
     .is-del {
-      background: #fde8ea;
-      color: #e50012;
+      // background: #fde8ea;
+      color: #999999;
       .a-icon {
-        color: #e50012;
+        color: #999999;
       }
     }
   }

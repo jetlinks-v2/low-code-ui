@@ -10,7 +10,8 @@
           {{ getText(key) ?? '流程分类已被删除，请重新添加' }}
         </div>
         <div class="process">
-          <div
+          <j-card
+            hoverable
             class="process-item"
             @click="handleDetail(item)"
             v-for="item of data[key]"
@@ -28,7 +29,7 @@
             <j-ellipsis line-clamp="2">
               <span class="title">{{ item.name }}</span>
             </j-ellipsis>
-          </div>
+          </j-card>
         </div>
       </div>
       <div class="empty">
@@ -95,17 +96,26 @@ const handleDetail = (data) => {
       gap: 24px;
       flex-wrap: wrap;
       .process-item {
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        width: 159px;
-        height: 56px;
-        border-radius: 4px;
-        padding: 6px 12px;
         border: 1px solid #e5e8ef;
-        line-height: 22px;
+        :deep(.ant-card-body){
+          cursor: pointer;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 8px;
+          width: 159px;
+          height: 56px;
+          border-radius: 4px;
+          padding: 6px 12px;
+          // border: 1px solid #e5e8ef;
+          line-height: 22px;
+        }
+        
+        // &:hover {
+        //   box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.1);
+        //   // transition: .5s;
+        //   transition: all .5s;
+        // }
         .title {
           font-size: 16px;
           color: #1d2129;

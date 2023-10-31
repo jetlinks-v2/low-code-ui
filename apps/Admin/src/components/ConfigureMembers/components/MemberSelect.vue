@@ -256,7 +256,7 @@ const setLevel = (data: any[]) => {
 }
 
 const onSelect = (keys: string[], { node, selected }) => {
-  if (!selected && !infoState.supCancel) return
+  if (!selected) return
   selectedKeys.value = [...keys]
   const index = dataSource.value.findIndex(
     (i) => i.id === (active.value === 'var' ? node.fullId : node.id),
