@@ -183,36 +183,40 @@ const keywords = ref('')
 const filterFormList = ref<any[] | undefined>([])
 const allFormList = ref<any[] | undefined>([])
 const getFormList = async () => {
-  filterFormList.value = flowStore.model.config.forms?.map((m) => {
-    const _fields = m.fullInfo.configuration?.children
-    // 已经存在的字段
-    const existFields = forms.value[m.formId]
-    if (existFields && existFields.length) {
-      _fields?.forEach((p) => {
-        const _currentField = existFields.find(
-          (f) => f.id === p.formItemProps.name,
-        )
-        p['accessModes'] = _currentField ? _currentField.accessModes : ['read']
-        // 只有"写"权限时, 表单才可编辑
-        p.componentProps.disabled = !p.accessModes.includes('write')
-      })
+  filterFormList.value = flowStore.model.config.forms
+    ?.filter((f) => !f.isDelete)
+    ?.map((m) => {
+      const _fields = m.fullInfo.configuration?.children
+      // 已经存在的字段
+      const existFields = forms.value[m.formId]
+      if (existFields && existFields.length) {
+        _fields?.forEach((p) => {
+          const _currentField = existFields.find(
+            (f) => f.id === p.formItemProps.name,
+          )
+          p['accessModes'] = _currentField
+            ? _currentField.accessModes
+            : ['read']
+          // 只有"写"权限时, 表单才可编辑
+          p.componentProps.disabled = !p.accessModes.includes('write')
+        })
 
-      // 如果表单下每个字段都有读写, 则表单也有读写权限
-      return {
-        accessModes: _fields?.every((e) => e.accessModes.length === 2)
-          ? ['read', 'write']
-          : ['read'],
-        ...m,
+        // 如果表单下每个字段都有读写, 则表单也有读写权限
+        return {
+          accessModes: _fields?.every((e) => e.accessModes.length === 2)
+            ? ['read', 'write']
+            : ['read'],
+          ...m,
+        }
+      } else {
+        _fields?.forEach((p) => {
+          p['accessModes'] = ['read']
+          // 初始状态没有权限, 不可编辑
+          p.componentProps.disabled = true
+        })
+        return { accessModes: ['read'], ...m }
       }
-    } else {
-      _fields?.forEach((p) => {
-        p['accessModes'] = ['read']
-        // 初始状态没有权限, 不可编辑
-        p.componentProps.disabled = true
-      })
-      return { accessModes: ['read'], ...m }
-    }
-  })
+    })
   //   所有表单数据
   allFormList.value = cloneDeep(filterFormList.value)
   // 设置全部内容全选状态
