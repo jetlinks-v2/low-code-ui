@@ -173,6 +173,7 @@ const columnsTodo = [
         hideInTable:true,
         search: {
             type: 'select',
+            termFilter:['in','nin'],
             options: options,
         },
     },
@@ -259,6 +260,7 @@ const columnsFinished = [
         search: {
             type: 'select',
             options: options,
+            termFilter:['in','nin']
         },
     },
     {
@@ -368,6 +370,7 @@ const columnsInitiate = [
         scopedSlots: true,
         search: {
             type: 'select',
+            termFilter:['in','nin'],
             options: [
                 // { label: '审办中', value: 'running ' },
                 { label: '已完成', value: 'completed' },
@@ -470,6 +473,7 @@ const columnsCc = [
         hideInTable:true,
         search: {
             type: 'select',
+            termFilter:['in','nin'],
             options: options,
         },
     },
@@ -480,6 +484,7 @@ const columnsCc = [
         scopedSlots: true,
         search: {
             type: 'select',
+            termFilter:['in','nin'],
             options: [
                 // { label: '审办中', value: 'running ' },
                 { label: '已完成', value: 'completed' },
