@@ -15,8 +15,8 @@
       :closable="false"
       @close="handleClose"
     >
-      <template v-if="isAdvanceConfig" #title> 高级配置 </template>
-      <j-form ref="nameRef" :model="formData">
+      <template v-show="isAdvanceConfig" #title> 高级配置 </template>
+      <j-form v-show="!isAdvanceConfig" ref="nameRef" :model="formData">
         <j-form-item
           name="nodeName"
           :rules="[
@@ -25,7 +25,6 @@
           ]"
         >
           <j-input
-            v-if="!isAdvanceConfig"
             v-model:value="formData.nodeName"
             placeholder="请输入"
             style="margin-bottom: 10px"

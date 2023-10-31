@@ -1,62 +1,60 @@
 <!-- 并行分支配置 -->
 <template>
-  <j-tabs v-model:activeKey="activeKey" type="card">
-    <j-tab-pane key="basic" tab="基础配置">
-      <j-form ref="basicFormRef" :model="basicFormData" layout="vertical">
-        <j-form-item name="complexType">
-          <template #label>
-            请配置从并行分支进入下一个流程节点的条件
-            <j-tooltip placement="right">
-              <template #title>
-                并行分支中任意一个节点办理人选择了退回后，
-                不需要等待其他节点的处理意见，立刻退回至对应节点
-              </template>
-              <AIcon type="InfoCircleOutlined" />
-            </j-tooltip>
+  <j-form ref="basicFormRef" :model="basicFormData" layout="vertical">
+    <j-form-item name="complexType">
+      <template #label>
+        请配置从并行分支进入下一个流程节点的条件
+        <j-tooltip placement="right">
+          <template #title>
+            并行分支中任意一个节点办理人选择了退回后，
+            不需要等待其他节点的处理意见，立刻退回至对应节点
           </template>
-          <j-radio-group
-            v-model:value="basicFormData.complexType"
-            button-style="solid"
-          >
-            <j-radio-button value="percent">全部分支完成</j-radio-button>
-            <j-radio-button value="weight">部分分支完成</j-radio-button>
-          </j-radio-group>
-        </j-form-item>
-        <j-form-item
-          :name="['weight', 'inputNodeWeight']"
-          label="请配置各分支的权重"
-          v-if="basicFormData.complexType === 'weight'"
-        >
-          <j-button type="primary" block ghost @click="visible = true">
-            配置
-          </j-button>
-        </j-form-item>
-        <j-form-item
-          :name="['weight', 'complexWeight']"
-          label="请配置并行分支的通过权重"
-          v-if="basicFormData.complexType === 'weight'"
-          :rules="[
-            {
-              required: true,
-              message: `请输入通过权重`,
-              trigger: 'blur',
-            },
-            {
-              validator: rules.complexWeightValidator,
-              trigger: 'blur',
-            },
-          ]"
-        >
-          <j-input-number
-            v-model:value="basicFormData.weight.complexWeight"
-            :min="1"
-            :max="99999"
-            style="width: 100%"
-          />
-        </j-form-item>
-      </j-form>
-    </j-tab-pane>
-  </j-tabs>
+          <AIcon type="InfoCircleOutlined" />
+        </j-tooltip>
+      </template>
+      <j-radio-group
+        v-model:value="basicFormData.complexType"
+        button-style="solid"
+      >
+        <j-space>
+          <j-radio-button value="percent">全部分支完成</j-radio-button>
+          <j-radio-button value="weight">部分分支完成</j-radio-button>
+        </j-space>
+      </j-radio-group>
+    </j-form-item>
+    <j-form-item
+      :name="['weight', 'inputNodeWeight']"
+      label="请配置各分支的权重"
+      v-if="basicFormData.complexType === 'weight'"
+    >
+      <j-button type="primary" block ghost @click="visible = true">
+        配置
+      </j-button>
+    </j-form-item>
+    <j-form-item
+      :name="['weight', 'complexWeight']"
+      label="请配置并行分支的通过权重"
+      v-if="basicFormData.complexType === 'weight'"
+      :rules="[
+        {
+          required: true,
+          message: `请输入通过权重`,
+          trigger: 'blur',
+        },
+        {
+          validator: rules.complexWeightValidator,
+          trigger: 'blur',
+        },
+      ]"
+    >
+      <j-input-number
+        v-model:value="basicFormData.weight.complexWeight"
+        :min="1"
+        :max="99999"
+        style="width: 100%"
+      />
+    </j-form-item>
+  </j-form>
 
   <j-modal
     title="分支权重配置"
@@ -102,7 +100,6 @@ import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
 
-const activeKey = ref('basic')
 const props = defineProps({
   node: {
     type: Object,
