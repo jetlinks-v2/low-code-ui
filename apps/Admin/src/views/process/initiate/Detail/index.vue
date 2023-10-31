@@ -6,7 +6,7 @@
           <j-spin :spinning="spinning" />
         </div>
         <j-row :gutter="[16, 16]" v-else>
-          <j-col :span="12">
+          <j-col :span="10">
             <div class="form">
               <j-form ref="formRef" :model="tableData" autocomplete="off">
                 <template v-for="(item, index) in formList" :key="index">
@@ -20,6 +20,7 @@
                   <TableFormPreview
                     v-else
                     v-model:data-source="tableData[item.formId]"
+                    :hasRules="true"
                     :columns="
                       getTableColumns(
                         item.fullInfo?.configuration?.children,
@@ -32,20 +33,23 @@
                 </template>
               </j-form>
             </div>
-            <div class="btn-list">
-              <j-button class="btn" @click="cancel">取消</j-button>
-              <j-button class="btn" type="primary" @click="submit"
-                >提交</j-button
-              >
-              <j-button class="btn" type="primary" @click="save">保存</j-button>
-            </div>
+
           </j-col>
-          <j-col :span="12">
+          <j-col :span="10" :offset="4">
             <!-- 流程图 -->
             <div class="flow-chart">
-              <span>审批流程</span>
+              <div class="flow-title">审批流程</div>
               <FlowDesigner readOnly :nodesData="nodesData" />
             </div>
+          </j-col>
+          <j-col :span="4" :offset="10">
+            <j-affix :offset-bottom="24">
+              <div class="btn-list">
+                <j-button class="btn" @click="cancel">取消</j-button>
+                <j-button class="btn" type="primary" @click="submit">提交</j-button>
+                <j-button class="btn" type="primary" @click="save">保存</j-button>
+              </div>
+            </j-affix>
           </j-col>
         </j-row>
       </div>
@@ -312,6 +316,7 @@ const handleData = (data: any, model: string) => {
         obj.nodes.props.formBinds[item],
       )
     })
+    console.log(`output->bindMap`, bindMap)
     const forms = editDraft.value ? data.form : obj.config.forms
 
     formList.value = forms?.map((m) => {
@@ -324,7 +329,7 @@ const handleData = (data: any, model: string) => {
       _fields?.forEach((p) => {
         const accessModes = bindMap
           .get(m.formId)
-          ?.find((k) => k.id === p.key)?.accessModes
+          ?.find((k) => k.id === p.formItemProps.name)?.accessModes
         p.componentProps.disabled = !accessModes?.includes('write')
       })
       return {
@@ -368,14 +373,30 @@ const getProcess = () => {
     margin-top: 100px;
     text-align: center;
   }
+
+  .flow-chart{
+    border-left: 1px solid #f0f0f0;
+
+    .flow-title {
+      height: 64px;
+      padding: 22px 20px;
+      font-size: 18px;
+      font-weight: 500;
+      border-bottom: 1px solid #f0f0f0;
+      margin-bottom: 16px;
+    }
+  }
+
   .btn-list {
+    // width: 276px;
+    height: 44px;
     display: flex;
-    justify-content: center;
+    justify-content:space-evenly;
     gap: 8px;
     margin-top: 10px;
-    .btn {
-      width: 20%;
-    }
+    // .btn {
+    //   width: 20%;
+    // }
   }
 }
 </style>

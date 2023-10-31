@@ -198,6 +198,17 @@ const columns = computed(()=>[
     },
   },
   {
+    title: '结束时间',
+    dataIndex: 'endTime',
+    key: 'endTime',
+    ellipsis: true,
+    scopedSlots: true,
+    hideInTable: !history.value,
+    // search: {
+    //   type: 'date',
+    // },
+  },
+  {
     title: '操作',
     key: 'action',
     scopedSlots: true,

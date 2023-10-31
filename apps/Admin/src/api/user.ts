@@ -24,8 +24,14 @@ export const validateField_api = (type: 'username' | 'password', name: string) =
 
 // 获取角色列表
 export const getRoleList_api = () => request.get(`/role/_query/no-paging?paging=false`);
+// 获取所有角色
+export const getAllRole_api = (data: any) => request.post(`role/_query/no-paging`, data);
+
 // 获取组织列表
 export const getDepartmentList_api = () => request.get(`/organization/_all/tree?paging=false`);
+
+// 获取所有组织
+export const getAllDepartment_api = (data: any) => request.post(`/organization/_all/tree`, data);
 
 // 获取用户信息
 export const getUser_api = (id: string) => request.get(`/user/detail/${id}`);

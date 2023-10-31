@@ -34,8 +34,9 @@ const getCount = computed(() => {
     props.data.fun().then((res) => {
       count[props.data.key] = res.data
     })
+    return count[props.data.key]
   }
-  return count[props.data.key] || 0
+    return 0
 })
 </script>
 <style scoped lang="less">
