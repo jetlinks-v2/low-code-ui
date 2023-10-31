@@ -1,13 +1,19 @@
 <template>
-  <div class="operation-drawer">
+  <div class="operation-drawer" ref="operationDrawer">
+    <template v-if="open">
+      <img class="modal-config-img" :src="getImage('/list-page/column-config.png')" v-if="type === 'columns'">
+      <img class="modal-config-img" :src="getImage('/list-page/button.png')" v-else>
+    </template>
     <j-drawer
-      width="25vw"
-      :visible="_visible"
-      :title="type == 'columns' ? '操作列' : '添加按钮'"
-      @close="close"
+      placement="right"
+      width="560px"
       destroy-on-close
-      :z-index="1000"
-      :placement="type == 'columns' ? 'left' : 'right'"
+      :visible="_visible"
+      :title="type == 'columns' ? '操作列配置' : '添加按钮配置'"
+      :getContainer="() => $refs.operationDrawer"
+      :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
+      @close="close"
+
     >
       <BtnsList
         v-model:data="columnsTree"
@@ -38,16 +44,20 @@ import {
   activeBtnKey,
   columnsTreeKey,
   typeKey,
-  showColumnsKey,
   editTypeKey,
   parentKeyKey,
   errorListKey,
 } from './keys'
 import { validOperationsBtn } from './index'
 import { PropType } from 'vue'
+import { getImage } from '@jetlinks/utils';
+import { useFunctions } from '@/hooks'
+import { useProduct } from '@/store'
+import { providerEnum } from '@/components/ProJect'
 
 interface Emit {
   (e: 'update:open', value: boolean): void
+  (e: 'update:columnsTree', value: OperationConfigTreeItem[]): void
 }
 
 const emits = defineEmits<Emit>()
@@ -60,13 +70,22 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  initData: {
+  columnsTree: {
     type: Object as PropType<OperationConfigTreeItem[]>,
-    default: () => {}
+    default: () => []
   }
 })
 
-const columnsTree = ref<OperationConfigTreeItem[]>([])
+const { functionOptions } = useFunctions()
+const productStore = useProduct()
+const columnsTree = computed({
+  get() {
+    return props.columnsTree
+  },
+  set(val: OperationConfigTreeItem[]) {
+    emits('update:columnsTree', val)
+  }
+})
 
 const steps = ref('BtnsList')
 const _visible = computed({
@@ -88,7 +107,6 @@ const activeBtn = ref<Partial<OperationConfigTreeItem>>({})
 const editType = ref<'add' | 'edit'>('add')
 const parentKey = ref('')
 const EditBtnsRef = ref()
-const showColumns = ref(true)
 const errorList = ref<ErrorItemType[]>([])
 
 const save = async () => {
@@ -97,32 +115,25 @@ const save = async () => {
   })
 }
 
-const valid = async () => {
-  return new Promise((resolve, reject) => {
-    validOperationsBtn(columnsTree.value)
-    .then(() => {
-      errorList.value = []
-      resolve(errorList.value)
-    })
-    .catch((err: ErrorItemType[]) => {
-      errorList.value = err
-      resolve(errorList.value)
-    })
+const valid = () => {
+  const pages = [...productStore.getDataMap().values()].filter((item) => {
+    return [providerEnum.FormPage, providerEnum.HtmlPage].includes(item.type)
   })
+  errorList.value = validOperationsBtn(columnsTree.value, functionOptions.value, pages)
+  return errorList.value.length ? [{message: props.type === 'columns' ? '操作列配置错误': '操作按钮配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validOperationsBtn(columnsTree.value)
+  //   if(errorList.value.length) reject([{message: '操作按钮配置错误'}])
+  //   else resolve([])
+  // })
 }
 
-watchEffect(() => {
-  if(props.initData) {
-    columnsTree.value = props.initData
-  }
-})
 
 provide(activeBtnKey, activeBtn)
 provide(columnsTreeKey, columnsTree)
 provide(editTypeKey, editType)
 provide(parentKeyKey, parentKey)
 provide(typeKey, props.type)
-provide(showColumnsKey, showColumns)
 provide(errorListKey, errorList)
 
 defineExpose({

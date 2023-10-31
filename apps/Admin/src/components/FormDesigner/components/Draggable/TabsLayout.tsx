@@ -3,7 +3,10 @@ import Selection from '../Selection/index'
 import { Tabs, TabPane, FormItem } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, omit } from 'lodash-es'
+import { useTool } from '../../hooks'
+import generatorData from '../../utils/generatorData'
+import { uid } from '../../utils/uid'
 
 export default defineComponent({
     name: 'TabsLayout',
@@ -25,23 +28,37 @@ export default defineComponent({
         index: {
             type: Number,
             default: 0
+        },
+        visible: {
+            type: Boolean,
+            default: true
+        },
+        editable: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
+        const { isEditModel, isDragArea, layoutPadStyle } = useTool()
+
         const list = computed(() => {
             return props.data?.children || []
         })
 
         const handleAdd = () => {
-            props.data.context?.appendItem()
-            const addData = unref(list).slice(-1)
-            designer.setSelection(addData)
+            const _item = generatorData({
+                type: props.data?.type + '-item',
+                children: [],
+                componentProps: {
+                    name: 'Title'
+                },
+                formItemProps: {
+                    name: props.data?.type + '-item' + '_' + uid(6)
+                }
+            })
+            designer.onAddChild(_item, props.data)
         }
-
-        const isEditModel = computed(() => {
-            return unref(designer?.model) === 'edit'
-        })
 
         const _formItemProps = computed(() => {
             return props.data?.formItemProps
@@ -52,7 +69,7 @@ export default defineComponent({
         })
 
         return () => {
-            const _path = cloneDeep(props?.path || []);
+            let _path = cloneDeep(props?.path || []);
             const _index = props?.index || 0;
             if (props.data?.formItemProps?.name) {
                 _path[_index] = props.data.formItemProps.name
@@ -64,10 +81,11 @@ export default defineComponent({
                         unref(list).length ? <Tabs data-layout-type={'tabs'} {...props.data.componentProps}>
                             {
                                 unref(list).map((element) => {
+                                    const __path = [..._path, element.formItemProps?.name]
                                     return (
-                                        <TabPane key={element.key} {...element.componentProps}>
+                                        <TabPane key={element.key} {...omit(element.componentProps, 'name')} tab={element.componentProps.name}>
                                             <Selection
-                                                class={'drag-area'}
+                                                class={unref(isDragArea) && 'drag-area'}
                                                 data={element}
                                                 tag="div"
                                                 hasCopy={true}
@@ -81,8 +99,10 @@ export default defineComponent({
                                                     data-layout-type={'tabs-item'}
                                                     data={element.children}
                                                     parent={element}
-                                                    path={_path}
-                                                    index={_index + 1}
+                                                    path={__path}
+                                                    index={_index + 2}
+                                                    visible={props.visible}
+                                                    editable={props.editable}
                                                 />
                                             </Selection>
                                         </TabPane>
@@ -101,10 +121,10 @@ export default defineComponent({
             }
 
             return (
-                <Selection {...useAttrs()} style={{ padding: '16px' }} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
+                <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
                     {
                         unref(_isLayout) ?
-                            <FormItem {...unref(_formItemProps)}>
+                            <FormItem {...unref(_formItemProps)} validateFirst={true}>
                                 {renderContent()}
                             </FormItem>
                             : renderContent()

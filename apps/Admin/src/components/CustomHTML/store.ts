@@ -10,12 +10,14 @@ export const importMapFile = 'import-map.json'
 export const tsconfigFile = 'tsconfig.json'
 const defaultVueRuntimeURL = `https://unpkg.com/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.js`
 
+/**
+ * import { installJetlinksPlugin } from './${jetlinksPluginFile}'
+ * //注册内部插件(@jetlinks/ui、@jetlinks/components、@jetlinks/core、@jetlinks/hooks、@jetlinks/router、@jetlinks/stores、@jetlinks/types和@jetlinks/utils)
+ * installJetlinksPlugin()
+ */
 export const defaultVueCode = `
 <script setup>
 import { ref } from 'vue'
-import { installJetlinksPlugin } from './${jetlinksPluginFile}'
-//注册内部插件(@jetlinks/ui、@jetlinks/components、@jetlinks/core、@jetlinks/hooks、@jetlinks/router、@jetlinks/stores、@jetlinks/types和@jetlinks/utils)
-installJetlinksPlugin()
 
 const msg = ref('Hello World!')
 </script>
@@ -34,7 +36,6 @@ const jetlinksImports = {
   // '@ant-design/icons-vue': 'http://localhost:8080/src/components/CustomHTML/@ant-design/icons-vue',
   // '@ant-design/icons-svg': 'http://localhost:8080/src/components/CustomHTML/@ant-design/icons-svg',
   // '@ant-design/colors': 'http://localhost:8080/src/components/CustomHTML/@ant-design/colors',
-  '@jetlinks/ui': 'https://cdn.jsdelivr.net/npm/@varlet/ui@2.14.2/es/varlet.esm.js',
 }
 
 const tsconfig = {
@@ -98,9 +99,11 @@ export class ReplStore implements Store {
 
   init() {
     watchEffect(() =>
-      compileFile(this, this.state.activeFile).then(
-        (errs) => (this.state.errors = errs),
-      ),
+      {
+        compileFile(this, this.state.activeFile).then(
+          (errs) => (this.state.errors = errs),
+        )
+      }
     )
 
     this.state.errors = []
@@ -129,6 +132,10 @@ export class ReplStore implements Store {
 
   updateCompiledFile(compiled: File['compiled'], fileName: string) {
     this.state.files[fileName]!.compiled = compiled
+  }
+
+  updateCompiledCode(code: string, fileName: string) {
+    this.state.files[fileName]!.code = code
   }
 
   setJetlinksPluginVersion(version: string) {
@@ -242,7 +249,7 @@ function getJetlinksPluginCode(version: string | 'latest' | 'preview') {
   }
 
   return `\
-import JetlinksUI from '@jetlinks/ui'
+// import JetlinksUI from '@jetlinks/ui'
 import { getCurrentInstance } from 'vue'
 
 const jetlinksCss = '${jetlinksCss}'
@@ -250,8 +257,8 @@ const jetlinksCss = '${jetlinksCss}'
 await appendStyle()
 
 export function installJetlinksPlugin() {
-  const instance = getCurrentInstance()
-  instance.appContext.app.use(JetlinksUI)
+  // const instance = getCurrentInstance()
+  // instance.appContext.app.use(JetlinksUI)
 }
 
 export function appendStyle() {

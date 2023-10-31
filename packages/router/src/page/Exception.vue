@@ -1,8 +1,10 @@
 <template>
-    <j-result status="404" title="404"></j-result>
+    <Result status="404" title="404"></Result>
 </template>
 <script>
+import { Result } from 'jetlinks-ui-components'
 export default {
-  name: '404.vue'
+  name: 'Exception',
+  components: { Result }
 }
 </script>

@@ -1,11 +1,12 @@
 <template>
   <div class="btns-list">
-    <j-space v-if="type == 'columns'">
-      <span>展示</span>
-      <j-switch v-model:checked="showColumns"></j-switch>
-    </j-space>
-    <template v-if="showColumns">
-      <div v-if="!columnsTree?.length">
+    <j-form layout="vertical" v-if="type === 'columns'">
+      <j-form-item label="展示">
+        <j-switch v-model:checked="showColumns"></j-switch>
+      </j-form-item>
+    </j-form>
+    <template v-if="showColumns || type !== 'columns'">
+      <div>
         <p>
           {{
             type == 'columns'
@@ -13,34 +14,62 @@
               : '请配置当前页面需要的操作按钮'
           }}
         </p>
-        <j-button @click="handleAddBtn()">{{
-          type == 'columns' ? '添加操作' : '添加按钮'
-        }}</j-button>
+        <j-button
+          v-if="!columnsTree?.length"
+          class="add-btn"
+          @click="handleAddBtn()"
+          type="dashed"
+          >{{ type == 'columns' ? '添加操作' : '添加按钮' }}</j-button
+        >
       </div>
-      <div v-else>
+      <div v-if="columnsTree?.length">
         <BtnTree
           v-model:btn-list="columnsTree"
           :draggable="type === 'columns' ? false : true"
         >
-          <template #config="{ data }">
-            <j-button
-              type="link"
-              v-if="
-                data.type === 'customer' && data.level === 0 && type !== 'columns'
-              "
-              @click="handleAddBtn(data.key)"
-              >+下级</j-button
-            >
-            <j-button
-              type="link"
-              @click="handleEditBtn(data)"
+          <template #title="{ data }">
+            <span
               :class="{ error: errorList!.find((item) => item.key == data.key) }"
-              >配置</j-button
+              >{{ data.title }}</span
             >
-            <j-button type="link" @click="handleDel(data.key)">删除</j-button>
+          </template>
+          <template #config="{ data }">
+            <j-space size="middle">
+              <AIcon
+                v-if="
+                  data.type === 'customer' &&
+                  data.level === 0 &&
+                  type !== 'columns'
+                "
+                type="PlusOutlined"
+                @click="handleAddBtn(data.key)"
+              />
+              <AIcon
+                type="EditOutlined"
+                :class="{ error: errorList!.find((item) => item.key == data.key && item.errorKey != 'level') }"
+                class="primary"
+                @click="handleEditBtn(data)"
+              />
+              <AIcon
+                type="DeleteOutlined"
+                @click="handleDel(data.key)"
+                class="danger"
+              />
+            </j-space>
+            <span
+              style="position: absolute;right: -200px; color: #ff0000;"
+              v-if="errorList!.find((item) => item.key == data.key && item.errorKey == 'level')"
+              >{{
+                errorList!.find(
+                  (item) => item.key == data.key && item.errorKey == 'level',
+                )?.message
+              }}</span
+            >
           </template>
         </BtnTree>
-        <j-button type="text" @click="handleAddBtn()">+ {{ type == 'columns' ? '添加操作' : '添加按钮' }}</j-button>
+        <j-button class="add-btn" type="dashed" @click="handleAddBtn()"
+          >+ {{ type == 'columns' ? '添加操作' : '添加按钮' }}</j-button
+        >
       </div>
     </template>
   </div>
@@ -48,6 +77,7 @@
 <script setup lang="ts" name="BtnsList">
 import BtnTree from './BtnTree.vue'
 import { OperationConfigTreeItem } from '../type'
+import { ErrorItem } from '../..'
 import {
   columnsTreeKey,
   activeBtnKey,
@@ -55,7 +85,7 @@ import {
   typeKey,
   parentKeyKey,
   showColumnsKey,
-  errorListKey
+  errorListKey,
 } from '../keys'
 
 interface Emit {
@@ -84,7 +114,7 @@ const handleEditBtn = (dataRef: OperationConfigTreeItem) => {
 const emits = defineEmits<Emit>()
 
 const handleAddBtn = (parent?: string) => {
-  console.log(editType);
+  console.log(editType)
   editType!.value = 'add'
   parentKey!.value = parent
   emits('update:steps', 'BtnsType')
@@ -102,13 +132,28 @@ const handleDel = (key: string) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
+.btns-list {
+  width: 320px;
+  .add-btn {
+    width: 100%;
+  }
+  .danger {
+    color: #e50012;
+  }
+  .primary {
+    color: @primary-color;
+  }
+}
 .title {
   border-left: 1px solid;
   padding: 2px 50px 2px 10px;
   border-bottom: 1px solid;
 }
 .error {
-  color: red;
+  color: #e50012 !important;
+}
+:deep(.ant-tree-switcher-noop) {
+  opacity: 0;
 }
 </style>

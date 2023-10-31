@@ -19,6 +19,8 @@ interface RequestOptions<T, S> {
     onError: (e: any) => void
 
     defaultParams: S | any | any[]
+
+    handleResponse: (data: any) => any
 }
 
 const defaultOptions: any = {
@@ -55,7 +57,7 @@ export const useRequest = <T = any, S = any>(
               if (resp?.success) {
                 const successData = await _options.onSuccess?.(resp)
                 data.value = successData || get(resp, _options.formatName!)
-                console.log(data.value)
+                // console.log(data.value)
               } else {
                 _options.onError?.(resp)
               }

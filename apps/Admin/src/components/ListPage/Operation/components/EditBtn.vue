@@ -1,11 +1,10 @@
 <template>
   <div>
     <j-space>
-      <j-button @click="emits('update:steps', 'BtnsType')" type="text">
+      <j-button @click="handleBack" type="text">
         <AIcon type="LeftOutlined"></AIcon>
         返回
       </j-button>
-      <span>{{ title }}</span>
     </j-space>
     <Edit :data="activeBtn" ref="EditRef"></Edit>
   </div>
@@ -39,33 +38,16 @@ const activeBtn = inject(activeBtnKey)
 const editType = inject(editTypeKey)
 const columnsTree = inject(columnsTreeKey)
 const parentKey:any = inject(parentKeyKey)
-const title = computed(() => {
-  let text = '';
-  switch(activeBtn!.value.type) {
-    case 'customer':
-      text = '自定义操作'
-    break
-    case 'Update':
-      text =  '常用操作-编辑'
-    break
-    case 'Delete':
-      text = '常用操作-删除'
-    break
-    case 'Detail':
-      text =  '常用操作-查看详情'
-    break
-    case 'Add':
-      text = '常用操作-新增'
-    break
-    default:
-      text = '常用操作-批量导入/导出/删除'
-    break
+
+const handleBack = () => {
+  if(activeBtn!.value.key) {
+    emits('update:steps', 'BtnsList')
+  } else {
+    emits('update:steps', 'BtnsType')
   }
-  return text
-})
+}
 
-
-const save = async (callback: () => void) => {
+const save = async (callback: (...any) => void) => {
   const valid = await EditRef.value?.submit()
   if(valid) {
     if(editType!.value == 'add'){
@@ -91,7 +73,7 @@ const save = async (callback: () => void) => {
         }
       })
     }
-    callback && callback();
+    callback && callback(EditRef.value?.jsError, EditRef.value?.cssError);
   }
 }
 

@@ -1,20 +1,10 @@
 <template>
   <div class="list-skeleton">
-    <div class="left-menu">
-      <div
-        class="menus"
-        ref="menuRef"
-        @click="handleVisible('MenuConfigVisible')"
-      >
-        菜单配置
-      </div>
-      <div class="menus" ref="previewRef" @click="emits('goPreview')">预览</div>
-    </div>
     <div class="right-skeleton">
       <div class="skeleton-content">
-        <div class="search-skeleton">
+        <CardBox>
           <j-row justify="space-between">
-            <j-col :span="8">
+            <j-col>
               <j-space>
                 <j-badge :count="errorCount?.filterModule">
                   <j-skeleton-button
@@ -33,21 +23,19 @@
                 <j-skeleton-input style="width: 200px" size="large" />
               </j-space>
             </j-col>
-            <j-col :span="8">
-              <j-space size="large">
-                <j-space>
-                  <j-skeleton-button size="large" />
-                  <j-skeleton-button size="large" />
-                  <j-skeleton-button size="large" />
-                </j-space>
+            <j-col>
+              <j-space>
                 <j-skeleton-button size="large" />
+                <j-skeleton-button size="large" />
+                <j-skeleton-button size="large" />
+                <j-skeleton-input style="width: 136px" size="large" />
               </j-space>
             </j-col>
           </j-row>
-        </div>
-        <div class="table-skeleton">
+        </CardBox>
+        <CardBox class="table-skeleton">
           <j-row justify="space-between" align="middle">
-            <j-col :span="4">
+            <j-col>
               <j-badge :count="errorCount?.btn">
                 <j-skeleton-button
                   class="config-item btn"
@@ -61,38 +49,55 @@
                 />
               </j-badge>
             </j-col>
-            <j-col :span="2">
+            <j-col>
               <j-badge :count="errorCount?.listForm">
-                <j-space
-                  ref="ref6"
-                  class="config-item type"
-                  @click="handleVisible('ListFormVisible')"
-                >
-                  <j-skeleton-input style="width: 32px" />
-                  <j-skeleton-input style="width: 32px" />
+                <j-space @click="handleVisible('ListFormVisible')">
+                  <j-skeleton-input
+                    ref="ref6"
+                    class="width-32 config-item type"
+                    :class="{
+                      'config-done': configDone?.ListForm,
+                      animation:
+                        !configDone?.ListForm && !visibles.GuideVisible,
+                    }"
+                  />
+                  <j-skeleton-input
+                    ref="ref7"
+                    class="width-32 config-item type"
+                    :class="{
+                      'config-done': configDone?.ListForm,
+                      animation:
+                        !configDone?.ListForm && !visibles.GuideVisible,
+                    }"
+                  />
                 </j-space>
               </j-badge>
             </j-col>
           </j-row>
-          <j-row
-            :gutter="20"
-            style="height: 60%; overflow: hidden; padding: 20px"
-          >
+          <j-row :gutter="20" class="table-skeleton-row">
             <j-col :span="20">
-              <j-skeleton-input
-                size="large"
-                ref="ref3"
-                class="config-item column-data skeletion-input"
-                :class="{
-                  'config-done': configDone?.listData,
-                  animation: !configDone?.listData && !visibles.GuideVisible,
+              <j-badge
+                :count="errorCount?.listData"
+                style="width: 100%"
+                :numberStyle="{
+                  width: 'auto',
                 }"
-                @click="handleVisible('ListDataVisible')"
-              />
+              >
+                <j-skeleton-input
+                  size="large"
+                  ref="ref3"
+                  class="config-item column-data skeleton-input"
+                  :class="{
+                    'config-done': configDone?.listData,
+                    animation: !configDone?.listData && !visibles.GuideVisible,
+                  }"
+                  @click="handleVisible('ListDataVisible')"
+                />
+              </j-badge>
               <j-skeleton-input
-                class="skeletion-input"
+                class="skeleton-input"
                 size="large"
-                v-for="item in 8"
+                v-for="item in 12"
               />
             </j-col>
             <j-col :span="4">
@@ -107,7 +112,7 @@
                   size="large"
                   ref="ref4"
                   @click="handleVisible('OperationColumnsVisible')"
-                  class="config-item column-operation skeletion-input"
+                  class="config-item column-operation skeleton-input"
                   :class="{
                     'config-done': configDone?.actions,
                     animation: !configDone?.actions && !visibles.GuideVisible,
@@ -115,9 +120,9 @@
                 />
               </j-badge>
               <j-skeleton-input
-                class="skeletion-input"
+                class="skeleton-input"
                 size="large"
-                v-for="item in 8"
+                v-for="item in 12"
               />
             </j-col>
           </j-row>
@@ -131,27 +136,42 @@
                 }"
               >
                 <j-skeleton-input
-                  style="width: 100%"
+                  style="width: 100%; height: 40px"
                   size="large"
                   ref="ref5"
                   class="config-item pagination"
                   :class="{
                     'config-done': configDone?.pagination,
-                    animation: !configDone?.pagination && !visibles.GuideVisible,
+                    animation:
+                      !configDone?.pagination && !visibles.GuideVisible,
                   }"
                   @click="handleVisible('PagingConfigVisible')"
                 />
               </j-badge>
             </j-col>
           </j-row>
-        </div>
+        </CardBox>
       </div>
     </div>
+    <div class="left-menu">
+      <div class="menus" ref="previewRef" @click="emits('goPreview')">
+        <AIcon type="CaretRightOutlined" style="font-size: 20px" />
+      </div>
+      <j-badge :count="errorCount?.menuConfig" :offset="[-32, 0]">
+        <div
+          class="menus"
+          ref="menuRef"
+          @click="handleVisible('MenuConfigVisible')"
+        >
+          <AIcon type="MenuUnfoldOutlined" style="font-size: 20px" />
+        </div>
+      </j-badge>
+    </div>
+    <Guide :stepList="steps" v-model:open="visibles.GuideVisible" />
   </div>
-  <Guide :stepList="steps" v-model:open="visibles.GuideVisible" />
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="listSkeleton">
 import Guide from '../Guide/index.vue'
 import type { GuideProps } from '../Guide/type'
 
@@ -187,6 +207,7 @@ const ref3 = ref()
 const ref4 = ref()
 const ref5 = ref()
 const ref6 = ref()
+const ref7 = ref()
 const menuRef = ref()
 const steps = ref<GuideProps['stepsList']>([])
 
@@ -194,7 +215,7 @@ watchEffect(() => {
   steps.value = [
     {
       title: '步骤1',
-      description: '选择后端功能作为列表页的数据来源',
+      description: '选择后端功能作为标准列表页的数据来源',
       placement: 'bottom',
       target: () => [
         {
@@ -204,37 +225,42 @@ watchEffect(() => {
     },
     {
       title: '步骤2',
-      description: '不同色块代表列表页的不同功能，你可以根据业务需要自由选配',
-      placement: 'right',
+      description: '不同色块代表标准列表页的不同功能，你可以根据业务需要自由选配',
+      placement: 'top',
       target: () => [
         {
+          el: ref3.value && ref3.value.$el,
+          backgroundColor: '#E7E8EA',
+          overText: '数据列表头',
+        },
+        {
           el: ref1.value && ref1.value.$el,
-          backgroundColor: '#fbd9ab',
+          backgroundColor: '#E7E8EA',
           overText: '筛选项',
         },
         {
           el: ref2.value && ref2.value.$el,
-          backgroundColor: '#bbffff',
+          backgroundColor: '#E7E8EA',
           overText: '操作按钮',
         },
         {
-          el: ref3.value && ref3.value.$el,
-          backgroundColor: '#e5fcc1',
-          overText: '数据列表头',
-        },
-        {
           el: ref4.value && ref4.value.$el,
-          backgroundColor: '#ffffaf',
+          backgroundColor: '#E7E8EA',
           overText: '操作列',
         },
         {
           el: ref5.value && ref5.value.$el,
-          backgroundColor: '#f8cfd4',
+          backgroundColor: '#E7E8EA',
           overText: '分页器',
         },
         {
           el: ref6.value && ref6.value.$el,
-          backgroundColor: '#e2c2fe',
+          backgroundColor: '#E7E8EA',
+          overText: '展示格式',
+        },
+        {
+          el: ref7.value && ref7.value.$el,
+          backgroundColor: '#E7E8EA',
           overText: '展示格式',
         },
       ],
@@ -242,7 +268,7 @@ watchEffect(() => {
     {
       title: '步骤3',
       description: '如果该页面需要作为系统菜单，请在这里配置基本信息',
-      placement: 'right',
+      placement: 'left',
       target: () => [
         {
           el: menuRef.value,
@@ -252,61 +278,85 @@ watchEffect(() => {
   ]
   console.log(props.dataBindRef)
 })
+
+// watch(() => props.visibles, () => {
+//   console.log(props.visibles);
+// }, {immediate: true, deep: true})
 </script>
 
 <style scoped lang="less">
-@filterBg: #fbd9ab;
-@btnBg: #bbffff;
-@typeBg: #e1c1ff;
-@columnDataBg: #e5fcc1;
-@columnOperationBg: #ffffaf;
-@paginationBg: #f8cfd4;
+@filterBg: #c3d1ff;
+@btnBg: #c3d1ff;
+@typeBg: #c3d1ff;
+@columnDataBg: #c3d1ff;
+@columnOperationBg: #c3d1ff;
+@paginationBg: #c3d1ff;
+@bg: #c3d1ff;
 
 .list-skeleton {
-  height: 100%;
+  height: calc(100% - 70px);
   width: 100%;
   display: flex;
   .mb-50 {
     margin-bottom: 50;
   }
+  .width-32 {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
   .left-menu {
     background-color: #ffffff;
-    writing-mode: vertical-lr;
     display: flex;
+    flex-direction: column;
+    width: 44px;
+    padding: 10px 0 0 10px;
     .menus {
-      height: 120px;
-      width: 50px;
-      background-color: #f2f2f2;
-      text-align: center;
+      width: 28px;
+      height: 28px;
+      width: 28px;
+      height: 28px;
+      background-color: #f6f7f9;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 10px;
+      border-radius: 4px;
       cursor: pointer;
     }
   }
   .right-skeleton {
     flex: 1;
-    padding: 10px;
-    .skeletion-input {
+    padding: 24px;
+    .skeleton-input {
+      border-radius: 4px;
       width: 100%;
-      margin: 8px 0
+      margin-bottom: 2px;
     }
     .skeleton-content {
-      background-color: #f2f2f2;
-      padding: 10px;
       height: 100%;
     }
     .search-skeleton {
       padding: 20px;
-      margin: 20px 0;
+      margin-bottom: 16px;
       background-color: #ffffff;
+      border-radius: 8px;
     }
     .table-skeleton {
-      padding: 20px;
-      margin: 20px 0;
+      margin-top: 20px;
       background-color: #ffffff;
-      height: 100%;
+      height: 85%;
+      display: flex;
+      flex-direction: column;
+      .table-skeleton-row {
+        overflow: hidden;
+        padding: 20px 0;
+        flex: 1;
+      }
     }
     .pagination-skeleton {
       padding: 20px;
@@ -316,71 +366,91 @@ watchEffect(() => {
 
   .config-item {
     cursor: pointer;
+    border-radius: 4px;
+    position: relative;
     &.animation {
       animation: blink 1s infinite;
       &.filter {
-        background-color: @filterBg;
+        background-color: @bg;
       }
       &.btn {
-        background-color: @btnBg;
+        background-color: @bg;
       }
       &.type {
-        background-color: @typeBg;
+        background-color: @bg;
       }
       &.column-data {
-        background-color: @columnDataBg;
+        background-color: @bg;
       }
       &.column-operation {
-        background-color: @columnOperationBg;
+        background-color: @bg;
       }
       &.pagination {
-        background-color: @paginationBg;
+        background-color: @bg;
       }
     }
-    &.filter:hover {
-      background-color: @filterBg !important;
+    &:hover {
+      background-color: @primary-color !important;
+      &::after{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        left: 0;
+        top: 0;
+        color: #FFFFFF;
+      }
+      &.filter::after {
+        content: '\7b5b\9009\9879';
+      }
+      &.btn::after {
+        content: '\64cd\4f5c\6309\94ae';
+      }
+      &.type::after {
+        content: '\5c55\793a\683c\5f0f';
+      }
+      &.column-data::after {
+        content: '\6570\636e\5217\8868\5934';
+      }
+      &.column-operation::after {
+        content: '\64cd\4f5c\5217';
+      }
+      &.pagination::after {
+        content: '\5206\9875\5668';
+      }
     }
-    &.btn:hover {
-      background-color: @btnBg !important;
-    }
-    &.type:hover {
-      background-color: @typeBg !important;
-    }
-    &.column-data:hover {
-      background-color: @columnDataBg !important;
-    }
-    &.column-operation:hover {
-      background-color: @columnOperationBg !important;
-    }
-    &.pagination:hover {
-      background-color: @paginationBg !important;
-    }
+    // &.btn:hover {
+    //   background-color: @btnBg !important;
+    // }
+    // &.type:hover {
+    //   background-color: @typeBg !important;
+    // }
+    // &.column-data:hover {
+    //   background-color: @columnDataBg !important;
+    // }
+    // &.column-operation:hover {
+    //   background-color: @columnOperationBg !important;
+    // }
+    // &.pagination:hover {
+    //   background-color: @paginationBg !important;
+    // }
   }
 }
 .config-done {
-  &.filter {
-    background-color: @filterBg;
-  }
-  &.btn {
-    background-color: @btnBg;
-  }
-  &.type {
-    background-color: @typeBg;
-  }
-  &.column-data {
-    background-color: @columnDataBg;
-  }
-  &.column-operation {
-    background-color: @columnOperationBg;
-  }
-  &.pagination {
-    background-color: @paginationBg;
-  }
+  background-color: @bg;
 }
 
 @keyframes blink {
   50% {
     background-color: transparent;
   }
+}
+:deep(.ant-skeleton-input) {
+  line-height: 40px;
+}
+:deep(.ant-skeleton-button, .ant-skeleton-input) {
+  border-radius: 4px;
 }
 </style>

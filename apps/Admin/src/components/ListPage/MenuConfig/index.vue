@@ -1,15 +1,20 @@
 <template>
-  <div class="menu-config">
+  <div class="menu-config" ref="menuConfigRef">
     <j-drawer
       title="菜单配置"
       placement="right"
+      width="560px"
       :closable="false"
       :visible="open"
+      :destroyOnClose="true"
+      :getContainer="() => $refs.menuConfigRef"
+      :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
       @close="emits('update:open', false)"
     >
       <Menu
         ref="menuRef"
         @update:form="(newValue) => (subValue = newValue)"
+        :errorList="errorList"
         :formData="formData"
       />
     </j-drawer>
@@ -17,7 +22,8 @@
 </template>
 <script setup lang="ts">
 import Menu from '@/components/ListPage/MenuConfig/components/menu.vue'
-import { useAllListDataStore } from '@/store/listForm'
+import { validMenu } from './utils/valid'
+import { MENU_CONFIG } from '../keys';
 interface Emit {
   (e: 'update:open', value: boolean): void
 }
@@ -28,12 +34,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  data: {
-    type: Object,
-    default: () => {},
+  id: {
+    type: String,
+    default: '',
   },
 })
-const configurationStore = useAllListDataStore()
+const menConfig = inject(MENU_CONFIG)
 const open = computed({
   get() {
     return props.open
@@ -45,22 +51,19 @@ const open = computed({
 const subValue = ref({})
 const menuRef = ref()
 const formData = ref({ pageName: '', main: true, name: '', icon: '' })
-onMounted(() => {
-  formData.value =
-    configurationStore.getALLlistDataInfo(props.data?.id)?.menu || {}
-  formData.value.pageName = props.data?.title || ''
-})
 
-watch(
-  () => props.data,
-  (val) => {
-    formData.value.pageName = val.title || ''
-  },
-)
-watch(
-  () => subValue.value,
-  (val) => {
-    configurationStore.setALLlistDataInfo('menu', val, props.data?.id)
-  },
-)
+const errorList = ref<any[]>([])
+const valid = () => {
+  errorList.value = validMenu(menConfig)
+  return errorList.value.length ? [{message: '菜单配置错误'}] : []
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validMenu(menConfig)
+  //   if(errorList.value.length) reject([{message: '菜单配置错误'}])
+  //   else resolve([])
+  // })
+}
+defineExpose({
+  errorList,
+  valid
+})
 </script>

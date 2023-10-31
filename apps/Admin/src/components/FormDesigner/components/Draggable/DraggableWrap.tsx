@@ -1,10 +1,10 @@
-import Draggable from 'vuedraggable'
+import Draggable from '../JSortable/index'
 import { isHTMLTag } from '@vue/shared'
 import { PropType } from 'vue'
 
 const DraggableWrap = defineComponent({
     name: 'DraggableWrap',
-    inheritAttrs: false,
+    // inheritAttrs: false,
     customOptions: {},
     components: {
         Draggable
@@ -42,3 +42,4 @@ const DraggableWrap = defineComponent({
 });
 
 export default DraggableWrap;
+

@@ -3,6 +3,8 @@ import { useUserStore } from '@/store/user'
 import { useMenuStore } from '@/store/menu'
 import { useSystemStore } from '@/store/system'
 import { useAuthStore } from '@/store/auth'
+import { setToken } from '@jetlinks/utils'
+import {isString} from "lodash-es";
 
 async function setupRouter() {
 
@@ -13,7 +15,11 @@ async function setupRouter() {
         AuthStore: useAuthStore()
     })
 
-    createAuthRoute()
+    createAuthRoute((to) => {
+      if (isString(to.query.token) && to.query.token) {
+        setToken(to.query.token)
+      }
+    })
 }
 
 export { setupRouter }

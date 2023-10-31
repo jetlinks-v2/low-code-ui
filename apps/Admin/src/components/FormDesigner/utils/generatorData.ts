@@ -34,21 +34,17 @@ const handleProps = (node: any) => {
     }
     if (/^(date-picker)$/.test(node.type)) {
         result.placeholder = '请选择日期'
+        result.format = "YYYY-MM-DD"
+        result.showTime = false
+        result.valueFormat = "YYYY-MM-DD"
     }
     if (/^(time-picker)$/.test(node.type)) {
         result.placeholder = '请选择时间'
+        result.format = "HH:mm:ss"
+        result.valueFormat = "HH:mm:ss"
     }
 
     switch (node.type) {
-        case 'input':
-            result.maxLength = result?.maxLength || 64
-            break
-        case 'textarea':
-            result.maxLength = result?.maxLength || 200
-            break
-        case 'input-password':
-            result.maxLength = result?.maxLength || 64
-            break
         case 'input-number':
             result.max = undefined
             result.min = undefined
@@ -56,16 +52,24 @@ const handleProps = (node: any) => {
             break
         case 'select-card':
             result.options = generateOptions(3)
-            result.mode = ''
+            result.multiple = false
             break
         case 'select':
             result.options = generateOptions(3)
-            result.mode = ''
+            result.mode = undefined
+            result.showSearch = false
             break
         case 'tree-select':
-            result.treeData = generateOptions(3)
+            result.treeData = [
+                ...generateOptions(3),
+                {
+                    label: '选项4',
+                    value: uid(),
+                    children: generateOptions(3)
+                }
+            ]
             result.showSearch = false
-            result.mode = ''
+            result.multiple = false
             result.treeCheckStrictly = false
             break
         case 'upload':
@@ -74,8 +78,24 @@ const handleProps = (node: any) => {
             result.fileSize = 2
             result.unit = 'M'
             break
+        case 'geo':
+            result.level = 'all'
+            result.geoType = 'country'
+            break
         case 'grid':
             result.inlineMax = 4
+            result.rowSpan = 5
+            result.colSpan = 10
+            break
+        case 'form':
+            result.source = {
+                value: undefined,
+                code: ''
+            }
+            break
+        case 'space':
+            result.align = 'center'
+            result.direction = 'vertical'
             break
     }
 
@@ -97,12 +117,20 @@ const generatorData = (node: any) => {
     if (!result.key) {
         result.key = `${result.type}_${uid()}`
     }
-    if (checkIsField(result) || result.type === 'table') {
+    if ((checkIsField(result) || result.type === 'card') && result.type !== 'table-item') {
         result.formItemProps = handleFormItemProps(result)
+    }
+
+    if (result.type === 'grid' || result.type === 'space' || result.type === 'collapse' || result.type === 'tabs') {
+        result.formItemProps = {
+            name: result?.key,
+            isLayout: false
+        }
     }
 
     result.componentProps = {
         ...handleProps(node),
+        keys: [],
         visible: true,
         editable: true
     }

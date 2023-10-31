@@ -12,7 +12,7 @@ interface LayoutType {
 }
 export const useSystemStore = defineStore('system', () => {
   const theme = ref<string>('light') // 主题色
-  const title = ref<string>('Jetlinks') // 浏览器标签页title
+  const title = ref<string>('Jetlinks Code') // 浏览器标签页title
   const ico = ref<string>('/favicon.ico') // 浏览器标签页logo
   const systemInfo = ref<Record<string, any>>({})
   const amapKey = ref('')
@@ -23,7 +23,7 @@ export const useSystemStore = defineStore('system', () => {
     collapsedWidth: 48,
     title: '物联网平台',
     logo: getImage('/login/logo.png'),
-    layout: 'mix'
+    layout: 'side'
   })
 
   /**
@@ -57,14 +57,14 @@ export const useSystemStore = defineStore('system', () => {
     document.title = value
   }
 
-  const queryAmap = async () => {
-    const resp = await settingDetail('amap')
-    if (resp.success) {
-      const { apiKey } = resp.result
-      amapKey.value = apiKey
-      systemInfo.value.apiKey = apiKey
-    }
-  }
+  // const queryAmap = async () => {
+  //   const resp = await settingDetail('amap')
+  //   if (resp.success) {
+  //     const { apiKey } = resp.result
+  //     amapKey.value = apiKey
+  //     systemInfo.value.apiKey = apiKey
+  //   }
+  // }
 
   const queryInfo = async () => {
     const resp = await settingDetail('front')
@@ -77,7 +77,7 @@ export const useSystemStore = defineStore('system', () => {
       layout.logo = logo
       theme.value = headerTheme
     }
-    await queryAmap()
+    // await queryAmap()
   }
 
 

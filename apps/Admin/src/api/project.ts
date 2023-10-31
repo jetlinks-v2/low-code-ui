@@ -6,6 +6,7 @@ export const addProject = (data: any) => request.post(`/low-code/info/_add`, dat
 //编辑项目
 export const editProject = (data: any) => request.post(`/low-code/info/_update`, data)
 
+
 //删除项目
 export const delProject = (id: any) => request.remove(`/low-code/info/${id}/_delete`)
 
@@ -26,7 +27,7 @@ export const queryProjectDraft = (id: string) => request.post<Draft.Info>(`/low-
 /**
  * 查询功能下的指令
  */
-export const queryCommand = (data: any) => request.post(`/low-code/editor/support/commands`, data)
+export const queryCommand = (id: string, data?: any) => request.post(`/low-code/editor/${id}/support/commands`, data)
 
 export const updateDraft = (id: string, data: any) => request.post(`/low-code/editor/draft/${id}/_update`, data)
 

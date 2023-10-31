@@ -1,59 +1,29 @@
 <template>
-  <div class="data-bind">
-    <j-form :model="dataBind" layout="inline">
-      <j-form-item label="数据绑定">
-        <j-select
-          v-model:value="dataBind.data.function"
-          style="width: 200px"
-          :disabled="functionDisabled"
-          placeholder="请选择功能"
-        >
-          <j-select-option
-            v-for="item in functions"
-            :value="item.id"
-            :key="item.id"
-          >
-            {{ item.name }}
-          </j-select-option>
-        </j-select>
-      </j-form-item>
-      <j-form-item v-if="showCommand">
-        <j-select
-          v-model:value="dataBind.data.command"
-          style="width: 200px"
-        >
-        <j-select-option
-          v-for="item in commands"
-          :value="item.id"
-          :key="item.id"
-        >
-          {{ item.name }}
-        </j-select-option>
-      </j-select>
-      </j-form-item>
-      <j-form-item>
-        <j-button type="link" @click="handleModify">变更</j-button>
-      </j-form-item>
-      <j-form-item>
-        <j-button type="link" @click="handleValid">校验</j-button>
-      </j-form-item>
-      <j-form-item v-if="!open">
-        <j-button @click="emits('update:open', true)">操作向导</j-button>
-      </j-form-item>
-    </j-form>
-    <j-modal v-model:visible="visible" title="提示" @ok="handleOk">
-      <p class="text">
-        变更后将清空筛选组件及数据列表的所有数据<br />确认变更？
-      </p>
-    </j-modal>
+  <div class="data-bind" :class="{ 'is-guide': open }" ref="dataBindRef">
+    <div class="bind-button">
+      <j-badge :count="errorList.length">
+        <j-button type="primary" @click="visible = true" :disabled="open">数据绑定</j-button>
+      </j-badge>
+      <j-space>
+        <j-form-item-rest>
+          <j-button type="primary" @click="handleValid" :disabled="open">校验</j-button>
+        </j-form-item-rest>
+        <j-form-item-rest v-if="!open">
+          <j-button type="primary" @click="emits('update:open', true)" :disabled="open">操作向导</j-button>
+        </j-form-item-rest>
+      </j-space>
+    </div>
+    <DataBindModal v-model:open="visible" :el-container="($refs.dataBindRef as any)" v-if="visible" :errorList="errorList"/>
   </div>
 </template>
 
 <script setup lang="ts" name="DataBind">
-import { useProduct } from '@/store'
-import { storeToRefs } from 'pinia'
-import { queryCommand } from '@/api/project'
-import { functionsKey, DATA_BIND } from '../keys';
+import DataBindModal from './components/dataBind.vue'
+import { DATA_BIND } from '../keys'
+import { validDataBind } from './utils/valid'
+import { useFunctions } from '@/hooks/useFunctions'
+
+const { functionOptions } = useFunctions()
 
 const visible = ref(false)
 const handleValid = () => {
@@ -63,11 +33,15 @@ const handleValid = () => {
 interface Emit {
   (e: 'update:open', value: boolean): void
   (e: 'valid'): void
-  (e: 'modify'): void
 }
 
+const errorData = computed(() => {
+  return (key: string): any => {
+    return errorList.value.find((item) => item.key === key)
+  }
+})
 const emits = defineEmits<Emit>()
-const dataBind: any = inject(DATA_BIND)
+const dataBind = inject(DATA_BIND)
 const props = defineProps({
   open: {
     type: Boolean,
@@ -75,73 +49,45 @@ const props = defineProps({
   },
 })
 
-const { data } = storeToRefs(useProduct())
-
-const functionDisabled = computed(() => {
-  return dataBind.data.function && dataBind.data.function !== ''
-})
-
-const showCommand = computed(() => {
-  return functions!.value.find(item => item.id === dataBind.data.function)?.provider === 'rdb-sql-query'
-})
-
-const functions = inject(functionsKey)
-
-const commands = ref([
-  { name: '新增数据', id: 'Add' },
-  { name: '导入数据', id: 'Import' },
-  { name: '导出数据', id: 'Export' },
-  { name: '删除数据', id: 'Delete' },
-  { name: '更新数据', id: 'Update' },
-])
-
-/**查询功能下的指令 */
-const findCommand = async () => {
-  const params = {
-    modules: [
-        {
-        id: data.value?.[0].id,
-        name: data.value?.[0].name,
-        functions: functions!.value?.filter(item => item.id === dataBind.data.function)
-      }
-    ]
-  }
-  const res = await queryCommand(params)
-  if(res.success) {
-    commands.value = res.result?.[0]?.command
-  }
-}
-
-const handleModify = () => {
-  if(dataBind?.data?.function !== ''){
-    visible.value = true
-  }
-}
 
 const handleOk = () => {
-  emits('modify')
+  dataBind.filterBind = dataBind.columnBind = dataBind.data.command = dataBind.data.function  = null
+  dataBind.filterAsync = dataBind.columnAsync = false
   visible.value = false
 }
 
+const errorList = ref<any[]>([])
+const valid = () => {
+  errorList.value = validDataBind(dataBind.data, functionOptions.value)
+  return errorList.value.length ? [{message: '数据绑定配置错误'}] : []
+}
 
-watchEffect(() => {
-  if(dataBind?.data?.function) {
-    dataBind.functionInfo = functions!.value.find(item => item.id === dataBind.data.function)
-    findCommand();
-  }
+
+defineExpose({
+  valid,
+  errorList
 })
-
 /**树形结构转一维数组 */
 </script>
 
 <style scoped lang="less">
 .data-bind {
-  padding: 20px;
+  padding: 0 20px;
   background-color: #ffffff;
-  box-shadow: 0 1px 4px #0015291f;
-  margin-bottom: 5px;
+  height: 70px;
+  align-items: center;
+  border-width: 0px 0px 1px 0px;
+  border-style: solid;
+  border-color: #D9D9D9;
+  .bind-button {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
-.text {
-  text-align: center;
+.is-guide {
+  margin: 0 20px;
+  border-radius: 4px;
 }
 </style>

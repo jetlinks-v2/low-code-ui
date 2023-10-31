@@ -1,8 +1,9 @@
 .selectElement {
-  padding: 8px;
+  // padding: 8px;
   position: relative;
-  outline-offset: -1px;
+  // outline-offset: -1px;
   box-sizing: border-box;
+  // margin: 10px 0;
 
   .ant-tabs {
     overflow: visible !important;
@@ -12,26 +13,26 @@
     content: ' ';
     display: block;
     position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
+    left: -10px;
+    // background-color: rgba(0, 0, 0, .1);
+    top: -8px;
     margin: auto;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
+    width: calc(100% + 18px);
+    height: calc(100% + 40px);
+    z-index: 10;
   }
 }
 
+.inlineElement {
+  display: inline-block;
+}
+
 .edit-hover {
+  padding: 8px;
   &:hover {
     outline: 1px dashed #315efb !important;
   }
 }
-
-// .isScale {
-//     outline: 1px dashed #315efb !important;
-// }
 
 .borderless {
   padding: 0;
@@ -67,7 +68,7 @@
     bottom: 0;
     height: 30px;
     align-items: center;
-    z-index: 2;
+    z-index: 20;
     display: flex;
   }
 

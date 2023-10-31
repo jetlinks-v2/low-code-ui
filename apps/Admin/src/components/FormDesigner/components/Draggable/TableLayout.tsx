@@ -1,8 +1,13 @@
 import Selection from '../Selection/index'
 import './index.less'
 import { withModifiers } from 'vue'
-import { Table, AIcon, Input, Button, TableColumn, FormItem, Select } from 'jetlinks-ui-components'
+import { Table, AIcon, Button, TableColumn, FormItem } from 'jetlinks-ui-components'
 import { cloneDeep, get, omit, set } from 'lodash-es'
+import { useProps, useTool } from '../../hooks'
+import generatorData from '../../utils/generatorData'
+import { uid } from '../../utils/uid'
+import componentMap from '../../utils/componentMap'
+import { queryOptions } from '../../utils/utils'
 
 export default defineComponent({
     name: 'TableLayout',
@@ -24,10 +29,20 @@ export default defineComponent({
         index: {
             type: Number,
             default: 0
+        },
+        visible: {
+            type: Boolean,
+            default: true
+        },
+        editable: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
+
+        const { isEditModel, isDragArea, layoutPadStyle } = useTool()
 
         const _data = computed(() => {
             return props.data
@@ -35,10 +50,6 @@ export default defineComponent({
 
         const list = computed(() => {
             return props.data?.children || []
-        })
-
-        const isEditModel = computed(() => {
-            return unref(designer?.model) === 'edit'
         })
 
         const _formItemProps = computed(() => {
@@ -54,115 +65,203 @@ export default defineComponent({
             return _path
         })
 
-        const data = ref<any[]>(get(designer.formState, __path.value) || [{}])
+        const data = ref<any[]>([])
+
+        watchEffect(() => {
+            data.value = get(designer.formState, __path.value) || []
+        })
 
         const handleAdd = () => {
-            props.data.context?.appendItem()
-            const addData = unref(list).slice(-1)
-            designer.setSelection(addData)
+            const _item = generatorData({
+                type: props.data?.type + '-item',
+                key: `table-item_${uid()}`,
+                componentProps: {
+                    name: '列名' + uid(6),
+                    colSpan: 1,
+                    align: 'left',
+                },
+                children: [
+                    generatorData({
+                        type: 'input',
+                        name: '列名',
+                        children: [],
+                    })
+                ]
+            })
+            designer.onAddChild(_item, props.data)
         }
 
         const onAddIndex = () => {
-            const _index = unref(list).findIndex(item => item?.formItemProps?.name === 'index')
+            const _index = unref(list).findIndex(item => {
+                return item.children?.[0]?.type === 'table-item-index'
+            })
             if (_index === -1) {
-                props.data.context?.appendTableIndex()
-                // const addData = unref(list).slice(-1)
-                // designer.setSelection(addData)
-                designer.setSelection(props.data)
+                const _item = generatorData({
+                    type: props.data?.type + '-item',
+                    children: [
+                        generatorData({
+                            type: 'table-item-index',
+                            name: '',
+                            children: []
+                        })
+                    ],
+                    componentProps: {
+                        name: '索引',
+                        width: 60,
+                        colSpan: 1,
+                        align: 'left',
+                    },
+                })
+                designer.onAddChild(_item, props.data, 'start')
             }
         }
 
         const onAddAction = () => {
-            const _index = unref(list).findIndex(item => item?.formItemProps?.name === 'actions')
+            const _index = unref(list).findIndex(item => {
+                return item.children?.[0]?.type === 'table-item-actions'
+            })
             if (_index === -1) {
-                props.data.context?.appendTableAction()
-                // const addData = unref(list).slice(-1)
-                designer.setSelection(props.data)
+                const _item = generatorData({
+                    type: props.data?.type + '-item',
+                    componentProps: {
+                        name: '操作',
+                        width: 60,
+                        colSpan: 1,
+                        align: 'left',
+                    },
+                    children: [
+                        generatorData({
+                            type: 'table-item-actions',
+                            name: '',
+                            children: []
+                        })
+                    ],
+                })
+                designer.onAddChild(_item, props.data, 'end')
             }
         }
 
+        const onChange = () => {
+            designer?.onChange?.()
+        }
+
+        const componentRender = (dt: any, __data: any) => {
+            const _path1 = [...unref(__path), dt?.index, __data?.formItemProps.name]
+            const TypeComponent = componentMap[__data?.type || 'input']
+            const _props = useProps(__data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
+            const options = ref<any[]>(_props.componentProps.options)
+            const treeData = ref<any[]>(_props.componentProps.treeData)
+            const __value = ref<any>(get(designer.formState, _path1))
+
+            if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(__data?.type)) {
+                queryOptions(__data.componentProps.source).then(resp => {
+                    if (['select', 'select-card'].includes(__data?.type)) {
+                        options.value = resp
+                    } else {
+                        treeData.value = resp
+                    }
+                })
+            }
+
+            return <FormItem class="table-item" {...omit(__data?.formItemProps, 'label')} name={[unref(_formItemProps)?.name, dt.index, __data?.formItemProps?.name]}>
+                {
+                    __data?.type === 'switch' ?
+                        <TypeComponent
+                            {..._props?.componentProps}
+                            checked={__value.value}
+                            onUpdate:checked={(newValue) => {
+                                set(designer.formState, _path1, newValue)
+                            }}
+                            onChange={onChange}
+                        /> : <TypeComponent
+                            {..._props?.componentProps}
+                            options={unref(options)}
+                            treeData={unref(treeData)}
+                            value={__value.value}
+                            onUpdate:value={(newValue) => {
+                                set(designer.formState, _path1, newValue)
+                            }}
+                            onChange={onChange}
+                        />
+                }
+            </FormItem>
+        }
+
         const renderContent = (element: any, dt: any) => {
-            if (element?.formItemProps?.name === 'index') {
+            if (element.children?.[0]?.type === 'table-item-index') {
                 return (dt?.index || 0) + 1
-            } else if (element?.formItemProps?.name === 'actions') {
+            } else if (element.children?.[0]?.type === 'table-item-actions') {
                 return <Button onClick={() => {
-                    data.value.splice(dt?.index, 1)
+                    const arr = cloneDeep(get(designer.formState, __path.value) || [])
+                    arr.splice(dt?.index, 1)
+                    set(designer.formState, __path.value, arr)
                 }} type="link" danger><AIcon type="DeleteOutlined" /></Button>
             } else {
-                const _path1 = [...unref(__path), dt?.index, element.formItemProps.name]
-                const _value = ref<any>(get(designer.formState, _path1))
-                watch(
-                    () => _value.value, 
-                    (newValue) => {
-                        set(designer.formState, _path1, newValue)
-                    }, 
-                    {
-                        deep: true
-                    }
-                )
-                return <FormItem class="table-item" {...omit(element?.formItemProps, 'label')} name={[unref(_formItemProps)?.name, dt.index, element?.formItemProps?.name]}>
-                    {
-                        element?.componentProps.type === 'select' ? 
-                        <Select v-model:value={_value.value}></Select> : 
-                        <Input v-model:value={_value.value} />
-                    }
-                </FormItem>
+                return componentRender(dt, element?.children?.[0])
             }
+        }
+
+        const editContent = (element: any, dt: any) => {
+            return <Selection
+                class={
+                    unref(isDragArea) && 'drag-area'
+                }
+                data={element}
+                tag="div"
+                hasCopy={!['table-item-index', 'table-item-actions'].includes(element.children?.[0]?.type)}
+                hasDel={true}
+                hasMask={true}
+                parent={unref(list)}
+            >
+                {renderContent(element, dt)}
+            </Selection>
         }
 
         return () => {
             return (
-                <Selection {...useAttrs()} style={{ padding: '16px' }} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
+                <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <div class={'table'}>
-                        <FormItem {...unref(_formItemProps)}>
+                        <FormItem {...unref(_formItemProps)} validateFirst={true}>
                             <Table
                                 pagination={false}
-                                dataSource={data.value}
+                                dataSource={isEditModel.value ? [{}] : data.value}
+                                scroll={{ y: props.data.componentProps?.height, x: 'max-content' }}
                             >
                                 {
                                     unref(list).map(element => {
                                         return <TableColumn
                                             key={element.key}
-                                            {...omit(element.componentProps, 'title')}
+                                            {...omit(element.componentProps, ['name', 'align'])}
+                                            align={element?.componentProps?.align || props.data.componentProps?.align}
                                             v-slots={{
                                                 title: () => {
-                                                    return <Selection
-                                                        class={
-                                                            isEditModel.value && 'drag-area'
-                                                        }
-                                                        data={element}
-                                                        tag="div"
-                                                        hasCopy={!['actions', 'index'].includes(element?.formItemProps?.name)}
-                                                        hasDel={true}
-                                                        parent={unref(list)}
-                                                    >
-                                                        {element.componentProps?.title}
-                                                    </Selection>
+                                                    return element.componentProps?.name
                                                 },
                                                 default: (dt: any) => {
-                                                    return renderContent(element, dt)
+                                                    return editContent(element, dt)
                                                 }
                                             }}
                                         />
                                     })
                                 }
                             </Table>
-                            <Button disabled={isEditModel.value} onClick={() => {
-                                if (!isEditModel.value) {
-                                    data.value.push({})
-                                }
-                            }} style={{ width: '100%', marginTop: '10px' }}><AIcon type="PlusOutlined" />新增</Button>
+                            {
+                                !unref(isEditModel) && <Button onClick={() => {
+                                    const arr = get(designer.formState, __path.value) || []
+                                    set(designer.formState, __path.value, [...arr, {}])
+                                }} style={{ width: '100%', marginTop: '10px' }}><AIcon type="PlusOutlined" />新增</Button>
+                            }
                             {
                                 unref(isEditModel) &&
                                 <div class="draggable-add">
                                     <div class="draggable-add-btn" style={{ width: '200px' }}>
                                         <span onClick={withModifiers(handleAdd, ['stop'])}>添加列</span>
                                         {
-                                            !unref(list).find(item => item?.formItemProps?.name === 'index') &&
+                                            !unref(list).find(item => item.children?.[0]?.type === 'table-item-index') &&
                                             <span onClick={withModifiers(onAddIndex, ['stop'])} style={{ marginLeft: '10px' }}>添加索引</span>
                                         }
                                         {
-                                            !unref(list).find(item => item?.formItemProps?.name === 'actions') &&
+                                            !unref(list).find(item => item.children?.[0]?.type === 'table-item-actions') &&
                                             <span onClick={withModifiers(onAddAction, ['stop'])} style={{ marginLeft: '10px' }}>添加操作</span>
                                         }
                                     </div>

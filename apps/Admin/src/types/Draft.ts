@@ -30,6 +30,11 @@ namespace Draft {
      * 前端维护，存储能力创建修改时间、能力间引用关系之类的数据
      */
     others: Record<string, any>
+
+    state: {
+      text: string
+      value: string
+    }
   }
 
   export type Module = {
@@ -174,6 +179,13 @@ namespace Draft {
      * 菜单icon
      */
     icon?: string
+
+    buttons?: Array<Button>
+  }
+
+  export type Button = {
+    id: string,
+    name: string
   }
 
   export type AssetType = {

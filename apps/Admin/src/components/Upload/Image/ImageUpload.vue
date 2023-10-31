@@ -37,6 +37,7 @@
     :img="cropper.img"
     :title="cropperTitle"
     @cancel="cropper.visible = false"
+    output-type="jpg"
     @ok="saveImage"
   />
 </template>
@@ -111,11 +112,17 @@ const beforeUpload = (file: any) => {
   const isMaxSize = (file.size / 1024 / 1024) < maxSize
 
   if (!inType) {
-    onlyMessage('请上传正确格式的图片', 'error')
+    const _type = types.map(item => item.replace(/image\//, '.'))
+    if (_type.includes('.jpeg')) {
+      _type.unshift('.jpg')
+    }
+    onlyMessage(`仅支持${_type.join(' ')}格式文件`, 'error')
+    return false
   }
 
   if (!isMaxSize) {
-    onlyMessage(`图片大小必须小于${maxSize}M`, 'error');
+    onlyMessage(`请上传${maxSize}M以内的图片`, 'error');
+    return false
   }
   getBase64ByImg(file, base64Url => {
     cropper.img = base64Url
@@ -130,9 +137,9 @@ const handleChange = (info: UploadChangeParam) => {
     loading.value = true;
   }
   if (info.file.status === 'done') {
-    imageUrl.value = info.file.response?.result;
+    imageUrl.value = info.file.response?.result?.accessUrl;
     loading.value = false;
-    emit('update:value', info.file.response?.result);
+    emit('update:value', info.file.response?.result?.accessUrl);
   }
   if (info.file.status === 'error') {
     loading.value = false;
@@ -140,10 +147,10 @@ const handleChange = (info: UploadChangeParam) => {
   }
 }
 
-const saveImage = (url: string) => {
+const saveImage = (url: any) => {
   cropper.visible = false
-  imageUrl.value = url
-  emit('update:value', url);
+  imageUrl.value = url?.accessUrl
+  emit('update:value', url?.accessUrl);
 }
 
 watch(() => props.value, (newValue) => {

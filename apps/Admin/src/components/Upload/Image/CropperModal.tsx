@@ -95,6 +95,7 @@ const CropperModal = defineComponent({
       return (
         <Modal
           visible
+          maskClosable={false}
           title={title}
           width={width}
           confirmLoading={loading.value}

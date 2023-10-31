@@ -4,7 +4,10 @@ import Selection from '../Selection/index'
 import { Collapse, CollapsePanel, FormItem } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, omit } from 'lodash-es'
+import { useTool } from '../../hooks'
+import generatorData from '../../utils/generatorData'
+import { uid } from '../../utils/uid'
 
 export default defineComponent({
   name: 'CollapseLayout',
@@ -26,24 +29,38 @@ export default defineComponent({
     index: {
       type: Number,
       default: 0
+    },
+    visible: {
+      type: Boolean,
+      default: true
+    },
+    editable: {
+      type: Boolean,
+      default: true
     }
   },
   setup(props) {
     const designer: any = inject('FormDesigner')
+
+    const { isEditModel, isDragArea, layoutPadStyle } = useTool()
 
     const list = computed(() => {
       return props.data?.children || []
     })
 
     const handleAdd = () => {
-      props.data.context?.appendItem()
-      const addData = unref(list).slice(-1)
-      designer?.setSelection(addData)
+      const _item = generatorData({
+        type: props.data?.type + '-item',
+        children: [],
+        formItemProps: {
+          name: props.data?.type + '-item' + '_' + uid(6)
+        },
+        componentProps: {
+          name: 'Title'
+        }
+      })
+      designer.onAddChild(_item, props.data)
     }
-
-    const isEditModel = computed(() => {
-      return unref(designer?.model) === 'edit'
-    })
 
     const _formItemProps = computed(() => {
       return props.data?.formItemProps
@@ -72,10 +89,12 @@ export default defineComponent({
           unref(list)?.length ? <Collapse data-layout-type={'collapse'} {...props.data.componentProps}>
             {
               unref(list).map((element) => {
+                const __path = [..._path, element.formItemProps?.name]
+
                 return (
-                  <CollapsePanel key={element.key} {...element.componentProps}>
+                  <CollapsePanel key={element.key} {...omit(element.componentProps, 'header')} header={element.componentProps?.name}>
                     <Selection
-                      class={'drag-area'}
+                      class={unref(isDragArea) && 'drag-area'}
                       data={element}
                       tag="div"
                       hasCopy={true}
@@ -89,8 +108,10 @@ export default defineComponent({
                         data={element.children}
                         data-layout-type={'item'}
                         parent={element}
-                        path={_path}
-                        index={_index + 1}
+                        path={__path}
+                        index={_index + 2}
+                        visible={props.visible}
+                        editable={props.editable}
                       />
                     </Selection>
                   </CollapsePanel>
@@ -101,10 +122,10 @@ export default defineComponent({
         )
       }
       return (
-        <Selection {...useAttrs()} style={{ padding: '16px' }} hasCopy={true} hasDel={true} hasDrag={true} data={props.data} parent={props.parent}>
+        <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasCopy={true} hasDel={true} hasDrag={true} data={props.data} parent={props.parent}>
           {
             unref(_isLayout) ?
-              <FormItem {...unref(_formItemProps)}>
+              <FormItem {...unref(_formItemProps)} validateFirst={true}>
                 {renderContent()}
                 {addButton()}
               </FormItem>

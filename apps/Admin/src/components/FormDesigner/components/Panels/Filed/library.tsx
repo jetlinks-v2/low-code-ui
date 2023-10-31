@@ -1,11 +1,11 @@
 
 import { filedData } from '../../../utils/defaultData'
-import DragGableWrap from '../../Draggable/DragGableWrap'
-import { cloneDeep, omit } from 'lodash-es';
+import DraggableWrap from '../../Draggable/DraggableWrap'
+import { IconWidget } from '../../Icons';
 import './index.less';
-import { onMove, onEnd } from '../../Draggable/ControlInsertionPlugin';
+import { onEnd } from '@/components/FormDesigner/components/Draggable/ControlInsertionPlugin';
 import generatorData from '@/components/FormDesigner/utils/generatorData';
-import { Card, AIcon } from 'jetlinks-ui-components';
+import { cloneDeep } from 'lodash-es';
 
 const Library = defineComponent({
     name: 'Library',
@@ -14,71 +14,60 @@ const Library = defineComponent({
         const designer: any = inject('FormDesigner')
 
         const handleClone = (element) => {
-            const item = { ...generatorData(omit(element, ['icon'])) }
+            const item = { ...generatorData(element) }
             return cloneDeep(item)
-        }
-
-        const handleMove = () => {
-            return true
-        }
-
-        const dragOptions = {
-            dataSource: 'block',
-            direction: 'horizontal',
-            scroll: false,
         }
 
         const slots = {
             item: ({ element }) => {
                 return (
                     <div class="filed-item-card">
-                        <Card hoverable>
-                            <div class="filed-item-card-item">
-                                <AIcon type={element.icon} style={{ fontSize: '25px' }} />
-                                <span>{element.name}</span>
-                            </div>
-                        </Card>
+                        <div class="filed-item-card-icon">
+                            <span style="width: 50px; height: 30px;">{IconWidget(element.type)}</span>
+                        </div>
+                        <div class="filed-item-card-text">{element.name}</div>
                     </div>
                 )
             }
         }
 
+        const options = {
+            animation: 150,
+            direction: 'horizontal',
+            scroll: false,
+            sort: false,
+            group: { name: "j-canvas", pull: 'clone', put: false },
+            ghostClass: 'ghost',
+            clone: handleClone
+        }
+
         return () => {
             return (
-                    <div class="filed-container">
-                        {filedData.map((element) => {
-                            return (
-                                <div key={element.id} class="filed-item">
-                                    <div class="filed-item-title">{element.name}</div>
-                                    {
-                                        element.children?.length && (
-                                            <DragGableWrap
-                                                list={element.children}
-                                                clone={handleClone}
-                                                class="filed-item-children"
-                                                sort={false}
-                                                move={handleMove}
-                                                {...dragOptions}
-                                                group={
-                                                    { name: 'j-canvas', pull: 'clone', put: false }
-                                                }
-                                                model="edit"
-                                                item-key="null"
-                                                v-slots={slots}
-                                                onMove={(e) => {
-                                                    onMove(e, designer)
-                                                }}
-                                                onEnd={(e) => {
-                                                    onEnd(e, designer)
-                                                }}
-                                                data-layout-type={'filed-item'}
-                                            ></DragGableWrap>
-                                        )
-                                    }
-                                </div>
-                            )
-                        })}
-                    </div>
+                <div class="filed-container">
+                    {filedData.map((element) => {
+                        return (
+                            <div key={element.id} class="filed-item">
+                                <div class="filed-item-title">{element.name}</div>
+                                {
+                                    element.children?.length && (
+                                        <DraggableWrap
+                                            list={element?.children || []}
+                                            {...options}
+                                            class={"filed-item-children"}
+                                            tag={'div'}
+                                            v-slots={slots}
+                                            item-key="type"
+                                            data-layout-type={'filed-item'}
+                                            onEnd={(e) => {
+                                                onEnd(e, designer)
+                                            }}
+                                        ></DraggableWrap>
+                                    )
+                                }
+                            </div>
+                        )
+                    })}
+                </div>
             )
         };
     },

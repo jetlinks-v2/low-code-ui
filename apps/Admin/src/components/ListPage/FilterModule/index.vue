@@ -1,12 +1,16 @@
 <template>
-  <div className="filter-module-center">
+  <div className="filter-module-center" ref="filterModuleRef">
+    <img class="modal-config-img" :src="getImage('/list-page/filter.png')" v-if="open">
     <j-drawer
-      title="配置"
-      placement="bottom"
+      title="筛选模块配置"
+      placement="right"
+      width="560px"
       :closable="true"
       :visible="open"
+      :getContainer="() => $refs.filterModuleRef"
+      :wrap-style="{ position: 'absolute', zIndex: 1, overflow: 'hidden' }"
+      :destroyOnClose="true"
       @close="emits('update:open', false)"
-      height="520px"
     >
       <Table
         v-if="type === ''"
@@ -18,15 +22,20 @@
         :dataSource="dataSource"
         :modelActiveKey="activeKey"
         :show="show"
-        :asyncData="asyncData"
-        :configChange="configChange"
+        tableType="filter"
+        v-model:asyncData="dataBinds.filterAsync"
         :errorList="errorList"
+        :bindData="dataBinds.filterBind"
+        :bind-function-id="dataBinds.data.function"
         @handleAdd="handleAdd"
         @configuration="configuration"
         @handleOk="handleOk"
+        @bindData="bindData"
+        @handleChange="(data) => dataSource = data"
+        @update-bind="(data) => dataBinds.filterBind = data"
       />
       <div v-if="type !== ''">
-        <a-page-header title="配置筛选项" sub-title="配置筛选项" @back="goBack">
+        <a-page-header title=" " @back="goBack">
           <template #backIcon>
             <AIcon type="LeftOutlined" />
             返回
@@ -36,6 +45,7 @@
           v-if="type === 'enum'"
           :id="props.id"
           :data="configRow"
+          :errorList="errorList"
           @update:state="(newValue) => (subValue = newValue)"
         />
         <StringType
@@ -59,12 +69,14 @@
       </div>
 
       <template #footer v-if="type !== ''">
-        <j-button style="float: right" type="primary" @click="submit">
-          确定
-        </j-button>
-        <j-button style="float: right; margin-right: 8px" @click="goBack">
-          取消
-        </j-button>
+        <j-space>
+          <j-button @click="goBack">
+            取消
+          </j-button>
+          <j-button type="primary" @click="submit">
+            确定
+          </j-button>
+        </j-space>
       </template>
     </j-drawer>
   </div>
@@ -78,13 +90,15 @@ import {
   NumberType,
   DateType,
 } from '@/components/ListPage/FilterModule/components/index'
+import { getImage, randomString } from '@jetlinks/utils';
 
-import { useAllListDataStore } from '@/store/listForm'
 import { validFilterModule } from './utils/valid'
 import { DATA_BIND } from '../keys'
+import { cloneDeep } from 'lodash-es';
 
 interface Emit {
   (e: 'update:open', value: boolean): void
+  (e: 'update:dataSource', value: any): void
 }
 
 const emits = defineEmits<Emit>()
@@ -96,6 +110,10 @@ const props = defineProps({
   id: {
     type: null,
   },
+  dataSource: {
+    type: Array,
+    default: () => []
+  }
 })
 
 const open = computed({
@@ -109,13 +127,11 @@ const open = computed({
 const type = ref('')
 const title = ref('请选择页面支持的筛选项')
 const addBtnName = ref('新增筛选项')
-const configurationStore = useAllListDataStore()
 const subValue = ref({})
 const show = ref(false)
 //是否完成数据绑定
 const dataBind = ref(false)
 //是否同步数据
-const asyncData = ref(false)
 //数据是否有变动
 const dataChange = ref(false)
 //是否修改配置
@@ -148,34 +164,11 @@ const columns: any = [
     key: 'id',
     ellipsis: true,
     align: 'center',
-    width: 150,
+    width: 140,
     type: 'text',
     form: {
       isVerify: true,
       required: true,
-      rules: [
-        {
-          validator(data: any, value: any) {
-            if (!value) {
-              return Promise.reject('请输入标识')
-            } else {
-              const addId = data?.field.split('.')
-              if (Number(addId[1])) {
-                const same = dataSource.value?.findIndex(
-                  (i: any) => i?.id === value,
-                )
-                if (
-                  same !== -1 &&
-                  Number(addId[1]) > dataSource.value?.length - 1
-                ) {
-                  return Promise.reject('标识重复，请重新输入！')
-                }
-              }
-            }
-            return Promise.resolve()
-          },
-        },
-      ],
     },
     doubleClick(record) {
       return record?.mark === 'add'
@@ -187,21 +180,11 @@ const columns: any = [
     key: 'name',
     ellipsis: true,
     align: 'center',
-    width: 150,
+    width: 140,
     type: 'text',
     form: {
       isVerify: true,
       required: true,
-      rules: [
-        {
-          validator(_, value) {
-            if (!value) {
-              return Promise.reject('请输入名称')
-            }
-            return Promise.resolve()
-          },
-        },
-      ],
     },
   },
   {
@@ -212,7 +195,7 @@ const columns: any = [
     align: 'center',
     type: 'select',
     options: options,
-    width: 150,
+    width: 110,
     tips: true,
   },
   {
@@ -221,13 +204,20 @@ const columns: any = [
     dataIndex: 'action',
     ellipsis: true,
     align: 'center',
-    width: 140,
+    width: 100,
   },
 ]
 
 const dataBinds: any = inject(DATA_BIND)
 //数据
-const dataSource = ref([])
+const dataSource = computed({
+  get() {
+    return props.dataSource
+  },
+  set(val) {
+    emits('update:dataSource', val)
+  }
+})
 //新增一列table
 const handleAdd = async (table: any) => {
   table?.addItem({
@@ -235,8 +225,8 @@ const handleAdd = async (table: any) => {
     name: '',
     type: 'string',
     mark: 'add',
+    rowKey: randomString(8)
   })
-  // const data = await table?.getData();
 }
 
 const configRow = ref()
@@ -249,51 +239,41 @@ const configuration = (data: any, value: any) => {
 //处理方式弹窗
 const handleOk = (value: any, data: any) => {
   activeKey.value = value
-  let source: any = []
   switch (value) {
     case '1':
-      if (configChange.value) {
-        data?.map((item: any) => {
-          const dataFind = dataSource.value?.find(
-            (i: any) => i?.id === item?.id,
-          )
-          if (dataFind?.config !== item?.config) {
-            source.push(item)
-          }
-        })
-      } else {
-        data?.map((item: any) => {
-          if (item?.mark === 'add') {
-            source.push(item)
-          }
-        })
-      }
+      dataSource.value = data
       break
     case '2':
-      source = data
+      console.log(...data);
+      dataSource.value.push(...data)
+      // if (configChange.value) {
+      //   data?.map((item: any) => {
+      //     const dataFind = dataSource.value?.find(
+      //       (i: any) => i?.id === item?.id,
+      //     )
+      //     if (dataFind?.config !== item?.config) {
+      //       dataSource.value.push(item)
+      //     }
+      //   })
+      // } else {
+      //   data?.map((item: any) => {
+      //     if (item?.mark === 'add') {
+      //       dataSource.value.push(item)
+      //     }
+      //   })
+      // }
       break
     case '3':
-      source = dataBinds?.functionInfo?.configuration?.columns?.map((item) => {
-        return {
-          id: item.name,
-          name: item.name,
-          type: 'string',
-        }
-      })
       break
   }
-  dataSource.value = source
   configChange.value = false
-  configurationStore.setALLlistDataInfo(
-    'searchData',
-    dataSource.value,
-    props.id,
-  )
 }
-
+//点击显示table的同步数据
+const bindData = (data: any) => {
+  dataSource.value = data;
+}
 //保存
 const submit = () => {
-  configurationStore.setALLlistDataInfo(type.value, subValue.value, props.id)
   const dataRow = dataSource.value?.find(
     (item: any) => item?.id === configRow.value?.id,
   )
@@ -304,21 +284,36 @@ const submit = () => {
   type.value = ''
   show.value = true
   dataBind.value = true
-  asyncData.value = true
+  dataBinds.filterAsync = true
   configChange.value = true
 }
 const goBack = () => {
   type.value = ''
   show.value = true
   dataBind.value = true
-  asyncData.value = true
+  dataBinds.filterAsync = true
+  configChange.value = false
 }
 /**
  * 校验筛选模块配置
  */
 const errorList: any = ref([])
 const valid = async () => {
-  errorList.value = await validFilterModule(dataSource.value)
+  return new Promise((resolve) => {
+    validFilterModule(dataSource.value).then(res => {
+      errorList.value = res;
+      if(errorList.value.length) {
+        resolve([{message: '筛选项配置错误'}])
+      } else {
+        resolve([])
+      }
+    })
+  })
+  // return new Promise((resolve, reject) => {
+  //   errorList.value = validFilterModule(dataSource.value)
+  //   if (errorList.value.length) reject([{message: '数据绑定配置错误'}])
+  //   else resolve([])
+  // })
 }
 
 defineExpose({
@@ -326,26 +321,19 @@ defineExpose({
   errorList,
 })
 
-watch(
-  () => dataBinds,
-  () => {
-    if (dataBinds.functionInfo) {
-      dataBind.value = true
-    } else {
-      dataBind.value = false
-    }
-    dataSource.value = dataBinds?.functionInfo?.configuration?.columns?.map(
-      (item) => {
-        return {
-          id: item.name,
-          name: item.name,
-          type: 'string',
-        }
-      },
-    )
-  },
-  { immediate: true, deep: true },
-)
+// watch(
+//   () => dataBinds,
+//   () => {
+//     if (dataBinds.data.function) {
+//       dataBind.value = true
+//     } else {
+//       dataBind.value = false
+//       dataSource.value = [];
+//     }
+//   },
+//   { immediate: true, deep: true },
+// )
+
 </script>
 
 <style scoped lang="less"></style>

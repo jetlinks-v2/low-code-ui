@@ -1,54 +1,73 @@
 <template>
   <div class="headerBtn">
-    <div v-for="item in props.headerActions" :key="item.key">
-      <PermissionButton
-        :type="item.type"
-        v-bind:="handleFunction(item.permissionProps, item)"
-        style="width: 134px; margin-right: 10px"
-        :danger="item.command === 'Delete'"
-        :popConfirm="handleFunction(item.permissionProps)?.popConfirm"
-        v-if="item?.children?.length === 0"
-      >
-        <!-- <AIcon v-if="item.icon" :type="item?.icon" /> -->
-        {{ item?.text }}
-      </PermissionButton>
+    <j-space>
+      <div v-for="item in props.headerActions" :key="item.key">
+        <PermissionButton
+          v-if="item?.children?.length === 0"
+          type="primary"
+          :class="className(item.style)"
+          v-bind:="handleFunction(item.permissionProps, item, item)"
+          :danger="item.command === 'Delete'"
+          :hasPermission="route.params.sid ? `${route.params.sid}:${item.key}` : true"
+          :data-id="item.id"
+        >
+          <j-space>
+            <template v-if="item.icon">
+              <img :src="item.icon" alt="" v-if="item.icon.includes('http')" class="image-icon">
+              <AIcon v-else :type="item?.icon" />
+            </template>
+            {{ item?.text }}
+          </j-space>
+        </PermissionButton>
 
-      <j-dropdown
-        :trigger="['click']"
-        placement="bottomLeft"
-        v-if="item?.children?.length !== 0"
+
+        <BatchDropdown
+            v-model:isCheck="isCheck"
+            :actions="item?.children"
+            v-else
+        >
+        <PermissionButton
+        :key="item.key"
+        :danger="item.command === 'Delete'"
+        :class="extractCssClass(item.style)"
+        :hasPermission="route.params.sid ? `${route.params.sid}:${item.key}` : true"
+        :data-id="item.id"
       >
-        <j-button class="childBtn">
-          {{ item.text }}
-        </j-button>
-        <template #overlay>
-          <j-menu>
-            <j-menu-item v-for="child in item?.children" :key="child.key">
-              <PermissionButton
-                v-bind:="handleFunction(child.permissionProps, child)"
-                :danger="child.command === 'Delete'"
-                style="width: 100%"
-                :popConfirm="
-                  handleFunction(child.permissionProps, child)?.popConfirm
-                "
-              >
-                <!-- <AIcon v-if="item.icon" :type="item?.icon" /> -->
-                {{ child?.text }}
-              </PermissionButton>
-            </j-menu-item>
-          </j-menu>
+        <template v-if="item.icon">
+          <img
+            :src="item.icon"
+            alt=""
+            v-if="item.icon.includes('http')"
+            class="image-icon"
+          />
+          <AIcon v-else :type="item?.icon" />
         </template>
-      </j-dropdown>
-    </div>
+        {{ item.title }} <AIcon type="DownOutlined" />
+      </PermissionButton>
+        </BatchDropdown>
+      </div>
+    </j-space>
   </div>
 </template>
 <script setup lang="ts">
 import { isFunction, isObject } from 'lodash-es'
+import { PropType } from 'vue';
+import { extractCssClass, insertCustomCssToHead } from '@/components/FormDesigner/utils/utils';
+import BatchDropdown from './BatchDropdown/index.vue'
+
+const isCheck = ref(false)
+const route = useRoute()
 const props = defineProps({
   headerActions: {
-    type: Array,
+    type: Array as PropType<Record<string, any>[]>,
     default: () => [],
   },
+})
+
+const className = computed(() => {
+  return (val: string) => {
+    return extractCssClass(val)
+  }
 })
 
 const handleFunction = (item: any, data?: any) => {
@@ -59,13 +78,20 @@ const handleFunction = (item: any, data?: any) => {
   }
   return undefined
 }
+
+
+watchEffect(() => {
+  props.headerActions.forEach((item) => {
+    insertCustomCssToHead(item.style, item.key, 'dataid')
+  })
+})
+
+defineExpose({
+  isCheck
+})
 </script>
 <style lang="less" scoped>
 .headerBtn {
   display: flex;
-  .childBtn {
-    margin-right: 10px;
-    width: 134px;
-  }
 }
 </style>

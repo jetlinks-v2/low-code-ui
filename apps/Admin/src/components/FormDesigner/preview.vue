@@ -1,95 +1,145 @@
 <template>
   <div class="container">
-    <Canvas :data="formData" ref="formRef"></Canvas>
+    <Canvas></Canvas>
   </div>
 </template>
-  
-  <script lang="ts" setup>
+
+<script lang="ts" setup>
 import Canvas from './components/Panels/Canvas/index'
 import { provide, ref, reactive, PropType, watch } from 'vue'
 import { ISchema } from './typings'
-
-const initData = {
-  type: 'root',
-  key: 'root',
-  componentProps: {
-    layout: 'horizontal',
-    size: 'default',
-  },
-  children: [
-    {
-      type: 'input',
-      key: '123',
-      name: '123',
-      formItemProps: {
-        label: '123',
-      },
-    },
-  ],
-}
+import { getFieldData, initData } from './utils/utils'
+import { proAll } from '../QuickEditTable/util'
+import { cloneDeep } from 'lodash-es'
 
 const props = defineProps({
   value: {
     // 表单初始值
     type: Object,
-    default: () => {},
+    default: () => ({}),
   },
   mode: {
     type: String as PropType<'add' | 'edit'>,
     default: 'add',
   },
   data: {
-    type: Object
+    type: Object,
+    default: () => ({}),
+  },
+  type: {
+    // 判断是工作流还是低代码
+    type: String as PropType<'workflow' | 'low-code'>,
+    default: 'low-code',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  formStyle: {
+    type: Object,
   },
 })
-const formData = ref<ISchema>() // 表单数据
-const formState = reactive<any>({})
+
+const emit = defineEmits(['valueChange', 'stateChange'])
+
+const formData = ref<ISchema>(initData) // 表单数据
+const formState = reactive({})
 const formRef = ref<any>()
+const refList = ref<any>({})
+const formRefList = ref<any>({})
+
+const onChange = () => {
+  emit('stateChange', formState)
+}
 
 watch(
-  () => props.data?.other?.formDesigner,
-  (newVal) => {
-    formData.value = (newVal || initData) as ISchema
+  () => [JSON.stringify(props.value), JSON.stringify(props.data)],
+  () => {
+    if (props.data) {
+      let obj = cloneDeep(props.data)
+      if (props.formStyle) {
+        obj = {
+          ...obj,
+          componentProps: {
+            ...obj.componentProps,
+            ...props.formStyle,
+          },
+        }
+      }
+      formData.value = obj as ISchema
+      if(!props?.value){
+        Object.assign(formState, getFieldData(formData.value) || {})
+      }
+    }
+    Object.assign(formState, props.value || {})
   },
   {
-    deep: true,
     immediate: true,
   },
 )
 
 watch(
-  () => props.value,
-  () => {
-    Object.assign(formState, props.value)
+  () => props.formStyle,
+  (val: any) => {
+    if (val) {
+      const obj = {
+        ...formData.value,
+        componentProps: {
+          ...formData.value.componentProps,
+          ...val,
+        },
+      }
+      formData.value = cloneDeep(obj)
+    }
   },
   {
-    deep: true,
     immediate: true,
   },
 )
 
 provide('FormDesigner', {
   model: 'preview',
+  type: props?.type || 'low-code',
+  refList,
+  formRefList,
   formData,
   formState,
-  mode: props.mode
+  formRef,
+  mode: props.mode,
+  disabled: props.disabled,
+  onChange,
 })
 
 const onSave = () => {
-  formRef.value
-    .validateFields()
-    .then((values) => {
-      console.log('Received values of form: ', values)
-    })
-    .catch((info) => {
-      console.log('Validate Failed:', info)
-    })
+  // 校验内嵌表单
+  const _func = Object.keys(formRefList.value || {}).map((item) => {
+    return formRefList.value[item]?.onSave()
+  })
+  // 主表单
+  _func.push(formRef.value?.validate())
+  return new Promise((resolve, reject) => {
+    proAll(_func)
+      .then(() => {
+        //
+        resolve(formState)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
 }
 
-defineExpose({ onSave })
+watch(
+  () => JSON.stringify(formData.value),
+  () => {
+    emit('valueChange', formData.value)
+  },
+)
+
+defineExpose({ onSave, formState })
 </script>
-  
-  <style lang="less" scoped>
+
+<style lang="less" scoped>
 .container {
   background-color: #fff;
 }

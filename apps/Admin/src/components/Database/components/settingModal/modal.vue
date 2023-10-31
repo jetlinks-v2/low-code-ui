@@ -1,18 +1,26 @@
 <template>
-  <j-modal
+  <j-drawer
     visible
     title="配置"
-    @cancel="cancel"
-    @ok="save"
+    placement="right"
+    :style="{ position: 'absolute', zIndex: 1030 }"
+    :closable="false"
+    :width="500"
+    :get-container="warp"
+    @close="cancel"
   >
     <j-form
       ref="formRef"
       :model="formModel"
       layout="vertical"
     >
-      <component :is="componentName" />
+      <component :is="componentName" :warp="warp" :publish="publish" />
     </j-form>
-  </j-modal>
+    <template #footer>
+      <j-button style="margin-right: 8px" @click="cancel">取消</j-button>
+      <j-button type="primary" @click="save">确定</j-button>
+    </template>
+  </j-drawer>
 </template>
 
 <script setup name="TypeModal">
@@ -27,6 +35,13 @@ const props = defineProps({
   data: {
     type: Object,
     default: () => ({})
+  },
+  warp: {
+    type: Object
+  },
+  publish: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -67,8 +82,8 @@ const componentName = computed(() => {
         validator: {
           provider: undefined,
           configuration: {
-            message: undefined,
-            group: undefined
+            message: '数据格式错误',
+            group: ['save', 'update', 'insert'],
           }
         },
         spec,
@@ -76,7 +91,7 @@ const componentName = computed(() => {
       }
       return StringItem;
     case 'Double':
-    case 'Int':
+    case 'Integer':
     case 'Float':
     case 'BigDecimal':
     case 'BigInteger':
@@ -87,8 +102,8 @@ const componentName = computed(() => {
         validator: {
           provider: undefined,
           configuration: {
-            message: undefined,
-            group: undefined,
+            message: '数据格式错误',
+            group: ['save', 'update', 'insert'],
             classType: javaType,
             regexp: undefined,
             min: undefined,

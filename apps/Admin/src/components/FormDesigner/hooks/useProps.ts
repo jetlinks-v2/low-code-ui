@@ -1,169 +1,113 @@
-import { computed, isRef } from 'vue'
+import { omit } from "lodash-es"
 
-const addValidate = (result: any, node: any) => {
-  const {
-    componentProps
-  } = node
-  // result.prop = node.context && node.context.parents.map((e, index) => {
-  //   let result = ''
-  //   if (!index) {
-  //     result = e.context.parent.indexOf(e)
-  //   } else {
-  //     const parent = e.context.parent
-  //     let nodes = []
-  //     if (parent.columns) {
-  //       nodes = parent.columns
-  //       result += 'columns.'
-  //     } else if (parent.list) {
-  //       nodes = parent.list
-  //       result += 'list.'
-  //     } else if (parent?.rows) {
-  //       nodes = parent?.rows
-  //       result += 'rows.'
-  //     }
-  //     result += nodes.indexOf(e)
-  //   }
-  //   return result
-  // }).join('.') + '.options.defaultValue'
+const useProps = (element: any, _data: any, editable: boolean, __disabled: boolean, mode?: string) => {
+  // formItemProps
+  let rules: any[] = (element?.formItemProps?.rules || []).map(item => {
+    const trigger = item.trigger?.length > 1 ? item?.trigger : item.trigger?.join('')
+    // if (item?.validator) { // 处理自定义校验函数
+    //   return {
+    //     ...omit(item, ['validator', 'key']),
+    //     trigger,
+    //     validator(rule, value) {
+    //       let customFn = new Function('rule', 'value', item?.validator)
+    //       customFn(rule, value)
+    //       return Promise.resolve()
+    //     }
+    //   }
+    // }
+    // if (item?.pattern) {
+    //   let _pattern: any;
+    //   try {
+    //     _pattern = new RegExp(item?.pattern)
+    //   } catch (error) {
+    //   }
 
-  const obj: any = {}
-  // const validator = (...arg0) => new Promise((resolve, reject) => {
-  //   let value = arg0[1]
-  //   if (/^(signature|radio|checkbox|select|html)$/.test(node.type)) {
-  //     value = componentProps.defaultValue
-  //   }
-  //   const newValue = componentProps.isShowTrim ? value.trim() : value
-  //   if (result.required && (newValue === '' || newValue === null || newValue === undefined || (Array.isArray(newValue) && !newValue.length))) {
-  //     reject('必填')
-  //     return
-  //   }
-  //   switch (node.type) {
-  //     // resolve('')
-  //   }
-  // })
-  obj.required = componentProps?.required
-  // obj.asyncValidator = validator
-  result.rules = [obj]
-}
+    //   return {
+    //     ...omit(item, ['pattern', 'key']),
+    //     trigger,
+    //     pattern: _pattern
+    //   }
+    // }
 
+    // const elementValueType = element?.formItemProps?.type || 'string'
 
-const useProps = (node: any, isRoot?: boolean) => {
-  return computed(() => {
-    if (isRoot) {
-      return {}
+    return {
+      trigger,
+      async validator(rule, value, cb) {
+        const errorMessage: Array<string> = []
+        const len = element?.type === 'input-number' ? value : value?.length
+        // validator
+        if (item?.validator) {
+          let customFn = new Function('rule', 'value', 'callback', item?.validator)
+          try {
+            await customFn(rule, value, cb)
+          } catch (err: any) {
+            errorMessage.push(err)
+          }
+        }
+
+        // max
+        if (item.max && len !== undefined && len > item.max) {
+          errorMessage.push(`长度或值不能大于${item.max}`)
+        }
+        // min
+        if (item.min && len !== undefined && len < item.min) {
+          errorMessage.push(`长度或值不能小于${item.min}`)
+        }
+        // pattern
+
+        if (item.pattern) {
+          let _pattern: any;
+          try {
+            _pattern = new RegExp(item?.pattern)
+            if (!_pattern.test(value)) {
+              errorMessage.push(`该值不匹配${item?.pattern}`)
+            }
+
+          } catch (error) {
+          }
+        }
+        if (errorMessage.length) {
+          return Promise.reject(item.message || errorMessage.toString())
+        }
+        return Promise.resolve()
+      }
     }
-    let result: any = unref(node)?.componentProps
-    // const {
-    //   componentProps
-    // } = unref(node)
-
-    // result = {
-    //   label: unref(data)?.name || '',
-    //   disabled: componentProps?.disabled,
-    //   placeholder: componentProps?.placeholder,
-    //   required: componentProps?.required
-    // }
-    // if (state.mode === 'preview') {
-    //   const fieldState = state.fieldsLogicState.get(node)
-    //   const required = get(fieldState, 'required', undefined)
-    //   const readOnly = get(fieldState, 'readOnly', undefined)
-    //   if (readOnly === undefined) {
-    //     result.disabled = options.disabled
-    //   } else {
-    //     result.disabled = readOnly === 1
-    //   }
-    //   if (required === undefined) {
-    //     result.required = result.disabled ? false : result.required
-    //   } else {
-    //     result.required = result.disabled ? false : required === 1
-    //   }
-    // }
-    // addValidate(result, data) // 加校验
-
-    // result.labelWidth = options?.isShowLabel ? options?.labelWidth + 'px' : 'auto'
-
-    // switch (node.type) {
-    //   case 'input':
-    //     result.maxLength = componentProps?.maxLength || 64
-    //     break
-    //   // case 'textarea':
-    //   //   if (options?.isShowWordLimit) {
-    //   //     result.maxLength = options.max
-    //   //     result['show-word-limit'] = options?.isShowWordLimit
-    //   //   }
-    //   //   result.type = 'textarea'
-    //   //   result.rows = options?.rows
-    //   //   break
-    //   // case 'number':
-    //   //   result.controls = options.controls
-    //   //   if (options.controls) {
-    //   //     result['controls-position'] = options.controlsPosition ? 'right' : ''
-    //   //   }
-    //   //   if (options?.isShowWordLimit) {
-    //   //     result.min = options.min
-    //   //     result.max = options.max
-    //   //   } else {
-    //   //     result.min = Number.NEGATIVE_INFINITY
-    //   //     result.max = Number.POSITIVE_INFINITY
-    //   //   }
-    //   //   result.step = options.step
-    //   //   result.precision = options.precision
-    //   //   break
-    //   // case 'radio':
-    //   // case 'checkbox':
-    //   //   // result.options = get(state, `data[${options?.dataKey}].list`, [])
-    //   //   break
-    //   // case 'select':
-    //   //   // result.options = get(state, `data[${options?.dataKey}].list`, [])
-    //   //   result.multiple = options?.multiple
-    //   //   result.filterable = options?.filterable
-    //   //   break
-    //   // case 'time':
-    //   //   result.format = options.format
-    //   //   result.valueFormat = options.valueFormat
-    //   //   break
-    //   // case 'date':
-    //   //   result.placeholder = options.placeholder
-    //   //   result.format = options.format
-    //   //   result.type = options.type
-    //   //   result.valueFormat = 'X'
-    //   //   if (options.type === 'daterange') {
-    //   //     result.rangeSeparator = ''
-    //   //     result.startPlaceholder = options.placeholder
-    //   //   }
-    //   //   result.disabledDate = (time) => {
-    //   //     const {
-    //   //       startTime,
-    //   //       endTime,
-    //   //     } = options
-    //   //     const startDate = dayjs.unix(startTime)
-    //   //     const endDate = dayjs.unix(endTime)
-    //   //     const currentDate = dayjs(time)
-    //   //     let result = false
-    //   //     if (options?.isShowWordLimit) {
-    //   //       result = currentDate.isBefore(startDate) || currentDate.isAfter(endDate)
-    //   //     }
-    //   //     return result
-    //   //   }
-    //   //   break
-    //   // case 'cascader':
-    //   //   // result.options = get(state, `data[${options.dataKey}].list`, [])
-    //   //   result.props = {
-    //   //     multiple: options?.multiple,
-    //   //     checkStrictly: options.checkStrictly
-    //   //   }
-    //   //   break
-    //   // case 'uploadfile':
-    //   //   result.multiple = options?.multiple
-    //   //   result.action = options.action
-    //   //   result.accept = options.accept
-    //   //   result.maxSize = options.size * 1024 * 1024
-    //   //   result.limit = options.limit
-    //   //   break
-    // }
-    // specialHandling && specialHandling(node.type, result)
-    return result || {}
   })
+  // 处理内嵌表单的校验问题
+  if (element?.formItemProps?.required) {
+    if (['org', 'user', 'role', 'device', 'product', 'select-card', 'switch', 'tree-select', 'select', 'date-picker', 'time-picker'].includes(element.type)) {
+      rules = [{
+        required: true,
+        message: `请选择${element?.formItemProps?.label}`
+      }]
+    }
+  }
+
+
+  const _disabled = element?.componentProps?.disabled || __disabled || !editable || (mode === 'edit' && !element?.componentProps?.editable)
+  // componentProps
+  const _componentProps = {
+    ...omit(element?.componentProps, ['description', 'cssCode', 'editable', 'onChange', 'visible', 'source']),
+    size: _data?.componentProps.size,
+    disabled: _disabled
+  }
+
+  if (element?.componentProps?.options) {
+    _componentProps.options = element?.componentProps?.options || []
+  }
+
+  if (element?.componentProps?.treeData) {
+    _componentProps.treeData = element?.componentProps?.treeData || []
+  }
+
+  const result = {
+    ...element,
+    formItemProps: { ...element?.formItemProps, rules },
+    componentProps: _componentProps
+  }
+
+  return result
 }
 
 export default useProps

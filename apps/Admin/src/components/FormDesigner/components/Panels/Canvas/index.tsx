@@ -1,21 +1,26 @@
-import { useProps } from "@/components/FormDesigner/hooks"
-import { Form, Scrollbar, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
+import { Form, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import DraggableLayout from "../../Draggable/DraggableLayout"
 import './index.less'
 import { cloneDeep, omit } from "lodash-es"
-import { addContext } from "@/components/FormDesigner/utils/addContext"
 import { uid } from "@/components/FormDesigner/utils/uid"
 import CollectModal from '../../CollectModal/index.vue'
-import { useProduct, useFormDesigner } from "@/store"
+import { useProduct } from "@/store"
+import { extractCssClass, insertCustomCssToHead } from "@/components/FormDesigner/utils/utils"
+import { useMagicKeys } from '@vueuse/core'
+import { useElementHover } from '@vueuse/core'
 
-export default defineComponent({
+const Canvas = defineComponent({
   name: 'Canvas',
   inheritAttrs: false,
   customOptions: {},
   setup() {
     const designer: any = inject('FormDesigner')
-    const formDesigner = useFormDesigner()
     const product = useProduct()
+    const canvasRef = ref<any>()
+    const keys = useMagicKeys()
+    const focused = useElementHover(canvasRef)
+
+    const cssClassList = ref<string[]>([])
 
     const handleClick = () => {
       designer.setSelection('root')
@@ -25,60 +30,138 @@ export default defineComponent({
       return unref(designer?.model) === 'edit'
     })
 
-    const _style = {
-      margin: '10px 10px 0 10px',
-      paddingTop: '10px',
-      height: '100%',
-      boxSizing: 'border-box'
+    watch(
+      () => [keys?.['Ctrl']?.value, keys?.['Meta']?.value],
+      ([v1, v2]) => {
+        designer._ctrl.value = v1 || v2
+      },
+    )
+
+    watch(
+      () => [keys?.['Ctrl+C']?.value, keys?.['Meta+C']?.value],
+      ([v1, v2]) => {
+        designer._other.value = v1 || v2
+        if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
+          designer?.onCopy?.()
+        }
+      },
+    )
+
+    watch(
+      () => [keys?.['Ctrl+X']?.value, keys?.['Meta+X']?.value],
+      ([v1, v2]) => {
+        designer._other.value = v1 || v2
+        if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
+          designer?.onShear?.()
+        }
+      },
+    )
+
+    watch(
+      () => [keys?.['Ctrl+V']?.value, keys?.['Meta+V']?.value],
+      ([v1, v2]) => {
+        designer._other.value = v1 || v2
+        if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
+          designer?.onPaste?.()
+        }
+      },
+    )
+
+    // 删除
+    watch(
+      () => [keys?.['Backspace']?.value, keys?.['Delete']?.value],
+      ([v1, v2]) => {
+        designer._other.value = v1 || v2
+        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
+          if (!designer?.delVisible?.value) {
+            designer?.onDelete?.()
+          }
+        }
+      },
+    )
+
+    const getWidgetRef = (path) => {
+      let foundRef = unref(designer.refList)?.[path]
+      return foundRef
     }
+
+    const _width = computed(() => {
+      return !unref(designer.formData)?.children?.length ? "100%" : ''
+    })
 
     const onPaste = () => {
-      const _data = formDesigner.getCopyData()
-      if (_data) {
-        const newNode = reactive(cloneDeep(toRaw(_data)))
-        delete newNode.context
-        newNode.key = `${newNode.type}_${uid()}-paste`
-        addContext(newNode, unref(designer.formData), (node) => {
-          node.key = `${node.type}_${uid()}-paste`
-        })
-        designer.formData?.value?.children?.push(newNode)
-        designer.setSelection(newNode)
-        formDesigner.deleteData()
-      }
+      designer?.onPaste?.()
     }
 
+    watchEffect(() => {
+      const arr = extractCssClass(unref(designer.formData)?.componentProps?.cssCode)
+      cssClassList.value = arr
+      insertCustomCssToHead(unref(designer.formData)?.componentProps?.cssCode, 'root')
+    })
+
+    watch(
+      () => focused?.value,
+      (newValue) => {
+        if (designer.focus) {
+          designer.focus.value = newValue
+        }
+      },
+      {
+        immediate: true,
+        deep: true
+      }
+    )
+
     const renderContent = () => {
-      const typeProps = useProps(designer, true) // 根结点，也是form的props
       const Layout = (
         <DraggableLayout
           path={[]}
           index={0}
           data-layout-type={'root'}
-          style={_style}
-          data={unref(designer.formData)?.children}
-          parent={unref(designer.formData)}
+          style={{
+            margin: '10px 10px 0 10px',
+            paddingTop: '10px',
+            height: '100%',
+            width: unref(_width)
+          }}
+          data={designer.formData.value?.children || []}
+          parent={designer.formData.value}
           isRoot
         ></DraggableLayout>
       )
 
       return (
-        <div style={{ height: '100%' }}>
-          <Form
-            ref={designer.formRef}
-            model={designer.formState}
-            {...omit(unref(designer.formData)?.componentProps, ['size'])}
-            onClick={unref(isEditModel) && handleClick}
-            {...unref(typeProps)}
-          >
-            {Layout}
-          </Form>
-        </div>
+        <Form
+          ref={designer.formRef}
+          model={designer.formState}
+          {...omit(designer.formData.value?.componentProps, ['size', 'cssCode', 'eventCode'])}
+          onClick={unref(isEditModel) && handleClick}
+          class={[...unref(cssClassList)]}
+          onValidate={(name, status, errorMsgs) => {
+            if (designer.formData.value?.componentProps?.eventCode) {
+              let customFn = new Function('e', designer.formData.value?.componentProps?.eventCode)
+              customFn.call({ getWidgetRef: getWidgetRef }, name, status, errorMsgs)
+            }
+          }}
+          style={{
+            height: "100%",
+            width: "100%"
+          }}
+        >
+          {Layout}
+        </Form>
       )
     }
 
     const renderChildren = () => {
       return <Dropdown
         trigger={['contextmenu']}
+        onContextmenu={() => {
+          const flag = designer.selected.value.find(item => item.key === 'root')
+          if (!flag) {
+            designer.setSelection('root')
+          }
+        }}
         v-slots={{
           overlay: () => {
             return (
@@ -95,18 +178,8 @@ export default defineComponent({
 
     return () => {
       return (
-        <div class={['canvas-box', unref(isEditModel) && 'editModel']}>
-          {unref(isEditModel)
-            ? (
-              <div class="container">
-                <Scrollbar height={'100%'}>
-                  <div class="subject">
-                    {renderChildren()}
-                  </div>
-                </Scrollbar>
-              </div>
-            )
-            : renderContent()}
+        <div class="subject" ref={canvasRef}>
+          {unref(isEditModel) ? renderChildren() : renderContent()}
           {unref(designer.collectVisible) && unref(isEditModel) && <CollectModal
             onSave={(name: string) => {
               const obj = {
@@ -134,3 +207,5 @@ export default defineComponent({
     }
   }
 })
+
+export default Canvas

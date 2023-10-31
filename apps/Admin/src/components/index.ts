@@ -16,6 +16,12 @@ import ProImage from './Image/index.vue'
 import EditorModal from './EditorModal'
 import CRUD from './Database'
 import {BooleanSelect, EmptySelect} from './Select'
+import { SQLCode, FunctionCode } from './SQL'
+import OppositeSelect from './OppositeSelect/index.vue'
+import CardBox from './CardBox/index.vue'
+import CheckSpin from './CheckSpin/index.vue'
+import CheckButton from './CheckButton/index.vue'
+
 export default  {
     install(app: App) {
         app.component('TitleComponent', TitleComponent)
@@ -35,5 +41,11 @@ export default  {
           .component('Project',Project)
           .component('EmptySelect',EmptySelect)
           .component('BooleanSelect',BooleanSelect)
+          .component('SQLCode', SQLCode)
+          .component('FunctionCode', FunctionCode)
+          .component('OppositeSelect',OppositeSelect)
+          .component('CardBox',CardBox)
+          .component('CheckSpin', CheckSpin)
+          .component('CheckButton', CheckButton)
     }
 }

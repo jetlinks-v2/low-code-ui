@@ -14,6 +14,7 @@
       v-model:value="state.min"
       class="input"
       :precision="0"
+      :min="1"
       :max="state.max"
       :step="1"
     />
@@ -37,8 +38,8 @@ const emits = defineEmits<Emit>()
 const data = props.data?.config || null
 
 const state = reactive({
-  max: data?.max || null,
-  min: data?.min || null,
+  max: data?.max || 1,
+  min: data?.min || 1,
 })
 
 watch(

@@ -1,48 +1,90 @@
 <template>
   <div class="content-files">
-    <j-tabs
-      v-model:activeKey="activeFile"
-      hide-add
-      type="editable-card"
-      class="content-tabs"
-      @edit="onEdit"
-      @tabClick="select"
-    >
+    <j-tabs v-model:activeKey="activeFile" hide-add type="editable-card" class="content-tabs" @edit="onEdit"
+      @tabClick="select">
       <template #moreIcon>
         <AIcon type="MoreOutlined" />
       </template>
-      <j-tab-pane v-for="item in files" :key="item.id" :tab="item.title" :closable="true">
+      <j-tab-pane v-for="item in files" :key="item.id" :closable="true">
+        <template #tab>
+          <span>
+            <img :src="typeImages[item.type]" style="width: 20px;height: 20px;margin-right: 5px;">
+            {{ item.title }}
+          </span>
+        </template>
         <Content :data="item" />
       </j-tab-pane>
     </j-tabs>
-<!--    <Tabs-->
-<!--      v-model:activeKey="activeFile"-->
-<!--      :options="files"-->
-<!--      @edit="onEdit"-->
-<!--      @select="select"-->
-<!--    />-->
-<!--    <Content/>-->
+
+    <div class="content-module" v-if="activeData?.type === 'project' || activeData?.type === 'module'"
+      :key="activeData.id">
+      <ProjectEmpty v-if="activeData?.type === 'project' && activeData.children.length === 0" :data="activeData" />
+      <Project v-else :data="activeData.children" />
+    </div>
+
+<!--    <div class="footer">-->
+<!--      <j-scrollbar>-->
+<!--        <div class="items">-->
+<!--          <div v-for="(item, index) in path" class="item">-->
+<!--            <div class="icon"><img :src="typeImages[item.type]"></div>-->
+<!--            <div class="title" @click="onClick(item)">{{ item.title }}</div>-->
+<!--            <div v-if="path.length !== index + 1" class="path"> > </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </j-scrollbar>-->
+<!--    </div>-->
   </div>
 </template>
 
 <script setup name="ContentTabs">
 import { storeToRefs } from 'pinia'
-import { useEngine } from '@/store'
-import Tabs from '../Tabs/tabs.vue'
+import { useEngine, useProduct } from '@/store'
+// import Tabs from '../Tabs/tabs.vue'
 import Content from './content.vue'
+import ProjectEmpty from '@/components/ProJect/Empty/index.vue'
+import { typeImages } from '@/components/ProJect/index'
+
 
 const engine = useEngine()
+const product = useProduct()
+const path = ref()
 
 const { files, activeFile } = storeToRefs(engine)
+const activeData = ref()
 
 const onEdit = (targetKey) => {
   engine.removeFile(targetKey)
+  const item = product.data[0]
+  product.update({
+    ...item,
+    others: {
+      ...item?.others,
+      activeFile: activeFile.value,
+      files: files.value
+    }
+  })
 }
 
 const select = (key) => {
-  // console.log(key)
   engine.selectFile(key)
 }
+
+const onClick = (data) => {
+  engine.selectFile(data.id)
+  engine.addFile(data)
+}
+
+watch(
+  () => [activeFile.value, product.data],
+  (val) => {
+    // console.log('val',val)
+    if (val) {
+      activeData.value = product.getById(val[0])
+      path.value = product.getParent(activeData.value)
+    }
+  },
+  { deep: true, immediate: true }
+)
 
 </script>
 
@@ -55,12 +97,14 @@ const select = (key) => {
 
   .content-tabs {
     height: 100%;
+    z-index: 1;
 
     &>:deep(.ant-tabs) {
       height: 100%;
 
       &>.ant-tabs-content-holder {
         height: calc(100% - 36px);
+
         &>.ant-tabs-content {
           height: 100%;
         }
@@ -71,6 +115,7 @@ const select = (key) => {
 
         &>.ant-tabs-nav-operations {
           padding: 4px;
+
           .ant-tabs-nav-more {
             //background-color: #21252b !important;
             //color: #fdd835;
@@ -104,6 +149,60 @@ const select = (key) => {
 
   }
 
+  .content-module {
+    height: calc(100% - 46px);
+    background-color: rgb(255, 255, 255);
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 2;
+    overflow: hidden;
+  }
 
+  //.footer {
+  //  border-top: 1px solid #D9D9D9;
+  //  z-index: 3;
+  //  height: 44px;
+  //  line-height: 43px;
+  //  font-size: 16px;
+  //  width: 100%;
+  //  display: flex;
+  //  padding: 0 10px;
+  //  user-select: none;
+  //
+  //  .items {
+  //    width: 100%;
+  //    display: flex;
+  //
+  //    .item {
+  //      display: flex;
+  //      white-space: nowrap;
+  //
+  //      .icon {
+  //        margin: 0 5px;
+  //        width: 22px;
+  //        height: 22px;
+  //
+  //        img {
+  //          width: 100%;
+  //          height: 100%;
+  //        }
+  //      }
+  //
+  //      .title {
+  //        cursor: pointer;
+  //        // &:hover{
+  //        //   color: #7595f3;
+  //        // }
+  //      }
+  //
+  //      .path {
+  //        margin: 0 16px;
+  //      }
+  //    }
+  //  }
+
+
+  //}
 }
 </style>

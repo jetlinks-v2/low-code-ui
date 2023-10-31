@@ -15,4 +15,4 @@ export const executeReq = (provider: Draft.Provider, command: Draft.Command, dat
 
 export const getAssetType = () => request.get('/asset/types')
 
-export const getResource = (projectId: string, moduleId: string, resourceId: string) => request.get(`/low-code/runtime/${projectId}/${moduleId}/resources/${resourceId}`, {}, { headers: { 'Content-Type': 'text/plain'}})
+export const getResource = (projectId: string, moduleId: string, resourceId: string) => request.get(`/low-code/runtime/${projectId}/${moduleId}/resources/${resourceId}`, {}, { headers: { 'Content-Type': 'text/plain;application/x-www-form-urlencoded;charset=utf-8;'}})

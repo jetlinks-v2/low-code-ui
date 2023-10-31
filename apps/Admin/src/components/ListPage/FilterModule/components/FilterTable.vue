@@ -1,103 +1,94 @@
 <template>
   <div className="filter-table">
     <div class="tips">{{ props.title }}</div>
-    <j-button
+    <!-- <j-button
       @click="syncData"
       myIcon="SyncOutlined"
       size="small"
-      :type="props.dataBind ? 'primary' : 'stroke'"
+      :type="dataBinds.data.dataSource.length ? 'primary' : 'default'"
     >
       同步数据绑定
-    </j-button>
-    <div class="table" v-if="bindShow || props.show">
-      <j-data-table
-        class="ant-table-striped"
-        rowKey="code"
-        bordered
-        ref="tableRef"
-        size="small"
-        :columns="props.columns"
-        :data-source="props.dataSource"
-        :height="200"
-        :row-class-name="
-          (_record, index) => (_record?.mark === 'add' ? 'table-striped' : null)
-        "
-        @change="(data) => handleChange(data)"
-      >
-        <template #headerCell="{ column }">
-          <template v-if="column.tips">
-            <span>
-              <j-popover trigger="hover">
-                <template #content>
-                  <div class="hover-tips">
-                    <j-table
-                      :columns="tipsColumns"
-                      :data-source="data"
-                      :pagination="false"
-                      bordered
-                      size="small"
-                    />
-                  </div>
-                </template>
-                <AIcon type="QuestionCircleOutlined" />
-              </j-popover>
-              {{ column.title }}
-            </span>
-          </template>
-        </template>
-        <template #name="{ data }">
-          <ErrorItem :errorData="errorData(data.record.id)">
-            <span>{{ data.record?.name }}</span>
-          </ErrorItem>
-        </template>
-        <template #action="{ data }">
+    </j-button> -->
+    <j-data-table
+      columnDrag
+      class="ant-table-striped table-striped"
+      rowKey="rowKey"
+      bordered
+      ref="tableRef"
+      size="small"
+      :columns="props.columns"
+      :data-source="props.dataSource"
+      :showTool="false"
+      :height="500"
+      @change="(data) => handleChange(data)"
+    >
+      <template #headerCell="{ column }">
+        <template v-if="column.tips">
           <span>
-            <a @click="configuration(data)">配置</a>
-            <j-divider type="vertical" />
-            <JPopconfirm
-              @confirm="confirm(data)"
-              :loading="loading"
-              title="确定删除此数据？"
-            >
-              <a>删除</a>
-            </JPopconfirm>
+            {{ column.title }}
+            <j-popover trigger="hover">
+              <template #content>
+                <div class="hover-tips">
+                  <div>不同于列自身的数据类型，筛选组件提供string、enum、<br>date、number四种数据类型，用于控制运算符和筛选值样式</div>
+                  <j-table
+                    :columns="tipsColumns"
+                    :data-source="data"
+                    :pagination="false"
+                    bordered
+                    size="small"
+                  />
+                </div>
+              </template>
+              <AIcon type="QuestionCircleOutlined" />
+            </j-popover>
           </span>
         </template>
-      </j-data-table>
-    </div>
+      </template>
+      <template #name="{ data }">
+        <ErrorItem :border="false" :errorData="errorData('name' + data.record?._sortIndex)">
+          <span class="data-column">{{ data.record?.name }}</span>
+        </ErrorItem>
+      </template>
+      <template #id="{ data }">
+        <ErrorItem :border="false" :errorData="errorData('id' + data.record?._sortIndex)">
+          <span class="data-column">{{ data.record?.id }}</span>
+        </ErrorItem>
+      </template>
+      <template #action="{ data }">
+        <j-space>
+          <j-button type="link" @click="configuration(data)" :style="{ color: errorData('config' + data.record?._sortIndex) ? 'red' : '' }">配置</j-button>
+          <JPopconfirm
+            @confirm="confirm(data)"
+            :loading="loading"
+            title="确定删除此数据？"
+          >
+            <j-button type="text" danger v-if="data.record?.mark === 'add'">删除</j-button>
+          </JPopconfirm>
+        </j-space>
+      </template>
+    </j-data-table>
     <br />
     <j-button
       class="editable-add-btn"
-      style="margin-bottom: 8px"
-      type="link"
       @click="handleAdd"
+      type="dashed"
     >
       + {{ props.addBtnName }}
     </j-button>
     <!--处理方式弹窗-->
     <j-modal
       :visible="visible"
+      width="800px"
       title="数据绑定内容有变动，请选择处理方式"
       @ok="handleOk"
       @cancel="handleCancel"
       class="handle-modal"
     >
-      <j-row :gutter="16">
-        <j-col
-          :span="8"
-          v-for="(item, index) in props.handleOptions"
-          :key="index"
-        >
-          <j-card
-            style="height: 150px"
-            @click="() => handleSelect(item.value)"
-            :class="activeKey === item.value ? 'active' : 'data-handle'"
-          >
-            <p class="custom-label">{{ item.label }}</p>
-            <p class="custom-sub-label">{{ item.subLabel }}</p>
-          </j-card>
-        </j-col>
-      </j-row>
+    <j-card-select v-model:value="activeKey" float="right" :options="handleOptions">
+      <template #image="data">
+        <img :src="getImage(data.option.image)">
+      </template>
+    </j-card-select>
     </j-modal>
   </div>
 </template>
@@ -106,6 +97,10 @@
 import { onlyMessage } from '@/utils/comm'
 import { ErrorItem } from '../..'
 import type { PropType } from 'vue'
+import { useProduct } from '@/store';
+import { getImage, randomString } from '@jetlinks/utils';
+import { cloneDeep } from 'lodash-es';
+import { DATA_BIND } from '../../keys';
 const props = defineProps({
   title: {
     type: String,
@@ -125,10 +120,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  //配置是否修改
-  configChange: {
-    type: Boolean,
-    default: false,
+  tableType: {
+    type: String,
+    default: ''
   },
   //数据是否有变动
   dataChange: {
@@ -159,17 +153,20 @@ const props = defineProps({
       {
         value: '1',
         label: '覆盖',
-        subLabel: '以功能下的数据覆盖页面已有内容',
+        subLabel: '以下功能的数据覆盖页面已有内容',
+        image: '/list-page/cover.png',
       },
       {
         value: '2',
         label: '追加',
         subLabel: '在页面已有内容的基础上追加新增内容',
+        image: '/list-page/append.png',
       },
       {
         value: '3',
         label: '忽略',
         subLabel: '保留页面已有内容，忽略变动',
+        image: '/list-page/ignore.png',
       },
     ],
   },
@@ -183,10 +180,56 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  //绑定功能表数据
+  bindData: {
+    type: Array as PropType<Record<string, any>>,
+    default: () => []
+  },
+  bindFunctionId: {
+    type: String,
+    default: ''
+  }
 })
+
+const dataBinds = inject(DATA_BIND)
+enum javaType {
+  enum = 'enum',
+  string = 'text',
+  double = 'double',
+  int = 'int',
+  bigDecimal = 'text',
+  dateTime = 'date',
+  date = 'date',
+  float = 'float',
+  byte = 'int',
+  long = 'long',
+  list = 'array',
+  boolean = 'boolean',
+  object = 'object',
+  array = 'array'
+}
+
+enum filterType {
+  enum = 'enum',
+  string = 'string',
+  double = 'number',
+  int = 'number',
+  bigDecimal = 'string',
+  dateTime = 'date',
+  date = 'date',
+  float = 'number',
+  byte = 'number',
+  long = 'number',
+  list = 'string',
+  boolean = 'enum',
+  map = 'string',
+  object = 'enum',
+  array = 'string'
+}
+
+
 const tableRef = ref()
 const visible = ref<boolean>(false)
-
 const loading = ref<boolean>(false)
 const emit = defineEmits([
   'configuration',
@@ -195,16 +238,27 @@ const emit = defineEmits([
   'handleAdd',
   'handleOk',
   'handleChange',
+  'update:data',
+  'bindData',
+  'updateBind',
+  'update:asyncData'
 ])
 
 const handleChange = (data) => {
+  data = data.map((item) => {
+    if(props.dataSource.find(val => val.id === item.id)?.type !== item.type) {
+      console.log(item);
+      item.config = null
+    }
+    return item
+  })
   emit('handleChange', data)
 }
 
-const activeKey = ref('1')
+const activeKey = ref(['1'])
 
 const errorData = computed(() => {
-  return (val: string) => {
+  return (val: string): any => {
     return props.errorList?.find((item: any) => item.key === val)
   }
 })
@@ -214,6 +268,7 @@ const tipsColumns: any = [
   {
     title: '筛选项类型',
     dataIndex: 'type',
+    width: '120px',
     customCell: (_, index) => {
       if (index === 1) {
         return { rowSpan: 2 }
@@ -307,10 +362,14 @@ const data = [
 //新增一列table
 const handleAdd = async () => {
   emit('handleAdd', tableRef.value)
+  setTimeout(() => {
+    //滚动到表格底部
+    tableRef.value.$el.getElementsByTagName('tbody')?.[0].scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" })
+  })
 }
+
 //配置
 const configuration = async (data: any) => {
-  tableRef.value.cleanEditStatus()
   const dataSource = await tableRef.value.getData()
   emit('configuration', data, dataSource)
 }
@@ -323,24 +382,39 @@ const confirm = (data: any) => {
 }
 const bindShow = ref(false)
 //是否同步数据绑定
-const asyncData = ref(props.asyncData)
 //同步数据绑定
 const syncData = async () => {
-  if (!props.dataBind) {
+  if (dataBinds.data.dataSource.length === 0) {
     bindShow.value = false
     return onlyMessage('请先完成数据绑定', 'error')
   }
-  if (!asyncData.value) {
-    bindShow.value = true
-    asyncData.value = true
-  } else {
-    const data = await tableRef.value?.getData()
-    if (data?.length !== props.dataSource?.length || props.configChange) {
-      openModel(props.modelActiveKey)
-    } else {
-      onlyMessage('已是最新数据', 'success')
-    }
+  const changeFunctionData = asyncDataBind()
+  if(!props.asyncData) { 
+    handleChange([...props.dataSource, ...asyncDataBind()])
+    emit('update:asyncData', true)
+    emit('updateBind', cloneDeep([...props.dataSource, ...asyncDataBind()]))
+    return
   }
+  tempData.value = [];
+  changeFunctionData.forEach((item) => {
+    let find = props.bindData?.find((i) => i.id === item.id)
+    if(!find) tempData.value.push(item)
+  })
+  if (tempData.value.length || changeFunctionData.length !== props.bindData.length) {
+    openModel(props.modelActiveKey)
+  } else {
+    onlyMessage('已是最新数据', 'success')
+  }
+}
+
+const asyncDataBind = () => {
+  return dataBinds.data.dataSource.map(item => {
+    return {
+      rowKey: randomString(8),
+      ...item,
+      type: props.tableType === 'columnData' ? javaType[item.type] : filterType[item.type],
+    }
+  }) || []
 }
 //打开弹窗
 const openModel = (value: any) => {
@@ -349,26 +423,55 @@ const openModel = (value: any) => {
 }
 //处理方式弹窗
 const handleOk = async () => {
-  const dataSource = await tableRef.value.getData()
+  const newBind = asyncDataBind()
+  const dataSource = activeKey.value?.[0] === '1' ? newBind.map((item) => item) : tempData.value
+  emit('updateBind', cloneDeep(newBind))
+  const changeData = [...new Set([...dataSource, ...tempData.value].map(item => JSON.stringify(item)))].map(item => JSON.parse(item))
   tableRef.value.cleanEditStatus()
-  emit('handleOk', activeKey.value, dataSource)
+  emit('handleOk', activeKey.value?.[0], changeData)
   visible.value = false
 }
 const handleCancel = () => {
   visible.value = false
 }
-const handleSelect = (key: string) => {
-  activeKey.value = key
-}
+
+const tempData = ref<any[]>([])
+
+watch(() => props.bindFunctionId, () => {
+  if(!props.bindFunctionId) emit('update:asyncData', false);
+  bindShow.value = true
+  tempData.value = props.dataSource.length ? props.dataSource : props.bindData?.map(
+    (item) => {
+      return {
+        id: item.alias,
+        name: item.comment,
+        type: props.tableType === 'columnData' ? javaType[item.javaType] : filterType[item.javaType],
+        rowKey: randomString(8)
+      }
+    },
+  )
+}, { immediate: true })
+
 </script>
 
 <style scoped lang="less">
 .filter-table {
   .tips {
     padding-bottom: 8px;
+    .hover-tips {
+      width: 400px;
+    }
   }
-  .table {
     padding-top: 18px;
+    .data-column{
+      width: 100%;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  .editable-add-btn{
+    width: 100%;
   }
 }
 .handle-modal {
@@ -392,7 +495,23 @@ const handleSelect = (key: string) => {
   }
 }
 
-.ant-table-striped :deep(.table-striped) td {
-  background-color: #f2fcfe;
+:deep(.ant-table-cell) {
+  text-align: left !important;
+}
+:deep(.ant-btn-link) {
+  padding: 0 !important;
+}
+:deep(.ant-btn-text) {
+  padding: 0 !important;
+}
+:deep(.j-card-item.active) {
+  background-color: var(--ant-primary-color);
+  color: #ffffff;
+  .sub-title {
+    color: #ffffff !important;
+  }
+}
+:deep(.sub-title) {
+  color: #666666 !important;
 }
 </style>

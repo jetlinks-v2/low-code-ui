@@ -2,10 +2,9 @@ import { isHTMLTag } from '@vue/shared'
 import { withModifiers } from 'vue'
 import './index.less'
 import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
-import { checkIsField, extractCssClass, insertCustomCssToHead } from '../../utils/utils'
-import { cloneDeep, set } from 'lodash-es'
-import { useFormDesigner } from '@/store/designer'
-import { addContext } from '../../utils/addContext'
+import { checkIsField, copyDataByKey, extractCssClass, findParentById, handleCopyData, insertCustomCssToHead, updateData } from '../../utils/utils'
+import { map, set } from 'lodash-es'
+import { uid } from '../../utils/uid'
 
 const Selection = defineComponent({
   name: 'Selection',
@@ -45,17 +44,19 @@ const Selection = defineComponent({
       default: () => []
     },
   },
-  setup(props, { expose }) {
+  setup(props, { slots, expose }) {
     const designer: any = inject('FormDesigner')
-    const slots = useSlots()
     const isField = checkIsField(props.data)
     const cssClassList = ref<string[]>([])
     const visible = ref<boolean>(true)
 
-    const formDesigner = useFormDesigner()
-
     const Selected = computed(() => {
-      return props?.data?.key !== undefined && designer.selected?.key === props?.data?.key
+      const flag = designer.selected.value.find(item => props?.data?.key === item.key)
+      return props?.data?.key !== undefined && flag
+    })
+
+    const isMultiple = computed(() => {
+      return designer.selected.value?.length > 1
     })
 
     const isEditModel = computed(() => {
@@ -68,38 +69,17 @@ const Selection = defineComponent({
       }
     }
 
-    const handleAction = (_type: string) => {
-      const index = (props?.parent || [])?.findIndex(item => item?.key === props.data?.key)
-      switch (_type) {
-        case 'remove':
-          props.data.context?.delete()
-          const arr: any = cloneDeep(props.parent) || []
-          if (arr?.length > 0) {
-            if (index === arr?.length) {
-              designer.setSelection(arr?.[index - 1])
-            } else {
-              designer.setSelection(arr?.[index])
-            }
-          } else {
-            designer.setSelection('root')
-          }
-          break
-        case 'copy':
-          props.data.context?.copy()
-          const copyData = props.parent?.[index + 1]
-          designer.setSelection(copyData)
-          break
-        default: break
-      }
-    }
-    const TagComponent = isHTMLTag(props?.tag) ? props.tag : resolveComponent(props?.tag)
-
-    const maskNode = (<div class={['mask']}></div>)
+    const TagComponent = isHTMLTag(props.tag as string) ? props.tag : resolveComponent(props.tag as string)
 
     const _hasDrag = computed(() => { return props.hasDrag })
 
     const _error = computed(() => {
-      return designer.errorKey?.value.includes(props.data?.key)
+      const arr = map(designer.errorKey?.value, 'key')
+      if (props?.data?.type === 'table-item') {
+        return arr.includes(props.data?.children?.[0]?.key)
+      } else {
+        return arr.includes(props.data?.key)
+      }
     })
 
     watchEffect(() => {
@@ -113,7 +93,22 @@ const Selection = defineComponent({
     }
 
     const setOptions = (arr: any[]) => {
-      props.data.context?.updateProps(arr, 'options')
+      const obj = {
+        ...props.data,
+        componentProps: props.data.type === 'tree-select' ? {
+          ...props.data.componentProps,
+          options: arr
+        } : {
+          ...props.data.componentProps,
+          treeData: arr
+        }
+      }
+      const _list = updateData(unref(designer.formData)?.children, obj)
+      designer.formData.value = {
+        ...designer.formData.value,
+        children: _list || [],
+      }
+      designer.setSelection(props.data || 'root')
     }
 
     const setValue = (_val: any) => {
@@ -123,47 +118,108 @@ const Selection = defineComponent({
     }
 
     const setDisabled = (bool: boolean) => {
-      props.data.context?.updateProps(bool, 'disabled')
+      const _list = updateData(unref(designer.formData)?.children, {
+        ...props.data,
+        componentProps: {
+          ...props.data.componentProps,
+          disabled: bool
+        }
+      })
+      designer.formData.value = {
+        ...designer.formData.value,
+        children: _list || [],
+      }
+      designer.setSelection(props.data || 'root')
     }
 
     // 复制
     const onCopy = () => {
-      formDesigner.setCopyData(props.data)
+      const _data: any = {
+        ...props.data,
+        key: props.data?.key + '_' + uid(),
+        children: handleCopyData(props.data?.children || []),
+      }
+      if (!['grid-item'].includes(props.data?.type)) {
+        _data.formItemProps = {
+          ...props.data?.formItemProps,
+          label: 'copy_' + props.data?.formItemProps?.label,
+          name: 'copy_' + props.data?.formItemProps?.name
+        }
+      }
+      const dt = findParentById(designer.formData.value, props.data)
+      if (dt?.key === 'root') {
+        designer.formData.value = {
+          ...designer.formData.value,
+          children: [...designer.formData.value?.children, _data],
+        }
+      } else {
+        designer.formData.value = {
+          ...designer.formData.value,
+          children: copyDataByKey(designer.formData.value?.children, [_data], props.data),
+        }
+      }
+      designer.setSelection(_data || 'root')
     }
     // 粘贴
     const onPaste = () => {
-      const _data = formDesigner.getCopyData()
-      if (_data) {
-        const index = (props?.parent || [])?.findIndex(item => item?.key === props.data?.key)
-        props.data.context?.paste(_data)
-        const copyData = props.parent?.[index + 1]
-        designer.setSelection(copyData)
-        formDesigner.deleteData()
-      }
+      designer.onPaste()
     }
     // 剪切
     const onShear = () => {
-      formDesigner.setCopyData(props.data)
-      handleAction('remove')
+      designer.onShear()
     }
     // 删除
     const onDelete = () => {
-      handleAction('remove')
+      designer.onDelete()
     }
 
     // 收藏为模板
     const onCollect = () => {
-      const newNode = cloneDeep(toRaw(props.data))
-      designer.collectData.value = {...newNode}
-      designer.collectVisible.value = true
+      designer.onCollect()
     }
 
     expose({ setVisible, setOptions, setValue, setDisabled })
 
+    const editNode = () => {
+      return <Dropdown
+        trigger={['contextmenu']}
+        onContextmenu={withModifiers(() => {
+          const flag = designer.selected.value.find(item => item.key === props.data.key)
+          if (!flag) {
+            designer.setSelection(props.data)
+          }
+        }, ['stop'])}
+        v-slots={{
+          overlay: () => {
+            return (
+              <Menu>
+                <MenuItem key="copy"><Button type="link" onClick={() => { designer.onCopy() }}>复制</Button></MenuItem>
+                <MenuItem key="paste"><Button type="link" onClick={onPaste}>粘贴</Button></MenuItem>
+                <MenuItem key="shear"><Button type="link" onClick={onShear}>剪切</Button></MenuItem>
+                <MenuItem key="delete"><Button danger type="link" onClick={onDelete}>删除</Button></MenuItem>
+                <MenuItem key="collect"><Button type="link" onClick={onCollect}>收藏为模版</Button></MenuItem>
+              </Menu>
+            )
+          }
+        }}
+      >
+        <div style={{ position: 'relative' }}>
+          {slots?.default()}
+          {props.hasMask && <div class={['mask']}></div>}
+        </div>
+      </Dropdown>
+    }
+
+    const isInline = computed(() => {
+      return designer.formData?.value?.componentProps?.layout === 'inline'
+    })
+
     const renderSelected = () => {
       return <TagComponent
+        data-id={props.data?.key}
         class={[
           'selectElement',
+          unref(isInline) && 'inlineElement',
           unref(isEditModel) && unref(_hasDrag) && 'handle',
           !isField && 'borderless',
           unref(isEditModel) && Selected.value && 'Selected',
@@ -174,15 +230,15 @@ const Selection = defineComponent({
         {...useAttrs()}
         onClick={withModifiers(handleClick, ['stop'])}
       >
-        {slots?.default()}
+        {unref(isEditModel) ? editNode() : slots?.default()}
         {
-          unref(isEditModel) && Selected.value && (
+          unref(isEditModel) && Selected.value && !isMultiple.value && (
             <div class="bottomRight">
               {
                 props.hasCopy && (
                   <div
                     class="action"
-                    onClick={withModifiers(() => { handleAction('copy') }, ['stop'])}
+                    onClick={withModifiers(() => onCopy(), ['stop'])}
                   >
                     <AIcon type="CopyOutlined" />
                   </div>
@@ -192,7 +248,7 @@ const Selection = defineComponent({
                 props.hasDel && (
                   <div
                     class="action"
-                    onClick={withModifiers(() => { handleAction('remove') }, ['stop'])}
+                    onClick={withModifiers(() => onDelete(), ['stop'])}
                   >
                     <AIcon type="DeleteOutlined" />
                   </div>
@@ -201,43 +257,10 @@ const Selection = defineComponent({
             </div>
           )
         }
-        {
-          unref(isEditModel) && props.hasMask && maskNode
-        }
       </TagComponent>
     }
 
-    const renderContent = () => {
-      if (unref(isEditModel)) {
-        return <Dropdown
-          trigger={['contextmenu']}
-          onContextmenu={withModifiers(() => { }, ['stop'])}
-          v-slots={{
-            overlay: () => {
-              return (
-                <Menu>
-                  <MenuItem key="copy"><Button type="link" onClick={onCopy}>复制</Button></MenuItem>
-                  <MenuItem key="paste"><Button type="link" onClick={onPaste}>粘贴</Button></MenuItem>
-                  <MenuItem key="shear"><Button type="link" onClick={onShear}>剪切</Button></MenuItem>
-                  <MenuItem key="delete"><Button danger type="link" onClick={onDelete}>删除</Button></MenuItem>
-                  <MenuItem key="collect"><Button type="link" onClick={onCollect}>收藏为模版</Button></MenuItem>
-                </Menu>
-              )
-            }
-          }}
-        >
-          {renderSelected()}
-        </Dropdown>
-      } else {
-        if (unref(visible)) {
-          return renderSelected()
-        } else {
-          return <div></div>
-        }
-      }
-    }
-
-    return () => renderContent()
+    return () => renderSelected()
   }
 })
 
