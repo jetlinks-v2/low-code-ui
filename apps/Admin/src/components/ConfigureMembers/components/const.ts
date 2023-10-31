@@ -5,14 +5,14 @@ export const defaultColumns = (key: string, isNode: boolean) => {
       dataIndex: 'name',
       key: 'name',
       ellipsis: true,
-      width: 120,
+      // width: 120,
     },
     {
       title: '权重',
       dataIndex: 'weight',
       key: 'weight',
       ellipsis: true,
-      width: 100,
+      width: 80,
     },
     {
       title: '操作',

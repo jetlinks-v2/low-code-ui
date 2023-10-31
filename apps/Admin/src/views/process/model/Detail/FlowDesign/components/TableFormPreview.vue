@@ -18,7 +18,7 @@
     <template #bodyCell="{ column, text, record, index }">
       <j-form-item
         :name="[column.formId, index, column.dataIndex]"
-        :rules="[
+        :rules="!hasRules ? null : [
           ...(column.formItemProps?.rules ?? []),
           {
             required: column.formItemProps?.required,
@@ -56,6 +56,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  hasRules: {
+    type: Boolean,
+    default: false,
+  }
 })
 
 const myDataSource = ref<any>([])
