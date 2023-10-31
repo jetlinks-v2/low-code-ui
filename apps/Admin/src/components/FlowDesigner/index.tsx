@@ -55,7 +55,11 @@ const FlowDesigner = defineComponent({
     const valid = ref(true)
 
     const nodeMap = computed(() => flowStore.nodeMap)
-    const dom = computed(() => nodesData || flowStore.model.nodes)
+    const dom = computed(() =>
+      nodesData && Object.keys(nodesData).length
+        ? nodesData
+        : flowStore.model.nodes,
+    )
 
     const getDomTree = (h, node) => {
       toMapping(node)
@@ -536,7 +540,14 @@ const FlowDesigner = defineComponent({
 
     const validateProcess = () => {
       valid.value = true
-      let err = []
+      let err: any[] = []
+
+      if (!dom.value?.children) {
+        err.push({
+          errors: ['没有任何节点'],
+          name: ['no-nodes'],
+        })
+      }
       validate(err, dom.value)
       return err
     }
