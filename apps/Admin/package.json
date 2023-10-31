@@ -23,6 +23,8 @@
     "@vue/shared": "^3.3.4",
     "@vuemap/vue-amap": "^2.0.13",
     "@vueuse/core": "^10.1.2",
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-vue": "^5.1.12",
     "async-validator": "^4.2.5",
     "dayjs": "^1.11.8",
     "jetlinks-ui-components": "1.0.34-6",
