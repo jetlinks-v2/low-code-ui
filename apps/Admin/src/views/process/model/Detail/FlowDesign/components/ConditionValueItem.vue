@@ -217,9 +217,6 @@ watch(
   :deep(.ant-select-selection-placeholder) {
     color: #CE29DD;
   }
-  :deep(.ant-select-selection-item) {
-    max-width: 180px;
-  }
 }
 input{
   color: #CE29DD !important;
