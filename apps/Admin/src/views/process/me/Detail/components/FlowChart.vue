@@ -15,8 +15,17 @@
   })
   const  nodesData = ref()
   watchEffect(()=>{
-   nodesData.value = JSON.parse(props.info?.modelContent)?.nodes
+   // console.log(JSON.parse(props.info?.modelContent)?.nodes)
+   const nodes = JSON.parse(props.info?.modelContent)?.nodes
+   nodesData.value = {
+      ...nodes,
+      props:{
+         ...nodes.props,
+         creatorName:props.info.creatorName
+      }
+   }
   })
+
   </script>
   
   <style scoped lang='less'>
