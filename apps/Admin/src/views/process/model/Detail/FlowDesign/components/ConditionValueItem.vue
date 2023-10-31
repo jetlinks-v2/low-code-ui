@@ -213,6 +213,9 @@ watch(
   :deep(.ant-select-clear) {
     color: #CE29DD;
   }
+  :deep(.ant-select-selection-placeholder) {
+    color: #CE29DD;
+  }
 }
 input{
   color: #CE29DD !important;
