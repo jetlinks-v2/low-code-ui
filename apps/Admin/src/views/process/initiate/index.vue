@@ -3,37 +3,33 @@
   <page-container>
     <FullPage class="page">
       <div class="type-item" v-for="key of Object.keys(data)">
-        <j-row :gutter="[16, 16]">
-          <j-col :span="24">
-            <TitleComponent
-              :data="getText(key) ?? '流程分类已被删除，请重新添加'"
-            />
-          </j-col>
-          <j-col
-            :xs="20"
-            :sm="10"
-            :md="6"
-            :lg="6"
-            :xl="2"
+        <!-- <TitleComponent
+          :data="getText(key) ?? '流程分类已被删除，请重新添加'"
+        /> -->
+        <div class="type-title" :class="{ 'is-del': !getText(key) }">
+          {{ getText(key) ?? '流程分类已被删除，请重新添加' }}
+        </div>
+        <div class="process">
+          <div
+            class="process-item"
+            @click="handleDetail(item)"
             v-for="item of data[key]"
           >
-            <div class="process" @click="handleDetail(item)">
-              <div class="icon">
-                <ProImage
-                  v-if="isImg(item.icon)"
-                  :width="100"
-                  :height="100"
-                  :src="item.icon"
-                  :preview="false"
-                />
-                <AIcon v-else :type="item.icon" :style="{ fontSize: '40px' }" />
-              </div>
-              <j-ellipsis style="text-align: center;">
-                {{ item.name }}
-              </j-ellipsis>
+            <div class="icon">
+              <ProImage
+                v-if="isImg(item.icon)"
+                :width="24"
+                :height="24"
+                :src="item.icon"
+                :preview="false"
+              />
+              <AIcon v-else :type="item.icon" :style="{ fontSize: '40px' }" />
             </div>
-          </j-col>
-        </j-row>
+            <j-ellipsis line-clamp="2">
+              <span class="title">{{ item.name }}</span>
+            </j-ellipsis>
+          </div>
+        </div>
       </div>
       <div class="empty">
         <j-spin :spinning="loading" />
@@ -54,7 +50,14 @@ const router = useRouter()
 const data = reactive({})
 const loading = ref(true)
 getList_api({
-  paging: false
+  paging: false,
+  terms: [
+    {
+      value: 'enabled',
+      termType: 'eq',
+      column: 'state',
+    },
+  ],
 }).then((res) => {
   Object.assign(data, groupBy(res.result, 'classifiedId'))
   loading.value = false
@@ -72,26 +75,41 @@ const handleDetail = (data) => {
 </script>
 <style scoped lang="less">
 .page {
-  padding: 20px;
+  padding: 24px;
 
   .type-item {
     margin-bottom: 20px;
+
+    .is-del {
+      color: #e50012 !important;
+    }
+    .type-title {
+      margin-bottom: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 22px;
+      color: #1d2129;
+    }
     .process {
-      // width: 100px;
-      // height: 100px;
-      // border: 1px solid #ccc;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      .icon {
-        width: 100px;
-        height: 100px;
-        overflow: hidden;
-        // background: #036a8a;
+      gap: 24px;
+      flex-wrap: wrap;
+      .process-item {
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        width: 159px;
+        height: 56px;
         border-radius: 4px;
-        border: 1px solid #000;
-        font-size: 40px;
+        padding: 6px 12px;
+        border: 1px solid #e5e8ef;
+        line-height: 22px;
+        .title {
+          font-size: 16px;
+          color: #1d2129;
+        }
       }
     }
   }
