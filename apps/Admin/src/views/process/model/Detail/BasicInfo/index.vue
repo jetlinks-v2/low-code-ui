@@ -60,9 +60,11 @@ const formData = reactive({
 })
 
 const rules = {
-  checkFormList: async (_rule: any, value: string): Promise<any> => {
-    if (formData.forms?.length === 0) {
+  checkFormList: async (_rule: any, value: any[]): Promise<any> => {
+    if (value?.length === 0) {
       return Promise.reject('请配置表单')
+    } else if (value?.every((m) => m.isDelete)) {
+      return Promise.reject('所配表单已全部被删除, 请重新选择可用表单')
     } else {
       return Promise.resolve()
     }
