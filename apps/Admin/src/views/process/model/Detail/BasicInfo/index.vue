@@ -20,7 +20,7 @@
             },
           ]"
         >
-          <ConfigForm v-model:modelValue="formData.forms" />
+          <ConfigForm ref="configFormRef" v-model:modelValue="formData.forms" />
         </j-form-item>
         <TitleComponent data="权限控制" />
         <j-form-item name="assignedUser" label="配置可以使用该流程的成员">
@@ -41,6 +41,7 @@ import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
 const formRef = ref()
+const configFormRef = ref()
 
 const formData = reactive({
   forms: computed({
@@ -98,6 +99,13 @@ watch(
 )
 onMounted(() => {
   validateSteps()
+  // 进入页面获取最新表单数据, 判断是否有表单被删除
+  configFormRef.value.getFormList().then((res) => {
+    formData.forms = formData.forms.map((m) => ({
+      ...m,
+      isDelete: !res.includes(m.formId),
+    }))
+  })
 })
 </script>
 <style scoped lang="less">
