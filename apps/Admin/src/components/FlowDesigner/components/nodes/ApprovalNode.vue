@@ -106,7 +106,12 @@ const validate = (err) => {
       errors: ['审批成员可以使用哪些按钮'],
       name: ['authButtons'],
     })
-  } else if (!gotoWhenReject) {
+  } else if (
+    !endProcessWhenReject &&
+    (!gotoWhenReject ||
+      !gotoWhenReject.length ||
+      gotoWhenReject.some((s) => !s))
+  ) {
     err.push({
       errors: ['请选择驳回至哪个节点'],
       name: ['gotoWhenReject'],
