@@ -42,6 +42,7 @@ import FlowDesigner from '@/components/FlowDesigner'
 import NodeConfig from './components/NodeConfig.vue'
 import { useFlowStore } from '@/store/flow'
 import { findNodeById } from './components/utils'
+import { onlyMessage } from '@jetlinks/utils'
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
@@ -136,6 +137,10 @@ watch(
 const validateSteps = () => {
   return new Promise((resolve, reject) => {
     const err = flowDesignerRef.value.validateProcess()
+
+    if (err[0]?.name[0] === 'no-nodes') {
+      onlyMessage('请先添加节点', 'warning')
+    }
     // reject时 返回当前步骤序号
     !err.length ? resolve(1) : reject(1)
   })

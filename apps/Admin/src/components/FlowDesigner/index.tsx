@@ -540,7 +540,14 @@ const FlowDesigner = defineComponent({
 
     const validateProcess = () => {
       valid.value = true
-      let err = []
+      let err: any[] = []
+
+      if (!dom.value?.children) {
+        err.push({
+          errors: ['没有任何节点'],
+          name: ['no-nodes'],
+        })
+      }
       validate(err, dom.value)
       return err
     }
