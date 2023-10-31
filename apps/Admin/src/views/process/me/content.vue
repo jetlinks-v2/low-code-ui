@@ -29,8 +29,8 @@
                     }">
                         签收
                     </PermissionButton>
-                    <PermissionButton type="link" :tooltip="{
-                        title: '办理',
+                    <PermissionButton v-if="isManage(record.identityLinks)" type="link" :tooltip="{
+                        title: '办理', 
                     }" @click="onSave(record)">
                         办理
                     </PermissionButton>
@@ -55,7 +55,7 @@
                 </div>
             </template>
         </JProTable>
-        <Detail v-if="visible" @close="onCancelDrawer" :current="current" :type="type" :history="history" />
+        <Detail v-if="visible" @close="onCancelDrawer" :current="current" :type="type" :history="history" :is-draft="activeKey === 'draft'"/>
         <j-modal v-model:visible="visibleModel" :closable="false" :width="300" @cancel="onCancel" @ok="onCancel">
             <div class="content">
                 <div class="title">共签收{{ sign.length }}个任务</div>
@@ -269,6 +269,7 @@ const columnsFinished = [
         scopedSlots: true,
         search: {
             type: 'select',
+            termFilter:['in','nin'],
             options: [
                 // { label: '审办中', value: 'running ' },
                 { label: '已完成', value: 'completed' },
@@ -794,6 +795,12 @@ const onDraft = (record) => {
 const isSign = (arr) => {
     return arr?.some((item) => item.linkType.value === 'candidate')
     // const tag = arr.some((item)=>item.linkType.value==='assignee' && item.state.value === 'todo')
+}
+
+//是否办理
+const isManage = (arr)=>{
+    return arr?.some(item => item.linkType.value === 'assignee' && item.state.value === 'todo')
+    
 }
 
 const _query = (e) => {
