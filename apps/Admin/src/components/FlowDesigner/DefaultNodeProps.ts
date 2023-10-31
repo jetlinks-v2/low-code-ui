@@ -11,7 +11,8 @@ export const APPROVAL_PROPS = {
     completeWeight: 1,
     rejectWeight: 1,
     autoClaim: true,
-    autoComplete: false,
+    autoComplete: true,
+    dealRequired: true,
     others: {
         defaultComment: '同意'
     }

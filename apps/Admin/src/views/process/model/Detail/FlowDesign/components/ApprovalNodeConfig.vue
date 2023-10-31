@@ -201,8 +201,8 @@ const basicFormData = reactive({
   formBinds:
     props.node?.props?.formBinds ||
     setDefaultFormBinds(flowStore.model.config?.forms),
-  autoComplete: props.node?.props?.autoComplete || true,
-  dealRequired: props.node?.props?.dealRequired || true,
+  autoComplete: props.node?.props?.autoComplete,
+  dealRequired: props.node?.props?.dealRequired,
   others: props.node?.props?.others || { defaultComment: '同意' },
 })
 const collapseActive = ref(['1', '2', '3'])
