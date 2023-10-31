@@ -28,7 +28,8 @@ export const BASIC_ROUTER_DATA: any[] = [
     name: '项目编辑器',
     url: '/engine/:id',
     meta: {
-      hideInMenu: true
+      hideInMenu: true,
+      hasLayout: false
     }
   },
   {
@@ -36,7 +37,8 @@ export const BASIC_ROUTER_DATA: any[] = [
     name: '发布',
     url: '/release/:id',
     meta: {
-      hideInMenu: true
+      hideInMenu: true,
+      hasLayout: false
     }
   },
   {
@@ -44,7 +46,8 @@ export const BASIC_ROUTER_DATA: any[] = [
     name: '预览',
     url: '/preview/:project/:module/:id/:type/:sid',
     meta: {
-      hideInMenu: true
+      hideInMenu: true,
+      hasLayout: false
     }
   },
   {
