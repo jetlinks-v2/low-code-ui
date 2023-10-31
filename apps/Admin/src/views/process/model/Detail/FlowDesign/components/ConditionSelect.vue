@@ -17,7 +17,7 @@
         v-model:searchValue="item.searchValue"
         show-search
         label-in-value
-        placeholder="请选择"
+        placeholder="请配置变量"
         allow-clear
         tree-default-expand-all
         tree-node-filter-prop="name"

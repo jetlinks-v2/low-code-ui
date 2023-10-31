@@ -1,7 +1,8 @@
 <!-- 根节点 -->
 <template>
+  <!-- title="发起申请" -->
   <Node
-    title="发起申请"
+    :title="config.name"
     :is-root="true"
     :show-error="showError"
     :error-info="errorInfo"
@@ -29,7 +30,8 @@ const showError = ref(false)
 const errorInfo = ref('')
 
 const content = computed(() => {
-  return '系统自动匹配参与人' // #19303
+  //   return '系统自动匹配参与人' // #19303
+  return props?.config?.props?.creatorName || '系统自动匹配参与人' // #19431
   if (props?.config?.props?.assignedUser.length) {
     let texts: string[] = []
     props.config.props.assignedUser.forEach((item) => texts.push(item.name))

@@ -15,7 +15,7 @@
 
                         <div v-else>
                             <div>{{ item?.config.formName }}</div>
-                            <Preview :value="activeKey == 'before' ? item.beforeData : item.afterData"
+                            <Preview :value="activeKey == 'before' ? item.beforeData : item.afterData" :disabled="true"
                                 :data="item?.config?.configuration" />
                         </div>
                     </div>
