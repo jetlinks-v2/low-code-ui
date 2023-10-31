@@ -65,12 +65,12 @@ const props = defineProps({
 const basicFormRef = ref()
 const nodeProps = computed(() => props.node?.props)
 // 临时变量, 用于radio展示 仅供前端使用
-// const tempType = ref(
-//   nodeProps.value?.type === 'exclusive'
-//     ? 'exclusive'
-//     : nodeProps.value?.inclusiveType,
-// )
-const tempType = ref('exclusive')
+const tempType = ref(
+  nodeProps.value?.type === 'exclusive'
+    ? 'exclusive'
+    : nodeProps.value?.inclusiveType,
+)
+// const tempType = ref('exclusive')
 
 const basicFormData = reactive({
   type: nodeProps.value?.type || 'inclusive',

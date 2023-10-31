@@ -6,8 +6,8 @@
         请配置从并行分支进入下一个流程节点的条件
         <j-tooltip placement="right">
           <template #title>
-            并行分支中任意一个节点办理人选择了退回后，
-            不需要等待其他节点的处理意见，立刻退回至对应节点
+            审批节点被"驳回"时, 计为该分支未完成<br />
+            审批节点"通过"或办理节点"提交"时, 计为该分支完成
           </template>
           <AIcon type="InfoCircleOutlined" />
         </j-tooltip>
@@ -51,6 +51,7 @@
         v-model:value="basicFormData.weight.complexWeight"
         :min="1"
         :max="99999"
+        :precision="0"
         style="width: 100%"
       />
     </j-form-item>
@@ -59,9 +60,10 @@
   <j-modal
     title="分支权重配置"
     width="300px"
+    :maskClosable="false"
     v-model:visible="visible"
     @ok="saveBranchWeight"
-    @cancel="visible = false"
+    @cancel="handleCancel"
   >
     <j-form ref="branchFormRef" :model="branchFormData" layout="vertical">
       <template v-for="(item, index) in branchFormItem" :key="index">
@@ -71,7 +73,7 @@
           :rules="[
             {
               required: true,
-              message: `请输入${item.label}权重`,
+              message: `请输入${item.label}`,
               trigger: 'blur',
             },
             {
@@ -114,7 +116,7 @@ const basicFormData = reactive({
   complexType: props.node?.props?.complexType || 'percent', // complexType: 'percent': 全部完成 | 'weight': 部分完成
   complexPercent: props.node?.props?.complexPercent || 1, // 全部完成时才有的字段
   weight: {
-    complexWeight: props.node?.props?.weight?.complexWeight || 2,
+    complexWeight: props.node?.props?.weight?.complexWeight || 1,
     inputNodeWeight: props.node?.props?.weight?.inputNodeWeight || {},
   },
 })
@@ -192,6 +194,18 @@ const saveBranchWeight = () => {
     })
     visible.value = false
   })
+}
+
+/**
+ * 关闭弹窗时, 不保存输入值, 恢复原有数据
+ */
+const handleCancel = () => {
+  // 原有的分支权重
+  const _oldNodeWeight = basicFormData.weight.inputNodeWeight
+  branchFormItem.value.forEach((item) => {
+    branchFormData.value[item.name] = _oldNodeWeight[item.name]
+  })
+  visible.value = false
 }
 
 /**
