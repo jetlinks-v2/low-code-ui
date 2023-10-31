@@ -8,7 +8,6 @@
     :pure="state.pure"
   >
     <template #breadcrumbRender="slotProps">
-      {{ slotProps.route.breadcrumbName }}
       <a v-if="slotProps.route.index !== 0 && !slotProps.route.isLast" @click="() => jumpPage(slotProps.route)" >
         {{ slotProps.route.breadcrumbName }}
       </a>

@@ -32,7 +32,7 @@
         <j-input
           v-model:value="keywords"
           @keyup.enter="handleSearch"
-          placeholder="请输入表单名称"
+          placeholder="搜索字段名称"
         >
           <template #suffix>
             <AIcon type="SearchOutlined" />
@@ -64,7 +64,11 @@
               >
                 <template #header>
                   <div class="form-title">
-                    <div class="name">{{ form.formName }}</div>
+                    <div class="name">
+                      <j-ellipsis line-clamp="1">
+                        {{ form.formName }}
+                      </j-ellipsis>
+                    </div>
                     <div class="permission">
                       <j-checkbox-group
                         v-model:value="form.accessModes"
@@ -81,12 +85,16 @@
                   :key="'field' + idx"
                 >
                   <div class="field-title">
-                    <div class="name">{{ field.formItemProps?.label }}</div>
+                    <div class="name">
+                      <j-ellipsis line-clamp="1">
+                        {{ field.formItemProps?.label }}
+                      </j-ellipsis>
+                    </div>
                     <div class="permission">
                       <j-checkbox-group
                         v-model:value="field.accessModes"
                         :options="permissions"
-                        @change="handleFieldCheck(field)"
+                        @change="handleFieldCheck(form, field)"
                       />
                     </div>
                   </div>
@@ -107,11 +115,7 @@
             >
               <div class="name">
                 <img
-                  :src="
-                    getImage(
-                      `/flow-designer/${item.multiple ? 'list' : 'form'}.png`,
-                    )
-                  "
+                  :src="getImage(`/flow-designer/preview-form.png`)"
                   style="height: 16px"
                 />
                 <span>{{ item.formName }}</span>
@@ -192,7 +196,14 @@ const getFormList = async () => {
         // 只有"写"权限时, 表单才可编辑
         p.componentProps.disabled = !p.accessModes.includes('write')
       })
-      return { accessModes: ['read'], ...m }
+
+      // 如果表单下每个字段都有读写, 则表单也有读写权限
+      return {
+        accessModes: _fields?.every((e) => e.accessModes.length === 2)
+          ? ['read', 'write']
+          : ['read'],
+        ...m,
+      }
     } else {
       _fields?.forEach((p) => {
         p['accessModes'] = ['read']
@@ -204,6 +215,8 @@ const getFormList = async () => {
   })
   //   所有表单数据
   allFormList.value = cloneDeep(filterFormList.value)
+  // 设置全部内容全选状态
+  setCheckAll()
 }
 
 const handleSearch = () => {
@@ -215,10 +228,25 @@ const handleSearch = () => {
  */
 const checkAll = ref(false)
 const handleAllCheck = () => {
-  filterFormList.value?.forEach((item) => {
-    item.accessModes = checkAll.value ? ['read', 'write'] : ['read']
-    handleFormCheck(item)
-  })
+  if (checkAll.value) {
+    filterFormList.value?.forEach((item) => {
+      item.accessModes = ['read', 'write']
+      handleFormCheck(item)
+    })
+  } else {
+    filterFormList.value?.forEach((item) => {
+      item.accessModes = ['read']
+      handleFormCheck(item)
+    })
+  }
+}
+
+/**
+ * 设置全部内容全选状态
+ */
+const setCheckAll = () => {
+  checkAll.value =
+    filterFormList.value?.every((e) => e.accessModes.length === 2) || false
 }
 
 /**
@@ -230,35 +258,45 @@ const handleFormCheck = (form: any) => {
     p.accessModes = form.accessModes
     p.componentProps.disabled = !p.accessModes.includes('write')
   })
+  // 设置全部内容全选状态
+  setCheckAll()
 }
 
 /**
  * 字段勾选/取消"写", 自动勾选/取消"读"
  */
-const handleFieldCheck = (field) => {
+const handleFieldCheck = (form, field) => {
   // 字段有写权限, 必有读
   if (field.accessModes.length === 1 && field.accessModes[0] === 'write') {
     field.accessModes = ['read', 'write']
   }
   // 只有"写"权限时, 表单才可编辑
   field.componentProps.disabled = !field.accessModes.includes('write')
+
+  // 设置表单全选状态
+  form.accessModes = form.fullInfo?.configuration?.children?.every(
+    (e) => e.accessModes.length === 2,
+  )
+    ? ['read', 'write']
+    : ['read']
+  // 设置全部内容全选状态
+  setCheckAll()
 }
 
 const tableData = ref<any>([{}])
 const getTableColumns = (fields: any[]) => {
-  //   console.log('getTableColumns: ', fields)
-
   const _columns = fields?.map((m) => ({
     title: m.formItemProps?.label,
     dataIndex: m.formItemProps?.name,
     ellipsis: true,
+    width: 200,
     ...m,
   }))
 
   _columns?.forEach((item) => {
     tableData.value[0][item.dataIndex] = undefined
   })
-  //   console.log('tableData.value: ', tableData.value)
+
   return _columns
 }
 
@@ -280,7 +318,7 @@ const handleOk = () => {
     })
   })
   visible.value = false
-  //   console.log('forms.value: ', forms.value);
+  //   console.log('forms.value: ', forms.value)
 }
 
 watch(
@@ -335,6 +373,9 @@ watch(
     display: flex;
     justify-content: space-between;
     margin-bottom: 5px;
+    .name {
+      max-width: 100px;
+    }
   }
   .form-fields {
     padding-left: 30px;
@@ -342,6 +383,9 @@ watch(
       display: flex;
       justify-content: space-between;
       margin-bottom: 5px;
+      .name {
+        max-width: 100px;
+      }
     }
   }
 }

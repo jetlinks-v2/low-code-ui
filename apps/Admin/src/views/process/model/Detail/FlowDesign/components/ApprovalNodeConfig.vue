@@ -103,8 +103,10 @@
               </template>
               <j-input-number
                 :min="1"
-                :max="99999"
+                :max="999999"
                 v-model:value="memberFormData.completeWeight"
+                :precision="0"
+                :defaultValue="1"
                 style="width: 100%"
               />
             </j-form-item>
@@ -116,15 +118,16 @@
                 驳回权重
                 <j-tooltip placement="right">
                   <template #title>
-                    审批意见为“通过”的成员权重总和达到设定值时，审批通过
+                    审批意见为“驳回”的成员权重总和达到设定值时，审批驳回
                   </template>
                   <AIcon type="InfoCircleOutlined" />
                 </j-tooltip>
               </template>
               <j-input-number
                 :min="1"
-                :max="99999"
+                :max="999999"
                 v-model:value="memberFormData.rejectWeight"
+                :precision="0"
                 style="width: 100%"
               />
             </j-form-item>
@@ -217,7 +220,7 @@ const memberFormData = reactive({
   rejectTo: props.node?.props?.gotoWhenReject[0] || undefined,
 })
 const allButtons = ref([
-  { label: '通过', value: 'pass' },
+  { label: '通过', value: 'pass', disabled:true},
   { label: '驳回', value: 'reject' },
 ])
 const nodeList = ref<{ label: string; value: string }[]>([
