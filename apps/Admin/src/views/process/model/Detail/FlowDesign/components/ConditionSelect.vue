@@ -176,7 +176,7 @@ const getFormFields = async () => {
  * @param item
  */
 const handleConditionChange = (value, node, item, index) => {
-  item.value = item.selectedTermType = null
+  item.value = item.selectedTermType = undefined
   item.column = node.fullId
   item.columnName = node.name
 }
