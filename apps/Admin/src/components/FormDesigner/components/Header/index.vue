@@ -46,7 +46,14 @@
           style="padding-left: 4px; padding-right: 4px"
           ><AIcon style="font-size: 20px" type="CaretRightOutlined"
         /></j-button>
-        <j-button type="primary" @click="onSave">保存</j-button>
+        <PermissionButton
+          @click="onSave"
+          type="primary"
+          hasPermission="code:form_save"
+        >
+          新增
+        </PermissionButton>
+        <!-- <j-button type="primary" @click="onSave">保存</j-button> -->
       </j-space>
     </template>
   </div>
