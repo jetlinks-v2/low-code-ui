@@ -17,7 +17,8 @@
                     >
                         <template v-for="(i,index) in item.configuration" #[i.dataIndex]="{record, index, valueChange}">
                             <!-- <slot :name="name" v-bind="slotData || {}" /> -->
-                            <ValueItem :itemType="i.type"  v-model:modelValue="record[i.dataIndex]" @change="()=>{valueChange(record[i.dataIndex])}" :disabled="i?.disabled"></ValueItem>
+                            <FormItem :itemType="i.type"  v-model:modelValue="record[i.dataIndex]" @change="()=>{valueChange(record[i.dataIndex])}" :disabled="i?.disabled" :keys="i.keys"></FormItem>
+                            <!-- {{ i }} -->
                         </template>
                         </QuickEditTable>
                         <j-button @click="()=>addTableData(item)" block style="margin-top: 10px;" v-if="type=='todo'">新增</j-button>
@@ -45,6 +46,7 @@ import FormPreview from '@/components/FormDesigner/preview.vue'
 import { cloneDeep } from 'lodash-es'
 import { _claim, _save, _complete, _reject } from '@/api/process/me'
 import { onlyMessage } from '@jetlinks/utils';
+import FormItem from './FormItem.vue'
 import md5 from 'md5'
 const props = defineProps({
     info: {
@@ -221,6 +223,7 @@ const dealTable = (disabled) =>{
                     dataIndex: item.formItemProps?.name,
                     type: item?.type,
                     disabled:disabled?true:false,
+                    keys:item.componentProps.keys,
                     form:{
                         rules:rules
                     }
@@ -253,8 +256,8 @@ const dealForm = (nodes) => {
             const id = md5(item+'|'+props.info.others?.formVersion[item])
             bindMap.set(id, nodes.props.formBinds[item])
         })
-        console.log('bindMap',bindMap)
-        console.log('formValue.value',formValue.value)
+        // console.log('bindMap',bindMap)
+        // console.log('formValue.value',formValue.value)
         //循环表单匹配对应节点表单ID
         formValue.value = formValue.value.filter((item) => {
             if (bindMap.has(item.formId)) {
@@ -262,7 +265,7 @@ const dealForm = (nodes) => {
                 item.configuration.children = item.configuration.children.filter((i) => {
                     return bindMap.get(item.formId).some((k) => {
                         if (k.id === i.formItemProps.name) {
-                            console.log('k.required',k.required)
+                            // console.log('k.required',k.required)
                             // i.formItemProps.required = k.required
                             i.componentProps.disabled = !k?.accessModes?.includes('write')
                             i.componentProps.visible = k?.accessModes?.includes('read')
@@ -290,7 +293,7 @@ const dealForm = (nodes) => {
 }
 watch(() => props.info, () => {
     formValue.value = cloneDeep(props.info?.form)
-   console.log('sssss',props.info?.form)
+//    console.log('sssss',props.info?.form)
     nodes.value = JSON.parse(props.info.modelContent)?.nodes
     if (props.type === 'todo') {
         dealForm(nodes.value)
@@ -306,7 +309,7 @@ watch(() => props.info, () => {
             }
             
         })
-        console.log('formValue.value',formValue.value)
+        // console.log('formValue.value',formValue.value)
     }
 })
 
