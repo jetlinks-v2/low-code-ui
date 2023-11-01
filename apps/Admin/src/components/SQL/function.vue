@@ -5,6 +5,7 @@
       language="javascript"
       :registrationTypescript="registrationTypescript"
       @change="onChange"
+      :init="editorInit"
     />
 
   </div>
@@ -54,6 +55,30 @@ const registrationTypescript = ref({
   name: 'typescript',
   typescript: ''
 })
+
+const editorInit = (editor, monaco) => {
+  monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+    noSemanticValidation: true,
+    noSyntaxValidation: false,
+  });
+
+  // compiler options
+  monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+    allowJs: true,
+    checkJs: true,
+    allowNonTsExtensions: true,
+    target: monaco.languages.typescript.ScriptTarget.ESNext,
+    strictNullChecks: false,
+    strictPropertyInitialization: true,
+    strictFunctionTypes: true,
+    strictBindCallApply: true,
+    useDefineForClassFields: true,//permit class static fields with private name to have initializer
+    moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+    module: monaco.languages.typescript.ModuleKind.CommonJS,
+    typeRoots: ["types"],
+    lib: ["esnext"]
+  });
+}
 
 const getTSTips = async () => {
   const modules = await project.getServerModulesData({ key: 'id', value: [props.id] })

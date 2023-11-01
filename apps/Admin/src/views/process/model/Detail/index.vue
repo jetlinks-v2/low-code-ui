@@ -44,7 +44,11 @@
               </j-tooltip>
             </template>
           </j-button>
-          <j-button type="primary" @click="handleDeploy">
+          <j-button
+            type="primary"
+            @click="handleDeploy"
+            :disabled="flowDetail?.state?.value === 'deployed'"
+          >
             部署
             <template #icon>
               <j-tooltip placement="right">
@@ -118,8 +122,10 @@ const oldData = ref({
 /**
  * 获取模型详情
  */
+const flowDetail = ref<any>({})
 const getFlowDetail = async () => {
   const { result } = await detail_api(route.query.id as string)
+  flowDetail.value = result
   const model = JSON.parse(result.model || '{}')
   //   console.log('model: ', model)
   if(result.model!==''){
@@ -137,21 +143,20 @@ const getFlowDetail = async () => {
 const handleNext = async () => {
   // 点击下一步先保存数据, 再校验->#19300
   handleSave('next')
-  // 下一步前, 查询表单是否被删除
-  step1.value.getLatestFormList().then((res) => {
-    // 触发校验
-    stepRef.value
-      ?.validateSteps('next')
-      .then((idx) => {
-        // 校验通过, 对应步骤恢复正常状态, 并进入下一步骤
-        stepStatus.value[idx] = ''
-        current.value++
-      })
-      .catch((idx) => {
-        // 步骤校验失败, 返回的当前步骤序号, 直接将对应步骤标红提示
-        stepStatus.value[idx] = 'error'
-      })
-  })
+  // 从基础信息点击下一步前, 查询最新表单, 验证已选表单是否被全部删除
+  if (current.value === 0) await step1.value.getLatestFormList()
+  // 触发校验
+  stepRef.value
+    ?.validateSteps('next')
+    .then((idx) => {
+      // 校验通过, 对应步骤恢复正常状态, 并进入下一步骤
+      stepStatus.value[idx] = ''
+      current.value++
+    })
+    .catch((idx) => {
+      // 步骤校验失败, 返回的当前步骤序号, 直接将对应步骤标红提示
+      stepStatus.value[idx] = 'error'
+    })
 }
 
 /**
@@ -193,7 +198,6 @@ const handleDeploy = () => {
   // 部署前, 查询表单是否被删除
   step1.value.getLatestFormList().then((res) => {
     validLoading.value = true
-    //   stepRef.value?.validateSteps()
     Promise.allSettled([
       step1.value?.validateSteps(),
       step2.value?.validateSteps(),
