@@ -76,10 +76,10 @@
               message: `请输入${item.label}`,
               trigger: 'blur',
             },
-            {
-              validator: rules.branchWeightValidator,
-              trigger: 'blur',
-            },
+            // {
+            //   validator: rules.branchWeightValidator,
+            //   trigger: 'blur',
+            // },
           ]"
           required
         >
