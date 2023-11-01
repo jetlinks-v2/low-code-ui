@@ -133,12 +133,14 @@ watch(
 
 /**
  * 当前步骤校验方法
+ * @param type next: 点击下一步校验, deploy: 点击部署校验
  */
-const validateSteps = () => {
+const validateSteps = (type?: string) => {
   return new Promise((resolve, reject) => {
     const err = flowDesignerRef.value.validateProcess()
 
-    if (err[0]?.name[0] === 'no-nodes') {
+    if (type && type === 'next' && err[0]?.name[0] === 'no-nodes') {
+      // 下一步校验才有此提示, 部署不需要此提示
       onlyMessage('请先添加节点', 'warning')
     }
     // reject时 返回当前步骤序号
