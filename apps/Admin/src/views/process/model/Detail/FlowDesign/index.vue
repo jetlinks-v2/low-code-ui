@@ -149,9 +149,6 @@ const validateSteps = (type?: string) => {
 }
 
 defineExpose({ validateSteps })
-onMounted(() => {
-  //   validateSteps()
-})
 </script>
 
 <style lang="less" scoped></style>

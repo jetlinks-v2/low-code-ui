@@ -128,7 +128,7 @@ const validate = (err) => {
   const { terms } = props.config.props?.condition?.configuration
 
   showError.value = true
-  errorInfo.value = '未填写必填配置项'
+  errorInfo.value = '配置项错误'
   if (
     !terms ||
     !terms.length ||

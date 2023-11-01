@@ -81,7 +81,9 @@
                 </template>
                 <div
                   class="form-fields"
-                  v-for="(field, idx) in form.configuration?.children"
+                  v-for="(field, idx) in form.configuration?.children?.filter(
+                    (f) => !unDisplayFieldsType.includes(f.type),
+                  )"
                   :key="'field' + idx"
                 >
                   <div class="field-title">
@@ -123,7 +125,13 @@
               <FormPreview v-if="!item.multiple" :data="item.configuration" />
               <TableFormPreview
                 v-model:data-source="tableData"
-                :columns="getTableColumns(item.configuration?.children)"
+                :columns="
+                  getTableColumns(
+                    item.configuration?.children?.filter(
+                      (f) => !unDisplayFieldsType.includes(f.type),
+                    ),
+                  )
+                "
                 v-else
               />
             </div>
@@ -179,44 +187,9 @@ const filterFormList = ref<any[] | undefined>([])
 const allFormList = ref<any[] | undefined>([])
 // 表单预览数据
 const previewData = ref<any[]>([])
+// 不用展示的表单字段类型: 卡片, 网格, 选项卡, 折叠面板, 弹性间距...
+const unDisplayFieldsType = ref(['card', 'grid', 'tabs', 'collapse', 'space'])
 const getFormList = async () => {
-  //   filterFormList.value = flowStore.model.config.forms
-  //     ?.filter((f) => !f.isDelete)
-  //     ?.map((m) => {
-  //       const _fields = m.fullInfo.configuration?.children
-  //       // 已经存在的字段
-  //       const existFields = forms.value[m.formId]
-  //       if (existFields && existFields.length) {
-  //         _fields?.forEach((p) => {
-  //           const _currentField = existFields.find(
-  //             (f) => f.id === p.formItemProps.name,
-  //           )
-  //           p['accessModes'] = _currentField
-  //             ? _currentField.accessModes
-  //             : ['read']
-  //           // 只有"写"权限时, 表单才可编辑
-  //           p.componentProps.disabled = !p.accessModes.includes('write')
-  //         })
-
-  //         // 如果表单下每个字段都有读写, 则表单也有读写权限
-  //         return {
-  //           accessModes: _fields?.every((e) => e.accessModes.length === 2)
-  //             ? ['read', 'write']
-  //             : ['read'],
-  //           ...m,
-  //         }
-  //       } else {
-  //         _fields?.forEach((p) => {
-  //           p['accessModes'] = ['read']
-  //           // 初始状态没有权限, 不可编辑
-  //           p.componentProps.disabled = true
-  //         })
-  //         return { accessModes: ['read'], ...m }
-  //       }
-  //     })
-  //   所有表单数据
-  //   allFormList.value = cloneDeep(filterFormList.value)
-
   // 过滤已经删除的表单
   const existForms = flowStore.model.config.forms?.filter((f) => !f.isDelete)
 
@@ -269,10 +242,16 @@ const getFormList = async () => {
     }
   })
   // 右侧预览数据
-  previewData.value = result.map((m) => ({
-    ...m,
-    multiple: existForms?.find((f) => f.formId === m.key)?.multiple,
-  }))
+  previewData.value = result.map((m) => {
+    // 过滤不需要展示的字段
+    m.configuration.children = m.configuration.children?.filter(
+      (f) => !unDisplayFieldsType.value.includes(f.type),
+    )
+    return {
+      ...m,
+      multiple: existForms?.find((f) => f.formId === m.key)?.multiple,
+    }
+  })
 
   // 所有表单数据, 用于前端筛选
   allFormList.value = cloneDeep(filterFormList.value)
@@ -389,21 +368,6 @@ watch(
     if (val) getFormList()
   },
 )
-// watch(
-//   () => filterFormList.value,
-//   (val) => {
-//     val?.forEach((form) => {
-//       const fieldAccessModes = form.fullInfo?.configuration?.children?.map(
-//         (field) => field.accessModes,
-//       )
-//       // 当表单下, 每个字段都有"写"权限时, 对应表单也勾选"写"
-//       form.accessModes = fieldAccessModes?.every((e) => e.includes('write'))
-//         ? ['read', 'write']
-//         : ['read']
-//     })
-//   },
-//   { deep: true, immediate: true },
-// )
 </script>
 
 <style lang="less" scoped>
