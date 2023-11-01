@@ -30,7 +30,7 @@
                 v-if="nodeType === 'APPROVAL' && btnList.includes('reject')" :loading="btnLoading">驳回</j-button>
             <j-button type="primary" class="btn" @click="onClick('pass')"
                 v-if="nodeType === 'APPROVAL' && btnList.includes('pass')" :loading="btnLoading">通过</j-button>
-            <j-button type="primary" class="btn" @click="submitForm"
+            <j-button type="primary" class="btn" @click="onClick('submit')"
                 v-if="nodeType === 'DEAL' && btnList.includes('submit')" :loading="btnLoading">提交</j-button>
             <j-button type="primary" class="btn" @click="onClick('save')" :loading="btnLoading">保存</j-button>
         </div>
@@ -188,7 +188,12 @@ const onClick = async (value) => {
                 })
             })
             submitData.value = data
-            visible.value = true
+            if(modalType.value !== 'submit' || freeChoiceUser.value ){
+                visible.value = true
+            }
+            if(modalType.value === 'submit'){
+                    submitForm()
+            }
         })
     }
 }
@@ -198,9 +203,9 @@ const submitForm = async() => {
             i.nodeId === freeChoiceUser.value ? taskId.value = i.id : ''
         })
         submitId.value = md5(props.info?.modelId + '|' + props?.info?.id + '|' + freeChoiceUser.value)
-        onClick('submit')
     }
     else {
+        // console.log('=============',submitData.value)
         const res = await _complete(props.info.currentTaskId, {
             form: submitData.value,
         })

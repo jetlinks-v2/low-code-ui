@@ -8,6 +8,7 @@
       :accept="accept"
       name="file"
       :multiple="maxCount > 1"
+      :disabled="disabled"
       :before-upload="beforeUpload"
       @change="handleChange"
       @drop="handleDrop"
@@ -68,6 +69,10 @@ const props = defineProps({
     },
   },
   value: Array,
+  disabled:{
+    type:Boolean,
+    default:false
+  }
 })
 
 const emits = defineEmits(['change'])

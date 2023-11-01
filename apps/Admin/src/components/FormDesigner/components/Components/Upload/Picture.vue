@@ -10,7 +10,7 @@
     }"
     :before-upload="beforeUpload"
     :accept="accept"
-    :disabled="fileList.length >= maxCount"
+    :disabled="fileList.length >= maxCount || disabled"
   >
     <div v-if="maxCount > 1 || fileList.length < maxCount">
       <p class="icon">
@@ -90,6 +90,10 @@ const props = defineProps({
     default: 'picture',
   },
   value: Array,
+  disabled:{
+    type:Boolean,
+    default:false
+  }
 })
 
 const emits = defineEmits(['change'])
