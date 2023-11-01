@@ -67,7 +67,7 @@ const validate = (err) => {
   } = props.config.props
 
   showError.value = true
-  errorInfo.value = '未填写必填配置项'
+  errorInfo.value = '配置项错误'
   if (!name) {
     err.push({
       errors: ['审批节点名称不能为空'],
@@ -78,12 +78,15 @@ const validate = (err) => {
       errors: ['审批节点名称最多输入64个字符'],
       name: ['name'],
     })
-  } else if (!formBinds || !Object.keys(formBinds).length) {
-    // err.push({
-    //   errors: ['请确认当前节点需要候选人办理的表单内容'],
-    //   name: ['formBinds'],
-    // })
-  } else if (others.defaultComment.length > 64) {
+  }
+  // 表单默认勾选"读"权限, 此处不做校验
+  //   else if (!formBinds || !Object.keys(formBinds).length) {
+  //     err.push({
+  //       errors: ['请确认当前节点需要候选人办理的表单内容'],
+  //       name: ['formBinds'],
+  //     })
+  //   }
+  else if (others.defaultComment.length > 64) {
     err.push({
       errors: ['审批意见默认值最多输入64个字符'],
       name: ['others', 'defaultComment'],
