@@ -48,14 +48,18 @@
             <!-- 流程图 -->
             <div class="flow-chart" style="height: calc(100vh - 225px)">
               <div class="flow-title">审批流程</div>
-              <FlowDesigner readOnly :nodesData="nodesData" />
+              <FlowDesigner readOnly dragging :nodesData="nodesData" />
             </div>
           </j-col>
           <j-col :span="4" :offset="10">
             <j-affix :offset-bottom="24">
               <div class="btn-list">
                 <j-button class="btn" @click="cancel">取消</j-button>
-                <j-button class="btn" type="primary" :loading="loading" @click="submit"
+                <j-button
+                  class="btn"
+                  type="primary"
+                  :loading="loading"
+                  @click="submit"
                   >提交</j-button
                 >
                 <!-- <j-button class="btn" type="primary" @click="save"
@@ -74,6 +78,7 @@ import { onlyMessage } from '@jetlinks/utils'
 import FlowDesigner from '@/components/FlowDesigner'
 import { Modal } from 'jetlinks-ui-components'
 import {
+  create_api,
   start_api,
   getList_api,
   processDetail_api,
@@ -92,15 +97,6 @@ interface FormsProps {
   multiple: boolean
   data?: any
 }
-
-// interface draftProps {
-//   id: string
-//   start: boolean
-//   form: {
-//     formId: string
-//     data: any
-//   }[]
-// }
 
 const loading = ref<boolean>(false)
 const router = useRouter()
@@ -134,6 +130,7 @@ const getTableColumns = (
     ellipsis: true,
     formId,
     multiple,
+    width: 200,
     ...m,
   }))
 
@@ -182,17 +179,17 @@ const cancel = () => {
       okText: '保存',
       cancelText: '不保存',
       onOk() {
-        // 不校验必填项保存已填数据，toast提示“保存成功”并返回发起申请页；
-        // 再次发起该流程时横幅提示“继续编辑草稿”
-        startProcess(list, false).then((flag) => {
-          flag
-            ? router.push({
-                path: '/flow-engine/me/initiate',
-                query: {
-                  state: 'ready',
-                },
-              })
-            : ''
+        const param = startProcess(list)
+        save_api(param).then((res) => {
+          if (res.success) {
+            onlyMessage('保存成功')
+            router.push({
+              path: '/flow-engine/me/initiate',
+              query: {
+                state: 'ready',
+              },
+            })
+          }
         })
       },
       onCancel() {
@@ -210,14 +207,20 @@ const cancel = () => {
 const submit = async () => {
   loading.value = true
   const list = previewRef.value?.map((item) => item.onSave()) || []
-  Promise.all([...list, formRef.value.validate()]).then((res) => {
-    startProcess(res).then((flag) => {
-      // 跳转至我的流程-我发起的
-      flag ? router.push('/flow-engine/me/initiate') : ''
+  Promise.all([...list, formRef.value.validate()])
+    .then(async (res) => {
+      const param = startProcess(res, true)
+      const resp = editDraft.value
+        ? await start_api(param)
+        : await create_api(param)
+      if (resp.success) {
+        onlyMessage('提交成功')
+        router.push('/flow-engine/me/initiate')
+      }
     })
-  }).finally(() =>{
-    loading.value = false
-  })
+    .finally(() => {
+      loading.value = false
+    })
 }
 // /**
 //  * 保存
@@ -285,7 +288,7 @@ const getDetail = (id: string) => {
  * 发起流程处理
  * @param list 表单数据
  */
-const startProcess = async (list: any, start: boolean = true) => {
+const startProcess = (list: any, start: boolean | undefined = undefined) => {
   let flag = 0
   const param = {
     id: draftId.value || route.query.id,
@@ -300,24 +303,7 @@ const startProcess = async (list: any, start: boolean = true) => {
     },
     start,
   }
-  const resp =
-    editDraft.value || draftId.value
-      ? await save_api(param)
-      : await start_api(param)
-  if (resp.success) {
-    onlyMessage(`${start ? '提交' : '保存'}成功`)
-    return true
-  } else {
-    return false
-  }
-  // return start_api(param).then((resp) => {
-  //   if (resp.success) {
-  //     onlyMessage(`${start ? '提交' : '保存'}成功`)
-  //     return true
-  //   } else {
-  //     return false
-  //   }
-  // })
+  return param
 }
 
 // 处理数据
@@ -335,7 +321,6 @@ const handleData = (data: any, model: string) => {
         obj.nodes.props.formBinds[item],
       )
     })
-    console.log(`output->bindMap`, bindMap)
     const forms = editDraft.value ? data.form : obj.config.forms
 
     formList.value = forms?.map((m) => {
@@ -357,9 +342,7 @@ const handleData = (data: any, model: string) => {
         ...m,
       }
     })
-  } catch (error) {
-    // console.error(`output->error`,error)
-  } finally {
+  } catch (error) {} finally {
     spinning.value = false
   }
 }

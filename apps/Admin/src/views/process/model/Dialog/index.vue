@@ -56,42 +56,35 @@
         label="流程图标"
         :rules="[{ required: true, message: '请上传流程图标' }]"
       >
-        <j-space :size="24">
-          <div class="base-icon" v-for="item of 4">
-            <div class="upload-icon">
-              <ProImage
-                :src="getImage(`/process/model/icon${item}.png`)"
-                :width="24"
-                :preview="false"
-              />
-            </div>
-            <div>图标{{ item }}</div>
-          </div>
-          <div class="base-icon">
-            <div class="upload-icon">
-              <ImageUpload v-model:value="form.icon" :accept="accept">
-                <template #content="{ imageUrl }">
-                  <div v-if="imageUrl">
-                    <ProImage
-                      v-if="isImg(imageUrl)"
-                      :src="imageUrl"
-                      :width="48"
-                      :preview="false"
-                    />
-                    <AIcon
-                      v-else
-                      :type="form.icon"
-                      :style="{ fontSize: '16px' }"
-                    />
-                    <div class="upload-image-mask">更换</div>
-                  </div>
-                  <AIcon v-else type="PlusOutlined" style="font-size: 20px" />
-                </template>
-              </ImageUpload>
-            </div>
+        <j-radio-group v-model:value="form.icon" class="radio">
+          <j-radio-button
+            v-for="(item, index) of baseIcon"
+            :value="item"
+            :key="item"
+            :class="{ active: form.icon === item }"
+          >
+            <!-- <AIcon :type="typeStr" /> -->
+            <ProImage
+              style="border: 1px dashed #dcdcdc"
+              :src="item"
+              :width="44"
+              :preview="false"
+            />
+            <div>图标{{ index + 1 }}</div>
+          </j-radio-button>
+          <j-radio-button
+            :value="selected"
+            :class="{ active: form.icon === selected }"
+          >
+            <ImageUpload
+              class="upload"
+              v-model:value="selected"
+              :accept="accept"
+              style="width: 60px; height: 60px"
+            />
             <div>自定义</div>
-          </div>
-        </j-space>
+          </j-radio-button>
+        </j-radio-group>
       </j-form-item>
     </j-form>
   </j-modal>
@@ -132,16 +125,17 @@ const emits = defineEmits<{
 
 // const { classified, getText } = useClassified()
 const baseIcon = [
-  'icon-shujumoni',
-  'icon-tongzhiguanli',
-  'icon-rizhifuwu',
-  'icon-keshihua',
+  getImage(`/process/model/icon1.png`),
+  getImage(`/process/model/icon2.png`),
+  getImage(`/process/model/icon3.png`),
+  getImage(`/process/model/icon4.png`),
 ]
 
 // 上传icon格式
 const accept = '.jpg,.jpeg,.png'
 const title = ref<string>('新增')
 const formRef = ref<any>()
+const selected = ref<string>()
 // 表单相关
 const form = reactive<Partial<FormType>>({
   key: randomString(),
@@ -185,6 +179,7 @@ const confirm = () => {
 const init = () => {
   title.value = '编辑'
   Object.assign(form, props.data)
+  selected.value = baseIcon.some((i) => i === form.icon) ? '' : form.icon
 }
 
 watch(
@@ -198,39 +193,48 @@ watch(
     immediate: true,
   },
 )
+watch(selected, (val) => {
+  form.icon = val
+})
 </script>
 
 <style lang="less" scoped>
 .base-icon {
   text-align: center;
 }
-.upload-icon {
+.radio {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  // font-size: 16px;
-  border-radius: 4px;
-  border: 1px dashed #dcdcdc;
-  background: #eeeeee;
+  gap: 24px;
+  // display: grid;
+  // grid-gap: 20px;
+  // grid-template-columns: repeat(6, 1fr);
+  // max-height: 500px;
+  // overflow-y: auto;
 
-  :deep(.upload-image-content) {
-    &:hover .upload-image-mask {
-      display: flex;
+  .ant-radio-button-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+
+    border: 2px solid #efefef;
+    border-radius: 2px;
+    cursor: pointer;
+
+    &.active {
+      color: #415ed1;
+      border-color: #415ed1;
     }
-    .upload-image-mask {
-      align-items: center;
-      justify-content: center;
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: none;
-      width: 100%;
-      height: 100%;
-      color: #fff;
-      font-size: 16px;
-      background-color: rgba(#000, 0.25);
+    :deep(.upload-image-content) {
+      width: 44px !important;
+      height: 44px !important;
+      padding: 0;
+      background: #fff;
+    }
+    :deep(.ant-upload.ant-upload-select-picture-card) {
+      margin: 0;
     }
   }
 }

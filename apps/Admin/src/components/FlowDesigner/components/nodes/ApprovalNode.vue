@@ -97,7 +97,7 @@ const validate = (err) => {
       errors: ['请选择可参与审批的候选成员'],
       name: ['candidates'],
     })
-  } else if (completeWeight === '' || rejectWeight === '') {
+  } else if (!completeWeight || !rejectWeight) {
     err.push({
       errors: ['请输入权重'],
       name: ['completeWeight', 'rejectWeight'],

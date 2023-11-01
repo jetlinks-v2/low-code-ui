@@ -86,10 +86,16 @@ const basicFormData = reactive({
 })
 
 const allConditionBranches = computed(() => {
-  return flowStore.selectedNode.branches.map((m) => ({
+  const _res = flowStore.selectedNode.branches.map((m) => ({
     label: m.name,
     value: m.id,
   }))
+
+  // 过滤已经删除的节点
+  basicFormData.condition = basicFormData.condition.filter((f) =>
+    _res.map((m) => m.value).includes(f),
+  )
+  return _res
 })
 
 watch(
@@ -97,6 +103,14 @@ watch(
   (val) => {
     basicFormData.type = val === 'exclusive' ? 'exclusive' : 'inclusive'
     basicFormData.inclusiveType = val !== 'exclusive' ? val : undefined
+  },
+)
+watch(
+  () => basicFormData.condition,
+  (val) => {
+    basicFormData.gotoNodes = basicFormData.gotoNodes.filter(
+      (f) => val.includes(f) || f === '@exclusive',
+    )
   },
 )
 

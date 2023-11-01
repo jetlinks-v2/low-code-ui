@@ -8,7 +8,9 @@
           @click="handleAddBranch"
           v-if="isConditionNode"
         >
-          <AIcon type="FunnelPlotOutlined" />
+          <div class="node-icon">
+            <AIcon type="FunnelPlotOutlined" />
+          </div>
           <span>添加分支</span>
         </div>
         <div
@@ -16,7 +18,9 @@
           @click="handleAddApproval"
           v-if="!isConditionNode"
         >
-          <AIcon type="UserOutlined" />
+          <div class="node-icon">
+            <AIcon type="UserOutlined" />
+          </div>
           <span>审批节点</span>
         </div>
         <div
@@ -24,11 +28,15 @@
           @click="handleAddDeal"
           v-if="!isConditionNode"
         >
-          <AIcon type="CarryOutOutlined" />
+          <div class="node-icon">
+            <AIcon type="CarryOutOutlined" />
+          </div>
           <span>办理节点</span>
         </div>
         <div class="node-select-item config" @click="handleOpenConfig">
-          <AIcon type="SettingOutlined" />
+          <div class="node-icon">
+            <AIcon type="SettingOutlined" />
+          </div>
           <span>高级配置</span>
         </div>
       </div>
@@ -87,23 +95,39 @@ const handleOpenConfig = () => {
     cursor: pointer;
     padding: 5px 15px;
     border: 1px solid #f8f9f9;
-    background-color: #f8f9f9;
+    background: #f2f3f5;
     border-radius: 5px;
+    .node-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      border-radius: 6px;
+    }
     &:hover {
-      background-color: #fff;
       box-shadow: 0 0 8px 2px #d6d6d6;
     }
     &.approval {
-      background: #facd91;
+      .node-icon {
+        background: #fcab34;
+      }
     }
     &.deal {
-      background: #caf982;
+      .node-icon {
+        background: #4fc971;
+      }
     }
     &.conditions {
-      background: #debaff;
+      .node-icon {
+        background: #ab62ee;
+      }
     }
     &.config {
-      background: #f2f2f2;
+      .node-icon {
+        background: #999999;
+      }
     }
   }
 }

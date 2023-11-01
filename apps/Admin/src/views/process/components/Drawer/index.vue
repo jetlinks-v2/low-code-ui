@@ -4,10 +4,11 @@
     class="custom-class"
     title="流程详情"
     :closable="false"
+    width="900px"
     placement="right"
     @close="emits('update:visible', false)"
-    :contentWrapperStyle="{ width: 'auto', minWidth: '50%', maxWidth: '66.6%' }"
-  >
+    >
+    <!-- :contentWrapperStyle="{ width: 'auto', minWidth: '50%', maxWidth: '66.6%' }" -->
     <!-- <j-scrollbar> -->
     <j-tabs v-model:activeKey="activeKey">
       <j-tab-pane key="form">
@@ -19,28 +20,30 @@
           </div>
         </template>
         <div class="content">
-          <div v-for="item in formData">
-            <div class="title">
-              <j-space>
-                <img
-                  :src="getImage(`/flow-designer/preview-form.png`)"
-                  style="height: 16px"
-                />
-                <span>
-                  {{ item.formName }}
-                </span>
-              </j-space>
+          <j-scrollbar>
+            <div v-for="item in formData">
+              <div class="title">
+                <j-space>
+                  <img
+                    :src="getImage(`/flow-designer/preview-form.png`)"
+                    style="height: 16px"
+                  />
+                  <span>
+                    {{ item.formName }}
+                  </span>
+                </j-space>
+              </div>
+              <FormPreview
+                v-if="!item.multiple"
+                :data="item.fullInfo.configuration"
+              />
+              <TableFormPreview
+                v-else
+                v-model:data-source="tableData"
+                :columns="getTableColumns(item.fullInfo?.configuration?.children)"
+              />
             </div>
-            <FormPreview
-              v-if="!item.multiple"
-              :data="item.fullInfo.configuration"
-            />
-            <TableFormPreview
-              v-else
-              v-model:data-source="tableData"
-              :columns="getTableColumns(item.fullInfo?.configuration?.children)"
-            />
-          </div>
+          </j-scrollbar>
         </div>
       </j-tab-pane>
       <j-tab-pane key="flow">
@@ -51,7 +54,7 @@
             >
           </div>
         </template>
-        <FlowDesigner readOnly :nodesData="nodesData" />
+        <FlowDesigner readOnly dragging :nodesData="nodesData" />
       </j-tab-pane>
     </j-tabs>
     <!-- </j-scrollbar> -->
@@ -99,6 +102,7 @@ const getTableColumns = (fields: any[]) => {
     dataIndex: m.formItemProps?.name,
     ellipsis: true,
     // formId,
+    width: 200,
     ...m,
   }))
   _columns?.forEach((item) => {
