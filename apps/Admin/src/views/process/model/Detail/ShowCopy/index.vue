@@ -167,15 +167,20 @@ const getVariables = async () => {
  * -> {var:发起人fullId:发起人name}的{var:流程名称fullId:流程名称name}
  */
 const formatToVariable = (val: string = '') => {
-  return val
+  const str = val
     .replace(/\{(.*?)\}/g, ($1, $2) => {
       const variable = formData.variables.filter((item) => item.label === $2)[0]
       return variable ? `{var:${variable.value}:${$2}}` : `{var:${$2}}`
     })
-    .replace(/\}(.*?)\{/g, ($1, $2) => {
-      // 查找}{中间的内容, 并添加中划线
-      return `}-${$2}-{`
+    .replace(/\{/g, ($1, $2) => {
+      return $2 ? `-{` : '{'
     })
+    .replace(/\}/g, ($1, $2) => {
+      // 查找}{中间的内容, 并添加中划线
+      return $2 ? `}-` : '}'
+    })
+    .replace(/-$/, "")
+    return str
 }
 
 const formData = reactive({
