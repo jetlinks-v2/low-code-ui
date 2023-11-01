@@ -150,6 +150,7 @@ const handleSave = (type?: string) => {
         isModal.value = true
         router.go(-1)
       }
+      getFlowDetail()
     })
     .finally(() => {
       saveLoading.value = false
