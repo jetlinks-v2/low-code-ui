@@ -1,7 +1,7 @@
 <template>
   <div class="member">
     <a-form-item-rest>
-      <j-button class="btn"  type="text" @click="visible = true">
+      <j-button class="btn" type="text" @click="visible = true">
         <span>选择成员</span>
         <span class="icon" v-show="initList.length > 0">
           <img :src="getImage('/members/check.png')" />
@@ -21,16 +21,26 @@
               <j-space class="item-item">
                 <AIcon :type="iconType[item.type]" class="a-icon" />
                 <!-- v-if="isDel(item)" -->
-                <!-- <j-tooltip v-if="item.isDel">
-                  <template #title>用户不存在</template>
-                  {{ item.name }}
-                  <AIcon type="ExclamationCircleFilled" style="color: #EB636F;" />
-                </j-tooltip> -->
 
                 <j-ellipsis line-clamp="1">
                   {{ item.name }}
                 </j-ellipsis>
-                <AIcon v-if="item.isDel" type="ExclamationCircleFilled" class="war-icon" style="font-size: 16px; color: #EB636F;" />
+                <j-tooltip v-if="item.isDel">
+                  <template #title
+                    >{{
+                      item.type === 'org'
+                        ? '组织'
+                        : item.type === 'user'
+                        ? '用户'
+                        : '角色'
+                    }}不存在</template
+                  >
+                  <AIcon
+                    v-if="item.isDel"
+                    type="ExclamationCircleFilled"
+                    class="war-icon"
+                  />
+                </j-tooltip>
               </j-space>
             </j-list-item>
           </template>
@@ -229,7 +239,7 @@ const getTree = (data: any) => {
       model: JSON.stringify(flowStore.model),
     },
     nodeId: props.nodeId,
-    containThisNode: false,
+    containThisNode: props.nodeId === 'ROOT_1'
   }
   getVar_api(param).then((res) => {
     if (res.success) {
@@ -294,7 +304,8 @@ watch(
       list.value = val
     } else if (isObject(val)) {
       let arr = []
-      relationList.value = val['relation']?.map((i) => i.related?.relation) || []
+      relationList.value =
+        val['relation']?.map((i) => i.related?.relation) || []
       getRelation()
       Object.keys(val).forEach((i) => {
         arr = arr.concat(
@@ -326,7 +337,7 @@ watch(
     position: relative;
     // width: 496px;
     margin-bottom: 8px;
-    background: #F3F3F3;
+    background: #f3f3f3;
   }
   .icon {
     position: absolute;
@@ -347,10 +358,12 @@ watch(
       line-height: 40px;
       border-radius: 4px;
       background: #f6f7f9;
-      .war-icon{
+      .war-icon {
         position: absolute;
         top: 13px;
         right: 8px;
+        font-size: 16px;
+        color: #eb636f;
       }
       .a-icon {
         font-size: 16px;

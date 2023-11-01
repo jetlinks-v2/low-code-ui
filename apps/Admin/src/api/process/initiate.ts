@@ -11,7 +11,7 @@ export const getList_api = (data: any) =>
  * 发起流程
  * @returns
  */
-export const start_api = ({ id, data, start }: any) =>
+export const create_api = ({ id, data, start }: any) =>
   request.postParams(`/process/runtime/${id}/_create`, data, { start })
 
 /**
@@ -25,6 +25,13 @@ export const processDetail_api = (id: string) =>
  * 有草稿时保存
  * @returns
  */
-export const save_api = ({ id, data, start }: any) =>
-request.postParams(`/process/runtime/${id}/_save`, data, { start })
+export const save_api = ({ id, data }: any) =>
+request.postParams(`/process/runtime/${id}/_save`, data)
 
+  /**
+ * 启动草稿
+ * @returns
+ */
+  export const start_api = ({ id, data, start }: any) =>
+  request.postParams(`/process/runtime/${id}/_start`, data, { start })
+  
