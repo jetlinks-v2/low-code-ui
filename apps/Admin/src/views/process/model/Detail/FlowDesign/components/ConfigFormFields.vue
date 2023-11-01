@@ -81,7 +81,9 @@
                 </template>
                 <div
                   class="form-fields"
-                  v-for="(field, idx) in form.configuration?.children"
+                  v-for="(field, idx) in form.configuration?.children?.filter(
+                    (f) => !unDisplayFieldsType.includes(f.type),
+                  )"
                   :key="'field' + idx"
                 >
                   <div class="field-title">
@@ -123,7 +125,13 @@
               <FormPreview v-if="!item.multiple" :data="item.configuration" />
               <TableFormPreview
                 v-model:data-source="tableData"
-                :columns="getTableColumns(item.configuration?.children)"
+                :columns="
+                  getTableColumns(
+                    item.configuration?.children?.filter(
+                      (f) => !unDisplayFieldsType.includes(f.type),
+                    ),
+                  )
+                "
                 v-else
               />
             </div>
@@ -179,6 +187,8 @@ const filterFormList = ref<any[] | undefined>([])
 const allFormList = ref<any[] | undefined>([])
 // 表单预览数据
 const previewData = ref<any[]>([])
+// 不用展示的表单字段类型: 卡片, 网格, 选项卡, 折叠面板, 弹性间距...
+const unDisplayFieldsType = ref(['card', 'grid', 'tabs', 'collapse', 'space'])
 const getFormList = async () => {
   //   filterFormList.value = flowStore.model.config.forms
   //     ?.filter((f) => !f.isDelete)
@@ -269,10 +279,16 @@ const getFormList = async () => {
     }
   })
   // 右侧预览数据
-  previewData.value = result.map((m) => ({
-    ...m,
-    multiple: existForms?.find((f) => f.formId === m.key)?.multiple,
-  }))
+  previewData.value = result.map((m) => {
+    // 过滤不需要展示的字段
+    m.configuration.children = m.configuration.children?.filter(
+      (f) => !unDisplayFieldsType.value.includes(f.type),
+    )
+    return {
+      ...m,
+      multiple: existForms?.find((f) => f.formId === m.key)?.multiple,
+    }
+  })
 
   // 所有表单数据, 用于前端筛选
   allFormList.value = cloneDeep(filterFormList.value)
