@@ -93,6 +93,17 @@ const step3 = ref()
 const nextLoading = ref(false)
 const saveLoading = ref(false)
 const isModal = ref(false)
+const oldData = ref({
+    config: {},
+    nodes: {
+        id: 'ROOT_1',
+        parentId: null,
+        type: 'ROOT',
+        name: '发起申请',
+        active: false,
+        props: { assignedUser: [] },
+    }
+})
 /**
  * 获取模型详情
  */
@@ -103,6 +114,9 @@ const getFlowDetail = async () => {
 
   flowStore.setModel(model)
   flowStore.setModelBaseInfo(result)
+  if(result.model!==''){
+    oldData.value = model
+  }
 }
 
 /**
@@ -252,7 +266,9 @@ const routerChange = (next?:Function)=>{
 }
 
 onBeforeRouteLeave((to, form, next) => {
-  if(!isModal.value){
+  const isChange = JSON.stringify(oldData.value) === JSON.stringify(flowStore.model)
+  // console.log('==========',isChange)
+  if(!isModal.value && !isChange){
     routerChange(next)
   }else{
     next()
@@ -260,7 +276,9 @@ onBeforeRouteLeave((to, form, next) => {
   
 })
 onBeforeRouteUpdate((to, from, next)=>{
-  if(!isModal.value){
+  const isChange = JSON.stringify(oldData.value) === JSON.stringify(flowStore.model)
+  // console.log('-------',isChange)
+  if(!isModal.value && !isChange){
     routerChange(next)
   }else{
     next()
