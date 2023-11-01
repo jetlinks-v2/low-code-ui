@@ -89,18 +89,18 @@ export const useMouseEvent = (El: Ref<HTMLDivElement>) => {
   }
 
   const bindEventListener = () => {
-    El.value.addEventListener('pointerdown', handlePointerdown)
-    El.value.addEventListener('pointermove', handlePointermove);
-    El.value.addEventListener('pointerup', handlePointerup);
-    El.value.addEventListener('wheel', handleWheel)
+    El.value?.addEventListener('pointerdown', handlePointerdown)
+    El.value?.addEventListener('pointermove', handlePointermove);
+    El.value?.addEventListener('pointerup', handlePointerup);
+    El.value?.addEventListener('wheel', handleWheel)
 
   }
 
   const removeEventListener = () => {
-    El.value.removeEventListener('pointerdown', handlePointerdown)
-    El.value.removeEventListener('pointermove', handlePointermove);
-    El.value.removeEventListener('pointerup', handlePointerup);
-    El.value.removeEventListener('wheel', handleWheel)
+    El.value?.removeEventListener('pointerdown', handlePointerdown)
+    El.value?.removeEventListener('pointermove', handlePointermove);
+    El.value?.removeEventListener('pointerup', handlePointerup);
+    El.value?.removeEventListener('wheel', handleWheel)
   }
 
   nextTick(() => {
