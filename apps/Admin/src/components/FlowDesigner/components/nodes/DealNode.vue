@@ -53,7 +53,7 @@ const validate = (err) => {
   const { formBinds, candidates, authButtons } = props.config.props
 
   showError.value = true
-  errorInfo.value = '未填写必填配置项'
+  errorInfo.value = '配置项错误'
   if (!name) {
     err.push({
       errors: ['办理节点名称不能为空'],

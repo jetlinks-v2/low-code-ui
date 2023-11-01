@@ -67,7 +67,7 @@ const validate = (err) => {
   } = props.config.props
 
   showError.value = true
-  errorInfo.value = '未填写必填配置项'
+  errorInfo.value = '配置项错误'
   if (!name) {
     err.push({
       errors: ['审批节点名称不能为空'],
