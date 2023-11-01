@@ -295,7 +295,7 @@ const dealForm = (nodes) => {
 }
 watch(() => props.info, () => {
     formValue.value = cloneDeep(props.info?.form)
-   console.log('sssss',props.info?.form)
+//    console.log('sssss',props.info?.form)
     nodes.value = JSON.parse(props.info.modelContent)?.nodes
     if (props.type === 'todo') {
         dealForm(nodes.value)
@@ -311,7 +311,6 @@ watch(() => props.info, () => {
             }
             
         })
-        console.log('formValue.value',formValue.value)
     }
 })
 
