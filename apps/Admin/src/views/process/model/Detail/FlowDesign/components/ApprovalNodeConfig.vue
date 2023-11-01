@@ -103,7 +103,7 @@
               </template>
               <j-input-number
                 :min="1"
-                :max="999999"
+                :max="99999"
                 v-model:value="memberFormData.completeWeight"
                 :precision="0"
                 :defaultValue="1"
@@ -125,7 +125,7 @@
               </template>
               <j-input-number
                 :min="1"
-                :max="999999"
+                :max="99999"
                 v-model:value="memberFormData.rejectWeight"
                 :precision="0"
                 style="width: 100%"
@@ -170,6 +170,7 @@
               <j-select
                 v-model:value="memberFormData.rejectTo"
                 :options="nodeList"
+                showSearch
               />
             </j-form-item>
           </j-collapse-panel>
@@ -200,8 +201,8 @@ const basicFormData = reactive({
   formBinds:
     props.node?.props?.formBinds ||
     setDefaultFormBinds(flowStore.model.config?.forms),
-  autoComplete: props.node?.props?.autoComplete || true,
-  dealRequired: props.node?.props?.dealRequired || true,
+  autoComplete: props.node?.props?.autoComplete,
+  dealRequired: props.node?.props?.dealRequired,
   others: props.node?.props?.others || { defaultComment: '同意' },
 })
 const collapseActive = ref(['1', '2', '3'])
@@ -234,12 +235,13 @@ const nodeList = ref<{ label: string; value: string }[]>([
  */
 const getRejectNodes = (nodeId) => {
   const _parentNode = findNodeById(flowStore.model.nodes, nodeId)
-  if (_parentNode.type === 'APPROVAL' || _parentNode.type === 'DEAL') {
+  if (_parentNode?.type === 'APPROVAL' || _parentNode?.type === 'DEAL') {
     nodeList.value.push({ label: _parentNode.name, value: _parentNode.id })
   }
   // 父节点存在, 并且可以驳回的节点没有找到 继续查找
-  if (_parentNode.parentId && !nodeList.value.length)
+  if (_parentNode?.parentId)
     getRejectNodes(_parentNode.parentId)
+    memberFormData.rejectTo = memberFormData.rejectTo ? memberFormData.rejectTo : nodeList.value?.[0]?.value
 }
 
 /**
@@ -261,6 +263,7 @@ const saveConfigToStore = () => {
       ...basicFormData,
       ...others,
     }
+    console.log(result.props);
     resolve(result)
   })
 }
@@ -303,6 +306,9 @@ defineExpose({
 })
 onMounted(() => {
   getRejectNodes(props.node?.parentId)
+  if(!nodeList.value.find(item => item.value === memberFormData.rejectTo)) {
+    memberFormData.rejectTo = null
+  }
 })
 </script>
 

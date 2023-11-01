@@ -1,6 +1,10 @@
 <template>
   <page-container>
-    <pro-search :columns="columns" target="engine-form" @search="handleSearch" />
+    <pro-search
+      :columns="columns"
+      target="engine-form"
+      @search="handleSearch"
+    />
     <JProTable
       ref="tableRef"
       :columns="columns"
@@ -20,7 +24,13 @@
       }"
     >
       <template #headerTitle>
-        <j-button type="primary" @click="handleAdd()">新增</j-button>
+        <PermissionButton
+          @click="handleAdd()"
+          type="primary"
+          hasPermission="code:form_save"
+        >
+          新增
+        </PermissionButton>
       </template>
       <template #createTime="slotProps">
         <span>{{
@@ -46,7 +56,7 @@
               type="link"
               style="padding: 0 5px"
               :danger="i?.key === 'delete'"
-              :hasPermission="i?.hasPermission"
+              :hasPermission="i?.key === 'view' ? false : `code:${i?.hasPermission}`"
             >
               <template #icon><AIcon :type="i.icon" /></template>
             </PermissionButton>
@@ -152,7 +162,6 @@ const getActions = (record) => {
       tooltip: {
         title: '查看',
       },
-      hasPermission: false,
       icon: 'EyeOutlined',
       onClick: () => {
         router.replace(`/flow-engine/form/detail/${record?.id}`)
@@ -164,8 +173,8 @@ const getActions = (record) => {
       tooltip: {
         title: '编辑',
       },
-      hasPermission: false,
       icon: 'EditOutlined',
+      hasPermission: "form_save",
       onClick: () => {
         handleAdd(record)
       },
@@ -177,22 +186,20 @@ const getActions = (record) => {
         title: '删除',
       },
       icon: 'DeleteOutlined',
+      hasPermission: "form_delete",
       popConfirm: {
         title: '确认删除？',
         onConfirm: () => {
           _del(record.id)
         },
       },
-      hasPermission: false,
     },
   ]
 }
 
 const handleSearch = (data: any) => {
   params.value = {
-    terms: [
-      {...data}
-    ]
+    terms: [{ ...data }],
   }
 }
 

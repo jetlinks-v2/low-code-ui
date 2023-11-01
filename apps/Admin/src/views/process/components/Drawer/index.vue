@@ -9,43 +9,51 @@
     :contentWrapperStyle="{ width: 'auto', minWidth: '50%', maxWidth: '66.6%' }"
   >
     <!-- <j-scrollbar> -->
-      <j-tabs v-model:activeKey="activeKey">
-        <j-tab-pane key="form">
-          <template #tab>
-            <div>
-              <j-button :type="activeKey === 'form' ? 'primary' : 'text'"
-                >表单</j-button
-              >
-            </div>
-          </template>
-          <div class="content">
-            <div v-for="item in formData">
-              <div class="title">{{ item.formName }}</div>
-              <FormPreview
-                v-if="!item.multiple"
-                :data="item.fullInfo.configuration"
-              />
-              <TableFormPreview
-                v-else
-                v-model:data-source="tableData"
-                :columns="
-                  getTableColumns(item.fullInfo?.configuration?.children)
-                "
-              />
-            </div>
+    <j-tabs v-model:activeKey="activeKey">
+      <j-tab-pane key="form">
+        <template #tab>
+          <div>
+            <j-button :type="activeKey === 'form' ? 'primary' : 'text'"
+              >表单</j-button
+            >
           </div>
-        </j-tab-pane>
-        <j-tab-pane key="flow">
-          <template #tab>
-            <div>
-              <j-button :type="activeKey === 'flow' ? 'primary' : 'text'"
-                >流程图</j-button
-              >
+        </template>
+        <div class="content">
+          <div v-for="item in formData">
+            <div class="title">
+              <j-space>
+                <img
+                  :src="getImage(`/flow-designer/preview-form.png`)"
+                  style="height: 16px"
+                />
+                <span>
+                  {{ item.formName }}
+                </span>
+              </j-space>
             </div>
-          </template>
-          <FlowDesigner readOnly :nodesData="nodesData" />
-        </j-tab-pane>
-      </j-tabs>
+            <FormPreview
+              v-if="!item.multiple"
+              :data="item.fullInfo.configuration"
+            />
+            <TableFormPreview
+              v-else
+              v-model:data-source="tableData"
+              :columns="getTableColumns(item.fullInfo?.configuration?.children)"
+            />
+          </div>
+        </div>
+      </j-tab-pane>
+      <j-tab-pane key="flow">
+        <template #tab>
+          <div>
+            <j-button :type="activeKey === 'flow' ? 'primary' : 'text'"
+              >流程图</j-button
+            >
+          </div>
+        </template>
+        <FlowDesigner readOnly :nodesData="nodesData" />
+      </j-tab-pane>
+    </j-tabs>
     <!-- </j-scrollbar> -->
   </j-drawer>
 </template>
@@ -53,6 +61,7 @@
 import FlowDesigner from '@/components/FlowDesigner'
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
+import { getImage } from '@jetlinks/utils'
 
 interface EmitProps {
   (e: 'update:visible', flag: boolean): void
@@ -135,7 +144,7 @@ init()
     color: #333333;
   }
   :deep(.container) {
-      background: #fafafa;
-    }
+    background: #fafafa;
+  }
 }
 </style>

@@ -39,6 +39,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  disabled:{
+    type:Boolean,
+    default:false
+  }
 })
 const _value: any = ref([])
 const emit = defineEmits(['update:value'])

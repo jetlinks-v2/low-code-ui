@@ -1,9 +1,13 @@
+
+._root-dragging {
+
+}
 ._root {
   margin: 0 auto;
   height: 100%;
-  overflow: auto;
   //   overflow: hidden;
   //   cursor: grab;
+  user-select: none;
 }
 .process-end {
   width: 80px;
@@ -86,9 +90,23 @@
     display: none;
   }
   .add-branch-btn-el {
-    z-index: 999;
+    z-index: 1;
     position: absolute;
     top: -15px;
+    border-radius: 20px;
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    top: -23px;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+    width: 0;
+    border-style: solid;
+    border-width: 8px 6px 4px;
+    border-color: #cacaca transparent transparent;
+    background: #fff;
   }
 }
 

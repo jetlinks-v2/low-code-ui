@@ -66,7 +66,7 @@
                   <div class="form-title">
                     <div class="name">
                       <j-ellipsis line-clamp="1">
-                        {{ form.formName }}
+                        {{ form.name }}
                       </j-ellipsis>
                     </div>
                     <div class="permission">
@@ -81,7 +81,7 @@
                 </template>
                 <div
                   class="form-fields"
-                  v-for="(field, idx) in form.fullInfo.configuration?.children"
+                  v-for="(field, idx) in form.configuration?.children"
                   :key="'field' + idx"
                 >
                   <div class="field-title">
@@ -110,7 +110,7 @@
           <j-scrollbar height="525">
             <div
               class="preview-item"
-              v-for="(item, index) in filterFormList"
+              v-for="(item, index) in previewData"
               :key="index"
             >
               <div class="name">
@@ -118,17 +118,12 @@
                   :src="getImage(`/flow-designer/preview-form.png`)"
                   style="height: 16px"
                 />
-                <span>{{ item.formName }}</span>
+                <span>{{ item.name }}</span>
               </div>
-              <FormPreview
-                v-if="!item.multiple"
-                :data="item.fullInfo?.configuration"
-              />
+              <FormPreview v-if="!item.multiple" :data="item.configuration" />
               <TableFormPreview
                 v-model:data-source="tableData"
-                :columns="
-                  getTableColumns(item.fullInfo?.configuration?.children)
-                "
+                :columns="getTableColumns(item.configuration?.children)"
                 v-else
               />
             </div>
@@ -182,11 +177,71 @@ const loading = ref(false)
 const keywords = ref('')
 const filterFormList = ref<any[] | undefined>([])
 const allFormList = ref<any[] | undefined>([])
+// 表单预览数据
+const previewData = ref<any[]>([])
 const getFormList = async () => {
-  filterFormList.value = flowStore.model.config.forms?.map((m) => {
-    const _fields = m.fullInfo.configuration?.children
+  //   filterFormList.value = flowStore.model.config.forms
+  //     ?.filter((f) => !f.isDelete)
+  //     ?.map((m) => {
+  //       const _fields = m.fullInfo.configuration?.children
+  //       // 已经存在的字段
+  //       const existFields = forms.value[m.formId]
+  //       if (existFields && existFields.length) {
+  //         _fields?.forEach((p) => {
+  //           const _currentField = existFields.find(
+  //             (f) => f.id === p.formItemProps.name,
+  //           )
+  //           p['accessModes'] = _currentField
+  //             ? _currentField.accessModes
+  //             : ['read']
+  //           // 只有"写"权限时, 表单才可编辑
+  //           p.componentProps.disabled = !p.accessModes.includes('write')
+  //         })
+
+  //         // 如果表单下每个字段都有读写, 则表单也有读写权限
+  //         return {
+  //           accessModes: _fields?.every((e) => e.accessModes.length === 2)
+  //             ? ['read', 'write']
+  //             : ['read'],
+  //           ...m,
+  //         }
+  //       } else {
+  //         _fields?.forEach((p) => {
+  //           p['accessModes'] = ['read']
+  //           // 初始状态没有权限, 不可编辑
+  //           p.componentProps.disabled = true
+  //         })
+  //         return { accessModes: ['read'], ...m }
+  //       }
+  //     })
+  //   所有表单数据
+  //   allFormList.value = cloneDeep(filterFormList.value)
+
+  // 过滤已经删除的表单
+  const existForms = flowStore.model.config.forms?.filter((f) => !f.isDelete)
+
+  // 查询预览表单参数
+  const params = {
+    paging: false,
+    terms: [
+      {
+        column: 'key',
+        termType: 'in',
+        value: existForms?.map((m) => m.formId),
+      },
+      {
+        column: 'latest',
+        termType: 'eq',
+        value: 'true',
+      },
+    ],
+  }
+  const { result } = await queryFormNoPage_api(params)
+  // 左侧表单读写操作列表
+  filterFormList.value = result?.map((m) => {
+    const _fields = m.configuration?.children
     // 已经存在的字段
-    const existFields = forms.value[m.formId]
+    const existFields = forms.value[m.key]
     if (existFields && existFields.length) {
       _fields?.forEach((p) => {
         const _currentField = existFields.find(
@@ -213,8 +268,15 @@ const getFormList = async () => {
       return { accessModes: ['read'], ...m }
     }
   })
-  //   所有表单数据
+  // 右侧预览数据
+  previewData.value = result.map((m) => ({
+    ...m,
+    multiple: existForms?.find((f) => f.formId === m.key)?.multiple,
+  }))
+
+  // 所有表单数据, 用于前端筛选
   allFormList.value = cloneDeep(filterFormList.value)
+
   // 设置全部内容全选状态
   setCheckAll()
 }
@@ -253,7 +315,7 @@ const setCheckAll = () => {
  * 表单读写勾选/取消勾选
  */
 const handleFormCheck = (form: any) => {
-  const _fields = form.fullInfo.configuration?.children
+  const _fields = form.configuration?.children
   _fields?.forEach((p) => {
     p.accessModes = form.accessModes
     p.componentProps.disabled = !p.accessModes.includes('write')
@@ -274,7 +336,7 @@ const handleFieldCheck = (form, field) => {
   field.componentProps.disabled = !field.accessModes.includes('write')
 
   // 设置表单全选状态
-  form.accessModes = form.fullInfo?.configuration?.children?.every(
+  form.accessModes = form.configuration?.children?.every(
     (e) => e.accessModes.length === 2,
   )
     ? ['read', 'write']
@@ -305,11 +367,11 @@ const getTableColumns = (fields: any[]) => {
  */
 const handleOk = () => {
   filterFormList.value?.forEach((item) => {
-    const _fields = item.fullInfo.configuration?.children
-    forms.value[item.formId] = []
+    const _fields = item.configuration?.children
+    forms.value[item.key] = []
     _fields?.forEach((p) => {
       if (p.accessModes.length) {
-        forms.value[item.formId].push({
+        forms.value[item.key].push({
           id: p.formItemProps.name,
           required: true,
           accessModes: p.accessModes,

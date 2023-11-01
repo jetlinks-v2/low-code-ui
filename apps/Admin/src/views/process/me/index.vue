@@ -42,6 +42,9 @@ onMounted(() => {
    const item = route.path?.split('/')
    // console.log(item)
    type.value = item[item.length - 1]
+   if(route.query?.state === 'ready'){
+        activeKey.value = 'draft'
+    }
 })
 
 </script>
