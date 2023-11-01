@@ -190,7 +190,7 @@ const getActions = (record) => {
       popConfirm: {
         title: '确认删除？',
         onConfirm: () => {
-          _del(record.id)
+          _del(record.key)
         },
       },
     },

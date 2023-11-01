@@ -8,15 +8,17 @@
     allow-clear
     placeholder="请选择"
     class="value-select"
-    :max-tag-text-length="2"
-    :max-tag-count="1"
+    :max-tag-text-length="1"
+    :max-tag-count="2"
     @change="onChange"
   />
   <j-tree-select
     v-else-if="['org','tree-select'].includes(conditionType)"
     v-model:value="myValue"
     v-model:searchValue="searchValue"
-    :mode="['in', 'nin'].includes(operator?.value) ? 'multiple' : 'default'"
+    :multiple="['in', 'nin'].includes(operator?.value)"
+    :max-tag-text-length="1"
+    :max-tag-count="2"
     class="value-select"
     show-search
     placeholder="请选择"

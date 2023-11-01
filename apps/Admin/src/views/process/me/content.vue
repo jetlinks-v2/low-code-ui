@@ -1,7 +1,8 @@
 
 <template>
     <div>
-        <pro-search :columns="columns" target="code" @search="handleSearch" />
+        <pro-search :columns="columns" target="running" @search="handleSearch" v-if="activeKey==='running'"/>
+        <pro-search :columns="columns" target="code" @search="handleSearch" v-else/>
         <JProTable ref="tableRef" :request="(e) => _query(e)" :columns="columns" :params="params" model="table"
             :defaultParams="defaultParams" :rowSelection="isCheck
                 ? {
