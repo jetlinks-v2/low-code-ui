@@ -46,6 +46,10 @@ const FlowDesigner = defineComponent({
       type: Boolean,
       default: false,
     },
+    dragging: {
+      type: Boolean,
+      default: true
+    }
   },
   setup(props, { emit, expose }) {
     const { nodesData, readOnly } = props
@@ -603,7 +607,9 @@ const FlowDesigner = defineComponent({
     }
     expose({ validateProcess })
     // 鼠标事件
-    useMouseEvent(DragRef)
+    if (props.dragging) {
+      useMouseEvent(DragRef)
+    }
 
     // 渲染组件
     return () => {
