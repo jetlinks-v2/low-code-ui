@@ -46,6 +46,10 @@ const FlowDesigner = defineComponent({
       type: Boolean,
       default: false,
     },
+    dragging: {
+      type: Boolean,
+      default: true
+    }
   },
   setup(props, { emit, expose }) {
     const { nodesData, readOnly } = props
@@ -60,6 +64,8 @@ const FlowDesigner = defineComponent({
         ? nodesData
         : flowStore.model.nodes,
     )
+
+    const DragRef = ref()
 
     const getDomTree = (h, node) => {
       toMapping(node)
@@ -601,15 +607,9 @@ const FlowDesigner = defineComponent({
     }
     expose({ validateProcess })
     // 鼠标事件
-    const {
-      scale,
-      offsetX,
-      offsetY,
-      onMousewheel,
-      startDrag,
-      dragging,
-      endDrag,
-    } = useMouseEvent()
+    if (props.dragging) {
+      useMouseEvent(DragRef)
+    }
 
     // 渲染组件
     return () => {
@@ -630,23 +630,17 @@ const FlowDesigner = defineComponent({
         setEmptyNodeProps(dom.value)
       }, 300)
 
-      return h(
-        'div',
-        {
-          ref: '_root',
-          class: { _root: true },
-          style: {
-            // width: '200%',
-            // height: '200%',
-            // background: '#eee',
-            // transform: `scale(${scale.value}) translate(${offsetX.value}px, ${offsetY.value}px)`,
-          },
-          onMousewheel: (e) => onMousewheel(e),
-          onMousedown: (e) => startDrag(e),
-          onMousemove: (e) => dragging(e),
-          onMouseup: (e) => endDrag(e),
+      return h('div', {
+          ref: DragRef,
+          style: { overflow: 'hidden', height: '100%'}
         },
-        processTrees,
+        h(
+          'div',
+          {
+            class: { _root: true },
+          },
+          processTrees,
+        )
       )
     }
   },

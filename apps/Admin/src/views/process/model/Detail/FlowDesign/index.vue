@@ -1,6 +1,6 @@
 <!-- 流程设计 -->
 <template>
-  <div>
+  <div style="height: 100%; width: 100%">
     <FlowDesigner
       ref="flowDesignerRef"
       @selectNode="nodeSelected"
