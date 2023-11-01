@@ -20,6 +20,8 @@ export interface IForms {
 export interface IConfig {
     nameGenerator: string;
     summaryGenerator: string;
+    nameGeneratorHtml: string;
+    summaryGeneratorHtml: string;
     ccMember: Partial<ICandidate>;
     forms: IForms[];
     // fields?: IVariables[];

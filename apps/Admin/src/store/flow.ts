@@ -23,8 +23,9 @@ export const useFlowStore = defineStore('flow', () => {
     const selectedNode = ref<any>({})
     // 流程模型数据
     const model = ref<IModel>({
-        config: {},
-        nodes: {}
+        // config: {},
+        // nodes: {}
+        ...defaultModel
     })
     // 流程模型基础信息
     const modelBaseInfo = ref<Partial<IModelBaseInfo>>({})

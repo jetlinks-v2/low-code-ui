@@ -41,6 +41,7 @@
               </div>
             </template>
           </j-tree>
+          <j-empty v-else style="margin-top: 50px;" />
         </j-scrollbar>
       </j-col>
       <j-col :span="14">
