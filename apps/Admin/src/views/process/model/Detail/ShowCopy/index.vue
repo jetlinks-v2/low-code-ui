@@ -10,10 +10,10 @@
     >
       <TitleComponent data="展示配置" />
       <j-form-item name="variables" label="可用变量">
-        <div>
-          <j-button @click="visible = true">
+        <div class="btn">
+          <j-button style="background-color: #EBEDF3; border: none;" @click="visible = true">
             <AIcon type="PlusOutlined" />
-            <span>表单字段</span>
+            <span>添加表单字段</span>
           </j-button>
         </div>
         <div
@@ -45,7 +45,7 @@
         />
       </j-form-item>
       <j-form-item
-        name="nameGenerator"
+        name="nameGeneratorHtml"
         :rules="[{ required: true, trigger: 'change' }]"
       >
         <template #label>
@@ -61,13 +61,13 @@
         </template>
         <TemplateText
           placeholder="{发起人}的{流程名称}"
-          :value="formData.nameGenerator"
+          v-model:data="formData.nameGenerator"
+          v-model:value="formData.nameGeneratorHtml"
           :variables="formData.variables"
-          @change="onNameChange"
         />
       </j-form-item>
       <j-form-item
-        name="summaryGenerator"
+        name="summaryGeneratorHtml"
         :rules="[{ required: true, trigger: 'change' }]"
       >
         <template #label>
@@ -77,9 +77,9 @@
         </template>
         <TemplateText
           placeholder="{请假人}的{请假类型}"
-          :value="formData.summaryGenerator"
+          v-model:data="formData.summaryGenerator"
+          v-model:value="formData.summaryGeneratorHtml"
           :variables="formData.variables"
-          @change="onSummaryChange"
         />
       </j-form-item>
       <TitleComponent data="抄送配置" />
@@ -188,8 +188,30 @@ const formData = reactive({
       flowStore.model.config.variables = [...initVariables.value, ...val]
     },
   }),
-  nameGenerator: '',
-  summaryGenerator: '',
+  nameGenerator: computed({
+    get: () => formatToName(flowStore.model.config.nameGenerator),
+    set: (val) => {
+      flowStore.model.config.nameGenerator = formatToVariable(val)
+    },
+  }),
+  nameGeneratorHtml: computed({
+    get: () => flowStore.model.config.nameGeneratorHtml,
+    set: (val) => {
+      flowStore.model.config.nameGeneratorHtml = val
+    },
+  }),
+  summaryGenerator: computed({
+    get: () => formatToName(flowStore.model.config.summaryGenerator),
+    set: (val) => {
+      flowStore.model.config.summaryGenerator = formatToVariable(val)
+    },
+  }),
+  summaryGeneratorHtml: computed({
+    get: () => flowStore.model.config.summaryGeneratorHtml,
+    set: (val) => {
+      flowStore.model.config.summaryGeneratorHtml = val
+    },
+  }),
   ccMember: computed({
     get: () => flowStore.model.config.ccMember,
     set: (val) => {
@@ -197,26 +219,6 @@ const formData = reactive({
     },
   }),
 })
-
-watch(
-  () => flowStore.model.config,
-  (newVal) => {
-    formData.nameGenerator = formatToName(newVal?.nameGenerator)
-    formData.summaryGenerator = formatToName(newVal?.summaryGenerator)
-  },
-  {
-    deep: true,
-    immediate: true,
-  },
-)
-
-const onSummaryChange = (val) => {
-  flowStore.model.config.summaryGenerator = formatToVariable(val)
-}
-
-const onNameChange = (val) => {
-  flowStore.model.config.nameGenerator = formatToVariable(val)
-}
 
 /**
  * 当前步骤校验方法
@@ -265,5 +267,9 @@ defineExpose({ validateSteps })
       }
     }
   }
+}
+
+.btn {
+
 }
 </style>
