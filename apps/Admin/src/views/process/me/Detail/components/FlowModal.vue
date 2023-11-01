@@ -49,6 +49,10 @@ const props = defineProps({
     candidates:{
         type: Object,
         default:{}
+    },
+    comment:{
+        type: String,
+        default: ''
     }
 })
 type Emits = {
