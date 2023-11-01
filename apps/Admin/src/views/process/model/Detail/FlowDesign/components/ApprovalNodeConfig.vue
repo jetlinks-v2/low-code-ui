@@ -150,6 +150,7 @@
               label="驳回配置"
               name="endProcessWhenReject"
               :rules="[{ required: true, message: '请选择驳回配置' }]"
+              v-if="memberFormData.authButtons.includes('reject')"
             >
               <j-radio-group
                 v-model:value="memberFormData.endProcessWhenReject"
@@ -165,7 +166,10 @@
               label="请选择驳回至哪个节点"
               name="rejectTo"
               :rules="[{ required: true, message: '请选择驳回至哪个节点' }]"
-              v-if="!memberFormData.endProcessWhenReject"
+              v-if="
+                memberFormData.authButtons.includes('reject') &&
+                !memberFormData.endProcessWhenReject
+              "
             >
               <j-select
                 v-model:value="memberFormData.rejectTo"
@@ -221,7 +225,7 @@ const memberFormData = reactive({
   rejectTo: props.node?.props?.gotoWhenReject[0] || undefined,
 })
 const allButtons = ref([
-  { label: '通过', value: 'pass', disabled:true},
+  { label: '通过', value: 'pass', disabled: true },
   { label: '驳回', value: 'reject' },
 ])
 const nodeList = ref<{ label: string; value: string }[]>([
@@ -239,9 +243,10 @@ const getRejectNodes = (nodeId) => {
     nodeList.value.push({ label: _parentNode.name, value: _parentNode.id })
   }
   // 父节点存在, 并且可以驳回的节点没有找到 继续查找
-  if (_parentNode?.parentId)
-    getRejectNodes(_parentNode.parentId)
-    memberFormData.rejectTo = memberFormData.rejectTo ? memberFormData.rejectTo : nodeList.value?.[0]?.value
+  if (_parentNode?.parentId) getRejectNodes(_parentNode.parentId)
+  memberFormData.rejectTo = memberFormData.rejectTo
+    ? memberFormData.rejectTo
+    : nodeList.value?.[0]?.value
 }
 
 /**
@@ -249,21 +254,26 @@ const getRejectNodes = (nodeId) => {
  */
 const saveConfigToStore = () => {
   return new Promise((resolve, reject) => {
-    const result = findNodeById(
-      flowStore.model.nodes,
-      flowStore.selectedNode.id,
-    )
+    let result = findNodeById(flowStore.model.nodes, flowStore.selectedNode.id)
     if (!basicFormData.others.defaultComment) {
       delete basicFormData.others.defaultComment
     }
     const { rejectTo, ...others } = memberFormData
     others.gotoWhenReject = [rejectTo]
-    result.props = {
-      ...result.props,
-      ...basicFormData,
-      ...others,
+    // result.props = {
+    //   ...result.props,
+    //   ...basicFormData,
+    //   ...others,
+    // }
+    // #19583
+    result = {
+      ...result,
+      props: {
+        ...result.props,
+        ...basicFormData,
+        ...others,
+      },
     }
-    console.log(result.props);
     resolve(result)
   })
 }
@@ -306,7 +316,7 @@ defineExpose({
 })
 onMounted(() => {
   getRejectNodes(props.node?.parentId)
-  if(!nodeList.value.find(item => item.value === memberFormData.rejectTo)) {
+  if (!nodeList.value.find((item) => item.value === memberFormData.rejectTo)) {
     memberFormData.rejectTo = null
   }
 })
