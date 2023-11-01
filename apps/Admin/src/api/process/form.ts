@@ -7,10 +7,10 @@ export const _save = (data: any) => request.patch('/process/form', data);
 export const _update = (data: any) => request.post('/process/form/new-version/_insert', data);
 
 // 查询
-export const _query = (data: any) => request.post('/process/form/_query', data);
+export const _query = (data: any) => request.post('/process/form/latest/_query', data);
 
 // 删除
-export const _delete = (id: string) => request.remove(`/process/form/${id}`);
+export const _delete = (id: string) => request.remove(`/process/form/key/${id}`);
 
 /**
  * 验证设备ID是否重复
