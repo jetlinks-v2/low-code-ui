@@ -113,7 +113,8 @@ const content = computed(() => {
   //   console.log('terms: ', terms)
   // 条件描述
   const _conditionDesc = terms.map(
-    (item) => `${item.columnName || ''}${item.termTypeName || ''}${item.value || ''}`,
+    (item) =>
+      `${item.columnName || ''}${item.termTypeName || ''}${item.value || ''}`,
   )
   return _conditionDesc.length
     ? String(_conditionDesc).replaceAll(',', '、')
@@ -128,7 +129,11 @@ const validate = (err) => {
 
   showError.value = true
   errorInfo.value = '未填写必填配置项'
-  if (!terms || !terms.length || !terms.some(item => Boolean(Object.keys(item).length))) {
+  if (
+    !terms ||
+    !terms.length ||
+    !terms.some((item) => Boolean(Object.keys(item).length))
+  ) {
     err.push({
       errors: ['请配置进入下方节点的条件'],
       name: ['condition', 'configuration', 'terms'],
@@ -212,13 +217,14 @@ defineExpose({ validate })
       align-items: center;
       position: absolute;
       height: 100%;
+      z-index: 1;
 
       .anticon {
         display: none;
       }
 
       &:hover {
-        background-color: #ececec;
+        background-color: #f7f7f7;
       }
     }
 

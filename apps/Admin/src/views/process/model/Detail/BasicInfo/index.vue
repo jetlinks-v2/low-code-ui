@@ -48,10 +48,8 @@ const getData = (arr: any[]) => {
     return {
       id: i.formItemProps?.name, //字段id
       required: i.formItemProps?.required, //是否必填
-      accessModes: [
-        'read',
-      ],
-      children: getData(i?.children || [])
+      accessModes: ['read'],
+      children: getData(i?.children || []),
     }
   })
 }
@@ -114,7 +112,25 @@ const validateSteps = () => {
   })
 }
 
-defineExpose({ validateSteps })
+// 进入页面获取最新表单数据, 判断是否有表单被删除
+const getLatestFormList = () => {
+  return new Promise((resolve, reject) => {
+    configFormRef.value
+      .getFormList()
+      .then((res) => {
+        formData.forms = formData.forms.map((m) => ({
+          ...m,
+          isDelete: !res.includes(m.formId),
+        }))
+        resolve(formData.forms)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
+}
+
+defineExpose({ validateSteps, getLatestFormList })
 
 watch(
   () => formData.forms,
@@ -125,13 +141,7 @@ watch(
 )
 onMounted(() => {
   validateSteps()
-  // 进入页面获取最新表单数据, 判断是否有表单被删除
-  configFormRef.value.getFormList().then((res) => {
-    formData.forms = formData.forms.map((m) => ({
-      ...m,
-      isDelete: !res.includes(m.formId),
-    }))
-  })
+  getLatestFormList()
 })
 </script>
 <style scoped lang="less">
