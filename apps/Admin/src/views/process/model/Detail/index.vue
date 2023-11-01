@@ -112,7 +112,7 @@ const handleNext = () => {
   // 点击下一步先保存数据, 再校验->#19300
   handleSave('next')
   stepRef.value
-    ?.validateSteps()
+    ?.validateSteps('next')
     .then((idx) => {
       // 校验通过, 对应步骤恢复正常状态, 并进入下一步骤
       stepStatus.value[idx] = ''
