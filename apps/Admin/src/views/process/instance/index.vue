@@ -87,8 +87,10 @@
                       :type="record.icon"
                       :style="{ fontSize: '40px' }"
                     />
-                    <div>
-                      <div class="name">{{ record.name }}</div>
+                    <div class="right">
+                      <j-ellipsis style="max-width: 200px">
+                        <div class="name">{{ record.name }}</div>
+                      </j-ellipsis>
                       <div class="other">
                         <j-ellipsis style="width: 200px">
                           <span class="text">部署人：</span>
@@ -438,21 +440,28 @@ const refresh = () => {
   }
   .card-content {
     height: 64px;
-    .name {
-      margin-bottom: 16px;
-      font-size: 16px;
-      line-height: 16px;
-      font-weight: 500;
-      color: #333333;
-    }
-    .other {
-      display: inline-flex;
 
-      .text {
-        color: rgba(10, 27, 48, 0.6);
+    .right {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 64px;
+      .name {
+        margin-bottom: 16px;
+        font-size: 16px;
+        line-height: 16px;
+        font-weight: 500;
+        color: #333333;
       }
-      .value {
-        color: rgba(10, 27, 48, 0.4);
+      .other {
+        display: inline-flex;
+
+        .text {
+          color: rgba(10, 27, 48, 0.6);
+        }
+        .value {
+          color: rgba(10, 27, 48, 0.4);
+        }
       }
     }
   }
