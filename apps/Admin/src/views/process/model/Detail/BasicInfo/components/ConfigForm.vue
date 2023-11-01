@@ -19,19 +19,27 @@
         >
           <template #renderItem="{ item }">
             <j-list-item>
-              <j-space>
-                <img
-                  :src="
-                    getImage(
-                      `/flow-designer/${item.multiple ? 'list' : 'form'}.png`,
-                    )
-                  "
-                  style="height: 16px"
-                />
-                <j-ellipsis line-clamp="1">
-                  {{ item.formName }}
-                </j-ellipsis>
-              </j-space>
+              <div
+                class="preview-item-box"
+                :class="{ 'is-delete': item.isDelete }"
+              >
+                <j-space>
+                  <img
+                    :src="
+                      getImage(
+                        `/flow-designer/${item.multiple ? 'list' : 'form'}.png`,
+                      )
+                    "
+                    style="height: 16px"
+                  />
+                  <j-ellipsis line-clamp="1">
+                    {{ item.formName }}
+                  </j-ellipsis>
+                </j-space>
+                <j-tooltip title="流程表单不存在" v-if="item.isDelete">
+                  <AIcon class="delete-icon" type="WarningOutlined" />
+                </j-tooltip>
+              </div>
             </j-list-item>
           </template>
         </j-list>
@@ -96,7 +104,10 @@
               item-key="key"
             >
               <template #item="{ element }">
-                <div class="selected-item">
+                <div
+                  class="selected-item"
+                  :class="{ 'is-delete': element.isDelete }"
+                >
                   <div class="name">
                     <j-ellipsis line-clamp="1">
                       {{ element.formName }}
@@ -216,6 +227,8 @@ const params = ref<any>({
 const getFormList = async () => {
   const { result } = await queryFormNoPage_api(params.value)
   formList.value = result
+  // 返回存在的表单的keys, 以供父级验证是否已配置表单是否存在
+  return formList.value.map((m) => m.key)
 }
 
 /**
@@ -288,6 +301,10 @@ watch(
   },
   { deep: true },
 )
+
+defineExpose({
+  getFormList,
+})
 </script>
 <style scoped lang="less">
 :deep(.ant-table-cell) {
@@ -323,6 +340,17 @@ watch(
         line-height: 40px;
         border-radius: 4px;
         background: #f6f7f9;
+      }
+    }
+    .preview-item-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      &.is-delete {
+        color: #999;
+      }
+      .delete-icon {
+        color: #e50012;
       }
     }
   }
@@ -375,6 +403,10 @@ watch(
         background: #f6f7f9;
         margin-bottom: 16px;
         padding: 9px 16px;
+        &.is-delete {
+          background: #fdebec;
+          color: #e50012;
+        }
         .name {
           flex: 1;
         }

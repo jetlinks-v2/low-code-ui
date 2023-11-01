@@ -55,11 +55,11 @@
       </j-card>
     </FullPage>
 
-    <!-- 隐藏域, 用于部署校验每一步数据 -->
+    <!-- 隐藏域, 仅用于部署校验每一步数据, noQuery: 不查询接口 -->
     <div class="validate-box">
       <BasicInfo ref="step1" />
       <FlowDesign ref="step2" />
-      <ShowCopy ref="step3" />
+      <ShowCopy ref="step3" :noQuery="true" />
     </div>
   </page-container>
 </template>
@@ -292,5 +292,8 @@ onBeforeRouteUpdate((to, from, next)=>{
   width: 0;
   height: 0;
   overflow: hidden;
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
 </style>

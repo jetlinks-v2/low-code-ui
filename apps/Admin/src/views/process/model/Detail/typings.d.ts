@@ -15,6 +15,7 @@ export interface IForms {
     formName?: string
     // 仅前端使用
     fullInfo?: any
+    isDelete?: boolean
 }
 export interface IConfig {
     nameGenerator: string;

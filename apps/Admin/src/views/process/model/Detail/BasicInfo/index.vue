@@ -20,7 +20,7 @@
             },
           ]"
         >
-          <ConfigForm v-model:modelValue="formData.forms" />
+          <ConfigForm ref="configFormRef" v-model:modelValue="formData.forms" />
         </j-form-item>
         <TitleComponent data="权限控制" />
         <j-form-item name="assignedUser" label="配置可以使用该流程的成员">
@@ -41,6 +41,7 @@ import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
 const formRef = ref()
+const configFormRef = ref()
 
 const getData = (arr: any[]) => {
   return arr.map((i) => {
@@ -83,9 +84,11 @@ const formData = reactive({
 })
 
 const rules = {
-  checkFormList: async (_rule: any, value: string): Promise<any> => {
-    if (formData.forms?.length === 0) {
+  checkFormList: async (_rule: any, value: any[]): Promise<any> => {
+    if (value?.length === 0) {
       return Promise.reject('请配置表单')
+    } else if (value?.every((m) => m.isDelete)) {
+      return Promise.reject('所配表单已全部被删除, 请重新选择可用表单')
     } else {
       return Promise.resolve()
     }
@@ -122,6 +125,13 @@ watch(
 )
 onMounted(() => {
   validateSteps()
+  // 进入页面获取最新表单数据, 判断是否有表单被删除
+  configFormRef.value.getFormList().then((res) => {
+    formData.forms = formData.forms.map((m) => ({
+      ...m,
+      isDelete: !res.includes(m.formId),
+    }))
+  })
 })
 </script>
 <style scoped lang="less">

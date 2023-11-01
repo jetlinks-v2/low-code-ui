@@ -62,6 +62,8 @@ const validate = (err) => {
     authButtons,
     endProcessWhenReject,
     gotoWhenReject,
+    rejectTo,
+    others,
   } = props.config.props
 
   showError.value = true
@@ -71,10 +73,20 @@ const validate = (err) => {
       errors: ['审批节点名称不能为空'],
       name: ['name'],
     })
-  } else if (!formBinds || !Object.keys(formBinds).length) {
+  } else if (name.length > 64) {
     err.push({
-      errors: ['请确认当前节点需要候选人办理的表单内容'],
-      name: ['formBinds'],
+      errors: ['审批节点名称最多输入64个字符'],
+      name: ['name'],
+    })
+  } else if (!formBinds || !Object.keys(formBinds).length) {
+    // err.push({
+    //   errors: ['请确认当前节点需要候选人办理的表单内容'],
+    //   name: ['formBinds'],
+    // })
+  } else if (others.defaultComment.length > 64) {
+    err.push({
+      errors: ['审批意见默认值最多输入64个字符'],
+      name: ['others', 'defaultComment'],
     })
   } else if (
     !candidates ||
@@ -95,7 +107,7 @@ const validate = (err) => {
       errors: ['审批成员可以使用哪些按钮'],
       name: ['authButtons'],
     })
-  } else if (!gotoWhenReject) {
+  } else if (!endProcessWhenReject && !rejectTo) {
     err.push({
       errors: ['请选择驳回至哪个节点'],
       name: ['gotoWhenReject'],

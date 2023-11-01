@@ -2,6 +2,7 @@
 <template>
   <j-modal
     visible
+    :maskClosable="false"
     title="权限控制"
     width="35%"
     @cancel="emits('update:visible', false)"
@@ -68,7 +69,7 @@ const confirm = () => {
 }
 onMounted(() => {
   getMembers_api(props.data.id).then((res) => {
-    form.links = res.result
+    form.links = res.result.filter(i => i.id !== 'all')
   })
 })
 </script>

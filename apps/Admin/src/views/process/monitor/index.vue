@@ -43,7 +43,6 @@
       <template #endTime="{ endTime }">
         {{ endTime && dayjs(endTime).format('YYYY-MM-DD HH:mm:ss') }}
       </template>
-      
 
       <template #action="slotProps">
         <PermissionButton
@@ -80,7 +79,7 @@
     <Drawer
       v-if="drawer.visible"
       type="card"
-      @close="drawer.visible = false" 
+      @close="drawer.visible = false"
       :current="drawer.selectItem"
       :history="history"
     />
@@ -97,7 +96,7 @@ import Drawer from '@/views/process/me/Detail/index.vue'
 const { classified, getText } = useClassified()
 const tableRef = ref()
 const history = ref(false)
-const columns = computed(()=>[
+const defaultColumns = [
   {
     title: '流程分类',
     dataIndex: 'classifiedId',
@@ -142,20 +141,19 @@ const columns = computed(()=>[
     key: 'state',
     ellipsis: true,
     scopedSlots: true,
-    hideInTable: !history.value,
-    // search: {
-    //   type: 'select',
-    //   componentProps: {
-    //     placeholder: '请选择状态',
-    //   },
-    //   options: [
-    //     { label: '已准备', value: 'ready' },
-    //     { label: '运行中', value: 'running' },
-    //     { label: '已完成', value: 'completed' },
-    //     { label: '已驳回', value: 'rejected' },
-    //     { label: '已撤销', value: 'repealed' },
-    //   ],
-    // },
+    search: {
+      type: 'select',
+      componentProps: {
+        placeholder: '请选择状态',
+      },
+      options: [
+        // { label: '已准备', value: 'ready' },
+        // { label: '运行中', value: 'running' },
+        { label: '已完成', value: 'completed' },
+        { label: '已驳回', value: 'rejected' },
+        { label: '已撤销', value: 'repealed' },
+      ],
+    },
   },
   {
     title: '发起人',
@@ -172,6 +170,7 @@ const columns = computed(()=>[
         const resp = await getList_api({
           paging: false,
           sorts: [{ name: 'createTime', order: 'desc' }],
+          history: history.value,
         })
         const listMap = new Map()
         if (resp.status === 200) {
@@ -203,17 +202,27 @@ const columns = computed(()=>[
     key: 'endTime',
     ellipsis: true,
     scopedSlots: true,
-    hideInTable: !history.value,
-    // search: {
-    //   type: 'date',
-    // },
+    search: {
+      type: 'date',
+    },
   },
   {
     title: '操作',
     key: 'action',
     scopedSlots: true,
   },
-])
+]
+const columns = computed(() => {
+  return history.value
+    ? defaultColumns
+    : defaultColumns.filter(
+        (item) => item.dataIndex !== 'state' && item.dataIndex !== 'endTime',
+      )
+})
+
+// const key = computed(() => {
+
+// })
 
 const params = ref({})
 
@@ -229,8 +238,8 @@ const handleSearch = (data) => {
 
 // 关闭
 const handleClose = (id) => {
-  close_api(id).then(res =>{
-    if(res.success){
+  close_api(id).then((res) => {
+    if (res.success) {
       onlyMessage('操作成功')
       tableRef.value.reload()
     }

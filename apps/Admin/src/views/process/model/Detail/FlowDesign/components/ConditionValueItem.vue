@@ -3,6 +3,7 @@
     v-if="normalSelectTypes.includes(conditionType)"
     v-model:value="myValue"
     :options="valueOptions"
+    show-search
     placeholder="请选择"
     class="value-select"
     @change="onChange"
@@ -211,6 +212,9 @@ watch(
     color: #CE29DD;
   }
   :deep(.ant-select-clear) {
+    color: #CE29DD;
+  }
+  :deep(.ant-select-selection-placeholder) {
     color: #CE29DD;
   }
 }

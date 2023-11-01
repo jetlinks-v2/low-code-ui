@@ -2,7 +2,7 @@
 <template>
    <div class="content">
       <j-timeline>
-         <j-timeline-item v-for=" (item, index) in timelines" :color="getColor(index) ? '#315EFB' : '#999999'">
+         <j-timeline-item v-for=" (item, index) in timelines" :color="getColor(item,index) ? '#315EFB' : '#999999'">
             <div class="items">
                <div class="item">
                   <div class="item-left">
@@ -41,8 +41,10 @@
                      {{ typeMap.get(item.childrenNode.others.afterState) }}
                   </j-tag>
                </div>
-               <div v-if="item.childrenNode?.others.afterState === 'rejected'" class="item-children">
-                  <div style="margin-right: 10px;">{{ item.others.taskName }} 已驳回至 {{ findRejectNode(item.childrenNode?.traceId) }}</div>
+               <div v-if="item.childrenNode?.others.afterState === 'rejected' && findRejectNode(item.childrenNode?.traceId)" class="item-children">
+                  <div style="margin-right: 10px;">
+                     {{ item.others.taskName }} 已驳回至 {{ findRejectNode(item.childrenNode?.traceId) }}
+                  </div>
                </div>
             </div>
          </j-timeline-item>
@@ -63,6 +65,7 @@ colorMap.set('children_rejected', 'error')
 colorMap.set('reject', '#E50012')
 colorMap.set('default', 'processing')
 colorMap.set('completed', '#4FC971')
+colorMap.set('off', '#99a59c')
 
 const typeMap = new Map()
 typeMap.set('todo', '待办')
@@ -89,6 +92,7 @@ actionType.set('auto', '自动通过')
 actionType.set('reject', '驳回')
 actionType.set('submit', '提交')
 actionType.set('initiate', '发起申请')
+actionType.set('off', '关闭')
 
 
 const props = defineProps({
@@ -127,20 +131,21 @@ const handleTask = (arr) => {
    })
 }
 
-const getColor = (index) => {
+const getColor = (item,index) => {
    // console.log('isend',isEnd.value,timelines.value.length,index,isEnd.value && index === timelines.value.length - 1)
-   return isEnd.value && index === timelines.value.length - 1
+   return isEnd.value && index === timelines.value.length - 1 || item.action === 'processEnd'
 }
 //判断节点类型
-const nodeState = (nodeType,auto)=>{
-   if(nodeType === 'APPROVAL'){
-      return auto?'pass':'pass'
+const nodeState = (nodeType, auto) => {
+   if (nodeType === 'APPROVAL') {
+      return auto ? 'pass' : 'pass'
    }
-   if(nodeType === 'DEAL'){
+   if (nodeType === 'DEAL') {
       return 'submit'
    }
    return 'pass'
 }
+
 
 //判断节点是否在时间线上
 const filterLine = (item, index) => {
@@ -152,7 +157,7 @@ const filterLine = (item, index) => {
          operatorName: item.others.identity.name,
          actionType: 'sign',
          actionColor: 'completed',
-         show:item.others.autoOperation? false:true
+         show: item.others.autoOperation ? false : true
       }
    } else if (item.action === 'taskLinkChanged') {
       //完成
@@ -161,7 +166,7 @@ const filterLine = (item, index) => {
             ...item,
             nodeType: nodeType,
             operatorName: item.others.identity.name,
-            actionType: item.others.afterState === 'completed' ? nodeState(nodeType,item.others.autoOperation) : 'reject',
+            actionType: item.others.afterState === 'completed' ? nodeState(nodeType, item.others.autoOperation) : 'reject',
             actionColor: item.others.afterState === 'completed' ? 'completed' : 'reject',
             show: true,
          }
@@ -182,6 +187,13 @@ const filterLine = (item, index) => {
             // branchStartIndex: handleBranch(item) ? index : undefined,
             // branchEndIndex: nodeType === 'EMPTY' ? index : undefined
          }
+      }
+   } else if (item.action === 'processEnd') {
+      return {
+         ...item,
+         actionType: 'off',
+         actionColor: 'off',
+         show:item.others.state.value==='repealed'? true: false
       }
    } else {
       return {
@@ -236,9 +248,9 @@ const showChanged = (val, type) => {
 
 
 //找驳回至的节点
-const findRejectNode = (traceId)=>{
-   const nodeId = props.info.timelines?.find(item=>item.action === 'taskFallback' && item.traceId === traceId)?.others.nodeIds?.[0]
-   const obj = props.info.tasks?.find(item=>item.nodeId === nodeId)
+const findRejectNode = (traceId) => {
+   const nodeId = props.info.timelines?.find(item => item.action === 'taskFallback' && item.traceId === traceId)?.others.nodeIds?.[0]
+   const obj = props.info.tasks?.find(item => item.nodeId === nodeId)
    // console.log('------',nodeId,obj)
    return obj?.nodeName
 }

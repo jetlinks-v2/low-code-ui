@@ -17,20 +17,21 @@
         v-model:searchValue="item.searchValue"
         show-search
         label-in-value
-        placeholder="请选择"
+        placeholder="请配置变量"
         allow-clear
         tree-default-expand-all
         tree-node-filter-prop="name"
         :tree-data="conditionOptions"
-        :field-names="{ label: 'name', value: 'fullId' }"
+        :field-names="{ label: 'name', value: 'key' }"
         :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-        style="width: 400px"
+        style="max-width: 200px;min-width: 200px;"
         class="variable-select"
         @clear="handleConditionClear(item, index)"
-        @change="handleConditionChange(item)"
+        @select="(value, label) => handleConditionChange(value,label, item, index)"
       >
         <template #title="{ name }">
-          <template
+          <j-ellipsis line-clamp="1">
+            <template
             v-for="(fragment, i) in name
               ?.toString()
               ?.split(
@@ -49,6 +50,7 @@
             </span>
             <template v-else>{{ fragment }}</template>
           </template>
+          </j-ellipsis>
         </template>
       </j-tree-select>
       <j-select
@@ -150,18 +152,32 @@ const getFormFields = async () => {
       provider,
     },
     nodeId: flowStore.selectedNode.props.branchBy, // 条件节点配置, id传当前条件节点的branchBy
+    containThisNode: true, //变量来源是否包含本节点
   }
   const { result } = await queryVariables_api(params)
+  addKeys(result)
   conditionOptions.value = result
+  function addKeys(list, parentFullId = '') {
+    for (let i = 0; i < list.length; i++) {
+      if(list[i].children?.length) {
+        list[i].disabled = true
+      }
+      list[i].key = parentFullId + list[i].id
+      if (list[i].children) {
+        addKeys(list[i].children, list[i].fullId)
+      }
+    }
+  }
 }
 
 /**
  * 条件选择改变 设置column和columnName
  * @param item
  */
-const handleConditionChange = (item) => {
-  item.column = item.selectedColumn.value
-  item.columnName = item.selectedColumn.label
+const handleConditionChange = (value, node, item, index) => {
+  item.value = item.selectedTermType = null
+  item.column = node.fullId
+  item.columnName = node.name
 }
 
 const handleConditionClear = (item, index) => {
@@ -181,6 +197,9 @@ const handleTermTypeChange = (item) => {
 const conditionType = (item) => {
   const _var = findVariableById(conditionOptions.value, item?.column)
     console.log('_var: ', _var)
+  if(_var?.id === 'processOwnerName') {
+    return 'input'
+  }
   return _var?.others?.type || _var?.others?.relation 
 }
 

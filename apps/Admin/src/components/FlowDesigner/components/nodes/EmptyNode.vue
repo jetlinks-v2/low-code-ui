@@ -7,6 +7,7 @@
 import Node from './Node.vue'
 
 const emits = defineEmits(['insertNode'])
+provide('isEmptyNode', true)
 </script>
 
 <style scoped></style>

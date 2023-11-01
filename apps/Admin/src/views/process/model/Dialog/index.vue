@@ -88,7 +88,6 @@
                   <AIcon v-else type="PlusOutlined" style="font-size: 20px" />
                 </template>
               </ImageUpload>
-              <!-- <div>自定义</div> -->
             </div>
             <div>自定义</div>
           </div>
@@ -159,7 +158,9 @@ const { data: classified } = useRequest(providerEnum, {
         value: item.id,
       }
     })
-    op.some(i => i.value === form.classifiedId) ? '' : form.classifiedId = ''
+    op.some((i) => i.value === form.classifiedId)
+      ? ''
+      : (form.classifiedId = '')
     return op
   },
 })

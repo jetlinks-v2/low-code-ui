@@ -15,13 +15,21 @@
           </div>
           <span>办理节点</span>
         </div>
-        <div class="node-select-item conditions" @click="handleAddConditions">
+        <div
+          class="node-select-item conditions"
+          :class="{ disabled: isEmptyNode }"
+          @click="handleAddConditions"
+        >
           <div class="node-icon">
             <AIcon type="FunnelPlotOutlined" />
           </div>
           <span>条件分支</span>
         </div>
-        <div class="node-select-item concurrents" @click="handleAddConcurrents">
+        <div
+          class="node-select-item concurrents"
+          :class="{ disabled: isEmptyNode }"
+          @click="handleAddConcurrents"
+        >
           <div class="node-icon">
             <AIcon type="ShareAltOutlined" />
           </div>
@@ -43,7 +51,7 @@ import { computed } from 'vue'
 
 const emits = defineEmits(['insertNode'])
 const flowStore = useFlowStore()
-
+const isEmptyNode = inject('isEmptyNode')
 const selectedNode = computed(() => flowStore.selectedNode)
 
 const visible = ref(false)
@@ -56,10 +64,12 @@ const handleAddDeal = () => {
   emits('insertNode', 'DEAL')
 }
 const handleAddConditions = () => {
+  if (isEmptyNode) return
   visible.value = false
   emits('insertNode', 'CONDITIONS')
 }
 const handleAddConcurrents = () => {
+  if (isEmptyNode) return
   visible.value = false
   emits('insertNode', 'CONCURRENTS')
 }
