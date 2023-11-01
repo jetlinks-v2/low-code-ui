@@ -24,8 +24,15 @@
         </div>
 
         <div class="btn">
-          <j-button :disabled="current === 0" @click="current--">上一步</j-button>
-          <j-button :disabled="current === 2" @click="handleNext" :loading="nextLoading">下一步</j-button>
+          <j-button :disabled="current === 0" @click="current--"
+            >上一步</j-button
+          >
+          <j-button
+            :disabled="current === 2"
+            @click="handleNext"
+            :loading="nextLoading"
+            >下一步</j-button
+          >
           <j-button type="primary" @click="handleSave" :loading="saveLoading">
             保存
             <template #icon>
@@ -50,9 +57,12 @@
       </div>
     </j-card>
     <FullPage>
-      <j-card :bordered="false">
+      <!--      <j-card :bordered="false">-->
+      <!--        <component ref="stepRef" :is="componentsMap[current]" />-->
+      <!--      </j-card>-->
+      <div style="height: 100%; padding: 24px">
         <component ref="stepRef" :is="componentsMap[current]" />
-      </j-card>
+      </div>
     </FullPage>
 
     <!-- 隐藏域, 仅用于部署校验每一步数据, noQuery: 不查询接口 -->
@@ -108,20 +118,24 @@ const getFlowDetail = async () => {
 /**
  * 下一步, 校验当前步骤的数据规范
  */
-const handleNext = () => {
+const handleNext = async () => {
   // 点击下一步先保存数据, 再校验->#19300
   handleSave('next')
-  stepRef.value
-    ?.validateSteps()
-    .then((idx) => {
-      // 校验通过, 对应步骤恢复正常状态, 并进入下一步骤
-      stepStatus.value[idx] = ''
-      current.value++
-    })
-    .catch((idx) => {
-      // 步骤校验失败, 返回的当前步骤序号, 直接将对应步骤标红提示
-      stepStatus.value[idx] = 'error'
-    })
+  // 下一步前, 查询表单是否被删除
+  step1.value.getLatestFormList().then((res) => {
+    // 触发校验
+    stepRef.value
+      ?.validateSteps('next')
+      .then((idx) => {
+        // 校验通过, 对应步骤恢复正常状态, 并进入下一步骤
+        stepStatus.value[idx] = ''
+        current.value++
+      })
+      .catch((idx) => {
+        // 步骤校验失败, 返回的当前步骤序号, 直接将对应步骤标红提示
+        stepStatus.value[idx] = 'error'
+      })
+  })
 }
 
 /**
@@ -147,6 +161,7 @@ const handleSave = (type?: string) => {
         isModal.value = true
         router.go(-1)
       }
+      getFlowDetail()
     })
     .finally(() => {
       saveLoading.value = false
@@ -159,41 +174,44 @@ const handleSave = (type?: string) => {
  */
 const validLoading = ref(false)
 const handleDeploy = () => {
-  validLoading.value = true
-  //   stepRef.value?.validateSteps()
-  Promise.allSettled([
-    step1.value?.validateSteps(),
-    step2.value?.validateSteps(),
-    step3.value?.validateSteps(),
-  ])
-    .then((valid) => {
-      //   console.log('handleDeploy valid: ', valid)
-      // 添加加载中动画, 适当给个延时
-      setTimeout(() => {
-        valid?.forEach((item, index) => {
-          if (item.status === 'fulfilled') {
-            stepStatus.value[index] = ''
-          }
-          if (item.status === 'rejected') {
-            stepStatus.value[index] = 'error'
-          }
-        })
-        validLoading.value = false
-      }, 500)
+  // 部署前, 查询表单是否被删除
+  step1.value.getLatestFormList().then((res) => {
+    validLoading.value = true
+    //   stepRef.value?.validateSteps()
+    Promise.allSettled([
+      step1.value?.validateSteps(),
+      step2.value?.validateSteps(),
+      step3.value?.validateSteps(),
+    ])
+      .then((valid) => {
+        //   console.log('handleDeploy valid: ', valid)
+        // 添加加载中动画, 适当给个延时
+        setTimeout(() => {
+          valid?.forEach((item, index) => {
+            if (item.status === 'fulfilled') {
+              stepStatus.value[index] = ''
+            }
+            if (item.status === 'rejected') {
+              stepStatus.value[index] = 'error'
+            }
+          })
+          validLoading.value = false
+        }, 500)
 
-      if (
-        Array.isArray(valid) &&
-        valid.every((item) => item.status === 'fulfilled')
-      ) {
-        // 所有步骤验证通过, 开始部署
-        saveAndDeploy()
-      } else {
-        onlyMessage('部署失败，流程配置内容不合规', 'error')
-      }
-    })
-    .catch((err) => {
-      //   console.log('handleDeploy err: ', err)
-    })
+        if (
+          Array.isArray(valid) &&
+          valid.every((item) => item.status === 'fulfilled')
+        ) {
+          // 所有步骤验证通过, 开始部署
+          saveAndDeploy()
+        } else {
+          onlyMessage('部署失败，流程配置内容不合规', 'error')
+        }
+      })
+      .catch((err) => {
+        //   console.log('handleDeploy err: ', err)
+      })
+  })
 }
 
 /**
@@ -223,50 +241,48 @@ onMounted(() => {
 })
 
 //离开路由改变路由
-const routerChange = (next?:Function)=>{
+const routerChange = (next?: Function) => {
   const modal = Modal.confirm({
     content: '页面改动数据未保存',
-      okText: '保存',
-      cancelText: '不保存',
-      zIndex: 1400,
-      closable: true,
-      onOk: () => {
-        const params = {
-          id: route.query.id,
-          state: 'undeployed',
-          model: JSON.stringify(flowStore.model),
-        }
-        update_api(params).then((res)=>{
-          if(res.status === 200){
-            onlyMessage('保存成功')
-            modal.destroy();
-            (next as Function)?.()
-          }
-        })
-      },
-      onCancel: (e: any) => {
-        modal.destroy();
-        (next as Function)?.()
+    okText: '保存',
+    cancelText: '不保存',
+    zIndex: 1400,
+    closable: true,
+    onOk: () => {
+      const params = {
+        id: route.query.id,
+        state: 'undeployed',
+        model: JSON.stringify(flowStore.model),
       }
+      update_api(params).then((res) => {
+        if (res.status === 200) {
+          onlyMessage('保存成功')
+          modal.destroy()
+          ;(next as Function)?.()
+        }
+      })
+    },
+    onCancel: (e: any) => {
+      modal.destroy()
+      ;(next as Function)?.()
+    },
   })
 }
 
 onBeforeRouteLeave((to, form, next) => {
-  if(!isModal.value){
+  if (!isModal.value) {
     routerChange(next)
-  }else{
-    next()
-  }
-  
-})
-onBeforeRouteUpdate((to, from, next)=>{
-  if(!isModal.value){
-    routerChange(next)
-  }else{
+  } else {
     next()
   }
 })
-
+onBeforeRouteUpdate((to, from, next) => {
+  if (!isModal.value) {
+    routerChange(next)
+  } else {
+    next()
+  }
+})
 </script>
 
 <style lang="less" scoped>

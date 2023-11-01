@@ -233,7 +233,7 @@ const props = defineProps({
         display: none;
       }
       &:hover {
-        background-color: #ececec;
+        background-color: #f7f7f7;
       }
     }
     .node-body-left {

@@ -43,11 +43,33 @@ const flowStore = useFlowStore()
 const formRef = ref()
 const configFormRef = ref()
 
+const getData = (arr: any[]) => {
+  return arr.map((i) => {
+    return {
+      id: i.formItemProps?.name, //字段id
+      required: i.formItemProps?.required, //是否必填
+      accessModes: ['read'],
+      children: getData(i?.children || []),
+    }
+  })
+}
+
+const formToObj = (arr: any[]) => {
+  const obj: any = {}
+  arr.map((item) => {
+    obj[item.formId] = getData(item.fullInfo?.configuration?.children || [])
+  })
+  return obj
+}
+
 const formData = reactive({
   forms: computed({
     get: () => flowStore.model.config.forms || [],
     set: (val) => {
       flowStore.model.config.forms = val
+      if (!flowStore.model?.nodes?.props?.formBinds?.length) {
+        flowStore.model.nodes.props!.formBinds = formToObj(val)
+      }
     },
   }),
   assignedUser: computed({
@@ -90,7 +112,25 @@ const validateSteps = () => {
   })
 }
 
-defineExpose({ validateSteps })
+// 进入页面获取最新表单数据, 判断是否有表单被删除
+const getLatestFormList = () => {
+  return new Promise((resolve, reject) => {
+    configFormRef.value
+      .getFormList()
+      .then((res) => {
+        formData.forms = formData.forms.map((m) => ({
+          ...m,
+          isDelete: !res.includes(m.formId),
+        }))
+        resolve(formData.forms)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
+}
+
+defineExpose({ validateSteps, getLatestFormList })
 
 watch(
   () => formData.forms,
@@ -101,13 +141,7 @@ watch(
 )
 onMounted(() => {
   validateSteps()
-  // 进入页面获取最新表单数据, 判断是否有表单被删除
-  configFormRef.value.getFormList().then((res) => {
-    formData.forms = formData.forms.map((m) => ({
-      ...m,
-      isDelete: !res.includes(m.formId),
-    }))
-  })
+  getLatestFormList()
 })
 </script>
 <style scoped lang="less">

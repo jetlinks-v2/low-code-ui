@@ -62,6 +62,7 @@ const validate = (err) => {
     authButtons,
     endProcessWhenReject,
     gotoWhenReject,
+    rejectTo,
     others,
   } = props.config.props
 
@@ -96,7 +97,7 @@ const validate = (err) => {
       errors: ['请选择可参与审批的候选成员'],
       name: ['candidates'],
     })
-  } else if (completeWeight === '' || rejectWeight === '') {
+  } else if (!completeWeight || !rejectWeight) {
     err.push({
       errors: ['请输入权重'],
       name: ['completeWeight', 'rejectWeight'],
@@ -106,12 +107,7 @@ const validate = (err) => {
       errors: ['审批成员可以使用哪些按钮'],
       name: ['authButtons'],
     })
-  } else if (
-    !endProcessWhenReject &&
-    (!gotoWhenReject ||
-      !gotoWhenReject.length ||
-      gotoWhenReject.some((s) => !s))
-  ) {
+  } else if (!endProcessWhenReject && !rejectTo) {
     err.push({
       errors: ['请选择驳回至哪个节点'],
       name: ['gotoWhenReject'],

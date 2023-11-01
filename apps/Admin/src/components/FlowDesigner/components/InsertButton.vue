@@ -98,7 +98,6 @@ const handleAddConcurrents = () => {
       border-radius: 6px;
     }
     &:hover {
-      //   background-color: #fff;
       box-shadow: 0 0 8px 2px #d6d6d6;
     }
     &.approval {
