@@ -7,7 +7,7 @@
     "dev:force": "vite --force",
     "build": "node ./node_modules/vite/bin/vite.js build",
     "preview": "vite preview",
-    "clean": "pnpm rimraf node_modules && pnpm rimraf dist && pnpm rimraf .turbo"
+    "clean": "pnpm rimraf node_modules"
   },
   "dependencies": {
     "@jetlinks/components": "workspace:^",
@@ -27,7 +27,7 @@
     "@wangeditor/editor-for-vue": "^5.1.12",
     "async-validator": "^4.2.5",
     "dayjs": "^1.11.8",
-    "jetlinks-ui-components": "1.0.34-6",
+    "jetlinks-ui-components": "1.0.34-7",
     "lodash-es": "^4.17.21",
     "md5": "^2.3.0",
     "pinia": "^2.1.3",

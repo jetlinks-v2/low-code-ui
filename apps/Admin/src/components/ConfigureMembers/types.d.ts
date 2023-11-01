@@ -5,4 +5,5 @@ export interface DataSourceProps {
   type: string
   groupField?: string
   others?: any
+  isDel?: boolean
 }

@@ -118,8 +118,8 @@ const formRef = ref<any>()
 const form = reactive({
   id: props.data.id,
   name: `copy_${props.data.name}`,
-  // classifiedId: props.data.classifiedId,
-  // icon: props.data.icon,
+  classifiedId: props.data.classifiedId,
+  icon: props.data.icon,
 } as FormType)
 
 // const { data: providerOptions } = useRequest(providerEnum)

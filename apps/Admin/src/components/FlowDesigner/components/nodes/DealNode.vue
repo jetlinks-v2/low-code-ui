@@ -56,14 +56,19 @@ const validate = (err) => {
   errorInfo.value = '未填写必填配置项'
   if (!name) {
     err.push({
-      errors: ['审批节点名称不能为空'],
+      errors: ['办理节点名称不能为空'],
+      name: ['name'],
+    })
+  } else if (name.length > 64) {
+    err.push({
+      errors: ['办理节点名称最多输入64个字符'],
       name: ['name'],
     })
   } else if (!formBinds || !Object.keys(formBinds).length) {
-    err.push({
-      errors: ['请确认当前节点需要候选人办理的表单内容'],
-      name: ['formBinds'],
-    })
+    // err.push({
+    //   errors: ['请确认当前节点需要候选人办理的表单内容'],
+    //   name: ['formBinds'],
+    // })
   } else if (
     !candidates ||
     !Object.keys(candidates).length ||

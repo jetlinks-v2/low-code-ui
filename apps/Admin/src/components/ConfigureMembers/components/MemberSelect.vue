@@ -64,7 +64,7 @@
           >
             <template #title="data">
               <j-ellipsis>
-                <span style="margin-right: 80px;">
+                <span style="margin-right: 80px">
                   {{ data.name }}
                 </span>
               </j-ellipsis>
@@ -108,6 +108,9 @@
           }"
           :scroll="{ y: 230 }"
           class="table-row"
+          :row-class-name="
+            (_record, index) => (_record.isDel ? 'table-del' : null)
+          "
         >
           <template #bodyCell="{ column, text, record }">
             <template v-if="column.key === 'name'">
@@ -116,7 +119,9 @@
                   v-if="infoState.isNode"
                   class="type"
                   :style="{
-                    background: dimensionsColor[record.groupField],
+                    background: record.isDel
+                      ? '#e50012'
+                      : dimensionsColor[record.groupField],
                   }"
                 ></div>
                 <j-tooltip :title="text">
@@ -132,9 +137,9 @@
                   :min="1"
                   :max="99"
                   :precision="0"
-                  :controls="false"
                   v-model:value="record[column.dataIndex]"
-                  style="margin: -5px 0"
+                  style="margin: -5px 0; width: 70px"
+                  :parser="(num) => (!num ? 1 : Number(num))"
                 />
               </div>
               <!-- :bordered="bordered"
@@ -165,13 +170,6 @@ import Relational from './Relational.vue'
 import { treeFilter } from 'jetlinks-ui-components/es/Tree'
 import { defaultColumns, leftData, iconType } from './const'
 import { DataSourceProps } from '../types'
-import {
-  getDepartmentList_api,
-  getAllUser_api,
-  getRoleList_api,
-} from '@/api/user'
-import { getVar_api } from '@/api/member'
-import { detail_api } from '@/api/process/model'
 import { cloneDeep } from 'lodash-es'
 
 const props = defineProps({
@@ -189,20 +187,17 @@ const emits = defineEmits<{
 }>()
 
 // const bordered = ref(false)
-const route = useRoute()
 const infoState: any = inject('infoState')
 // 筛选关键字
 const searchText = ref<string>('')
 const active = ref<string>('')
-// const filterData = ref<any[]>([])
-// 固定/变量/关系数据
-const dataMap = ref<Map<string, any>>(new Map())
-// 变量关系初始数据
-const varRelTree = ref<any[]>([])
+
 // 选中的树节点
 const selectedKeys = ref<string[]>([])
 // 表格数据
 const dataSource = ref<DataSourceProps[]>([])
+// 当前var数据
+const currentVar = ref<any>([])
 
 const columns = computed(() => {
   const _columns = defaultColumns(props.type, infoState.isNode)
@@ -220,7 +215,9 @@ const dimensionsColor = {
 }
 
 const treeData = computed(() => {
-  return dataMap.value.get(active.value) ?? []
+  return active.value === 'var'
+    ? currentVar.value
+    : infoState.dataMap.value.get(active.value) ?? []
 })
 
 const treeDataCom = computed(() => {
@@ -235,60 +232,9 @@ const onSearch = (value: string) => {
   //     : treeData.value
 }
 
-onMounted(() => {
-  if (infoState.isNode) {
-    detail_api(route.query.id as string).then((res) => {
-      if (res.success) {
-        getTree(res.result)
-      }
-    })
-  }
-})
-
-/**
- * 获取变量，关系的树
- */
-const getTree = (data: any) => {
-  const param = {
-    definition: {
-      ...data,
-    },
-    nodeId: infoState.nodeId,
-    // nodeId: 'ROOT_1',
-    containThisNode: true,
-  }
-  getVar_api(param).then((res) => {
-    if (res.success) {
-      varRelTree.value = res.result
-      dataMap.value.set('relation', hasRelation(varRelTree.value))
-    }
-  })
-}
-
-/**
- * 遍历树，如果当前结点对象不包含relation属性，删除当前结点
- * @param data
- */
-const hasRelation = (data: any) => {
-  const cloneData = cloneDeep(data)
-  function delTree(tree) {
-    tree.forEach((item, index) => {
-      if (item.children) {
-        item.disabled = true
-        delTree(item.children)
-      } else if (!item.others?.relation) {
-        tree.splice(index, 1)
-      }
-    })
-  }
-  delTree(cloneData)
-  return cloneData
-}
-
 /**
  * 处理树结构
  * @param data
- * @param type 变量/关系
  */
 const setLevel = (data: any[]) => {
   const cloneData = cloneDeep(data)
@@ -297,7 +243,7 @@ const setLevel = (data: any[]) => {
       item.level = level
       item.id = item.fullId
       item.type = item.others?.type || ''
-      if (level !== 3) {
+      if (level !== 4) {
         item.disabled = true
       }
       if (item.children && item.children.length > 0) {
@@ -310,7 +256,7 @@ const setLevel = (data: any[]) => {
 }
 
 const onSelect = (keys: string[], { node, selected }) => {
-  if (!selected && !infoState.supCancel) return
+  if (!selected) return
   selectedKeys.value = [...keys]
   const index = dataSource.value.findIndex(
     (i) => i.id === (active.value === 'var' ? node.fullId : node.id),
@@ -378,27 +324,21 @@ const handleDel = (id: string) => {
   dataSource.value = dataSource.value.filter((item) => item.id !== id)
 }
 
-const getTreeData = () => {
-  const apiList = [
-    getDepartmentList_api(),
-    getAllUser_api({ paging: false }),
-    getRoleList_api(),
-  ]
-  Promise.all(apiList).then((res) => {
-    dataMap.value.set('org', res[0].result)
-    dataMap.value.set('user', res[1].result)
-    dataMap.value.set('role', res[2].result)
-  })
-}
-getTreeData()
 watch(
   () => props.type,
   () => {
     active.value = props.type
-    dataMap.value.set(
-      'var',
-      treeFilter(setLevel(varRelTree.value), props.type, 'type'),
-    )
+    if (infoState.isNode) {
+      currentVar.value = treeFilter(
+        setLevel(infoState.dataMap.value.get('var')),
+        props.type,
+        'type',
+      )
+      // infoState.dataMap.value.set(
+      //   'var',
+      //   treeFilter(setLevel(infoState.dataMap.value.get('var')), props.type, 'type'),
+      // )
+    }
   },
   { immediate: true },
 )
@@ -406,7 +346,7 @@ watch(
 watch(
   () => [props.type, infoState.members],
   () => {
-    if(!infoState.isNode) return
+    if (!infoState.isNode) return
     dataSource.value = infoState.members.value.filter(
       (i) => i.type === props.type,
     )
@@ -415,12 +355,16 @@ watch(
   { immediate: true },
 )
 
-watch(() => infoState.members, (val) => {
-  if(!infoState.isNode){
-    dataSource.value = [...val.value]
-    selectedKeys.value = dataSource.value.map((item) => item.id)
-  }
-}, { immediate: true })
+watch(
+  () => infoState.members,
+  (val) => {
+    if (!infoState.isNode) {
+      dataSource.value = [...val.value]
+      selectedKeys.value = dataSource.value.map((item) => item.id)
+    }
+  },
+  { immediate: true },
+)
 
 defineExpose({
   dataSource,
@@ -502,7 +446,6 @@ defineExpose({
     // min-width: 200px;
     border: 1px solid #e0e0e0;
     .center-tree {
-
       padding: 16px 27px 16px 13px;
       height: 100%;
       :deep(.ant-tree) {
@@ -545,6 +488,12 @@ defineExpose({
     }
     .table-row {
       padding: 0 10px;
+
+      :deep(.table-del) td {
+        background-color: #fde8ea;
+        color: #e50012;
+      }
+
       :deep(.ant-table-thead > tr > th) {
         background-color: #e9ecf1;
       }

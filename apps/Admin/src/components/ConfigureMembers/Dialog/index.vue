@@ -2,6 +2,7 @@
 <template>
   <j-modal
     visible
+    :maskClosable="false"
     title="配置成员"
     :width="1076"
     @ok="confirm"
@@ -83,21 +84,21 @@ const dimensions = [
     id: '1',
     name: '组织',
     value: 'org',
-    description: '从组织维度划分可发起流程的成员',
+    description: props.isNode ? '从组织维度划分候选人范围' : '从组织维度划分可发起流程的成员',
     checked: true,
   },
   {
     id: '2',
     name: '用户',
     value: 'user',
-    description: '从用户维度划分可发起流程的成员',
+    description: props.isNode ? '从用户维度划分候选人范围' : '从用户维度划分可发起流程的成员',
     checked: false,
   },
   {
     id: '3',
     name: '角色',
     value: 'role',
-    description: '从角色维度划分可发起流程的成员',
+    description: props.isNode ? '从角色维度划分候选人范围' : '从角色维度划分可发起流程的成员',
     checked: false,
   },
 ]

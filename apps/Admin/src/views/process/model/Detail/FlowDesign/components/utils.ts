@@ -152,17 +152,14 @@ export function filterFormByName(list, name) {
     // console.log('list: ', list);
     const _res = []
     list?.forEach(item => {
-        const _fields = item.fullInfo?.configuration?.children || []
+        const _fields = item.configuration?.children || []
         const _filterFields = _fields.filter(f => f.formItemProps.label.includes(name))
         if (_filterFields.length) {
             _res.push({
                 ...item,
-                fullInfo: {
-                    ...item.fullInfo,
-                    configuration: {
-                        ...item.fullInfo.configuration,
-                        children: _filterFields
-                    }
+                configuration: {
+                    ...item.configuration,
+                    children: _filterFields
                 }
             })
         }

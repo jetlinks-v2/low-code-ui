@@ -6,7 +6,7 @@
   "module": "dist/index.d.ts",
   "scripts": {
     "prepack": "pnpm unbuild --stub",
-    "clean": "pnpm rimraf node_modules && pnpm rimraf dist && pnpm rimraf .turbo"
+    "clean": "pnpm rimraf node_modules && pnpm rimraf dist"
   },
   "files": [
     "src",
@@ -41,6 +41,6 @@
   },
   "dependencies": {
     "ant-design-vue": "^3.2.15",
-    "jetlinks-ui-components": "1.0.34-6"
+    "jetlinks-ui-components": "1.0.34-7"
   }
 }
