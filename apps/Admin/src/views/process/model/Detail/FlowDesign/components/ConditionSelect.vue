@@ -64,6 +64,7 @@
       />
       <ConditionValueItem
         v-model:modelValue="item.value"
+        :operator="item.selectedTermType"
         :full-id="findVariableById(conditionOptions, item?.column)?.fullId"
         :conditionType="conditionType(item)"
       />
@@ -152,7 +153,7 @@ const getFormFields = async () => {
       provider,
     },
     nodeId: flowStore.selectedNode.props.branchBy, // 条件节点配置, id传当前条件节点的branchBy
-    containThisNode: true, //变量来源是否包含本节点
+    containThisNode: false, //变量来源是否包含本节点
   }
   const { result } = await queryVariables_api(params)
   addKeys(result)

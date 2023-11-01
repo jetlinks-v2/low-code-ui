@@ -3,15 +3,20 @@
     v-if="normalSelectTypes.includes(conditionType)"
     v-model:value="myValue"
     :options="valueOptions"
+    :mode="['in', 'nin'].includes(operator?.value) ? 'multiple' : 'default'"
     show-search
+    allow-clear
     placeholder="请选择"
     class="value-select"
+    :max-tag-text-length="2"
+    :max-tag-count="1"
     @change="onChange"
   />
   <j-tree-select
     v-else-if="['org','tree-select'].includes(conditionType)"
     v-model:value="myValue"
     v-model:searchValue="searchValue"
+    :mode="['in', 'nin'].includes(operator?.value) ? 'multiple' : 'default'"
     class="value-select"
     show-search
     placeholder="请选择"
@@ -90,6 +95,7 @@ type Props = {
   conditionType: string
   mode?: string
   fullId?: string
+  operator?: Record<string, any>
 }
 const emit = defineEmits<Emits>()
 const props = defineProps<Props>()
@@ -202,7 +208,8 @@ watch(
 
 <style lang="less" scoped>
 .value-select{
-  width: 400px;
+  max-width: 200px;
+  min-width: 200px;
   border: 1px solid #CE29DD;
   color: #CE29DD;
   :deep(.ant-select-selector) {
