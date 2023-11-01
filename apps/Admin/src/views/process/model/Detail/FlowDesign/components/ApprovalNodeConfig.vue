@@ -260,20 +260,21 @@ const saveConfigToStore = () => {
     }
     const { rejectTo, ...others } = memberFormData
     others.gotoWhenReject = [rejectTo]
-    // result.props = {
-    //   ...result.props,
-    //   ...basicFormData,
-    //   ...others,
-    // }
-    // #19583
-    result = {
-      ...result,
-      props: {
-        ...result.props,
-        ...basicFormData,
-        ...others,
-      },
+    // #19514
+    result.props = {
+      ...result.props,
+      ...basicFormData,
+      ...others,
     }
+    // #19583
+    // result = {
+    //   ...result,
+    //   props: {
+    //     ...result.props,
+    //     ...basicFormData,
+    //     ...others,
+    //   },
+    // }
     resolve(result)
   })
 }
