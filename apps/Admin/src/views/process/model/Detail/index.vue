@@ -50,9 +50,12 @@
       </div>
     </j-card>
     <FullPage>
-      <j-card :bordered="false">
+<!--      <j-card :bordered="false">-->
+<!--        <component ref="stepRef" :is="componentsMap[current]" />-->
+<!--      </j-card>-->
+      <div style="height: 100%;padding: 24px;">
         <component ref="stepRef" :is="componentsMap[current]" />
-      </j-card>
+      </div>
     </FullPage>
 
     <!-- 隐藏域, 仅用于部署校验每一步数据, noQuery: 不查询接口 -->
@@ -257,7 +260,7 @@ onBeforeRouteLeave((to, form, next) => {
   }else{
     next()
   }
-  
+
 })
 onBeforeRouteUpdate((to, from, next)=>{
   if(!isModal.value){
