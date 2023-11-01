@@ -6,6 +6,7 @@
       :mode="'default'"
       @onCreated="handleCreated"
       @onChange="onChange"
+      v-model="editorHtml"
     />
     <div class="select">
       <j-select
@@ -29,6 +30,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  data: {
+    type: String,
+    default: '',
+  },
   variables: {
     type: Array,
     default: () => [],
@@ -39,15 +44,16 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['update:value', 'change'])
+const emits = defineEmits(['update:value', 'update:data'])
 const editorRef = shallowRef()
+const editorHtml = ref(props.value || '')
 
 // // 正则匹配{}中间内容，并替换成<span style="color: 随机颜色"></span>
-const replace = (str: string) => {
-  return str.replace(/\n/g, '<br/>').replace(/\{(.*?)\}/g, ($1, $2) => {
-    return `<span style="color: ${getColor($2)}">${$1}</span>`
-  })
-}
+// const replace = (str: string) => {
+//   return str.replace(/\n/g, '<br/>').replace(/\{(.*?)\}/g, ($1, $2) => {
+//     return `<span style="color: ${getColor($2)}">${$1}</span>`
+//   })
+// }
 
 // 根据选择的变量找出颜色
 const getColor = (str: string) => {
@@ -62,8 +68,7 @@ watch(
   () => [props.value, editorRef.value],
   () => {
     if (editorRef.value) {
-      const _val = replace(props.value || '')
-      editorRef.value?.setHtml('<p>' + _val + '</p>')
+        editorHtml.value = props.value
     }
   },
   {
@@ -72,12 +77,12 @@ watch(
 )
 
 const selectVariable = (_, { label }) => {
-    const val = (props?.value || '') + `{${label}}`
-    emits('change', val)
+    editorRef.value?.insertNode({ type: 'span', color: `${getColor(label)}`, text: `{${label}}` })
 }
 
 const onChange = () => {
-  emits('change', editorRef.value?.getText())
+  emits('update:data', editorRef.value?.getText())
+  emits('update:value', editorHtml.value)
 }
 
 onBeforeUnmount(() => {

@@ -43,11 +43,35 @@ const flowStore = useFlowStore()
 const formRef = ref()
 const configFormRef = ref()
 
+const getData = (arr: any[]) => {
+  return arr.map((i) => {
+    return {
+      id: i.formItemProps?.name, //字段id
+      required: i.formItemProps?.required, //是否必填
+      accessModes: [
+        'read',
+      ],
+      children: getData(i?.children || [])
+    }
+  })
+}
+
+const formToObj = (arr: any[]) => {
+  const obj: any = {}
+  arr.map((item) => {
+    obj[item.formId] = getData(item.fullInfo?.configuration?.children || [])
+  })
+  return obj
+}
+
 const formData = reactive({
   forms: computed({
     get: () => flowStore.model.config.forms || [],
     set: (val) => {
       flowStore.model.config.forms = val
+      if (!flowStore.model?.nodes?.props?.formBinds?.length) {
+        flowStore.model.nodes.props!.formBinds = formToObj(val)
+      }
     },
   }),
   assignedUser: computed({
