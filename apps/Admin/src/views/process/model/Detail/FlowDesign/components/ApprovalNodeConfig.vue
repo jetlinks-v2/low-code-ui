@@ -103,7 +103,7 @@
               </template>
               <j-input-number
                 :min="1"
-                :max="999999"
+                :max="99999"
                 v-model:value="memberFormData.completeWeight"
                 :precision="0"
                 :defaultValue="1"
@@ -125,7 +125,7 @@
               </template>
               <j-input-number
                 :min="1"
-                :max="999999"
+                :max="99999"
                 v-model:value="memberFormData.rejectWeight"
                 :precision="0"
                 style="width: 100%"
