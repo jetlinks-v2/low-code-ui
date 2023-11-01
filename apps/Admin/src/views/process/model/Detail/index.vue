@@ -44,7 +44,11 @@
               </j-tooltip>
             </template>
           </j-button>
-          <j-button type="primary" @click="handleDeploy">
+          <j-button
+            type="primary"
+            @click="handleDeploy"
+            :disabled="flowDetail?.state?.value === 'deployed'"
+          >
             部署
             <template #icon>
               <j-tooltip placement="right">
@@ -117,8 +121,10 @@ const oldData = ref({
 /**
  * 获取模型详情
  */
+const flowDetail = ref<any>({})
 const getFlowDetail = async () => {
   const { result } = await detail_api(route.query.id as string)
+  flowDetail.value = result
   const model = JSON.parse(result.model || '{}')
   //   console.log('model: ', model)
 
