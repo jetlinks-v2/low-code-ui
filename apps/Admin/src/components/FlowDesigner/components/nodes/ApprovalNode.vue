@@ -62,6 +62,7 @@ const validate = (err) => {
     authButtons,
     endProcessWhenReject,
     gotoWhenReject,
+    rejectTo,
     others,
   } = props.config.props
 
@@ -106,12 +107,7 @@ const validate = (err) => {
       errors: ['审批成员可以使用哪些按钮'],
       name: ['authButtons'],
     })
-  } else if (
-    !endProcessWhenReject &&
-    (!gotoWhenReject ||
-      !gotoWhenReject.length ||
-      gotoWhenReject.some((s) => !s))
-  ) {
+  } else if (!endProcessWhenReject && !rejectTo) {
     err.push({
       errors: ['请选择驳回至哪个节点'],
       name: ['gotoWhenReject'],
