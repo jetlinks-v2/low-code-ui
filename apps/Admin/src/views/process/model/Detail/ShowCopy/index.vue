@@ -83,7 +83,11 @@
         />
       </j-form-item>
       <TitleComponent data="抄送配置" />
-      <j-form-item name="ccMember" label="配置该流程需要抄送的成员">
+      <j-form-item
+        name="ccMember"
+        label="配置该流程需要抄送的成员"
+        v-if="!noQuery"
+      >
         <ConfigureMembers
           :hasWeight="false"
           nodeId="ROOT_1"
@@ -106,8 +110,8 @@ const flowStore = useFlowStore()
 const props = defineProps({
   noQuery: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 // 初始变量
@@ -137,7 +141,7 @@ const formatToName = (val: string = '') => {
  * 表单内的变量展示到弹窗
  * 其他变量展示到外面
  */
- const getVariables = async () => {
+const getVariables = async () => {
   const { id, name, key, model, provider } = flowStore.modelBaseInfo
   if (!id || props.noQuery) return
   const params = {
@@ -232,7 +236,6 @@ const validateSteps = () => {
       })
   })
 }
-
 
 onMounted(() => {
   getVariables()
