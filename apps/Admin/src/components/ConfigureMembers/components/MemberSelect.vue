@@ -139,7 +139,7 @@
                   :precision="0"
                   v-model:value="record[column.dataIndex]"
                   style="margin: -5px 0; width: 70px"
-                  :parser="(num) => (!num ? 1 : Number(num))"
+                  :parser="(num) => (!num ? 1 : isNaN(Number(num)) ? 1 : num)"
                 />
               </div>
               <!-- :bordered="bordered"

@@ -197,13 +197,16 @@ const saveBranchWeight = () => {
 }
 
 /**
- * 关闭弹窗时, 不保存输入值, 恢复原有数据
+ * 关闭弹窗时, 不保存输入值
  */
 const handleCancel = () => {
   // 原有的分支权重
   const _oldNodeWeight = basicFormData.weight.inputNodeWeight
+  // 如果有原始数据则恢复原有数据, 否则恢复默认值1
   branchFormItem.value.forEach((item) => {
-    branchFormData.value[item.name] = _oldNodeWeight[item.name]
+    branchFormData.value[item.name] = Object.keys(_oldNodeWeight).length
+      ? _oldNodeWeight[item.name]
+      : 1
   })
   visible.value = false
 }
