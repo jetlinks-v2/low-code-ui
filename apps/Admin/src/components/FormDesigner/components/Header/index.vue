@@ -51,7 +51,7 @@
           type="primary"
           hasPermission="code:form_save"
         >
-          新增
+          保存
         </PermissionButton>
         <!-- <j-button type="primary" @click="onSave">保存</j-button> -->
       </j-space>
