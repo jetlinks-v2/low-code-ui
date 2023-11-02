@@ -49,7 +49,7 @@
         <PermissionButton
           @click="onSave"
           type="primary"
-          hasPermission="code:form_save"
+          hasPermission="workflow:form_save"
         >
           保存
         </PermissionButton>
