@@ -60,11 +60,7 @@
               </j-tooltip>
             </template>
           </j-button> -->
-          <j-button
-            type="primary"
-            @click="handleDeploy"
-            :disabled="flowDetail?.state?.value === 'deployed'"
-          >
+          <j-button type="primary" @click="handleDeploy" :disabled="!isChange">
             部署
             <template #icon>
               <j-tooltip placement="right">
@@ -304,19 +300,19 @@ const routerChange = (next?: Function) => {
   })
 }
 
+// 数据是否更改
+const isChange = computed(
+  () => JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model),
+)
 onBeforeRouteLeave((to, form, next) => {
-  const isChange =
-    JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model)
-  if (!isModal.value && isChange) {
+  if (!isModal.value && isChange.value) {
     routerChange(next)
   } else {
     next()
   }
 })
 onBeforeRouteUpdate((to, from, next) => {
-  const isChange =
-    JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model)
-  if (!isModal.value && isChange) {
+  if (!isModal.value && isChange.value) {
     routerChange(next)
   } else {
     next()
