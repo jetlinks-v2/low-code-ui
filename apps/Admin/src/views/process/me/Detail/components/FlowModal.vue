@@ -50,7 +50,7 @@ const props = defineProps({
         type: Object,
         default:{}
     },
-    comment:{
+    defaultComment:{
         type: String,
         default: ''
     }
@@ -74,7 +74,7 @@ const tabs = [{
 const user = ref({})
 const formRef = ref()
 const modelRef = reactive({
-    comment: undefined,
+    comment:props?.defaultComment|| undefined,
     user: 'none'
 })
 const approverOptions = ref<any[]>([{
