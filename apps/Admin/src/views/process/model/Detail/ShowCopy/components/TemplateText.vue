@@ -81,23 +81,26 @@ watch(
 )
 
 const selectVariable = (_, { label }) => {
-    // editorRef.value?.insertNode({ type: 'span', color: `${getColor(label)}`, text: `{${label}}` })
-  const at = pointer.start === pointer.end ? [pointer.start] : [pointer.start, pointer.end]
-  const node = { type: 'insert_text', children: [{ type: 'span', color: `${getColor(label)}`, text: `{${label}}` }] }
-  SlateTransforms.insertNodes(editorRef.value, [node], { at })
+    editorRef.value?.insertNode({ type: 'span', color: `${getColor(label)}`, text: `{${label}}` })
+  // // const at = pointer.start === pointer.end ? [pointer.start] : [pointer.start, pointer.end]
+  // const at = [pointer.start]
+  // const node = { type: 'span', children: [{ type: 'span', color: `${getColor(label)}`, text: `{${label}}` }] }
+  // if (editorRef.value) {
+  //   SlateTransforms.insertNodes(editorRef.value, [node], { at: [2] })
+  // }
 }
 
 const onChange = debounce((e) => {
   emits('update:data', editorRef.value?.getText())
   emits('update:value', editorHtml.value)
 
-  if (e.selection) {
-    console.log(e.selection, )
-    const selection = e.selection
-    const range = [selection.focus.offset, selection.anchor.offset].sort()
-    pointer.start = range[0]
-    pointer.end = range[1]
-  }
+  // if (e.selection) {
+  //   console.log(e.selection, )
+  //   const selection = e.selection
+  //   const range = [selection.focus.offset, selection.anchor.offset].sort()
+  //   pointer.start = range[0]
+  //   pointer.end = range[1]
+  // }
 
 }, 500)
 
