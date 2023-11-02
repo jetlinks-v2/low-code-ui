@@ -111,8 +111,8 @@ const FlowDesigner = defineComponent({
           h(
             'div',
             { class: { 'add-branch-btn': true, 'read-only': readOnly } },
-            {
-              default: h(
+            [
+              h(
                 BranchButton,
                 {
                   class: { 'add-branch-btn-el': true },
@@ -123,9 +123,8 @@ const FlowDesigner = defineComponent({
                   onAddBranchNode: (type) => addBranchNode(node, type),
                   onOpenConfig: () => openConfig(node),
                 },
-              ),
-            },
-            []
+              )
+            ]
           ),
         )
         let bchDom = [h('div', { class: { 'branch-node': true } }, branchItems)]
@@ -653,13 +652,20 @@ const FlowDesigner = defineComponent({
         setEmptyNodeProps(dom.value)
       }, 300)
 
-      return (
-        <div ref={DragRef} class={'drag-warp'}>
-          <div class={'_root'}>
-            {processTrees}
-          </div>
-          { ScaleRender(enlarge, zoomOut, scale.value) }
-        </div>
+      return h('div', {
+          ref: DragRef,
+          class: 'drag-warp'
+        },
+        [
+          h(
+            'div',
+            {
+              class: { _root: true },
+            },
+            processTrees,
+          ),
+          ScaleRender(enlarge, zoomOut, scale.value)
+        ]
       )
     }
   },
