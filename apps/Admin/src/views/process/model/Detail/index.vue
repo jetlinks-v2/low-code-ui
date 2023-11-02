@@ -72,7 +72,7 @@
         </div>
       </div>
     </j-card>
-    <FullPage>
+    <FullPage :minHeight="current !== 1">
       <!--      <j-card :bordered="false">-->
       <!--        <component ref="stepRef" :is="componentsMap[current]" />-->
       <!--      </j-card>-->
@@ -146,6 +146,7 @@ const getFlowDetail = async () => {
 
   flowStore.setModel(model)
   flowStore.setModelBaseInfo(result)
+
 }
 
 /**
