@@ -33,7 +33,12 @@
             :loading="nextLoading"
             >下一步</j-button
           >
-          <j-button type="primary" @click="handleSave" :loading="saveLoading">
+          <PermissionButton
+            type="primary"
+            @click="handleSave"
+            :loading="saveLoading"
+            hasPermission="code:release_save"
+          >
             保存
             <template #icon>
               <j-tooltip placement="right">
@@ -43,7 +48,18 @@
                 <AIcon type="QuestionCircleOutlined" />
               </j-tooltip>
             </template>
-          </j-button>
+          </PermissionButton>
+          <!-- <j-button type="primary" @click="handleSave" :loading="saveLoading">
+            保存
+            <template #icon>
+              <j-tooltip placement="right">
+                <template #title>
+                  仅保存配置数据，不校验填写内容的合规性。
+                </template>
+                <AIcon type="QuestionCircleOutlined" />
+              </j-tooltip>
+            </template>
+          </j-button> -->
           <j-button
             type="primary"
             @click="handleDeploy"
@@ -128,13 +144,12 @@ const getFlowDetail = async () => {
   flowDetail.value = result
   const model = JSON.parse(result.model || '{}')
   //   console.log('model: ', model)
-  if(result.model!==''){
+  if (result.model !== '') {
     oldData.value = cloneDeep(model)
   }
 
   flowStore.setModel(model)
   flowStore.setModelBaseInfo(result)
- 
 }
 
 /**
@@ -290,7 +305,8 @@ const routerChange = (next?: Function) => {
 }
 
 onBeforeRouteLeave((to, form, next) => {
-  const isChange = JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model)
+  const isChange =
+    JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model)
   if (!isModal.value && isChange) {
     routerChange(next)
   } else {
@@ -298,7 +314,8 @@ onBeforeRouteLeave((to, form, next) => {
   }
 })
 onBeforeRouteUpdate((to, from, next) => {
-  const isChange = JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model)
+  const isChange =
+    JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model)
   if (!isModal.value && isChange) {
     routerChange(next)
   } else {
