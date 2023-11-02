@@ -90,7 +90,7 @@
                   <div class="field-title">
                     <div class="name">
                       <j-ellipsis line-clamp="1">
-                        {{ field.formItemProps?.label }}
+                        {{ field.formItemProps?.label || field.name }}
                       </j-ellipsis>
                     </div>
                     <div class="permission">
