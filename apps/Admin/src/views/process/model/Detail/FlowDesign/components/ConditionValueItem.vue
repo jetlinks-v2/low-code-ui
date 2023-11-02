@@ -8,8 +8,8 @@
     allow-clear
     placeholder="请选择"
     class="value-select"
-    :max-tag-text-length="1"
-    :max-tag-count="2"
+    :max-tag-text-length="myValue?.length > 1 ? 1 : 6"
+    :max-tag-count="1"
     @change="onChange"
   />
   <j-tree-select
@@ -17,8 +17,8 @@
     v-model:value="myValue"
     v-model:searchValue="searchValue"
     :multiple="['in', 'nin'].includes(operator?.value)"
-    :max-tag-text-length="1"
-    :max-tag-count="2"
+    :max-tag-text-length="myValue?.length > 1 ? 1 : 6"
+    :max-tag-count="1"
     class="value-select"
     show-search
     placeholder="请选择"
@@ -77,6 +77,7 @@
     v-model:value="myValue"
     class="value-select"
     @change="onChange"
+    maxlength="64"
     placeholder="请输入"
   />
 </template>
@@ -88,7 +89,10 @@ import {
   getUser_api,
   getProduct_api,
   getDevice_api,
+  queryFormNoPage_api
 } from '@/api/process/model'
+import { queryRuntime, queryDictionaryData } from '@/api/form'
+import { useFlowStore } from '@/store/flow'
 type Emits = {
   (e: 'update:modelValue', data: string | number | boolean): void
 }
@@ -97,8 +101,11 @@ type Props = {
   conditionType: string
   mode?: string
   fullId?: string
-  operator?: Record<string, any>
+  operator?: Record<string, any>,
+  formItemComponent?: string
 }
+
+const flowStore = useFlowStore()
 const emit = defineEmits<Emits>()
 const props = defineProps<Props>()
 
@@ -162,6 +169,47 @@ const onChange = (e) => {
   emit('update:modelValue', myValue.value)
 }
 
+/**类型是表单里的下拉框时 */
+const findValueOptions = async () => {
+  const existForms = flowStore.model.config.forms?.filter((f) => !f.isDelete)
+  // 查询预览表单参数
+  const params = {
+    paging: false,
+    terms: [
+      {
+        column: 'key',
+        termType: 'in',
+        value: existForms?.map((m) => m.formId),
+      },
+      {
+        column: 'latest',
+        termType: 'eq',
+        value: 'true',
+      },
+    ],
+  }
+  const {result} = await queryFormNoPage_api(params)
+  const source = searchTree(result?.[0].configuration.children, props.formItemComponent)?.componentProps?.source
+  console.log(source);
+  if(source?.type === 'end') {
+    const { result } = await queryRuntime(source.projectId, source.fullId, source.commandId, {})
+    valueOptions.value = result?.[source.source]?.map(item => {
+      return {
+        label: item?.[source.label],
+        value: item?.[source.value]
+      }
+    })
+  } else if(source?.type === 'dic') {
+    const { result } = await queryDictionaryData(source.dictionary)
+    valueOptions.value = result?.map(item => {
+      return {
+        label: item.text,
+        value: item.value
+      }
+    })
+  }
+}
+
 watch(
   () => props.modelValue,
   () => {
@@ -170,9 +218,9 @@ watch(
   { deep: true, immediate: true },
 )
 watch(
-  () => props.conditionType,
+  () => [props.conditionType, props.fullId],
   (val) => {
-    switch (val) {
+    switch (val[0]) {
       case 'role':
         getRoleOptions()
         break
@@ -200,18 +248,44 @@ watch(
           },
         ]
         break
+      case 'select':
+        // 过滤已经删除的表单
+        findValueOptions()
+        break
       default:
         break
     }
   },
   { deep: true, immediate: true },
 )
+
+const searchTree = (arr: any[], _item: any) => {
+    let _data: any = undefined
+    arr?.map((item) => {
+        if (item.key === _item) {
+            _data = item
+            return
+        }
+        if (item.children?.length) {
+            _data = searchTree(item.children, _item)
+        }
+    })
+    return _data
+}
+
+watch(() => props.operator?.value, (newVal, oldVal) => {
+  if(['in', 'nin'].includes(newVal) && ['eq', 'neq'].includes(oldVal)) {
+    myValue.value = []
+  } else if(['eq', 'neq'].includes(newVal) && ['in', 'nin'].includes(oldVal)) {
+    myValue.value = undefined
+  }
+})
 </script>
 
 <style lang="less" scoped>
 .value-select{
-  max-width: 200px;
-  min-width: 200px;
+  max-width: 170px;
+  min-width: 170px;
   border: 1px solid #CE29DD;
   color: #CE29DD;
   :deep(.ant-select-selector) {

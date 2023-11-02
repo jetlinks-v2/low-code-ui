@@ -117,13 +117,12 @@ const generatorData = (node: any) => {
     if (!result.key) {
         result.key = `${result.type}_${uid()}`
     }
-    if ((checkIsField(result) || result.type === 'card') && result.type !== 'table-item') {
+    if (checkIsField(result) && result.type !== 'table-item') {
         result.formItemProps = handleFormItemProps(result)
     }
 
-    if (result.type === 'grid' || result.type === 'space' || result.type === 'collapse' || result.type === 'tabs') {
+    if (result.type === 'card' || result.type === 'grid' || result.type === 'space' || result.type === 'collapse' || result.type === 'tabs') {
         result.formItemProps = {
-            name: result?.key,
             isLayout: false
         }
     }

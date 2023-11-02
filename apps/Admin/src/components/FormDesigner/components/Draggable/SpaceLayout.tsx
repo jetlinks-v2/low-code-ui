@@ -85,7 +85,7 @@ export default defineComponent({
                                                     data={element.children}
                                                     parent={element}
                                                     path={_path}
-                                                    index={_index + 1}
+                                                    index={_index}
                                                     visible={props.visible}
                                                     editable={props.editable}
                                                 />

@@ -33,7 +33,7 @@ export const upperCase = (str: string, reg?: RegExp) => {
 /**
  * 判断是否为图片地址
  */
-export const isImg = (str: string) => {
+export const isImg = (str: string | undefined) => {
   const _reg = /\.(jpg|jpeg|png|gif).*$/i
-  return _reg.test(str)
+  return str && _reg.test(str)
 }

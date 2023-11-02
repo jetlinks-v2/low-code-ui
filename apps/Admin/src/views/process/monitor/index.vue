@@ -1,15 +1,26 @@
 <!-- 流程监控 -->
 <template>
   <page-container>
-    <div class="tab">
-      <j-radio-group v-model:value="history" button-style="solid">
-        <j-space>
-          <j-radio-button :value="false">流转中</j-radio-button>
-          <j-radio-button :value="true">已完成</j-radio-button>
-        </j-space>
-      </j-radio-group>
+    <div class="tabs">
+      <j-tabs v-model:activeKey="history" @change="change">
+        <j-tab-pane :key="false">
+          <template #tab>
+          <div class="tab-item" :class="{active: !history }">
+            流转中
+          </div>
+        </template>
+          <pro-search :columns="columns" target="monitor-false" @search="handleSearch" />
+        </j-tab-pane>
+        <j-tab-pane :key="true">
+          <template #tab>
+          <div class="tab-item" :class="{active: history }">
+            已完成
+          </div>
+        </template>
+          <pro-search :columns="columns" target="monitor-true" @search="handleSearch" />
+        </j-tab-pane>
+      </j-tabs>
     </div>
-    <pro-search :columns="columns" target="monitor" @search="handleSearch" />
     <JProTable
       ref="tableRef"
       model="table"
@@ -93,6 +104,7 @@ import dayjs from 'dayjs'
 import { useClassified } from '@/hooks/useClassified'
 import Drawer from '@/views/process/me/Detail/index.vue'
 
+const activeKey = ref('1')
 const { classified, getText } = useClassified()
 const tableRef = ref()
 const history = ref(false)
@@ -223,6 +235,12 @@ const columns = computed(() => {
 // const key = computed(() => {
 
 // })
+const change = ()=>{
+  nextTick(()=>{
+    params.value={}
+  })
+  tableRef?.value?.reload()
+}
 
 const params = ref({})
 
@@ -253,24 +271,35 @@ const handleDetail = (row) => {
 }
 </script>
 <style scoped lang="less">
-.tab {
-  height: 48px;
-  border-bottom: 1px solid #d9d9d9;
-  padding: 10px 16px;
-  background: #ffffff;
-  :deep(.ant-radio-button-wrapper) {
-    border-radius: 4px;
-    border: none;
-    &:hover {
-      color: #315efb;
-      background: #e4eaff;
-      border: none;
+.tabs{
+  :deep(.ant-tabs) {
+    border: 1px solid #f0f0f0;
+    .ant-tabs-nav {
+      padding-left: 16px;
+      background: #fff;
+      margin: 0;
+      border-bottom: 1px solid #d9d9d9;
+
+      .tab-item{
+        width: 96px;
+        height: 28px;
+        border-radius: 4px;
+        text-align: center;
+        line-height: 28px;
+        color: #333333;
+        &:hover {
+          background: #E4EAFF;
+        }
+      }
+      .active{
+        color: #315EFB;
+        background: #E4EAFF;
+
+      }
     }
-  }
-  :deep(.ant-radio-button-wrapper-checked) {
-    color: #315efb;
-    background: #e4eaff;
-    border: none;
+    .ant-tabs-ink-bar {
+      background-color: transparent;
+    }
   }
 }
 </style>

@@ -203,14 +203,28 @@ const props = defineProps({
     min-height: 80px;
     max-height: 120px;
     position: relative;
-    border-radius: 5px;
+    border-radius: 4px;
     background-color: white;
-    box-shadow: 0px 0px 5px 0px #d8d8d8;
+    box-shadow: 0px 0px 6px 0px #d8d8d8;
 
     &:hover {
-      box-shadow: 0px 0px 3px 0px #1890ff;
+      box-shadow: 0px 0px 6px 0px #1890ff;
+
+      .node-body-left{
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+      }
+
+      .node-body-right{
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+      }
+
       .node-body-left,
       .node-body-right {
+
+        transition: all .3s;
+
         .anticon {
           display: block !important;
         }
