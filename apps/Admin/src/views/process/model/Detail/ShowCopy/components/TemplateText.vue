@@ -32,10 +32,6 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  data: {
-    type: String,
-    default: '',
-  },
   variables: {
     type: Array,
     default: () => [],
@@ -46,7 +42,7 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['update:value', 'update:data'])
+const emits = defineEmits(['update:value'])
 
 // 绑定节点
 const hide = ref() // 隐藏的输入框的节点
@@ -81,7 +77,6 @@ watch(
 
 const onChange = (e) => {
   emits('update:value', e.target.value)
-  console.log(window.getSelection())
 }
 
 const selectVariable = (_, { label }) => {
