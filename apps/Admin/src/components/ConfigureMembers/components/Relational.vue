@@ -5,7 +5,7 @@
       <j-tree
         :multiple="multiple"
         block-node
-        :tree-data="treeData"
+        :tree-data="relationTreeData"
         :selectedKeys="selectedKeys"
         :fieldNames="{ children: 'children', title: 'name', key: 'id' }"
         :height="300"
@@ -17,7 +17,7 @@
           </j-ellipsis>
         </template>
       </j-tree>
-      <j-empty v-if="treeData.length < 1" />
+      <j-empty v-if="relationTreeData && relationTreeData.length < 1" />
     </div>
     <div class="subject-rel">
       <div class="title">
@@ -59,6 +59,7 @@
 import { onlyMessage } from '@jetlinks/utils'
 import { DataSourceProps } from '../types'
 import { getRelation_api } from '@/api/member'
+import { cloneDeep } from 'lodash-es'
 
 const props = defineProps({
   type: {
@@ -79,6 +80,13 @@ const emits = defineEmits<{
   (e: 'rel-submit', subject: any, data: any): void
 }>()
 
+// 流程表单项
+const hasFrom = {
+  org: ['product', 'device', 'user'],
+  user: ['product', 'device', 'org', 'user', 'role'],
+  role: ['user'],
+}
+
 const multiple = ref<boolean>(false)
 const selectedKeys = ref<string[]>([])
 // 关系数据
@@ -87,6 +95,54 @@ const relSelectedKeys = ref<string[]>([])
 // 暂存需要添加到表格的数据
 const intermediateData = ref<any>({})
 const currentSub = ref<any>({})
+
+const relationTreeData = computed(() => {
+  return filterAndDeleteEmptyParents(cloneDeep(props.treeData), (item) => {
+    if (item.others && item.others.relation) {
+      return (
+        hasFrom[props.type].includes(item.others.type) ||
+        !item.fullId.includes('form')
+      )
+    } else {
+      return false
+    }
+  })
+})
+
+/**
+ * 根据维度过滤关系数据
+ * @param data 初始数据
+ * @param fun 条件函数
+ */
+function filterAndDeleteEmptyParents(data: any, fun: (item: any) => boolean) {
+  // 递归过滤掉最后一个层级中others没有relation的数据
+  function filterNodes(nodes) {
+    return nodes.filter((node) => {
+      if (node.children) {
+        node.children = filterNodes(node.children)
+        return node.children.length > 0
+      } else {
+        return fun(node)
+      }
+    })
+  }
+  // 递归删除父节点的children为空的节点
+  function deleteEmptyParents(nodes) {
+    nodes.forEach((node) => {
+      if (node.children) {
+        node.disabled = true
+        deleteEmptyParents(node.children)
+        if (node.children.length === 0) {
+          delete node.children
+        }
+      }
+    })
+  }
+  const filteredData = filterNodes(data)
+  deleteEmptyParents(filteredData)
+  return filteredData[0]?.children
+}
+
 const onSelect = (keys: string[], { node }: { node: any }) => {
   currentSub.value = node
   intermediateData.value = {}
@@ -141,16 +197,27 @@ const relSubmit = () => {
   height: 100%;
 
   :deep(.ant-tree) {
-    .ant-tree-switcher{
+    .ant-tree-treenode-disabled {
+      .ant-tree-node-content-wrapper {
+        &:hover {
+          color: rgba(0, 0, 0, 0.25) !important;
+        }
+      }
+    }
+    .ant-tree-treenode {
+      .ant-tree-node-content-wrapper {
+        &:hover {
+          color: #315efb;
+        }
+      }
+    }
+    .ant-tree-switcher {
       height: 32px;
       line-height: 32px;
     }
     .ant-tree-title {
       height: 32px;
       line-height: 32px;
-      &:hover {
-        color: #315efb;
-      }
     }
   }
   .subject {

@@ -77,10 +77,16 @@
             :class="{ active: form.icon === selected }"
           >
             <ImageUpload
+              v-if="isImg(selected)"
               class="upload"
               v-model:value="selected"
               :accept="accept"
               style="width: 60px; height: 60px"
+            />
+            <AIcon
+              v-else
+              :type="form.icon ?? 'PlusOutlined'"
+              :style="{ fontSize: form.icon ? '16px' : '' }"
             />
             <div>自定义</div>
           </j-radio-button>
