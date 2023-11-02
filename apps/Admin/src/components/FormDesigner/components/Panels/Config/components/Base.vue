@@ -173,6 +173,7 @@
         <!-- <template> -->
         <j-form-item
           label="标识"
+          v-if="target.formItemProps.isLayout"
           :name="['formItemProps', 'name']"
           required
           :validateFirst="true"
@@ -370,7 +371,7 @@
           </j-form-item>
         </template>
       </template>
-      <template v-if="['grid', 'space'].includes(type)">
+      <!-- <template v-if="['grid', 'space'].includes(type)">
         <j-form-item
           label="标识"
           :name="['formItemProps', 'name']"
@@ -385,7 +386,7 @@
             v-model:value="target.formItemProps.name"
           />
         </j-form-item>
-      </template>
+      </template> -->
       <template v-if="['tabs'].includes(type)">
         <j-form-item
           :validateFirst="true"
