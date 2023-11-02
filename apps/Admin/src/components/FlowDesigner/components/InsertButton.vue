@@ -51,7 +51,7 @@ import { computed } from 'vue'
 
 const emits = defineEmits(['insertNode'])
 const flowStore = useFlowStore()
-const isEmptyNode = inject('isEmptyNode')
+const isEmptyNode = inject('isEmptyNode', false)
 const selectedNode = computed(() => flowStore.selectedNode)
 
 const visible = ref(false)
