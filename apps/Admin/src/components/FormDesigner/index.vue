@@ -366,7 +366,7 @@ watch(
   () => props.data,
   (newVal) => {
     if(props.type === 'workflow') {
-      formData.value = cloneDeep(newVal) || cloneDeep(initData)
+      formData.value = newVal && Object.keys(newVal)?.length ? cloneDeep(newVal) : cloneDeep(initData)
     } else {
         try {
         const obj = JSON.parse(newVal?.configuration?.code)

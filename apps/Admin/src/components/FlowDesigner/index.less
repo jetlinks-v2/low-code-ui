@@ -2,6 +2,32 @@
 ._root-dragging {
 
 }
+.drag-warp {
+  overflow: hidden;
+  height: 100%;
+  position: relative;
+
+  .flow-designer-tool {
+    position: absolute;
+    display: flex;
+    gap: 6px;
+    top: 10px;
+    left: 20px;
+
+    .tool-item {
+      padding: 4px;
+      border: 1px solid #e3e3e3;
+      border-radius: 2px;
+      cursor: pointer;
+      user-select: none;
+      background-color: #fff;
+
+      &.btn {
+        padding: 4px 10px;
+      }
+    }
+  }
+}
 ._root {
   margin: 0 auto;
   height: 100%;

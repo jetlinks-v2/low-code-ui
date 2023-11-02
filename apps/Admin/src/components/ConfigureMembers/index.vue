@@ -239,33 +239,14 @@ const getTree = (data: any) => {
       model: JSON.stringify(flowStore.model),
     },
     nodeId: props.nodeId,
-    containThisNode: props.nodeId === 'ROOT_1'
+    containThisNode: props.nodeId === 'ROOT_1',
   }
   getVar_api(param).then((res) => {
     if (res.success) {
       dataMap.value.set('var', res.result)
-      dataMap.value.set('relation', hasRelation(res.result))
+      dataMap.value.set('relation', res.result)
     }
   })
-}
-/**
- * 遍历树，如果当前结点对象不包含relation属性，删除当前结点
- * @param data
- */
-const hasRelation = (data: any) => {
-  const cloneData = cloneDeep(data)
-  function delTree(tree) {
-    tree.forEach((item, index) => {
-      if (item.children) {
-        item.disabled = true
-        delTree(item.children)
-      } else if (!item.others?.relation) {
-        tree.splice(index, 1)
-      }
-    })
-  }
-  delTree(cloneData)
-  return cloneData
 }
 
 const getRelation = async () => {
