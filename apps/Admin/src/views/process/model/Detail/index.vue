@@ -211,7 +211,7 @@ const handleSave = (type?: string) => {
         isModal.value = true
         router.go(-1)
       }
-      //   getFlowDetail()
+      //   getFlowDetail() #19297 此处调用详情会报错闪一下
     })
     .finally(() => {
       saveLoading.value = false
