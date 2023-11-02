@@ -194,9 +194,9 @@ const columnsTodo = [
         ellipsis: true,
         scopedSlots: true,
         hideInTable: true,
-        search: {
-            type: 'date',
-        },
+        // search: {
+        //     type: 'date',
+        // },
     },
     {
         title: '操作',

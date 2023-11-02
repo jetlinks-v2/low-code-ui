@@ -254,26 +254,33 @@ const getRejectNodes = (nodeId) => {
  */
 const saveConfigToStore = () => {
   return new Promise((resolve, reject) => {
-    let result = findNodeById(flowStore.model.nodes, flowStore.selectedNode.id)
+    const result = findNodeById(
+      flowStore.model.nodes,
+      flowStore.selectedNode.id,
+    )
     if (!basicFormData.others.defaultComment) {
       delete basicFormData.others.defaultComment
     }
     const { rejectTo, ...others } = memberFormData
     others.gotoWhenReject = [rejectTo]
+    // #19514
     // result.props = {
     //   ...result.props,
     //   ...basicFormData,
     //   ...others,
     // }
+    Object.assign(result.props, basicFormData, others)
+    console.log('result.props: ', result.props)
+    console.log('result: ', result)
     // #19583
-    result = {
-      ...result,
-      props: {
-        ...result.props,
-        ...basicFormData,
-        ...others,
-      },
-    }
+    // result = {
+    //   ...result,
+    //   props: {
+    //     ...result.props,
+    //     ...basicFormData,
+    //     ...others,
+    //   },
+    // }
     resolve(result)
   })
 }
