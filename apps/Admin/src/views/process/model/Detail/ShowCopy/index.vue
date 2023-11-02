@@ -45,7 +45,7 @@
         />
       </j-form-item>
       <j-form-item
-        name="nameGeneratorHtml"
+        name="nameGenerator"
         :rules="[{ required: true, trigger: 'change' }]"
       >
         <template #label>
@@ -61,13 +61,12 @@
         </template>
         <TemplateText
           placeholder="{发起人}的{流程名称}"
-          v-model:data="formData.nameGenerator"
-          v-model:value="formData.nameGeneratorHtml"
+          v-model:value="formData.nameGenerator"
           :variables="formData.variables"
         />
       </j-form-item>
       <j-form-item
-        name="summaryGeneratorHtml"
+        name="summaryGenerator"
         :rules="[{ required: true, trigger: 'change' }]"
       >
         <template #label>
@@ -77,8 +76,7 @@
         </template>
         <TemplateText
           placeholder="{请假人}的{请假类型}"
-          v-model:data="formData.summaryGenerator"
-          v-model:value="formData.summaryGeneratorHtml"
+          v-model:value="formData.summaryGenerator"
           :variables="formData.variables"
         />
       </j-form-item>
@@ -211,22 +209,10 @@ const formData = reactive({
       flowStore.model.config.nameGenerator = formatToVariable(val)
     },
   }),
-  nameGeneratorHtml: computed({
-    get: () => flowStore.model.config.nameGeneratorHtml,
-    set: (val) => {
-      flowStore.model.config.nameGeneratorHtml = val
-    },
-  }),
   summaryGenerator: computed({
     get: () => formatToName(flowStore.model.config.summaryGenerator),
     set: (val) => {
       flowStore.model.config.summaryGenerator = formatToVariable(val)
-    },
-  }),
-  summaryGeneratorHtml: computed({
-    get: () => flowStore.model.config.summaryGeneratorHtml,
-    set: (val) => {
-      flowStore.model.config.summaryGeneratorHtml = val
     },
   }),
   ccMember: computed({
