@@ -81,11 +81,12 @@
                 </template>
                 <div
                   class="form-fields"
-                  v-for="(field, idx) in form.configuration?.children?.filter(
-                    (f) => !unDisplayFieldsType.includes(f.type),
-                  )"
+                  v-for="(field, idx) in form.configuration?.children"
                   :key="'field' + idx"
                 >
+                  <!-- ?.filter(
+                    (f) => !unDisplayFieldsType.includes(f.type),
+                  ) -->
                   <div class="field-title">
                     <div class="name">
                       <j-ellipsis line-clamp="1">
@@ -213,6 +214,9 @@ const getFormList = async () => {
   // 左侧表单读写操作列表
   filterFormList.value = result?.map((m) => {
     const _fields = m.configuration?.children
+    // ?.filter(
+    //   (f) => !unDisplayFieldsType.value.includes(f.type),
+    // )
     // 已经存在的字段
     const existFields = forms.value[m.key]
     if (existFields && existFields.length) {
@@ -244,9 +248,10 @@ const getFormList = async () => {
   // 右侧预览数据
   previewData.value = result.map((m) => {
     // 过滤不需要展示的字段
-    m.configuration.children = m.configuration.children?.filter(
-      (f) => !unDisplayFieldsType.value.includes(f.type),
-    )
+    m.configuration.children = m.configuration.children
+    // ?.filter(
+    //   (f) => !unDisplayFieldsType.value.includes(f.type),
+    // )
     return {
       ...m,
       multiple: existForms?.find((f) => f.formId === m.key)?.multiple,
@@ -295,6 +300,9 @@ const setCheckAll = () => {
  */
 const handleFormCheck = (form: any) => {
   const _fields = form.configuration?.children
+  //   ?.filter(
+  //     (f) => !unDisplayFieldsType.value.includes(f.type),
+  //   )
   _fields?.forEach((p) => {
     p.accessModes = form.accessModes
     p.componentProps.disabled = !p.accessModes.includes('write')
@@ -315,9 +323,9 @@ const handleFieldCheck = (form, field) => {
   field.componentProps.disabled = !field.accessModes.includes('write')
 
   // 设置表单全选状态
-  form.accessModes = form.configuration?.children?.every(
-    (e) => e.accessModes.length === 2,
-  )
+  form.accessModes = form.configuration?.children
+    // ?.filter((f) => !unDisplayFieldsType.value.includes(f.type))
+    ?.every((e) => e.accessModes.length === 2)
     ? ['read', 'write']
     : ['read']
   // 设置全部内容全选状态
@@ -347,6 +355,9 @@ const getTableColumns = (fields: any[]) => {
 const handleOk = () => {
   filterFormList.value?.forEach((item) => {
     const _fields = item.configuration?.children
+    // ?.filter(
+    //   (f) => !unDisplayFieldsType.value.includes(f.type),
+    // )
     forms.value[item.key] = []
     _fields?.forEach((p) => {
       if (p.accessModes.length) {
