@@ -13,7 +13,11 @@
       }"
     >
       <template #headerTitle>
-        <PermissionButton type="primary" @click="handleSave(undefined)">
+        <PermissionButton
+          type="primary"
+          @click="handleSave(undefined)"
+          hasPermission="workflow:definition_save"
+        >
           <!-- <AIcon type="PlusOutlined" /> -->
           新增</PermissionButton
         >
@@ -49,7 +53,8 @@
             v-for="item of getActions(slotProps, 'table')"
             v-bind="handleFunction(item.permissionProps, slotProps)"
             :danger="item.key === 'delete'"
-          >
+            >
+            <!-- :hasPermission="item?.key === 'view' ? false : `workflow:${item?.hasPermission}`" -->
             <template #icon v-if="item.icon || item.key === 'delete'">
               <AIcon :type="item.icon ? item.icon : 'DeleteOutlined'" />
             </template>
@@ -266,14 +271,13 @@ const drawer = reactive({
 const getActions = (record, type = 'card') => {
   const actions = [
     {
-      key: 'edit',
+      key: 'view',
       text: '预览',
       icon: 'PlayCircleOutlined',
       permissionProps: (data) => ({
         tooltip: {
           title: '预览',
         },
-        hasPermission: false,
         onClick: () => {
           _view(data)
         },
@@ -287,7 +291,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: '编辑',
         },
-        hasPermission: false,
+        hasPermission: 'workflow:definition_save',
         onClick: () => {
           handleSave(data)
         },
@@ -301,7 +305,6 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: '查看',
         },
-        hasPermission: false,
         onClick: () => {
           handleView(data)
         },
@@ -316,7 +319,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: data.state.value === 'deployed' ? '请勿重复部署' : '部署',
         },
-        hasPermission: false,
+        hasPermission: 'workflow:release_save',
         onClick: () => {
           deploy_api(data.id).then((res) => {
             if (res.success) {
@@ -338,7 +341,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: '删除',
         },
-        hasPermission: false,
+        hasPermission: 'workflow:definition_delete',
         popConfirm: {
           title: `确认删除`,
           onConfirm: () => {
