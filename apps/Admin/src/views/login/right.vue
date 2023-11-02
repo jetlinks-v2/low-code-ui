@@ -59,6 +59,7 @@ import Remember from './remember.vue'
 import { getImage } from '@jetlinks/utils'
 import { useRequest } from '@jetlinks/hooks'
 import {captchaConfig, codeUrl} from '@/api/login'
+import { defineExpose } from 'vue'
 import { rules } from './util'
 
 const logoImage = getImage('/login/logo.png')
@@ -84,11 +85,13 @@ const { data: url, run: getCode } = useRequest(codeUrl, {
   immediate: false
 })
 
-useRequest(captchaConfig, {
+const { data: imageEnabled  } = useRequest(captchaConfig, {
   onSuccess(resp) {
-    if (resp.success && resp.result?.enabled) {
+    if (resp.result?.enabled) {
       getCode()
     }
+    console.log(resp)
+    return resp.result?.enabled
   }
 })
 
@@ -108,6 +111,15 @@ const showCode = computed(() => {
 const submit = () => {
     emit('submit', formData)
 }
+
+defineExpose({
+  reload: () => {
+    console.log(imageEnabled)
+    if (imageEnabled.value) {
+      getCode()
+    }
+  }
+})
 
 </script>
 <style lang="less" scoped>

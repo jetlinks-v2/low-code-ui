@@ -8,7 +8,7 @@
         </a>
       </div>
       <div class='right'>
-        <Right :logo="systemInfo?.logo" :title="systemInfo?.title" :loading="loading" @submit="submit" />
+        <Right ref="rightRef" :logo="systemInfo?.logo" :title="systemInfo?.title" :loading="loading" @submit="submit" />
       </div>
     </div>
   </j-spin>
@@ -30,6 +30,9 @@ const { systemInfo } = storeToRefs(systemStore)
 
 // const { data: sysVersion } = useRequest<any, { version: string}>(systemVersion)
 
+const rightRef = ref()
+const { data: encryption, run: encryptionRun } = useRequest(encryptionConfig)
+
 const { loading, run } = useRequest(login, {
   immediate: false,
   onSuccess(res) {
@@ -38,10 +41,14 @@ const { loading, run } = useRequest(login, {
       userStore.getUserInfo()
       window.location.href = '/'
     }
+  },
+  onError() {
+    rightRef.value?.reload()
+    encryptionRun?.()
   }
 })
 
-const { data: encryption } = useRequest(encryptionConfig)
+
 
 const submit = (data: any) => {
   const copyData = cloneDeep(data)
