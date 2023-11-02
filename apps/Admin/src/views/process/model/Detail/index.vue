@@ -37,14 +37,28 @@
             type="primary"
             @click="handleSave"
             :loading="saveLoading"
+            hasPermission="workflow:definition_save"
           >
-            <!-- hasPermission="code:release_save" -->
             保存
             <template #icon>
               <j-tooltip placement="right">
                 <template #title>
                   仅保存配置数据，不校验填写内容的合规性。
                 </template>
+                <AIcon type="QuestionCircleOutlined" />
+              </j-tooltip>
+            </template>
+          </PermissionButton>
+          <PermissionButton
+            type="primary"
+            @click="handleDeploy"
+            hasPermission="workflow:definition_save"
+            :disabled="!isChange && flowDetail?.state?.value === 'deployed'"
+          >
+            部署
+            <template #icon>
+              <j-tooltip placement="right">
+                <template #title> 配置内容需要通过合规性校验。 </template>
                 <AIcon type="QuestionCircleOutlined" />
               </j-tooltip>
             </template>
@@ -60,7 +74,7 @@
               </j-tooltip>
             </template>
           </j-button> -->
-          <j-button
+          <!-- <j-button
             type="primary"
             @click="handleDeploy"
             :disabled="!isChange && flowDetail?.state?.value === 'deployed'"
@@ -72,7 +86,7 @@
                 <AIcon type="QuestionCircleOutlined" />
               </j-tooltip>
             </template>
-          </j-button>
+          </j-button> -->
         </div>
       </div>
     </j-card>
