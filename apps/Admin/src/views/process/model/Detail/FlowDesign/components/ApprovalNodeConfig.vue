@@ -270,6 +270,8 @@ const saveConfigToStore = () => {
     //   ...others,
     // }
     Object.assign(result.props, basicFormData, others)
+    console.log('result.props: ', result.props)
+    console.log('result: ', result)
     // #19583
     // result = {
     //   ...result,
