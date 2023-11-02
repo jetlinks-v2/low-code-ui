@@ -50,7 +50,7 @@ const hide = ref() // 隐藏的输入框的节点
 // 根据选择的变量找出颜色
 const getColor = (str) => {
   return (
-    props.variables?.filter((item) => item?.label === str)?.[0]?.color || 'red'
+    props.variables?.filter((item) => item?.label === str)?.[0]?.color
   )
 }
 

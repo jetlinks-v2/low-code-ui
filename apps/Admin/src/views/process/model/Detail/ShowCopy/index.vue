@@ -127,7 +127,7 @@ const formRef = ref()
 const formatToName = (val: string = '') => {
   return val
     .replace(/-/g, '')
-    .replace(/\n/g, '<br/>')
+    // .replace(/\n/g, '<br/>')
     .replace(/\{(.*?)\}/g, ($1, $2) => {
       const _$2 = $2.split(':')
       return `{${_$2[_$2.length - 1]}}`
@@ -169,26 +169,20 @@ const formatToVariable = (val: string = '') => {
   const str = val
     .replace(/\{(.*?)\}/g, ($1, $2) => {
       const variable = formData.variables.filter((item) => item.label === $2)[0]
-      return variable ? `{var:${variable.value}:${$2}}` : `{var:${$2}}`
+      return variable ? `-{var:${variable.value}:${$2}}-` : `{${$2}}`
     })
-    .replace(/(?<!^)(?<![-])(\{)/g, "-$1").replace(/(\})(?!\-)(?!$)/g, "$1-")
-    // .replace(/\{/g, ($1, $2) => {
-    //   return $2 ? `-{` : '{'
-    // })
-    // .replace(/\}/g, ($1, $2) => {
-    //   // 查找}{中间的内容, 并添加中划线
-    //   return $2 ? `}-` : '}'
-    // })
-    // .replace(/--/g, ($1, $2) => {
-    //   // 查找}{中间的内容, 并添加中划线
-    //   return '-'
-    // })
+    .replace(/--/g, () => {
+      return '-'
+    })
+    .replace(/\n/g, () => {
+      return '-'
+    })
     let a = str
-    if(a.slice(-1) === '\n'){
-      a = a.slice(0,a.length-1);
-    }
     if(a.slice(-1) === '-'){
       a = a.slice(0,a.length-1);
+    }
+    if(a.slice(0, 1) === '-'){
+      a = a.slice(1,a.length);
     }
     return a
 }
