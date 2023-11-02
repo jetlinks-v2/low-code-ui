@@ -1,27 +1,34 @@
 
 <template>
     <div>
-       
         <div class="items">
             <j-scrollbar>
-                <template  v-for="(item,index) in formValue">
-                    <div class="title"> {{item?.formName}}</div>
-                    <FormPreview v-if="!item.multiple" :value="item.data" :data="item.configuration" ref="formRef" @state-change="(data)=>getFormData(data,index)"/>
-                    <div  v-else style="background-color: #fff;">
-                    <QuickEditTable
-                        validate
-                        ref="tableRef"
-                        :data="item.data"
-                        :columns="item.configuration"
-                        :scroll="{x: 1300, y: 500}"
-                    >
-                        <template v-for="(i,index) in item.configuration" #[i.dataIndex]="{record, index, valueChange}">
-                            <!-- <slot :name="name" v-bind="slotData || {}" /> -->
-                            <FormItem :itemType="i.type"  v-model:modelValue="record[i.dataIndex]" @change="()=>{valueChange(record[i.dataIndex])}" :disabled="i?.disabled" :keys="i.keys"></FormItem>
-                            <!-- {{ i }} -->
-                        </template>
+                <div class="header">
+                    <j-ellipsis style="max-width: 300px;text-align: center;">
+                        {{ info.name }}
+                    </j-ellipsis>
+                </div>
+                <template v-for="(item, index) in formValue">
+                    <div class="title">
+                        <img :src="getImage(`/flow-designer/preview-form.png`)" style="height: 16px" />
+                        {{ item?.formName }}
+                    </div>
+                    <FormPreview v-if="!item.multiple" :value="item.data" :data="item.configuration" ref="formRef"
+                        @state-change="(data) => getFormData(data, index)" />
+                    <div v-else style="background-color: #fff;">
+                        <QuickEditTable validate ref="tableRef" :data="item.data" :columns="item.configuration"
+                            :scroll="{ x: 1300, y: 500 }">
+                            <template v-for="(i, index) in item.configuration"
+                                #[i.dataIndex]="{ record, index, valueChange }">
+                                <!-- <slot :name="name" v-bind="slotData || {}" /> -->
+                                <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
+                                    @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled">
+                                </ValueItem>
+                                <!-- <FormItem :itemType="i.type"  v-model:modelValue="record[i.dataIndex]" @change="()=>{valueChange(record[i.dataIndex])}" :disabled="i?.disabled" :keys="i.keys"></FormItem> -->
+                            </template>
                         </QuickEditTable>
-                        <j-button @click="()=>addTableData(item)" block style="margin-top: 10px;" v-if="type=='todo'">新增</j-button>
+                        <j-button @click="() => addTableData(item)" block style="margin-top: 10px;"
+                            v-if="type == 'todo'">新增</j-button>
                     </div>
                 </template>
             </j-scrollbar>
@@ -37,7 +44,7 @@
         </div>
     </div>
     <FlowModal v-if="visible" @close="visible = false" @save="onSave" :type="modalType" :required="required"
-        :taskId="taskId" :candidates="candidates"/>
+        :taskId="taskId" :candidates="candidates" :defaultComment="defaultComment"/>
 </template>
 
 <script setup>
@@ -48,6 +55,8 @@ import { _claim, _save, _complete, _reject } from '@/api/process/me'
 import { onlyMessage } from '@jetlinks/utils';
 import FormItem from './FormItem.vue'
 import md5 from 'md5'
+import { getImage } from '@jetlinks/utils'
+
 const props = defineProps({
     info: {
         type: Object,
@@ -67,10 +76,11 @@ const formValue = ref()
 const visible = ref(false)
 const modalType = ref('pass')
 const comment = ref()
+const defaultComment = ref('')
 const formRef = ref()
 const submitData = ref([])
 const nodeType = ref()
-const tableRef= ref()
+const tableRef = ref()
 //提交审批taskId 
 const nodes = ref()
 // 审批意见是否必填
@@ -87,16 +97,16 @@ const btnLoading = ref(false)
 //提交可选审批人条件
 const candidates = ref()
 //存放表单暂存数据
-const formData =  ref({})
-const addTableData = (item) =>{
+const formData = ref({})
+const addTableData = (item) => {
     let obj = {}
-    item.configuration.map((i)=>{
+    item.configuration.map((i) => {
         const key = i.dataIndex
         obj[key] = undefined
     })
     item.data.push(obj)
 }
-const getFormData = (data,index) =>{
+const getFormData = (data, index) => {
     formData.value[index] = data
 }
 const onSave = (value) => {
@@ -125,27 +135,27 @@ const onSave = (value) => {
                 }
             })
             break;
-        case 'submit': 
+        case 'submit':
             const commands = [
-            {
-            commandId: "ClaimTask",
-            param: {
-                taskId: submitId.value,
-                identity: value
-            }
-        }
+                {
+                    commandId: "ClaimTask",
+                    param: {
+                        taskId: submitId.value,
+                        identity: value
+                    }
+                }
             ]
             _complete(props.info.currentTaskId, {
                 form: submitData.value,
                 commands: commands
-            }).then((res)=>{
+            }).then((res) => {
                 if (res.status === 200) {
                     onlyMessage('提交成功')
                     emit('close')
                 }
             })
             break;
-        }
+    }
 }
 //处理可编辑表格数据
 const dealTableData = (value) =>{
@@ -212,9 +222,9 @@ const onClick = async (value) => {
                 dealTableData(i)
             }
             data.push({
-                    formId: i.formId,
-                    data: Array.isArray(i.data) ? i.data : formData.value[index]
-                })
+                formId: i.formId,
+                data: Array.isArray(i.data) ? i.data : formData.value[index]
+            })
         })
         submitData.value = data
         btnLoading.value = true
@@ -231,7 +241,7 @@ const onClick = async (value) => {
         formRef.value?.forEach((i, index) => {
             promise.push(i.onSave())
         })
-        tableRef.value?.forEach((i)=>{
+        tableRef.value?.forEach((i) => {
             promise.push(i.validates())
         })
         Promise.all(promise).then((res) => {
@@ -246,16 +256,16 @@ const onClick = async (value) => {
                 })
             })
             submitData.value = data
-            if(modalType.value !== 'submit' || freeChoiceUser.value ){
+            if (modalType.value !== 'submit' || freeChoiceUser.value) {
                 visible.value = true
             }
-            if(modalType.value === 'submit'){
-                    submitForm()
+            if (modalType.value === 'submit') {
+                submitForm()
             }
         })
     }
 }
-const submitForm = async() => {
+const submitForm = async () => {
     if (freeChoiceUser.value) {
         props.info.tasks.forEach((i) => {
             i.nodeId === freeChoiceUser.value ? taskId.value = i.id : ''
@@ -267,7 +277,7 @@ const submitForm = async() => {
         const res = await _complete(props.info.currentTaskId, {
             form: submitData.value,
         })
-        if(res.status === 200){
+        if (res.status === 200) {
             emit('close')
         }
     }
@@ -284,7 +294,7 @@ const analyzeTableData = (data,keys,name) =>{
    data[name] = obj
 }
 //根据配置项生成表格
-const dealTable = (disabled) =>{
+const dealTable = (disabled) => {
     const tableColumn = []
     const tableData = []
     formValue.value.forEach((i)=>{
@@ -317,14 +327,16 @@ const dealTable = (disabled) =>{
 }
 // 列表接口数据nodeId 对应form表单ID处理数据
 const dealForm = (nodes) => {
-    console.log('nodes---',nodes,props.nodeId)
+    console.log('nodes---', nodes, props.nodeId)
     if (nodes.id === props.nodeId) {
+        //默认审批意见
+        defaultComment.value = nodes?.props.others?.defaultComment
         //获取节点类型
         nodeType.value = nodes.type
         //审批意见是否必填
         required.value = nodes?.props?.dealRequired
         //审批提交是否可以指定处理人
-        if(nodes?.props?.freeChoiceUser && nodes?.props.freeChoiceUser === nodes?.children?.id){
+        if (nodes?.props?.freeChoiceUser && nodes?.props.freeChoiceUser === nodes?.children?.id) {
             freeChoiceUser.value = nodes.props.freeChoiceUser
             candidates.value = nodes?.children?.props?.candidates
         }
@@ -335,7 +347,7 @@ const dealForm = (nodes) => {
         // console.log('md5-----------',nodes.props?.formBinds)
         Object.keys(nodes.props?.formBinds).forEach((item) => {
             //formid + formVersion
-            const id = md5(item+'|'+props.info.others?.formVersion[item])
+            const id = md5(item + '|' + props.info.others?.formVersion[item])
             bindMap.set(id, nodes.props.formBinds[item])
         })
         // console.log('bindMap',bindMap)
@@ -373,6 +385,8 @@ const dealForm = (nodes) => {
         }
     }
 }
+
+//
 watch(() => props.info, () => {
     formValue.value = cloneDeep(props.info?.form)
 //    console.log('sssss',props.info?.form)
@@ -382,14 +396,14 @@ watch(() => props.info, () => {
     } else {
         // dealTable(true)
         formValue.value?.map((i) => {
-            if(i.multiple){
+            if (i.multiple) {
                 dealTable(true)
-            }else{
+            } else {
                 i.configuration.children?.map((item) => {
-                item.componentProps.disabled = true
-            })
+                    item.componentProps.disabled = true
+                })
             }
-            
+
         })
         // console.log('formValue.value',formValue.value)
     }
@@ -400,9 +414,10 @@ watch(() => props.info, () => {
 <style scoped lang='less'>
 .title {
     width: 100%;
-    text-align: center;
+    // text-align: center;
     margin-top: 10px;
-    font-size: 20px;
+    padding: 10px 12px;
+    font-size: 16px;
     background-color: #fff;
 }
 
@@ -410,6 +425,13 @@ watch(() => props.info, () => {
     height: calc(100vh - 240px);
     background-color: #EEE;
     padding: 12px;
+
+    .header {
+        // background-color: #FFF;
+        font-size: 18px;
+        display: flex;
+        justify-content: center;
+    }
 }
 
 .bottom {

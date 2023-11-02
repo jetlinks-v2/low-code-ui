@@ -100,7 +100,7 @@ const handleDetail = (data) => {
         :deep(.ant-card-body){
           cursor: pointer;
           display: flex;
-          justify-content: center;
+          justify-content: start;
           align-items: center;
           gap: 8px;
           width: 159px;

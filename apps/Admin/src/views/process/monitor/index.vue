@@ -151,7 +151,7 @@ const defaultColumns = [
         // { label: '运行中', value: 'running' },
         { label: '已完成', value: 'completed' },
         { label: '已驳回', value: 'rejected' },
-        { label: '已撤销', value: 'repealed' },
+        { label: '已关闭', value: 'repealed' },
       ],
     },
   },

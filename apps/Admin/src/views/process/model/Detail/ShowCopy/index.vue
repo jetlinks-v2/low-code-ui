@@ -167,20 +167,32 @@ const getVariables = async () => {
  * -> {var:发起人fullId:发起人name}的{var:流程名称fullId:流程名称name}
  */
 const formatToVariable = (val: string = '') => {
+  // console.log(val, 'val')
   const str = val
     .replace(/\{(.*?)\}/g, ($1, $2) => {
       const variable = formData.variables.filter((item) => item.label === $2)[0]
       return variable ? `{var:${variable.value}:${$2}}` : `{var:${$2}}`
     })
-    .replace(/\{/g, ($1, $2) => {
-      return $2 ? `-{` : '{'
-    })
-    .replace(/\}/g, ($1, $2) => {
-      // 查找}{中间的内容, 并添加中划线
-      return $2 ? `}-` : '}'
-    })
-    .replace(/-$/, "")
-    return str
+    .replace(/(?<!^)(?<![-])(\{)/g, "-$1").replace(/(\})(?!\-)(?!$)/g, "$1-")
+    // .replace(/\{/g, ($1, $2) => {
+    //   return $2 ? `-{` : '{'
+    // })
+    // .replace(/\}/g, ($1, $2) => {
+    //   // 查找}{中间的内容, 并添加中划线
+    //   return $2 ? `}-` : '}'
+    // })
+    // .replace(/--/g, ($1, $2) => {
+    //   // 查找}{中间的内容, 并添加中划线
+    //   return '-'
+    // })
+    let a = str
+    if(a.slice(-1) === '\n'){
+      a = a.slice(0,a.length-1);
+    }
+    if(a.slice(-1) === '-'){
+      a = a.slice(0,a.length-1);
+    }
+    return a
 }
 
 const formData = reactive({
