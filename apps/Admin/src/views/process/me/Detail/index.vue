@@ -1,16 +1,16 @@
 
 <template>
     <j-drawer visible :closable="false" @close="emit('close')" title="流程详情" size="large">
-       
+
         <j-scrollbar>
             <j-select v-if="type == 'todo'" showSearch v-model:value="taskId" class="top" :options="options"
                 placeholder="请选择办理的节点" @change="onChange">
             </j-select>
             <div class="watermark" v-if="type !== 'todo' || !!taskId">
-                <img :src="stateMap.get(current.state.value)"/>
+                <img :src="stateMap.get(current.state.value)" />
             </div>
             <j-tabs v-model:activeKey="activeKey" type="card" v-if="type !== 'todo' || !!taskId">
-                
+
                 <j-tab-pane key="form" tab="表单">
                     <FlowForm :info="info" :nodeId="taskNodeId" :type="type" @close="closeDrawer" />
                 </j-tab-pane>
@@ -45,7 +45,7 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    isDraft:{
+    isDraft: {
         type: Boolean,
         default: false
     }
@@ -60,10 +60,10 @@ const taskId = ref(undefined)
 const taskNodeId = ref()
 
 const stateMap = new Map()
-stateMap.set('completed',getImage('/me/completed.png'))
-stateMap.set('rejected',getImage('/me/rejected.png'))
-stateMap.set('repealed',getImage('/me/repealed.png'))
-stateMap.set('running',getImage('/me/running.png'))
+stateMap.set('completed', getImage('/me/completed.png'))
+stateMap.set('rejected', getImage('/me/rejected.png'))
+stateMap.set('repealed', getImage('/me/repealed.png'))
+stateMap.set('running', getImage('/me/running.png'))
 
 const getDetail = async (taskId?: string) => {
     const res = taskId ? await getProcessTodoDetail(props.current.id, taskId) : await getProcessDetail(props.current.id, props.history)
@@ -93,6 +93,11 @@ onMounted(() => {
     }))
     if (props.type !== 'todo') {
         getDetail()
+    } else {
+        taskId.value = arr[0]?.taskId
+        taskNodeId.value = arr[0]?.nodeId
+        getDetail(arr[0]?.taskId)
+        // console.log('=======', taskId.value, taskNodeId.value)
     }
 
     // console.log('arr--', props.current.identityLinks, arr)
@@ -108,7 +113,7 @@ onMounted(() => {
 .watermark {
     width: 100px;
     // height: 100px;
-    
+
     // transform: rotate(20deg);
     font-size: 20px;
     position: absolute;

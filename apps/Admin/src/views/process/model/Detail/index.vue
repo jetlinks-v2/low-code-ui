@@ -33,7 +33,12 @@
             :loading="nextLoading"
             >下一步</j-button
           >
-          <j-button type="primary" @click="handleSave" :loading="saveLoading">
+          <PermissionButton
+            type="primary"
+            @click="handleSave"
+            :loading="saveLoading"
+          >
+            <!-- hasPermission="code:release_save" -->
             保存
             <template #icon>
               <j-tooltip placement="right">
@@ -43,12 +48,19 @@
                 <AIcon type="QuestionCircleOutlined" />
               </j-tooltip>
             </template>
-          </j-button>
-          <j-button
-            type="primary"
-            @click="handleDeploy"
-            :disabled="flowDetail?.state?.value === 'deployed'"
-          >
+          </PermissionButton>
+          <!-- <j-button type="primary" @click="handleSave" :loading="saveLoading">
+            保存
+            <template #icon>
+              <j-tooltip placement="right">
+                <template #title>
+                  仅保存配置数据，不校验填写内容的合规性。
+                </template>
+                <AIcon type="QuestionCircleOutlined" />
+              </j-tooltip>
+            </template>
+          </j-button> -->
+          <j-button type="primary" @click="handleDeploy" :disabled="!isChange">
             部署
             <template #icon>
               <j-tooltip placement="right">
@@ -109,15 +121,15 @@ const nextLoading = ref(false)
 const saveLoading = ref(false)
 const isModal = ref(false)
 const oldData = ref({
-    config: {},
-    nodes: {
-        id: 'ROOT_1',
-        parentId: null,
-        type: 'ROOT',
-        name: '发起申请',
-        active: false,
-        props: { assignedUser: [] },
-    }
+  config: {},
+  nodes: {
+    id: 'ROOT_1',
+    parentId: null,
+    type: 'ROOT',
+    name: '发起申请',
+    active: false,
+    props: { assignedUser: [] },
+  },
 })
 /**
  * 获取模型详情
@@ -128,13 +140,12 @@ const getFlowDetail = async () => {
   flowDetail.value = result
   const model = JSON.parse(result.model || '{}')
   //   console.log('model: ', model)
-  if(result.model!==''){
+  if (result.model !== '') {
     oldData.value = cloneDeep(model)
   }
 
   flowStore.setModel(model)
   flowStore.setModelBaseInfo(result)
- 
 }
 
 /**
@@ -289,17 +300,19 @@ const routerChange = (next?: Function) => {
   })
 }
 
+// 数据是否更改
+const isChange = computed(
+  () => JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model),
+)
 onBeforeRouteLeave((to, form, next) => {
-  const isChange = JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model)
-  if (!isModal.value && isChange) {
+  if (!isModal.value && isChange.value) {
     routerChange(next)
   } else {
     next()
   }
 })
 onBeforeRouteUpdate((to, from, next) => {
-  const isChange = JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model)
-  if (!isModal.value && isChange) {
+  if (!isModal.value && isChange.value) {
     routerChange(next)
   } else {
     next()

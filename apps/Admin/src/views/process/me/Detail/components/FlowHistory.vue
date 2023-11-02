@@ -34,7 +34,7 @@
                   </div>
                   <!-- <j-input v-if="showChanged(item.changed,'taskCommentChanged')" style="width: 60%;" :value="showChanged(item.changed,'taskCommentChanged')?.others.afterComment" /> -->
                </div>
-               <div v-if="item.childrenNode" class="item-children">
+               <div v-if="item.childrenNode && !findRejectNode(item.childrenNode?.traceId)" class="item-children" >
                   <div style="margin-right: 10px;">{{ item.childrenNode.others.taskName }}</div>
                   <j-tag
                      :color="colorMap.get(item.childrenNode.others.afterState === 'completed' ? 'children_completed' : 'children_rejected')">
@@ -345,7 +345,7 @@ onMounted(() => {
                color: #000000;
                font-weight: 500;
                font-size: 16px;
-               max-width: 400px;
+               max-width: 350px;
             }
          }
 
