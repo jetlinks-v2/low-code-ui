@@ -10,7 +10,7 @@ interface RequestOptions<T, S> {
      * @param data
      * @returns
      */
-    onSuccess: (data: AxiosResponseRewrite<S>) => S | void
+    onSuccess: (data: AxiosResponseRewrite<S>) => S | void | any
     /**
      * 返回参数处理
      * @returns
@@ -56,7 +56,7 @@ export const useRequest = <T = any, S = any>(
 
               if (resp?.success) {
                 const successData = await _options.onSuccess?.(resp)
-                data.value = successData ?? get(resp, _options.formatName!)
+                data.value = successData ?? get(resp, _options.formatName || defaultOptions.formatName)
               } else {
                 _options.onError?.(resp)
               }
