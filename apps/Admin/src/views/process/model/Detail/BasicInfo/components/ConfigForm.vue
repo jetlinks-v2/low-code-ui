@@ -214,7 +214,7 @@ const params = ref<any>({
       column: 'configuration',
     },
     {
-      value: [],
+      value: {},
       termType: 'not',
       column: 'configuration',
     },

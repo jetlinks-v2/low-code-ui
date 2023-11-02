@@ -87,6 +87,7 @@ import { detail_api, update_api, deploy_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { onlyMessage } from '@jetlinks/utils'
 import { Modal } from 'ant-design-vue'
+import { cloneDeep } from 'lodash-es'
 
 const flowStore = useFlowStore()
 const route = useRoute()
@@ -108,15 +109,15 @@ const nextLoading = ref(false)
 const saveLoading = ref(false)
 const isModal = ref(false)
 const oldData = ref({
-  config: {},
-  nodes: {
-    id: 'ROOT_1',
-    parentId: null,
-    type: 'ROOT',
-    name: '发起申请',
-    active: false,
-    props: { assignedUser: [] },
-  },
+    config: {},
+    nodes: {
+        id: 'ROOT_1',
+        parentId: null,
+        type: 'ROOT',
+        name: '发起申请',
+        active: false,
+        props: { assignedUser: [] },
+    }
 })
 /**
  * 获取模型详情
@@ -127,12 +128,13 @@ const getFlowDetail = async () => {
   flowDetail.value = result
   const model = JSON.parse(result.model || '{}')
   //   console.log('model: ', model)
+  if(result.model!==''){
+    oldData.value = cloneDeep(model)
+  }
 
   flowStore.setModel(model)
   flowStore.setModelBaseInfo(result)
-  if (result.model !== '') {
-    oldData.value = model
-  }
+ 
 }
 
 /**
@@ -288,19 +290,16 @@ const routerChange = (next?: Function) => {
 }
 
 onBeforeRouteLeave((to, form, next) => {
-  const isChange =
-    JSON.stringify(oldData.value) === JSON.stringify(flowStore.model)
-  console.log('===========', isChange, oldData.value)
-  if (!isModal.value && !isChange) {
+  const isChange = JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model)
+  if (!isModal.value && isChange) {
     routerChange(next)
   } else {
     next()
   }
 })
 onBeforeRouteUpdate((to, from, next) => {
-  const isChange =
-    JSON.stringify(oldData.value) === JSON.stringify(flowStore.model)
-  if (!isModal.value && !isChange) {
+  const isChange = JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model)
+  if (!isModal.value && isChange) {
     routerChange(next)
   } else {
     next()
