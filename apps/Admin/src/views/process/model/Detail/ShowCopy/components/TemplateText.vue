@@ -1,12 +1,13 @@
 <template>
   <div class="template">
     <Editor
+      v-model="editorHtml"
       style="height: 120px; overflow-y: hidden"
+      mode='default'
       :defaultConfig="{ placeholder }"
-      :mode="'default'"
       @onCreated="handleCreated"
       @onChange="onChange"
-      v-model="editorHtml"
+      @focus=""
     />
     <div class="select">
       <j-select
@@ -24,6 +25,8 @@
 import { shallowRef, watch, onBeforeUnmount, ref } from 'vue'
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import { Editor } from '@wangeditor/editor-for-vue'
+import { SlateTransforms } from '@wangeditor/editor'
+import { debounce } from 'lodash-es'
 
 const props = defineProps({
   value: {
@@ -46,7 +49,8 @@ const props = defineProps({
 
 const emits = defineEmits(['update:value', 'update:data'])
 const editorRef = shallowRef()
-const editorHtml = ref(props.value || '')
+const editorHtml = ref('')
+const pointer = reactive({ start: 0, end: 0})
 
 // // 正则匹配{}中间内容，并替换成<span style="color: 随机颜色"></span>
 // const replace = (str: string) => {
@@ -78,12 +82,27 @@ watch(
 
 const selectVariable = (_, { label }) => {
     editorRef.value?.insertNode({ type: 'span', color: `${getColor(label)}`, text: `{${label}}` })
+  // // const at = pointer.start === pointer.end ? [pointer.start] : [pointer.start, pointer.end]
+  // const at = [pointer.start]
+  // const node = { type: 'span', children: [{ type: 'span', color: `${getColor(label)}`, text: `{${label}}` }] }
+  // if (editorRef.value) {
+  //   SlateTransforms.insertNodes(editorRef.value, [node], { at: [2] })
+  // }
 }
 
-const onChange = () => {
+const onChange = debounce((e) => {
   emits('update:data', editorRef.value?.getText())
   emits('update:value', editorHtml.value)
-}
+
+  // if (e.selection) {
+  //   console.log(e.selection, )
+  //   const selection = e.selection
+  //   const range = [selection.focus.offset, selection.anchor.offset].sort()
+  //   pointer.start = range[0]
+  //   pointer.end = range[1]
+  // }
+
+}, 500)
 
 onBeforeUnmount(() => {
   const editor = editorRef.value

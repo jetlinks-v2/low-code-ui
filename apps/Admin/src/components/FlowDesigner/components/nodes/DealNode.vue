@@ -53,7 +53,7 @@ const validate = (err) => {
   const { formBinds, candidates, authButtons } = props.config.props
 
   showError.value = true
-  errorInfo.value = '未填写必填配置项'
+  errorInfo.value = '配置项错误'
   if (!name) {
     err.push({
       errors: ['办理节点名称不能为空'],
@@ -64,12 +64,15 @@ const validate = (err) => {
       errors: ['办理节点名称最多输入64个字符'],
       name: ['name'],
     })
-  } else if (!formBinds || !Object.keys(formBinds).length) {
-    // err.push({
-    //   errors: ['请确认当前节点需要候选人办理的表单内容'],
-    //   name: ['formBinds'],
-    // })
-  } else if (
+  }
+  // 表单默认勾选"读"权限, 此处不做校验
+  //   else if (!formBinds || !Object.keys(formBinds).length) {
+  //     err.push({
+  //       errors: ['请确认当前节点需要候选人办理的表单内容'],
+  //       name: ['formBinds'],
+  //     })
+  //   }
+  else if (
     !candidates ||
     !Object.keys(candidates).length ||
     Object.values(candidates).every((item: any) => !item.length)

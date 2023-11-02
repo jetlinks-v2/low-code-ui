@@ -8,14 +8,16 @@
 export function findNodeById(node, id) {
     if (node.id === id) {
         return node
-    } else if (node.branches?.length) {
+    }
+    if (node.branches?.length) {
         let _res = null
         for (let i = 0; i < node.branches.length; i++) {
             _res = findNodeById(node.branches[i], id)
             if (_res) break
         }
         if (_res) return _res
-    } else if (node.children) {
+    }
+    if (node.children && Object.keys(node.children).length) {
         const _res = findNodeById(node.children, id)
         if (_res) return _res
     }

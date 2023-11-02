@@ -27,7 +27,7 @@
         <PermissionButton
           @click="handleAdd()"
           type="primary"
-          hasPermission="code:form_save"
+          hasPermission="workflow:form_save"
         >
           新增
         </PermissionButton>
@@ -56,7 +56,7 @@
               type="link"
               style="padding: 0 5px"
               :danger="i?.key === 'delete'"
-              :hasPermission="i?.key === 'view' ? false : `code:${i?.hasPermission}`"
+              :hasPermission="i?.key === 'view' ? false : `workflow:${i?.hasPermission}`"
             >
               <template #icon><AIcon :type="i.icon" /></template>
             </PermissionButton>
@@ -190,7 +190,7 @@ const getActions = (record) => {
       popConfirm: {
         title: '确认删除？',
         onConfirm: () => {
-          _del(record.id)
+          _del(record.key)
         },
       },
     },

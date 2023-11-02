@@ -51,7 +51,9 @@ const Library = defineComponent({
                                 {
                                     element.children?.length && (
                                         <DraggableWrap
-                                            list={element?.children || []}
+                                            list={element?.children.filter(i => {
+                                                return !(designer?.type === 'workflow' && i?.type === 'form')
+                                            }) || []}
                                             {...options}
                                             class={"filed-item-children"}
                                             tag={'div'}

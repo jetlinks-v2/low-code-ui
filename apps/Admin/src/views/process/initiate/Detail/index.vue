@@ -194,12 +194,9 @@ const cancel = () => {
             })
           }
         // })
-      },
-      onCancel() {
-        // 关闭弹窗并返回发起申请页
-        router.back()
-      },
+      }
     })
+        // 关闭弹窗并返回发起申请页
   } else {
     router.back()
   }
@@ -213,9 +210,6 @@ const submit = async () => {
   Promise.all([...list, formRef.value.validate()])
     .then(async (res) => {
       const param = startProcess(res, true)
-
-      // 没有草稿_create
-
       const resp = editDraft.value
         ? await start_api(param)
         : await create_api(param)
