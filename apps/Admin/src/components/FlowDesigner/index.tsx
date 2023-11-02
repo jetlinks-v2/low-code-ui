@@ -33,6 +33,18 @@ const componentsMap = {
   EMPTY: Empty,
 }
 
+const ScaleRender = (enlarge, zoomOut, scale) => {
+  console.log(scale*100)
+  const scaleStr = scale ? Math.round(scale*100) + '%' : '100%'
+  return (
+    <div class={'flow-designer-tool'}>
+      <div class={'tool-item btn'} onClick={zoomOut}> - </div>
+      <div class={'tool-item'}>{scaleStr}</div>
+      <div class={'tool-item btn'} onClick={enlarge}> + </div>
+    </div>
+  )
+}
+
 const FlowDesigner = defineComponent({
   name: 'FlowDesigner',
   props: {
@@ -620,10 +632,9 @@ const FlowDesigner = defineComponent({
       }
     }
     expose({ validateProcess })
-    // 鼠标事件
-    if (props.dragging) {
-      useMouseEvent(DragRef)
-    }
+
+
+    const { enlarge, zoomOut, scale } = useMouseEvent(DragRef, props.dragging)
 
     // 渲染组件
     return () => {
@@ -646,15 +657,18 @@ const FlowDesigner = defineComponent({
 
       return h('div', {
           ref: DragRef,
-          style: { overflow: 'hidden', height: '100%'}
+          class: 'drag-warp'
         },
-        h(
+        [
+          h(
           'div',
           {
-            class: { _root: true },
-          },
-          processTrees,
-        )
+              class: { _root: true },
+            },
+            processTrees,
+          ),
+          ScaleRender(enlarge, zoomOut, scale.value)
+        ]
       )
     }
   },

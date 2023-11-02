@@ -2,7 +2,7 @@ import {ref} from 'vue'
 import type {Ref} from 'vue'
 import {difference} from "lodash-es";
 
-export const useMouseEvent = (El: Ref<HTMLDivElement>) => {
+export const useMouseEvent = (El: Ref<HTMLDivElement>, enabled) => {
   // 缩放
   const scale = ref<number>(1)
 
@@ -72,20 +72,36 @@ export const useMouseEvent = (El: Ref<HTMLDivElement>) => {
   }
 
   const handleWheel = (e: WheelEvent) => {
+    e.preventDefault();
     const deltaY = e.deltaY
-    if (deltaY < 0) {
-      scale.value = parseFloat(
-        (scale.value >= 1 ? 1 : scale.value + 0.1).toFixed(1),
-      )
-    } else {
-      scale.value = parseFloat(
-        (scale.value <= 0.5 ? 0.5 : scale.value - 0.1).toFixed(1),
-      )
-    }
+    deltaY < 0 ? enlarge() :zoomOut()
+  }
+
+  const TransformRender = () => {
     const rootEl = El.value.querySelector('._root') as HTMLDivElement
     if (rootEl) {
       rootEl.style.transform = `scale(${scale.value}) translate3d(${diff.x}px, ${diff.y}px, 0)`
     }
+  }
+
+  /**
+   * 放大
+   */
+  const enlarge = () => {
+    let oldValue = scale.value
+    oldValue += 0.1
+    scale.value = oldValue >= 1.25 ? 1.25 : oldValue
+    TransformRender()
+  }
+
+  /**
+   * 缩小
+   */
+  const zoomOut = () => {
+    let oldValue = scale.value
+    oldValue -= 0.1
+    scale.value = oldValue <= 0.5 ? 0.5 : oldValue
+    TransformRender()
   }
 
   const bindEventListener = () => {
@@ -104,11 +120,16 @@ export const useMouseEvent = (El: Ref<HTMLDivElement>) => {
   }
 
   nextTick(() => {
-    bindEventListener()
+    if (enabled) {
+      bindEventListener()
+    }
   })
 
   onUnmounted(() => {
     removeEventListener()
   })
 
+  return {
+    enlarge, zoomOut, scale
+  }
 }
