@@ -194,14 +194,28 @@ const FlowDesigner = defineComponent({
     /**
      * 分支交换位置
      * @param node
-     * @param offset
+     * @param offset // 位移
+     * @param index
      */
     const branchMove = (node, offset) => {
       let parentNode = nodeMap.value.get(node.parentId)
       let index = parentNode.branches.indexOf(node)
       let branch = parentNode.branches[index + offset]
-      parentNode.branches[index + offset] = parentNode.branches[index]
+      const targetNode = parentNode.branches[index]
+
+      //  处理子节点
+      const copyChildrenLeft = cloneDeep(targetNode.children)
+      const copyChildrenRight = cloneDeep(branch.children)
+
+      copyChildrenLeft.parentId = branch.id
+      copyChildrenRight.parentId = targetNode.id
+
+      targetNode.children = copyChildrenRight
+      branch.children = copyChildrenLeft
+
+      parentNode.branches[index + offset] = targetNode
       parentNode.branches[index] = branch
+
       proxy?.$forceUpdate()
     }
 
