@@ -37,7 +37,6 @@
             type="primary"
             @click="handleSave"
             :loading="saveLoading"
-            hasPermission="code:release_save"
           >
             保存
             <template #icon>
