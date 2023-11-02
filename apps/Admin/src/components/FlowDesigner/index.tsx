@@ -34,7 +34,6 @@ const componentsMap = {
 }
 
 const ScaleRender = (enlarge, zoomOut, scale) => {
-  console.log(scale*100)
   const scaleStr = scale ? Math.round(scale*100) + '%' : '100%'
   return (
     <div class={'flow-designer-tool'}>
@@ -112,8 +111,8 @@ const FlowDesigner = defineComponent({
           h(
             'div',
             { class: { 'add-branch-btn': true, 'read-only': readOnly } },
-            [
-              h(
+            {
+              default: h(
                 BranchButton,
                 {
                   class: { 'add-branch-btn-el': true },
@@ -124,9 +123,9 @@ const FlowDesigner = defineComponent({
                   onAddBranchNode: (type) => addBranchNode(node, type),
                   onOpenConfig: () => openConfig(node),
                 },
-                [],
               ),
-            ],
+            },
+            []
           ),
         )
         let bchDom = [h('div', { class: { 'branch-node': true } }, branchItems)]
@@ -175,7 +174,6 @@ const FlowDesigner = defineComponent({
             onLeftMove: () => branchMove(node, -1),
             onRightMove: () => branchMove(node, 1),
           },
-          [],
         ),
       )
     }
@@ -655,20 +653,13 @@ const FlowDesigner = defineComponent({
         setEmptyNodeProps(dom.value)
       }, 300)
 
-      return h('div', {
-          ref: DragRef,
-          class: 'drag-warp'
-        },
-        [
-          h(
-          'div',
-          {
-              class: { _root: true },
-            },
-            processTrees,
-          ),
-          ScaleRender(enlarge, zoomOut, scale.value)
-        ]
+      return (
+        <div ref={DragRef} class={'drag-warp'}>
+          <div class={'_root'}>
+            {processTrees}
+          </div>
+          { ScaleRender(enlarge, zoomOut, scale.value) }
+        </div>
       )
     }
   },
