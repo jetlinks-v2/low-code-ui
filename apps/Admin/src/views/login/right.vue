@@ -90,7 +90,6 @@ const { data: imageEnabled  } = useRequest(captchaConfig, {
     if (resp.result?.enabled) {
       getCode()
     }
-    console.log(resp)
     return resp.result?.enabled
   }
 })
@@ -114,7 +113,6 @@ const submit = () => {
 
 defineExpose({
   reload: () => {
-    console.log(imageEnabled)
     if (imageEnabled.value) {
       getCode()
     }
