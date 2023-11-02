@@ -512,6 +512,7 @@ const emits = defineEmits(['refresh'])
 
 const onSwitch = (_checked: boolean) => {
   target.value.formItemProps.label = _checked ? target.value.name : undefined
+  target.value.formItemProps.name = _checked ? `${target.value?.type}_${uid()}` : undefined
   target.value.formItemProps.isLayout = _checked
   emits('refresh', target.value)
 }
