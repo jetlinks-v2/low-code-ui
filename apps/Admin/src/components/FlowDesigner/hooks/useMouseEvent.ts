@@ -125,7 +125,7 @@ export const useMouseEvent = (El: Ref<HTMLDivElement>, enabled) => {
     El.value?.removeEventListener('pointerup', handlePointerup);
     El.value?.removeEventListener('wheel', handleWheel)
     document.removeEventListener('pointerup', handlePointerup);
-    if (El) {
+    if (El.value) {
       El.value.ondragstart = null
       El.value.ondragend = null
     }
