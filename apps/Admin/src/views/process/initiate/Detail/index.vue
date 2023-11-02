@@ -178,9 +178,12 @@ const cancel = () => {
       title: '是否保存申请表单为草稿？',
       okText: '保存',
       cancelText: '不保存',
-      onOk() {
+      async onOk() {
         const param = startProcess(list)
-        save_api(param).then((res) => {
+        // 没有草稿_create
+        const res = draftId.value ? await save_api(param): await create_api({...param, start: false})
+
+        // save_api(param).then((res) => {
           if (res.success) {
             onlyMessage('保存成功')
             router.push({
@@ -190,7 +193,7 @@ const cancel = () => {
               },
             })
           }
-        })
+        // })
       },
       onCancel() {
         // 关闭弹窗并返回发起申请页
@@ -210,6 +213,9 @@ const submit = async () => {
   Promise.all([...list, formRef.value.validate()])
     .then(async (res) => {
       const param = startProcess(res, true)
+
+      // 没有草稿_create
+
       const resp = editDraft.value
         ? await start_api(param)
         : await create_api(param)
