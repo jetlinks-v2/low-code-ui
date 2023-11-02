@@ -180,7 +180,7 @@ const handleNext = async () => {
 const handleSave = (type?: string) => {
   const params = {
     id: route.query.id,
-    state: 'undeployed',
+    state: flowDetail.value?.state?.value || 'undeployed',
     model: JSON.stringify(flowStore.model),
   }
   //   console.log('flowStore.model: ', flowStore.model)
