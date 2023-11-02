@@ -60,7 +60,11 @@
               </j-tooltip>
             </template>
           </j-button> -->
-          <j-button type="primary" @click="handleDeploy" :disabled="!isChange">
+          <j-button
+            type="primary"
+            @click="handleDeploy"
+            :disabled="!isChange && flowDetail?.state?.value === 'deployed'"
+          >
             部署
             <template #icon>
               <j-tooltip placement="right">
@@ -193,7 +197,7 @@ const handleSave = (type?: string) => {
         isModal.value = true
         router.go(-1)
       }
-      getFlowDetail()
+      //   getFlowDetail()
     })
     .finally(() => {
       saveLoading.value = false
