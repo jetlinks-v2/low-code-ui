@@ -6,7 +6,10 @@
         :placeholder="placeholder"
         :auto-size="{ minRows: 4 }"
         :bordered="false"
+        :class="className"
         @change="onChange"
+        @focus="focus"
+        @blur="focus"
       />
       <div class="html">
         <span v-html="titleHtml"></span>
@@ -26,6 +29,7 @@
 
 <script setup>
 import { watch, ref } from 'vue'
+import { randomString } from '@jetlinks/utils'
 
 const props = defineProps({
   value: {
@@ -43,6 +47,11 @@ const props = defineProps({
 })
 
 const emits = defineEmits(['update:value'])
+const className = ref(randomString(4))
+const offset = reactive({
+  start: 0,
+  end: 0
+})
 
 // 绑定节点
 const hide = ref() // 隐藏的输入框的节点
@@ -65,6 +74,10 @@ const titleHtml = computed(() => {
   return replace(hide.value || '')
 })
 
+const focus = () => {
+  getOffset()
+}
+
 watch(
   () => props.value,
   () => {
@@ -75,13 +88,31 @@ watch(
   },
 )
 
+const getOffset = () => {
+  const textAreaEl = document.querySelector(`.${className.value}`)
+  if (textAreaEl) {
+    offset.start = textAreaEl.selectionStart
+    offset.end = textAreaEl.selectionEnd
+  }
+}
+
 const onChange = (e) => {
+  getOffset()
   emits('update:value', e.target.value)
 }
 
-const selectVariable = (_, { label }) => {
-  emits('update:value', hide.value + `{${label}}`)
+const insertText = (val) => {
+  const valArr = hide.value.split('')
+  const len = offset.end - offset.start
+  valArr.splice(offset.start, len, val)
+  hide.value = valArr.join('')
 }
+
+const selectVariable = (_, { label }) => {
+  // emits('update:value', hide.value + `{${label}}`)
+  insertText(`{${label}}`)
+}
+
 </script>
 
 <style lang="less" scoped>
@@ -101,6 +132,7 @@ const selectVariable = (_, { label }) => {
       color: rgba(0, 0, 0, 0);
       background-color: transparent;
       caret-color: black; // 光标颜色
+      word-break: break-all;
     }
 
     .html {
@@ -109,6 +141,7 @@ const selectVariable = (_, { label }) => {
         left: 0;
         padding: 4px 11px;
         pointer-events: none;
+        word-break: break-all;
     }
   }
 
