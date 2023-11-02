@@ -7,7 +7,7 @@ export const getConfigList = (_type: string, obj: any) => {
         })
     }
 
-    if (!['root', 'grid-item'].includes(unref(_type))) {
+    if (!['root', 'grid-item', 'grid'].includes(unref(_type))) {
         arr.push({
             key: 'Base',
             header: '基础信息',
