@@ -37,7 +37,7 @@
             type="primary"
             @click="handleSave"
             :loading="saveLoading"
-            hasPermission="workflow:definition_save"
+            hasPermission="workflow:model_save"
           >
             保存
             <template #icon>
@@ -52,7 +52,7 @@
           <PermissionButton
             type="primary"
             @click="handleDeploy"
-            hasPermission="workflow:definition_save"
+            hasPermission="workflow:model_deploy"
             :disabled="!isChange && flowDetail?.state?.value === 'deployed'"
           >
             部署
