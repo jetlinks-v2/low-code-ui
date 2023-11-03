@@ -40,6 +40,13 @@ export const useMouseEvent = (El: Ref<HTMLDivElement>, enabled) => {
       lastPointermove.y = e.clientY
       El.value.classList.add('_root-dragging')
     }
+    // 处理鼠标拖拽过程抬起仍旧处于拖拽状态问题
+    El.value.ondragstart = function (e) {
+      e.preventDefault()
+    }
+    El.value.ondragend = function (e) {
+      e.preventDefault()
+    }
   }
 
   const handlePointermove = (e) => {
@@ -109,7 +116,7 @@ export const useMouseEvent = (El: Ref<HTMLDivElement>, enabled) => {
     El.value?.addEventListener('pointermove', handlePointermove);
     El.value?.addEventListener('pointerup', handlePointerup);
     El.value?.addEventListener('wheel', handleWheel)
-
+    document.addEventListener('pointerup', handlePointerup);
   }
 
   const removeEventListener = () => {
@@ -117,6 +124,11 @@ export const useMouseEvent = (El: Ref<HTMLDivElement>, enabled) => {
     El.value?.removeEventListener('pointermove', handlePointermove);
     El.value?.removeEventListener('pointerup', handlePointerup);
     El.value?.removeEventListener('wheel', handleWheel)
+    document.removeEventListener('pointerup', handlePointerup);
+    if (El.value) {
+      El.value.ondragstart = null
+      El.value.ondragend = null
+    }
   }
 
   nextTick(() => {
