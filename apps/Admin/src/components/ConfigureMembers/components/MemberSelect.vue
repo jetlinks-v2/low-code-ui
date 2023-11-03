@@ -11,6 +11,7 @@
           v-model:value="active"
           button-style="solid"
           class="radio"
+          @change="searchText = ''"
         >
           <j-radio-button
             v-for="item in leftData[type]"
