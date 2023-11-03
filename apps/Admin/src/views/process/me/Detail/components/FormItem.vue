@@ -48,7 +48,11 @@
         v-model:value="myValue"
         @change="onChange"
       /> -->
-      <Product v-if="itemType === 'product'" v-model:value="myValue"  v-bind="props" :keys="keys"/>
+      <Product v-if="itemType === 'product'" v-model:value="myValue"  v-bind="props" :keys="keys" :mode="mode"/>
+      <Device v-else-if="itemType ==='device'" v-model:value="myValue" v-bind="props" :keys="keys" :mode="mode"/>
+      <User v-else-if="itemType === 'user'" v-model:value="myValue" v-bind="props" :keys="keys" :mode="mode" />
+      <Role v-else-if="itemType === 'role'" v-model:value="myValue" v-bind="props" :keys="keys" :mode="mode" />
+      <Org v-else-if="itemType === 'org'" v-model:value="myValue" v-bind="props" :keys="keys" :mode="mode" />
       <!-- <j-input
         v-else
         allowClear
@@ -63,8 +67,10 @@
   <script setup lang="ts">
   import { CSSProperties, PropType } from 'vue'
   import Product from '@/components/FormDesigner/components/Components/Product.vue'
-import { deepEqual } from 'assert';
-import { cloneDeep } from 'lodash-es';
+  import Device from '@/components/FormDesigner/components/Components/Device.vue'
+  import User from '@/components/FormDesigner/components/Components/User/index.vue'
+  import Role from '@/components/FormDesigner/components/Components/Role.vue'
+  import Org from '@/components/FormDesigner/components/Components/Org.vue'
   type Emits = {
     (e: 'update:modelValue', data: string | number | boolean): void
     (e: 'change', data: any, item?: any): void
