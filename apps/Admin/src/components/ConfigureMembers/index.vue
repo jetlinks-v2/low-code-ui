@@ -153,12 +153,12 @@ const searchIdInTree = (tree: any, id: string, type: string) => {
   // 遍历每个节点
   for (const node of tree) {
     if (
-      type === 'relation' &&
-      node.fullId === arr[0] &&
-      existingRel.value.some((item) => item === arr[1])
+      (type === 'relation' &&
+        node.fullId === arr[0] &&
+        existingRel.value.includes(arr[1])) ||
+      node.id === id ||
+      node.fullId === id
     ) {
-      return true
-    } else if (node.id === id || node.fullId === id) {
       return true
     }
     if (node.children && node.children.length > 0) {
@@ -305,10 +305,6 @@ watch(
   },
   { immediate: true },
 )
-
-// watch(()=>[list.value,dataMap.value],()=>{
-
-// })
 </script>
 <style scoped lang="less">
 .member {

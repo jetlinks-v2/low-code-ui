@@ -4,7 +4,7 @@
     class="custom-class"
     title="流程详情"
     :closable="false"
-    width="900px"
+    width="50%"
     placement="right"
     @close="emits('update:visible', false)"
     >
