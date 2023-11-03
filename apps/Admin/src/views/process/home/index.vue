@@ -3,7 +3,7 @@
   <page-container>
     <TitleComponent data="流程搭建" />
     <div class="process">
-      <MyCard v-for="item of processBuild" :data="item"></MyCard>
+      <MyCard v-for="item of build" :data="item"></MyCard>
     </div>
 
     <TitleComponent data="我的流程" />
@@ -14,11 +14,15 @@
 </template>
 <script setup>
 import MyCard from '../components/MyCard/index.vue'
-import { useMenuStore } from '@/store/menu'
 import { getMeProcessList } from '@/api/process/me'
+import { useUserStore } from '@/store/user'
 
-const menuStore = useMenuStore()
+const userStore = useUserStore()
 
+
+const build = computed(()=>{
+  return userStore.userInfo.username === 'admin' ? processBuild : processBuild.filter(item => item.name !== '流程监控')
+})
 const processBuild = [
   { name: '流程模型', icon: '/process/model.png', path: '/flow-engine/model' },
   { name: '流程表单', icon: '/process/form.png', path: '/flow-engine/form' },
