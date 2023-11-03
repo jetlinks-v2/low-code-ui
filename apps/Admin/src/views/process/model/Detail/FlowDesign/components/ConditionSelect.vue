@@ -26,7 +26,7 @@
         :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
         style="max-width: 200px;min-width: 200px;"
         class="variable-select"
-        @clear="handleConditionClear(item, index)"
+        @clear="handleConditionClear(index)"
         @select="(value, label) => handleConditionChange(value,label, item, index)"
       >
         <template #title="{ name }">
