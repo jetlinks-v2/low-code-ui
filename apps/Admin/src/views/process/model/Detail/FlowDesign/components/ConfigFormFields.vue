@@ -113,7 +113,7 @@
           <j-scrollbar height="525">
             <div
               class="preview-item"
-              v-for="(item, index) in previewData"
+              v-for="(item, index) in allFormList"
               :key="index"
             >
               <div class="name">
@@ -186,8 +186,6 @@ const loading = ref(false)
 const keywords = ref('')
 const filterFormList = ref<any[] | undefined>([])
 const allFormList = ref<any[] | undefined>([])
-// 表单预览数据
-const previewData = ref<any[]>([])
 // 不用展示的表单字段类型: 卡片, 网格, 选项卡, 折叠面板, 弹性间距...
 const unDisplayFieldsType = ref(['card', 'grid', 'tabs', 'collapse', 'space'])
 const getFormList = async () => {
@@ -235,6 +233,7 @@ const getFormList = async () => {
           ? ['read', 'write']
           : ['read'],
         ...m,
+        multiple: existForms?.find((f) => f.formId === m.key)?.multiple,
       }
     } else {
       _fields?.forEach((p) => {
@@ -242,25 +241,17 @@ const getFormList = async () => {
         // 初始状态没有权限, 不可编辑
         p.componentProps.disabled = true
       })
-      return { accessModes: ['read'], ...m }
-    }
-  })
-  // 右侧预览数据
-  previewData.value = result.map((m) => {
-    // 过滤不需要展示的字段
-    m.configuration.children = m.configuration.children
-    // ?.filter(
-    //   (f) => !unDisplayFieldsType.value.includes(f.type),
-    // )
-    return {
-      ...m,
-      multiple: existForms?.find((f) => f.formId === m.key)?.multiple,
+      return {
+        accessModes: ['read'],
+        ...m,
+        multiple: existForms?.find((f) => f.formId === m.key)?.multiple,
+      }
     }
   })
 
   // 所有表单数据, 用于前端筛选
   allFormList.value = cloneDeep(filterFormList.value)
-
+  handleSearch()
   // 设置全部内容全选状态
   setCheckAll()
 }
