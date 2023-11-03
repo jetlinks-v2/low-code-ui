@@ -48,7 +48,7 @@
         v-model:value="myValue"
         @change="onChange"
       /> -->
-      <Product v-if="itemType === 'product'" v-model:value="myValue"  v-bind="props" :keys="keys"/>
+      <Product v-if="itemType === 'product'" v-model:value="myValue"  v-bind="props" :keys="keys" :mode="mode"/>
       <!-- <j-input
         v-else
         allowClear

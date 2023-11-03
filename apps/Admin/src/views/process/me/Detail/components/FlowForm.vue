@@ -24,7 +24,9 @@
                                 <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled">
                                 </ValueItem>
-                                <!-- <FormItem :itemType="i.type"  v-model:modelValue="record[i.dataIndex]" @change="()=>{valueChange(record[i.dataIndex])}" :disabled="i?.disabled" :keys="i.keys"></FormItem> -->
+                                <!-- <FormItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
+                                    @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled"
+                                    :keys="i.keys" :mode="i.mode"></FormItem> -->
                             </template>
                         </QuickEditTable>
                         <j-button @click="() => addTableData(item)" block style="margin-top: 10px;"
@@ -44,7 +46,7 @@
         </div>
     </div>
     <FlowModal v-if="visible" @close="visible = false" @save="onSave" :type="modalType" :required="required"
-        :taskId="taskId" :candidates="candidates" :defaultComment="defaultComment"/>
+        :taskId="taskId" :candidates="candidates" :defaultComment="defaultComment" />
 </template>
 
 <script setup>
@@ -158,55 +160,56 @@ const onSave = (value) => {
     }
 }
 //处理可编辑表格数据
-const dealTableData = (value) =>{
+const dealTableData = (value) => {
     const keysMap = new Map()
-    value.configuration.map((item)=>{
-        keysMap.set(item.dataIndex,item.keys)
+    value.configuration.map((item) => {
+        keysMap.set(item.dataIndex, item.keys)
     })
-    value.data =  value.data.map((item)=>{
-        let obj 
-        Object.keys(item).forEach((i)=>{
-            if(keysMap.has(i)){
-                dealIotModuleData(item[i],keysMap.get(i))
-                if(!Array.isArray(i)){
+    value.data = value.data.map((item) => {
+        let obj
+        Object.keys(item).forEach((i) => {
+            if (keysMap.has(i)) {
+                dealIotModuleData(item[i], keysMap.get(i))
+                if (!Array.isArray(item[i])) {
                     item = {
-                    ...item,
-                    ...item[i]
+                        ...item,
+                        ...item[i]
+                    }
+                    delete item[i]
                 }
-                delete item[i]
-                obj =  item
-                }else{
-
-                }
+                obj = item
             }
         })
         return obj
     })
 }
 //按照配置处理高级组件的数据
-const dealIotModuleData = (data,keys)=>{
-    if(Array.isArray(data)){
-        data = data.map((itemData)=>{
-            return Object.keys(itemData).map(i=>{
-                keys.map((item)=>{
-                    if(item.key === i){
-                    itemData[item.config.source] = itemData[i]
-                    delete itemData[i]
+const dealIotModuleData = (data, keys) => {
+    if (Array.isArray(data)) {
+        data.map((itemData) => {
+            Object.keys(itemData).map(i => {
+                keys.map((item) => {
+                    if (item.key === i) {
+                        itemData[item.config.source] = itemData[i]
+                        if (item.config.source !== i) {
+                            delete itemData[i]
+                        }
                     }
-                    return itemData
                 })
             })
         })
-    }else{
-        Object.keys(data).map(i=>{
-            keys.forEach((item)=>{
-                if(item.key === i){
-                data[item.config.source] = data[i]
-                delete data[i]
+    } else {
+        Object.keys(data).map(i => {
+            keys.forEach((item) => {
+                if (item.key === i) {
+                    data[item.config.source] = data[i]
+                    if (item.config.source !== i) {
+                        delete data[i]
+                    }
                 }
             })
         })
-    }   
+    }
 }
 
 //处理接受的可编辑表格数据
@@ -216,9 +219,8 @@ const onClick = async (value) => {
     if (modalType.value === 'save') {
         let data = []
         const fromValueCopy = cloneDeep(formValue.value)
-
-        fromValueCopy.forEach((i,index)=>{
-            if(i?.multiple){
+        fromValueCopy.forEach((i, index) => {
+            if (i?.multiple) {
                 dealTableData(i)
             }
             data.push({
@@ -283,45 +285,69 @@ const submitForm = async () => {
     }
 }
 //解析数据
-const analyzeTableData = (data,keys,name) =>{
+const analyzeTableData = (data, keys, name) => {
     let obj
-    Object.keys(data).forEach((i)=>{
-        if(keys.has(i)){
-            obj[keys.get(i)] = data[i]
-            delete data[i]
-        }
+    // if (Array.isArray(data)) {
+    //     let arr = []
+    //     data.map((itemData) => {
+    //         Object.keys(itemData).forEach((i) => {
+    //             if (keys.has(i)) {
+    //                 obj[keys.get(i)] = itemData[i]
+    //                 delete itemData[i]
+    //                 arr.push(obj)
+    //             }
+    //         })
+    //     })
+    //     data[name] = arr 
+    // }else{
+        Object.keys(data).forEach((item) => {
+            if(Array.isArray(data[item]) && name === i){
+                data[i].map((itemData)=>{
+                    Object.keys(itemData).forEach((ti) => {
+                        if (keys.has(i)) {
+                            obj[keys.get(i)] = itemData[i]
+                            delete itemData[i]
+                            arr.push(obj)
+                        }
+                    })
+                })
+            }
+            if (keys.has(i)) {
+                obj[keys.get(i)] = data[i]
+                delete data[i]
+            }
     })
-   data[name] = obj
+    data[name] = obj
+    // }
 }
 //根据配置项生成表格
 const dealTable = (disabled) => {
     const tableColumn = []
-    const tableData = []
-    formValue.value.forEach((i)=>{
-        if(i.multiple){
-             i?.configuration?.children.map((item)=>{
-                const rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}`},...item?.formItemProps?.rules] : [...item?.formItemProps?.rules]
-               tableColumn.push({
+
+    formValue.value.forEach((i) => {
+        if (i.multiple) {
+            i?.configuration?.children.map((item) => {
+                const rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }, ...item?.formItemProps?.rules] : [...item?.formItemProps?.rules]
+                tableColumn.push({
                     title: item.formItemProps?.label,
-                    dataIndex:  item.formItemProps?.name,
-                    mode: item.componentProps?.mode, 
+                    dataIndex: item.formItemProps?.name,
+                    mode: item.componentProps?.mode,
                     type: item?.type,
-                    disabled:disabled?true:false,
-                    keys:item.componentProps.keys,
-                    form:{
-                        rules:rules
+                    disabled: disabled ? true : false,
+                    keys: item.componentProps.keys,
+                    form: {
+                        rules: rules
                     }
-                }) 
-                const keysMap = new Map()
-                item.componentProps.keys.forEach(keys=>{
-                    keysMap.set(keys.config.source,keys.key)
-                 i?.data?.forEach((data)=>{
-                    analyzeTableData(data,keysMap,item.formItemProps)
-                 })
-                }) 
+                })
+                // const keysMap = new Map()
+                // item.componentProps.keys.forEach(keys => {
+                //     keysMap.set(keys.config.source, keys.key)
+                // })
+                // i?.data?.forEach((data) => {
+                //     analyzeTableData(data, keysMap, item.formItemProps)
+                // })
             })
             i.configuration = tableColumn
-           
         }
     })
 }
@@ -389,12 +415,11 @@ const dealForm = (nodes) => {
 //
 watch(() => props.info, () => {
     formValue.value = cloneDeep(props.info?.form)
-//    console.log('sssss',props.info?.form)
+    //    console.log('sssss',props.info?.form)
     nodes.value = JSON.parse(props.info.modelContent)?.nodes
     if (props.type === 'todo') {
         dealForm(nodes.value)
     } else {
-        // dealTable(true)
         formValue.value?.map((i) => {
             if (i.multiple) {
                 dealTable(true)
