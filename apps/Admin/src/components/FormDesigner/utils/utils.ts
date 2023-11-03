@@ -4,6 +4,9 @@ import { ISchema } from "../typings"
 import { queryDictionary, queryDictionaryData, queryEndCommand, queryEndCommands, queryProject, queryRuntime } from "@/api/form"
 import { cloneDeep, flatten, isObject, map, omit } from "lodash-es"
 
+// 在流程表单中这些key在表中自动生成不能配置为name
+export const _specialKeys = ['id', 'processId', 'modelKey', 'modelId', 'creatorId', 'createTime', 'modifierId', 'modifyTime']
+
 // 查询数据字典或者项目列表
 let _source = {
     end: [],
@@ -59,7 +62,7 @@ export const generateOptions = (len: number) => {
 
 const arr = ['input', 'textarea', 'input-number', 'card-select', 'input-password', 'upload', 'switch', 'form', 'select', 'tree-select', 'date-picker', 'time-picker', 'table', 'geo', 'product', 'device', 'org', 'user', 'role']
 
-const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], source: any, commandsMap: any) => {
+const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], source: any, commandsMap: any, type: 'workflow' | 'low-code') => {
     const obj = {
         key: node?.key,
         message: (node.formItemProps?.label || node.name) + '配置错误'
@@ -77,6 +80,8 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
             if (!node?.formItemProps?.name) {
                 return obj
             } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
+                return obj
+            } else if (_specialKeys.includes(node?.formItemProps?.name) && type === 'workflow') {
                 return obj
             } else {
                 const _arr = cloneDeep(queryKeys(allData))
@@ -214,6 +219,12 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
                 if (flag) {
                     return obj
                 }
+                if(type === 'workflow'){
+                    const _flag = map(node.componentProps?.keys || [], 'config.source')?.find(i => {
+                      return _specialKeys.includes(i)
+                    })
+                    if (_flag) return obj
+                  }
             }
         }
     }
@@ -242,7 +253,7 @@ const _valEndData = async (info: any, node: ISchema) => {
     }
     if (node.componentProps?.source?.projectId && !_commandsMap.get(node.componentProps?.source?.projectId)) {
         let response: any = undefined
-        if(node.componentProps?.source?.projectId === info?.id){
+        if (node.componentProps?.source?.projectId === info?.id) {
             response = await queryEndCommand(info?.draftId, [])
         } else {
             response = await queryEndCommands(node.componentProps?.source?.projectId, [])
@@ -255,23 +266,23 @@ const _valEndData = async (info: any, node: ISchema) => {
 
 const errorMap = new Map()
 // 校验配置项必填
-const checkConfig = async (info: any, node: ISchema, allData: any[], formList: any[]) => {
+const checkConfig = async (info: any, node: ISchema, allData: any[], formList: any[], type: 'workflow' | 'low-code') => {
     if (['select', 'tree-select', 'select-card'].includes(node.type)) {
         await _valEndData(info, node)
     }
-    const _data: any = checkedConfigItem(node, allData, formList, _source, _commandsMap);
+    const _data: any = checkedConfigItem(node, allData, formList, _source, _commandsMap, type);
     if (_data) {
         errorMap.set(node.key, _data)
     }
     if (node.children && node.children?.length) {
         for (let index = 0; index < node?.children?.length; index++) {
             const element = node?.children[index];
-            await checkConfig(info, element, allData, formList)
+            await checkConfig(info, element, allData, formList, type)
         }
     }
 }
 
-export const checkedConfig = (info: any, node: ISchema, formList: any[]) => {
+export const checkedConfig = (info: any, node: ISchema, formList: any[], type: 'workflow' | 'low-code') => {
     _commandsMap.clear()
     errorMap.clear()
     _source = {
@@ -279,7 +290,7 @@ export const checkedConfig = (info: any, node: ISchema, formList: any[]) => {
         dictionary: []
     }
     return new Promise(async (resolve) => {
-        await checkConfig(info, node, node?.children || [], formList)
+        await checkConfig(info, node, node?.children || [], formList, type)
         resolve([...errorMap.values()])
     })
 }
@@ -391,7 +402,7 @@ export const getBrotherList = (value: string | number, arr: any[]) => {
             const element = arr[index];
             if (element.key === value) {
                 return arr
-            }else if (element?.children?.length) {
+            } else if (element?.children?.length) {
                 return getBrotherList(value, element?.children)
             }
         }
