@@ -10,7 +10,7 @@
         @change="onChange"
         @focus="focus"
         @blur="focus"
-        :maxlength="maxlength"
+        :maxlength="256"
       />
       <div class="html">
         <span v-html="titleHtml"></span>
@@ -46,13 +46,12 @@ const props = defineProps({
     type: String,
     default: '请输入',
   },
-  maxlength: {
-    type: Number,
-    default: 64
-  },
   name: {
     type: String,
   },
+  maxlength: {
+    type: Number
+  }
 })
 
 const emits = defineEmits(['update:value'])
@@ -114,7 +113,7 @@ const insertText = (val) => {
   const valArr = hide.value.split('')
   const len = offset.end - offset.start
   valArr.splice(offset.start, len, val)
-  hide.value = valArr.join('')
+  hide.value = valArr.join('').substring(0, 256)
 }
 
 const selectVariable = (_, { label }) => {
