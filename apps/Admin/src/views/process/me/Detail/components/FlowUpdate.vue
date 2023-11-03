@@ -1,6 +1,6 @@
 
 <template>
-    <j-modal visible @cancel="emit('close')" title="办理详情" :width="700" @ok="emit('close')">
+    <j-modal visible @cancel="emit('close')" title="办理详情" :width="700" @ok="emit('close')" :maskClosable="false">
         <j-tabs v-model:activeKey="activeKey" type="card">
             <j-tab-pane v-for="item in tabs" :key="item.key" :tab="item.label">
                 <j-scrollbar style="height: calc(100vh - 350px)">
