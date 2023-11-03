@@ -49,6 +49,9 @@ const props = defineProps({
   name: {
     type: String,
   },
+  maxlength: {
+    type: Number
+  }
 })
 
 const emits = defineEmits(['update:value'])
@@ -110,7 +113,7 @@ const insertText = (val) => {
   const valArr = hide.value.split('')
   const len = offset.end - offset.start
   valArr.splice(offset.start, len, val)
-  hide.value = valArr.join('')
+  hide.value = valArr.join('').substring(0, 256)
 }
 
 const selectVariable = (_, { label }) => {
