@@ -271,7 +271,7 @@ const drawer = reactive({
 const getActions = (record, type = 'card') => {
   const actions = [
     {
-      key: 'view',
+      key: 'preview',
       text: '预览',
       icon: 'PlayCircleOutlined',
       permissionProps: (data) => ({

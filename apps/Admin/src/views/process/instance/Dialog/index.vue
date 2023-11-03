@@ -57,7 +57,7 @@
       <j-form-item
         name="icon"
         label="流程图标"
-        :rules="[{ required: true, message: '请上传流程图标' }]"
+        :rules="[{ required: true, message: '请上传流程图标'}]"
       >
       <j-radio-group v-model:value="form.icon" class="radio">
           <j-radio-button
@@ -90,9 +90,9 @@
               <AIcon
                 v-else
                 :type="selected || 'PlusOutlined'"
-                :style="{ fontSize: form.icon ? '16px' : '' }"
+                :style="{ fontSize: form.icon ? '26px' : '' }"
               />
-              {{ selected }}
+              <!-- {{ selected }} -->
             </div>
             <div>自定义</div>
           </j-radio-button>
@@ -191,6 +191,7 @@ const confirm = () => {
     if (chooseIconRef.value.selected) {
       selected.value = chooseIconRef.value.selected
       form.icon = selected.value
+      formRef.value?.validateFields(['icon'])
       showIcon.value = false
     } else {
       onlyMessage('请选择图标', 'error')
@@ -208,10 +209,7 @@ const cancel = () => {
     emits('update:visible', false)
   }
 }
-watch(() => form.icon, (val)=>{
-  console.log(`output->baseIcon`,baseIcon)
-  console.log(`output->val`,val)
-  // props.data.icon
+watch(() => props.data.icon, (val)=>{
   selected.value = baseIcon.some((i) => i === form.icon) ? '' : form.icon
 },{immediate: true})
 </script>
