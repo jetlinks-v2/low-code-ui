@@ -72,7 +72,7 @@
     />
   </page-container>
 </template>
-  
+
 <script lang="ts" setup>
 import Save from './Save/index.vue'
 import dayjs from 'dayjs'
@@ -174,7 +174,7 @@ const getActions = (record) => {
         title: '编辑',
       },
       icon: 'EditOutlined',
-      hasPermission: "form_save",
+      hasPermission: "form_update",
       onClick: () => {
         handleAdd(record)
       },
@@ -225,7 +225,6 @@ const _del = async (id: string) => {
   }
 }
 </script>
-  
+
 <style scoped lang="less">
 </style>
-  
