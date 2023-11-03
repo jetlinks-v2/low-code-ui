@@ -53,7 +53,8 @@ export default defineComponent({
         type: props.data?.type + '-item',
         children: [],
         formItemProps: {
-          name: props.data?.type + '-item' + '_' + uid(6)
+          name: props.data?.type + '-item' + '_' + uid(6),
+          isLayout: true
         },
         componentProps: {
           name: 'Title'
