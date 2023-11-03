@@ -21,12 +21,12 @@
                             <template v-for="(i, index) in item.configuration"
                                 #[i.dataIndex]="{ record, index, valueChange }">
                                 <!-- <slot :name="name" v-bind="slotData || {}" /> -->
-                                <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
+                                <!-- <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled">
-                                </ValueItem>
-                                <!-- <FormItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
+                                </ValueItem> -->
+                                <FormItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled"
-                                    :keys="i.keys" :mode="i.mode"></FormItem> -->
+                                    :keys="i.keys" :mode="i.mode"></FormItem>
                             </template>
                         </QuickEditTable>
                         <j-button @click="() => addTableData(item)" block style="margin-top: 10px;"
@@ -304,6 +304,7 @@ const dealTable = (disabled) => {
                     }
                 })
             })
+            console.log(tableColumn,'___')
             i.configuration = tableColumn
         }
     })
@@ -339,12 +340,13 @@ const dealForm = (nodes) => {
         formValue.value = formValue.value.filter((item) => {
             if (bindMap.has(item.formId)) {
                 // 循环表单项 根据节点 配置表单项属性 过滤掉节点没有配置的表单项
+                console.log(bindMap,'map')
                 item.configuration.children = item.configuration.children.filter((i) => {
                     return bindMap.get(item.formId).some((k) => {
                         if (k.id === i.formItemProps.name) {
                             // console.log('k.required',k.required)
                             i.componentProps.disabled = !k?.accessModes?.includes('write')
-                            return false
+                            return true
                         }
                     })
                 })
@@ -353,7 +355,6 @@ const dealForm = (nodes) => {
                 return false
             }
         })
-        // console.log('formValue.value',formValue.value)
         dealTable()
     } else {
         nodes?.children ? dealForm(nodes.children) : ''
@@ -382,8 +383,8 @@ watch(() => props.info, () => {
             }
 
         })
-        // console.log('formValue.value',formValue.value)
     }
+    console.log('formValue.value',formValue.value)
 })
 
 </script>
