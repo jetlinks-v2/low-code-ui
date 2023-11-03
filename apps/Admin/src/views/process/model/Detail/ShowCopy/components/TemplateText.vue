@@ -56,7 +56,7 @@ const props = defineProps({
 })
 
 const emits = defineEmits(['update:value'])
-const className = ref(randomString(4))
+const className = ref(`template-textarea--${randomString(4)}`)
 const offset = reactive({
   start: 0,
   end: 0
