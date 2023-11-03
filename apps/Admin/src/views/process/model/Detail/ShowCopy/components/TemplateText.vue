@@ -10,7 +10,7 @@
         @change="onChange"
         @focus="focus"
         @blur="focus"
-        :maxlength="maxlength"
+        :maxlength="256"
       />
       <div class="html">
         <span v-html="titleHtml"></span>
@@ -45,10 +45,6 @@ const props = defineProps({
   placeholder: {
     type: String,
     default: '请输入',
-  },
-  maxlength: {
-    type: Number,
-    default: 64
   },
   name: {
     type: String,
