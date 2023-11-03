@@ -101,7 +101,7 @@ export default defineComponent({
                                                     data-layout-type={'item'}
                                                     parent={element}
                                                     path={_path}
-                                                    index={_index + 1}
+                                                    index={_index}
                                                     visible={props.visible}
                                                     editable={props.editable}
                                                 />

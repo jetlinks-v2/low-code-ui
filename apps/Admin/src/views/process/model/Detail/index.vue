@@ -33,7 +33,12 @@
             :loading="nextLoading"
             >下一步</j-button
           >
-          <j-button type="primary" @click="handleSave" :loading="saveLoading">
+          <PermissionButton
+            type="primary"
+            @click="handleSave"
+            :loading="saveLoading"
+            hasPermission="workflow:definition_save"
+          >
             保存
             <template #icon>
               <j-tooltip placement="right">
@@ -43,11 +48,12 @@
                 <AIcon type="QuestionCircleOutlined" />
               </j-tooltip>
             </template>
-          </j-button>
-          <j-button
+          </PermissionButton>
+          <PermissionButton
             type="primary"
             @click="handleDeploy"
-            :disabled="flowDetail?.state?.value === 'deployed'"
+            hasPermission="workflow:definition_save"
+            :disabled="!isChange && flowDetail?.state?.value === 'deployed'"
           >
             部署
             <template #icon>
@@ -56,11 +62,35 @@
                 <AIcon type="QuestionCircleOutlined" />
               </j-tooltip>
             </template>
-          </j-button>
+          </PermissionButton>
+          <!-- <j-button type="primary" @click="handleSave" :loading="saveLoading">
+            保存
+            <template #icon>
+              <j-tooltip placement="right">
+                <template #title>
+                  仅保存配置数据，不校验填写内容的合规性。
+                </template>
+                <AIcon type="QuestionCircleOutlined" />
+              </j-tooltip>
+            </template>
+          </j-button> -->
+          <!-- <j-button
+            type="primary"
+            @click="handleDeploy"
+            :disabled="!isChange && flowDetail?.state?.value === 'deployed'"
+          >
+            部署
+            <template #icon>
+              <j-tooltip placement="right">
+                <template #title> 配置内容需要通过合规性校验。 </template>
+                <AIcon type="QuestionCircleOutlined" />
+              </j-tooltip>
+            </template>
+          </j-button> -->
         </div>
       </div>
     </j-card>
-    <FullPage>
+    <FullPage :minHeight="current !== 1">
       <!--      <j-card :bordered="false">-->
       <!--        <component ref="stepRef" :is="componentsMap[current]" />-->
       <!--      </j-card>-->
@@ -109,15 +139,15 @@ const nextLoading = ref(false)
 const saveLoading = ref(false)
 const isModal = ref(false)
 const oldData = ref({
-    config: {},
-    nodes: {
-        id: 'ROOT_1',
-        parentId: null,
-        type: 'ROOT',
-        name: '发起申请',
-        active: false,
-        props: { assignedUser: [] },
-    }
+  config: {},
+  nodes: {
+    id: 'ROOT_1',
+    parentId: null,
+    type: 'ROOT',
+    name: '发起申请',
+    active: false,
+    props: { assignedUser: [] },
+  },
 })
 /**
  * 获取模型详情
@@ -128,13 +158,12 @@ const getFlowDetail = async () => {
   flowDetail.value = result
   const model = JSON.parse(result.model || '{}')
   //   console.log('model: ', model)
-  if(result.model!==''){
+  if (result.model !== '') {
     oldData.value = cloneDeep(model)
   }
 
   flowStore.setModel(model)
   flowStore.setModelBaseInfo(result)
- 
 }
 
 /**
@@ -165,7 +194,7 @@ const handleNext = async () => {
 const handleSave = (type?: string) => {
   const params = {
     id: route.query.id,
-    state: 'undeployed',
+    state: flowDetail.value?.state?.value || 'undeployed',
     model: JSON.stringify(flowStore.model),
   }
   //   console.log('flowStore.model: ', flowStore.model)
@@ -182,7 +211,7 @@ const handleSave = (type?: string) => {
         isModal.value = true
         router.go(-1)
       }
-      getFlowDetail()
+      //   getFlowDetail() #19297 此处调用详情会报错闪一下
     })
     .finally(() => {
       saveLoading.value = false
@@ -289,17 +318,19 @@ const routerChange = (next?: Function) => {
   })
 }
 
+// 数据是否更改
+const isChange = computed(
+  () => JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model),
+)
 onBeforeRouteLeave((to, form, next) => {
-  const isChange = JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model)
-  if (!isModal.value && isChange) {
+  if (!isModal.value && isChange.value) {
     routerChange(next)
   } else {
     next()
   }
 })
 onBeforeRouteUpdate((to, from, next) => {
-  const isChange = JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model)
-  if (!isModal.value && isChange) {
+  if (!isModal.value && isChange.value) {
     routerChange(next)
   } else {
     next()

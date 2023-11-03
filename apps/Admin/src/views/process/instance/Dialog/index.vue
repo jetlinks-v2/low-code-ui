@@ -4,7 +4,7 @@
     visible
     :maskClosable="false"
     :title="title"
-    :width="!showIcon ? 552 : '50%'"
+    :width="!showIcon ? 700 : '50%'"
     @cancel="cancel"
     @ok="confirm"
     class="edit-dialog-container"
@@ -33,7 +33,7 @@
         <j-input
           v-model:value="form.name"
           placeholder="请输入流程名称"
-          style="width: 320px"
+          style="width: 576px"
         />
       </j-form-item>
       <j-form-item
@@ -45,7 +45,7 @@
           v-model:value="form.classifiedId"
           placeholder="请选择流程分类"
           :options="classified"
-          style="width: 320px"
+          style="width: 576px"
         >
           <template #notFoundContent>
             <div>
@@ -57,9 +57,47 @@
       <j-form-item
         name="icon"
         label="流程图标"
-        :rules="[{ required: true, message: '请上传流程图标' }]"
+        :rules="[{ required: true, message: '请上传流程图标'}]"
       >
-        <div class="upload-img-icon" @click="chooseIcon">
+      <j-radio-group v-model:value="form.icon" class="radio">
+          <j-radio-button
+            v-for="(item, index) of baseIcon"
+            :value="item"
+            :key="item"
+            :class="{ active: form.icon === item }"
+          >
+            <ProImage
+              style="border: 1px dashed #dcdcdc"
+              :src="item"
+              :width="44"
+              :preview="false"
+            />
+            <div>图标{{ index + 1 }}</div>
+          </j-radio-button>
+          <j-radio-button
+            :value="selected"
+            :class="{ active: form.icon === selected }"
+          >
+          <div class="upload-img-icon" @click="chooseIcon">
+              <ProImage
+                v-if="isImg(selected)"
+                :width="40"
+                :height="40"
+                :src="selected"
+                :preview="false"
+              />
+              
+              <AIcon
+                v-else
+                :type="selected || 'PlusOutlined'"
+                :style="{ fontSize: form.icon ? '26px' : '' }"
+              />
+              <!-- {{ selected }} -->
+            </div>
+            <div>自定义</div>
+          </j-radio-button>
+        </j-radio-group>
+        <!-- <div class="upload-img-icon" @click="chooseIcon">
           <ProImage
             v-if="isImg(form.icon)"
             :width="40"
@@ -72,7 +110,7 @@
             :type="form.icon ?? 'PlusOutlined'"
             :style="{ fontSize: form.icon ? '16px' : '' }"
           />
-        </div>
+        </div> -->
       </j-form-item>
     </j-form>
     <!-- 选择图标 -->
@@ -80,7 +118,7 @@
   </j-modal>
 </template>
 <script setup lang="ts">
-import { onlyMessage } from '@jetlinks/utils'
+import { onlyMessage, getImage } from '@jetlinks/utils'
 import ChooseIcon from './ChooseIcon.vue'
 import { copy_api } from '@/api/process/instance'
 import { useRequest } from '@jetlinks/hooks'
@@ -110,7 +148,15 @@ const emits = defineEmits<{
   (e: 'refresh'): void
 }>()
 
+const baseIcon = [
+  getImage(`/process/model/icon1.png`),
+  getImage(`/process/model/icon2.png`),
+  getImage(`/process/model/icon3.png`),
+  getImage(`/process/model/icon4.png`),
+]
+
 const { classified } = useClassified()
+const selected = ref<string>('')
 const chooseIconRef = ref()
 const title = ref<string>('复制为模型')
 const showIcon = ref<boolean>(false)
@@ -143,7 +189,9 @@ const chooseIcon = () => {
 const confirm = () => {
   if (showIcon.value) {
     if (chooseIconRef.value.selected) {
-      form.icon = chooseIconRef.value.selected
+      selected.value = chooseIconRef.value.selected
+      form.icon = selected.value
+      formRef.value?.validateFields(['icon'])
       showIcon.value = false
     } else {
       onlyMessage('请选择图标', 'error')
@@ -161,6 +209,9 @@ const cancel = () => {
     emits('update:visible', false)
   }
 }
+watch(() => props.data.icon, (val)=>{
+  selected.value = baseIcon.some((i) => i === form.icon) ? '' : form.icon
+},{immediate: true})
 </script>
 <style scoped lang="less">
 .upload-img-icon {
@@ -173,5 +224,41 @@ const cancel = () => {
   border-radius: 4px;
   border: 1px dashed #dcdcdc;
   background: #eeeeee;
+}
+.radio {
+  display: flex;
+  gap: 24px;
+  // display: grid;
+  // grid-gap: 20px;
+  // grid-template-columns: repeat(6, 1fr);
+  // max-height: 500px;
+  // overflow-y: auto;
+
+  .ant-radio-button-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+
+    border: 2px solid #efefef;
+    border-radius: 2px;
+    cursor: pointer;
+
+    &.active {
+      color: #415ed1;
+      border-color: #415ed1;
+    }
+    :deep(.upload-image-content) {
+      width: 44px !important;
+      height: 44px !important;
+      padding: 0;
+      background: #fff;
+    }
+    :deep(.ant-upload.ant-upload-select-picture-card) {
+      margin: 0;
+    }
+  }
 }
 </style>

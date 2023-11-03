@@ -197,7 +197,7 @@ const Selection = defineComponent({
                 <MenuItem key="paste"><Button type="link" onClick={onPaste}>粘贴</Button></MenuItem>
                 <MenuItem key="shear"><Button type="link" onClick={onShear}>剪切</Button></MenuItem>
                 <MenuItem key="delete"><Button danger type="link" onClick={onDelete}>删除</Button></MenuItem>
-                <MenuItem key="collect"><Button type="link" onClick={onCollect}>收藏为模版</Button></MenuItem>
+                {designer?.type === 'low-code' && <MenuItem key="collect"><Button type="link" onClick={onCollect}>收藏为模版</Button></MenuItem>}
               </Menu>
             )
           }

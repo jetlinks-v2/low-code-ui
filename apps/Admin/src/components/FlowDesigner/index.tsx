@@ -33,6 +33,17 @@ const componentsMap = {
   EMPTY: Empty,
 }
 
+const ScaleRender = (enlarge, zoomOut, scale) => {
+  const scaleStr = scale ? Math.round(scale*100) + '%' : '100%'
+  return (
+    <div class={'flow-designer-tool'}>
+      <div class={'tool-item btn'} onClick={zoomOut}> - </div>
+      <div class={'tool-item'}>{scaleStr}</div>
+      <div class={'tool-item btn'} onClick={enlarge}> + </div>
+    </div>
+  )
+}
+
 const FlowDesigner = defineComponent({
   name: 'FlowDesigner',
   props: {
@@ -112,9 +123,8 @@ const FlowDesigner = defineComponent({
                   onAddBranchNode: (type) => addBranchNode(node, type),
                   onOpenConfig: () => openConfig(node),
                 },
-                [],
-              ),
-            ],
+              )
+            ]
           ),
         )
         let bchDom = [h('div', { class: { 'branch-node': true } }, branchItems)]
@@ -163,7 +173,6 @@ const FlowDesigner = defineComponent({
             onLeftMove: () => branchMove(node, -1),
             onRightMove: () => branchMove(node, 1),
           },
-          [],
         ),
       )
     }
@@ -194,14 +203,28 @@ const FlowDesigner = defineComponent({
     /**
      * 分支交换位置
      * @param node
-     * @param offset
+     * @param offset // 位移
+     * @param index
      */
     const branchMove = (node, offset) => {
       let parentNode = nodeMap.value.get(node.parentId)
       let index = parentNode.branches.indexOf(node)
       let branch = parentNode.branches[index + offset]
-      parentNode.branches[index + offset] = parentNode.branches[index]
+      const targetNode = parentNode.branches[index]
+
+      //  处理子节点
+      const copyChildrenLeft = cloneDeep(targetNode.children)
+      const copyChildrenRight = cloneDeep(branch.children)
+
+      copyChildrenLeft.parentId = branch.id
+      copyChildrenRight.parentId = targetNode.id
+
+      targetNode.children = copyChildrenRight
+      branch.children = copyChildrenLeft
+
+      parentNode.branches[index + offset] = targetNode
       parentNode.branches[index] = branch
+
       proxy?.$forceUpdate()
     }
 
@@ -606,10 +629,9 @@ const FlowDesigner = defineComponent({
       }
     }
     expose({ validateProcess })
-    // 鼠标事件
-    if (props.dragging) {
-      useMouseEvent(DragRef)
-    }
+
+
+    const { enlarge, zoomOut, scale } = useMouseEvent(DragRef, props.dragging)
 
     // 渲染组件
     return () => {
@@ -632,15 +654,18 @@ const FlowDesigner = defineComponent({
 
       return h('div', {
           ref: DragRef,
-          style: { overflow: 'hidden', height: '100%'}
+          class: 'drag-warp'
         },
-        h(
-          'div',
-          {
-            class: { _root: true },
-          },
-          processTrees,
-        )
+        [
+          h(
+            'div',
+            {
+              class: { _root: true },
+            },
+            processTrees,
+          ),
+          ScaleRender(enlarge, zoomOut, scale.value)
+        ]
       )
     }
   },

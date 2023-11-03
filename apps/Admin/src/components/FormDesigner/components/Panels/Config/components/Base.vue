@@ -173,6 +173,7 @@
         <!-- <template> -->
         <j-form-item
           label="标识"
+          v-if="target.formItemProps.isLayout"
           :name="['formItemProps', 'name']"
           required
           :validateFirst="true"
@@ -370,7 +371,7 @@
           </j-form-item>
         </template>
       </template>
-      <template v-if="['grid', 'space'].includes(type)">
+      <!-- <template v-if="['grid', 'space'].includes(type)">
         <j-form-item
           label="标识"
           :name="['formItemProps', 'name']"
@@ -385,7 +386,7 @@
             v-model:value="target.formItemProps.name"
           />
         </j-form-item>
-      </template>
+      </template> -->
       <template v-if="['tabs'].includes(type)">
         <j-form-item
           :validateFirst="true"
@@ -494,7 +495,7 @@ import { computed, inject, unref } from 'vue'
 import { useTarget } from '../../../../hooks'
 import { basic } from '@/components/FormDesigner/utils/defaultData'
 import generatorData from '@/components/FormDesigner/utils/generatorData'
-import { getBrotherList, queryKeys, updateData } from '../../../../utils/utils'
+import { getBrotherList, queryKeys, updateData, _specialKeys } from '../../../../utils/utils'
 import Storage from './Storage/index.vue'
 import { uid } from '@/components/FormDesigner/utils/uid'
 import { cloneDeep, flatten, map } from 'lodash-es'
@@ -511,6 +512,7 @@ const emits = defineEmits(['refresh'])
 
 const onSwitch = (_checked: boolean) => {
   target.value.formItemProps.label = _checked ? target.value.name : undefined
+  target.value.formItemProps.name = _checked ? `${target.value?.type}_${uid()}` : undefined
   target.value.formItemProps.isLayout = _checked
   emits('refresh', target.value)
 }
@@ -600,6 +602,10 @@ const rules = [
         .filter((item) => item.key !== __key)
         .find((i) => i?.formItemProps?.name === value)
       if (flag) return Promise.reject(`标识${value}已被占用`)
+      // 判断key是否为_specialKeys
+      if(designer.type === 'workflow' && _specialKeys.includes(value)){
+        return Promise.reject(`标识不能与内置字段重名`)
+      }
       return Promise.resolve()
     },
     trigger: 'change',
@@ -633,6 +639,12 @@ const storageRules = [
         return map(value, 'config.source')?.includes(i)
       })
       if (flag) return Promise.reject(`标识${flag}已被占用`)
+      if(designer.type === 'workflow'){
+        const _flag = map(value, 'config.source')?.find(i => {
+          return _specialKeys.includes(i)
+        })
+        if (_flag) return Promise.reject(`标识不能与内置字段重名`)
+      }
       return Promise.resolve()
     },
     trigger: 'change',
