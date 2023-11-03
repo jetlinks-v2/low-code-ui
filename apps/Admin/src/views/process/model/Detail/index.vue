@@ -37,7 +37,7 @@
             type="primary"
             @click="handleSave"
             :loading="saveLoading"
-            hasPermission="workflow:model_add"
+            hasPermission="workflow:model_save"
           >
             保存
             <template #icon>

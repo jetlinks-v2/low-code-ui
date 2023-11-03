@@ -284,7 +284,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: '复制为模型',
         },
-        hasPermission: 'workflow:release_copy',
+        hasPermission: 'workflow:model_add',
         onClick: () => {
           copyAsModel(data)
         },
