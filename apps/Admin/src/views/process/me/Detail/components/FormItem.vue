@@ -48,11 +48,12 @@
         v-model:value="myValue"
         @change="onChange"
       /> -->
-      <Product v-if="itemType === 'product'" v-model:value="myValue"  v-bind="props" :keys="keys" :mode="mode"/>
-      <Device v-else-if="itemType ==='device'" v-model:value="myValue" v-bind="props" :keys="keys" :mode="mode"/>
-      <User v-else-if="itemType === 'user'" v-model:value="myValue" v-bind="props" :keys="keys" :mode="mode" />
-      <Role v-else-if="itemType === 'role'" v-model:value="myValue" v-bind="props" :keys="keys" :mode="mode" />
-      <Org v-else-if="itemType === 'org'" v-model:value="myValue" v-bind="props" :keys="keys" :mode="mode" />
+      <Product v-if="itemType === 'product'" v-model:value="myValue"  v-bind="props" :keys="keys" :mode="mode" @change="onChange"/>
+      <Device v-else-if="itemType ==='device'" v-model:value="myValue" v-bind="props" :keys="keys" :mode="mode" @change="onChange"/>
+      <User v-else-if="itemType === 'user'" v-model:value="myValue" v-bind="props" :keys="keys" :mode="mode" @change="onChange"/>
+      <Role v-else-if="itemType === 'role'" v-model:value="myValue" v-bind="props" :keys="keys" :mode="mode" @change="onChange"/>
+      <Org v-else-if="itemType === 'org'" v-model:value="myValue" v-bind="props" :keys="keys" :mode="mode" @change="onChange"/>
+      <j-switch v-else-if="itemType === 'switch' " v-model:value="myValue" v-bind="props" @change="onChange"></j-switch>
       <!-- <j-input
         v-else
         allowClear
@@ -114,30 +115,15 @@
   })
   
   const myValue = ref(undefined)
-  watch(()=>myValue.value,(value:any)=>{
-  //  Object.keys(data).map(i=>{
-  //     props.keys?.forEach((item:any)=>{
-  //       if(item.key === i){
-  //         data[item.config.source] = data[i]
-  //         delete data[i]
-  //       }
-  //     })
-  //   })
+  const onChange = () =>{
     emit('update:modelValue', myValue.value)
     emit('change', myValue.value)
-  })
+  }
+
 
   watch(
     () => props.modelValue,
     () => {
-      // Object.keys(data).map(i=>{
-      // props.keys?.forEach((item:any)=>{
-      //   if(item.config.source === i){
-      //     data[item.key] = data[i]
-      //     delete data[i]
-      //   }
-      // })
-    // })
       myValue.value = props.modelValue
     },
     { immediate: true },
