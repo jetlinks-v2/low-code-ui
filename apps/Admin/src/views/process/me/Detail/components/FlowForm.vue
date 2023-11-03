@@ -278,6 +278,7 @@ const submitForm = async () => {
             form: submitData.value,
         })
         if (res.status === 200) {
+            onlyMessage('操作成功')
             emit('close')
         }
     }
