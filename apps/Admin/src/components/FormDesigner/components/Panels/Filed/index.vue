@@ -3,7 +3,7 @@
     <Scrollbar height="100%">
       <j-tabs v-model:activeKey="activeKey" :tabBarGutter="0" type="card">
         <j-tab-pane tab="组件库" key="module"><Library /></j-tab-pane>
-        <j-tab-pane tab="模板" key="template"><Template /></j-tab-pane>
+        <j-tab-pane v-if="designer?.type === 'low-code'" tab="模板" key="template"><Template /></j-tab-pane>
       </j-tabs>
     </Scrollbar>
   </div>
@@ -12,9 +12,12 @@
 <script lang="ts" setup>
 import Library from './library'
 import Template from './template'
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 import { Scrollbar } from 'jetlinks-ui-components'
+
+const designer: any = inject('FormDesigner')
 const activeKey = ref('module')
+
 </script>
 <style lang="less" scoped>
 .filed-box {

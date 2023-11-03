@@ -58,13 +58,14 @@
         :options="operatorMap[conditionType(item) || 'default']"
         label-in-value
         placeholder="请选择"
-        style="width: 200px"
+        style="max-width: 120px;"
         class="operator-select"
         @change="handleTermTypeChange(item)"
       />
       <ConditionValueItem
         v-model:modelValue="item.value"
         :operator="item.selectedTermType"
+        :formItemComponent="item.selectedNodeId"
         :full-id="findVariableById(conditionOptions, item?.column)?.fullId"
         :conditionType="conditionType(item)"
       />
@@ -87,6 +88,7 @@ import { useFlowStore } from '@/store/flow'
 import ConditionValueItem from './ConditionValueItem.vue'
 import { operatorMap } from './const'
 import { findVariableById } from './utils'
+import { onlyMessage } from '@jetlinks/utils'
 
 const flowStore = useFlowStore()
 
@@ -102,6 +104,7 @@ interface IConditionSelect {
   selectedTermType?: any
   termTypeName?: string | undefined
   valueName?: string | undefined
+  selectedNodeId?: string //选中的节点ID
 }
 
 const emit = defineEmits(['update:value'])
@@ -163,7 +166,7 @@ const getFormFields = async () => {
       if(list[i].children?.length) {
         list[i].disabled = true
       }
-      list[i].key = parentFullId + list[i].id
+      list[i].key = parentFullId + ',' + list[i].id
       if (list[i].children) {
         addKeys(list[i].children, list[i].fullId)
       }
@@ -179,6 +182,7 @@ const handleConditionChange = (value, node, item, index) => {
   item.value = item.selectedTermType = undefined
   item.column = node.fullId
   item.columnName = node.name
+  item.selectedNodeId = node.id
 }
 
 const handleConditionClear = (item, index) => {
@@ -197,7 +201,7 @@ const handleTermTypeChange = (item) => {
  */
 const conditionType = (item) => {
   const _var = findVariableById(conditionOptions.value, item?.column)
-    console.log('_var: ', _var)
+    // console.log('_var: ', _var)
   if(_var?.id === 'processOwnerName') {
     return 'input'
   }
@@ -209,11 +213,15 @@ const handleRemove = (index: number) => {
 }
 
 const handleAdd = () => {
+  if(!conditionSelect.value[conditionSelect.value.length - 1].selectedColumn || !conditionSelect.value[conditionSelect.value.length - 1].selectedTermType || !conditionSelect.value[conditionSelect.value.length - 1].value) {
+    onlyMessage('上一个条件未配置完成', 'error')
+    return
+  }
   conditionSelect.value.push({
     column: undefined,
     termType: undefined,
     value: undefined,
-    type: undefined,
+    type: 'and',
 
     // 前端筛选需要
     searchValue: '',

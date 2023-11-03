@@ -62,9 +62,6 @@
                   @click="submit"
                   >提交</j-button
                 >
-                <!-- <j-button class="btn" type="primary" @click="save"
-                  >保存</j-button
-                >-->
               </div>
             </j-affix>
           </j-col>
@@ -112,8 +109,6 @@ const formList = ref<FormsProps[]>([])
 // 表单版本
 const formVersion = reactive({})
 // 草稿
-// const draft = reactive<draftProps>({} as draftProps)
-// const hasDraft = ref<Boolean>(false)
 const draftId = ref<string>('')
 const editDraft = ref<Boolean>(false)
 
@@ -178,25 +173,29 @@ const cancel = () => {
       title: '是否保存申请表单为草稿？',
       okText: '保存',
       cancelText: '不保存',
-      onOk() {
+      async onOk() {
         const param = startProcess(list)
-        save_api(param).then((res) => {
-          if (res.success) {
-            onlyMessage('保存成功')
-            router.push({
-              path: '/flow-engine/me/initiate',
-              query: {
-                state: 'ready',
-              },
-            })
-          }
-        })
+        // 没有草稿_create
+        const res = draftId.value
+          ? await save_api(param)
+          : await create_api({ ...param, start: false })
+
+        if (res.success) {
+          onlyMessage('保存成功')
+          router.push({
+            path: '/flow-engine/me/initiate',
+            query: {
+              state: 'ready',
+            },
+          })
+        }
       },
       onCancel() {
         // 关闭弹窗并返回发起申请页
         router.back()
       },
     })
+        // 关闭弹窗并返回发起申请页
   } else {
     router.back()
   }
@@ -222,16 +221,7 @@ const submit = async () => {
       loading.value = false
     })
 }
-// /**
-//  * 保存
-//  */
-// const save = () => {
-//   const list = previewRef.value?.map((item) => item.formState)
-//   startProcess(list, false).then((flag) => {
-//     // 跳转至我的流程-我的待办
-//     flag ? router.push('/flow-engine/me/todo') : ''
-//   })
-// }
+
 onMounted(() => {
   spinning.value = true
   // 草稿箱进入
@@ -342,7 +332,8 @@ const handleData = (data: any, model: string) => {
         ...m,
       }
     })
-  } catch (error) {} finally {
+  } catch (error) {
+  } finally {
     spinning.value = false
   }
 }
@@ -396,9 +387,6 @@ const getProcess = () => {
     justify-content: space-evenly;
     gap: 8px;
     margin-top: 10px;
-    // .btn {
-    //   width: 20%;
-    // }
   }
 }
 </style>

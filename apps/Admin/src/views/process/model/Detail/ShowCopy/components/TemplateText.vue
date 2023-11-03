@@ -1,14 +1,20 @@
 <template>
   <div class="template">
-    <Editor
-      v-model="editorHtml"
-      style="height: 120px; overflow-y: hidden"
-      mode='default'
-      :defaultConfig="{ placeholder }"
-      @onCreated="handleCreated"
-      @onChange="onChange"
-      @focus=""
-    />
+    <div class="box">
+      <j-textarea
+        :value="hide"
+        :placeholder="placeholder"
+        :auto-size="{ minRows: 4 }"
+        :bordered="false"
+        :class="className"
+        @change="onChange"
+        @focus="focus"
+        @blur="focus"
+      />
+      <div class="html">
+        <span v-html="titleHtml"></span>
+      </div>
+    </div>
     <div class="select">
       <j-select
         style="width: 120px; text-align: left"
@@ -21,19 +27,12 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import { shallowRef, watch, onBeforeUnmount, ref } from 'vue'
-import '@wangeditor/editor/dist/css/style.css' // 引入 css
-import { Editor } from '@wangeditor/editor-for-vue'
-import { SlateTransforms } from '@wangeditor/editor'
-import { debounce } from 'lodash-es'
+<script setup>
+import { watch, ref } from 'vue'
+import { randomString } from '@jetlinks/utils'
 
 const props = defineProps({
   value: {
-    type: String,
-    default: '',
-  },
-  data: {
     type: String,
     default: '',
   },
@@ -47,75 +46,105 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['update:value', 'update:data'])
-const editorRef = shallowRef()
-const editorHtml = ref('')
-const pointer = reactive({ start: 0, end: 0})
+const emits = defineEmits(['update:value'])
+const className = ref(randomString(4))
+const offset = reactive({
+  start: 0,
+  end: 0
+})
 
-// // 正则匹配{}中间内容，并替换成<span style="color: 随机颜色"></span>
-// const replace = (str: string) => {
-//   return str.replace(/\n/g, '<br/>').replace(/\{(.*?)\}/g, ($1, $2) => {
-//     return `<span style="color: ${getColor($2)}">${$1}</span>`
-//   })
-// }
+// 绑定节点
+const hide = ref() // 隐藏的输入框的节点
 
 // 根据选择的变量找出颜色
-const getColor = (str: string) => {
-  return props.variables?.filter((item: any) => item?.label === str)?.[0]?.color
+const getColor = (str) => {
+  return (
+    props.variables?.filter((item) => item?.label === str)?.[0]?.color
+  )
 }
 
-const handleCreated = (editor) => {
-  editorRef.value = editor // 记录 editor 实例，重要！
+// 正则匹配{}中间内容，并替换成<span style="color: 随机颜色"></span>${getColor($2)}
+const replace = (str) => {
+  return str.replace(/\n/g, '<br/>').replace(/\{(.*?)\}/g, ($1, $2) => {
+    return `<span style="color: ${getColor($2)}">${$1}</span>`
+  })
+}
+
+const titleHtml = computed(() => {
+  return replace(hide.value || '')
+})
+
+const focus = () => {
+  getOffset()
 }
 
 watch(
-  () => [props.value, editorRef.value],
+  () => props.value,
   () => {
-    if (editorRef.value) {
-        editorHtml.value = props.value
-    }
+    hide.value = props.value
   },
   {
     immediate: true,
   },
 )
 
-const selectVariable = (_, { label }) => {
-    editorRef.value?.insertNode({ type: 'span', color: `${getColor(label)}`, text: `{${label}}` })
-  // // const at = pointer.start === pointer.end ? [pointer.start] : [pointer.start, pointer.end]
-  // const at = [pointer.start]
-  // const node = { type: 'span', children: [{ type: 'span', color: `${getColor(label)}`, text: `{${label}}` }] }
-  // if (editorRef.value) {
-  //   SlateTransforms.insertNodes(editorRef.value, [node], { at: [2] })
-  // }
+const getOffset = () => {
+  const textAreaEl = document.querySelector(`.${className.value}`)
+  if (textAreaEl) {
+    offset.start = textAreaEl.selectionStart
+    offset.end = textAreaEl.selectionEnd
+  }
 }
 
-const onChange = debounce((e) => {
-  emits('update:data', editorRef.value?.getText())
-  emits('update:value', editorHtml.value)
+const onChange = (e) => {
+  getOffset()
+  emits('update:value', e.target.value)
+}
 
-  // if (e.selection) {
-  //   console.log(e.selection, )
-  //   const selection = e.selection
-  //   const range = [selection.focus.offset, selection.anchor.offset].sort()
-  //   pointer.start = range[0]
-  //   pointer.end = range[1]
-  // }
+const insertText = (val) => {
+  const valArr = hide.value.split('')
+  const len = offset.end - offset.start
+  valArr.splice(offset.start, len, val)
+  hide.value = valArr.join('')
+}
 
-}, 500)
+const selectVariable = (_, { label }) => {
+  // emits('update:value', hide.value + `{${label}}`)
+  insertText(`{${label}}`)
+}
 
-onBeforeUnmount(() => {
-  const editor = editorRef.value
-  if (editor == null) return
-  editor?.destroy()
-})
 </script>
 
 <style lang="less" scoped>
 .template {
+  position: relative;
   width: 100%;
-  padding: 0 10px 10px 0;
+  min-height: 155px;
   border: 1px solid #d9d9d9;
+  padding: 10px;
+
+  .box {
+    position: relative;
+    width: 100%;
+    height: 100px;
+
+    textarea {
+      color: rgba(0, 0, 0, 0);
+      background-color: transparent;
+      caret-color: black; // 光标颜色
+      word-break: break-all;
+    }
+
+    .html {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 4px 11px;
+        pointer-events: none;
+        word-break: break-all;
+    }
+  }
+
   .select {
     text-align: end;
   }

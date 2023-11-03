@@ -277,14 +277,14 @@ const permission = reactive({
 const getActions = (record, type = 'card') => {
   const actions = [
     {
-      key: 'edit',
+      key: 'copy',
       text: '复制为模型',
-      icon: 'CopyOutlined',
+      icon: 'icon-queue',
       permissionProps: (data) => ({
         tooltip: {
           title: '复制为模型',
         },
-        hasPermission: false,
+        hasPermission: 'workflow:release_save',
         onClick: () => {
           copyAsModel(data)
         },
@@ -301,7 +301,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: record.state?.value !== 'disabled' ? '禁用' : '启用',
         },
-        hasPermission: false,
+        hasPermission: 'workflow:release_save',
         popConfirm: {
           title: `确认${record.state?.value !== 'disabled' ? '禁用' : '启用'}`,
           onConfirm: () => {
@@ -329,7 +329,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: '权限控制',
         },
-        hasPermission: false,
+        hasPermission: 'workflow:release_save',
         onClick: () => {
           permission.selectItem = { ...data }
           permission.visible = true
@@ -346,7 +346,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: record.state?.value !== 'disabled' ? '请先禁用再删除' : '删除',
         },
-        hasPermission: false,
+        hasPermission: 'workflow:release_delete',
         popConfirm: {
           title: `确认删除`,
           onConfirm: () => {

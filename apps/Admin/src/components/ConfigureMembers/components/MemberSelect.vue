@@ -70,7 +70,7 @@
               </j-ellipsis>
             </template>
           </j-tree>
-          <j-empty v-if="treeDataCom.length < 1" />
+          <j-empty v-if="treeDataCom && treeDataCom.length < 1" />
         </div>
         <!-- 主体的关系 -->
         <Relational
@@ -329,15 +329,12 @@ watch(
   () => {
     active.value = props.type
     if (infoState.isNode) {
-      currentVar.value = treeFilter(
+      const tree = treeFilter(
         setLevel(infoState.dataMap.value.get('var')),
         props.type,
         'type',
       )
-      // infoState.dataMap.value.set(
-      //   'var',
-      //   treeFilter(setLevel(infoState.dataMap.value.get('var')), props.type, 'type'),
-      // )
+      currentVar.value = tree[0]?.children
     }
   },
   { immediate: true },
@@ -449,16 +446,26 @@ defineExpose({
       padding: 16px 27px 16px 13px;
       height: 100%;
       :deep(.ant-tree) {
+        .ant-tree-treenode-disabled {
+          .ant-tree-node-content-wrapper {
+            &:hover {
+              color: rgba(0, 0, 0, 0.25) !important;
+            }
+          }
+        }
+        .ant-tree-treenode {
+          .ant-tree-node-content-wrapper {
+            &:hover {
+              color: #315efb;
+            }
+          }
+        }
         .ant-tree-switcher {
           height: 32px;
           line-height: 32px;
         }
         .ant-tree-title {
           line-height: 32px;
-          // margin-right: 80px;
-          &:hover {
-            color: #315efb;
-          }
         }
       }
     }

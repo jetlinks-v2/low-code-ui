@@ -76,12 +76,29 @@
             :value="selected"
             :class="{ active: form.icon === selected }"
           >
-            <ImageUpload
-              class="upload"
-              v-model:value="selected"
-              :accept="accept"
-              style="width: 60px; height: 60px"
-            />
+          <div class="upload-img-icon">
+            <div class="upload-icon">
+              <ImageUpload v-model:value="selected" :accept="accept">
+                <template #content="{ imageUrl }">
+                  <div v-if="imageUrl">
+                    <ProImage
+                      v-if="isImg(imageUrl)"
+                      :src="imageUrl"
+                      :width="48"
+                      :preview="false"
+                    />
+                    <AIcon
+                      v-else
+                      :type="selected"
+                      :style="{ fontSize: '16px' }"
+                    />
+                    <div class="upload-image-mask">更换</div>
+                  </div>
+                  <AIcon v-else type="PlusOutlined" style="font-size: 20px" />
+                </template>
+              </ImageUpload>
+            </div>
+          </div>
             <div>自定义</div>
           </j-radio-button>
         </j-radio-group>
@@ -141,6 +158,7 @@ const form = reactive<Partial<FormType>>({
   key: randomString(),
   model: '',
   provider: 'wflow',
+  classifiedId: undefined
 })
 
 const { data: classified } = useRequest(providerEnum, {
@@ -154,7 +172,7 @@ const { data: classified } = useRequest(providerEnum, {
     })
     op.some((i) => i.value === form.classifiedId)
       ? ''
-      : (form.classifiedId = '')
+      : (form.classifiedId = undefined)
     return op
   },
 })
@@ -205,11 +223,6 @@ watch(selected, (val) => {
 .radio {
   display: flex;
   gap: 24px;
-  // display: grid;
-  // grid-gap: 20px;
-  // grid-template-columns: repeat(6, 1fr);
-  // max-height: 500px;
-  // overflow-y: auto;
 
   .ant-radio-button-wrapper {
     display: flex;
@@ -235,6 +248,37 @@ watch(selected, (val) => {
     }
     :deep(.ant-upload.ant-upload-select-picture-card) {
       margin: 0;
+    }
+  }
+}
+
+.upload-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  // font-size: 16px;
+  border-radius: 4px;
+  border: 1px dashed #dcdcdc;
+  background: #eeeeee;
+
+  :deep(.upload-image-content) {
+    &:hover .upload-image-mask {
+      display: flex;
+    }
+    .upload-image-mask {
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+      width: 100%;
+      height: 100%;
+      color: #fff;
+      font-size: 16px;
+      background-color: rgba(#000, 0.25);
     }
   }
 }
