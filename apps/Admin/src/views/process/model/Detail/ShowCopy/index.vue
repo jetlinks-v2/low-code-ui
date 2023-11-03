@@ -177,9 +177,9 @@ const formatToVariable = (val: string = '') => {
     // .replace(/--/g, () => {
     //   return '-'
     // })
-    // .replace(/\n/g, () => {
-    //   return ''
-    // })
+    .replace(/\n/g, () => {
+      return '' // 不需要支持换行的问题
+    })
     // let a = str
     // if(a.slice(-1) === '-'){
     //   a = a.slice(0,a.length-1);
