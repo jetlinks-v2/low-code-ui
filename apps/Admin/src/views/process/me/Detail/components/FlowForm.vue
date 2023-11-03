@@ -186,18 +186,18 @@ const dealTableData = (value) => {
 //按照配置处理高级组件的数据
 const dealIotModuleData = (data, keys) => {
     if (Array.isArray(data)) {
-        data.map((itemData) => {
-            Object.keys(itemData).map(i => {
-                keys.map((item) => {
-                    if (item.key === i) {
-                        itemData[item.config.source] = itemData[i]
-                        if (item.config.source !== i) {
-                            delete itemData[i]
-                        }
-                    }
-                })
-            })
-        })
+        // data.map((itemData) => {
+        //     Object.keys(itemData).map(i => {
+        //         keys.map((item) => {
+        //             if (item.key === i) {
+        //                 itemData[item.config.source] = itemData[i]
+        //                 if (item.config.source !== i) {
+        //                     delete itemData[i]
+        //                 }
+        //             }
+        //         })
+        //     })
+        // })
     } else {
         Object.keys(data).map(i => {
             keys.forEach((item) => {
@@ -284,46 +284,9 @@ const submitForm = async () => {
         }
     }
 }
-//解析数据
-const analyzeTableData = (data, keys, name) => {
-    let obj
-    // if (Array.isArray(data)) {
-    //     let arr = []
-    //     data.map((itemData) => {
-    //         Object.keys(itemData).forEach((i) => {
-    //             if (keys.has(i)) {
-    //                 obj[keys.get(i)] = itemData[i]
-    //                 delete itemData[i]
-    //                 arr.push(obj)
-    //             }
-    //         })
-    //     })
-    //     data[name] = arr 
-    // }else{
-        Object.keys(data).forEach((item) => {
-            if(Array.isArray(data[item]) && name === i){
-                data[i].map((itemData)=>{
-                    Object.keys(itemData).forEach((ti) => {
-                        if (keys.has(i)) {
-                            obj[keys.get(i)] = itemData[i]
-                            delete itemData[i]
-                            arr.push(obj)
-                        }
-                    })
-                })
-            }
-            if (keys.has(i)) {
-                obj[keys.get(i)] = data[i]
-                delete data[i]
-            }
-    })
-    data[name] = obj
-    // }
-}
 //根据配置项生成表格
 const dealTable = (disabled) => {
     const tableColumn = []
-
     formValue.value.forEach((i) => {
         if (i.multiple) {
             i?.configuration?.children.map((item) => {
@@ -339,13 +302,6 @@ const dealTable = (disabled) => {
                         rules: rules
                     }
                 })
-                // const keysMap = new Map()
-                // item.componentProps.keys.forEach(keys => {
-                //     keysMap.set(keys.config.source, keys.key)
-                // })
-                // i?.data?.forEach((data) => {
-                //     analyzeTableData(data, keysMap, item.formItemProps)
-                // })
             })
             i.configuration = tableColumn
         }

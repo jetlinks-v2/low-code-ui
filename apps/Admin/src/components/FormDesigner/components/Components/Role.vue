@@ -45,7 +45,7 @@ const props = defineProps({
     default: () => [],
   },
 })
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value','change'])
 const _value = ref()
 
 const _getObj = (value: any) => {
@@ -81,6 +81,7 @@ const valueChange = (value: any) => {
     })
     emit('update:value', arr)
   }
+  emit('change')
 }
 
 const dealTreeData = (tree: any) => {
