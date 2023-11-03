@@ -27,8 +27,6 @@
           <div class="item-body">
             <slot name="content"></slot>
           </div>
-          <!-- 勾选 -->
-          <Active v-show="active"/>
           <!-- 状态 -->
           <div v-if="showStatus" class="item-state" :style="{ backgroundColor: `rgba(${stateColor}, .1)`}">
             <div class="item-state-content">
@@ -41,7 +39,8 @@
             </div>
           </div>
         </div>
-
+        <!-- 勾选 -->
+        <Active v-show="active"/>
       </div>
     </div>
     <ResizeObserver :onResize="onResize">

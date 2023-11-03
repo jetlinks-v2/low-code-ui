@@ -155,7 +155,15 @@ export function filterFormByName(list, name) {
     const _res = []
     list?.forEach(item => {
         const _fields = item.configuration?.children || []
-        const _filterFields = _fields.filter(f => f.formItemProps.label.includes(name))
+        const _filterFields = _fields.filter(f => {
+            if (f.formItemProps.label) {
+                // 常规组件
+                return f.formItemProps.label.includes(name)
+            } else {
+                // 布局组件没有formItemProps.label, 直接用name匹配
+                return f.name.includes(name)
+            }
+        })
         if (_filterFields.length) {
             _res.push({
                 ...item,

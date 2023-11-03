@@ -71,7 +71,7 @@
       />
       <AIcon
         type="CloseCircleFilled"
-        style="color: red;position: absolute;right: -8px;top: -4px;"
+        style="color: red;position: absolute;right: 0px;top: -4px;"
         @click="handleRemove(index)"
         v-if="index !== 0"
       />
@@ -89,6 +89,7 @@ import ConditionValueItem from './ConditionValueItem.vue'
 import { operatorMap } from './const'
 import { findVariableById } from './utils'
 import { onlyMessage } from '@jetlinks/utils'
+import { cloneDeep } from 'lodash-es'
 
 const flowStore = useFlowStore()
 
@@ -116,31 +117,8 @@ const props = defineProps({
 })
 
 const conditionSelect = ref<IConditionSelect[]>([])
-watch(
-  () => props.value,
-  (val) => {
-    conditionSelect.value =
-      val && val.length
-        ? val
-        : [
-            {
-              column: undefined,
-              termType: undefined,
-              value: undefined,
-
-              // 前端筛选需要
-              searchValue: '',
-              // 存起来, 节点回显需要
-              columnName: undefined,
-              termTypeName: undefined,
-              valueName: undefined,
-            },
-          ]
-  },
-  { deep: true, immediate: true },
-)
-
 const conditionOptions = ref([])
+
 
 /**
  * 获取条件下拉数据
@@ -159,8 +137,6 @@ const getFormFields = async () => {
     containThisNode: false, //变量来源是否包含本节点
   }
   const { result } = await queryVariables_api(params)
-  addKeys(result)
-  conditionOptions.value = result
   function addKeys(list, parentFullId = '') {
     for (let i = 0; i < list.length; i++) {
       if(list[i].children?.length) {
@@ -171,7 +147,21 @@ const getFormFields = async () => {
         addKeys(list[i].children, list[i].fullId)
       }
     }
+    return list
   }
+  function filter(list) {
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].children) {
+        filter(list[i].children)
+      }
+      if(['table', 'upload'].includes(list[i].others?.type)) {
+        list.splice(i, 1)
+        return
+      }
+    }
+    return list
+  }
+  conditionOptions.value = filter(addKeys(result))
 }
 
 /**
@@ -185,7 +175,7 @@ const handleConditionChange = (value, node, item, index) => {
   item.selectedNodeId = node.id
 }
 
-const handleConditionClear = (item, index) => {
+const handleConditionClear = (index) => {
   conditionSelect.value[index] = {} as any
 }
 
@@ -213,8 +203,12 @@ const handleRemove = (index: number) => {
 }
 
 const handleAdd = () => {
-  if(!conditionSelect.value[conditionSelect.value.length - 1].selectedColumn || !conditionSelect.value[conditionSelect.value.length - 1].selectedTermType || !conditionSelect.value[conditionSelect.value.length - 1].value) {
-    onlyMessage('上一个条件未配置完成', 'error')
+  const beforeDone = conditionSelect.value.some((item: any) => {
+    console.log(item);
+    return !item.selectedColumn || !item.selectedTermType || !item.value
+  })
+  if(!beforeDone) {
+    onlyMessage('前置条件未配置完成', 'error')
     return
   }
   conditionSelect.value.push({
@@ -231,6 +225,37 @@ const handleAdd = () => {
     valueName: undefined,
   })
 }
+
+watch(
+  () => props.value,
+  (val) => {
+    conditionSelect.value =
+      val && val.length
+        ? cloneDeep(val)
+        : [
+            {
+              column: undefined,
+              termType: undefined,
+              value: undefined,
+
+              // 前端筛选需要
+              searchValue: '',
+              // 存起来, 节点回显需要
+              columnName: undefined,
+              termTypeName: undefined,
+              valueName: undefined,
+            },
+          ]
+    // conditionSelect.value.forEach((item, index) => {
+    //   const node = findVariableById(conditionOptions.value, item?.column)
+    //   if(!node) {
+    //     handleConditionClear(index)
+    //   }
+    // })
+  },
+  
+  { deep: true, immediate: true },
+)
 
 watch(
   () => conditionSelect.value,

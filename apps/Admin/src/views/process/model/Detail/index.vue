@@ -37,14 +37,28 @@
             type="primary"
             @click="handleSave"
             :loading="saveLoading"
+            hasPermission="workflow:model_add"
           >
-            <!-- hasPermission="code:release_save" -->
             保存
             <template #icon>
               <j-tooltip placement="right">
                 <template #title>
                   仅保存配置数据，不校验填写内容的合规性。
                 </template>
+                <AIcon type="QuestionCircleOutlined" />
+              </j-tooltip>
+            </template>
+          </PermissionButton>
+          <PermissionButton
+            type="primary"
+            @click="handleDeploy"
+            hasPermission="workflow:model_deploy"
+            :disabled="!isChange && flowDetail?.state?.value === 'deployed'"
+          >
+            部署
+            <template #icon>
+              <j-tooltip placement="right">
+                <template #title> 配置内容需要通过合规性校验。 </template>
                 <AIcon type="QuestionCircleOutlined" />
               </j-tooltip>
             </template>
@@ -60,7 +74,11 @@
               </j-tooltip>
             </template>
           </j-button> -->
-          <j-button type="primary" @click="handleDeploy" :disabled="!isChange">
+          <!-- <j-button
+            type="primary"
+            @click="handleDeploy"
+            :disabled="!isChange && flowDetail?.state?.value === 'deployed'"
+          >
             部署
             <template #icon>
               <j-tooltip placement="right">
@@ -68,7 +86,7 @@
                 <AIcon type="QuestionCircleOutlined" />
               </j-tooltip>
             </template>
-          </j-button>
+          </j-button> -->
         </div>
       </div>
     </j-card>
@@ -146,7 +164,6 @@ const getFlowDetail = async () => {
 
   flowStore.setModel(model)
   flowStore.setModelBaseInfo(result)
-
 }
 
 /**
@@ -177,7 +194,7 @@ const handleNext = async () => {
 const handleSave = (type?: string) => {
   const params = {
     id: route.query.id,
-    state: 'undeployed',
+    state: flowDetail.value?.state?.value || 'undeployed',
     model: JSON.stringify(flowStore.model),
   }
   //   console.log('flowStore.model: ', flowStore.model)
@@ -194,7 +211,7 @@ const handleSave = (type?: string) => {
         isModal.value = true
         router.go(-1)
       }
-      getFlowDetail()
+      //   getFlowDetail() #19297 此处调用详情会报错闪一下
     })
     .finally(() => {
       saveLoading.value = false
