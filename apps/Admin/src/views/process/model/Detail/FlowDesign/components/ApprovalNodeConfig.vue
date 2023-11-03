@@ -300,11 +300,18 @@ const validateConfig = () => {
               flowStore.model.nodes,
               flowStore.selectedNode.id,
             )
-            result.props = {
-              ...result.props,
-              ...basicFormData,
-              ...memberFormData,
+            // result.props = {
+            //   ...result.props,
+            //   ...basicFormData,
+            //   ...memberFormData,
+            // }
+            // #19573
+            if (!basicFormData.others.defaultComment) {
+              delete basicFormData.others.defaultComment
             }
+            const { rejectTo, ...others } = memberFormData
+            others.gotoWhenReject = [rejectTo]
+            Object.assign(result.props, basicFormData, others)
             resolve({ ...valid1, ...valid2 })
           })
           .catch((err) => {
