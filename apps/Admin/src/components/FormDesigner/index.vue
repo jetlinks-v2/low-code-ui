@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Header
-      @save="emits('saveData', formData)"
+      @save="onWorkFlowSave"
       :type="type"
       :data="data"
       @validate="onValid"
@@ -365,10 +365,13 @@ watch(
 watch(
   () => props.data,
   (newVal) => {
-    if(props.type === 'workflow') {
-      formData.value = newVal && Object.keys(newVal)?.length ? cloneDeep(newVal) : cloneDeep(initData)
+    if (props.type === 'workflow') {
+      formData.value =
+        newVal && Object.keys(newVal)?.length
+          ? cloneDeep(newVal)
+          : cloneDeep(initData)
     } else {
-        try {
+      try {
         const obj = JSON.parse(newVal?.configuration?.code)
         formData.value = Object.keys(obj).length ? obj : cloneDeep(initData)
       } catch (error) {
@@ -389,7 +392,12 @@ onUnmounted(() => {
 // 校验
 const onValidate = async () => {
   return new Promise(async (resolve, reject) => {
-    const resp: any = await checkedConfig(product.info, unref(formData), getFormList.value)
+    const resp: any = await checkedConfig(
+      product.info,
+      unref(formData),
+      getFormList.value,
+      props?.type
+    )
     errorKey.value = resp
     if (errorKey.value?.length) {
       reject(errorKey.value)
@@ -397,6 +405,13 @@ const onValidate = async () => {
       resolve(true)
     }
   })
+}
+
+const onWorkFlowSave = async () => {
+  const _val = await onValidate()
+  if (_val) {
+    emits('saveData', formData.value)
+  }
 }
 
 const onValid = async () => {
