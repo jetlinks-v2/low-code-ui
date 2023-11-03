@@ -91,7 +91,7 @@ const handleClose = () => {
   // 关闭前校验节点名称
   nameRef.value.validate()
   // 校验配置内容
-  //   nodeConfigRef.value.validateConfig() // #19573
+  nodeConfigRef.value.validateConfig()
   // 不论校验结果如何, 都关闭弹窗继续后续操作
   showConfig.value = false
 }
