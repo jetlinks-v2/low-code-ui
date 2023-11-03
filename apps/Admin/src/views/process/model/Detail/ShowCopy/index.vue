@@ -63,6 +63,8 @@
           placeholder="{发起人}的{流程名称}"
           v-model:value="formData.nameGenerator"
           :variables="formData.variables"
+          :maxlength="64"
+          name="标题模板"
         />
       </j-form-item>
       <j-form-item
@@ -78,6 +80,8 @@
           placeholder="{请假人}的{请假类型}"
           v-model:value="formData.summaryGenerator"
           :variables="formData.variables"
+          :maxlength="255"
+          name="摘要模板"
         />
       </j-form-item>
       <TitleComponent data="抄送配置" />
