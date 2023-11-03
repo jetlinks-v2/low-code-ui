@@ -130,7 +130,7 @@ const formRef = ref()
  */
 const formatToName = (val: string = '') => {
   return val
-    .replace(/-/g, '')
+    // .replace(/-/g, '')
     // .replace(/\n/g, '<br/>')
     .replace(/\{(.*?)\}/g, ($1, $2) => {
       const _$2 = $2.split(':')
@@ -169,26 +169,25 @@ const getVariables = async () => {
  * -> {var:发起人fullId:发起人name}的{var:流程名称fullId:流程名称name}
  */
 const formatToVariable = (val: string = '') => {
-  // console.log(val, 'val')
   const str = val
     .replace(/\{(.*?)\}/g, ($1, $2) => {
       const variable = formData.variables.filter((item) => item.label === $2)[0]
-      return variable ? `-{var:${variable.value}:${$2}}-` : `{${$2}}`
+      return variable ? `{var:${variable.value}:${$2}}` : `{${$2}}`
     })
-    .replace(/--/g, () => {
-      return '-'
-    })
-    .replace(/\n/g, () => {
-      return '-'
-    })
-    let a = str
-    if(a.slice(-1) === '-'){
-      a = a.slice(0,a.length-1);
-    }
-    if(a.slice(0, 1) === '-'){
-      a = a.slice(1,a.length);
-    }
-    return a
+    // .replace(/--/g, () => {
+    //   return '-'
+    // })
+    // .replace(/\n/g, () => {
+    //   return ''
+    // })
+    // let a = str
+    // if(a.slice(-1) === '-'){
+    //   a = a.slice(0,a.length-1);
+    // }
+    // if(a.slice(0, 1) === '-'){
+    //   a = a.slice(1,a.length);
+    // }
+    return str
 }
 
 const formData = reactive({
