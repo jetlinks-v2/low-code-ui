@@ -63,6 +63,8 @@
           placeholder="{发起人}的{流程名称}"
           v-model:value="formData.nameGenerator"
           :variables="formData.variables"
+          :maxlength="64"
+          name="标题模板"
         />
       </j-form-item>
       <j-form-item
@@ -78,6 +80,8 @@
           placeholder="{请假人}的{请假类型}"
           v-model:value="formData.summaryGenerator"
           :variables="formData.variables"
+          :maxlength="255"
+          name="摘要模板"
         />
       </j-form-item>
       <TitleComponent data="抄送配置" />
@@ -126,7 +130,7 @@ const formRef = ref()
  */
 const formatToName = (val: string = '') => {
   return val
-    .replace(/-/g, '')
+    // .replace(/-/g, '')
     // .replace(/\n/g, '<br/>')
     .replace(/\{(.*?)\}/g, ($1, $2) => {
       const _$2 = $2.split(':')
@@ -165,26 +169,25 @@ const getVariables = async () => {
  * -> {var:发起人fullId:发起人name}的{var:流程名称fullId:流程名称name}
  */
 const formatToVariable = (val: string = '') => {
-  // console.log(val, 'val')
   const str = val
     .replace(/\{(.*?)\}/g, ($1, $2) => {
       const variable = formData.variables.filter((item) => item.label === $2)[0]
-      return variable ? `-{var:${variable.value}:${$2}}-` : `{${$2}}`
+      return variable ? `{var:${variable.value}:${$2}}` : `{${$2}}`
     })
-    .replace(/--/g, () => {
-      return '-'
-    })
+    // .replace(/--/g, () => {
+    //   return '-'
+    // })
     .replace(/\n/g, () => {
-      return '-'
+      return '' // 不需要支持换行的问题
     })
-    let a = str
-    if(a.slice(-1) === '-'){
-      a = a.slice(0,a.length-1);
-    }
-    if(a.slice(0, 1) === '-'){
-      a = a.slice(1,a.length);
-    }
-    return a
+    // let a = str
+    // if(a.slice(-1) === '-'){
+    //   a = a.slice(0,a.length-1);
+    // }
+    // if(a.slice(0, 1) === '-'){
+    //   a = a.slice(1,a.length);
+    // }
+    return str
 }
 
 const formData = reactive({
