@@ -6,7 +6,7 @@
           <j-spin :spinning="spinning" />
         </div>
         <j-row :gutter="[16, 16]" v-else>
-          <j-col :span="10">
+          <j-col :span="12">
             <j-scrollbar style="height: calc(100vh - 225px)">
               <div class="form">
                 <j-form ref="formRef" :model="tableData" autocomplete="off">
@@ -44,14 +44,14 @@
               </div>
             </j-scrollbar>
           </j-col>
-          <j-col :span="10" :offset="4">
+          <j-col :span="12">
             <!-- 流程图 -->
             <div class="flow-chart" style="height: calc(100vh - 225px)">
               <div class="flow-title">审批流程</div>
               <FlowDesigner readOnly dragging :nodesData="nodesData" />
             </div>
           </j-col>
-          <j-col :span="4" :offset="10">
+          <j-col :span="4" :offset="8">
             <j-affix :offset-bottom="24">
               <div class="btn-list">
                 <j-button class="btn" @click="cancel">取消</j-button>

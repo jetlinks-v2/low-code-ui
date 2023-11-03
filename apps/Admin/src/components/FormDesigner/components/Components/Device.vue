@@ -30,7 +30,7 @@ const props = defineProps({
   },
 })
 const _value:any = ref()
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value','change'])
 
 const getObj: any = (value: any) => {
   const obj = {}
@@ -51,6 +51,7 @@ const updateValue = (value: any) => {
   } else {
     emit('update:value', getObj(value)?.id ? getObj(value) : undefined)
   }
+  emit('change')
 }
 
 provide('type', 'device')
