@@ -188,7 +188,7 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
                 }
             }
         }
-        if (node?.formItemProps?.isLayout && !node.formItemProps?.label) {
+        if (['tabs', 'collapse', 'card'].includes(_type) && node?.formItemProps?.isLayout && !node.formItemProps?.label) {
             return obj
         }
         if (['input', 'textarea', 'input-password', 'date-picker', 'time-picker'].includes(_type)) {
