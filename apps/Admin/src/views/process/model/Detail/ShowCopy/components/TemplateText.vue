@@ -10,12 +10,14 @@
         @change="onChange"
         @focus="focus"
         @blur="focus"
+        :maxlength="maxlength"
       />
       <div class="html">
         <span v-html="titleHtml"></span>
       </div>
     </div>
     <div class="select">
+      <span class="tip">请将{{name}}最终长度控制在{{maxlength}}个字符内</span>
       <j-select
         style="width: 120px; text-align: left"
         placeholder="添加变量"
@@ -44,10 +46,17 @@ const props = defineProps({
     type: String,
     default: '请输入',
   },
+  maxlength: {
+    type: Number,
+    default: 64
+  },
+  name: {
+    type: String,
+  },
 })
 
 const emits = defineEmits(['update:value'])
-const className = ref(randomString(4))
+const className = ref(`template-textarea--${randomString(4)}`)
 const offset = reactive({
   start: 0,
   end: 0
@@ -127,6 +136,7 @@ const selectVariable = (_, { label }) => {
     position: relative;
     width: 100%;
     height: 100px;
+    overflow-y: auto;
 
     textarea {
       color: rgba(0, 0, 0, 0);
@@ -146,7 +156,14 @@ const selectVariable = (_, { label }) => {
   }
 
   .select {
-    text-align: end;
+    width: 100%;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+
+    .tip {
+      color: #00000073;
+    }
   }
 }
 </style>

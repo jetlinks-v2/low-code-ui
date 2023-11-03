@@ -54,7 +54,8 @@ export default defineComponent({
                     name: 'Title'
                 },
                 formItemProps: {
-                    name: props.data?.type + '-item' + '_' + uid(6)
+                    name: props.data?.type + '-item' + '_' + uid(6),
+                    isLayout: true
                 }
             })
             designer.onAddChild(_item, props.data)
