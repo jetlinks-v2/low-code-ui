@@ -6,16 +6,18 @@ interface IModel {
     nodes: Partial<INode>;
 }
 
-const defaultModel = {
-    config: {},
+export const defaultModel = {
+    config: {
+        forms: [],
+    },
     nodes: {
         id: 'ROOT_1',
         parentId: null,
         type: 'ROOT',
         name: '发起申请',
         active: false,
-        props: { assignedUser: [] },
-    }
+        props: { assignedUser: [], formBinds: {} },
+    },
 }
 
 export const useFlowStore = defineStore('flow', () => {

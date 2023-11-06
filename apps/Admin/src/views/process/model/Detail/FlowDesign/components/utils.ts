@@ -165,6 +165,7 @@ export function filterFormByName(list, name) {
             }
         })
         if (_filterFields.length) {
+            // @ts-ignore
             _res.push({
                 ...item,
                 configuration: {
@@ -195,14 +196,18 @@ export function sumValues(data: { [key: string]: number }) {
 
 /**
  * 表单字段全部默认有"读"权限, 设置formBinds字段初始值
+ * @param forms 
+ * @param type conditionSelect: 条件节点设置默认值, forms为接口返回的数据
+ * @returns 
  */
-export function setDefaultFormBinds(forms) {
+export function setDefaultFormBinds(forms, type?: string) {
     const res = {};
     forms?.forEach((item) => {
-        const _fields = item.fullInfo.configuration?.children
-        res[item.formId] = []
+        const _fields = type === 'conditionSelect' ? item.configuration?.children : item.fullInfo.configuration?.children
+        const _key = type === 'conditionSelect' ? item.key : item.formId
+        res[_key] = []
         _fields?.forEach((p) => {
-            res[item.formId].push({
+            res[_key].push({
                 id: p.formItemProps.name,
                 required: true,
                 accessModes: ['read'],
