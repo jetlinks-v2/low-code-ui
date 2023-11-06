@@ -219,12 +219,12 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
                 if (flag) {
                     return obj
                 }
-                if(type === 'workflow'){
+                if (type === 'workflow') {
                     const _flag = map(node.componentProps?.keys || [], 'config.source')?.find(i => {
-                      return _specialKeys.includes(i)
+                        return _specialKeys.includes(i)
                     })
                     if (_flag) return obj
-                  }
+                }
             }
         }
     }
@@ -403,11 +403,13 @@ export const getBrotherList = (value: string | number, arr: any[]) => {
             if (element.key === value) {
                 return arr
             } else if (element?.children?.length) {
-                return getBrotherList(value, element?.children)
+                const _arr = getBrotherList(value, element?.children)
+                if(_arr?.length){
+                    return _arr
+                }
             }
         }
     }
-
     return []
 }
 
