@@ -165,6 +165,7 @@ export function filterFormByName(list, name) {
             }
         })
         if (_filterFields.length) {
+            // @ts-ignore
             _res.push({
                 ...item,
                 configuration: {
