@@ -184,7 +184,7 @@ const handleNext = async () => {
 const handleSave = (type?: string) => {
   const params = {
     id: route.query.id,
-    state: flowDetail.value?.state?.value || 'undeployed',
+    state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
     model: JSON.stringify(flowStore.model),
   }
   //   console.log('flowStore.model: ', flowStore.model)
@@ -259,7 +259,7 @@ const handleDeploy = () => {
 const saveAndDeploy = () => {
   const params = {
     id: route.query.id,
-    state: 'undeployed',
+    state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
     model: JSON.stringify(flowStore.model),
   }
   update_api(params).then(() => {
