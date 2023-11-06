@@ -114,7 +114,7 @@ import BasicInfo from './BasicInfo/index.vue'
 import FlowDesign from './FlowDesign/index.vue'
 import ShowCopy from './ShowCopy/index.vue'
 import { detail_api, update_api, deploy_api } from '@/api/process/model'
-import { useFlowStore } from '@/store/flow'
+import { useFlowStore, defaultModel } from '@/store/flow'
 import { onlyMessage } from '@jetlinks/utils'
 import { Modal } from 'ant-design-vue'
 import { cloneDeep } from 'lodash-es'
@@ -138,17 +138,7 @@ const step3 = ref()
 const nextLoading = ref(false)
 const saveLoading = ref(false)
 const isModal = ref(false)
-const oldData = ref({
-  config: {},
-  nodes: {
-    id: 'ROOT_1',
-    parentId: null,
-    type: 'ROOT',
-    name: '发起申请',
-    active: false,
-    props: { assignedUser: [] },
-  },
-})
+const oldData = ref(defaultModel)
 /**
  * 获取模型详情
  */
@@ -194,7 +184,7 @@ const handleNext = async () => {
 const handleSave = (type?: string) => {
   const params = {
     id: route.query.id,
-    state: flowDetail.value?.state?.value || 'undeployed',
+    state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
     model: JSON.stringify(flowStore.model),
   }
   //   console.log('flowStore.model: ', flowStore.model)
@@ -269,7 +259,7 @@ const handleDeploy = () => {
 const saveAndDeploy = () => {
   const params = {
     id: route.query.id,
-    state: 'undeployed',
+    state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
     model: JSON.stringify(flowStore.model),
   }
   update_api(params).then(() => {

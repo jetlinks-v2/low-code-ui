@@ -93,7 +93,11 @@ const validate = (err) => {
       name: ['authButtons'],
     })
     //   } else if (!endProcessWhenReject && !rejectTo) {
-  } else if (!endProcessWhenReject && !gotoWhenReject.length) {
+  } else if (
+    authButtons.includes('reject') &&
+    !endProcessWhenReject &&
+    (!gotoWhenReject.length || !gotoWhenReject[0])
+  ) {
     err.push({
       errors: ['请选择驳回至哪个节点'],
       name: ['gotoWhenReject'],
