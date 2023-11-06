@@ -105,6 +105,26 @@
       <FlowDesign ref="step2" />
       <ShowCopy ref="step3" :noQuery="true" />
     </div>
+
+    <j-modal v-model:visible="visible"  :width="300" @cancel="onCancel" @ok="onOk" :closable="false">
+      <template #footer>
+        <PermissionButton
+            @click="onCancel"
+            :hasPermission="true"
+          >
+            不保存
+          </PermissionButton>
+        <PermissionButton
+            type="primary"
+            @click="onOk"
+            hasPermission="workflow/model:save"
+          >
+            保存
+          </PermissionButton>
+      </template>
+      <div class="model-content" >页面改动数据未保存</div>
+    </j-modal>
+
   </page-container>
 </template>
 
@@ -115,9 +135,9 @@ import FlowDesign from './FlowDesign/index.vue'
 import ShowCopy from './ShowCopy/index.vue'
 import { detail_api, update_api, deploy_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
-import { onlyMessage } from '@jetlinks/utils'
-import { Modal } from 'ant-design-vue'
+import { onlyMessage,LocalStore } from '@jetlinks/utils'
 import { cloneDeep } from 'lodash-es'
+import { TOKEN_KEY } from '@jetlinks/constants'
 
 const flowStore = useFlowStore()
 const route = useRoute()
@@ -149,6 +169,8 @@ const oldData = ref({
     props: { assignedUser: [] },
   },
 })
+const visible = ref(false)
+let routerNext;
 /**
  * 获取模型详情
  */
@@ -285,53 +307,46 @@ const saveAndDeploy = () => {
   })
 }
 
+const onOk =async ()=>{
+  const params = {
+    id: route.query.id,
+    state: 'undeployed',
+    model: JSON.stringify(flowStore.model),
+  }
+  const res = await update_api(params)
+  if(res.status === 200){
+    onlyMessage('保存成功')
+    visible.value = false
+    routerNext()
+  }
+}
+const onCancel = ()=>{
+  visible.value = false
+  routerNext()
+}
+
 onMounted(() => {
   getFlowDetail()
 })
 
-//离开路由改变路由
-const routerChange = (next?: Function) => {
-  const modal = Modal.confirm({
-    content: '页面改动数据未保存',
-    okText: '保存',
-    cancelText: '不保存',
-    zIndex: 1400,
-    closable: true,
-    onOk: () => {
-      const params = {
-        id: route.query.id,
-        state: 'undeployed',
-        model: JSON.stringify(flowStore.model),
-      }
-      update_api(params).then((res) => {
-        if (res.status === 200) {
-          onlyMessage('保存成功')
-          modal.destroy()
-          ;(next as Function)?.()
-        }
-      })
-    },
-    onCancel: (e: any) => {
-      modal.destroy()
-      ;(next as Function)?.()
-    },
-  })
-}
 
 // 数据是否更改
 const isChange = computed(
   () => JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model),
 )
 onBeforeRouteLeave((to, form, next) => {
-  if (!isModal.value && isChange.value) {
-    routerChange(next)
+  console.log('to===',to)
+  if (!isModal.value && isChange.value && LocalStore.get(TOKEN_KEY)) {
+    visible.value = true
+    routerNext = next
   } else {
     next()
   }
 })
 onBeforeRouteUpdate((to, from, next) => {
-  if (!isModal.value && isChange.value) {
-    routerChange(next)
+  if (!isModal.value && isChange.value && LocalStore.get(TOKEN_KEY)) {
+    visible.value = true
+    routerNext = next
   } else {
     next()
   }
@@ -363,5 +378,10 @@ onBeforeRouteUpdate((to, from, next) => {
   position: absolute;
   bottom: 0;
   right: 0;
+}
+
+.model-content {
+  text-align: center;
+  margin: 20px 0;
 }
 </style>
