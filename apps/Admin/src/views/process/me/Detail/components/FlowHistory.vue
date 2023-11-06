@@ -352,6 +352,7 @@ onMounted(() => {
          .item-right {
             color: #9E9E9E;
             font-size: 14px;
+            padding-right: 12px;
          }
 
 

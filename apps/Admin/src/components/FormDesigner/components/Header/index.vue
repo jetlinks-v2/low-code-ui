@@ -50,7 +50,7 @@
           @click="onSave"
           type="primary"
           v-if="isEditModel"
-          hasPermission="workflow:form_save"
+          hasPermission="process/form:save"
         >
           保存
         </PermissionButton>
@@ -59,7 +59,7 @@
     </template>
   </div>
 </template>
-  
+
 <script lang="ts" setup>
 import { cloneDeep } from 'lodash-es'
 import { inject, computed, unref } from 'vue'
