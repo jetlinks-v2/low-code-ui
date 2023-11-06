@@ -64,30 +64,6 @@
               </j-tooltip>
             </template>
           </PermissionButton>
-          <!-- <j-button type="primary" @click="handleSave" :loading="saveLoading">
-            保存
-            <template #icon>
-              <j-tooltip placement="right">
-                <template #title>
-                  仅保存配置数据，不校验填写内容的合规性。
-                </template>
-                <AIcon type="QuestionCircleOutlined" />
-              </j-tooltip>
-            </template>
-          </j-button> -->
-          <!-- <j-button
-            type="primary"
-            @click="handleDeploy"
-            :disabled="!isChange && flowDetail?.state?.value === 'deployed'"
-          >
-            部署
-            <template #icon>
-              <j-tooltip placement="right">
-                <template #title> 配置内容需要通过合规性校验。 </template>
-                <AIcon type="QuestionCircleOutlined" />
-              </j-tooltip>
-            </template>
-          </j-button> -->
         </div>
       </div>
     </j-card>
@@ -163,7 +139,7 @@ const getFlowDetail = async () => {
  */
 const handleNext = async () => {
   // 点击下一步先保存数据, 再校验->#19300
-  handleSave('next')
+  //   handleSave('next') #19300 恢复之前交互 下一步不保存数据
   // 从基础信息点击下一步前, 查询最新表单, 验证已选表单是否被全部删除
   if (current.value === 0) await step1.value.getLatestFormList()
   // 触发校验
