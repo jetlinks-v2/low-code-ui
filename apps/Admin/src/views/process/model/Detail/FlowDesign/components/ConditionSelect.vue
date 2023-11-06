@@ -228,7 +228,7 @@ watch(
   (val) => {
     conditionSelect.value =
       val && val.length
-        ? cloneDeep(val)
+        ? val
         : [
             {
               column: undefined,
