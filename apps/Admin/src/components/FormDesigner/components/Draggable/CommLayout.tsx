@@ -53,11 +53,6 @@ export default defineComponent({
             return isNumber(props?.index) ? props.index : 0
         })
 
-        const params = {
-            data: props.data,
-            parent: props.parent
-        }
-
         if (props.data?.formItemProps?.name) {
             _path[_index.value] = props.data?.formItemProps?.name
         }
@@ -158,6 +153,12 @@ export default defineComponent({
         })
         return () => {
             const _props = useProps(props.data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
+
+            const params = {
+                data: props.data,
+                parent: props.parent
+            }
+            
             return (
                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                     <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true}>
