@@ -265,17 +265,10 @@ const handleSearch = () => {
  */
 const checkAll = ref(false)
 const handleAllCheck = () => {
-  if (checkAll.value) {
-    filterFormList.value?.forEach((item) => {
-      item.accessModes = ['read', 'write']
-      handleFormCheck(item)
-    })
-  } else {
-    filterFormList.value?.forEach((item) => {
-      item.accessModes = ['read']
-      handleFormCheck(item)
-    })
-  }
+  filterFormList.value?.forEach((item) => {
+    item.accessModes = checkAll.value ? ['read', 'write'] : ['read']
+    handleFormCheck(item)
+  })
 }
 
 /**
