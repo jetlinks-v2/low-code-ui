@@ -50,7 +50,7 @@
           @click="onSave"
           type="primary"
           v-if="isEditModel"
-          hasPermission="workflow/form:save"
+          hasPermission="process/form:save"
         >
           保存
         </PermissionButton>

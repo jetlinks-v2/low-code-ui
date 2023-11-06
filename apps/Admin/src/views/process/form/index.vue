@@ -27,7 +27,7 @@
         <PermissionButton
           @click="handleAdd()"
           type="primary"
-          hasPermission="workflow/form:add"
+          hasPermission="process/form:add"
         >
           新增
         </PermissionButton>
@@ -56,7 +56,7 @@
               type="link"
               style="padding: 0 5px"
               :danger="i?.key === 'delete'"
-              :hasPermission="i?.key === 'view' ? false : `workflow/form:${i?.hasPermission}`"
+              :hasPermission="i?.key === 'view' ? false : `process/form:${i?.hasPermission}`"
             >
               <template #icon><AIcon :type="i.icon" /></template>
             </PermissionButton>
