@@ -87,7 +87,7 @@ const type = computed(() => {
 
 const isShow = computed(() => {
   const _item = findParentById(unref(designer.formData), unref(target))
-  return !['card-item', 'tabs-item', 'collapse-item'].includes(_item?.type)
+  return !['card-item', 'tabs-item', 'collapse-item'].includes(_item?.type) && designer?.type === 'low-code'
 })
 
 const onDataChange = () => {

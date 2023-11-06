@@ -89,7 +89,7 @@ const Panels = {
 }
 
 const panelsList = computed(() => {
-  return getConfigList(_type.value, target.value)
+  return getConfigList(_type.value, target.value, designer?.type)
 })
 
 const activeKey = ref<string[]>(map(panelsList.value, 'key'))
