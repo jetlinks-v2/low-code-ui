@@ -252,30 +252,18 @@ const getFormList = async () => {
   // 所有表单数据, 用于前端筛选
   allFormList.value = cloneDeep(filterFormList.value)
   handleSearch()
-  // 设置全部内容全选状态
-  setCheckAll()
 }
 
 const handleSearch = () => {
   filterFormList.value = filterFormByName(allFormList.value, keywords.value)
-}
-
-/**
- * 全部内容勾选/取消勾选
- */
-const checkAll = ref(false)
-const handleAllCheck = () => {
-  if (checkAll.value) {
-    filterFormList.value?.forEach((item) => {
-      item.accessModes = ['read', 'write']
-      handleFormCheck(item)
-    })
-  } else {
-    filterFormList.value?.forEach((item) => {
-      item.accessModes = ['read']
-      handleFormCheck(item)
-    })
-  }
+  filterFormList.value?.forEach((item) => {
+    item.accessModes = item.configuration?.children
+      // ?.filter((f) => !unDisplayFieldsType.value.includes(f.type))
+      ?.every((e) => e.accessModes.length === 2)
+      ? ['read', 'write']
+      : ['read']
+  })
+  setCheckAll()
 }
 
 /**
@@ -284,6 +272,17 @@ const handleAllCheck = () => {
 const setCheckAll = () => {
   checkAll.value =
     filterFormList.value?.every((e) => e.accessModes.length === 2) || false
+}
+
+/**
+ * 全部内容勾选/取消勾选
+ */
+const checkAll = ref(false)
+const handleAllCheck = () => {
+  filterFormList.value?.forEach((item) => {
+    item.accessModes = checkAll.value ? ['read', 'write'] : ['read']
+    handleFormCheck(item)
+  })
 }
 
 /**

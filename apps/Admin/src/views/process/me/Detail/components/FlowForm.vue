@@ -225,6 +225,7 @@ const onClick = async (value) => {
             }
             data.push({
                 formId: i.formId,
+                formKey:i.formKey,
                 data: Array.isArray(i.data) ? i.data : formData.value[index]
             })
         })
@@ -251,6 +252,7 @@ const onClick = async (value) => {
             res.forEach((i, index) => {
                 data.push({
                     formId: formValue.value[index].formId,
+                    formKey:formValue.value[index].formKey,
                     data: Array.isArray(i) ? i : {
                         ...formValue.value[index].data,
                         ...i
@@ -311,7 +313,7 @@ const dealTable = (disabled) => {
 }
 // 列表接口数据nodeId 对应form表单ID处理数据
 const dealForm = (nodes) => {
-    console.log('nodes---', nodes, props.nodeId)
+    // console.log('nodes---', nodes, props.nodeId)
     if (nodes.id === props.nodeId) {
         //默认审批意见
         defaultComment.value = nodes?.props.others?.defaultComment

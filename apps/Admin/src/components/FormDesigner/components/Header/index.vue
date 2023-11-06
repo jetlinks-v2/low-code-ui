@@ -30,7 +30,7 @@
     </template>
     <template v-else>
       <div class="left">
-        <j-button @click="emits('back')">返回</j-button>
+        <j-button v-if="isEditModel" @click="emits('back')">返回</j-button>
         <template v-if="!isEditModel">
           <j-button type="link" @click="onPreview('edit')"
             ><AIcon type="LeftOutlined" />结束预览</j-button
@@ -49,7 +49,8 @@
         <PermissionButton
           @click="onSave"
           type="primary"
-          hasPermission="workflow:form_save"
+          v-if="isEditModel"
+          hasPermission="process/form:save"
         >
           保存
         </PermissionButton>
@@ -58,7 +59,7 @@
     </template>
   </div>
 </template>
-  
+
 <script lang="ts" setup>
 import { cloneDeep } from 'lodash-es'
 import { inject, computed, unref } from 'vue'
