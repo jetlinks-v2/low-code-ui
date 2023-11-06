@@ -67,7 +67,8 @@ const formData = reactive({
     get: () => flowStore.model.config.forms || [],
     set: (val) => {
       flowStore.model.config.forms = val
-      if (!flowStore.model?.nodes?.props?.formBinds?.length) {
+      // @ts-ignore
+      if (!Object.keys(flowStore.model?.nodes?.props?.formBinds)?.length) {
         flowStore.model.nodes.props!.formBinds = formToObj(val)
       }
     },
