@@ -113,7 +113,8 @@ const insertText = (val) => {
   const valArr = hide.value.split('')
   const len = offset.end - offset.start
   valArr.splice(offset.start, len, val)
-  hide.value = valArr.join('').substring(0, 256)
+  // hide.value = valArr.join('').substring(0, 256)
+  emits('update:value', valArr.join('').substring(0, 256))
 }
 
 const selectVariable = (_, { label }) => {
