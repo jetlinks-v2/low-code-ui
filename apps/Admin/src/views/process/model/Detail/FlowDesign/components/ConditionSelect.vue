@@ -24,32 +24,36 @@
         :tree-data="conditionOptions"
         :field-names="{ label: 'name', value: 'key' }"
         :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-        style="max-width: 200px;min-width: 200px;"
+        style="max-width: 200px; min-width: 200px"
         class="variable-select"
         @clear="handleConditionClear(item, index)"
-        @select="(value, label) => handleConditionChange(value,label, item, index)"
+        @select="
+          (value, label) => handleConditionChange(value, label, item, index)
+        "
       >
         <template #title="{ name }">
           <j-ellipsis line-clamp="1">
             <template
-            v-for="(fragment, i) in name
-              ?.toString()
-              ?.split(
-                new RegExp(
-                  `(?<=${item.searchValue})|(?=${item.searchValue})`,
-                  'i',
-                ),
-              )"
-          >
-            <span
-              v-if="fragment.toLowerCase() === item.searchValue?.toLowerCase()"
-              :key="i"
-              style="color: #08c"
+              v-for="(fragment, i) in name
+                ?.toString()
+                ?.split(
+                  new RegExp(
+                    `(?<=${item.searchValue})|(?=${item.searchValue})`,
+                    'i',
+                  ),
+                )"
             >
-              {{ fragment }}
-            </span>
-            <template v-else>{{ fragment }}</template>
-          </template>
+              <span
+                v-if="
+                  fragment.toLowerCase() === item.searchValue?.toLowerCase()
+                "
+                :key="i"
+                style="color: #08c"
+              >
+                {{ fragment }}
+              </span>
+              <template v-else>{{ fragment }}</template>
+            </template>
           </j-ellipsis>
         </template>
       </j-tree-select>
@@ -58,7 +62,7 @@
         :options="operatorMap[conditionType(item) || 'default']"
         label-in-value
         placeholder="请选择"
-        style="max-width: 120px;"
+        style="max-width: 120px"
         class="operator-select"
         @change="handleTermTypeChange(item)"
       />
@@ -71,23 +75,27 @@
       />
       <AIcon
         type="CloseCircleFilled"
-        style="color: red;position: absolute;right: 0px;top: -4px;"
+        style="color: red; position: absolute; right: 0px; top: -4px"
         @click="handleRemove(index)"
         v-if="index !== 0"
       />
     </div>
   </div>
-  <j-button type="default" style="width: 84px;background-color: #EBEDF3;" @click="handleAdd">
-    <AIcon type="PlusOutlined"/>
+  <j-button
+    type="default"
+    style="width: 84px; background-color: #ebedf3"
+    @click="handleAdd"
+  >
+    <AIcon type="PlusOutlined" />
   </j-button>
 </template>
 
 <script setup lang="ts">
-import { queryVariables_api } from '@/api/process/model'
+import { queryFormNoPage_api, queryVariables_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import ConditionValueItem from './ConditionValueItem.vue'
 import { operatorMap } from './const'
-import { findVariableById } from './utils'
+import { findVariableById, setDefaultFormBinds } from './utils'
 import { onlyMessage } from '@jetlinks/utils'
 import { cloneDeep } from 'lodash-es'
 
@@ -119,6 +127,35 @@ const props = defineProps({
 const conditionSelect = ref<IConditionSelect[]>([])
 const conditionOptions = ref([])
 
+/**
+ * 获取最新的表单字段, 并赋值给根节点的formBinds, 根节点赋值了才能查出变量
+ */
+const getLatestFormList = async () => {
+  const existForms = flowStore.model.config.forms?.filter((f) => !f.isDelete)
+  // 查询预览表单参数
+  const params = {
+    paging: false,
+    terms: [
+      {
+        column: 'key',
+        termType: 'in',
+        value: existForms?.map((m) => m.formId),
+      },
+      {
+        column: 'latest',
+        termType: 'eq',
+        value: 'true',
+      },
+    ],
+  }
+  const { result } = await queryFormNoPage_api(params)
+
+  flowStore.model.nodes.props!.formBinds = setDefaultFormBinds(
+    result,
+    'conditionSelect',
+  )
+  getFormFields()
+}
 
 /**
  * 获取条件下拉数据
@@ -139,7 +176,7 @@ const getFormFields = async () => {
   const { result } = await queryVariables_api(params)
   function addKeys(list, parentFullId = '') {
     for (let i = 0; i < list.length; i++) {
-      if(list[i].children?.length) {
+      if (list[i].children?.length) {
         list[i].disabled = true
       }
       list[i].key = parentFullId + ',' + list[i].id
@@ -154,7 +191,7 @@ const getFormFields = async () => {
       if (list[i].children) {
         filter(list[i].children)
       }
-      if(['table', 'upload'].includes(list[i].others?.type)) {
+      if (['table', 'upload'].includes(list[i].others?.type)) {
         list.splice(i, 1)
         return
       }
@@ -191,11 +228,11 @@ const handleTermTypeChange = (item) => {
  */
 const conditionType = (item) => {
   const _var = findVariableById(conditionOptions.value, item?.column)
-    // console.log('_var: ', _var)
-  if(_var?.id === 'processOwnerName') {
+  // console.log('_var: ', _var)
+  if (_var?.id === 'processOwnerName') {
     return 'input'
   }
-  return _var?.others?.type || _var?.others?.relation 
+  return _var?.others?.type || _var?.others?.relation
 }
 
 const handleRemove = (index: number) => {
@@ -204,10 +241,9 @@ const handleRemove = (index: number) => {
 
 const handleAdd = () => {
   const beforeDone = conditionSelect.value.some((item: any) => {
-    console.log(item);
     return !item.selectedColumn || !item.selectedTermType || !item.value
   })
-  if(!beforeDone) {
+  if (!beforeDone) {
     onlyMessage('前置条件未配置完成', 'error')
     return
   }
@@ -253,7 +289,7 @@ watch(
     //   }
     // })
   },
-  
+
   { deep: true, immediate: true },
 )
 
@@ -267,7 +303,7 @@ watch(
 )
 
 onMounted(() => {
-  getFormFields()
+  getLatestFormList()
 })
 </script>
 
@@ -278,44 +314,44 @@ onMounted(() => {
   gap: 10px;
   margin-bottom: 10px;
   position: relative;
-  .variable-select{
-    border: 1px solid #15C4FF;
-    color: #15C4FF;
+  .variable-select {
+    border: 1px solid #15c4ff;
+    color: #15c4ff;
     :deep(.ant-select-selector) {
-      background-color: #EEFBFF;
+      background-color: #eefbff;
     }
     :deep(.ant-select-arrow) {
-      color: #15C4FF;
+      color: #15c4ff;
     }
     :deep(.ant-select-clear) {
-      color: #15C4FF;
+      color: #15c4ff;
     }
     :deep(.ant-select-selection-placeholder) {
-      color: #15C4FF;
+      color: #15c4ff;
     }
   }
 }
-.operator-select{
-  border: 1px solid #208CFF;
-  color: #208CFF;
+.operator-select {
+  border: 1px solid #208cff;
+  color: #208cff;
   :deep(.ant-select-selector) {
-    background-color: #F0F7FF;
+    background-color: #f0f7ff;
   }
   :deep(.ant-select-arrow) {
-    color: #208CFF;
+    color: #208cff;
   }
   :deep(.ant-select-clear) {
-    color: #208CFF;
+    color: #208cff;
   }
   :deep(.ant-select-selection-placeholder) {
-      color: #208CFF;
-    }
+    color: #208cff;
+  }
 }
-input{
-  color: #CE29DD !important;
-  background-color: #FEF5FF;
-  &::placeholder{
-    color: #CE29DD !important;
+input {
+  color: #ce29dd !important;
+  background-color: #fef5ff;
+  &::placeholder {
+    color: #ce29dd !important;
   }
 }
 </style>
