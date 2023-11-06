@@ -21,9 +21,12 @@
                             <template v-for="(i, index) in item.configuration"
                                 #[i.dataIndex]="{ record, index, valueChange }">
                                 <!-- <slot :name="name" v-bind="slotData || {}" /> -->
-                                <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
+                                <!-- <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled">
-                                </ValueItem>
+                                </ValueItem> -->
+                                <FormItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
+                                    @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled"
+                                    :keys="i.keys" :mode="i.mode"></FormItem>
                             </template>
                         </QuickEditTable>
                         <j-button @click="() => addTableData(item)" block style="margin-top: 10px;"
@@ -43,15 +46,16 @@
         </div>
     </div>
     <FlowModal v-if="visible" @close="visible = false" @save="onSave" :type="modalType" :required="required"
-        :taskId="taskId" :candidates="candidates" :defaultComment="defaultComment"/>
+        :taskId="taskId" :candidates="candidates" :defaultComment="defaultComment" />
 </template>
 
 <script setup>
 import FlowModal from './FlowModal.vue';
 import FormPreview from '@/components/FormDesigner/preview.vue'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, keys } from 'lodash-es'
 import { _claim, _save, _complete, _reject } from '@/api/process/me'
 import { onlyMessage } from '@jetlinks/utils';
+import FormItem from './FormItem.vue'
 import md5 from 'md5'
 import { getImage } from '@jetlinks/utils'
 
@@ -155,20 +159,77 @@ const onSave = (value) => {
             break;
     }
 }
+//处理可编辑表格数据
+const dealTableData = (value) => {
+    const keysMap = new Map()
+    value.configuration.map((item) => {
+        keysMap.set(item.dataIndex, item.keys)
+    })
+    value.data = value.data.map((item) => {
+        let obj
+        Object.keys(item).forEach((i) => {
+            if (keysMap.has(i)) {
+                dealIotModuleData(item[i], keysMap.get(i))
+                if (!Array.isArray(item[i])) {
+                    item = {
+                        ...item,
+                        ...item[i]
+                    }
+                    delete item[i]
+                }
+                obj = item
+            }
+        })
+        return obj
+    })
+}
+//按照配置处理高级组件的数据
+const dealIotModuleData = (data, keys) => {
+    if (Array.isArray(data)) {
+        // data.map((itemData) => {
+        //     Object.keys(itemData).map(i => {
+        //         keys.map((item) => {
+        //             if (item.key === i) {
+        //                 itemData[item.config.source] = itemData[i]
+        //                 if (item.config.source !== i) {
+        //                     delete itemData[i]
+        //                 }
+        //             }
+        //         })
+        //     })
+        // })
+    } else {
+        Object.keys(data).map(i => {
+            keys.forEach((item) => {
+                if (item.key === i) {
+                    data[item.config.source] = data[i]
+                    if (item.config.source !== i) {
+                        delete data[i]
+                    }
+                }
+            })
+        })
+    }
+}
 
+//处理接受的可编辑表格数据
 const onClick = async (value) => {
     const promise = []
     modalType.value = value
     if (modalType.value === 'save') {
         let data = []
-        formValue.value.map((i, index) => {
+        const fromValueCopy = cloneDeep(formValue.value)
+        fromValueCopy.forEach((i, index) => {
+            if (i?.multiple) {
+                dealTableData(i)
+            }
             data.push({
                 formId: i.formId,
+                formKey:i.formKey,
                 data: Array.isArray(i.data) ? i.data : formData.value[index]
             })
         })
         submitData.value = data
-        console.log(submitData.value)
         btnLoading.value = true
         _save(props.info.currentTaskId, {
             form: submitData.value
@@ -191,6 +252,7 @@ const onClick = async (value) => {
             res.forEach((i, index) => {
                 data.push({
                     formId: formValue.value[index].formId,
+                    formKey:formValue.value[index].formKey,
                     data: Array.isArray(i) ? i : {
                         ...formValue.value[index].data,
                         ...i
@@ -220,6 +282,7 @@ const submitForm = async () => {
             form: submitData.value,
         })
         if (res.status === 200) {
+            onlyMessage('操作成功')
             emit('close')
         }
     }
@@ -234,20 +297,23 @@ const dealTable = (disabled) => {
                 tableColumn.push({
                     title: item.formItemProps?.label,
                     dataIndex: item.formItemProps?.name,
+                    mode: item.componentProps?.mode,
                     type: item?.type,
                     disabled: disabled ? true : false,
+                    keys: item.componentProps.keys,
                     form: {
                         rules: rules
                     }
                 })
             })
+            console.log(tableColumn,'___')
             i.configuration = tableColumn
         }
     })
 }
 // 列表接口数据nodeId 对应form表单ID处理数据
 const dealForm = (nodes) => {
-    console.log('nodes---', nodes, props.nodeId)
+    // console.log('nodes---', nodes, props.nodeId)
     if (nodes.id === props.nodeId) {
         //默认审批意见
         defaultComment.value = nodes?.props.others?.defaultComment
@@ -270,22 +336,19 @@ const dealForm = (nodes) => {
             const id = md5(item + '|' + props.info.others?.formVersion[item])
             bindMap.set(id, nodes.props.formBinds[item])
         })
-        console.log('bindMap', bindMap)
-        console.log('formValue.value', formValue.value)
+        // console.log('bindMap',bindMap)
+        // console.log('formValue.value',formValue.value)
         //循环表单匹配对应节点表单ID
         formValue.value = formValue.value.filter((item) => {
             if (bindMap.has(item.formId)) {
                 // 循环表单项 根据节点 配置表单项属性 过滤掉节点没有配置的表单项
+                console.log(bindMap,'map')
                 item.configuration.children = item.configuration.children.filter((i) => {
                     return bindMap.get(item.formId).some((k) => {
                         if (k.id === i.formItemProps.name) {
-                            console.log('k.required', k.required)
-                            // i.formItemProps.required = k.required
+                            // console.log('k.required',k.required)
                             i.componentProps.disabled = !k?.accessModes?.includes('write')
-                            i.componentProps.visible = k?.accessModes?.includes('read')
                             return true
-                        } else {
-                            return false
                         }
                     })
                 })
@@ -294,7 +357,6 @@ const dealForm = (nodes) => {
                 return false
             }
         })
-        // console.log('formValue.value',formValue.value)
         dealTable()
     } else {
         nodes?.children ? dealForm(nodes.children) : ''
@@ -313,7 +375,6 @@ watch(() => props.info, () => {
     if (props.type === 'todo') {
         dealForm(nodes.value)
     } else {
-        // dealTable(true)
         formValue.value?.map((i) => {
             if (i.multiple) {
                 dealTable(true)
@@ -325,6 +386,7 @@ watch(() => props.info, () => {
 
         })
     }
+    console.log('formValue.value',formValue.value)
 })
 
 </script>

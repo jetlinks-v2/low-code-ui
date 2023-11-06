@@ -16,7 +16,7 @@
         <PermissionButton
           type="primary"
           @click="handleSave(undefined)"
-          hasPermission="workflow:model_add"
+          hasPermission="process/model:add"
         >
           <!-- <AIcon type="PlusOutlined" /> -->
           新增</PermissionButton
@@ -309,7 +309,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: '编辑',
         },
-        hasPermission: 'workflow:model_update',
+        hasPermission: 'process/model:update',
         onClick: () => {
           handleSave(data)
         },
@@ -390,7 +390,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: '删除',
         },
-        hasPermission: 'workflow:model_delete',
+        hasPermission: 'process/model:delete',
         popConfirm: {
           title: `确认删除`,
           onConfirm: () => {

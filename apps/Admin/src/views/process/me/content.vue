@@ -1,8 +1,8 @@
 
 <template>
     <div>
-        <pro-search :columns="columns" target="running" @search="handleSearch" v-if="activeKey==='running'"/>
-        <pro-search :columns="columns" target="code" @search="handleSearch" v-else/>
+        <pro-search :columns="columns" target="running" @search="handleSearch" v-if="activeKey === 'running'" />
+        <pro-search :columns="columns" target="code" @search="handleSearch" v-else />
         <JProTable ref="tableRef" :request="(e) => _query(e)" :columns="columns" :params="params" model="table"
             :defaultParams="defaultParams" :rowSelection="isCheck
                 ? {
@@ -19,7 +19,8 @@
             <template #createTime="record">
                 {{ record.createTime ? dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}
             </template>
-            <template #endTime="record">{{ record.endTime ? dayjs(record.endTime).format('YYYY-MM-DD HH:mm:ss') : '--'}}</template>
+            <template #endTime="record">{{ record.endTime ? dayjs(record.endTime).format('YYYY-MM-DD HH:mm:ss') :
+                '--' }}</template>
             <!-- <template #modifyTime="record">{{ record.modifyTime ? dayjs(record.modifyTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}</template> -->
             <template #state="record">{{ record.state.text }}</template>
             <template #action="record">
@@ -31,7 +32,7 @@
                         签收
                     </PermissionButton>
                     <PermissionButton v-if="isManage(record.identityLinks)" type="link" :tooltip="{
-                        title: '办理', 
+                        title: '办理',
                     }" @click="onSave(record)">
                         办理
                     </PermissionButton>
@@ -56,7 +57,8 @@
                 </div>
             </template>
         </JProTable>
-        <Detail v-if="visible" @close="onCancelDrawer" :current="current" :type="type" :history="history" :is-draft="activeKey === 'draft'"/>
+        <Detail v-if="visible" @close="onCancelDrawer" :current="current" :type="type" :history="history"
+            :is-draft="activeKey === 'draft'" />
         <j-modal v-model:visible="visibleModel" :closable="false" :width="300" @cancel="onCancel" @ok="onCancel">
             <div class="content">
                 <div class="title">共签收{{ sign.length }}个任务</div>
@@ -170,10 +172,10 @@ const columnsTodo = [
         key: 'creatorId',
         ellipsis: true,
         scopedSlots: true,
-        hideInTable:true,
+        hideInTable: true,
         search: {
             type: 'select',
-            termFilter:['in','nin'],
+            termFilter: ['in', 'nin'],
             options: options,
         },
     },
@@ -256,11 +258,11 @@ const columnsFinished = [
         key: 'creatorId',
         ellipsis: true,
         scopedSlots: true,
-        hideInTable:true,
+        hideInTable: true,
         search: {
             type: 'select',
             options: options,
-            termFilter:['in','nin']
+            termFilter: ['in', 'nin']
         },
     },
     {
@@ -270,7 +272,7 @@ const columnsFinished = [
         scopedSlots: true,
         search: {
             type: 'select',
-            termFilter:['in','nin'],
+            termFilter: ['in', 'nin'],
             options: [
                 // { label: '审办中', value: 'running ' },
                 { label: '已完成', value: 'completed' },
@@ -371,7 +373,7 @@ const columnsInitiate = [
         scopedSlots: true,
         search: {
             type: 'select',
-            termFilter:['in','nin'],
+            termFilter: ['in', 'nin'],
             options: [
                 // { label: '审办中', value: 'running ' },
                 { label: '已完成', value: 'completed' },
@@ -471,10 +473,10 @@ const columnsCc = [
         key: 'creatorId',
         ellipsis: true,
         scopedSlots: true,
-        hideInTable:true,
+        hideInTable: true,
         search: {
             type: 'select',
-            termFilter:['in','nin'],
+            termFilter: ['in', 'nin'],
             options: options,
         },
     },
@@ -485,7 +487,7 @@ const columnsCc = [
         scopedSlots: true,
         search: {
             type: 'select',
-            termFilter:['in','nin'],
+            termFilter: ['in', 'nin'],
             options: [
                 // { label: '审办中', value: 'running ' },
                 { label: '已完成', value: 'completed' },
@@ -585,8 +587,8 @@ const columns = computed(() => {
     } else if (props.type === 'finished') {
         return props.activeKey === "running" ? columnsFinished.filter(item => item.dataIndex !== 'state') : columnsFinished
     } else if (props.type === 'initiate') {
-        return props.activeKey === 'draft'? columnDraft :
-            props.activeKey === "running" ? columnsInitiate.filter(item => item.dataIndex !== 'state'): columnsInitiate
+        return props.activeKey === 'draft' ? columnDraft :
+            props.activeKey === "running" ? columnsInitiate.filter(item => item.dataIndex !== 'state') : columnsInitiate
 
     } else {
         return props.activeKey === "running" ? columnsCc.filter(item => item.dataIndex !== 'state') : columnsCc
@@ -708,9 +710,14 @@ const onAction = async (key) => {
             taskIds: taskIds.flat()
         })
         if (res.status === 200) {
-            onlyMessage('操作成功')
+            // onlyMessage('操作成功')
             _selectedRowKeys.value = [];
-            tableRef.value?.reload()
+            // tableRef.value?.reload()
+            visibleModel.value = true
+            sign.length = res.result.length
+            sign.success = res.result.filter(item => item.success)?.length
+            sign.error = res.result.filter(item => !item.success)?.length
+
         }
     }
 
@@ -741,27 +748,39 @@ const getActionData = async (value) => {
     }
 }
 
-const onConfirm = (item) => {
+const onConfirm = async (item) => {
     // console.log('item', item)
-    const task = item.identityLinks?.filter(item => item.linkType.value === 'candidate')
+    const task = item.identityLinks?.filter(item => item.linkType.value === 'candidate').map(item=>item.taskId)
     sign.length = task.length
-
-
-    task?.forEach(async (el) => {
-        const res = await _claim(el.taskId)
-        if (res.status === 200) {
-            // onlyMessage('签收成功')
-            sign.success = sign.success + 1
-        } else {
-            sign.error = sign.error + 1
-        }
+    const res = await _claimBatch({
+        taskIds: task
     })
-    visibleModel.value = true
+    if (res.status === 200) {
+        visibleModel.value = true
+        sign.length = res.result.length
+        sign.success = res.result.filter(item => item.success)?.length
+        sign.error = res.result.filter(item => !item.success)?.length
+    }
+
+
+    // task?.forEach(async (el) => {
+    //     const res = await _claim(el.taskId)
+    //     if (res.status === 200) {
+    //         // onlyMessage('签收成功')
+    //         sign.success = sign.success + 1
+    //     } else {
+    //         sign.error = sign.error + 1
+    //     }
+    // })
+    // visibleModel.value = true
     // tableRef.value?.reload()
 }
 const onCancel = () => {
     visibleModel.value = false
     tableRef.value?.reload()
+    sign.length = 0
+    sign.error = 0
+    sign.success = 0
 }
 
 const onCancelDrawer = () => {
@@ -799,9 +818,9 @@ const isSign = (arr) => {
 }
 
 //是否办理
-const isManage = (arr)=>{
+const isManage = (arr) => {
     return arr?.some(item => item.linkType.value === 'assignee' && item.state.value === 'todo')
-    
+
 }
 
 const _query = (e) => {
@@ -820,8 +839,8 @@ const _query = (e) => {
 }
 
 const getUser = async (type) => {
-    const res = await getInitiatorList(type,props.history,{
-        paging:false
+    const res = await getInitiatorList(type, props.history, {
+        paging: false
     })
     if (res.status === 200) {
         options.value = res.result.map(item => ({
@@ -833,8 +852,8 @@ const getUser = async (type) => {
 
 
 watch(
-    ()=>props.type,
-    ()=>{
+    () => props.type,
+    () => {
         getUser(props.type)
     }
 )

@@ -51,7 +51,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value','change'])
 
 const selectData: any = ref()
 const modalVisible = ref(false)
@@ -91,6 +91,7 @@ const saveData = (data: any[]) => {
     })
     emit('update:value', arr)
   }
+  emit('change')
 }
 const selectedUser = (data: any[]) => {
   saveData(data)

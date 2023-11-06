@@ -138,7 +138,7 @@ const getColor = (item,index) => {
 //判断节点类型
 const nodeState = (nodeType, auto) => {
    if (nodeType === 'APPROVAL') {
-      return auto ? 'pass' : 'pass'
+      return auto ? 'auto' : 'pass'
    }
    if (nodeType === 'DEAL') {
       return 'submit'
@@ -352,6 +352,7 @@ onMounted(() => {
          .item-right {
             color: #9E9E9E;
             font-size: 14px;
+            padding-right: 12px;
          }
 
 
