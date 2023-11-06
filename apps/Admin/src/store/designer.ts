@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash-es'
 import { defineStore } from 'pinia'
 
 export const useFormDesigner = defineStore('form-designer', () => {
@@ -6,7 +7,7 @@ export const useFormDesigner = defineStore('form-designer', () => {
     const setCopyData = (id: string, _data: any[]) => {
         copyData.value = {
             key: id,
-            list: _data
+            list: cloneDeep(_data)
         }
     }
 

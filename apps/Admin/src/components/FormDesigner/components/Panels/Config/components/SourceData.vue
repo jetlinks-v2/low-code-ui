@@ -332,6 +332,7 @@ const getEnd = (id: string) => {
 }
 
 const onRadioChange = (e) => {
+  console.log(e, 'e')
   if (e === 'end') {
     emits('change', {
       type: 'end',
@@ -499,11 +500,19 @@ watch(
       dictionary: undefined,
       type: 'dic',
     }
-    if (data.type === 'dic') {
+    if (obj.type === 'dic') {
       data.dictionary = obj.dictionary
       data.type = 'dic'
     } else {
-      Object.assign(data, cloneDeep(obj))
+      data.type = 'end'
+      data.projectId = obj?.projectId
+      data.functionId = obj?.functionId
+      data.fullId = obj?.fullId
+      data.commandId = obj?.commandId
+      data.source = obj?.source
+      data.label = obj?.label
+      data.value = obj?.value
+      data.isSource = obj?.isSource
       if (data?.projectId && !end.value?.length) {
         getEnd(data.projectId)
       }
