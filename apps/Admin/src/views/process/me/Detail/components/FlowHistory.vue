@@ -138,7 +138,7 @@ const getColor = (item,index) => {
 //判断节点类型
 const nodeState = (nodeType, auto) => {
    if (nodeType === 'APPROVAL') {
-      return auto ? 'pass' : 'pass'
+      return auto ? 'auto' : 'pass'
    }
    if (nodeType === 'DEAL') {
       return 'submit'

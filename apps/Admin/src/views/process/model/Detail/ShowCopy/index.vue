@@ -64,7 +64,7 @@
           v-model:value="formData.nameGenerator"
           :variables="formData.variables"
           :maxlength="64"
-          name="标题模板"
+          name="标题"
         />
       </j-form-item>
       <j-form-item
@@ -81,7 +81,7 @@
           v-model:value="formData.summaryGenerator"
           :variables="formData.variables"
           :maxlength="255"
-          name="摘要模板"
+          name="摘要"
         />
       </j-form-item>
       <TitleComponent data="抄送配置" />

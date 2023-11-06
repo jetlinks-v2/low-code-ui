@@ -708,9 +708,14 @@ const onAction = async (key) => {
             taskIds: taskIds.flat()
         })
         if (res.status === 200) {
-            onlyMessage('操作成功')
+            // onlyMessage('操作成功')
             _selectedRowKeys.value = [];
-            tableRef.value?.reload()
+            // tableRef.value?.reload()
+            visibleModel.value = true
+            sign.length = res.result.length
+            sign.success = res.result.filter(item=>item.success)?.length
+            sign.error = res.result.filter(item=>!item.success)?.length
+           
         }
     }
 
@@ -762,6 +767,9 @@ const onConfirm = (item) => {
 const onCancel = () => {
     visibleModel.value = false
     tableRef.value?.reload()
+    sign.length = 0
+    sign.error = 0
+    sign.success = 0
 }
 
 const onCancelDrawer = () => {

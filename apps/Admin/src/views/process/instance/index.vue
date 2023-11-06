@@ -284,7 +284,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: '复制为模型',
         },
-        hasPermission: 'workflow:release_save',
+        hasPermission: 'workflow:model_add',
         onClick: () => {
           copyAsModel(data)
         },
@@ -301,7 +301,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: record.state?.value !== 'disabled' ? '禁用' : '启用',
         },
-        hasPermission: 'workflow:release_save',
+        hasPermission: 'workflow:release_action',
         popConfirm: {
           title: `确认${record.state?.value !== 'disabled' ? '禁用' : '启用'}`,
           onConfirm: () => {
@@ -329,7 +329,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: '权限控制',
         },
-        hasPermission: 'workflow:release_save',
+        hasPermission: 'workflow:release_auth',
         onClick: () => {
           permission.selectItem = { ...data }
           permission.visible = true
