@@ -64,7 +64,9 @@ export const useMenuStore = defineStore('menu', () => {
 
     const handleMenusMapById = (item: { name: string, path: string}) => {
       const { name, path } = item
-      menusMap.value.set(name, { path })
+      if (name) {
+        menusMap.value.set(name, { path })
+      }
     }
 
     const queryMenus = async () => {
@@ -86,7 +88,7 @@ export const useMenuStore = defineStore('menu', () => {
             menu.value = routes
 
             console.log('routes',routes)
-            // handleMenusMap(routes, handleMenusMapById)
+            handleMenusMap(routes, handleMenusMapById)
             siderMenus.value = handleSiderMenu(cloneDeep(BASIC_ROUTER_DATA)) // 处理菜单
         }
     }
