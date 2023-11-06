@@ -54,6 +54,7 @@
             @click="handleDeploy"
             hasPermission="workflow:model_deploy"
             :disabled="!isChange && flowDetail?.state?.value === 'deployed'"
+            :loading="deployLoading"
           >
             部署
             <template #icon>
@@ -137,6 +138,7 @@ const step2 = ref()
 const step3 = ref()
 const nextLoading = ref(false)
 const saveLoading = ref(false)
+const deployLoading = ref(false)
 const isModal = ref(false)
 const oldData = ref(defaultModel)
 /**
@@ -262,17 +264,22 @@ const saveAndDeploy = () => {
     state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
     model: JSON.stringify(flowStore.model),
   }
-  update_api(params).then(() => {
-    deploy_api(route.query.id as string).then((res) => {
-      if (res.success) {
-        onlyMessage('部署成功', 'success')
-        isModal.value = true
-        router.go(-1)
-      } else {
-        onlyMessage('部署失败', 'error')
-      }
+  deployLoading.value = true
+  update_api(params)
+    .then(() => {
+      deploy_api(route.query.id as string).then((res) => {
+        if (res.success) {
+          onlyMessage('部署成功', 'success')
+          isModal.value = true
+          router.go(-1)
+        } else {
+          onlyMessage('部署失败', 'error')
+        }
+      })
     })
-  })
+    .finally(() => {
+      deployLoading.value = false
+    })
 }
 
 onMounted(() => {
