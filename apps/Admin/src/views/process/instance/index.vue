@@ -279,7 +279,7 @@ const getActions = (record, type = 'card') => {
     {
       key: 'copy',
       text: '复制为模型',
-      icon: 'icon-queue',
+      icon: 'CopyOutlined',
       permissionProps: (data) => ({
         tooltip: {
           title: '复制为模型',

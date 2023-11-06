@@ -335,7 +335,7 @@ watch(
         props.type,
         'type',
       )
-      currentVar.value = tree[0]?.children
+      currentVar.value = tree
     }
   },
   { immediate: true },

@@ -290,6 +290,7 @@ const startProcess = (list: any, start: boolean | undefined = undefined) => {
         data: i.multiple ? tableData[i.formId][0] : list[flag++],
       })),
       variables: {},
+      formKey: start ? Object.keys(formVersion).toString() : undefined
     },
     start,
   }
