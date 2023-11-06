@@ -22,11 +22,11 @@
         tree-default-expand-all
         tree-node-filter-prop="name"
         :tree-data="conditionOptions"
-        :field-names="{ label: 'name', value: 'key' }"
+        :field-names="{ label: 'name', value: 'fullId' }"
         :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
         style="max-width: 200px;min-width: 200px;"
         class="variable-select"
-        @clear="handleConditionClear(item, index)"
+        @clear="handleConditionClear(index)"
         @select="(value, label) => handleConditionChange(value,label, item, index)"
       >
         <template #title="{ name }">
@@ -137,20 +137,11 @@ const getFormFields = async () => {
     containThisNode: false, //变量来源是否包含本节点
   }
   const { result } = await queryVariables_api(params)
-  function addKeys(list, parentFullId = '') {
+  function filter(list) {
     for (let i = 0; i < list.length; i++) {
       if(list[i].children?.length) {
         list[i].disabled = true
       }
-      list[i].key = parentFullId + ',' + list[i].id
-      if (list[i].children) {
-        addKeys(list[i].children, list[i].fullId)
-      }
-    }
-    return list
-  }
-  function filter(list) {
-    for (let i = 0; i < list.length; i++) {
       if (list[i].children) {
         filter(list[i].children)
       }
@@ -161,7 +152,13 @@ const getFormFields = async () => {
     }
     return list
   }
-  conditionOptions.value = filter(addKeys(result))
+  conditionOptions.value = filter(result)
+  conditionSelect.value.forEach((item, index) => {
+    const node = findVariableById(conditionOptions.value, item?.column)
+    if(!node) {
+      handleConditionClear(index)
+    }
+  })
 }
 
 /**
@@ -231,7 +228,7 @@ watch(
   (val) => {
     conditionSelect.value =
       val && val.length
-        ? cloneDeep(val)
+        ? val
         : [
             {
               column: undefined,
@@ -246,12 +243,6 @@ watch(
               valueName: undefined,
             },
           ]
-    // conditionSelect.value.forEach((item, index) => {
-    //   const node = findVariableById(conditionOptions.value, item?.column)
-    //   if(!node) {
-    //     handleConditionClear(index)
-    //   }
-    // })
   },
   
   { deep: true, immediate: true },
