@@ -252,12 +252,26 @@ const getFormList = async () => {
   // 所有表单数据, 用于前端筛选
   allFormList.value = cloneDeep(filterFormList.value)
   handleSearch()
-  // 设置全部内容全选状态
-  setCheckAll()
 }
 
 const handleSearch = () => {
   filterFormList.value = filterFormByName(allFormList.value, keywords.value)
+  filterFormList.value?.forEach((item) => {
+    item.accessModes = item.configuration?.children
+      // ?.filter((f) => !unDisplayFieldsType.value.includes(f.type))
+      ?.every((e) => e.accessModes.length === 2)
+      ? ['read', 'write']
+      : ['read']
+  })
+  setCheckAll()
+}
+
+/**
+ * 设置全部内容全选状态
+ */
+const setCheckAll = () => {
+  checkAll.value =
+    filterFormList.value?.every((e) => e.accessModes.length === 2) || false
 }
 
 /**
@@ -269,14 +283,6 @@ const handleAllCheck = () => {
     item.accessModes = checkAll.value ? ['read', 'write'] : ['read']
     handleFormCheck(item)
   })
-}
-
-/**
- * 设置全部内容全选状态
- */
-const setCheckAll = () => {
-  checkAll.value =
-    filterFormList.value?.every((e) => e.accessModes.length === 2) || false
 }
 
 /**
