@@ -176,7 +176,7 @@ const onDelete = debounce(() => {
 
 // 复制
 const onCopy = () => {
-  const list = selected.value.filter((item) => {
+  const list = cloneDeep(selected.value).filter((item) => {
     return ![
       'collapse-item',
       'tabs-item',
