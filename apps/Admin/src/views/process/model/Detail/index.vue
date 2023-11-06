@@ -111,13 +111,14 @@
         <PermissionButton
             @click="onCancel"
             :hasPermission="true"
+            style="margin-right:12px;"
           >
             不保存
           </PermissionButton>
         <PermissionButton
             type="primary"
             @click="onOk"
-            hasPermission="workflow/model:save"
+            hasPermission="process/model:save"
           >
             保存
           </PermissionButton>

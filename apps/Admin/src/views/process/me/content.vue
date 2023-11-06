@@ -16,8 +16,8 @@
             <template #headerTitle v-if="type === 'todo'">
                 <BatchDropdown v-model:isCheck="isCheck" :actions="batchActions" @change="onCheckChange" />
             </template>
-            <template #createTime="record">
-                {{ record.createTime ? dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}
+            <template #deployTime="record">
+                {{ record.deployTime ? dayjs(record.deployTime).format('YYYY-MM-DD HH:mm:ss') : '--' }}
             </template>
             <template #endTime="record">{{ record.endTime ? dayjs(record.endTime).format('YYYY-MM-DD HH:mm:ss') :
                 '--' }}</template>
@@ -101,7 +101,7 @@ const visible = ref(false)
 const visibleModel = ref(false)
 const current = ref({})
 const defaultParams = ref({
-    sorts: [{ name: 'createTime', order: 'desc' }]
+    sorts: [{ name: 'deployTime', order: 'desc' }]
 })
 const options = ref([])
 const sign = reactive({
@@ -181,8 +181,8 @@ const columnsTodo = [
     },
     {
         title: '发起时间',
-        dataIndex: 'createTime',
-        key: 'createTime',
+        dataIndex: 'deployTime',
+        key: 'deployTime',
         ellipsis: true,
         scopedSlots: true,
         search: {
@@ -283,8 +283,8 @@ const columnsFinished = [
     },
     {
         title: '发起时间',
-        dataIndex: 'createTime',
-        key: 'createTime',
+        dataIndex: 'deployTime',
+        key: 'deployTime',
         ellipsis: true,
         scopedSlots: true,
         search: {
@@ -384,8 +384,8 @@ const columnsInitiate = [
     },
     {
         title: '发起时间',
-        dataIndex: 'createTime',
-        key: 'createTime',
+        dataIndex: 'deployTime',
+        key: 'deployTime',
         ellipsis: true,
         scopedSlots: true,
         search: {
@@ -498,8 +498,8 @@ const columnsCc = [
     },
     {
         title: '发起时间',
-        dataIndex: 'createTime',
-        key: 'createTime',
+        dataIndex: 'deployTime',
+        key: 'deployTime',
         ellipsis: true,
         scopedSlots: true,
         search: {
