@@ -27,7 +27,7 @@
         <PermissionButton
           @click="handleAdd()"
           type="primary"
-          hasPermission="workflow:form_save"
+          hasPermission="workflow/form:add"
         >
           新增
         </PermissionButton>
@@ -56,7 +56,7 @@
               type="link"
               style="padding: 0 5px"
               :danger="i?.key === 'delete'"
-              :hasPermission="i?.key === 'view' ? false : `workflow:${i?.hasPermission}`"
+              :hasPermission="i?.key === 'view' ? false : `workflow/form:${i?.hasPermission}`"
             >
               <template #icon><AIcon :type="i.icon" /></template>
             </PermissionButton>
@@ -174,7 +174,7 @@ const getActions = (record) => {
         title: '编辑',
       },
       icon: 'EditOutlined',
-      hasPermission: "form_update",
+      hasPermission: "update",
       onClick: () => {
         handleAdd(record)
       },
@@ -186,7 +186,7 @@ const getActions = (record) => {
         title: '删除',
       },
       icon: 'DeleteOutlined',
-      hasPermission: "form_delete",
+      hasPermission: "delete",
       popConfirm: {
         title: '确认删除？',
         onConfirm: () => {
