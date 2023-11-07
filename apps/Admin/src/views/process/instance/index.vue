@@ -345,6 +345,7 @@ const getActions = (record, type = 'card') => {
         disabled: record.state?.value !== 'disabled',
         tooltip: {
           title: record.state?.value !== 'disabled' ? '请先禁用再删除' : '删除',
+          placement: 'topRight'
         },
         hasPermission: 'process/instance:delete',
         popConfirm: {

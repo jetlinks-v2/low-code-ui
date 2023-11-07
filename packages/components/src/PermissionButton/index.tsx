@@ -79,7 +79,7 @@ const PermissionButton = defineComponent({
       const _tooltip = tooltip ? h(Tooltip, { ...tooltip, disabled: isPermission.value }, { default: () => button}) : undefined
 
       // 无权限
-      const noPermissionButton = !permission.value ? h(Tooltip, { title: noPermissionTitle || '暂无权限，请联系管理员' }, { default: () => button}) : undefined
+      const noPermissionButton = !permission.value ? h(Tooltip, { ...tooltip, title: noPermissionTitle || '暂无权限，请联系管理员' }, { default: () => button}) : undefined
 
       // 二次确认
       const _popConfirm = popConfirm ?

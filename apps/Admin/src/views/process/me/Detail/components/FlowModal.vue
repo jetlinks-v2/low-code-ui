@@ -1,6 +1,6 @@
 
 <template>
-    <j-modal visible :width="type === 'submit' ? 900 : 400" :footer="null">
+    <j-modal visible :width="type === 'submit' ? 900 : 400" :footer="null" @cancel="emit('close')">
         <j-form :layout="'vertical'" ref="formRef" :model="modelRef" v-if="type !== 'submit'">
             <div class="title">{{ title }}</div>
             <div>
@@ -27,6 +27,10 @@
                     <Select :type="item.key" :user=user :candidates="candidates" @selected="selectUser" />
                 </j-tab-pane>
             </j-tabs>
+            <div class="footer">
+                    <j-button style="margin-right: 20px;" @click="emit('close')">取消</j-button>
+                    <j-button type="primary" @click="onSave">确定</j-button>
+                </div>
         </div>
     </j-modal>
 </template>

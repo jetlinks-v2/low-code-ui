@@ -82,6 +82,8 @@ import Detail from './Detail/index.vue'
 import { getMeProcessList, _claim, _delete, getInitiatorList, _claimBatch, _rejectBatch, _completeBatch } from '@/api/process/me'
 import BatchDropdown from '@/components/BatchDropdown/index.vue';
 import ActionModal from './ActionModal.vue';
+import { useMenuStore } from '@/store'
+const menu = useMenuStore()
 
 
 const props = defineProps({
@@ -804,12 +806,16 @@ const onSave = (item) => {
 }
 
 const onDraft = (record) => {
-    router.push({
-        path: '/flow-engine/initiate/initiate-detail',
-        query: {
-            id: record.id,
-            isDraft: true,
-        }
+    // router.push({
+    //     path: '/flow-engine/initiate/initiate-detail',
+    //     query: {
+    //         id: record.id,
+    //         isDraft: true,
+    //     }
+    // })
+    menu.jumpPage('process/initiate/Detail',{},{
+        id: record.id,
+        isDraft: true
     })
 }
 
