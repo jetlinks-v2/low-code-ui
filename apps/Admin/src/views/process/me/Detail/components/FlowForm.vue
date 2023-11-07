@@ -348,7 +348,7 @@ const dealForm = (nodes) => {
                 item.configuration.children = item.configuration.children.filter((i) => {
                     return bindMap.get(item.formId).some((k) => {
                         if (k.id === i.formItemProps.name) {
-                            console.log('k.required',k)
+                            console.log('k=========',k,!k?.accessModes?.includes('write'))
                             i.componentProps.disabled = !k?.accessModes?.includes('write')
                             return true
                         }

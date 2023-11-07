@@ -1,6 +1,6 @@
 
 <template>
-    <div>
+    <div class="item">
         <pro-search :columns="columns" target="running" @search="handleSearch" v-if="activeKey === 'running'" />
         <pro-search :columns="columns" target="code" @search="handleSearch" v-else />
         <JProTable ref="tableRef" :request="(e) => _query(e)" :columns="columns" :params="params" model="table"
@@ -59,14 +59,18 @@
         </JProTable>
         <Detail v-if="visible" @close="onCancelDrawer" :current="current" :type="type" :history="history"
             :is-draft="activeKey === 'draft'" />
-        <j-modal v-model:visible="visibleModel" :closable="false" :width="300" @cancel="onCancel" @ok="onCancel">
+        <j-modal v-model:visible="visibleModel"  :width="300" @cancel="onCancel" @ok="onCancel" :footer="null">
             <div class="content">
-                <div class="title">共签收{{ sign.length }}个任务</div>
-                <div> 签收成功：{{ sign.success }}</div>
-                <div>签收失败：{{ sign.error }}</div>
+                <div class="title">共签收<span> {{ sign.length }} </span>个任务</div>
+                <div> 签收成功：<span style="color: #208CFF;">{{ sign.success }}</span></div>
+                <div>签收失败：<span style="color: red;">{{ sign.error }}</span></div>
+            </div>
+            <div class="footer">
+                <j-button style="margin-right: 20px;" @click="onCancel">取消</j-button>
+                <j-button type="primary" @click="onCancel">确定</j-button>
             </div>
         </j-modal>
-        <ActionModal v-if="actionRef.visible" :type="actionRef.visible" @save="getActionData"
+        <ActionModal v-if="actionRef.visible" :type="actionRef.type" @save="getActionData"
             @close="actionRef.visible = false" />
     </div>
 </template>
@@ -734,9 +738,7 @@ const getActionData = async (value) => {
         })
         const param = {
             taskIds: taskIds.flat(),
-            variables: {
-                comment: value
-            }
+            variables: value
         }
         console.log('---------', param)
         const res = actionRef.type === 'pass' ? await _completeBatch(param) : await _rejectBatch(param)
@@ -872,12 +874,22 @@ watch(
 
 <style scoped lang='less'>
 .content {
-    text-align: center;
-    padding: 24px 0;
+    // text-align: center;
+    padding: 12px 0;
 
     .title {
         font-size: 18px;
         margin-bottom: 20px;
+        font-weight: 500;
+        line-height: 24px;
+        color: #333333;
+        span{
+            color: #208CFF;
+            margin: 0 5px;
+        }
     }
+}
+.footer{
+    text-align: right;
 }
 </style>
