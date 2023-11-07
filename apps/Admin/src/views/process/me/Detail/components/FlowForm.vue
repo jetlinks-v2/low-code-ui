@@ -13,8 +13,8 @@
                         <img :src="getImage(`/flow-designer/preview-form.png`)" style="height: 16px" />
                         {{ item?.formName }}
                     </div>
-                    <FormPreview v-if="!item.multiple" :value="item.data" :data="item.configuration" ref="formRef"
-                        @state-change="(data) => getFormData(data, index)" />
+                    <FormPreview v-if="!item.multiple" :value="item.data" :data="item.configuration" ref="formRef" :disabled="disable"
+                        @state-change="(data) => getFormData(data, index)"/>
                     <div v-else style="background-color: #fff;">
                         <QuickEditTable validate ref="tableRef" :data="item.data" :columns="item.configuration"
                             :scroll="{ x: 1300, y: 500 }">
@@ -111,6 +111,8 @@ const addTableData = (item) => {
 const getFormData = (data, index) => {
     formData.value[index] = data
 }
+const disable = computed(()=>props.type !=='todo')
+
 const onSave = (value) => {
     // btnLoading.value = true
     switch (modalType.value) {
@@ -147,10 +149,10 @@ const onSave = (value) => {
                     }
                 }
             ]
-            _complete(props.info.currentTaskId, {
+            _complete(props.info.currentTaskId,value? {
                 form: submitData.value,
                 commands: commands
-            }).then((res) => {
+            }:{form: submitData.value}).then((res) => {
                 if (res.status === 200) {
                     onlyMessage('提交成功')
                     emit('close')
@@ -346,7 +348,7 @@ const dealForm = (nodes) => {
                 item.configuration.children = item.configuration.children.filter((i) => {
                     return bindMap.get(item.formId).some((k) => {
                         if (k.id === i.formItemProps.name) {
-                            // console.log('k.required',k.required)
+                            console.log('k.required',k)
                             i.componentProps.disabled = !k?.accessModes?.includes('write')
                             return true
                         }
@@ -420,5 +422,9 @@ watch(() => props.info, () => {
     .btn {
         margin-right: 15px;
     }
+}
+
+:deep(.ant-modal-header){
+    border-bottom: 1px solid #ffffff; 
 }
 </style>
