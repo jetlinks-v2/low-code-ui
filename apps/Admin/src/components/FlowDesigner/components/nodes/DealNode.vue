@@ -18,6 +18,9 @@
 
 <script setup lang="ts" name="DealNode">
 import Node from './Node.vue'
+import { useFlowStore } from '@/store/flow'
+
+const flowStore = useFlowStore()
 
 const emits = defineEmits(['selected', 'delNode', 'insertNode'])
 const props = defineProps({
@@ -43,6 +46,20 @@ const content = computed(() => {
   const _names = result.map((item) => item.name)
   return _names.length ? String(_names).replaceAll(',', '、') : '未配置'
 })
+
+/**
+ * 节点绑定表单字段后, 更改了基础配置的表单
+ * 如基础配置删除表单, 则节点表单配置中的formBinds删除对应的表单配置
+ */
+const updateFormBinds = () => {
+  // 基础信息配置的表单
+  const basicFormsKeys = flowStore.model.config.forms?.map((m) => m.formId)
+  // 基础表单配置更改之前的节点表单配置
+  const oldFormBinds = props.config.props.formBinds
+  Object.keys(oldFormBinds).forEach((key) => {
+    if (!basicFormsKeys?.includes(key)) delete oldFormBinds[key]
+  })
+}
 
 /**
  * 校验节点
@@ -89,21 +106,9 @@ const validate = (err) => {
 }
 
 defineExpose({ validate })
-
-//校验数据配置的合法性
-// const validate = (err) => {
-//   showError.value = false
-//   if (props.config.props.shouldAdd) {
-//     showError.value = false
-//   } else if (props.config.props.assignedUser.length === 0) {
-//     showError.value = true
-//     errorInfo.value = '请选择需要抄送的人员'
-//   }
-//   if (showError.value) {
-//     err.push(`抄送节点 ${props.config.name} 未设置抄送人`)
-//   }
-//   return !showError.value
-// }
+onMounted(() => {
+  updateFormBinds()
+})
 </script>
 
 <style scoped></style>
