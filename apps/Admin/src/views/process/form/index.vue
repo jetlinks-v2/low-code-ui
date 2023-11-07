@@ -78,9 +78,10 @@ import Save from './Save/index.vue'
 import dayjs from 'dayjs'
 import { _query, _delete } from '@/api/process/form'
 import { onlyMessage } from '@/utils/comm'
-import { router } from '@jetlinks/router'
 import { ref } from 'vue'
+import { useMenuStore } from '@/store'
 
+const menu = useMenuStore()
 const params = ref<any>({})
 const tableRef = ref<Record<string, any>>({})
 const current = ref({})
@@ -164,7 +165,8 @@ const getActions = (record) => {
       },
       icon: 'EyeOutlined',
       onClick: () => {
-        router.replace(`/flow-engine/form/detail/${record?.id}`)
+        menu.jumpPage('process/form/Detail', {params: { id: record?.id }})
+        // router.replace(`/flow-engine/form/detail/${record?.id}`)
       },
     },
     {
