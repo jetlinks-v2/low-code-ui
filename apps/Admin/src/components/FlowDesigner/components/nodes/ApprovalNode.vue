@@ -57,7 +57,7 @@ const updateFormBinds = () => {
   const basicFormsKeys = flowStore.model.config.forms?.map((m) => m.formId)
   // 基础表单配置更改之前的节点表单配置
   const oldFormBinds = props.config.props.formBinds
-  Object.keys(oldFormBinds).forEach((key) => {
+  Object.keys(oldFormBinds || {}).forEach((key) => {
     if (!basicFormsKeys?.includes(key)) delete oldFormBinds[key]
   })
 }

@@ -125,19 +125,32 @@ const content = computed(() => {
  * 校验节点
  */
 const validate = (err) => {
+  const { name } = props.config
   const { terms } = props.config.props?.condition?.configuration
 
   showError.value = true
   errorInfo.value = '配置项错误'
-  if (
+  if (!name) {
+    err.push({
+      errors: ['条件节点名称不能为空'],
+      name: ['name'],
+    })
+  } else if (
     !terms ||
     !terms.length ||
-    !terms.some((item) => Boolean(Object.keys(item).length))
+    !terms.some((item) => Boolean(Object.keys(item).length)) ||
+    terms.some((item) => !item.column || !item.termType || !item.value)
   ) {
     err.push({
       errors: ['请配置进入下方节点的条件'],
       name: ['condition', 'configuration', 'terms'],
     })
+  } else if (name.length > 64) {
+    err.push({
+      errors: ['条件节点名称最多输入64个字符'],
+      name: ['name'],
+    })
+    errorInfo.value = '配置项错误'
   } else {
     showError.value = false
     errorInfo.value = ''
@@ -211,12 +224,12 @@ defineExpose({ validate })
       box-shadow: 0px 0px 6px 0px #1890ff;
     }
 
-    .node-body-left{
+    .node-body-left {
       border-top-left-radius: 4px;
       border-bottom-left-radius: 4px;
     }
 
-    .node-body-right{
+    .node-body-right {
       border-top-right-radius: 4px;
       border-bottom-right-radius: 4px;
     }
@@ -228,7 +241,7 @@ defineExpose({ validate })
       position: absolute;
       height: 100%;
       z-index: 1;
-      transition: all .3s;
+      transition: all 0.3s;
 
       .anticon {
         display: none;

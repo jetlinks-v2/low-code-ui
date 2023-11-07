@@ -195,6 +195,7 @@ export function sumValues(data: { [key: string]: number }) {
  * @returns 
  */
 export function setDefaultFormBinds(forms, type?: string, oldFormBinds?: any) {
+    console.log('forms: ', forms);
     const res = {};
     forms?.forEach((item) => {
         const _fields = type === 'conditionSelect' ? item.flattenFields : item.fullInfo.configuration?.children
@@ -204,7 +205,7 @@ export function setDefaultFormBinds(forms, type?: string, oldFormBinds?: any) {
             res[_key].push({
                 id: p.formItemProps.name,
                 required: true,
-                accessModes: oldFormBinds[_key]?.find(f => f.id === p.key)?.accessModes || ['read'],
+                accessModes: oldFormBinds ? oldFormBinds[_key]?.find(f => f.id === p.key)?.accessModes : ['read'],
             })
         })
     })
