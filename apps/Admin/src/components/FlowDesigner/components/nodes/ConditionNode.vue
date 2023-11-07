@@ -127,6 +127,7 @@ const content = computed(() => {
 const validate = (err) => {
   const { name } = props.config
   const { terms } = props.config.props?.condition?.configuration
+  const { children } = props.config
 
   showError.value = true
   errorInfo.value = '配置项错误'
@@ -135,6 +136,12 @@ const validate = (err) => {
       errors: ['条件节点名称不能为空'],
       name: ['name'],
     })
+  } else if (!children || !Object.keys(children).length) {
+    err.push({
+      errors: ['条件节点下未配置审批/办理节点'],
+      name: ['children'],
+    })
+    errorInfo.value = '条件节点下未配置审批/办理节点'
   } else if (
     !terms ||
     !terms.length ||
