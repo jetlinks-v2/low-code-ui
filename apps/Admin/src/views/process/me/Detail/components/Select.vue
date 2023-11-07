@@ -7,22 +7,30 @@
                     <AIcon type="SearchOutlined" @click="search" />
                 </template>
             </j-input>
-            <j-tree :tree-data="treeData" v-model:selectedKeys="selectedKeys" @select="treeSelect"
+            <j-tree :tree-data="treeData" v-model:selectedKeys="selectedKeys" @select="treeSelect" :fieldNames="{
+                key:'id',
+                title:'name'
+            }"
                 v-if="treeData.length"></j-tree>
             <j-empty v-else style="margin-top: 100px;"></j-empty>
         </div>
         <div :class="{ right: type !== 'user' }">
-            <pro-search :columns="columns" target="system-role"  type="simple" @search="handelSearch" />
+            <pro-search :columns="columns" target="system-role" type="simple" @search="handelSearch" />
             <JProTable model="TABLE" ref="tableRef" :defaultParams="{
                 sorts: [
                     { name: 'createTime', order: 'desc' },
                     { name: 'id', order: 'desc' },
                 ]
-            }" :columns="columns" :params="queryParams" :request="queryUser" :rowSelection="{
-    selectedRowKeys: _selectedRowKeys,
-    onSelect: onSelectChange,
-    onSelectNone: onSelectNone
-}">
+            }" 
+            :columns="columns" 
+            :params="queryParams" 
+            :request="queryUser" 
+            :rowSelection="{
+                selectedRowKeys: _selectedRowKeys,
+                hideSelectAll:true,
+                onSelect: onSelectChange,
+                onSelectNone: onSelectNone
+            }">
                 <template #status="slotProps">
                     <BadgeStatus :status="slotProps.status" :text="slotProps.status ? '正常' : '禁用'" :statusNames="{
                         1: 'success',
@@ -37,6 +45,8 @@
 <script setup>
 import { cloneDeep } from 'lodash-es';
 import { getUserList } from '@/api/process/me'
+import { getOrg_api } from '@/api/process/model'
+
 const props = defineProps({
     type: {
         type: String,
@@ -99,7 +109,7 @@ const search = () => {
         treeData.value = treeInitData.value.filter((i) => {
             return i.title.includes(searchValue.value)
         })
-        console.log(treeData.value)
+        // console.log(treeData.value)
     } else {
         treeData.value = cloneDeep(treeInitData.value)
     }
@@ -188,6 +198,25 @@ const onSelectNone = () => {
     _selectedRowKeys.value = []
     emit('selected', {})
 }
+
+const orgAll = async (orgs)=>{
+    const org = orgs?.map(item=>item.id)
+    const res = await getOrg_api({
+        paging:false,
+        terms:[{
+            column:'id',
+            termType:'in',
+            value:org
+        }]
+    })
+    if(res.status === 200){
+        treeInitData.value = res.result
+        treeData.value = res.result
+        selectedKeys.value = [res.result[0]?.id]
+        selectId.value = res.result[0]?.id
+    }
+}
+
 watch(() => props.user, () => {
     if (props.user?.id) {
         _selectedRowKeys.value = [props.user.id]
@@ -205,15 +234,15 @@ watch(() => selectId.value, () => {
     immediate: true
 })
 onMounted(() => {
-    console.log('props.candidates',props.candidates)
+    console.log('props.candidates', props.candidates)
     if (props.type !== 'user') {
-        treeInitData.value = cloneDeep(props.candidates?.[props.type])?.map((i) => {
-            return {
-                title: i.name,
-                key: i.id
-            }
-        })
+       if(props.type === 'org'){
+        orgAll(props.candidates.org)
+       }else{
+        treeInitData.value = cloneDeep(props.candidates?.[props.type])
         treeData.value = cloneDeep(treeInitData.value)
+       }
+       
     } else {
         //取角色id查询
         userIds.value = cloneDeep(props.candidates?.user)?.map((i) => {
@@ -233,6 +262,9 @@ onMounted(() => {
         height: 100%;
         padding: 0 10px;
         box-sizing: border-box;
+        .search-input{
+            margin-bottom: 10px;
+        }
     }
 
     .right {

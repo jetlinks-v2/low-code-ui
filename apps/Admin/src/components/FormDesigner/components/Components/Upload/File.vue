@@ -28,7 +28,7 @@
             ref="nameRef"
           ></j-input>
           <div @dblclick="onDbClick(file)" v-else>{{ file.name }}</div>
-          <j-button type="link" style="width: 10%" @click="onDelete(file)">
+          <j-button type="link" style="width: 10%" @click="onDelete(file)" :disabled="disabled">
             <AIcon type="DeleteOutlined" />
           </j-button>
         </div>
