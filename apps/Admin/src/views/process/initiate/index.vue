@@ -3,11 +3,13 @@
   <page-container>
     <FullPage class="page">
       <div class="type-item" v-for="key of Object.keys(data)">
-        <!-- <TitleComponent
-          :data="getText(key) ?? '流程分类已被删除，请重新添加'"
-        /> -->
-        <div class="type-title" :class="{ 'is-del': !getText(key) }">
-          {{ getText(key) ?? '流程分类已被删除，请重新添加' }}
+        <div v-if="getText(key)" class="type-title">
+          {{ getText(key) }}
+        </div>
+        <div v-else class="type-title-del">
+          <div>
+            流程分类已被删除, 请 <span @click="handleAdd(key)">重新添加</span>
+          </div>
         </div>
         <div class="process">
           <j-card
@@ -44,10 +46,10 @@ import { groupBy } from 'lodash-es'
 import { getList_api } from '@/api/process/initiate'
 import { useClassified } from '@/hooks/useClassified'
 import { isImg } from '@/utils/comm'
+import { useMenuStore } from '@/store'
 
+const menu = useMenuStore()
 const { getText } = useClassified()
-
-const router = useRouter()
 const data = reactive({})
 const loading = ref(true)
 getList_api({
@@ -65,13 +67,21 @@ getList_api({
 })
 
 const handleDetail = (data) => {
-  router.push({
-    path: '/flow-engine/initiate/initiate-detail',
+  menu.jumpPage('process/initiate/Detail',{
     query: {
       id: data.id,
       isDraft: false,
     },
   })
+}
+
+const handleAdd = (id) => {
+  // 字典新增
+  // menu.jumpPage('process/initiate/Detail',{
+  //   query: {
+  //     id: id,
+  //   },
+  // })
 }
 </script>
 <style scoped lang="less">
@@ -91,13 +101,23 @@ const handleDetail = (data) => {
       line-height: 22px;
       color: #1d2129;
     }
+    .type-title-del {
+      margin-bottom: 16px;
+      font-size: 14px;
+      line-height: 18px;
+      color: #333333;
+      > div > span {
+        cursor: pointer;
+        color: #315efb;
+      }
+    }
     .process {
       display: flex;
       gap: 24px;
       flex-wrap: wrap;
       .process-item {
         border: 1px solid #e5e8ef;
-        :deep(.ant-card-body){
+        :deep(.ant-card-body) {
           cursor: pointer;
           display: flex;
           justify-content: start;
@@ -110,12 +130,6 @@ const handleDetail = (data) => {
           // border: 1px solid #e5e8ef;
           line-height: 22px;
         }
-        
-        // &:hover {
-        //   box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.1);
-        //   // transition: .5s;
-        //   transition: all .5s;
-        // }
         .title {
           font-size: 16px;
           color: #1d2129;
