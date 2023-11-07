@@ -338,7 +338,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: data.state.value === 'deployed' ? '请勿重复部署' : '部署',
         },
-        hasPermission: 'workflow:model_deploy',
+        hasPermission: 'process/model:deploy',
         onClick: async () => {
           loading.value = true
           try {
