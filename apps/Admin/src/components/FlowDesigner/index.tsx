@@ -470,7 +470,7 @@ const FlowDesigner = defineComponent({
             node.branches.push({
               id: getRandomId(),
               parentId: node.id,
-              name: '审批人' + (node.branches.length + 1),
+              name: '审批节点' + (node.branches.length + 1),
               type: 'APPROVAL',
               props: {
                 ...cloneDeep(DefaultProps.APPROVAL_PROPS),
@@ -487,7 +487,7 @@ const FlowDesigner = defineComponent({
             node.branches.push({
               id: getRandomId(),
               parentId: node.id,
-              name: '办理人' + (node.branches.length + 1),
+              name: '办理节点' + (node.branches.length + 1),
               type: 'DEAL',
               props: {
                 ...cloneDeep(DefaultProps.DEAL_PROPS),
