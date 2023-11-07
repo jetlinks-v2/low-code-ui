@@ -27,7 +27,9 @@
         style="max-width: 200px; min-width: 200px"
         class="variable-select"
         @clear="handleConditionClear(index)"
-        @select="(value, label) => handleConditionChange(value,label, item, index)"
+        @select="
+          (value, label) => handleConditionChange(value, label, item, index)
+        "
       >
         <template #title="{ name }">
           <j-ellipsis line-clamp="1">
@@ -147,10 +149,11 @@ const getLatestFormList = async () => {
     ],
   }
   const { result } = await queryFormNoPage_api(params)
-
+  // 设置根节点模式表单字段"读"配置时, 保留原有的配置
   flowStore.model.nodes.props!.formBinds = setDefaultFormBinds(
     result,
     'conditionSelect',
+    flowStore.model.nodes.props!.formBinds,
   )
   getFormFields()
 }
@@ -190,7 +193,7 @@ const getFormFields = async () => {
   conditionOptions.value = filter(result)
   conditionSelect.value.forEach((item, index) => {
     const node = findVariableById(conditionOptions.value, item?.column)
-    if(!node) {
+    if (!node) {
       handleConditionClear(index)
     }
   })

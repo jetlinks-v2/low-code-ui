@@ -198,9 +198,10 @@ export function sumValues(data: { [key: string]: number }) {
  * 表单字段全部默认有"读"权限, 设置formBinds字段初始值
  * @param forms 
  * @param type conditionSelect: 条件节点设置默认值, forms为接口返回的数据
+ * @param oldFormBinds 根节点配置好的表单
  * @returns 
  */
-export function setDefaultFormBinds(forms, type?: string) {
+export function setDefaultFormBinds(forms, type?: string, oldFormBinds?: any) {
     const res = {};
     forms?.forEach((item) => {
         const _fields = type === 'conditionSelect' ? item.configuration?.children : item.fullInfo.configuration?.children
@@ -210,7 +211,7 @@ export function setDefaultFormBinds(forms, type?: string) {
             res[_key].push({
                 id: p.formItemProps.name,
                 required: true,
-                accessModes: ['read'],
+                accessModes: oldFormBinds[_key]?.find(f => f.id === p.key)?.accessModes || ['read'],
             })
         })
     })
