@@ -288,9 +288,9 @@ const startProcess = (list: any, start: boolean | undefined = undefined) => {
           ? i.formId
           : md5(i.formId + '|' + formVersion[i.formId]),
         data: i.multiple ? tableData[i.formId][0] : list[flag++],
+        formKey: start ? Object.keys(formVersion).toString() : undefined
       })),
       variables: {},
-      formKey: start ? Object.keys(formVersion).toString() : undefined
     },
     start,
   }

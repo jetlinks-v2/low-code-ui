@@ -25,13 +25,10 @@
       ref="tableRef"
       model="table"
       :columns="columns"
-      :params="{
-        history,
-        ...params,
-      }"
+      :params="tableParams"
       :request="getList_api"
       :defaultParams="{
-        sorts: [{ name: 'createTime', order: 'desc' }],
+        sorts: [{ name: 'deployTime', order: 'desc' }],
       }"
     >
       <template #state="{ state }">
@@ -45,8 +42,8 @@
         /> -->
         {{ state.text }}
       </template>
-      <template #createTime="{ createTime }">
-        {{ dayjs(createTime).format('YYYY-MM-DD HH:mm:ss') }}
+      <template #deployTime="{ deployTime }">
+        {{ dayjs(deployTime).format('YYYY-MM-DD HH:mm:ss') }}
       </template>
       <template #endTime="{ endTime }">
         {{ endTime && dayjs(endTime).format('YYYY-MM-DD HH:mm:ss') }}
@@ -198,8 +195,8 @@ const defaultColumns = [
   },
   {
     title: '发起时间',
-    dataIndex: 'createTime',
-    key: 'createTime',
+    dataIndex: 'deployTime',
+    key: 'deployTime',
     ellipsis: true,
     scopedSlots: true,
     search: {
@@ -230,9 +227,6 @@ const columns = computed(() => {
       )
 })
 
-// const key = computed(() => {
-
-// })
 const change = ()=>{
   nextTick(()=>{
     params.value={}
@@ -241,6 +235,11 @@ const change = ()=>{
 }
 
 const params = ref({})
+
+const tableParams = computed(()=>({
+  history: history.value,
+  ...params.value,
+}))
 
 // 抽屉
 const drawer = reactive({
