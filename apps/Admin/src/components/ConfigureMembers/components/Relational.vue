@@ -140,7 +140,7 @@ function filterAndDeleteEmptyParents(data: any, fun: (item: any) => boolean) {
   }
   const filteredData = filterNodes(data)
   deleteEmptyParents(filteredData)
-  return filteredData[0]?.children
+  return filteredData
 }
 
 const onSelect = (keys: string[], { node }: { node: any }) => {

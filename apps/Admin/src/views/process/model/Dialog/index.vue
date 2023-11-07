@@ -166,7 +166,7 @@ const { data: classified } = useRequest(providerEnum, {
   onSuccess(res) {
     const op = res.result.map((item) => {
       return {
-        label: item.value,
+        label: item.text,
         value: item.id,
       }
     })
@@ -213,6 +213,7 @@ watch(
 )
 watch(selected, (val) => {
   form.icon = val
+  formRef.value?.validateFields(['icon'])
 })
 </script>
 

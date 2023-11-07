@@ -7,7 +7,7 @@
     width="50%"
     placement="right"
     @close="emits('update:visible', false)"
-    >
+  >
     <!-- :contentWrapperStyle="{ width: 'auto', minWidth: '50%', maxWidth: '66.6%' }" -->
     <!-- <j-scrollbar> -->
     <j-tabs v-model:activeKey="activeKey">
@@ -20,7 +20,7 @@
           </div>
         </template>
         <div class="content">
-          <j-scrollbar>
+          <j-scrollbar style="height: calc(100vh - 225px)">
             <div v-for="item in formData">
               <div class="title">
                 <j-space>
@@ -40,7 +40,9 @@
               <TableFormPreview
                 v-else
                 v-model:data-source="tableData"
-                :columns="getTableColumns(item.fullInfo?.configuration?.children)"
+                :columns="
+                  getTableColumns(item.fullInfo?.configuration?.children)
+                "
               />
             </div>
           </j-scrollbar>
@@ -54,7 +56,12 @@
             >
           </div>
         </template>
-        <FlowDesigner readOnly dragging :nodesData="nodesData" />
+        <FlowDesigner
+          readOnly
+          dragging
+          :nodesData="nodesData"
+          style="height: calc(100vh - 225px)"
+        />
       </j-tab-pane>
     </j-tabs>
     <!-- </j-scrollbar> -->
@@ -65,6 +72,7 @@ import FlowDesigner from '@/components/FlowDesigner'
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
 import { getImage } from '@jetlinks/utils'
+import { queryFormNoPage_api } from '@/api/process/model'
 
 interface EmitProps {
   (e: 'update:visible', flag: boolean): void
@@ -83,6 +91,10 @@ const props = defineProps({
   visible: {
     type: Boolean,
     default: () => false,
+  },
+  type: {
+    type: String,
+    default: '',
   },
 })
 
@@ -116,8 +128,56 @@ const init = () => {
   try {
     const obj = JSON.parse(props.data.model)
     nodesData.value = obj.nodes
-    formData.value = obj.config.forms
+    if (props.data.state.value === 'undeployed') {
+      getFormData(obj.config.forms)
+    } else {
+      formData.value = obj.config.forms
+    }
   } catch (error) {}
+}
+
+const getFormData = (list: FormsProps[]) => {
+  const param = {
+    terms: [
+      {
+        type: 'and',
+        value: list.map((i) => i.formId),
+        termType: 'in',
+        column: 'key',
+      },
+      {
+        value: 'true',
+        termType: 'eq',
+        type: 'and',
+        column: 'latest',
+      },
+      // 过滤未配置的表单
+      {
+        value: '',
+        termType: 'notnull',
+        column: 'configuration',
+      },
+      {
+        value: {},
+        termType: 'not',
+        column: 'configuration',
+      },
+    ],
+  }
+  queryFormNoPage_api(param).then((res) => {
+    if (res.success) {
+      formData.value = list.map((item) => {
+        const row = res.result.find((m) => m.key === item.formId)
+        return {
+          ...item,
+          formId: row.key,
+          formName: row.name,
+          // 表单完整信息: 仅供前端使用
+          fullInfo: row,
+        }
+      })
+    }
+  })
 }
 
 init()
