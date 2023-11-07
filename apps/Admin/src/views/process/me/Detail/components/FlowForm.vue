@@ -312,6 +312,18 @@ const dealTable = (disabled) => {
         }
     })
 }
+
+//递归处理布局组件的disabled
+const handleLayout = (arr,disabled)=>{
+   return arr.map(item=>{
+        item.componentProps.disabled = disabled
+        if(item.children){
+            item.children = handleLayout(item.children,disabled)
+        }
+        return item
+    })
+}
+
 // 列表接口数据nodeId 对应form表单ID处理数据
 const dealForm = (nodes) => {
     // console.log('nodes---', nodes, props.nodeId)
@@ -347,8 +359,12 @@ const dealForm = (nodes) => {
                 item.configuration.children = item.configuration.children.filter((i) => {
                     return bindMap.get(item.formId).some((k) => {
                         if (k.id === i.formItemProps.name) {
-                            console.log('k=========',k,!k?.accessModes?.includes('write'))
+                            // console.log('k=========',k,i)
                             i.componentProps.disabled = !k?.accessModes?.includes('write')
+                            //处理布局组件
+                            if(i.children){
+                                i.children = handleLayout(i.children,!k?.accessModes?.includes('write'))
+                            }
                             return true
                         }
                     })
