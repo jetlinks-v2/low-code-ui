@@ -261,15 +261,15 @@ watch(
 
 const searchTree = (arr: any[], _item: any) => {
     let _data: any = undefined
-    arr?.map((item) => {
-        if (item.key === _item) {
-            _data = item
-            return
+    for(let i = 0; i < arr.length; i++) {
+      if (arr[i].key === _item) {
+            _data = arr[i]
+            break
         }
-        if (item.children?.length) {
-            _data = searchTree(item.children, _item)
+        if (arr[i].children?.length) {
+            _data = searchTree(arr[i].children, _item)
         }
-    })
+    }
     return _data
 }
 

@@ -12,7 +12,7 @@
             <j-empty v-else style="margin-top: 100px;"></j-empty>
         </div>
         <div :class="{ right: type !== 'user' }">
-            <pro-search :columns="columns" target="system-role" @search="handelSearch" />
+            <pro-search :columns="columns" target="system-role"  type="simple" @search="handelSearch" />
             <JProTable model="TABLE" ref="tableRef" :defaultParams="{
                 sorts: [
                     { name: 'createTime', order: 'desc' },
@@ -60,9 +60,18 @@ const _selectedRowKeys = ref([])
 const selectId = ref()
 const columns = [
     {
-        title: '名称',
+        title: '姓名',
         dataIndex: 'name',
         key: 'name',
+        ellipsis: true,
+        search: {
+            type: 'string',
+        },
+    },
+    {
+        title: '用户名',
+        dataIndex: 'username',
+        key: 'username',
         ellipsis: true,
         search: {
             type: 'string',
@@ -91,7 +100,7 @@ const search = () => {
             return i.title.includes(searchValue.value)
         })
         console.log(treeData.value)
-    }else{
+    } else {
         treeData.value = cloneDeep(treeInitData.value)
     }
 }
@@ -111,7 +120,7 @@ const queryUser = async (params) => {
                 {
                     terms: [
                         {
-                            column: props.type === 'org' ? 'id$in-dimension$org$not' : 'id$in-dimension$role',
+                            column: props.type === 'org' ? 'id$in-dimension$org' : 'id$in-dimension$role',
                             value: selectId.value,
                         },
                     ],
@@ -196,6 +205,7 @@ watch(() => selectId.value, () => {
     immediate: true
 })
 onMounted(() => {
+    console.log('props.candidates',props.candidates)
     if (props.type !== 'user') {
         treeInitData.value = cloneDeep(props.candidates?.[props.type])?.map((i) => {
             return {

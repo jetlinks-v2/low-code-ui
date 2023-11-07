@@ -226,7 +226,18 @@ const params = ref<any>({
  */
 const getFormList = async () => {
   const { result } = await queryFormNoPage_api(params.value)
-  formList.value = result
+  formList.value = result  
+  selectedRow.value = selectedRow.value.map((item)=>{
+    const row = result.find((m) => m.key === item.formId)
+    return{
+      ...item,
+      formId: row.key,
+      formName: row.name,
+      // 表单完整信息: 仅供前端使用
+      fullInfo: row,
+    }
+  })
+  emits('update:modelValue', selectedRow.value)
   // 返回存在的表单的keys, 以供父级验证是否已配置表单是否存在
   return formList.value.map((m) => m.key)
 }
