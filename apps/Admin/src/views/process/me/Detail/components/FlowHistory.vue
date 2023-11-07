@@ -151,13 +151,14 @@ const nodeState = (nodeType, auto) => {
 const filterLine = (item, index) => {
    const nodeType = modal.value.get(task.value.get(item.taskId)?.nodeId)
    if (item.action === 'taskAddLink' && item.others.type === 'assignee' && item.others.state === 'todo') {
+      const isShow = item.others.autoOperation || item.operator.id !==item.others.identity.id
       return {
          ...item,
          nodeType: nodeType,
          operatorName: item.others.identity.name,
          actionType: 'sign',
          actionColor: 'completed',
-         show: item.others.autoOperation ? false : true
+         show: isShow ? false : true
       }
    } else if (item.action === 'taskLinkChanged') {
       //完成

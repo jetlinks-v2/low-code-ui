@@ -20,13 +20,12 @@
                             :scroll="{ x: 1300, y: 700 }">
                             <template v-for="(i, index) in item.configuration"
                                 #[i.dataIndex]="{ record, index, valueChange }">
-                                <!-- <slot :name="name" v-bind="slotData || {}" /> -->
-                                <!-- <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
+                                <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled">
-                                </ValueItem> -->
-                                <FormItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
+                                </ValueItem>
+                                <!-- <FormItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled"
-                                    :component-props="i.componentProps"></FormItem>
+                                    :component-props="i.componentProps"></FormItem>-->
                             </template>
                         </QuickEditTable>
                         <j-button @click="() => addTableData(item)" block style="margin-top: 10px;"
@@ -357,7 +356,7 @@ const dealForm = (nodes) => {
                 item.configuration.children = item.configuration.children.filter((i) => {
                     return bindMap.get(item.formId).some((k) => {
                         if (k.id === i.formItemProps.name) {
-                            console.log('k.required',k)
+                            console.log('k=========',k,!k?.accessModes?.includes('write'))
                             i.componentProps.disabled = !k?.accessModes?.includes('write')
                             return true
                         }

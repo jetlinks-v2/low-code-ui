@@ -1,7 +1,8 @@
 
 <template>
-    <j-modal visible @cancel="emit('close')" @ok="onSave" :title="title" :width="type === 'submit' ? 900 : 400" >
+    <j-modal visible :width="type === 'submit' ? 900 : 400" :footer="null">
         <j-form :layout="'vertical'" ref="formRef" :model="modelRef" v-if="type !== 'submit'">
+            <div class="title">{{ title }}</div>
             <div>
                 <!-- <div style="margin-bottom: 10px;" v-if="type === 'refuse'"> 驳回后将结束流程</div> -->
                 <j-form-item name="comment" label="审批意见" :rules="required ? [
@@ -9,6 +10,10 @@
                 ] : []">
                     <j-textarea v-model:value="modelRef.comment" placeholder="请填写审批意见" :maxlength="200" showCount />
                 </j-form-item>
+                <div class="footer">
+                    <j-button style="margin-right: 20px;" @click="emit('close')">取消</j-button>
+                    <j-button type="primary" @click="onSave">确定</j-button>
+                </div>
             </div>
         </j-form>
         <div v-else>
@@ -17,9 +22,9 @@
                     </j-select>
                 </j-form-item> -->
             <span>您可以指定下一个节点的审批人</span>
-            <j-tabs v-model:activeKey="activeKey">    
+            <j-tabs v-model:activeKey="activeKey">
                 <j-tab-pane v-for="item in tabs" :key="item.key" :tab="item.tab">
-                    <Select :type="item.key" :user=user :candidates="candidates"  @selected="selectUser"/>
+                    <Select :type="item.key" :user=user :candidates="candidates" @selected="selectUser" />
                 </j-tab-pane>
             </j-tabs>
         </div>
@@ -28,7 +33,7 @@
 
 <script setup lang='ts'>
 import Select from './Select.vue';
-import { onlyMessage  } from '@jetlinks/utils'
+import { onlyMessage } from '@jetlinks/utils'
 const props = defineProps({
     type: {
         type: String,
@@ -36,7 +41,7 @@ const props = defineProps({
     },
     current: {
         type: Object,
-        default: {} 
+        default: {}
     },
     required: {
         type: Boolean,
@@ -46,11 +51,11 @@ const props = defineProps({
         type: String,
         default: ''
     },
-    candidates:{
+    candidates: {
         type: Object,
-        default:{}
+        default: {}
     },
-    defaultComment:{
+    defaultComment: {
         type: String,
         default: ''
     }
@@ -62,21 +67,21 @@ type Emits = {
 const emit = defineEmits<Emits>();
 const activeKey = ref('org')
 const tabs = [{
-    key:'org',
-    tab:'组织'
-},{
-    key:'role',
-    tab:'角色'
+    key: 'org',
+    tab: '组织'
+}, {
+    key: 'role',
+    tab: '角色'
 },
-// {
-//     key:'user',
-//     tab:'用户'
-// }
+    // {
+    //     key:'user',
+    //     tab:'用户'
+    // }
 ]
 const user = ref()
 const formRef = ref()
 const modelRef = reactive({
-    comment:props?.defaultComment|| undefined,
+    comment: props?.defaultComment || undefined,
     user: 'none'
 })
 const approverOptions = ref<any[]>([{
@@ -93,18 +98,18 @@ const title = computed(() => {
     }
 })
 
-const selectUser = (data) =>{
+const selectUser = (data) => {
     user.value = data
 }
 const onSave = async () => {
-    if (props.type!=='submit') {
+    if (props.type !== 'submit') {
         const res = await formRef.value.validate()
-       if(res){
-        emit('save', res)
-        emit('close')
-       }
+        if (res) {
+            emit('save', res)
+            emit('close')
+        }
     }
-    if(props.type === 'submit'){
+    if (props.type === 'submit') {
         emit('save', user.value)
     }
 }
@@ -112,5 +117,16 @@ const onSave = async () => {
 </script>
 
 <style scoped lang='less'>
+.title {
+    font-size: 18px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    line-height: 24px;
+    color: #333333;
+}
 
+.footer {
+    text-align: right;
+    margin-top: 35px;
+}
 </style>
