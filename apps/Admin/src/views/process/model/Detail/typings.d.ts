@@ -28,7 +28,7 @@ export interface IConfig {
 
 export interface INodeProps {
     formBinds: {
-        formId: IFormFields[]
+        formId?: IFormFields[]
     };
     // type === ROOT
     assignedUser: IIdentity[];

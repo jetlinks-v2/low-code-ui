@@ -279,12 +279,12 @@ const getActions = (record, type = 'card') => {
     {
       key: 'copy',
       text: '复制为模型',
-      icon: 'icon-queue',
+      icon: 'CopyOutlined',
       permissionProps: (data) => ({
         tooltip: {
           title: '复制为模型',
         },
-        hasPermission: 'workflow:model_add',
+        hasPermission: 'process/model:add',
         onClick: () => {
           copyAsModel(data)
         },
@@ -301,7 +301,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: record.state?.value !== 'disabled' ? '禁用' : '启用',
         },
-        hasPermission: 'workflow:release_action',
+        hasPermission: 'process/instance:action',
         popConfirm: {
           title: `确认${record.state?.value !== 'disabled' ? '禁用' : '启用'}`,
           onConfirm: () => {
@@ -329,7 +329,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: '权限控制',
         },
-        hasPermission: 'workflow:release_auth',
+        hasPermission: 'process/instance:auth',
         onClick: () => {
           permission.selectItem = { ...data }
           permission.visible = true
@@ -346,7 +346,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: record.state?.value !== 'disabled' ? '请先禁用再删除' : '删除',
         },
-        hasPermission: 'workflow:release_delete',
+        hasPermission: 'process/instance:delete',
         popConfirm: {
           title: `确认删除`,
           onConfirm: () => {

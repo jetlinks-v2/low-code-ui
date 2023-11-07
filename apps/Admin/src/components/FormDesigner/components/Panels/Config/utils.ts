@@ -1,4 +1,4 @@
-export const getConfigList = (_type: string, obj: any) => {
+export const getConfigList = (_type: string, obj: any, type: 'workflow' | 'low-code') => {
     const arr: any[] = []
     if (['root'].includes(unref(_type))) {
         arr.push({
@@ -63,34 +63,29 @@ export const getConfigList = (_type: string, obj: any) => {
         })
     }
 
-    if (
-        [
-            'root',
-            'text',
-            'input',
-            'textarea',
-            'input-number',
-            'input-password',
-            'select-card',
-            'upload',
-            'switch',
-            'tree-select',
-            'select',
-            'date-picker',
-            'time-picker',
-            'table',
-            'card',
-            'tabs',
-            'collapse',
-            'org',
-            'role',
-            'user',
-            'product',
-            'device',
-            'geo',
-            'form'
-        ].includes(unref(_type))
-    ) {
+    const list = [
+        'root',
+        'text',
+        'input',
+        'textarea',
+        'input-number',
+        'input-password',
+        'select-card',
+        'upload',
+        'switch',
+        'tree-select',
+        'select',
+        'date-picker',
+        'time-picker',
+        'table',
+        'card',
+        'tabs',
+        'collapse',
+        'form'
+    ]
+    const _list = ['geo', 'device', 'product', 'org', 'user', 'role']
+
+    if (([...list, ..._list].includes(unref(_type)) && type === 'low-code') || [...list].includes(unref(_type)) && type === 'workflow') {
         arr.push({
             key: 'Status',
             header: '高级配置',

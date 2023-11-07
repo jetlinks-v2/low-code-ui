@@ -34,9 +34,6 @@
         sorts: [{ name: 'createTime', order: 'desc' }],
       }"
     >
-      <template #classifiedId="{ classifiedId }">
-        {{ getText(classifiedId) }}
-      </template>
       <template #state="{ state }">
         <!-- <BadgeStatus
           :status="state.value"
@@ -111,12 +108,13 @@ const history = ref(false)
 const defaultColumns = [
   {
     title: '流程分类',
-    dataIndex: 'classifiedId',
-    key: 'classifiedId',
+    dataIndex: 'classifiedName',
+    key: 'classifiedName',
     ellipsis: true,
     scopedSlots: true,
     search: {
       type: 'select',
+      rename: 'classifiedId',
       componentProps: {
         placeholder: '请选择流程分类',
       },

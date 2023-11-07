@@ -16,7 +16,7 @@
         <PermissionButton
           type="primary"
           @click="handleSave(undefined)"
-          hasPermission="workflow:model_add"
+          hasPermission="process/model:add"
         >
           <!-- <AIcon type="PlusOutlined" /> -->
           新增</PermissionButton
@@ -53,14 +53,10 @@
             v-for="item of getActions(slotProps, 'table')"
             v-bind="handleFunction(item.permissionProps, slotProps)"
             :danger="item.key === 'delete'"
-            >
-            <!-- :hasPermission="item?.key === 'view' ? false : `workflow:${item?.hasPermission}`" -->
+          >
             <template #icon v-if="item.icon || item.key === 'delete'">
               <AIcon :type="item.icon ? item.icon : 'DeleteOutlined'" />
             </template>
-            <!-- <span v-if="item.key !== 'delete'">
-              {{ item.text }}
-            </span> -->
           </PermissionButton>
         </div>
       </template>
@@ -140,6 +136,12 @@
       v-model:visible="drawer.visible"
       :data="drawer.selectItem"
     />
+    <!-- 隐藏域, 仅用于部署校验每一步数据, noQuery: 不查询接口 -->
+    <div class="validate-box">
+      <BasicInfo ref="step1" />
+      <FlowDesign ref="step2" />
+      <ShowCopy ref="step3" :noQuery="true" />
+    </div>
   </page-container>
 </template>
 <script setup>
@@ -148,10 +150,26 @@ import dayjs from 'dayjs'
 import Dialog from './Dialog/index.vue'
 import Drawer from '../components/Drawer/index.vue'
 import { isFunction, isObject } from 'lodash-es'
-import { getProcess_api, deploy_api, del_api } from '@/api/process/model'
+import {
+  getProcess_api,
+  deploy_api,
+  del_api,
+  detail_api,
+  update_api,
+} from '@/api/process/model'
 import { useClassified } from '@/hooks/useClassified'
 import { isImg } from '@/utils/comm'
+import BasicInfo from '@/views/process/model/Detail/BasicInfo/index.vue'
+import FlowDesign from '@/views/process/model/Detail/FlowDesign/index.vue'
+import ShowCopy from '@/views/process/model/Detail/ShowCopy/index.vue'
+import { useFlowStore } from '@/store/flow'
+import { Modal } from 'jetlinks-ui-components'
 
+const loading = ref(false)
+const flowStore = useFlowStore()
+const step1 = ref()
+const step2 = ref()
+const step3 = ref()
 const { classified } = useClassified()
 const router = useRouter()
 const tableRef = ref()
@@ -291,7 +309,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: '编辑',
         },
-        hasPermission: 'workflow:model_update',
+        hasPermission: 'process/model:update',
         onClick: () => {
           handleSave(data)
         },
@@ -315,20 +333,51 @@ const getActions = (record, type = 'card') => {
       text: '部署',
       icon: 'DeploymentUnitOutlined',
       permissionProps: (data) => ({
+        // loading: loading.value,
         disabled: data.state.value === 'deployed',
         tooltip: {
           title: data.state.value === 'deployed' ? '请勿重复部署' : '部署',
         },
         hasPermission: 'workflow:model_deploy',
-        onClick: () => {
-          deploy_api(data.id).then((res) => {
-            if (res.success) {
-              onlyMessage('操作成功')
-              refresh()
-            } else {
-              onlyMessage('操作失败', 'error')
-            }
-          })
+        onClick: async () => {
+          loading.value = true
+          try {
+            const { result } = await detail_api(data.id)
+            const model = JSON.parse(result.model || '{}')
+            flowStore.setModel(model)
+            flowStore.setModelBaseInfo(result)
+            await step1.value.getLatestFormList()
+            Promise.allSettled([
+              step1.value?.validateSteps(),
+              step2.value?.validateSteps(),
+              step3.value?.validateSteps(),
+            ]).then(async (valid) => {
+              // 验证通过后保存新表单
+              const params = {
+                id: data.id,
+                model: JSON.stringify(flowStore.model),
+              }
+              const res = await update_api(params)
+              if (
+                Array.isArray(valid) &&
+                valid.every((item) => item.status === 'fulfilled')
+              ) {
+                deploy_api(data.id).then((resp) => {
+                  if (resp.success) {
+                    onlyMessage('操作成功')
+                    refresh()
+                  }
+                })
+              } else {
+                Modal.error({
+                  title: '部署失败，流程配置内容不合规',
+                })
+              }
+            })
+          } catch (error) {
+          } finally {
+            loading.value = false
+          }
         },
       }),
     },
@@ -341,7 +390,7 @@ const getActions = (record, type = 'card') => {
         tooltip: {
           title: '删除',
         },
-        hasPermission: 'workflow:model_delete',
+        hasPermission: 'process/model:delete',
         popConfirm: {
           title: `确认删除`,
           onConfirm: () => {
@@ -369,6 +418,7 @@ const getActions = (record, type = 'card') => {
 const handleFunction = (item, record) => {
   if (isFunction(item)) {
     return item(record)
+    // return ()=>({...item(record), loading: record.id === id.value})
   } else if (isObject(item)) {
     return item
   }
@@ -461,5 +511,13 @@ const refresh = () => {
       }
     }
   }
+}
+.validate-box {
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
 </style>
