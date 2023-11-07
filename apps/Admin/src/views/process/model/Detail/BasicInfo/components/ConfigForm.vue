@@ -1,7 +1,7 @@
 <!-- 基础信息配置表单 -->
 <template>
   <div class="config-form">
-    <j-button class="btn" @click="visible = true">
+    <j-button class="btn" type="text" @click="visible = true">
       <span>表单配置</span>
       <span class="icon" v-show="selectedRow.length">
         <img :src="getImage('/members/check.png')" />
@@ -37,7 +37,7 @@
                   </j-ellipsis>
                 </j-space>
                 <j-tooltip title="流程表单不存在" v-if="item.isDelete">
-                  <AIcon class="delete-icon" type="WarningOutlined" />
+                  <AIcon class="delete-icon" type="ExclamationCircleFilled" />
                 </j-tooltip>
               </div>
             </j-list-item>
@@ -227,17 +227,6 @@ const params = ref<any>({
 const getFormList = async () => {
   const { result } = await queryFormNoPage_api(params.value)
   formList.value = result  
-  selectedRow.value = selectedRow.value.map((item)=>{
-    const row = result.find((m) => m.key === item.formId)
-    return{
-      ...item,
-      formId: row.key,
-      formName: row.name,
-      // 表单完整信息: 仅供前端使用
-      fullInfo: row,
-    }
-  })
-  emits('update:modelValue', selectedRow.value)
   // 返回存在的表单的keys, 以供父级验证是否已配置表单是否存在
   return formList.value.map((m) => m.key)
 }
@@ -296,11 +285,25 @@ const submit = () => {
     visible.value = false
   }
 }
-
+// 更新表单
+const updateForm = (modelValue: any[]) => {
+  if(formList.value.length < 1) return
+  selectedRow.value = modelValue.map((item)=>{
+    const row = formList.value.find((m) => m.key === item.formId)
+    return{
+      ...item,
+      formId: row?.key || item.formId,
+      formName: row?.name || item.formName,
+      fullInfo: row || item,
+      isDelete: !row
+    }
+  })
+}
 watch(
-  () => props.modelValue,
+  () => [props.modelValue, formList.value],
   () => {
     selectedRow.value = props.modelValue
+    updateForm(props.modelValue)
   },
   { immediate: true },
 )
@@ -332,6 +335,7 @@ defineExpose({
   .btn {
     width: 100%;
     margin-bottom: 8px;
+    background: #f3f3f3;
     .icon {
       position: absolute;
       top: -4px;
@@ -361,7 +365,8 @@ defineExpose({
         color: #999;
       }
       .delete-icon {
-        color: #e50012;
+        color: #eb636f;
+        font-size: 16px;
       }
     }
   }
