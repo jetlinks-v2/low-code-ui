@@ -24,7 +24,7 @@
       :disabled="disabled" @change="onChange" />
     <Select v-else-if="itemType === 'select' || itemType === 'select-card'" v-bind="props.componentProps" v-model:value="myValue"
       :options="options" :disabled="disabled" @change="onChange" style="width: 100%;" />
-    <Upload v-else-if="itemType === 'upload'" v-model:value="myValue" v-bind="props.componentProps" @change="onChange"/>
+    <Upload v-else-if="itemType === 'upload'" :value="myValue" v-bind="props.componentProps" @change="onChange" style="width: 100%;"/>
     <div v-else>--</div>
   </div>
 </template>
@@ -69,8 +69,10 @@ const props = defineProps({
 const myValue = ref(undefined)
 const options = ref<any>([])
 const treeData = ref()
-const onChange = () => {
-  console.log(myValue.value,'change')
+const onChange = (e) => {
+  if(props.itemType === 'upload'){
+    myValue.value = e && e?.length > 0 ? JSON.stringify(e) : null
+  }
   emit('update:modelValue', myValue.value)
   emit('change', myValue.value)
 }
@@ -101,5 +103,9 @@ onMounted(() => {
 </script>
   
 <style lang="less" scoped>
+.value-item-warp{
+  overflow: scroll;
+  height: 40px;
+}
 </style>
   

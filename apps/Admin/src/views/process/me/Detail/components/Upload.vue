@@ -1,9 +1,23 @@
 <template>
     <a-upload name="file" v-model:file-list="fileList" :max-count="maxCount" :headers="{
         [TOKEN_KEY]: LocalStore.get(TOKEN_KEY),
-    }" :before-upload="beforeUpload" :accept="accept" :disabled="fileList.length >= maxCount || disabled"   @change="handleChange">
+    }" :before-upload="beforeUpload" :accept="accept" :disabled="fileList.length >= maxCount || disabled"  @change="handleChange" :action="listType ==='text' ? _fileUpload : ''">
         <j-button type="primary">上传</j-button>
-
+        <template #itemRender="{ file }">
+            <div class="render">
+                <j-input
+                    v-model:value="file.name"
+                    v-if="dbId === file.uid && dbRef"
+                    @blur="onBlur"
+                    ref="nameRef"
+                    ></j-input>
+                <j-ellipsis v-else style="width: 100px;" @dblclick="onDbClick(file)">
+                    {{ file.name }}</j-ellipsis>
+                <j-button class="deleteBtn" type="link" style="width: 10%" @click="onDelete(file)">
+                    <AIcon type="DeleteOutlined" />
+                </j-button>
+            </div>
+        </template>
     </a-upload>
     <CropperModal v-if="cropper.visible" :img="cropper.img" title="图片剪切" @cancel="cropper.visible = false"
         :openServer="false" @ok="saveImage" />
@@ -12,11 +26,12 @@
 <script lang="ts" setup>
 import { nextTick, reactive, ref, watch } from 'vue'
 import { fileUpload } from '@/api/comm'
+import { _fileUpload } from '@/api/comm'
 import { TOKEN_KEY } from '@jetlinks/constants'
 import { LocalStore } from '@jetlinks/utils/src/storage'
 import CropperModal from '@/components/Upload/Image/CropperModal'
 import { getBase64ByImg, onlyMessage, randomString } from '@jetlinks/utils'
-import type { UploadProps } from 'jetlinks-ui-components'
+import type { UploadProps,UploadChangeParam } from 'jetlinks-ui-components'
 
 const props = defineProps({
     fileSize: {
@@ -38,11 +53,14 @@ const props = defineProps({
         type: String,
         default: 'picture',
     },
-    value: Array,
+    value: {
+    type: String,
+    default: '',
+    },
     disabled: {
         type: Boolean,
         default: false
-    }
+    },
 })
 
 const emits = defineEmits(['change'])
@@ -111,6 +129,22 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
     })
 }
 
+const handleChange = async (info: UploadChangeParam) => {
+    if(props.listType === 'text'){
+        if (!info.file.status) return
+        if (info.file.status === 'done') {
+            // console.log(fileList.value)
+            const arr = fileList.value.map((item) => ({
+            name: item.name,
+            url: item.response?.result?.accessUrl || item.url,
+            uid: item.uid,
+            }))
+            emits('change', arr)
+            onlyMessage('上传成功！', 'success')
+        }
+    }
+}
+
 const onDbClick = (file) => {
     dbId.value = file.uid
     dbRef.value = true
@@ -136,10 +170,15 @@ const onDelete = (file: any) => {
 watch(
     () => props.value,
     (val) => {
-        fileList.value = val || []
+       try{
+        fileList.value = JSON.parse(val || '[]')
+       }catch(error){
+        console.error(error)
+       }
     },
     {
         immediate: true,
+        
     },
 )
 </script>
@@ -147,15 +186,24 @@ watch(
 <style scoped lang='less'>
 .render {
     padding: 8px;
-    border: 1px solid #d9d9d9;
     height: 100%;
-
+    width: 150px;
+    position: relative;
     .render-name {
         margin-top: 10px;
         width: 100%;
     }
+    .deleteBtn{
+        position: absolute;
+        left: 130px;
+        top: 4px;
+    }
 }
-
+:deep(.ant-upload-list-text-container){
+    background:none;
+    border: none;
+    width: auto;
+}
 .bottom {
     margin-top: 20px;
     color: #9c9c9c;

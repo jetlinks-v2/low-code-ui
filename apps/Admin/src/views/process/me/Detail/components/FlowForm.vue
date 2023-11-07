@@ -172,7 +172,7 @@ const dealTableData = (value) => {
         }
     })
     value.data = value.data.map((item) => {
-        let obj
+        let obj = cloneDeep(item)
         Object.keys(item).forEach((i) => {
             if (keysMap.has(i)) {
                 dealIotModuleData(item[i], keysMap.get(i))
@@ -236,17 +236,16 @@ const onClick = async (value) => {
             })
         })
         submitData.value = data
-        console.log(data)
-        // btnLoading.value = true
-        // _save(props.info.currentTaskId, {
-        //     form: submitData.value
-        // }).then((res) => {
-        //     if (res.status === 200) {
-        //         onlyMessage('保存成功')
-        //         btnLoading.value = false
-        //         emit('close')
-        //     }
-        // })
+        btnLoading.value = true
+        _save(props.info.currentTaskId, {
+            form: submitData.value
+        }).then((res) => {
+            if (res.status === 200) {
+                onlyMessage('保存成功')
+                btnLoading.value = false
+                emit('close')
+            }
+        })
     } else {
         formRef.value?.forEach((i, index) => {
             promise.push(i.onSave())
