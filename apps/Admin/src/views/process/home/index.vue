@@ -39,19 +39,17 @@ const myProcessOptions = computed(() => {
 })
 
 const processBuild = [
-  { name: '流程模型', code: 'process/model', icon: '/process/model.png', path: '/flow-engine/model' },
-  { name: '流程表单', code: 'process/form', icon: '/process/form.png', path: '/flow-engine/form' },
+  { name: '流程模型', code: 'process/model', icon: '/process/model.png' },
+  { name: '流程表单', code: 'process/form', icon: '/process/form.png' },
   {
     name: '流程监控',
     code: 'process/monitor',
     icon: '/process/monitor.png',
-    path: '/flow-engine/monitor',
   },
   {
     name: '流程实例',
     code: 'process/instance',
     icon: '/process/instance.png',
-    path: '/flow-engine/instance',
   },
 ]
 
@@ -60,14 +58,12 @@ const myProcess = [
     name: '发起流程',
     code: 'process/initiate',
     icon: '/process/initiate.png',
-    path: '/flow-engine/initiate',
   },
   {
     key: 'todo',
     name: '待办事项',
     code: 'process/me/todo',
     icon: '/process/todo.png',
-    path: '/flow-engine/me/todo',
     fun: () =>
       new Promise((resolve, reject) => {
         getMeProcessList(
@@ -92,19 +88,16 @@ const myProcess = [
     name: '已办事项',
     code: 'process/me',
     icon: '/process/finished.png',
-    path: '/flow-engine/me/finished',
   },
   {
     name: '我发起的',
     code: 'process/me/cc',
     icon: '/process/me-initiate.png',
-    path: '/flow-engine/me/initiate',
   },
   {
     name: '抄送给我',
     code: 'process/me/initiate',
     icon: '/process/cc.png',
-    path: '/flow-engine/me/cc',
   },
 ]
 </script>

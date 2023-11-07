@@ -16,8 +16,8 @@
           :validateFirst="true"
           :rules="[
             {
-              pattern: /^[a-zA-Z0-9_\-]+$/,
-              message: '请输入英文或者数字或者-或者_',
+              pattern: /^[a-zA-Z0-9_]+$/,
+              message: '请输入英文或者数字或者_',
               trigger: ['blur', 'change'],
             },
             {
