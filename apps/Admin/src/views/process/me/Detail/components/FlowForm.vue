@@ -20,12 +20,12 @@
                             :scroll="{ x: 1300, y: 700 }">
                             <template v-for="(i, index) in item.configuration"
                                 #[i.dataIndex]="{ record, index, valueChange }">
-                                <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
+                                <!-- <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled">
-                                </ValueItem>
-                                <!-- <FormItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
+                                </ValueItem> -->
+                                <FormItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled"
-                                    :component-props="i.componentProps"></FormItem>-->
+                                    :component-props="i.componentProps"></FormItem>
                             </template>
                         </QuickEditTable>
                         <j-button @click="() => addTableData(item)" block style="margin-top: 10px;"
@@ -57,6 +57,7 @@ import { onlyMessage } from '@jetlinks/utils';
 import FormItem from './FormItem.vue'
 import md5 from 'md5'
 import { getImage } from '@jetlinks/utils'
+import { handleSingleData } from './index'
 
 const props = defineProps({
     info: {
@@ -398,7 +399,6 @@ watch(() => props.info, () => {
     }
     // console.log('formValue.value',formValue.value)
 })
-
 </script>
 
 <style scoped lang='less'>

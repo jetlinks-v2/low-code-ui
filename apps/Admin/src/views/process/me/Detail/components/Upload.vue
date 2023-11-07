@@ -156,7 +156,7 @@ const onDbClick = (file) => {
 const onBlur = () => {
     dbId.value = ''
     dbRef.value = false
-    // console.log(fileList.value)
+    emits('change',fileList.value)
 }
 
 const onDelete = (file: any) => {
