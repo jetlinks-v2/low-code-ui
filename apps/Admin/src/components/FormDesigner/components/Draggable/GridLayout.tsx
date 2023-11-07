@@ -52,7 +52,10 @@ export default defineComponent({
                 children: [],
                 componentProps: {
                     span: 1
-                }
+                },
+                formItemProps: {
+                    isLayout: false
+                },
             })
             designer.onAddChild(_item, props.data)
         }

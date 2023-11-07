@@ -9,7 +9,7 @@
       @save="updateData"
       :select="selectIds"
     ></SelectModal>
-    <div class="select">
+    <div class="select" v-if="selectData.length > 0">
       <div v-for="item in selectData" :key="item?.id" class="selectItem">
         <div v-if="item?.name">{{ item?.name }}</div>
         <div v-else>{{ item?.id }}</div>

@@ -107,6 +107,9 @@ export const layout: ISchema[] = [
             {
                 type: 'card-item',
                 children: [],
+                formItemProps: {
+                    isLayout: false
+                },
             },
         ]
     },
@@ -118,34 +121,49 @@ export const layout: ISchema[] = [
             rowSpan: 5,
             colSpan: 10
         },
+        formItemProps: {
+            isLayout: false
+        },
         children: [
             {
                 componentProps: {
                     span: 1,
                 },
                 type: 'grid-item',
-                children: []
+                children: [],
+                formItemProps: {
+                    isLayout: false
+                },
             },
             {
                 componentProps: {
                     span: 1,
                 },
                 type: 'grid-item',
-                children: []
+                children: [],
+                formItemProps: {
+                    isLayout: false
+                },
             },
             {
                 componentProps: {
                     span: 1,
                 },
                 type: 'grid-item',
-                children: []
+                children: [],
+                formItemProps: {
+                    isLayout: false
+                },
             },
             {
                 componentProps: {
                     span: 1,
                 },
                 type: 'grid-item',
-                children: []
+                children: [],
+                formItemProps: {
+                    isLayout: false
+                },
             },
         ]
     },
@@ -181,7 +199,10 @@ export const layout: ISchema[] = [
             align: 'start',
             direction: 'horizontal',
             size: 8
-        }
+        },
+        formItemProps: {
+            isLayout: false
+        },
     },
 ]
 // 高级组件

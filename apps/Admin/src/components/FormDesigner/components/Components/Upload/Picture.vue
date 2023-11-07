@@ -25,6 +25,7 @@
           <template #previewMask>
             <AIcon type="EyeOutlined" />
             <AIcon
+              v-if="!disabled"
               type="DeleteOutlined"
               style="margin-left: 10px"
               @click="onDelete(file)"
