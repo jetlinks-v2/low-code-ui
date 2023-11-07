@@ -150,7 +150,7 @@ const nodeState = (nodeType, auto) => {
 //判断节点是否在时间线上
 const filterLine = (item, index) => {
    const nodeType = modal.value.get(task.value.get(item.taskId)?.nodeId)
-   if (item.action === 'taskAddLink' && item.others.type === 'assignee') {
+   if (item.action === 'taskAddLink' && item.others.type === 'assignee' && item.others.state === 'todo') {
       return {
          ...item,
          nodeType: nodeType,
