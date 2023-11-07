@@ -10,9 +10,11 @@
 import { _detail, _update } from '@/api/process/form'
 import { onlyMessage } from '@jetlinks/utils'
 import { onMounted, ref } from 'vue'
-import { router } from '@jetlinks/router'
 import { omit } from 'lodash-es'
+import { useMenuStore } from '@/store'
+import { useRoute } from 'vue-router'
 
+const menu = useMenuStore()
 const route = useRoute()
 const data = ref<any>()
 
@@ -32,17 +34,17 @@ const onSave = (dt: any) => {
     }).then(resp => {
         if(resp.success){
             onlyMessage('操作成功！')
-            router.replace(`/flow-engine/form`)
+            menu.jumpPage('process/form')
         }
     })
 }
 
 onMounted(() => {
-    queryDetail(route.params.id)
+    queryDetail(route.params?.id)
 })
 
 const onBack = () => {
-  router.replace(`/flow-engine/form`)
+  menu.jumpPage('process/form')
 }
 </script>
 

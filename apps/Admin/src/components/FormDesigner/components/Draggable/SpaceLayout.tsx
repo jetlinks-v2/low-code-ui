@@ -59,7 +59,10 @@ export default defineComponent({
                 const _item = generatorData({
                     type: props.data?.type + '-item',
                     children: [],
-                    componentProps: {}
+                    componentProps: {},
+                    formItemProps: {
+                        isLayout: false
+                    },
                 })
                 designer.onAddChild(_item, props.data)
             }

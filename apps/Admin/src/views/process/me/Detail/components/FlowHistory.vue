@@ -2,7 +2,7 @@
 <template>
    <div class="content">
       <j-timeline>
-         <j-timeline-item v-for=" (item, index) in timelines" :color="getColor(item,index) ? '#315EFB' : '#999999'">
+         <j-timeline-item v-for=" (item, index) in timelines" :color="getColor(item, index) ? '#315EFB' : '#999999'">
             <div class="items">
                <div class="item">
                   <div class="item-left">
@@ -34,14 +34,16 @@
                   </div>
                   <!-- <j-input v-if="showChanged(item.changed,'taskCommentChanged')" style="width: 60%;" :value="showChanged(item.changed,'taskCommentChanged')?.others.afterComment" /> -->
                </div>
-               <div v-if="item.childrenNode && !findRejectNode(item.childrenNode?.traceId)" class="item-children" >
+               <div v-if="item.childrenNode && !findRejectNode(item.childrenNode?.traceId)" class="item-children">
                   <div style="margin-right: 10px;">{{ item.childrenNode.others.taskName }}</div>
                   <j-tag
                      :color="colorMap.get(item.childrenNode.others.afterState === 'completed' ? 'children_completed' : 'children_rejected')">
                      {{ typeMap.get(item.childrenNode.others.afterState) }}
                   </j-tag>
                </div>
-               <div v-if="item.childrenNode?.others.afterState === 'rejected' && findRejectNode(item.childrenNode?.traceId)" class="item-children">
+               <div
+                  v-if="item.childrenNode?.others.afterState === 'rejected' && findRejectNode(item.childrenNode?.traceId)"
+                  class="item-children">
                   <div style="margin-right: 10px;">
                      {{ item.others.taskName }} 已驳回至 {{ findRejectNode(item.childrenNode?.traceId) }}
                   </div>
@@ -131,7 +133,7 @@ const handleTask = (arr) => {
    })
 }
 
-const getColor = (item,index) => {
+const getColor = (item, index) => {
    // console.log('isend',isEnd.value,timelines.value.length,index,isEnd.value && index === timelines.value.length - 1)
    return isEnd.value && index === timelines.value.length - 1 || item.action === 'processEnd'
 }
@@ -150,15 +152,29 @@ const nodeState = (nodeType, auto) => {
 //判断节点是否在时间线上
 const filterLine = (item, index) => {
    const nodeType = modal.value.get(task.value.get(item.taskId)?.nodeId)
-   if (item.action === 'taskAddLink' && item.others.type === 'assignee' && item.others.state === 'todo') {
-      return {
-         ...item,
-         nodeType: nodeType,
-         operatorName: item.others.identity.name,
-         actionType: 'sign',
-         actionColor: 'completed',
-         show: item.others.autoOperation ? false : true
+   if (item.action === 'taskAddLink' && item.others.type === 'assignee') {
+      if (item.others.state === 'todo') {
+         const isShow = item.others.autoOperation || item.operator.id !== item.others.identity.id
+         return {
+            ...item,
+            nodeType: nodeType,
+            operatorName: item.others.identity.name,
+            actionType: 'sign',
+            actionColor: 'completed',
+            show: isShow ? false : true
+         }
       }
+      if(item.others.state==='completed'|| item.others.state==='reject'){
+         return {
+            ...item,
+            nodeType: nodeType,
+            operatorName: item.others.identity.name,
+            actionType: item.others.state === 'completed' ? nodeState(nodeType, item.others.autoOperation) : 'reject',
+            actionColor: item.others.state === 'completed' ? 'completed' : 'reject',
+            show: true,
+         }
+      }
+
    } else if (item.action === 'taskLinkChanged') {
       //完成
       if (item.others.afterState === 'completed' || item.others.afterState === 'reject') {
@@ -181,11 +197,7 @@ const filterLine = (item, index) => {
             nodeType: nodeType,
             operatorName: item.operator.name,
             actionType: item.others.afterState === 'completed' ? 'pass' : 'error',
-            // actionColor: item.others.afterState === 'completed' ? 'children_completed' : 'children_rejected',
             show: false,
-            // isBranch: handleBranch(item),
-            // branchStartIndex: handleBranch(item) ? index : undefined,
-            // branchEndIndex: nodeType === 'EMPTY' ? index : undefined
          }
       }
    } else if (item.action === 'processEnd') {
@@ -193,7 +205,7 @@ const filterLine = (item, index) => {
          ...item,
          actionType: 'off',
          actionColor: 'off',
-         show:item.others.state.value==='repealed'? true: false
+         show: item.others.state.value === 'repealed' ? true : false
       }
    } else {
       return {
