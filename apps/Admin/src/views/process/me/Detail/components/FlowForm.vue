@@ -20,13 +20,12 @@
                             :scroll="{ x: 1300, y: 500 }">
                             <template v-for="(i, index) in item.configuration"
                                 #[i.dataIndex]="{ record, index, valueChange }">
-                                <!-- <slot :name="name" v-bind="slotData || {}" /> -->
-                                <!-- <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
+                                <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled">
-                                </ValueItem> -->
-                                <FormItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
+                                </ValueItem>
+                                <!-- <FormItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled"
-                                    :keys="i.keys" :mode="i.mode"></FormItem>
+                                    :keys="i.keys" :mode="i.mode"></FormItem> -->
                             </template>
                         </QuickEditTable>
                         <j-button @click="() => addTableData(item)" block style="margin-top: 10px;"
