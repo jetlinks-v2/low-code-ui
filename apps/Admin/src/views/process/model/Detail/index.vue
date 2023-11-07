@@ -111,6 +111,7 @@
         <PermissionButton
             @click="onCancel"
             :hasPermission="true"
+            style="margin-right:12px;"
           >
             不保存
           </PermissionButton>
