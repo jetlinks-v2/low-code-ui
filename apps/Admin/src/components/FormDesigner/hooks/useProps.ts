@@ -34,6 +34,10 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
     return {
       trigger,
       async validator(rule, value, cb) {
+        // 当输入框非必填的时候需要判断
+        if((value === undefined || value === null) && !element?.formItemProps?.required) {
+          return Promise.resolve()
+        }
         const errorMessage: Array<string> = []
         const len = element?.type === 'input-number' ? value : value?.length
         // validator

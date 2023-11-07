@@ -6,7 +6,7 @@
       ref="tableRef"
       :columns="columns"
       :params="params"
-      :request="getProcess_api"
+      :request="_query"
       :gridColumn="2"
       :defaultParams="{
         sorts: [{ name: 'createTime', order: 'desc' }],
@@ -270,7 +270,7 @@ const columns = [
     title: '操作',
     key: 'action',
     scopedSlots: true,
-    width: 300,
+    width: 320,
   },
 ]
 
@@ -333,14 +333,14 @@ const getActions = (record, type = 'card') => {
       text: '部署',
       icon: 'DeploymentUnitOutlined',
       permissionProps: (data) => ({
-        // loading: loading.value,
+        loading: data.loading,
         disabled: data.state.value === 'deployed',
         tooltip: {
           title: data.state.value === 'deployed' ? '请勿重复部署' : '部署',
         },
         hasPermission: 'process/model:deploy',
         onClick: async () => {
-          loading.value = true
+          data.loading = true
           try {
             const { result } = await detail_api(data.id)
             const model = JSON.parse(result.model || '{}')
@@ -376,7 +376,7 @@ const getActions = (record, type = 'card') => {
             })
           } catch (error) {
           } finally {
-            loading.value = false
+            data.loading = false
           }
         },
       }),
@@ -419,7 +419,6 @@ const getActions = (record, type = 'card') => {
 const handleFunction = (item, record) => {
   if (isFunction(item)) {
     return item(record)
-    // return ()=>({...item(record), loading: record.id === id.value})
   } else if (isObject(item)) {
     return item
   }
@@ -469,6 +468,19 @@ const handleView = (data) => {
  */
 const refresh = () => {
   tableRef.value.reload()
+}
+
+const _query = async (e) => {
+  const resp = await getProcess_api(e)
+  return {
+    result: {
+      data: resp.result.data.map((i) => ({ ...i, loading: false })),
+      pageIndex: e.pageIndex,
+      pageSize: e.pageSize,
+      total: resp.result.total,
+    },
+    status: resp.status,
+  }
 }
 </script>
 <style scoped lang="less">
