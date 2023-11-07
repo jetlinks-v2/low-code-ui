@@ -240,10 +240,20 @@ export function flattenTree(fields, parent = null, depth = 0) {
     for (let field of fields) {
         field.depth = depth
         field.parent = parent
-        if (field.children?.length) {
+        // if (field.children?.length) {
+        //     flattened = flattened.concat(flattenTree(field.children, field, depth + 1))
+        // } else {
+        //     // if (!field.formItemProps.hasOwnProperty('isLayout')) flattened.push(field)
+        //     if (!(
+        //         field.formItemProps.hasOwnProperty('isLayout') &&
+        //         !field.formItemProps.isLayout
+        //     )) flattened.push(field)
+        // }
+        if (field.formItemProps?.hasOwnProperty('isLayout') &&
+            !field.formItemProps.isLayout) {
             flattened = flattened.concat(flattenTree(field.children, field, depth + 1))
         } else {
-            if (!field.formItemProps.hasOwnProperty('isLayout')) flattened.push(field)
+            flattened.push(field)
         }
     }
     return flattened

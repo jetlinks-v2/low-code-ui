@@ -87,7 +87,7 @@
                   <div class="field-title">
                     <div class="name">
                       <j-ellipsis line-clamp="1">
-                        {{ field.formItemProps?.label || field.name }}
+                        {{ field.formItemProps?.label || field.componentProps?.name }}
                       </j-ellipsis>
                     </div>
                     <div class="permission">
@@ -225,7 +225,12 @@ const getFormList = async () => {
     // 平铺字段
     const flattenFields = [
       ...m.configuration?.children?.filter(
-        (f) => !f.formItemProps.hasOwnProperty('isLayout'),
+        // (f) => !f.formItemProps.hasOwnProperty('isLayout'),
+        (f) =>
+          !(
+            f.formItemProps.hasOwnProperty('isLayout') &&
+            !f.formItemProps.isLayout
+          ),
       ),
       ..._layoutFields,
     ]
@@ -262,6 +267,7 @@ const getFormList = async () => {
     }
   })
   allFormList.value = cloneDeep(filterFormList.value)
+  console.log('filterFormList.value: ', filterFormList.value)
   // 右侧预览数据处理
   initPreviewData(result)
 }
