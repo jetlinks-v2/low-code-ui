@@ -197,9 +197,7 @@ export function sumValues(data: { [key: string]: number }) {
 export function setDefaultFormBinds(forms, type?: string, oldFormBinds?: any) {
     const res = {};
     forms?.forEach((item) => {
-        console.log('item111: ', item);
-        const _fields = type === 'conditionSelect' ? item.configuration?.children : item.fullInfo.configuration?.children
-        console.log('_fields111: ', _fields);
+        const _fields = type === 'conditionSelect' ? item.flattenFields : item.fullInfo.configuration?.children
         const _key = type === 'conditionSelect' ? item.key : item.formId
         res[_key] = []
         _fields?.forEach((p) => {
@@ -294,35 +292,13 @@ export function handleFormList(data) {
             ..._layoutFields,
         ]
         // console.log('flattenFields: ', flattenFields)
-
-        // 已经存在的字段
-        const existFields = forms.value[m.key]
-        if (existFields && existFields.length) {
-            flattenFields?.forEach((p) => {
-                const _currentField = existFields.find(
-                    (f) => f.id === p.formItemProps.name,
-                )
-                p['accessModes'] = _currentField ? _currentField.accessModes : ['read']
-            })
-
-            return {
-                ...m,
-                accessModes: flattenFields?.every((e) => e.accessModes.length === 2)
-                    ? ['read', 'write']
-                    : ['read'],
-                multiple: existForms.value?.find((f) => f.formId === m.key)?.multiple,
-                flattenFields,
-            }
-        } else {
-            flattenFields?.forEach((p) => {
-                p['accessModes'] = ['read']
-            })
-            return {
-                ...m,
-                accessModes: ['read'],
-                multiple: existForms.value?.find((f) => f.formId === m.key)?.multiple,
-                flattenFields,
-            }
+        flattenFields?.forEach((p) => {
+            p['accessModes'] = ['read']
+        })
+        return {
+            ...m,
+            accessModes: ['read'],
+            flattenFields,
         }
     })
 }

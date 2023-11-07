@@ -95,7 +95,7 @@ import { queryFormNoPage_api, queryVariables_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import ConditionValueItem from './ConditionValueItem.vue'
 import { operatorMap } from './const'
-import { findVariableById, setDefaultFormBinds } from './utils'
+import { findVariableById, handleFormList, setDefaultFormBinds } from './utils'
 import { onlyMessage } from '@jetlinks/utils'
 import { cloneDeep } from 'lodash-es'
 
@@ -151,7 +151,7 @@ const getLatestFormList = async () => {
   const { result } = await queryFormNoPage_api(params)
   // 设置根节点模式表单字段"读"配置时, 保留原有的配置
   flowStore.model.nodes.props!.formBinds = setDefaultFormBinds(
-    result,
+    handleFormList(result),
     'conditionSelect',
     flowStore.model.nodes.props!.formBinds,
   )
