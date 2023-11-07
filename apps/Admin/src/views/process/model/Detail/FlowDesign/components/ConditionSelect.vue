@@ -211,7 +211,7 @@ const handleConditionChange = (value, node, item, index) => {
 }
 
 const handleConditionClear = (index) => {
-  conditionSelect.value[index] = {} as any
+  conditionSelect.value[index] = {type: conditionSelect.value[index]?.type} as any
 }
 
 const handleTermTypeChange = (item) => {
@@ -238,8 +238,8 @@ const handleRemove = (index: number) => {
 }
 
 const handleAdd = () => {
-  const beforeDone = conditionSelect.value.some((item: any) => {
-    return !item.selectedColumn || !item.selectedTermType || !item.value
+  const beforeDone = conditionSelect.value.every((item: any) => {
+    return item.selectedColumn && item.selectedTermType && item.value
   })
   if (!beforeDone) {
     onlyMessage('前置条件未配置完成', 'error')

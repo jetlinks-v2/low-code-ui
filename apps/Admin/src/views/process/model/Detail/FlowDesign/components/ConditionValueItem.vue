@@ -13,7 +13,7 @@
     @change="onChange"
   />
   <j-tree-select
-    v-else-if="['org','tree-select'].includes(conditionType)"
+    v-else-if="['org', 'tree-select'].includes(conditionType)"
     v-model:value="myValue"
     v-model:searchValue="searchValue"
     :multiple="['in', 'nin'].includes(operator?.value)"
@@ -24,16 +24,16 @@
     placeholder="请选择"
     allow-clear
     tree-default-expand-all
-    tree-node-filter-prop="name"
-    :tree-data="orgOptions"
-    :field-names="{ label: 'name', value: 'id' }"
+    :tree-node-filter-prop="sourceMap.label"
+    :tree-data="valueOptions"
+    :field-names="sourceMap"
     :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
     @change="onChange"
   >
     <!-- :multiple="['eq', 'not'].includes(item.termsType as string) ? false : true" -->
-    <template #title="{ name }">
+    <template #title="data">
       <template
-        v-for="(fragment, i) in name
+        v-for="(fragment, i) in data[sourceMap.label]
           ?.toString()
           ?.split(new RegExp(`(?<=${searchValue})|(?=${searchValue})`, 'i'))"
       >
@@ -93,6 +93,7 @@ import {
 } from '@/api/process/model'
 import { queryRuntime, queryDictionaryData } from '@/api/form'
 import { useFlowStore } from '@/store/flow'
+import { dictionaryItemList } from '@/api/list'
 type Emits = {
   (e: 'update:modelValue', data: string | number | boolean): void
 }
@@ -137,8 +138,10 @@ const getRoleOptions = async () => {
 }
 
 const getOrgOptions = async () => {
+  sourceMap.label = 'name'
+  sourceMap.value = 'id'
   const { result } = await getOrg_api(publicParams)
-  orgOptions.value = result
+  valueOptions.value = result
 }
 
 const getUserOptions = async () => {
@@ -169,6 +172,10 @@ const onChange = (e) => {
   emit('update:modelValue', myValue.value)
 }
 
+const sourceMap = reactive({
+  label: 'label',
+  value: 'value'
+})
 /**类型是表单里的下拉框时 */
 const findValueOptions = async () => {
   const existForms = flowStore.model.config.forms?.filter((f) => !f.isDelete)
@@ -190,17 +197,15 @@ const findValueOptions = async () => {
   }
   const {result} = await queryFormNoPage_api(params)
   const source = searchTree(result?.[0].configuration.children, props.formItemComponent)?.componentProps?.source
-  console.log(source);
   if(source?.type === 'end') {
+    sourceMap.label = source.label;
+    sourceMap.value = source.value
     const { result } = await queryRuntime(source.projectId, source.fullId, source.commandId, {})
-    valueOptions.value = result?.[source.source]?.map(item => {
-      return {
-        label: item?.[source.label],
-        value: item?.[source.value]
-      }
-    })
+    valueOptions.value = result.isSource ? result?.[source.source] : result
   } else if(source?.type === 'dic') {
-    const { result } = await queryDictionaryData(source.dictionary)
+    sourceMap.label = 'text';
+    sourceMap.value = 'value'
+    const { result } = await dictionaryItemList(source.dictionary)
     valueOptions.value = result?.map(item => {
       return {
         label: item.text,
@@ -252,6 +257,14 @@ watch(
         // 过滤已经删除的表单
         findValueOptions()
         break
+      case 'select-card':
+        // 过滤已经删除的表单
+        findValueOptions()
+        break
+      case 'tree-select':
+        // 过滤已经删除的表单
+        findValueOptions()
+        break
       default:
         break
     }
@@ -260,9 +273,11 @@ watch(
 )
 
 const searchTree = (arr: any[], _item: any) => {
+  console.log(arr, _item);
     let _data: any = undefined
     for(let i = 0; i < arr.length; i++) {
       if (arr[i].key === _item) {
+        console.log(arr[i], _item);
             _data = arr[i]
             break
         }
