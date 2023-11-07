@@ -87,6 +87,5 @@ export const operatorMap = {
     'org': operatorSelect,
     'device': operatorSelect,
     'role': operatorSelect,
-    'table': operatorSelect,
-    'text': operatorSelect,
+    'text': operatorInput,
 }
