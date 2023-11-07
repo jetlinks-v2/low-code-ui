@@ -349,6 +349,7 @@ const FlowDesigner = defineComponent({
       parentNode.children.name = '条件分支'
       parentNode.children.props = {
         branchBy: parentNode.props.branchBy || null,
+        type: 'exclusive',
       }
 
       parentNode.children.children = {

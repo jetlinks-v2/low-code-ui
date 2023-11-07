@@ -70,7 +70,6 @@ const tempType = ref(
     ? 'exclusive'
     : nodeProps.value?.inclusiveType,
 )
-// const tempType = ref('exclusive')
 
 const basicFormData = reactive({
   type: nodeProps.value?.type || 'inclusive',
