@@ -12,6 +12,7 @@
 </template>
 <script setup lang="ts">
 import { getImage } from '@jetlinks/utils'
+import { useMenuStore } from '@/store'
 
 const props = defineProps({
   data: {
@@ -21,10 +22,13 @@ const props = defineProps({
 })
 const router = useRouter()
 
+const menu = useMenuStore()
+
 const handleClick = () => {
-  router.push({
-    path: props.data.path,
-  })
+  // router.push({
+  //   path: props.data.path,
+  // })
+  menu.jumpPage(props.data.code)
 }
 
 const count = reactive({})

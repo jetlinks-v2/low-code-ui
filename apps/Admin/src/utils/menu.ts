@@ -27,6 +27,7 @@ const handleButtons = (buttons?: Buttons) => {
 const handleMeta = (item: MenuItem, isApp: boolean) => {
     const meta = item.meta
     return {
+        ...meta,
         icon: item.icon,
         title: meta?.title || item.name,
         hideInMenu: meta?.hideInMenu ?? item.isShow === false,
