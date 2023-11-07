@@ -268,7 +268,7 @@ export function updateFieldDisabled(fields, currentField) {
 }
 
 /**
- * 处理表单数据
+ * 处理表单数据, 用于变量查询接口参数数据结构处理
  * @param data 
  * @returns 
  */
@@ -291,7 +291,6 @@ export function handleFormList(data) {
             ),
             ..._layoutFields,
         ]
-        // console.log('flattenFields: ', flattenFields)
         flattenFields?.forEach((p) => {
             p['accessModes'] = ['read']
         })
