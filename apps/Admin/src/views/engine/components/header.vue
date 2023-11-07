@@ -20,11 +20,12 @@
 </template>
 
 <script setup name="EngineHeader">
-import { useProduct, useEngine } from '@/store'
+import { useProduct, useEngine, useMenuStore } from '@/store'
 import { getImage } from '@jetlinks/utils';
 
 const product = useProduct()
 const engine = useEngine()
+const menu = useMenuStore()
 
 const router = useRouter()
 const route = useRoute()
@@ -38,7 +39,8 @@ const onRelease = () => {
 }
 
 const quit = async () => {
-  router.push('/delivery/center')
+  // router.push('/delivery/center')
+  menu.jumpPage('center')
 }
 
 onMounted(() => {

@@ -389,6 +389,7 @@ const getActions = (record, type = 'card') => {
         // disabled: data.state.value === 'deployed',
         tooltip: {
           title: '删除',
+          placement: 'topRight'
         },
         hasPermission: 'process/model:delete',
         popConfirm: {

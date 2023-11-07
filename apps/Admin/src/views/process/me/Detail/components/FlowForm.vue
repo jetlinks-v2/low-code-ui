@@ -17,16 +17,15 @@
                         @state-change="(data) => getFormData(data, index)"/>
                     <div v-else style="background-color: #fff;">
                         <QuickEditTable validate ref="tableRef" :data="item.data" :columns="item.configuration"
-                            :scroll="{ x: 1300, y: 500 }">
+                            :scroll="{ x: 1300, y: 700 }">
                             <template v-for="(i, index) in item.configuration"
                                 #[i.dataIndex]="{ record, index, valueChange }">
-                                <!-- <slot :name="name" v-bind="slotData || {}" /> -->
                                 <!-- <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled">
                                 </ValueItem> -->
                                 <FormItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled"
-                                    :keys="i.keys" :mode="i.mode"></FormItem>
+                                    :component-props="i.componentProps"></FormItem>
                             </template>
                         </QuickEditTable>
                         <j-button @click="() => addTableData(item)" block style="margin-top: 10px;"
@@ -58,6 +57,7 @@ import { onlyMessage } from '@jetlinks/utils';
 import FormItem from './FormItem.vue'
 import md5 from 'md5'
 import { getImage } from '@jetlinks/utils'
+import { handleSingleData } from './index'
 
 const props = defineProps({
     info: {
@@ -100,6 +100,8 @@ const btnLoading = ref(false)
 const candidates = ref()
 //存放表单暂存数据
 const formData = ref({})
+//需要转换数据的组件类型
+const tableType = ["device","product","role","user","org"]
 const addTableData = (item) => {
     let obj = {}
     item.configuration.map((i) => {
@@ -165,10 +167,12 @@ const onSave = (value) => {
 const dealTableData = (value) => {
     const keysMap = new Map()
     value.configuration.map((item) => {
-        keysMap.set(item.dataIndex, item.keys)
+        if(tableType.includes(item.type)){
+            keysMap.set(item.dataIndex, item.componentProps?.keys)
+        }
     })
     value.data = value.data.map((item) => {
-        let obj
+        let obj = cloneDeep(item)
         Object.keys(item).forEach((i) => {
             if (keysMap.has(i)) {
                 dealIotModuleData(item[i], keysMap.get(i))
@@ -295,24 +299,41 @@ const dealTable = (disabled) => {
     formValue.value.forEach((i) => {
         if (i.multiple) {
             i?.configuration?.children.map((item) => {
-                const rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }, ...item?.formItemProps?.rules] : [...item?.formItemProps?.rules]
+                let rules
+                if(item?.formItemProps?.rules){
+                    rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }, ...item?.formItemProps?.rules] : [...item?.formItemProps?.rules]
+                }else{
+                    rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }] : []
+                }
                 tableColumn.push({
                     title: item.formItemProps?.label,
                     dataIndex: item.formItemProps?.name,
-                    mode: item.componentProps?.mode,
                     type: item?.type,
-                    disabled: disabled ? true : false,
-                    keys: item.componentProps.keys,
+                    width:200,
+                    disabled: disabled ? true : item.componentProps.disabled,
                     form: {
                         rules: rules
-                    }
+                    },
+                    componentProps:item.componentProps,
                 })
             })
-            console.log(tableColumn,'___')
+            // console.log(tableColumn,'___')
             i.configuration = tableColumn
         }
     })
 }
+
+//递归处理布局组件的disabled
+const handleLayout = (arr,disabled)=>{
+   return arr.map(item=>{
+        item.componentProps.disabled = disabled
+        if(item.children){
+            item.children = handleLayout(item.children,disabled)
+        }
+        return item
+    })
+}
+
 // 列表接口数据nodeId 对应form表单ID处理数据
 const dealForm = (nodes) => {
     // console.log('nodes---', nodes, props.nodeId)
@@ -344,12 +365,16 @@ const dealForm = (nodes) => {
         formValue.value = formValue.value.filter((item) => {
             if (bindMap.has(item.formId)) {
                 // 循环表单项 根据节点 配置表单项属性 过滤掉节点没有配置的表单项
-                console.log(bindMap,'map')
+                // console.log(bindMap,'map')
                 item.configuration.children = item.configuration.children.filter((i) => {
                     return bindMap.get(item.formId).some((k) => {
                         if (k.id === i.formItemProps.name) {
-                            console.log('k.required',k)
+                            // console.log('k=========',k,i)
                             i.componentProps.disabled = !k?.accessModes?.includes('write')
+                            //处理布局组件
+                            if(i.children){
+                                i.children = handleLayout(i.children,!k?.accessModes?.includes('write'))
+                            }
                             return true
                         }
                     })
@@ -388,9 +413,8 @@ watch(() => props.info, () => {
 
         })
     }
-    console.log('formValue.value',formValue.value)
+    // console.log('formValue.value',formValue.value)
 })
-
 </script>
 
 <style scoped lang='less'>
