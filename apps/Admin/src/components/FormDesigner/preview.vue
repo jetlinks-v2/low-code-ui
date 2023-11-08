@@ -67,7 +67,7 @@ watch(
         }
       }
       formData.value = obj as ISchema
-      if(!props?.value){
+      if(!props?.value || !Object.keys(props?.value)?.length){
         Object.assign(formState, getFieldData(formData.value) || {})
       }
     }
