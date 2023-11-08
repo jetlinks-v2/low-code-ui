@@ -126,7 +126,8 @@ const getData = (data: DataSourceProps[], type: string) => {
  * @param arr 要分组的数据
  * @param field 分类字段
  */
-const groupedData = (arr: any[], field: string) => {
+const groupedData = (array: any[], field: string) => {
+  const arr = cloneDeep(array)
   return arr.reduce((acc, curr) => {
     let key = curr[field]
     if (!acc[key]) {
@@ -269,6 +270,14 @@ const getRelation = async () => {
 
 getTreeData()
 
+/**
+ * 判断是否全被删除
+ */
+const isAllDel = () => {
+  if (initList.value.length < 1) return false
+  return !initList.value.some((i) => !i.isDel)
+}
+
 provide('infoState', {
   dataMap: dataMap,
   members: initList,
@@ -305,6 +314,8 @@ watch(
   },
   { immediate: true },
 )
+
+defineExpose({ isAllDel })
 </script>
 <style scoped lang="less">
 .member {

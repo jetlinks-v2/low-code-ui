@@ -156,6 +156,7 @@ import {
   del_api,
   detail_api,
   update_api,
+  providerEnum
 } from '@/api/process/model'
 import { useClassified } from '@/hooks/useClassified'
 import { isImg } from '@/utils/comm'
@@ -206,7 +207,20 @@ const columns = [
       componentProps: {
         placeholder: '请选择流程分类',
       },
-      options: classified,
+      options: async () => {
+        const resp = await providerEnum()
+        const listMap = new Map()
+        if (resp.status === 200) {
+          resp.result.forEach((item) => {
+            listMap.set(item.id, {
+              label: item.text,
+              value: item.id,
+            })
+          })
+          return [...listMap.values()]
+        }
+        return []
+      },
     },
   },
   {
