@@ -127,7 +127,15 @@ watch(
   () => showConfig.value,
   (val) => {
     // 关闭抽屉, 保存数据 打开抽屉, 校验数据
-    !val ? saveNodeConfig() : validateNodeConfig()
+    // !val ? saveNodeConfig() : validateNodeConfig()
+    if (!val) {
+      saveNodeConfig()
+    } else {
+      validateNodeConfig()
+      nextTick(() => {
+        nameRef.value.validate()
+      })
+    }
   },
 )
 
@@ -138,6 +146,7 @@ watch(
 const validateSteps = (type?: string) => {
   return new Promise((resolve, reject) => {
     const err = flowDesignerRef.value.validateProcess()
+    console.log('err: ', err)
 
     if (type && type === 'next' && err[0]?.name[0] === 'no-nodes') {
       // 下一步校验才有此提示, 部署不需要此提示
