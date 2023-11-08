@@ -163,9 +163,13 @@
     
 <script lang="ts" setup>
 import { watch, computed, reactive, ref } from 'vue'
-import { cloneDeep } from 'lodash-es'
 import { getArray, searchTree } from '@/components/FormDesigner/utils/utils'
-import { queryDictionary, queryEndCommand, queryEndCommands, queryProject } from '@/api/form'
+import {
+  queryDictionary,
+  queryEndCommand,
+  queryEndCommands,
+  queryProject,
+} from '@/api/form'
 import { useProduct } from '@/store'
 
 const product = useProduct()
@@ -190,6 +194,14 @@ const emits = defineEmits(['change'])
 
 const data = reactive<any>({})
 
+const getDictionary = async () => {
+  const resp = await queryDictionary()
+  if (resp.success) {
+    // 过滤掉没有启用的数据
+    dic.value = resp.result?.filter((item) => item?.status) || []
+  }
+}
+
 const rulesDic = [
   {
     required: true,
@@ -197,8 +209,8 @@ const rulesDic = [
   },
   {
     async validator(_rule: any, value: string) {
-      if(!dic.value?.length){
-        await queryDictionary()
+      if (!dic.value?.length) {
+        await getDictionary()
       }
       const item = dic.value?.find((i) => i?.id === value)
       if (!item) {
@@ -305,15 +317,6 @@ const getProject = () => {
           value: item.id,
         }
       })
-    }
-  })
-}
-
-const getDictionary = () => {
-  queryDictionary().then((resp) => {
-    if (resp.success) {
-      // 过滤掉没有启用的数据
-      dic.value = resp.result?.filter((item) => item?.status) || []
     }
   })
 }
@@ -525,4 +528,8 @@ watch(
     immediate: true,
   },
 )
+
+// onMounted(() => {
+//   getDictionary()
+// })
 </script>
