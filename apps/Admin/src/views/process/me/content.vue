@@ -59,7 +59,7 @@
         </JProTable>
         <Detail v-if="visible" @close="onCancelDrawer" :current="current" :type="type" :history="history"
             :is-draft="activeKey === 'draft'" />
-        <j-modal v-model:visible="visibleModel"  :width="300" @cancel="onCancel" @ok="onCancel" :footer="null">
+        <j-modal v-model:visible="visibleModel" :width="300" @cancel="onCancel" @ok="onCancel" :footer="null">
             <div class="content">
                 <div class="title">共签收<span> {{ sign.length }} </span>个任务</div>
                 <div> 签收成功：<span style="color: #208CFF;">{{ sign.success }}</span></div>
@@ -83,7 +83,11 @@ import { getMeProcessList, _claim, _delete, getInitiatorList, _claimBatch, _reje
 import BatchDropdown from '@/components/BatchDropdown/index.vue';
 import ActionModal from './ActionModal.vue';
 import { useMenuStore } from '@/store'
+import { useClassified } from '@/hooks/useClassified'
+
 const menu = useMenuStore()
+const { classified } = useClassified()
+
 
 
 const props = defineProps({
@@ -133,10 +137,12 @@ const columnsTodo = [
         key: 'classifiedName',
         ellipsis: true,
         search: {
-            type: 'string',
+            type: 'select',
+            rename: 'classifiedId',
             componentProps: {
-                placeholder: '请输入流程分类',
+                placeholder: '请选择流程分类',
             },
+            options: classified,
         },
     },
     {
@@ -219,10 +225,12 @@ const columnsFinished = [
         key: 'classifiedName',
         ellipsis: true,
         search: {
-            type: 'string',
+            type: 'select',
+            rename: 'classifiedId',
             componentProps: {
-                placeholder: '请输入流程分类',
+                placeholder: '请选择流程分类',
             },
+            options: classified,
         },
     },
     {
@@ -320,10 +328,12 @@ const columnsInitiate = [
         key: 'classifiedName',
         ellipsis: true,
         search: {
-            type: 'string',
+            type: 'select',
+            rename: 'classifiedId',
             componentProps: {
-                placeholder: '请输入流程分类',
+                placeholder: '请选择流程分类',
             },
+            options: classified,
         },
     },
     {
@@ -421,10 +431,12 @@ const columnsCc = [
         key: 'classifiedName',
         ellipsis: true,
         search: {
-            type: 'string',
+            type: 'select',
+            rename: 'classifiedId',
             componentProps: {
-                placeholder: '请输入流程分类',
+                placeholder: '请选择流程分类',
             },
+            options: classified,
         },
     },
     {
@@ -536,10 +548,12 @@ const columnDraft = [
         key: 'classifiedName',
         ellipsis: true,
         search: {
-            type: 'string',
+            type: 'select',
+            rename: 'classifiedId',
             componentProps: {
-                placeholder: '请输入流程分类',
+                placeholder: '请选择流程分类',
             },
+            options: classified,
         },
     },
     {
@@ -754,7 +768,7 @@ const getActionData = async (value) => {
 
 const onConfirm = async (item) => {
     // console.log('item', item)
-    const task = item.identityLinks?.filter(item => item.linkType.value === 'candidate').map(item=>item.taskId)
+    const task = item.identityLinks?.filter(item => item.linkType.value === 'candidate').map(item => item.taskId)
     sign.length = task.length
     const res = await _claimBatch({
         taskIds: task
@@ -808,14 +822,16 @@ const onSave = (item) => {
 const onDraft = (record) => {
     // router.push({
     //     path: '/flow-engine/initiate/initiate-detail',
-    //     query: {
-    //         id: record.id,
-    //         isDraft: true,
-    //     }
+    // query: {
+    //     id: record.id,
+    //     isDraft: true,
+    // }
     // })
-    menu.jumpPage('process/initiate/Detail',{},{
-        id: record.id,
-        isDraft: true
+    menu.jumpPage('process/initiate/Detail', {
+        query: {
+            id: record.id,
+            isDraft: true,
+        }
     })
 }
 
@@ -889,13 +905,15 @@ watch(
         font-weight: 500;
         line-height: 24px;
         color: #333333;
-        span{
+
+        span {
             color: #208CFF;
             margin: 0 5px;
         }
     }
 }
-.footer{
+
+.footer {
     text-align: right;
 }
 </style>
