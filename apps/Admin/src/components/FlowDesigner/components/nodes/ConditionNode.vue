@@ -109,17 +109,29 @@ const showError = ref(false)
 
 const active = computed(() => props?.config?.active)
 const content = computed(() => {
+  console.log(props.config.props?.condition?.configuration);
   const terms = props.config.props?.condition?.configuration?.terms
   //   console.log('terms: ', terms)
   // 条件描述
   const _conditionDesc = terms.map(
     (item) =>
-      `${item.columnName || ''}${item.termTypeName || ''}${item.value || ''}`,
+    formatValue(item),
   )
   return _conditionDesc.length
     ? String(_conditionDesc).replaceAll(',', '、')
     : '请配置条件'
 })
+
+const formatValue = (item) => {
+  switch (item.termType) {
+    case 'in':
+      return `${item.columnName || ''} 在 ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''} 之中`
+    case 'nin':
+      return `${item.columnName || ''} 不在 ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''} 之中`
+    default: 
+      return `${item.columnName || ''} ${item.termTypeName || ''} ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''}`
+  }
+}
 
 /**
  * 校验节点

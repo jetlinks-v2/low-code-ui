@@ -1,46 +1,60 @@
 <!-- 表格表单预览 -->
 <template>
-  <j-table
-    bordered
-    :data-source="myDataSource"
+  <QuickEditTable
+    serial
+    validate
+    ref="tableRef"
+    :data="myDataSource"
     :columns="columns"
-    :pagination="false"
+    :height="500"
+    :scroll="{x: 1600}"
   >
-    <template #headerCell="{ column, title }">
-      <template v-if="column.formItemProps?.required">
-        <span>
-          <div class="title">
-            {{ title }}
-          </div>
-        </span>
-      </template>
+    <template v-for="item in columns" #[item.dataIndex]>
+      <FormItem :item-type="item.type" :disabled="item.componentProps?.disabled" :component-props="item.componentProps" />
     </template>
-    <template #bodyCell="{ column, text, record, index }">
-      <j-form-item
-        :name="[column.formId, index, column.dataIndex]"
-        :rules="!hasRules ? null : [
-          ...(column.formItemProps?.rules ?? []),
-          {
-            required: column.formItemProps?.required,
-            message: `请输入${column.formItemProps?.label}`,
-          },
-        ]"
-      >
-        <div style="min-width: 120px">
-          <component
-            :is="componentMap[column.type]"
-            :data="record"
-            v-model:value="record[column.dataIndex]"
-            :disabled="column.componentProps.disabled"
-          />
-        </div>
-      </j-form-item>
-    </template>
-  </j-table>
+  </QuickEditTable>
+<!--  <j-table-->
+<!--    bordered-->
+<!--    :data-source="myDataSource"-->
+<!--    :columns="columns"-->
+<!--    :pagination="false"-->
+<!--  >-->
+<!--    <template #headerCell="{ column, title }">-->
+<!--      <template v-if="column.formItemProps?.required">-->
+<!--        <span>-->
+<!--          <div class="title">-->
+<!--            {{ title }}-->
+<!--          </div>-->
+<!--        </span>-->
+<!--      </template>-->
+<!--    </template>-->
+<!--    <template #bodyCell="{ column, text, record, index }">-->
+<!--      <j-form-item-->
+<!--        :name="[column.formId, index, column.dataIndex]"-->
+<!--        :rules="!hasRules ? null : [-->
+<!--          ...(column.formItemProps?.rules ?? []),-->
+<!--          {-->
+<!--            required: column.formItemProps?.required,-->
+<!--            message: `请输入${column.formItemProps?.label}`,-->
+<!--          },-->
+<!--        ]"-->
+<!--      >-->
+<!--        <div style="min-width: 120px">-->
+<!--          <component-->
+<!--            :is="componentMap[column.type]"-->
+<!--            :data="record"-->
+<!--            v-model:value="record[column.dataIndex]"-->
+<!--            :disabled="column.componentProps.disabled"-->
+<!--          />-->
+<!--        </div>-->
+<!--      </j-form-item>-->
+<!--    </template>-->
+<!--  </j-table>-->
 </template>
 
 <script setup lang="ts">
-import componentMap from '@/components/FormDesigner/utils/componentMap'
+// import componentMap from '@/components/FormDesigner/utils/componentMap'
+import FormItem from '@/views/process/me/Detail/components/FormItem.vue'
 
 type Emits = {
   (e: 'update:dataSource', data: any[]): void

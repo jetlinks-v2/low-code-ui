@@ -11,7 +11,7 @@
     @insertNode="(type) => emits('insertNode', type)"
     placeholder="系统自动匹配参与人"
     header-bgc="#485468"
-    header-icon="SendOutlined"
+    header-icon="icon-a-faqi2"
   />
 </template>
 
