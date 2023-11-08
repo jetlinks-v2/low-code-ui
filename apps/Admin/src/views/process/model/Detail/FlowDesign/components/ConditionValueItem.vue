@@ -8,6 +8,8 @@
     allow-clear
     placeholder="请选择"
     class="value-select"
+    :field-names="sourceMap"
+    :optionFilterProp="sourceMap.label"
     :max-tag-text-length="myValue?.length > 1 ? 1 : 6"
     :max-tag-count="1"
     @change="onChange"
@@ -60,6 +62,7 @@
   <j-time-picker
     v-else-if="conditionType === 'time-picker'"
     v-model:value="myValue"
+    valueFormat="HH:mm:ss"
     class="value-select"
     allowClear
     showTime
@@ -96,6 +99,7 @@ import { useFlowStore } from '@/store/flow'
 import { dictionaryItemList } from '@/api/list'
 type Emits = {
   (e: 'update:modelValue', data: string | number | boolean): void
+  (e: 'update:selectedItem', data?: string[]): void
 }
 type Props = {
   modelValue: string | string[] | number | undefined
@@ -118,7 +122,6 @@ const normalSelectTypes = ['role', 'user', 'product', 'device', 'switch', 'selec
 // 用户/角色/产品/设备 普通下拉数据
 const valueOptions = ref<{ label: string; value: string }[]>([])
 // 组织下拉树形数据
-const orgOptions = ref([])
 const publicParams = {
   paging: false,
   sorts: [
@@ -130,14 +133,15 @@ const publicParams = {
   terms: [],
 }
 const getRoleOptions = async () => {
+  valueOptions.value = [];
+  sourceMap.label = 'name'
+  sourceMap.value = 'id'
   const { result } = await getRole_api(publicParams)
-  valueOptions.value = result?.map((m) => ({
-    label: m.name,
-    value: m.id,
-  }))
+  valueOptions.value = result
 }
 
 const getOrgOptions = async () => {
+  valueOptions.value = [];
   sourceMap.label = 'name'
   sourceMap.value = 'id'
   const { result } = await getOrg_api(publicParams)
@@ -145,32 +149,46 @@ const getOrgOptions = async () => {
 }
 
 const getUserOptions = async () => {
+  valueOptions.value = [];
+  sourceMap.label = 'name'
+  sourceMap.value = 'id'
   const { result } = await getUser_api(publicParams)
-  valueOptions.value = result?.map((m) => ({
-    label: m.name,
-    value: m.id,
-  }))
+  valueOptions.value = result
 }
 
 const getProductOptions = async () => {
+  valueOptions.value = [];
+  sourceMap.label = 'name'
+  sourceMap.value = 'id'
   const { result } = await getProduct_api(publicParams)
-  valueOptions.value = result?.map((m) => ({
-    label: m.name,
-    value: m.id,
-  }))
+  valueOptions.value = result
 }
 
 const getDeviceOptions = async () => {
+  valueOptions.value = []
+  sourceMap.label = 'name'
+  sourceMap.value = 'id'
   const { result } = await getDevice_api(publicParams)
-  valueOptions.value = result?.map((m) => ({
-    label: m.name,
-    value: m.id,
-  }))
+  valueOptions.value = result
 }
 
-const onChange = (e) => {
-  emit('update:modelValue', myValue.value)
+const formatText = (label) => {
+  if(Array.isArray(label)) {
+    return label.map(item => item[sourceMap.label] || item)
+  } else if(label[sourceMap.label]) {
+    return [label[sourceMap.label]]
+  }
 }
+const onChange = (e, label) => {
+  emit('update:modelValue', myValue.value)
+  if(label) {
+    emit('update:selectedItem', formatText(label))
+  } else {
+    emit('update:selectedItem', undefined)
+  }
+}
+
+
 
 const sourceMap = reactive({
   label: 'label',
@@ -178,6 +196,7 @@ const sourceMap = reactive({
 })
 /**类型是表单里的下拉框时 */
 const findValueOptions = async () => {
+  valueOptions.value = [];
   const existForms = flowStore.model.config.forms?.filter((f) => !f.isDelete)
   // 查询预览表单参数
   const params = {
@@ -206,12 +225,7 @@ const findValueOptions = async () => {
     sourceMap.label = 'text';
     sourceMap.value = 'value'
     const { result } = await dictionaryItemList(source.dictionary)
-    valueOptions.value = result?.map(item => {
-      return {
-        label: item.text,
-        value: item.value
-      }
-    })
+    valueOptions.value = result
   }
 }
 
@@ -242,6 +256,8 @@ watch(
         getDeviceOptions()
         break
       case 'switch':
+        sourceMap.label = 'label'
+        sourceMap.value = 'value'
         valueOptions.value = [
           {
             label: '是',
@@ -273,11 +289,9 @@ watch(
 )
 
 const searchTree = (arr: any[], _item: any) => {
-  console.log(arr, _item);
     let _data: any = undefined
     for(let i = 0; i < arr.length; i++) {
       if (arr[i].key === _item) {
-        console.log(arr[i], _item);
             _data = arr[i]
             break
         }

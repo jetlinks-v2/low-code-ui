@@ -57,9 +57,9 @@
       <j-form-item
         name="icon"
         label="流程图标"
-        :rules="[{ required: true, message: '请上传流程图标'}]"
+        :rules="[{ required: true, message: '请上传流程图标' }]"
       >
-      <j-radio-group v-model:value="form.icon" class="radio">
+        <j-radio-group v-model:value="form.icon" class="radio">
           <j-radio-button
             v-for="(item, index) of baseIcon"
             :value="item"
@@ -78,7 +78,7 @@
             :value="selected"
             :class="{ active: form.icon === selected }"
           >
-          <div class="upload-img-icon" @click="chooseIcon">
+            <div class="upload-img-icon" @click="chooseIcon">
               <ProImage
                 v-if="isImg(selected)"
                 :width="40"
@@ -86,7 +86,7 @@
                 :src="selected"
                 :preview="false"
               />
-              
+
               <AIcon
                 v-else
                 :type="selected || 'PlusOutlined'"
@@ -122,13 +122,13 @@ import { onlyMessage, getImage } from '@jetlinks/utils'
 import ChooseIcon from './ChooseIcon.vue'
 import { copy_api } from '@/api/process/instance'
 import { useRequest } from '@jetlinks/hooks'
-import { useClassified } from '@/hooks/useClassified'
 import { isImg } from '@/utils/comm'
+import { providerEnum } from '@/api/process/model'
 
 type FormType = {
   id: string
   name: string
-  classifiedId: string
+  classifiedId: string | undefined
   icon: string
 }
 
@@ -155,7 +155,6 @@ const baseIcon = [
   getImage(`/process/model/icon4.png`),
 ]
 
-const { classified } = useClassified()
 const selected = ref<string>('')
 const chooseIconRef = ref()
 const title = ref<string>('复制为模型')
@@ -164,11 +163,24 @@ const formRef = ref<any>()
 const form = reactive({
   id: props.data.id,
   name: `copy_${props.data.name}`,
-  classifiedId: props.data.classifiedId,
   icon: props.data.icon,
 } as FormType)
 
-// const { data: providerOptions } = useRequest(providerEnum)
+const { data: classified } = useRequest(providerEnum, {
+  immediate: true,
+  onSuccess(res) {
+    const op = res.result.map((item) => {
+      return {
+        label: item.text,
+        value: item.id,
+      }
+    })
+    form.classifiedId = op.some((i) => i.value === props.data.classifiedId)
+      ? props.data.classifiedId
+      : undefined
+    return op
+  },
+})
 
 const { loading, run } = useRequest(copy_api, {
   immediate: false,
@@ -209,9 +221,13 @@ const cancel = () => {
     emits('update:visible', false)
   }
 }
-watch(() => props.data.icon, (val)=>{
-  selected.value = baseIcon.some((i) => i === form.icon) ? '' : form.icon
-},{immediate: true})
+watch(
+  () => props.data.icon,
+  (val) => {
+    selected.value = baseIcon.some((i) => i === form.icon) ? '' : form.icon
+  },
+  { immediate: true },
+)
 </script>
 <style scoped lang="less">
 .upload-img-icon {

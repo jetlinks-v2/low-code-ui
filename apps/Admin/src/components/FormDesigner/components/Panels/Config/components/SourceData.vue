@@ -196,10 +196,13 @@ const rulesDic = [
     message: '请选择',
   },
   {
-    validator(_rule: any, value: string) {
+    async validator(_rule: any, value: string) {
+      if(!dic.value?.length){
+        await queryDictionary()
+      }
       const item = dic.value?.find((i) => i?.id === value)
       if (!item) {
-        return Promise.reject(`数字字典已被删除或禁用`)
+        return Promise.reject(`数据字典已被删除或禁用`)
       }
       return Promise.resolve()
     },
@@ -332,7 +335,6 @@ const getEnd = (id: string) => {
 }
 
 const onRadioChange = (e) => {
-  console.log(e, 'e')
   if (e === 'end') {
     emits('change', {
       type: 'end',

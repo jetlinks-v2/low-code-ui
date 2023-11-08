@@ -2,14 +2,14 @@
 <template>
   <page-container>
     <template v-if="build.length">
-      <TitleComponent data="流程搭建" />
+      <TitleComponent data="流程搭建" style="font-size: 24px;font-weight: 500;" />
       <div class="process">
         <MyCard v-for="item of build" :data="item"></MyCard>
       </div>
     </template>
 
     <template v-if="myProcessOptions.length">
-      <TitleComponent data="我的流程" />
+      <TitleComponent data="我的流程" style="font-size: 24px;font-weight: 500;" />
       <div class="process">
         <MyCard v-for="item of myProcessOptions" :data="item"></MyCard>
       </div>

@@ -98,8 +98,7 @@ import dayjs from 'dayjs'
 import { useClassified } from '@/hooks/useClassified'
 import Drawer from '@/views/process/me/Detail/index.vue'
 
-const activeKey = ref('1')
-const { classified, getText } = useClassified()
+const { classified } = useClassified()
 const tableRef = ref()
 const history = ref(false)
 const defaultColumns = [
