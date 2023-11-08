@@ -95,7 +95,7 @@ export const useMenuStore = defineStore('menu', () => {
 
         return item
       })
-      const workFlowMenu = [...BASIC_ROUTER_DATA, ...filterMenu]
+      const workFlowMenu = [ ...filterMenu, ...BASIC_ROUTER_DATA]
       const routes = handleMenus(cloneDeep(workFlowMenu), extraMenu, asyncRoutes) // 处理路由
 
       if (routes.length) {
@@ -110,7 +110,7 @@ export const useMenuStore = defineStore('menu', () => {
 
       handleMenusMap(routes, handleMenusMapById)
       siderMenus.value = handleSiderMenu(cloneDeep(filterMenu)) // 处理菜单
-      console.log('routes', siderMenus.value, routes)
+
     }
   }
 

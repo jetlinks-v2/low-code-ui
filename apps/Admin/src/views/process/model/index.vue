@@ -164,14 +164,14 @@ import FlowDesign from '@/views/process/model/Detail/FlowDesign/index.vue'
 import ShowCopy from '@/views/process/model/Detail/ShowCopy/index.vue'
 import { useFlowStore } from '@/store/flow'
 import { Modal } from 'jetlinks-ui-components'
+import { useMenuStore } from '@/store'
 
-const loading = ref(false)
+const menu = useMenuStore()
 const flowStore = useFlowStore()
 const step1 = ref()
 const step2 = ref()
 const step3 = ref()
 const { classified } = useClassified()
-const router = useRouter()
 const tableRef = ref()
 const params = ref({})
 const columns = [
@@ -455,11 +455,10 @@ const _view = (data) => {
  * @param data
  */
 const handleView = (data) => {
-  router.push({
-    path: '/flow-engine/model/detail',
-    query: {
-      id: data.id,
-    },
+  menu.jumpPage('process/model/Detail',{
+      query: {
+        id: data.id,
+      },
   })
 }
 
