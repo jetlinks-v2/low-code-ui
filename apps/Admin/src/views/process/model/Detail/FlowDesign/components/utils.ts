@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash-es'
+import { advancedComponents } from './const'
 
 /**
  * 通过节点id查找对应节点
@@ -194,21 +195,46 @@ export function sumValues(data: { [key: string]: number }) {
  * @param oldFormBinds 根节点配置好的表单
  * @returns 
  */
-export function setDefaultFormBinds(forms, type?: string, oldFormBinds?: any) {
+export function setDefaultFormBinds(forms, oldFormBinds?: any) {
     console.log('forms: ', forms);
+    console.log('oldFormBinds: ', oldFormBinds);
     const res = {};
     forms?.forEach((item) => {
-        const _fields = type === 'conditionSelect' ? item.flattenFields : item.fullInfo.configuration?.children
-        const _key = type === 'conditionSelect' ? item.key : item.formId
-        res[_key] = []
-        _fields?.forEach((p) => {
-            res[_key].push({
-                id: p.formItemProps.name,
-                required: true,
-                accessModes: oldFormBinds ? oldFormBinds[_key]?.find(f => f.id === p.key)?.accessModes : ['read'],
-            })
+        res[item.key] = []
+        item.flattenFields?.forEach((p) => {
+            // res[item.key].push({
+            //     id: p.formItemProps.name,
+            //     required: p.formItemProps.required,
+            //     accessModes: oldFormBinds ? (oldFormBinds[item.key]?.find(f => f.id === p.formItemProps.name)?.accessModes || ['read']) : ['read'],
+            // })
+
+            // 处理单选高级组件, 平铺keys至formBinds
+            if (
+                !(
+                    p.componentProps.hasOwnProperty('mode') &&
+                    p.componentProps.mode === 'multiple'
+                ) &&
+                advancedComponents.includes(p.type)
+            ) {
+                // 高级组件, 并且为单选模式时, 将componentProps.keys平铺存入formBinds
+                p.componentProps.keys?.forEach((k) => {
+                    res[item.key].push({
+                        id: k.config.source,
+                        required: p.formItemProps.required,
+                        accessModes: p.accessModes,
+                        ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
+                    })
+                })
+            } else {
+                res[item.key].push({
+                    id: p.formItemProps.name,
+                    required: p.formItemProps.required,
+                    accessModes: oldFormBinds ? (oldFormBinds[item.key]?.find(f => f.id === p.formItemProps.name)?.accessModes || ['read']) : ['read'],
+                })
+            }
         })
     })
+    console.log('res: ', res);
     return res
 }
 

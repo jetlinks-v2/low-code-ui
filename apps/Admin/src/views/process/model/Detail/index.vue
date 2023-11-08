@@ -83,26 +83,31 @@
       <ShowCopy ref="step3" :noQuery="true" />
     </div>
 
-    <j-modal v-model:visible="visible"  :width="300" @cancel="onCancel" @ok="onOk" :closable="false">
+    <j-modal
+      v-model:visible="visible"
+      :width="300"
+      @cancel="onCancel"
+      @ok="onOk"
+      :closable="false"
+    >
       <template #footer>
         <PermissionButton
-            @click="onCancel"
-            :hasPermission="true"
-            style="margin-right:12px;"
-          >
-            不保存
-          </PermissionButton>
+          @click="onCancel"
+          :hasPermission="true"
+          style="margin-right: 12px"
+        >
+          不保存
+        </PermissionButton>
         <PermissionButton
-            type="primary"
-            @click="onOk"
-            hasPermission="process/model:save"
-          >
-            保存
-          </PermissionButton>
+          type="primary"
+          @click="onOk"
+          hasPermission="process/model:save"
+        >
+          保存
+        </PermissionButton>
       </template>
-      <div class="model-content" >页面改动数据未保存</div>
+      <div class="model-content">页面改动数据未保存</div>
     </j-modal>
-
   </page-container>
 </template>
 
@@ -112,7 +117,7 @@ import BasicInfo from './BasicInfo/index.vue'
 import FlowDesign from './FlowDesign/index.vue'
 import ShowCopy from './ShowCopy/index.vue'
 import { detail_api, update_api, deploy_api } from '@/api/process/model'
-import { onlyMessage,LocalStore } from '@jetlinks/utils'
+import { onlyMessage, LocalStore } from '@jetlinks/utils'
 import { useFlowStore, defaultModel } from '@/store/flow'
 import { Modal } from 'ant-design-vue'
 import { cloneDeep } from 'lodash-es'
@@ -139,7 +144,7 @@ const saveLoading = ref(false)
 const deployLoading = ref(false)
 const isModal = ref(false)
 const visible = ref(false)
-let routerNext;
+let routerNext
 const oldData = ref(defaultModel)
 /**
  * 获取模型详情
@@ -216,6 +221,7 @@ const handleSave = (type?: string) => {
  */
 const validLoading = ref(false)
 const handleDeploy = () => {
+  deployLoading.value = true
   // 部署前, 查询表单是否被删除
   step1.value.getLatestFormList().then((res) => {
     validLoading.value = true
@@ -247,10 +253,14 @@ const handleDeploy = () => {
           saveAndDeploy()
         } else {
           onlyMessage('部署失败，流程配置内容不合规', 'error')
+          deployLoading.value = false
         }
       })
       .catch((err) => {
         //   console.log('handleDeploy err: ', err)
+      })
+      .finally(() => {
+        deployLoading.value = false
       })
   })
 }
@@ -282,20 +292,20 @@ const saveAndDeploy = () => {
     })
 }
 
-const onOk =async ()=>{
+const onOk = async () => {
   const params = {
     id: route.query.id,
     state: 'undeployed',
     model: JSON.stringify(flowStore.model),
   }
   const res = await update_api(params)
-  if(res.status === 200){
+  if (res.status === 200) {
     onlyMessage('保存成功')
     visible.value = false
     routerNext()
   }
 }
-const onCancel = ()=>{
+const onCancel = () => {
   visible.value = false
   routerNext()
 }
@@ -304,14 +314,12 @@ onMounted(() => {
   getFlowDetail()
 })
 
-
 // 数据是否更改
 const isChange = computed(
   () => JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model),
 )
 onBeforeRouteLeave((to, form, next) => {
-  console.log(flowStore.model,oldData.value)
-  console.log('====',JSON.stringify(oldData.value) === JSON.stringify(flowStore.model),)
+  console.log('to===', to)
   if (!isModal.value && isChange.value && LocalStore.get(TOKEN_KEY)) {
     visible.value = true
     routerNext = next
