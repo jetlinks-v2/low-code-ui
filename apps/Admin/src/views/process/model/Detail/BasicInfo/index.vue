@@ -36,6 +36,10 @@
   </div>
 </template>
 <script setup lang="ts">
+import {
+  handleFormList,
+  setDefaultFormBinds,
+} from '../FlowDesign/components/utils'
 import ConfigForm from './components/ConfigForm.vue'
 import { useFlowStore } from '@/store/flow'
 
@@ -67,10 +71,16 @@ const formData = reactive({
     get: () => flowStore.model.config.forms || [],
     set: (val) => {
       flowStore.model.config.forms = val
+      // 设置根节点默认的表单配置, 以供条件节点, 成员选择和展示抄送页面的变量查询
+      flowStore.model.nodes.props!.formBinds = setDefaultFormBinds(
+        handleFormList(val.map((i) => i.fullInfo)),
+        'conditionSelect',
+        flowStore.model.nodes.props!.formBinds,
+      )
       // @ts-ignore
-      if (!Object.keys(flowStore.model?.nodes?.props?.formBinds)?.length) {
-        flowStore.model.nodes.props!.formBinds = formToObj(val)
-      }
+      //   if (!Object.keys(flowStore.model?.nodes?.props?.formBinds)?.length) {
+      //     flowStore.model.nodes.props!.formBinds = formToObj(val)
+      //   }
     },
   }),
   assignedUser: computed({
