@@ -27,7 +27,9 @@
         style="max-width: 200px; min-width: 200px"
         class="variable-select"
         @clear="handleConditionClear(index)"
-        @select="(value, label) => handleConditionChange(value,label, item, index)"
+        @select="
+          (value, label) => handleConditionChange(value, label, item, index)
+        "
       >
         <template #title="{ name }">
           <j-ellipsis line-clamp="1">
@@ -93,7 +95,7 @@ import { queryFormNoPage_api, queryVariables_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import ConditionValueItem from './ConditionValueItem.vue'
 import { operatorMap } from './const'
-import { findVariableById, setDefaultFormBinds } from './utils'
+import { findVariableById, handleFormList, setDefaultFormBinds } from './utils'
 import { onlyMessage } from '@jetlinks/utils'
 import { cloneDeep } from 'lodash-es'
 
@@ -147,10 +149,11 @@ const getLatestFormList = async () => {
     ],
   }
   const { result } = await queryFormNoPage_api(params)
-
+  // 设置根节点模式表单字段"读"配置时, 保留原有的配置
   flowStore.model.nodes.props!.formBinds = setDefaultFormBinds(
-    result,
+    handleFormList(result),
     'conditionSelect',
+    flowStore.model.nodes.props!.formBinds,
   )
   getFormFields()
 }
@@ -190,7 +193,7 @@ const getFormFields = async () => {
   conditionOptions.value = filter(result)
   conditionSelect.value.forEach((item, index) => {
     const node = findVariableById(conditionOptions.value, item?.column)
-    if(!node) {
+    if (!node) {
       handleConditionClear(index)
     }
   })
