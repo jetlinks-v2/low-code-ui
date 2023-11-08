@@ -186,7 +186,12 @@
 
 <script setup lang="ts">
 import ConfigFormFields from './ConfigFormFields.vue'
-import { findNodeById, setDefaultFormBinds, isSelectMember } from './utils'
+import {
+  findNodeById,
+  setDefaultFormBinds,
+  isSelectMember,
+  handleFormList,
+} from './utils'
 import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
@@ -202,9 +207,13 @@ const props = defineProps({
 // 基础配置
 const basicFormRef = ref()
 const basicFormData = reactive({
-  formBinds:
-    props.node?.props?.formBinds ||
-    setDefaultFormBinds(flowStore.model.config?.forms),
+  //   formBinds:
+  //     props.node?.props?.formBinds ||
+  //     setDefaultFormBinds(flowStore.model.config?.forms),
+  formBinds: setDefaultFormBinds(
+    handleFormList(flowStore.model.config.forms?.map((i) => i.fullInfo)),
+    props.node?.props?.formBinds,
+  ),
   autoComplete: props.node?.props?.autoComplete,
   dealRequired: props.node?.props?.dealRequired,
   others: props.node?.props?.others || { defaultComment: '同意' },

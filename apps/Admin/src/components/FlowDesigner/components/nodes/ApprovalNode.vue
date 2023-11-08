@@ -79,7 +79,7 @@ const validate = (err) => {
     rejectTo,
     others,
   } = props.config.props
-
+  console.log('others: ', others);
   showError.value = true
   errorInfo.value = '未填写必填配置项'
   if (!name) {

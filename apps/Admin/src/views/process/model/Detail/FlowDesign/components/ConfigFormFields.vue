@@ -87,7 +87,10 @@
                   <div class="field-title">
                     <div class="name">
                       <j-ellipsis line-clamp="1">
-                        {{ field.formItemProps?.label || field.componentProps?.name }}
+                        {{
+                          field.formItemProps?.label ||
+                          field.componentProps?.name
+                        }}
                       </j-ellipsis>
                     </div>
                     <div class="permission">
@@ -149,6 +152,7 @@ import FormPreview from '@/components/FormDesigner/preview.vue'
 import TableFormPreview from './TableFormPreview.vue'
 import { PropType } from 'vue'
 import { getImage } from '@jetlinks/utils'
+import { advancedComponents } from './const'
 
 const flowStore = useFlowStore()
 
@@ -267,7 +271,7 @@ const getFormList = async () => {
     }
   })
   allFormList.value = cloneDeep(filterFormList.value)
-  console.log('filterFormList.value: ', filterFormList.value)
+  //   console.log('filterFormList.value: ', filterFormList.value)
   // 右侧预览数据处理
   initPreviewData(result)
 }
@@ -390,16 +394,42 @@ const handleOk = () => {
     forms.value[item.key] = []
     item.flattenFields?.forEach((p) => {
       if (p.accessModes.length) {
-        forms.value[item.key].push({
-          id: p.formItemProps.name,
-          required: true,
-          accessModes: p.accessModes,
-        })
+        // forms.value[item.key].push({
+        //   id: p.formItemProps.name,
+        //   required: p.formItemProps.required,
+        //   accessModes: p.accessModes,
+        // })
+        
+        // 处理单选高级组件, 平铺keys至formBinds
+        if (
+          !(
+            p.componentProps.hasOwnProperty('mode') &&
+            p.componentProps.mode === 'multiple'
+          ) &&
+          advancedComponents.includes(p.type)
+        ) {
+          // 高级组件, 并且为单选模式时, 将componentProps.keys平铺存入formBinds
+          p.componentProps.keys?.forEach((k) => {
+            forms.value[item.key].push({
+              id: k.config.source,
+              required: p.formItemProps.required,
+              accessModes: p.accessModes,
+              //   ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
+            })
+          })
+        } else {
+          forms.value[item.key].push({
+            id: p.formItemProps.name,
+            required: p.formItemProps.required,
+            accessModes: p.accessModes,
+          })
+        }
       }
     })
   })
   visible.value = false
-  //   console.log('forms.value: ', forms.value)
+  console.log('filterFormList.value: ', filterFormList.value)
+  console.log('forms.value: ', forms.value)
 }
 
 watch(
