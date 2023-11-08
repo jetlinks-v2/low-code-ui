@@ -323,12 +323,21 @@ const dealTable = (disabled) => {
     })
 }
 
-//递归处理布局组件的disabled
-const handleLayout = (arr,disabled)=>{
-   return arr.map(item=>{
-        item.componentProps.disabled = disabled
-        if(item.children){
-            item.children = handleLayout(item.children,disabled)
+//根据读写权限递归处理组件的disabled
+
+const handleDisabled = (arr,accessModes)=>{
+    // console.log('arr----',arr)
+    // console.log('accessModes----',accessModes)
+    const Modes = new Map()
+    accessModes.forEach(item=>{
+        Modes.set(item.id,item.accessModes)
+    })
+    return arr.map(item=>{
+        if(Modes.has(item.formItemProps.name)){
+            item.componentProps.disabled = !Modes.get(item.formItemProps.name)?.includes('write')
+        }
+        if(item.children && item.children.length!==0){
+            item.children = handleDisabled(item.children,accessModes)
         }
         return item
     })
@@ -359,31 +368,13 @@ const dealForm = (nodes) => {
             const id = md5(item + '|' + props.info.others?.formVersion[item])
             bindMap.set(id, nodes.props.formBinds[item])
         })
-        // console.log('bindMap',bindMap)
-        // console.log('formValue.value',formValue.value)
-        //循环表单匹配对应节点表单ID
-        formValue.value = formValue.value.filter((item) => {
-            if (bindMap.has(item.formId)) {
-                // 循环表单项 根据节点 配置表单项属性 过滤掉节点没有配置的表单项
-                // console.log(bindMap,'map')
-                item.configuration.children = item.configuration.children.filter((i) => {
-                    return bindMap.get(item.formId).some((k) => {
-                        if (k.id === i.formItemProps.name) {
-                            // console.log('k=========',k,i)
-                            i.componentProps.disabled = !k?.accessModes?.includes('write')
-                            //处理布局组件
-                            if(i.children){
-                                i.children = handleLayout(i.children,!k?.accessModes?.includes('write'))
-                            }
-                            return true
-                        }
-                    })
-                })
-                return true
-            } else {
-                return false
+        formValue.value = formValue.value.map(item=>{
+            if(bindMap.has(item.formId)){
+                item.configuration.children = handleDisabled(item.configuration.children,bindMap.get(item.formId))
             }
+            return item
         })
+        // console.log('formValue.value',formValue.value)
         dealTable()
     } else {
         nodes?.children ? dealForm(nodes.children) : ''
