@@ -111,7 +111,7 @@ const formList = ref<FormsProps[]>([])
 // 表单版本
 const formVersion = reactive({})
 // 草稿
-const draftId = ref<string>('')
+const draftId = ref<string | undefined>('')
 const editDraft = ref<Boolean>(false)
 
 const tableData = reactive({})
@@ -179,8 +179,8 @@ const cancel = () => {
         const param = startProcess(list)
         // 没有草稿_create
         const res = draftId.value
-          ? await save_api(param)
-          : await create_api({ ...param, start: false })
+          ? await save_api({...param, id: draftId.value})
+          : await create_api({ ...param, start: false, id: route.query.id })
 
         if (res.success) {
           onlyMessage('保存成功')
@@ -211,8 +211,8 @@ const submit = async () => {
     .then(async (res) => {
       const param = startProcess(res, true)
       const resp = editDraft.value
-        ? await start_api(param)
-        : await create_api(param)
+        ? await start_api({...param, id: draftId.value})
+        : await create_api({...param, id: route.query.id})
       if (resp.success) {
         onlyMessage('提交成功')
         menu.jumpPage('process/me/initiate', {})
@@ -259,6 +259,7 @@ onMounted(() => {
             getDetail(res.result.data[0].id)
           },
           onCancel() {
+            // draftId.value = undefined
             getProcess()
           },
         })
@@ -282,7 +283,7 @@ const getDetail = (id: string) => {
 const startProcess = (list: any, start: boolean | undefined = undefined) => {
   let flag = 0
   const param = {
-    id: draftId.value || route.query.id,
+    // id: draftId.value || route.query.id,
     data: {
       form: formList.value?.map((i) => ({
         formId: editDraft.value
