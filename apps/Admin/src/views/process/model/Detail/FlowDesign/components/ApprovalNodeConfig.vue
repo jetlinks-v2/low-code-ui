@@ -186,7 +186,12 @@
 
 <script setup lang="ts">
 import ConfigFormFields from './ConfigFormFields.vue'
-import { findNodeById, setDefaultFormBinds, isSelectMember } from './utils'
+import {
+  findNodeById,
+  setDefaultFormBinds,
+  isSelectMember,
+  handleFormList,
+} from './utils'
 import { useFlowStore } from '@/store/flow'
 
 const flowStore = useFlowStore()
@@ -202,9 +207,13 @@ const props = defineProps({
 // 基础配置
 const basicFormRef = ref()
 const basicFormData = reactive({
-  formBinds:
-    props.node?.props?.formBinds ||
-    setDefaultFormBinds(flowStore.model.config?.forms),
+  //   formBinds:
+  //     props.node?.props?.formBinds ||
+  //     setDefaultFormBinds(flowStore.model.config?.forms),
+  formBinds: setDefaultFormBinds(
+    handleFormList(flowStore.model.config.forms?.map((i) => i.fullInfo)),
+    props.node?.props?.formBinds,
+  ),
   autoComplete: props.node?.props?.autoComplete,
   dealRequired: props.node?.props?.dealRequired,
   others: props.node?.props?.others || { defaultComment: '同意' },
@@ -239,7 +248,7 @@ const nodeList = ref<{ label: string; value: string }[]>([
  */
 const getRejectNodes = (nodeId) => {
   const _parentNode = findNodeById(flowStore.model.nodes, nodeId)
-  if (_parentNode.type && ['ROOT', 'APPROVAL', 'DEAL'].includes(_parentNode.type)) {
+  if (_parentNode?.type === 'APPROVAL' || _parentNode?.type === 'DEAL') {
     nodeList.value.push({ label: _parentNode.name, value: _parentNode.id })
   }
   // 父节点存在, 并且可以驳回的节点没有找到 继续查找

@@ -89,3 +89,8 @@ export const operatorMap = {
     'role': operatorSelect,
     'text': operatorInput,
 }
+
+// 高级组件
+export const advancedComponents = [
+    'org', 'user', 'role', 'product', 'device'
+]
