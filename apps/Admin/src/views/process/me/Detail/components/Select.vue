@@ -7,12 +7,16 @@
                     <AIcon type="SearchOutlined" @click="search" />
                 </template>
             </j-input>
-            <j-tree :tree-data="treeData" v-model:selectedKeys="selectedKeys" @select="treeSelect" :fieldNames="{
-                key:'id',
-                title:'name'
-            }"
-                v-if="treeData.length"></j-tree>
-            <j-empty v-else style="margin-top: 100px;"></j-empty>
+            <div>
+                <j-scrollbar >
+                <j-tree v-if="treeData.length" :tree-data="treeData" v-model:selectedKeys="selectedKeys" @select="treeSelect" :fieldNames="{
+                    key: 'id',
+                    title: 'name'
+                }" ></j-tree>
+                <j-empty v-else style="margin-top: 100px;"></j-empty>
+            </j-scrollbar>
+            </div>
+           
         </div>
         <div :class="{ right: type !== 'user' }">
             <pro-search :columns="columns" target="system-role" type="simple" @search="handelSearch" />
@@ -21,16 +25,12 @@
                     { name: 'createTime', order: 'desc' },
                     { name: 'id', order: 'desc' },
                 ]
-            }" 
-            :columns="columns" 
-            :params="queryParams" 
-            :request="queryUser" 
-            :rowSelection="{
-                selectedRowKeys: _selectedRowKeys,
-                hideSelectAll:true,
-                onSelect: onSelectChange,
-                onSelectNone: onSelectNone
-            }">
+            }" :columns="columns" :params="queryParams" :request="queryUser" :rowSelection="{
+    selectedRowKeys: _selectedRowKeys,
+    hideSelectAll: true,
+    onSelect: onSelectChange,
+    onSelectNone: onSelectNone
+}">
                 <template #status="slotProps">
                     <BadgeStatus :status="slotProps.status" :text="slotProps.status ? '正常' : '禁用'" :statusNames="{
                         1: 'success',
@@ -199,17 +199,17 @@ const onSelectNone = () => {
     emit('selected', {})
 }
 
-const orgAll = async (orgs)=>{
-    const org = orgs?.map(item=>item.id)
+const orgAll = async (orgs) => {
+    const org = orgs?.map(item => item.id)
     const res = await getOrg_api({
-        paging:false,
-        terms:[{
-            column:'id',
-            termType:'in',
-            value:org
+        paging: false,
+        terms: [{
+            column: 'id',
+            termType: 'in',
+            value: org
         }]
     })
-    if(res.status === 200){
+    if (res.status === 200) {
         treeInitData.value = res.result
         treeData.value = res.result
         selectedKeys.value = [res.result[0]?.id]
@@ -236,13 +236,13 @@ watch(() => selectId.value, () => {
 onMounted(() => {
     console.log('props.candidates', props.candidates)
     if (props.type !== 'user') {
-       if(props.type === 'org'){
-        orgAll(props.candidates.org)
-       }else{
-        treeInitData.value = cloneDeep(props.candidates?.[props.type])
-        treeData.value = cloneDeep(treeInitData.value)
-       }
-       
+        if (props.type === 'org') {
+            orgAll(props.candidates.org)
+        } else {
+            treeInitData.value = cloneDeep(props.candidates?.[props.type])
+            treeData.value = cloneDeep(treeInitData.value)
+        }
+
     } else {
         //取角色id查询
         userIds.value = cloneDeep(props.candidates?.user)?.map((i) => {
@@ -262,7 +262,8 @@ onMounted(() => {
         height: 100%;
         padding: 0 10px;
         box-sizing: border-box;
-        .search-input{
+
+        .search-input {
             margin-bottom: 10px;
         }
     }
