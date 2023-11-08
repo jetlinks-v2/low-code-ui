@@ -16,6 +16,11 @@ export const extraMenu = {
       name: '菜单详情'
     },
   ],
+  process: [{
+    code: 'process/monitor',
+    name: '流程监控',
+    url: '/monitor'
+  }],
   'process/model': [{
     code: 'process/model/Detail',
     name: '流程详情',

@@ -54,6 +54,7 @@
             @click="handleDeploy"
             hasPermission="process/model:deploy"
             :disabled="!isChange && flowDetail?.state?.value === 'deployed'"
+            :loading="deployLoading"
           >
             部署
             <template #icon>
@@ -63,30 +64,6 @@
               </j-tooltip>
             </template>
           </PermissionButton>
-          <!-- <j-button type="primary" @click="handleSave" :loading="saveLoading">
-            保存
-            <template #icon>
-              <j-tooltip placement="right">
-                <template #title>
-                  仅保存配置数据，不校验填写内容的合规性。
-                </template>
-                <AIcon type="QuestionCircleOutlined" />
-              </j-tooltip>
-            </template>
-          </j-button> -->
-          <!-- <j-button
-            type="primary"
-            @click="handleDeploy"
-            :disabled="!isChange && flowDetail?.state?.value === 'deployed'"
-          >
-            部署
-            <template #icon>
-              <j-tooltip placement="right">
-                <template #title> 配置内容需要通过合规性校验。 </template>
-                <AIcon type="QuestionCircleOutlined" />
-              </j-tooltip>
-            </template>
-          </j-button> -->
         </div>
       </div>
     </j-card>
@@ -159,6 +136,7 @@ const step2 = ref()
 const step3 = ref()
 const nextLoading = ref(false)
 const saveLoading = ref(false)
+const deployLoading = ref(false)
 const isModal = ref(false)
 const visible = ref(false)
 let routerNext;
@@ -185,7 +163,7 @@ const getFlowDetail = async () => {
  */
 const handleNext = async () => {
   // 点击下一步先保存数据, 再校验->#19300
-  handleSave('next')
+  //   handleSave('next') #19300 恢复之前交互 下一步不保存数据
   // 从基础信息点击下一步前, 查询最新表单, 验证已选表单是否被全部删除
   if (current.value === 0) await step1.value.getLatestFormList()
   // 触发校验
@@ -286,17 +264,22 @@ const saveAndDeploy = () => {
     state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
     model: JSON.stringify(flowStore.model),
   }
-  update_api(params).then(() => {
-    deploy_api(route.query.id as string).then((res) => {
-      if (res.success) {
-        onlyMessage('部署成功', 'success')
-        isModal.value = true
-        router.go(-1)
-      } else {
-        onlyMessage('部署失败', 'error')
-      }
+  deployLoading.value = true
+  update_api(params)
+    .then(() => {
+      deploy_api(route.query.id as string).then((res) => {
+        if (res.success) {
+          onlyMessage('部署成功', 'success')
+          isModal.value = true
+          router.go(-1)
+        } else {
+          onlyMessage('部署失败', 'error')
+        }
+      })
     })
-  })
+    .finally(() => {
+      deployLoading.value = false
+    })
 }
 
 const onOk =async ()=>{

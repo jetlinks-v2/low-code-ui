@@ -82,7 +82,6 @@ export const form = {
     ]
 }
 
-
 //获取高级组件的source-key的对应关系
 const fromItem = (prams: any) => {
     const obj = {}
@@ -139,3 +138,28 @@ export const handleFormList = (form: any) => {
         return obj
     })
 }
+// data为可编辑表格单行数据 map：fromItem函数处理的source-key关系对象
+export const handleData = (data,map)=>{
+    Object.keys(map).forEach(item=>{
+        Object.keys(map[item].keysMap).forEach(i=>{
+            Object.keys(data).forEach(e=>{
+                if(e === i){
+                    let obj = {}
+                    obj[map[item].keysMap[i]] = data[i]
+                    data[item] = obj
+                    delete data[i]
+                }
+            })
+        })
+    })
+    return data
+}
+
+export const handleSingleData = (form: any) =>{
+    const  formObj = fromItem(form)
+    return form.data.map((item=>{
+        const obj = item.data.map(i=>handleData(i,formObj))
+        return obj
+    }))
+}
+

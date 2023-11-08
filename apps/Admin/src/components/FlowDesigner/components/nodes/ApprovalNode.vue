@@ -49,6 +49,20 @@ const content = computed(() => {
 })
 
 /**
+ * 节点绑定表单字段后, 更改了基础配置的表单
+ * 如基础配置删除表单, 则节点表单配置中的formBinds删除对应的表单配置
+ */
+const updateFormBinds = () => {
+  // 基础信息配置的表单
+  const basicFormsKeys = flowStore.model.config.forms?.map((m) => m.formId)
+  // 基础表单配置更改之前的节点表单配置
+  const oldFormBinds = props.config.props.formBinds
+  Object.keys(oldFormBinds || {}).forEach((key) => {
+    if (!basicFormsKeys?.includes(key)) delete oldFormBinds[key]
+  })
+}
+
+/**
  * 校验节点
  */
 const validate = (err) => {
@@ -129,57 +143,9 @@ const validate = (err) => {
 }
 
 defineExpose({ validate })
-
-//校验数据配置的合法性
-// const validate = (err) => {
-//   try {
-//     return (showError.value = ![`validate_${props.config.props.assignedType}`](
-//       err,
-//     ))
-//   } catch (e) {
-//     return true
-//   }
-// }
-// const validate_ASSIGN_USER = (err) => {
-//   if (props.config.props.assignedUser.length > 0) {
-//     return true
-//   } else {
-//     errorInfo.value = '请指定审批人员'
-//     err.push(`${props.config.name} 未指定审批人员`)
-//     return false
-//   }
-// }
-// const validate_SELF_SELECT = (err) => {
-//   return true
-// }
-// const validate_LEADER_TOP = (err) => {
-//   return true
-// }
-// const validate_LEADER = (err) => {
-//   return true
-// }
-// const validate_ROLE = (err) => {
-//   if (props.config.props.role.length <= 0) {
-//     errorInfo.value = '请指定负责审批的系统角色'
-//     err.push(`${props.config.name} 未指定审批角色`)
-//     return false
-//   }
-//   return true
-// }
-// const validate_SELF = (err) => {
-//   return true
-// }
-// const validate_FORM_USER = (err) => {
-//   if (props.config.props.formUser === '') {
-//     errorInfo.value = '请指定表单中的人员组件'
-//     err.push(`${props.config.name} 审批人为表单中人员，但未指定`)
-//     return false
-//   }
-//   return true
-// }
-// const validate_REFUSE = (err) => {
-//   return true
-// }
+onMounted(() => {
+  updateFormBinds()
+})
 </script>
 
 <style scoped></style>

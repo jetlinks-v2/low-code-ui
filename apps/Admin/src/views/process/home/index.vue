@@ -86,17 +86,17 @@ const myProcess = [
   },
   {
     name: '已办事项',
-    code: 'process/me',
+    code: 'process/me/finished',
     icon: '/process/finished.png',
   },
   {
     name: '我发起的',
-    code: 'process/me/cc',
+    code: 'process/me/initiate',
     icon: '/process/me-initiate.png',
   },
   {
     name: '抄送给我',
-    code: 'process/me/initiate',
+    code: 'process/me/cc',
     icon: '/process/cc.png',
   },
 ]
