@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash-es'
+
 /**
  * 通过节点id查找对应节点
  * 节点存在branches[]和children{}下级关系
@@ -154,24 +156,15 @@ export function filterFormByName(list, name) {
     // console.log('list: ', list);
     const _res = []
     list?.forEach(item => {
-        const _fields = item.configuration?.children || []
+        const _fields = item.flattenFields || []
         const _filterFields = _fields.filter(f => {
-            if (f.formItemProps.label) {
-                // 常规组件
-                return f.formItemProps.label.includes(name)
-            } else {
-                // 布局组件没有formItemProps.label, 直接用name匹配
-                return f.name.includes(name)
-            }
+            return f.formItemProps.label.includes(name)
         })
         if (_filterFields.length) {
             // @ts-ignore
             _res.push({
                 ...item,
-                configuration: {
-                    ...item.configuration,
-                    children: _filterFields
-                }
+                flattenFields: _filterFields
             })
         }
     })
@@ -198,19 +191,21 @@ export function sumValues(data: { [key: string]: number }) {
  * 表单字段全部默认有"读"权限, 设置formBinds字段初始值
  * @param forms 
  * @param type conditionSelect: 条件节点设置默认值, forms为接口返回的数据
+ * @param oldFormBinds 根节点配置好的表单
  * @returns 
  */
-export function setDefaultFormBinds(forms, type?: string) {
+export function setDefaultFormBinds(forms, type?: string, oldFormBinds?: any) {
+    console.log('forms: ', forms);
     const res = {};
     forms?.forEach((item) => {
-        const _fields = type === 'conditionSelect' ? item.configuration?.children : item.fullInfo.configuration?.children
+        const _fields = type === 'conditionSelect' ? item.flattenFields : item.fullInfo.configuration?.children
         const _key = type === 'conditionSelect' ? item.key : item.formId
         res[_key] = []
         _fields?.forEach((p) => {
             res[_key].push({
                 id: p.formItemProps.name,
                 required: true,
-                accessModes: ['read'],
+                accessModes: oldFormBinds ? oldFormBinds[_key]?.find(f => f.id === p.key)?.accessModes : ['read'],
             })
         })
     })
@@ -232,4 +227,99 @@ export const isSelectMember = async (_, value) => {
     } else {
         return Promise.resolve()
     }
+}
+
+/**
+ * 表单字段, 树形数据扁平化
+ * @param fields 
+ * @param parent 
+ * @param depth 
+ * @returns 
+ */
+export function flattenTree(fields, parent = null, depth = 0) {
+    let flattened: any[] = []
+    for (let field of fields) {
+        field.depth = depth
+        field.parent = parent
+        // if (field.children?.length) {
+        //     flattened = flattened.concat(flattenTree(field.children, field, depth + 1))
+        // } else {
+        //     // if (!field.formItemProps.hasOwnProperty('isLayout')) flattened.push(field)
+        //     if (!(
+        //         field.formItemProps.hasOwnProperty('isLayout') &&
+        //         !field.formItemProps.isLayout
+        //     )) flattened.push(field)
+        // }
+        if (field.formItemProps?.hasOwnProperty('isLayout') &&
+            !field.formItemProps.isLayout) {
+            flattened = flattened.concat(flattenTree(field.children, field, depth + 1))
+        } else {
+            flattened.push(field)
+        }
+    }
+    return flattened
+}
+
+/**
+ * 根据key更新表单字段可编辑状态
+ * @param fields 表单下的所有字段
+ * @param currentField 当前操作的字段
+ */
+export function updateFieldDisabled(fields, currentField) {
+    for (let i = 0; i < fields.length; i++) {
+        if (fields[i].key === currentField.key) {
+            // 设置布局组件禁用状态
+            fields[i].componentProps.disabled = !currentField.accessModes.includes('write')
+            // 设置布局组件内部组件禁用状态
+            fields[i].children?.forEach(item => {
+                item.componentProps.disabled = fields[i].componentProps.disabled
+                item.children?.forEach(inner => {
+                    inner.componentProps.disabled = fields[i].componentProps.disabled
+                })
+            })
+            return
+        }
+        if (fields[i].children?.length) {
+            updateFieldDisabled(fields[i].children, currentField)
+        }
+    }
+    return
+}
+
+/**
+ * 处理表单数据, 用于变量查询接口参数数据结构处理
+ * @param data 
+ * @returns 
+ */
+export function handleFormList(data) {
+    return data?.map((m) => {
+        // 布局组件内部字段, 取出平铺
+        let _layoutFields = cloneDeep(
+            m.configuration?.children?.filter(
+                (f) =>
+                    f.formItemProps.hasOwnProperty('isLayout') &&
+                    !f.formItemProps.isLayout,
+            ),
+        )
+        _layoutFields = cloneDeep(flattenTree(_layoutFields))
+
+        // 平铺字段
+        const flattenFields = [
+            ...m.configuration?.children?.filter(
+                (f) => !(
+                    f.formItemProps.hasOwnProperty('isLayout') &&
+                    !f.formItemProps.isLayout
+                ),
+            ),
+            ..._layoutFields,
+        ]
+        flattenFields?.forEach((p) => {
+            p['accessModes'] = ['read']
+        })
+        return {
+            ...m,
+            accessModes: ['read'],
+            flattenFields,
+        }
+    })
 }

@@ -29,7 +29,7 @@
                 自动通过
                 <j-tooltip placement="right">
                   <template #title>
-                    某候选人在上一个审批节点中担任过审批人角色，开启后其在当前节点的审批意见为自动通过
+                    某候选人在上一个审批/办理节点中担任过审批人角色，开启后其在当前节点的审批意见为自动通过
                   </template>
                   <AIcon type="InfoCircleOutlined" />
                 </j-tooltip>

@@ -81,16 +81,13 @@
                 </template>
                 <div
                   class="form-fields"
-                  v-for="(field, idx) in form.configuration?.children"
+                  v-for="(field, idx) in form.flattenFields"
                   :key="'field' + idx"
                 >
-                  <!-- ?.filter(
-                    (f) => !unDisplayFieldsType.includes(f.type),
-                  ) -->
                   <div class="field-title">
                     <div class="name">
                       <j-ellipsis line-clamp="1">
-                        {{ field.formItemProps?.label || field.name }}
+                        {{ field.formItemProps?.label || field.componentProps?.name }}
                       </j-ellipsis>
                     </div>
                     <div class="permission">
@@ -113,7 +110,7 @@
           <j-scrollbar height="525">
             <div
               class="preview-item"
-              v-for="(item, index) in allFormList"
+              v-for="(item, index) in previewData"
               :key="index"
             >
               <div class="name">
@@ -146,7 +143,7 @@
 <script setup lang="ts">
 import { queryFormNoPage_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
-import { filterFormByName } from './utils'
+import { filterFormByName, updateFieldDisabled, flattenTree } from './utils'
 import { cloneDeep } from 'lodash-es'
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import TableFormPreview from './TableFormPreview.vue'
@@ -184,22 +181,26 @@ const permissions = ref([
  */
 const loading = ref(false)
 const keywords = ref('')
+// 左侧展示的表单
 const filterFormList = ref<any[] | undefined>([])
+// 所有表单数据, 用于前端筛选
 const allFormList = ref<any[] | undefined>([])
+// 右侧表单预览数据
+const previewData = ref<any[]>([])
 // 不用展示的表单字段类型: 卡片, 网格, 选项卡, 折叠面板, 弹性间距...
 const unDisplayFieldsType = ref(['card', 'grid', 'tabs', 'collapse', 'space'])
+// 过滤已经删除的表单
+const existForms = computed(() =>
+  flowStore.model.config.forms?.filter((f) => !f.isDelete),
+)
 const getFormList = async () => {
-  // 过滤已经删除的表单
-  const existForms = flowStore.model.config.forms?.filter((f) => !f.isDelete)
-
-  // 查询预览表单参数
   const params = {
     paging: false,
     terms: [
       {
         column: 'key',
         termType: 'in',
-        value: existForms?.map((m) => m.formId),
+        value: existForms.value?.map((m) => m.formId),
       },
       {
         column: 'latest',
@@ -211,55 +212,92 @@ const getFormList = async () => {
   const { result } = await queryFormNoPage_api(params)
   // 左侧表单读写操作列表
   filterFormList.value = result?.map((m) => {
-    const _fields = m.configuration?.children
-    // ?.filter(
-    //   (f) => !unDisplayFieldsType.value.includes(f.type),
-    // )
+    // 布局组件内部字段, 取出平铺
+    let _layoutFields = cloneDeep(
+      m.configuration?.children?.filter(
+        (f) =>
+          f.formItemProps.hasOwnProperty('isLayout') &&
+          !f.formItemProps.isLayout,
+      ),
+    )
+    _layoutFields = cloneDeep(flattenTree(_layoutFields))
+
+    // 平铺字段
+    const flattenFields = [
+      ...m.configuration?.children?.filter(
+        // (f) => !f.formItemProps.hasOwnProperty('isLayout'),
+        (f) =>
+          !(
+            f.formItemProps.hasOwnProperty('isLayout') &&
+            !f.formItemProps.isLayout
+          ),
+      ),
+      ..._layoutFields,
+    ]
+    // console.log('flattenFields: ', flattenFields)
+
     // 已经存在的字段
     const existFields = forms.value[m.key]
     if (existFields && existFields.length) {
-      _fields?.forEach((p) => {
+      flattenFields?.forEach((p) => {
         const _currentField = existFields.find(
           (f) => f.id === p.formItemProps.name,
         )
         p['accessModes'] = _currentField ? _currentField.accessModes : ['read']
-        // 只有"写"权限时, 表单才可编辑
-        p.componentProps.disabled = !p.accessModes.includes('write')
       })
 
-      // 如果表单下每个字段都有读写, 则表单也有读写权限
       return {
-        accessModes: _fields?.every((e) => e.accessModes.length === 2)
+        ...m,
+        accessModes: flattenFields?.every((e) => e.accessModes.length === 2)
           ? ['read', 'write']
           : ['read'],
-        ...m,
-        multiple: existForms?.find((f) => f.formId === m.key)?.multiple,
+        multiple: existForms.value?.find((f) => f.formId === m.key)?.multiple,
+        flattenFields,
       }
     } else {
-      _fields?.forEach((p) => {
+      flattenFields?.forEach((p) => {
         p['accessModes'] = ['read']
-        // 初始状态没有权限, 不可编辑
-        p.componentProps.disabled = true
       })
       return {
-        accessModes: ['read'],
         ...m,
-        multiple: existForms?.find((f) => f.formId === m.key)?.multiple,
+        accessModes: ['read'],
+        multiple: existForms.value?.find((f) => f.formId === m.key)?.multiple,
+        flattenFields,
       }
     }
   })
-
-  // 所有表单数据, 用于前端筛选
   allFormList.value = cloneDeep(filterFormList.value)
-  handleSearch()
+  console.log('filterFormList.value: ', filterFormList.value)
+  // 右侧预览数据处理
+  initPreviewData(result)
+}
+
+/**
+ * 预览数据初始化状态
+ * @param data
+ */
+const initPreviewData = (data) => {
+  previewData.value = data.map((m) => {
+    // m.configuration.children = m.configuration.children
+    return {
+      ...m,
+      multiple: existForms.value?.find((f) => f.formId === m.key)?.multiple,
+    }
+  })
+  // 设置预览数据初始读写状态
+  filterFormList.value?.forEach((form) => {
+    form.flattenFields?.forEach((field) => {
+      updatePreviewData(form, field)
+    })
+  })
 }
 
 const handleSearch = () => {
   filterFormList.value = filterFormByName(allFormList.value, keywords.value)
   filterFormList.value?.forEach((item) => {
-    item.accessModes = item.configuration?.children
-      // ?.filter((f) => !unDisplayFieldsType.value.includes(f.type))
-      ?.every((e) => e.accessModes.length === 2)
+    item.accessModes = item.flattenFields?.every(
+      (e) => e.accessModes.length === 2,
+    )
       ? ['read', 'write']
       : ['read']
   })
@@ -289,13 +327,10 @@ const handleAllCheck = () => {
  * 表单读写勾选/取消勾选
  */
 const handleFormCheck = (form: any) => {
-  const _fields = form.configuration?.children
-  //   ?.filter(
-  //     (f) => !unDisplayFieldsType.value.includes(f.type),
-  //   )
-  _fields?.forEach((p) => {
+  form.flattenFields?.forEach((p) => {
     p.accessModes = form.accessModes
-    p.componentProps.disabled = !p.accessModes.includes('write')
+    // 右侧预览数据更新
+    updatePreviewData(form, p)
   })
   // 设置全部内容全选状态
   setCheckAll()
@@ -305,21 +340,29 @@ const handleFormCheck = (form: any) => {
  * 字段勾选/取消"写", 自动勾选/取消"读"
  */
 const handleFieldCheck = (form, field) => {
-  // 字段有写权限, 必有读
-  if (field.accessModes.length === 1 && field.accessModes[0] === 'write') {
-    field.accessModes = ['read', 'write']
-  }
-  // 只有"写"权限时, 表单才可编辑
-  field.componentProps.disabled = !field.accessModes.includes('write')
-
+  // 左侧读写操作交互
   // 设置表单全选状态
-  form.accessModes = form.configuration?.children
-    // ?.filter((f) => !unDisplayFieldsType.value.includes(f.type))
-    ?.every((e) => e.accessModes.length === 2)
+  form.accessModes = form.flattenFields?.every(
+    (e) => e.accessModes.length === 2,
+  )
     ? ['read', 'write']
     : ['read']
   // 设置全部内容全选状态
   setCheckAll()
+
+  // 右侧预览数据更新
+  updatePreviewData(form, field)
+}
+
+/**
+ * 右侧预览数据根据左侧读写权限, 实时更新可编辑状态
+ */
+const updatePreviewData = (form, field) => {
+  previewData.value?.forEach((item) => {
+    if (item.key === form.key) {
+      updateFieldDisabled(item.configuration?.children, field)
+    }
+  })
 }
 
 const tableData = ref<any>([{}])
@@ -344,12 +387,8 @@ const getTableColumns = (fields: any[]) => {
  */
 const handleOk = () => {
   filterFormList.value?.forEach((item) => {
-    const _fields = item.configuration?.children
-    // ?.filter(
-    //   (f) => !unDisplayFieldsType.value.includes(f.type),
-    // )
     forms.value[item.key] = []
-    _fields?.forEach((p) => {
+    item.flattenFields?.forEach((p) => {
       if (p.accessModes.length) {
         forms.value[item.key].push({
           id: p.formItemProps.name,
