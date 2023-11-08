@@ -164,6 +164,7 @@ const filterLine = (item, index) => {
             show: isShow ? false : true
          }
       }
+      //自动通过的节点
       if(item.others.state==='completed'|| item.others.state==='reject'){
          return {
             ...item,
@@ -172,11 +173,13 @@ const filterLine = (item, index) => {
             actionType: item.others.state === 'completed' ? nodeState(nodeType, item.others.autoOperation) : 'reject',
             actionColor: item.others.state === 'completed' ? 'completed' : 'reject',
             show: true,
+            childrenNode: {
+               others: { taskName: item.others.taskName, afterState: item.others.state }
+            }
          }
       }
 
    } else if (item.action === 'taskLinkChanged') {
-      //完成
       if (item.others.afterState === 'completed' || item.others.afterState === 'reject') {
          return {
             ...item,
