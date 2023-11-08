@@ -122,6 +122,7 @@
               </div>
               <FormPreview v-if="!item.multiple" :data="item.configuration" />
               <TableFormPreview
+                v-else
                 v-model:data-source="tableData"
                 :columns="
                   getTableColumns(
@@ -130,7 +131,7 @@
                     ),
                   )
                 "
-                v-else
+
               />
             </div>
           </j-scrollbar>
@@ -378,7 +379,7 @@ const getTableColumns = (fields: any[]) => {
   _columns?.forEach((item) => {
     tableData.value[0][item.dataIndex] = undefined
   })
-
+  console.log(_columns)
   return _columns
 }
 
