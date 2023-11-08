@@ -74,7 +74,6 @@ const formData = reactive({
       // 设置根节点默认的表单配置, 以供条件节点, 成员选择和展示抄送页面的变量查询
       flowStore.model.nodes.props!.formBinds = setDefaultFormBinds(
         handleFormList(val.map((i) => i.fullInfo)),
-        'conditionSelect',
         flowStore.model.nodes.props!.formBinds,
       )
       // @ts-ignore

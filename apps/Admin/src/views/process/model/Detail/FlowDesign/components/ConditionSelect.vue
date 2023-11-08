@@ -131,30 +131,30 @@ const conditionOptions = ref([])
  * 获取最新的表单字段, 并赋值给根节点的formBinds, 根节点赋值了才能查出变量
  */
 const getLatestFormList = async () => {
-  const existForms = flowStore.model.config.forms?.filter((f) => !f.isDelete)
-  // 查询预览表单参数
-  const params = {
-    paging: false,
-    terms: [
-      {
-        column: 'key',
-        termType: 'in',
-        value: existForms?.map((m) => m.formId),
-      },
-      {
-        column: 'latest',
-        termType: 'eq',
-        value: 'true',
-      },
-    ],
-  }
-  const { result } = await queryFormNoPage_api(params)
-  // 设置根节点模式表单字段"读"配置时, 保留原有的配置
-  flowStore.model.nodes.props!.formBinds = setDefaultFormBinds(
-    handleFormList(result),
-    'conditionSelect',
-    flowStore.model.nodes.props!.formBinds,
-  )
+//   const existForms = flowStore.model.config.forms?.filter((f) => !f.isDelete)
+//   // 查询预览表单参数
+//   const params = {
+//     paging: false,
+//     terms: [
+//       {
+//         column: 'key',
+//         termType: 'in',
+//         value: existForms?.map((m) => m.formId),
+//       },
+//       {
+//         column: 'latest',
+//         termType: 'eq',
+//         value: 'true',
+//       },
+//     ],
+//   }
+//   const { result } = await queryFormNoPage_api(params)
+//   // 设置根节点模式表单字段"读"配置时, 保留原有的配置
+//   flowStore.model.nodes.props!.formBinds = setDefaultFormBinds(
+//     handleFormList(result),
+//     'conditionSelect',
+//     flowStore.model.nodes.props!.formBinds,
+//   )
   getFormFields()
 }
 
