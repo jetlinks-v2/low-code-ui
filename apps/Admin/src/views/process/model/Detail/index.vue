@@ -154,12 +154,12 @@ const getFlowDetail = async () => {
   const { result } = await detail_api(route.query.id as string)
   flowDetail.value = result
   const model = JSON.parse(result.model || '{}')
-  //   console.log('model: ', model)
+    console.log('model: ', model)
   if (result.model !== '') {
     oldData.value = cloneDeep(model)
   }
 
-  flowStore.setModel(model)
+  flowStore.setModel(cloneDeep(model))
   flowStore.setModelBaseInfo(result)
 }
 
