@@ -66,6 +66,7 @@
       />
       <ConditionValueItem
         v-model:modelValue="item.value"
+        v-model:selectedItem="item.selectedItem"
         :operator="item.selectedTermType"
         :formItemComponent="item.selectedNodeId"
         :full-id="findVariableById(conditionOptions, item?.column)?.fullId"
@@ -112,6 +113,7 @@ interface IConditionSelect {
   termTypeName?: string | undefined
   valueName?: string | undefined
   selectedNodeId?: string //选中的节点ID
+  selectedItem?: any[]
 }
 
 const emit = defineEmits(['update:value'])
@@ -155,7 +157,7 @@ const getLatestFormList = async () => {
   getFormFields()
 }
 
-/**
+/** 
  * 获取条件下拉数据
  */
 const getFormFields = async () => {
