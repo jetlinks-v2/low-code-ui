@@ -86,6 +86,7 @@ import FormPreview from '@/components/FormDesigner/preview.vue'
 import md5 from 'md5'
 import { getMeProcessList } from '@/api/process/me'
 import { getImage } from '@jetlinks/utils'
+import { useMenuStore } from '@/store'
 
 interface FormsProps {
   formId: string
@@ -95,6 +96,7 @@ interface FormsProps {
   data?: any
 }
 
+const menu = useMenuStore()
 const loading = ref<boolean>(false)
 const router = useRouter()
 const route = useRoute()
@@ -182,11 +184,10 @@ const cancel = () => {
 
         if (res.success) {
           onlyMessage('保存成功')
-          router.push({
-            path: '/flow-engine/me/initiate',
-            query: {
-              state: 'ready',
-            },
+          menu.jumpPage('process/me/initiate',{
+              query: {
+                state: 'ready',
+              },
           })
         }
       },
@@ -214,7 +215,7 @@ const submit = async () => {
         : await create_api(param)
       if (resp.success) {
         onlyMessage('提交成功')
-        router.push('/flow-engine/me/initiate')
+        menu.jumpPage('process/me/initiate', {})
       }
     })
     .finally(() => {
@@ -288,7 +289,7 @@ const startProcess = (list: any, start: boolean | undefined = undefined) => {
           ? i.formId
           : md5(i.formId + '|' + formVersion[i.formId]),
         data: i.multiple ? tableData[i.formId][0] : list[flag++],
-        formKey: start ? Object.keys(formVersion).toString() : undefined
+        formKey: Object.keys(formVersion).toString()
       })),
       variables: {},
     },
