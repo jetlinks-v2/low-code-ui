@@ -130,7 +130,7 @@ const validate = (err) => {
   //       name: ['formBinds'],
   //     })
   //   }
-  else if (others.defaultComment.length > 64) {
+  else if (others.defaultComment?.length > 64) {
     err.push({
       errors: ['审批意见默认值最多输入64个字符'],
       name: ['others', 'defaultComment'],
