@@ -1,23 +1,23 @@
 <template>
   <div class="template">
-    <div class="select">
-      <j-button
-        v-for="item in variables"
-        :key="item.value"
-        @click="getPosition(item)"
-        >{{ item.label }}</j-button
-      >
-    </div>
+<!--    <div class="select">-->
+<!--      <j-button-->
+<!--        v-for="item in variables"-->
+<!--        :key="item.value"-->
+<!--        @click="getPosition(item)"-->
+<!--        >{{ item.label }}</j-button-->
+<!--      >-->
+<!--    </div>-->
 
     <div class="box">
+<!--      <div-->
+<!--        class="model-show-input"-->
+<!--        contentEditable="plaintext-only"-->
+<!--        ref="show"-->
+<!--        tabIndex="-1"-->
+<!--      ></div>-->
       <div
         class="model-show-input"
-        contentEditable="plaintext-only"
-        ref="show"
-        tabIndex="-1"
-      ></div>
-      <div
-        class="model-hide-input"
         contentEditable="plaintext-only"
         @scroll="onScroll"
         @input="onInput"
@@ -26,7 +26,7 @@
         @keypress="onKeypress"
       ></div>
     </div>
-    <!-- <div class="select">
+    <div class="select">
       <span class="tip"
         >请将{{ name }}最终长度控制在{{ maxlength }}个字符内</span
       >
@@ -37,13 +37,14 @@
         @select="selectVariable"
       >
       </j-select>
-    </div> -->
+    </div>
   </div>
 </template>
 
 <script setup>
 import { watch, ref, onMounted } from 'vue'
 import { randomString } from '@jetlinks/utils'
+import { useSelection } from '@/hooks'
 
 const props = defineProps({
   value: {
@@ -73,9 +74,13 @@ const offset = reactive({
   end: 0,
 })
 
+
+
 // 绑定节点
 const hide = ref() // 隐藏的输入框的节点
 const show = ref()
+
+const { insertNode: selectionInsert } = useSelection(hide)
 
 const regHidden = (html) => {
   return html.replace(/\{(.*?)\}/g, ($1, $2) => {
@@ -96,17 +101,17 @@ const regHandle = (html) => {
   })
 }
 
-watch(
-  () => [props.value, !!show.value, props.variables],
-  () => {
-    if (show.value) {
-      show.value.innerHTML = regHandle(props.value)
-    }
-  },
-  {
-    immediate: true,
-  },
-)
+// watch(
+//   () => [props.value, !!show.value, props.variables],
+//   () => {
+//     if (show.value) {
+//       hide.value.innerHTML = regHandle(props.value)
+//     }
+//   },
+//   {
+//     immediate: true,
+//   },
+// )
 
 const onKeypress = (e) => {
   const _event = e || window.event
@@ -115,35 +120,9 @@ const onKeypress = (e) => {
   }
 }
 
-const getPosition = (item) => {
-  const contentEditableDiv = document.querySelector(`.${className.value}`)
-  // 获取被选中的内容，起点和终点在同一位置为光标，不同位置为选区
-  const selection = window.getSelection()
-  // 被选中/focus的元素
-  const anchorNode = selection.anchorNode
-  if (!anchorNode) return
-  // 父节点
-  const parentNode = selection.anchorNode.parentNode
-  const range = selection.getRangeAt(0)
-  const variable = props.variables.find((i) => i.value === item.value)
-  const textNode = document.createElement('span')
-  textNode.innerText = `{${item.label}}`
-  textNode.style.color = variable?.color
-  textNode.dataset.id = item.value
-
-  if (anchorNode == contentEditableDiv || parentNode == contentEditableDiv) {
-    range.insertNode(textNode)
-    range.collapse(true)
-  }
-
-  // 光标移到最后
-  const r = document.createRange()
-  r.selectNodeContents(contentEditableDiv)
-  r.collapse(false)
-  const s = window.getSelection()
-  s.removeAllRanges()
-  s.addRange(r)
-  handleValue()
+const getColor = (key) => {
+  const variable = props.variables.find((i) => i.value === key)
+  return variable?.color
 }
 
 const handleValue = () => {
@@ -153,6 +132,7 @@ const handleValue = () => {
     if (item.nodeName === 'SPAN') {
       if (item.dataset?.id) {
         str += item.innerText.replace(/\{(.*?)\}/g, ($1, $2) => {
+          console.log($1, $2)
           const variable = props.variables.find((item) => item.label === $2)
           if (variable) {
             return `{var:${item.dataset?.id}:${$2}}`
@@ -170,12 +150,33 @@ const handleValue = () => {
   emits('update:value', str)
 }
 
-const onInput = () => {
+const onInput = (v) => {
   handleValue()
+
 }
 
 const onScroll = () => {
   // show.value?.scrollTop = hide.value?.scrollTop;
+}
+
+const insertText = (val) => {
+  const valArr = regHidden(hide.value.innerHTML)?.split('')
+  const len = offset.end - offset.start
+  valArr.splice(offset.start, len, val)
+
+
+  // hide.value = valArr.join('').substring(0, 256)
+  emits('update:value', valArr.join('').substring(0, 256))
+}
+
+const selectVariable = (key, { label }) => {
+  // emits('update:value', hide.value + `{${label}}`)
+  const spanNode = document.createElement('span');
+  spanNode.innerText = `{${label}}`
+  spanNode.dataset.id = key
+  spanNode.style.color = getColor(key)
+  selectionInsert(spanNode)
+  insertText(`{${label}}`)
 }
 
 onMounted(() => {
