@@ -158,7 +158,7 @@ import {
   update_api,
   providerEnum
 } from '@/api/process/model'
-import { useClassified } from '@/hooks/useClassified'
+// import { useClassified } from '@/hooks/useClassified'
 import { isImg } from '@/utils/comm'
 import BasicInfo from '@/views/process/model/Detail/BasicInfo/index.vue'
 import FlowDesign from '@/views/process/model/Detail/FlowDesign/index.vue'
@@ -172,7 +172,7 @@ const flowStore = useFlowStore()
 const step1 = ref()
 const step2 = ref()
 const step3 = ref()
-const { classified } = useClassified()
+// const { classified } = useClassified()
 const tableRef = ref()
 const params = ref({})
 const columns = [
