@@ -173,8 +173,16 @@ const filterLine = (item, index) => {
             actionType: item.others.state === 'completed' ? nodeState(nodeType, item.others.autoOperation) : 'reject',
             actionColor: item.others.state === 'completed' ? 'completed' : 'reject',
             show: true,
-            childrenNode: {
-               others: { taskName: item.others.taskName, afterState: item.others.state }
+            // childrenNode: {
+            //    others: { 
+            //       taskName: item.others.taskName, 
+            //       afterState: item.others.state,
+            //       // weight: item.others.identity.weight
+            //    }
+            // },
+            others:{
+               ...item.others,
+               weight: item.others.identity.weight
             }
          }
       }
@@ -237,7 +245,10 @@ const handleChange = (arr) => {
       //节点状态
       const childrenNode = noShowList.find(e => {
          if (e.action === 'taskStateChanged' && item.action === 'taskLinkChanged') {
-            return e.traceId === item.traceId
+            return e.traceId === item.traceId 
+         }
+         if (e.action === 'taskStateChanged' && item.action === 'taskAddLink') {
+            return e.taskId === item.taskId && e.traceId === item.traceId
          }
       })
 
