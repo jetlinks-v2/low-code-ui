@@ -5,6 +5,8 @@
     :width="1000"
     @cancel="close"
     @ok="submitData"
+    :destroyOnClose="true"
+    :maskClosable="false"
   >
     <j-radio-group v-model:value="sourceType" @change="changeSourceType">
       <a-radio-button value="tissue">按组织</a-radio-button>
@@ -101,10 +103,9 @@
 </template>
 
 <script lang="ts" setup>
-// import { getDepartmentList_api } from '@/api/user'
 import { getUserList, getRoleList, getTissue } from '@/api/form'
 import { onMounted, ref, watch } from 'vue'
-import { cloneDeep, map } from 'lodash-es'
+import { map } from 'lodash-es'
 
 const sourceType = ref('tissue')
 const props = defineProps({

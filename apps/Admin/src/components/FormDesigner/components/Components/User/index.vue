@@ -1,25 +1,29 @@
 <template>
-  <j-select
-    placeholder="请选择"
-    :value="__value"
-    :open="false"
-    :showArrow="false"
-    @focus="showModal"
-    :options="selectOptions"
-    :mode="mode"
-    :disabled="disabled"
-    :size="size"
-    @change="onChange"
-    style="width: 100%"
-  >
-  </j-select>
-  <UserChoice
-    v-if="modalVisible"
-    @closeModal="closeModal"
-    @selectedUser="selectedUser"
-    :selected="selectData"
-    :mode="mode"
-  ></UserChoice>
+  <div>
+    <j-select
+      placeholder="请选择"
+      :value="__value"
+      :open="false"
+      :showArrow="false"
+      @focus="showModal"
+      :options="selectOptions"
+      :mode="mode"
+      :disabled="disabled"
+      :size="size"
+      @change="onChange"
+      style="width: 100%"
+    >
+    </j-select>
+    <!-- <j-button type="primary" @click="showModal">用户选择</j-button>
+    <j-tag v-for="item in __value" :key="item">{{ item }}</j-tag> -->
+    <UserChoice
+      v-if="modalVisible"
+      @closeModal="closeModal"
+      @selectedUser="selectedUser"
+      :selected="selectData"
+      :mode="mode"
+    ></UserChoice>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -51,7 +55,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:value','change'])
+const emit = defineEmits(['update:value', 'change'])
 
 const selectData: any = ref()
 const modalVisible = ref(false)
@@ -116,7 +120,7 @@ const queryUser = () => {
 queryUser()
 
 const onChange = (_val: any) => {
-  const _arr = selectData.value.filter(i => _val.includes(i.id))
+  const _arr = selectData.value.filter((i) => _val.includes(i.id))
   saveData(_arr)
 }
 
@@ -124,7 +128,9 @@ watch(
   () => props.value,
   () => {
     if (props.mode !== 'multiple') {
-      selectData.value = Array.isArray(props?.value) ? [props.value?.[0]] : props.value
+      selectData.value = Array.isArray(props?.value)
+        ? [props.value?.[0]]
+        : props.value
     } else {
       selectData.value = Array.isArray(props?.value) ? props?.value : []
     }

@@ -5,6 +5,8 @@
     @cancel="closeModal"
     :width="1000"
     @ok="submitData"
+    :destroyOnClose="true"
+    :maskClosable="false"
   >
     <pro-search
       type="simple"
