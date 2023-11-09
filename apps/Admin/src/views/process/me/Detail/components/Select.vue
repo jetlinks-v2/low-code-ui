@@ -2,21 +2,22 @@
     <div class="box">
         <div class="left" v-if="type !== 'user'">
             <j-input v-model:value="searchValue" :placeholder="type === 'org' ? '请输入组织名称' : '请输入角色'" class="search-input"
-                allowClear @pressEnter="search">
+                allowClear @pressEnter="search" @change="search">
                 <template #suffix>
-                    <AIcon type="SearchOutlined" @click="search" />
+                    <AIcon type="SearchOutlined" />
                 </template>
             </j-input>
             <div>
-                <j-scrollbar >
-                <j-tree v-if="treeData.length" :tree-data="treeData" v-model:selectedKeys="selectedKeys" @select="treeSelect" :fieldNames="{
-                    key: 'id',
-                    title: 'name'
-                }" ></j-tree>
-                <j-empty v-else style="margin-top: 100px;"></j-empty>
-            </j-scrollbar>
+                <j-scrollbar>
+                    <j-tree v-if="treeData.length" :tree-data="treeData" v-model:selectedKeys="selectedKeys"
+                        @select="treeSelect" :fieldNames="{
+                            key: 'id',
+                            title: 'name'
+                        }"></j-tree>
+                    <j-empty v-else style="margin-top: 100px;"></j-empty>
+                </j-scrollbar>
             </div>
-           
+
         </div>
         <div :class="{ right: type !== 'user' }">
             <pro-search :columns="columns" target="system-role" type="simple" @search="handelSearch" />
@@ -46,6 +47,7 @@
 import { cloneDeep } from 'lodash-es';
 import { getUserList } from '@/api/process/me'
 import { getOrg_api } from '@/api/process/model'
+import { filterTreeNodes } from '@jetlinks/utils';
 
 const props = defineProps({
     type: {
@@ -106,10 +108,7 @@ const tableRef = ref()
 const userIds = ref([])
 const search = () => {
     if (searchValue.value) {
-        treeData.value = treeInitData.value.filter((i) => {
-            return i.title.includes(searchValue.value)
-        })
-        // console.log(treeData.value)
+        treeData.value = filterTreeNodes(cloneDeep(treeInitData.value),searchValue.value,'name')
     } else {
         treeData.value = cloneDeep(treeInitData.value)
     }

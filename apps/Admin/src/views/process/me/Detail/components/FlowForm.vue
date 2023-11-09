@@ -13,8 +13,8 @@
                         <img :src="getImage(`/flow-designer/preview-form.png`)" style="height: 16px" />
                         {{ item?.formName }}
                     </div>
-                    <FormPreview v-if="!item.multiple" :value="item.data" :data="item.configuration" ref="formRef" :disabled="disable"
-                        @state-change="(data) => getFormData(data, index)"/>
+                    <FormPreview v-if="!item.multiple" :value="item.data" :data="item.configuration" ref="formRef"
+                        :disabled="disable" @state-change="(data) => getFormData(data, index)" />
                     <div v-else style="background-color: #fff;">
                         <QuickEditTable validate ref="tableRef" :data="item.data" :columns="item.configuration"
                             :scroll="{ x: 1300, y: 700 }">
@@ -101,7 +101,7 @@ const candidates = ref()
 //存放表单暂存数据
 const formData = ref({})
 //需要转换数据的组件类型
-const tableType = ["device","product","role","user","org"]
+const tableType = ["device", "product", "role", "user", "org"]
 const addTableData = (item) => {
     let obj = {}
     item.configuration.map((i) => {
@@ -113,7 +113,7 @@ const addTableData = (item) => {
 const getFormData = (data, index) => {
     formData.value[index] = data
 }
-const disable = computed(()=>props.type !=='todo')
+const disable = computed(() => props.type !== 'todo')
 
 const onSave = (value) => {
     // btnLoading.value = true
@@ -151,10 +151,10 @@ const onSave = (value) => {
                     }
                 }
             ]
-            _complete(props.info.currentTaskId,value? {
+            _complete(props.info.currentTaskId, value ? {
                 form: submitData.value,
                 commands: commands
-            }:{form: submitData.value}).then((res) => {
+            } : { form: submitData.value }).then((res) => {
                 if (res.status === 200) {
                     onlyMessage('提交成功')
                     emit('close')
@@ -167,7 +167,7 @@ const onSave = (value) => {
 const dealTableData = (value) => {
     const keysMap = new Map()
     value.configuration.map((item) => {
-        if(tableType.includes(item.type)){
+        if (tableType.includes(item.type)) {
             keysMap.set(item.dataIndex, item.componentProps?.keys)
         }
     })
@@ -231,7 +231,7 @@ const onClick = async (value) => {
             }
             data.push({
                 formId: i.formId,
-                formKey:i.formKey,
+                formKey: i.formKey,
                 data: Array.isArray(i.data) ? i.data : formData.value[index]
             })
         })
@@ -258,7 +258,7 @@ const onClick = async (value) => {
             res.forEach((i, index) => {
                 data.push({
                     formId: formValue.value[index].formId,
-                    formKey:formValue.value[index].formKey,
+                    formKey: formValue.value[index].formKey,
                     data: Array.isArray(i) ? i : {
                         ...formValue.value[index].data,
                         ...i
@@ -300,21 +300,21 @@ const dealTable = (disabled) => {
         if (i.multiple) {
             i?.configuration?.children.map((item) => {
                 let rules
-                if(item?.formItemProps?.rules){
+                if (item?.formItemProps?.rules) {
                     rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }, ...item?.formItemProps?.rules] : [...item?.formItemProps?.rules]
-                }else{
+                } else {
                     rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }] : []
                 }
                 tableColumn.push({
                     title: item.formItemProps?.label,
                     dataIndex: item.formItemProps?.name,
                     type: item?.type,
-                    width:200,
+                    width: 200,
                     disabled: disabled ? true : item.componentProps.disabled,
                     form: {
                         rules: rules
                     },
-                    componentProps:item.componentProps,
+                    componentProps: item.componentProps,
                 })
             })
             // console.log(tableColumn,'___')
@@ -323,22 +323,33 @@ const dealTable = (disabled) => {
     })
 }
 
-//根据读写权限递归处理组件的disabled
-
-const handleDisabled = (arr,accessModes)=>{
-    // console.log('arr----',arr)
-    // console.log('accessModes----',accessModes)
-    const Modes = new Map()
-    accessModes.forEach(item=>{
-        Modes.set(item.id,item.accessModes)
+const handleLayout = (arr, disabled) => {
+    return arr.map(item => {
+        item.componentProps.disabled = disabled
+        if (item.children && item.children.length !== 0) {
+            item.children = handleDisabled(item.children, disabled)
+        }
+        return item
     })
-    return arr.map(item=>{
-        if(Modes.has(item.formItemProps.name)){
-            item.componentProps.disabled = !Modes.get(item.formItemProps.name)?.includes('write')
+}
+
+//根据读写权限递归处理组件的disabled
+const handleDisabled = (arr, accessModes) => {
+    const Modes = new Map()
+    accessModes.forEach(item => {
+        Modes.set(item.id, item.accessModes)
+    })
+    return arr.map(item => {
+        if (Modes.has(item.formItemProps.name)) {
+            const disabled = !Modes.get(item.formItemProps.name)?.includes('write')
+            if (!item.formItemProps.isLayout) {
+                item.componentProps.disabled = disabled
+            }
         }
-        if(item.children && item.children.length!==0){
-            item.children = handleDisabled(item.children,accessModes)
+        if (item.children && item.children.length !== 0) {
+            item.children = item.formItemProps.isLayout ? handleLayout(item.children, disabled) : handleDisabled(item.children, accessModes)
         }
+        // console.log('====', item)
         return item
     })
 }
@@ -368,13 +379,13 @@ const dealForm = (nodes) => {
             const id = md5(item + '|' + props.info.others?.formVersion[item])
             bindMap.set(id, nodes.props.formBinds[item])
         })
-        formValue.value = formValue.value.map(item=>{
-            if(bindMap.has(item.formId)){
-                item.configuration.children = handleDisabled(item.configuration.children,bindMap.get(item.formId))
+        formValue.value = formValue.value.map(item => {
+            if (bindMap.has(item.formId)) {
+                item.configuration.children = handleDisabled(item.configuration.children, bindMap.get(item.formId))
             }
             return item
         })
-        // console.log('formValue.value',formValue.value)
+        console.log('formValue.value', formValue.value)
         dealTable()
     } else {
         nodes?.children ? dealForm(nodes.children) : ''
@@ -439,7 +450,7 @@ watch(() => props.info, () => {
     }
 }
 
-:deep(.ant-modal-header){
-    border-bottom: 1px solid #ffffff; 
+:deep(.ant-modal-header) {
+    border-bottom: 1px solid #ffffff;
 }
 </style>

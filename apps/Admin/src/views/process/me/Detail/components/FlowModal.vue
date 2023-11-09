@@ -1,6 +1,6 @@
 
 <template>
-    <j-modal visible :width="type === 'submit' ? 900 : 400" :footer="null" @cancel="emit('close')">
+    <j-modal visible :width="type === 'submit' ? 900 : 400" :footer="null" @cancel="emit('close')" :maskClosable="false">
         <j-form :layout="'vertical'" ref="formRef" :model="modelRef" v-if="type !== 'submit'">
             <div class="title">{{ title }}</div>
             <div>
