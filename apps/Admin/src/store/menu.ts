@@ -80,11 +80,15 @@ export const useMenuStore = defineStore('menu', () => {
       const filterMenu = result.filter(item => ['process', 'web_ide'].includes(item.code)).map(item => {
         if (item.code === 'process') {
           item.redirect = `${item.url}/home`
-          item.children.unshift({
-            code: 'process/home',
-            name: '',
-            url: item.redirect,
-          })
+          item.children =  [
+            {
+              code: 'process/home',
+              name: '',
+              url: item.redirect,
+            },
+            ...(item.children || [])
+          ]
+
           item.meta = {
             hideChildrenInMenu: true
           }
