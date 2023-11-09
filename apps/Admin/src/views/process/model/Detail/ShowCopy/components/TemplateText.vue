@@ -1,23 +1,26 @@
 <template>
   <div class="template">
     <div class="box">
-      <j-textarea
-        :value="hide"
-        :placeholder="placeholder"
-        :auto-size="{ minRows: 4 }"
-        :bordered="false"
+      <div
+        class="model-show-input"
+        contentEditable="plaintext-only"
+        ref="show"
+        tabIndex="-1"
+        :data-placeholder="placeholder"
+      ></div>
+      <div
+        class="model-hide-input"
+        contentEditable="plaintext-only"
+        @input="onInput"
         :class="className"
-        @change="onChange"
-        @focus="focus"
-        @blur="focus"
-        :maxlength="256"
-      />
-      <div class="html">
-        <span v-html="titleHtml"></span>
-      </div>
+        ref="hide"
+        @keypress="onKeypress"
+      ></div>
     </div>
     <div class="select">
-      <span class="tip">请将{{name}}最终长度控制在{{maxlength}}个字符内</span>
+      <span class="tip"
+        >请将{{ name }}最终长度控制在{{ maxlength }}个字符内</span
+      >
       <j-select
         style="width: 120px; text-align: left"
         placeholder="添加变量"
@@ -30,8 +33,9 @@
 </template>
 
 <script setup>
-import { watch, ref } from 'vue'
+import { watch, ref, onMounted } from 'vue'
 import { randomString } from '@jetlinks/utils'
+import { useSelection } from '@/hooks'
 
 const props = defineProps({
   value: {
@@ -50,87 +54,110 @@ const props = defineProps({
     type: String,
   },
   maxlength: {
-    type: Number
-  }
+    type: Number,
+  },
 })
 
 const emits = defineEmits(['update:value'])
 const className = ref(`template-textarea--${randomString(4)}`)
-const offset = reactive({
-  start: 0,
-  end: 0
-})
 
 // 绑定节点
 const hide = ref() // 隐藏的输入框的节点
+const show = ref()
 
-// 根据选择的变量找出颜色
-const getColor = (str) => {
-  return (
-    props.variables?.filter((item) => item?.label === str)?.[0]?.color
-  )
-}
+const { insertNode: selectionInsert } = useSelection(hide)
 
-// 正则匹配{}中间内容，并替换成<span style="color: 随机颜色"></span>${getColor($2)}
-const replace = (str) => {
-  return str.replace(/\n/g, '<br/>').replace(/\{(.*?)\}/g, ($1, $2) => {
-    return `<span style="color: ${getColor($2)}">${$1}</span>`
+const regHidden = (html) => {
+  return html.replace(/\{(.*?)\}/g, ($1, $2) => {
+    const _arr = $2.split(':')
+    return _arr?.length === 3
+      ? `<span data-id=${_arr[1]}>{${_arr[2]}}</span>`
+      : $1
   })
 }
 
-const titleHtml = computed(() => {
-  return replace(hide.value || '')
-})
+const getColor = (key) => {
+  const variable = props.variables.find((i) => i.value === key)
+  return variable?.color
+}
 
-const focus = () => {
-  getOffset()
+const regHandle = (html) => {
+  return html.replace(/\{(.*?)\}/g, ($1, $2) => {
+    const _arr = $2.split(':')
+    const _color = getColor(_arr?.[1])
+    return _arr?.length === 3 && _color
+      ? `<span style="color: ${_color}">{${_arr[2]}}</span>`
+      : $1
+  })
 }
 
 watch(
-  () => props.value,
+  () => [props.value, !!show.value, props.variables],
   () => {
-    hide.value = props.value
+    if (show.value) {
+      show.value.innerHTML = regHandle(props.value)
+    }
   },
   {
     immediate: true,
+    deep: true,
   },
 )
 
-const getOffset = () => {
-  const textAreaEl = document.querySelector(`.${className.value}`)
-  if (textAreaEl) {
-    offset.start = textAreaEl.selectionStart
-    offset.end = textAreaEl.selectionEnd
+const onKeypress = (e) => {
+  const _event = e || window.event
+  if (_event.keyCode === 13) {
+    _event.returnValue = false
   }
 }
 
-const onChange = (e) => {
-  getOffset()
-  emits('update:value', e.target.value)
+const handleValue = () => {
+  const _children = hide.value?.childNodes
+  let str = ''
+  _children.forEach((item) => {
+    if (item.nodeName === 'SPAN') {
+      if (item.dataset?.id) {
+        str += item.innerText.replace(/\{(.*?)\}/g, ($1, $2) => {
+          const variable = props.variables.find((item) => item.label === $2)
+          if (variable) {
+            return `{var:${item.dataset?.id}:${$2}}`
+          } else {
+            return $1
+          }
+        })
+      } else {
+        str += item.innerText
+      }
+    } else {
+      str += item?.textContent
+    }
+  })
+  emits('update:value', str)
 }
 
-const insertText = (val) => {
-  const valArr = hide.value.split('')
-  const len = offset.end - offset.start
-  valArr.splice(offset.start, len, val)
-  // hide.value = valArr.join('').substring(0, 256)
-  emits('update:value', valArr.join('').substring(0, 256))
+const onInput = () => {
+  handleValue()
 }
 
-const selectVariable = (_, { label }) => {
-  // emits('update:value', hide.value + `{${label}}`)
-  insertText(`{${label}}`)
+const selectVariable = (key, { label }) => {
+  const spanNode = document.createElement('span')
+  spanNode.innerText = `{${label}}`
+  spanNode.dataset.id = key
+  // spanNode.style.color = getColor(key)
+  selectionInsert(spanNode)
+  handleValue()
 }
 
+onMounted(() => {
+  hide.value.innerHTML = regHidden(props.value)
+})
 </script>
 
 <style lang="less" scoped>
 .template {
   position: relative;
   width: 100%;
-  min-height: 155px;
   border: 1px solid #d9d9d9;
-  padding: 10px;
 
   .box {
     position: relative;
@@ -138,20 +165,39 @@ const selectVariable = (_, { label }) => {
     height: 100px;
     overflow-y: auto;
 
-    textarea {
-      color: rgba(0, 0, 0, 0);
+    .model-hide-input {
+      width: 100%;
+      padding: 12px 12px 0 12px;
+      height: auto;
+      min-height: 99px;
+      max-height: 70px;
+      position: absolute;
+      overflow: auto;
+      overflow-x: hidden;
+      color: transparent;
       background-color: transparent;
-      caret-color: black; // 光标颜色
-      word-break: break-all;
+      caret-color: black; // 可能部分浏览器不生效
     }
 
-    .html {
-        position: absolute;
-        top: 0;
-        left: 0;
-        padding: 4px 11px;
-        pointer-events: none;
-        word-break: break-all;
+    .model-show-input {
+      width: 100%;
+      padding: 12px 12px 0 12px;
+      height: auto;
+      min-height: 99px;
+      position: absolute;
+      overflow: auto;
+      overflow-x: hidden;
+      background-color: white;
+
+      &:empty:before {
+        content: attr(data-placeholder);
+        color: lightgray;
+        text-overflow: ellipsis;
+      }
+    }
+
+    [contenteditable] {
+      outline: none;
     }
   }
 
@@ -160,7 +206,7 @@ const selectVariable = (_, { label }) => {
     align-items: center;
     display: flex;
     justify-content: space-between;
-
+    padding: 10px;
     .tip {
       color: #00000073;
     }

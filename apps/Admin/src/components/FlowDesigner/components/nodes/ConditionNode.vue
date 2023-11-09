@@ -118,18 +118,19 @@ const content = computed(() => {
     formatValue(item),
   )
   return _conditionDesc.length
-    ? String(_conditionDesc).replaceAll(',', '、')
+    ? _conditionDesc.join('')
     : '请配置条件'
 })
 
 const formatValue = (item) => {
+  const condition = `${item.type === 'and' ? '并且' : item.type === 'or' ? '或者' : ''}`
   switch (item.termType) {
     case 'in':
-      return `${item.columnName || ''} 在 ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''} 之中`
+      return ` ${condition} ${item.columnName || ''} 在 ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''} 之中`
     case 'nin':
-      return `${item.columnName || ''} 不在 ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''} 之中`
+      return ` ${condition} ${item.columnName || ''} 不在 ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''} 之中`
     default: 
-      return `${item.columnName || ''} ${item.termTypeName || ''} ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''}`
+      return ` ${condition} ${item.columnName || ''} ${item.termTypeName || ''} ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''}`
   }
 }
 
@@ -137,39 +138,19 @@ const formatValue = (item) => {
  * 校验节点
  */
 const validate = (err) => {
-  const { name } = props.config
   const { terms } = props.config.props?.condition?.configuration
-  const { children } = props.config
 
   showError.value = true
   errorInfo.value = '配置项错误'
-  if (!name) {
-    err.push({
-      errors: ['条件节点名称不能为空'],
-      name: ['name'],
-    })
-  } else if (!children || !Object.keys(children).length) {
-    err.push({
-      errors: ['条件节点下未配置审批/办理节点'],
-      name: ['children'],
-    })
-    errorInfo.value = '条件节点下未配置审批/办理节点'
-  } else if (
+  if (
     !terms ||
     !terms.length ||
-    !terms.some((item) => Boolean(Object.keys(item).length)) ||
-    terms.some((item) => !item.column || !item.termType || !item.value)
+    !terms.some((item) => Boolean(Object.keys(item).length))
   ) {
     err.push({
       errors: ['请配置进入下方节点的条件'],
       name: ['condition', 'configuration', 'terms'],
     })
-  } else if (name.length > 64) {
-    err.push({
-      errors: ['条件节点名称最多输入64个字符'],
-      name: ['name'],
-    })
-    errorInfo.value = '配置项错误'
   } else {
     showError.value = false
     errorInfo.value = ''
@@ -243,12 +224,12 @@ defineExpose({ validate })
       box-shadow: 0px 0px 6px 0px #1890ff;
     }
 
-    .node-body-left {
+    .node-body-left{
       border-top-left-radius: 4px;
       border-bottom-left-radius: 4px;
     }
 
-    .node-body-right {
+    .node-body-right{
       border-top-right-radius: 4px;
       border-bottom-right-radius: 4px;
     }
@@ -260,7 +241,7 @@ defineExpose({ validate })
       position: absolute;
       height: 100%;
       z-index: 1;
-      transition: all 0.3s;
+      transition: all .3s;
 
       .anticon {
         display: none;
