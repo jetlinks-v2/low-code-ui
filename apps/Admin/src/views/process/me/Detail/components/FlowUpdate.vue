@@ -64,11 +64,12 @@ const handleBefore = (val, newVal) => {
 
 
 onMounted(() => {
-    console.log('history--------', props.current)
+    console.log('history--------', props.current,props.info?.form)
 
     props.current.forEach(item => {
         props.info?.form.forEach(it => {
             if (item.others.formId === it.formId) {
+                console.log('====',it.formId,item.others.formId)
                 formMap.set(
                     item.others.formId,
                     {
@@ -93,7 +94,6 @@ onMounted(() => {
         afterDataSource: [item.others.after]
     }))
     formList.value = arr
-    console.log('arr--', arr)
 })
 </script>
 

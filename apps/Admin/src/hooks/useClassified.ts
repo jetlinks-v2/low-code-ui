@@ -11,12 +11,13 @@ export function useClassified() {
         return {
           label: item.text,
           value: item.id,
+          extra: item
         }
       })
     },
   })
 
-  const getText = (key: string | undefined) => {
+  const getText = (key: string) => {
     return map.value.get(key)?.text
   }
   return {

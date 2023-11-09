@@ -395,11 +395,11 @@ defineExpose({
 }
 .emphasisField-bg {
   position: absolute;
-  top: 30px;
-  right: -12px;
+  top: -24px;
+  right: -26px;
   display: flex;
   justify-content: center;
-  width: 100px;
+  width: 110px;
   padding: 2px 0;
   transform: skewX(45deg);
   z-index: 99999999;
