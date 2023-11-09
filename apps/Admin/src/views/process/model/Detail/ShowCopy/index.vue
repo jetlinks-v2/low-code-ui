@@ -200,18 +200,20 @@ const formData = reactive({
       flowStore.model.config.variables = [...initVariables.value, ...val]
     },
   }),
-  nameGenerator: computed({
-    get: () => formatToName(flowStore.model.config.nameGenerator),
-    set: (val) => {
-      flowStore.model.config.nameGenerator = formatToVariable(val)
-    },
-  }),
-  summaryGenerator: computed({
-    get: () => formatToName(flowStore.model.config.summaryGenerator),
-    set: (val) => {
-      flowStore.model.config.summaryGenerator = formatToVariable(val)
-    },
-  }),
+  // nameGenerator: computed({
+  //   get: () => formatToName(flowStore.model.config.nameGenerator),
+  //   set: (val) => {
+  //     flowStore.model.config.nameGenerator = formatToVariable(val)
+  //   },
+  // }),
+  nameGenerator: flowStore.model.config.nameGenerator,
+  // summaryGenerator: computed({
+  //   get: () => formatToName(flowStore.model.config.summaryGenerator),
+  //   set: (val) => {
+  //     flowStore.model.config.summaryGenerator = formatToVariable(val)
+  //   },
+  // }),
+  summaryGenerator: flowStore.model.config.summaryGenerator,
   ccMember: computed({
     get: () => flowStore.model.config.ccMember,
     set: (val) => {
