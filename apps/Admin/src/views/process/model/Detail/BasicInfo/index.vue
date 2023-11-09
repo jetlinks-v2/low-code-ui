@@ -38,7 +38,6 @@
 <script setup lang="ts">
 import { advancedComponents } from '../FlowDesign/components/const'
 import {
-  findNodeById,
   handleFormList,
   setDefaultFormBinds,
 } from '../FlowDesign/components/utils'
@@ -134,10 +133,9 @@ const nodeLoop = (forms, node) => {
  * @param node 节点
  */
 const updateNodesFormBinds = (forms, node) => {
-  const _targetNode = findNodeById(flowStore.model.nodes, node.id)
-  _targetNode.props.formBinds = {}
+  node.props.formBinds = {}
   forms?.forEach((item) => {
-    _targetNode.props.formBinds[item.key] = []
+    node.props.formBinds[item.key] = []
     item.flattenFields?.forEach((p) => {
       // 处理单选高级组件, 平铺keys至formBinds
       if (
@@ -149,7 +147,7 @@ const updateNodesFormBinds = (forms, node) => {
       ) {
         // 高级组件, 并且为单选模式时, 将componentProps.keys平铺存入formBinds
         p.componentProps.keys?.forEach((k) => {
-          _targetNode.props.formBinds[item.key].push({
+          node.props.formBinds[item.key].push({
             id: k.config.source,
             required: p.formItemProps.required,
             accessModes: p.accessModes,
@@ -157,11 +155,11 @@ const updateNodesFormBinds = (forms, node) => {
           })
         })
       } else {
-        _targetNode.props.formBinds[item.key].push({
+        node.props.formBinds[item.key].push({
           id: p.formItemProps.name,
           required: p.formItemProps.required,
-          accessModes: _targetNode.props.formBinds
-            ? _targetNode.props.formBinds[item.key]?.find(
+          accessModes: node.props.formBinds
+            ? node.props.formBinds[item.key]?.find(
                 (f) => f.id === p.formItemProps.name,
               )?.accessModes || ['read']
             : ['read'],
