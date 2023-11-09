@@ -1,5 +1,19 @@
 <template>
   <div>
+    <!-- <j-select
+      placeholder="请选择"
+      :value="__value"
+      :open="false"
+      :showArrow="false"
+      @focus="showModal"
+      :options="selectOptions"
+      :mode="mode"
+      :disabled="disabled"
+      :size="size"
+      @change="onChange"
+      style="width: 100%"
+    >
+    </j-select> -->
     <j-button type="primary" @click="showModal">用户选择</j-button>
     <div style="margin-top: 10px">
       <j-tag v-for="item in __value" :key="item?.value">
@@ -24,8 +38,8 @@
 <script lang="ts" setup>
 import UserChoice from './UserChoice.vue'
 import { getUser_PaginateNot } from '@/api/form'
-import { ref, watch, computed, onMounted } from 'vue'
-import { cloneDeep, map } from 'lodash-es'
+import { ref, watch, computed } from 'vue'
+import { map } from 'lodash-es'
 
 const props = defineProps({
   value: {
@@ -52,7 +66,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:value', 'change'])
 
-const selectData = ref([])
+const selectData: any = ref()
 const modalVisible = ref(false)
 const selectOptions = ref([])
 
@@ -63,8 +77,21 @@ const closeModal = () => {
   modalVisible.value = false
 }
 
+// const __value = computed(() => {
+//   if (props.mode !== 'multiple') {
+//     return selectData.value?.id
+//   } else {
+//     return map(selectData.value, 'id')
+//   }
+// })
+
 const __value = computed(() => {
-  let arr: any[] = map(selectData.value, 'id')
+  let arr: any[] = []
+  if (props.mode !== 'multiple') {
+    arr = [selectData.value?.id]
+  } else {
+    arr = map(selectData.value, 'id')
+  }
   return selectOptions.value.filter((item: any) => {
     return arr.includes(item?.value)
   })
@@ -91,9 +118,8 @@ const saveData = (data: any[]) => {
   }
   emit('change')
 }
-
 const selectedUser = (data: any[]) => {
-  saveData(cloneDeep(data))
+  saveData(data)
   modalVisible.value = false
 }
 
@@ -112,9 +138,17 @@ const queryUser = () => {
   })
 }
 
+queryUser()
+
+// const onChange = (_val: any) => {
+//   const _arr = selectData.value.filter((i) => _val.includes(i.id))
+//   saveData(_arr)
+// }
+
 const cancelSelect = (val: string) => {
-  const arr = selectData.value.filter((item: any) => item?.id !== val)
-  saveData(arr)
+  const index = selectData.value.findIndex((item: any) => item?.id === val)
+  selectData.value.splice(index, 1)
+  saveData(selectData.value)
 }
 
 watch(
@@ -123,7 +157,7 @@ watch(
     if (props.mode !== 'multiple') {
       selectData.value = Array.isArray(props?.value)
         ? [props.value?.[0]]
-        : [props.value]
+        : props.value
     } else {
       selectData.value = Array.isArray(props?.value) ? props?.value : []
     }
@@ -133,10 +167,6 @@ watch(
     // immediate:true
   },
 )
-
-onMounted(() => {
-  queryUser()
-})
 </script>
 <style lang="less" scoped>
 .selectItemIcon {
