@@ -36,7 +36,9 @@
   </div>
 </template>
 <script setup lang="ts">
+import { advancedComponents } from '../FlowDesign/components/const'
 import {
+  findNodeById,
   handleFormList,
   setDefaultFormBinds,
 } from '../FlowDesign/components/utils'
@@ -72,14 +74,19 @@ const formData = reactive({
     set: (val) => {
       flowStore.model.config.forms = val
       // 设置根节点默认的表单配置, 以供条件节点, 成员选择和展示抄送页面的变量查询
-      flowStore.model.nodes.props!.formBinds = setDefaultFormBinds(
-        handleFormList(val.map((i) => i.fullInfo)),
-        flowStore.model.nodes.props!.formBinds,
-      )
+      //   flowStore.model.nodes.props!.formBinds = setDefaultFormBinds(
+      //     handleFormList(val.map((i) => i.fullInfo)),
+      //     flowStore.model.nodes.props!.formBinds,
+      //   )
       // @ts-ignore
       //   if (!Object.keys(flowStore.model?.nodes?.props?.formBinds)?.length) {
       //     flowStore.model.nodes.props!.formBinds = formToObj(val)
       //   }
+      // 表单配置改变, 更新每个节点的表单配置
+      nodeLoop(
+        handleFormList(val.map((i) => i.fullInfo)),
+        flowStore.model.nodes,
+      )
     },
   }),
   assignedUser: computed({
@@ -101,6 +108,67 @@ const rules = {
       return Promise.resolve()
     }
   },
+}
+
+/**
+ * 递归遍历每个节点
+ * @param forms 基础信息配置的表单信息
+ * @param node 节点
+ */
+const nodeLoop = (forms, node) => {
+  if (['ROOT', 'APPROVAL', 'DEAL'].includes(node.type))
+    updateNodesFormBinds(forms, node)
+  if (node.branches?.length) {
+    for (let i = 0; i < node.branches.length; i++) {
+      nodeLoop(forms, node.branches[i])
+    }
+  }
+  if (node.children && Object.keys(node.children).length) {
+    nodeLoop(forms, node.children)
+  }
+}
+
+/**
+ * 更新每个节点的表单配置
+ * @param forms 基础信息配置的表单信息
+ * @param node 节点
+ */
+const updateNodesFormBinds = (forms, node) => {
+  const _targetNode = findNodeById(flowStore.model.nodes, node.id)
+  _targetNode.props.formBinds = {}
+  forms?.forEach((item) => {
+    _targetNode.props.formBinds[item.key] = []
+    item.flattenFields?.forEach((p) => {
+      // 处理单选高级组件, 平铺keys至formBinds
+      if (
+        !(
+          p.componentProps.hasOwnProperty('mode') &&
+          p.componentProps.mode === 'multiple'
+        ) &&
+        advancedComponents.includes(p.type)
+      ) {
+        // 高级组件, 并且为单选模式时, 将componentProps.keys平铺存入formBinds
+        p.componentProps.keys?.forEach((k) => {
+          _targetNode.props.formBinds[item.key].push({
+            id: k.config.source,
+            required: p.formItemProps.required,
+            accessModes: p.accessModes,
+            ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
+          })
+        })
+      } else {
+        _targetNode.props.formBinds[item.key].push({
+          id: p.formItemProps.name,
+          required: p.formItemProps.required,
+          accessModes: _targetNode.props.formBinds
+            ? _targetNode.props.formBinds[item.key]?.find(
+                (f) => f.id === p.formItemProps.name,
+              )?.accessModes || ['read']
+            : ['read'],
+        })
+      }
+    })
+  })
 }
 
 /**
