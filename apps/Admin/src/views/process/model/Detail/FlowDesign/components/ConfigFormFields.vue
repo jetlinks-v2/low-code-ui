@@ -214,8 +214,16 @@ const getFormList = async () => {
     ],
   }
   const { result } = await queryFormNoPage_api(params)
+  // 基础信息配置的表单key, 用于节点配置表单的排序
+  const _formKeys = flowStore.model.config.forms?.map((m) => m.formId)
+  const _sortResult = result
+    ?.map((m) => ({
+      ...m,
+      sort: _formKeys?.indexOf(m.key),
+    }))
+    .sort((a, b) => a.sort - b.sort)
   // 左侧表单读写操作列表
-  filterFormList.value = result?.map((m) => {
+  filterFormList.value = _sortResult?.map((m) => {
     // 布局组件内部字段, 取出平铺
     let _layoutFields = cloneDeep(
       m.configuration?.children?.filter(
@@ -273,7 +281,7 @@ const getFormList = async () => {
   allFormList.value = cloneDeep(filterFormList.value)
   //   console.log('filterFormList.value: ', filterFormList.value)
   // 右侧预览数据处理
-  initPreviewData(result)
+  initPreviewData(_sortResult)
 }
 
 /**
@@ -399,7 +407,7 @@ const handleOk = () => {
         //   required: p.formItemProps.required,
         //   accessModes: p.accessModes,
         // })
-        
+
         // 处理单选高级组件, 平铺keys至formBinds
         if (
           !(
