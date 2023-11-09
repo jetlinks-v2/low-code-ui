@@ -126,13 +126,8 @@
               <FormPreview v-if="!item.multiple" :data="item.configuration" />
               <TableFormPreview
                 v-model:data-source="tableData"
-                :columns="
-                  getTableColumns(
-                    item.configuration?.children?.filter(
-                      (f) => !unDisplayFieldsType.includes(f.type),
-                    ),
-                  )
-                "
+                :columns="getTableColumns(item.configuration?.children)"
+                :hasRules="true"
                 v-else
               />
             </div>
