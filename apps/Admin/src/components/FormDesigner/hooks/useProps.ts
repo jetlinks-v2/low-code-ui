@@ -91,10 +91,14 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
 
   const _disabled = element?.componentProps?.disabled || __disabled || !editable || (mode === 'edit' && !element?.componentProps?.editable)
   // componentProps
-  const _componentProps = {
+  const _componentProps: any = {
     ...omit(element?.componentProps, ['description', 'cssCode', 'editable', 'onChange', 'visible', 'source']),
     size: _data?.componentProps.size,
     disabled: _disabled
+  }
+
+  if(element.type === 'tree-select' && element.componentProps.showSearch){
+    _componentProps.treeNodeFilterProp = 'label'
   }
 
   if (element?.componentProps?.options) {
