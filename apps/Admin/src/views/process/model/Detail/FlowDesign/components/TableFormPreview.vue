@@ -57,6 +57,7 @@ import FormItem from '@/views/process/me/Detail/components/FormItem.vue'
 import {
   handleFormToTable
 } from "./TableFormPreviewUtil";
+import {cloneDeep} from "lodash-es";
 
 type Emits = {
   (e: 'update:dataSource', data: any[]): void
@@ -81,7 +82,8 @@ const props = defineProps({
 const myDataSource = ref<any>([])
 
 const myColumns = computed(() => {
-  return handleFormToTable(props.columns as any[])
+  console.log(cloneDeep(props.columns))
+  return handleFormToTable(cloneDeep(props.columns) as any[])
 })
 
 watch(
