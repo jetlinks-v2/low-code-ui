@@ -116,6 +116,15 @@ const getTableColumns = (fields: any[]) => {
     // formId,
     width: 200,
     ...m,
+    form: {
+      rules: [
+        ...(m.formItemProps?.rules ?? []),
+        {
+          required: m.formItemProps?.required,
+          message: `该项不能为空`,
+        },
+      ],
+    },
   }))
   _columns?.forEach((item) => {
     tableData.value[0][item.dataIndex] = undefined
