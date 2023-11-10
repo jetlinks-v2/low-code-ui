@@ -9,7 +9,7 @@
             </j-input>
             <div>
                 <j-scrollbar>
-                    <j-tree v-if="treeData.length" :tree-data="treeData" v-model:selectedKeys="selectedKeys"
+                    <j-tree v-if="treeData.length" :tree-data="treeData" v-model:selectedKeys="selectedKeys" v-model:expandedKeys="expandedKeys"
                         @select="treeSelect" :fieldNames="{
                             key: 'id',
                             title: 'name'
@@ -106,11 +106,30 @@ const columns = [
 const queryParams = ref();
 const tableRef = ref()
 const userIds = ref([])
+const expandedKeys = ref([])
+
+
+const handlexpandedKeys = (arr,val)=>{
+    arr.forEach(item=>{
+        // if(item.name.includes(val)){
+        //     expandedKeys.value.push(item.parentId || item.id)
+        // }
+        expandedKeys.value.push( item.id)
+        if(item.children){
+            handlexpandedKeys(item.children,val)
+        }
+    })
+}
+
 const search = () => {
     if (searchValue.value) {
-        treeData.value = filterTreeNodes(cloneDeep(treeInitData.value),searchValue.value,'name')
+        const arr = filterTreeNodes(cloneDeep(treeInitData.value),searchValue.value,'name')
+        console.log('arr===',arr)
+        handlexpandedKeys(arr,searchValue.value)
+        treeData.value = arr
     } else {
         treeData.value = cloneDeep(treeInitData.value)
+        expandedKeys.value = []
     }
 }
 const handelSearch = (search) => {

@@ -69,7 +69,7 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
  */
 const updateProductReq = debounce((draftData: any[], cb) => {
   const integrateData = Integrate(draftData)
-  console.log('updateProductReq', new Date().getTime())
+  console.log('updateProductReq', new Date().getTime(),draftData)
   updateDraft(integrateData.draftId, integrateData).then(resp => {
     if (resp.success) {
       const { children, ...oldProject } = draftData[0]
@@ -247,7 +247,7 @@ export const useProduct = defineStore('product', () => {
   }
 
   const update = async (record: any, cb?: Function) => {
-    // console.log('item---',record)
+    console.log('item---',record)
     dataMap.set(record.id, omit(record, ['children']))
     data.value = updateProduct(data.value, record)
     console.log('update',cloneDeep(data.value))

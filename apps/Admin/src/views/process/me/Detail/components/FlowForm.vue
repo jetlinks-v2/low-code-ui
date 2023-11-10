@@ -40,7 +40,7 @@
             <j-button type="primary" class="btn" @click="onClick('pass')"
                 v-if="nodeType === 'APPROVAL' && btnList.includes('pass')" :loading="btnLoading">通过</j-button>
             <j-button type="primary" class="btn" @click="onClick('submit')"
-                v-if="nodeType === 'DEAL' && btnList.includes('submit')" :loading="btnLoading">提交</j-button>
+                v-if="nodeType === 'ROOT'&& btnList.includes('submit') || nodeType === 'DEAL' && btnList.includes('submit')" :loading="btnLoading">提交</j-button>
             <j-button type="primary" class="btn" @click="onClick('save')" :loading="btnLoading">保存</j-button>
         </div>
     </div>
@@ -356,7 +356,7 @@ const handleDisabled = (arr, accessModes) => {
 
 // 列表接口数据nodeId 对应form表单ID处理数据
 const dealForm = (nodes) => {
-    // console.log('nodes---', nodes, props.nodeId)
+    console.log('nodes---', nodes, props.nodeId)
     if (nodes.id === props.nodeId) {
         //默认审批意见
         defaultComment.value = nodes?.props.others?.defaultComment
