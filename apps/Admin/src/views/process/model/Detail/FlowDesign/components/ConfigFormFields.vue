@@ -277,6 +277,7 @@ const getFormList = async () => {
   //   console.log('filterFormList.value: ', filterFormList.value)
   // 右侧预览数据处理
   initPreviewData(_sortResult)
+  handleSearch()
 }
 
 /**
