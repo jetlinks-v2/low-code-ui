@@ -4,11 +4,11 @@
     validate
     ref="tableRef"
     :data="myDataSource"
-    :columns="columns"
+    :columns="myColumns"
     :height="500"
     :scroll="{x: 1600}"
   >
-    <template v-for="item in columns" #[item.dataIndex]>
+    <template v-for="item in myColumns" #[item.dataIndex]>
       <FormItem :item-type="item.type" :disabled="item.componentProps?.disabled" :component-props="item.componentProps" />
     </template>
   </QuickEditTable>
@@ -54,6 +54,9 @@
 <script setup lang="ts">
 // import componentMap from '@/components/FormDesigner/utils/componentMap'
 import FormItem from '@/views/process/me/Detail/components/FormItem.vue'
+import {
+  handleFormToTable
+} from "./TableFormPreviewUtil";
 
 type Emits = {
   (e: 'update:dataSource', data: any[]): void
@@ -76,6 +79,10 @@ const props = defineProps({
 })
 
 const myDataSource = ref<any>([])
+
+const myColumns = computed(() => {
+  return handleFormToTable(props.columns as any[])
+})
 
 watch(
   () => props.dataSource,
