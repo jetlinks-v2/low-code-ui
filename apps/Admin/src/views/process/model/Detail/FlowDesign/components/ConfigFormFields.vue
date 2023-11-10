@@ -380,6 +380,12 @@ const getTableColumns = (fields: any[]) => {
     ellipsis: true,
     width: 200,
     ...m,
+    form: {
+      rules: [
+        ...m.formItemProps?.rules,
+        { required: m.formItemProps?.required || false },
+      ],
+    },
   }))
 
   _columns?.forEach((item) => {

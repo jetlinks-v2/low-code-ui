@@ -159,7 +159,7 @@ export function filterFormByName(list, name) {
     list?.forEach(item => {
         const _fields = item.flattenFields || []
         const _filterFields = _fields.filter(f => {
-            return f.formItemProps.label.includes(name)
+            return f.formItemProps.label?.includes(name)
         })
         if (_filterFields.length) {
             // @ts-ignore
