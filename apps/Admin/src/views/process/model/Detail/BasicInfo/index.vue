@@ -194,10 +194,16 @@ const getLatestFormList = () => {
     configFormRef.value
       .getFormList()
       .then((res) => {
-        formData.forms = formData.forms.map((m) => ({
-          ...m,
-          isDelete: !res.includes(m.formId),
-        }))
+        formData.forms = formData.forms.map((m) => {
+          const row = res.find((k) => k.key === m.formId)
+          return{
+            ...m,
+            formName: row?.name || m.formName,
+            fullInfo: row || m,
+            isDelete: !row
+            // isDelete: !res.includes(m.formId),
+          }
+        })
         resolve(formData.forms)
       })
       .catch((err) => {

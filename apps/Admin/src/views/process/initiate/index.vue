@@ -54,7 +54,7 @@ const data = reactive({})
 const loading = ref(true)
 getList_api({
   paging: false,
-  sorts: [{ name: 'createTime', order: 'desc' }],
+  sorts: [{ name: 'createTime', order: 'asc' }],
   terms: [
     {
       value: 'enabled',

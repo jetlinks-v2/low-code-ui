@@ -228,7 +228,8 @@ const getFormList = async () => {
   const { result } = await queryFormNoPage_api(params.value)
   formList.value = result  
   // 返回存在的表单的keys, 以供父级验证是否已配置表单是否存在
-  return formList.value.map((m) => m.key)
+  // return formList.value.map((m) => m.key)
+  return formList.value
 }
 
 /**
@@ -285,25 +286,11 @@ const submit = () => {
     visible.value = false
   }
 }
-// 更新表单
-const updateForm = (modelValue: any[]) => {
-  if(formList.value.length < 1) return
-  selectedRow.value = modelValue.map((item)=>{
-    const row = formList.value.find((m) => m.key === item.formId)
-    return{
-      ...item,
-      formId: row?.key || item.formId,
-      formName: row?.name || item.formName,
-      fullInfo: row || item,
-      isDelete: !row
-    }
-  })
-}
+
 watch(
-  () => [props.modelValue, formList.value],
+  () => props.modelValue,
   () => {
     selectedRow.value = props.modelValue
-    updateForm(props.modelValue)
   },
   { immediate: true },
 )
