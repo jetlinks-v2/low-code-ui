@@ -340,14 +340,14 @@ const handleDisabled = (arr, accessModes) => {
         Modes.set(item.id, item.accessModes)
     })
     return arr.map(item => {
-        if (Modes.has(item.formItemProps.name)) {
-            const disabled = !Modes.get(item.formItemProps.name)?.includes('write')
+       const  disabled  = !Modes.get(item.formItemProps?.name)?.includes('write')
+        if (Modes.has(item.formItemProps?.name)) {
             if (!item.formItemProps.isLayout) {
                 item.componentProps.disabled = disabled
             }
         }
         if (item.children && item.children.length !== 0) {
-            item.children = item.formItemProps.isLayout ? handleLayout(item.children, disabled) : handleDisabled(item.children, accessModes)
+            item.children = item.formItemProps?.isLayout ? handleLayout(item.children, disabled) : handleDisabled(item.children, accessModes)
         }
         // console.log('====', item)
         return item
