@@ -11,7 +11,10 @@
       <TitleComponent data="展示配置" />
       <j-form-item name="variables" label="可用变量">
         <div class="btn">
-          <j-button style="background-color: #EBEDF3; border: none;" @click="visible = true">
+          <j-button
+            style="background-color: #ebedf3; border: none"
+            @click="visible = true"
+          >
             <AIcon type="PlusOutlined" />
             <span>添加表单字段</span>
           </j-button>
@@ -129,13 +132,15 @@ const formRef = ref()
  * -> {发起人name}的{流程名称name}
  */
 const formatToName = (val: string = '') => {
-  return val
-    // .replace(/-/g, '')
-    // .replace(/\n/g, '<br/>')
-    .replace(/\{(.*?)\}/g, ($1, $2) => {
-      const _$2 = $2.split(':')
-      return `{${_$2[_$2.length - 1]}}`
-    })
+  return (
+    val
+      // .replace(/-/g, '')
+      // .replace(/\n/g, '<br/>')
+      .replace(/\{(.*?)\}/g, ($1, $2) => {
+        const _$2 = $2.split(':')
+        return `{${_$2[_$2.length - 1]}}`
+      })
+  )
 }
 
 /**
@@ -180,14 +185,14 @@ const formatToVariable = (val: string = '') => {
     .replace(/\n/g, () => {
       return '' // 不需要支持换行的问题
     })
-    // let a = str
-    // if(a.slice(-1) === '-'){
-    //   a = a.slice(0,a.length-1);
-    // }
-    // if(a.slice(0, 1) === '-'){
-    //   a = a.slice(1,a.length);
-    // }
-    return str
+  // let a = str
+  // if(a.slice(-1) === '-'){
+  //   a = a.slice(0,a.length-1);
+  // }
+  // if(a.slice(0, 1) === '-'){
+  //   a = a.slice(1,a.length);
+  // }
+  return str
 }
 
 const formData = reactive({
@@ -206,14 +211,24 @@ const formData = reactive({
   //     flowStore.model.config.nameGenerator = formatToVariable(val)
   //   },
   // }),
-  nameGenerator: flowStore.model.config.nameGenerator,
+  nameGenerator: computed({
+    get: () => flowStore.model.config.nameGenerator,
+    set: (val) => {
+      flowStore.model.config.nameGenerator = val
+    },
+  }),
   // summaryGenerator: computed({
   //   get: () => formatToName(flowStore.model.config.summaryGenerator),
   //   set: (val) => {
   //     flowStore.model.config.summaryGenerator = formatToVariable(val)
   //   },
   // }),
-  summaryGenerator: flowStore.model.config.summaryGenerator,
+  summaryGenerator: computed({
+    get: () => flowStore.model.config.summaryGenerator,
+    set: (val) => {
+      flowStore.model.config.summaryGenerator = val
+    },
+  }),
   ccMember: computed({
     get: () => flowStore.model.config.ccMember,
     set: (val) => {
@@ -272,6 +287,5 @@ defineExpose({ validateSteps })
 }
 
 .btn {
-
 }
 </style>
