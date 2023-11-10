@@ -384,7 +384,7 @@ const getTableColumns = (fields: any[]) => {
     form: {
       rules: [
         ...m.formItemProps?.rules,
-        { required: m.formItemProps?.required || false },
+        { required: m.formItemProps?.required || false, message: '此项为必填' },
       ],
     },
   }))
