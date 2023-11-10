@@ -42,6 +42,14 @@ watch(() => activeFile.value, () => {
   path.value = product.getParent({ id: activeFile.value })
 }, { immediate: true })
 
+watch(
+  ()=>files.value,
+  (val)=>{
+    console.log('val======',val)
+  },
+  {deep:true}
+)
+
 </script>
 
 <style scoped lang="less">
