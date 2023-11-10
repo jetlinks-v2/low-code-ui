@@ -14,9 +14,11 @@ export const handleFormToTable = (columns: ISchema[]) => {
       const newArr = handleFormToTable(item.children)
       array.concat(newArr)
     } else {
+      const rules = item.formItemProps.rules
       array.push({
         ...item,
-        dataIndex: item.key
+        dataIndex: item.key,
+        form: { rules }
       })
     }
   })

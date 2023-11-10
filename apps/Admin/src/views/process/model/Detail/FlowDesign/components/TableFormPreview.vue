@@ -8,8 +8,8 @@
     :height="500"
     :scroll="{x: 1600}"
   >
-    <template v-for="item in myColumns" #[item.dataIndex]>
-      <FormItem :item-type="item.type" :disabled="item.componentProps?.disabled" :component-props="item.componentProps" />
+    <template v-for="item in myColumns" #[item.dataIndex]="{ valueChange, record }">
+      <FormItem v-model="record[item.dataIndex]" :item-type="item.type" :disabled="item.componentProps?.disabled" :component-props="item.componentProps" @change="() => { valueChange(record[item.dataIndex])}" />
     </template>
   </QuickEditTable>
 <!--  <j-table-->
