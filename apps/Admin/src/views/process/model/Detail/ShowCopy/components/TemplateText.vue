@@ -76,17 +76,12 @@ const regHidden = (html) => {
   })
 }
 
-const getColor = (key) => {
-  const variable = props.variables.find((i) => i.value === key)
-  return variable?.color
-}
-
 const regHandle = (html) => {
-  return html.replace(/\{(.*?)\}/g, ($1, $2) => {
+  return html.replace(/{([^{}]+)}/g, ($1, $2) => {
     const _arr = $2.split(':')
-    const _color = getColor(_arr?.[1])
-    return _arr?.length === 3 && _color
-      ? `<span style="color: ${_color}">{${_arr[2]}}</span>`
+    const variable = props.variables.find((i) => i.value === _arr?.[1])
+    return _arr?.length === 3 && variable
+      ? `<span style="color: ${variable?.color}">{${_arr[2]}}</span>`
       : $1
   })
 }
@@ -111,11 +106,12 @@ const onKeypress = (e) => {
   }
 }
 
-const handleValue = () => {
-  const _children = hide.value?.childNodes
+const handleValue = (_children) => {
   let str = ''
   _children.forEach((item) => {
-    if (item.nodeName === 'SPAN') {
+    if(item.childNodes?.length > 1){
+      str += handleValue(item.childNodes)
+    }else if (item.nodeName === 'SPAN') {
       if (item.dataset?.id) {
         str += item.innerText.replace(/\{(.*?)\}/g, ($1, $2) => {
           const variable = props.variables.find((item) => item.label === $2)
@@ -132,20 +128,22 @@ const handleValue = () => {
       str += item?.textContent
     }
   })
-  emits('update:value', str)
+  return str
 }
 
 const onInput = () => {
-  handleValue()
+  const _children = hide.value?.childNodes
+  const str = handleValue(_children)
+  emits('update:value', str)
 }
 
 const selectVariable = (key, { label }) => {
   const spanNode = document.createElement('span')
   spanNode.innerText = `{${label}}`
   spanNode.dataset.id = key
-  // spanNode.style.color = getColor(key)
   selectionInsert(spanNode)
-  handleValue()
+  const str = handleValue(hide.value?.childNodes)
+  emits('update:value', str)
 }
 
 onMounted(() => {
