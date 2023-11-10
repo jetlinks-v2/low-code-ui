@@ -89,6 +89,7 @@
       @cancel="onCancel"
       @ok="onOk"
       :closable="false"
+      :maskClosable="false"
     >
       <template #footer>
         <PermissionButton
