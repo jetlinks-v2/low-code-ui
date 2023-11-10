@@ -11,7 +11,7 @@
       :disabled="disabled" @change="onChange" />
     <InputNumber v-else-if="itemType === 'input-number'" v-bind="props.componentProps" v-model:value="myValue" allowClear
       :disabled="disabled" @change="onChange" />
-    <InputPassword v-else-if="itemType === 'input-password'" allowClear v-bind="props" v-model:value="myValue"
+    <InputPassword v-else-if="itemType === 'input-password'" allowClear v-bind="props.componentProps" v-model:value="myValue"  
       :disabled="disabled" @change="onChange" />
     <Product v-else-if="itemType === 'product'" v-model:value="myValue" v-bind="props.componentProps" @change="onChange" />
     <Device v-else-if="itemType === 'device'" v-model:value="myValue" v-bind="props.componentProps" @change="onChange" />
@@ -23,9 +23,10 @@
     <Input v-else-if="itemType === 'input'" allowClear v-bind="props.componentProps" type="text" v-model:value="myValue"
       :disabled="disabled" @change="onChange" />
     <Select v-else-if="itemType === 'select' || itemType === 'select-card'" v-bind="props.componentProps" v-model:value="myValue"
-      :options="options" :disabled="disabled" @change="onChange" style="width: 100%;" />
+      :options="options" :disabled="disabled" @change="onChange" style="width: 100%;"/>
     <Upload v-else-if="itemType === 'upload'" :value="myValue" v-bind="props.componentProps" @change="onChange" style="width: 100%;"/>
     <div v-else>--</div>
+    <div class="itemDescription" v-if="props?.componentProps?.description">{{ props?.componentProps?.description }}</div>
   </div>
 </template>
   
@@ -106,6 +107,9 @@ onMounted(() => {
 .value-item-warp{
   overflow: scroll;
   height: 40px;
+}
+.itemDescription{
+  color: rgb(192, 192, 192);
 }
 </style>
   
