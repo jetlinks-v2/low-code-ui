@@ -41,7 +41,7 @@
 import FlowDesigner from '@/components/FlowDesigner'
 import NodeConfig from './components/NodeConfig.vue'
 import { useFlowStore } from '@/store/flow'
-import { findNodeById } from './components/utils'
+import { findBranchLastNode, findNodeById } from './components/utils'
 import { onlyMessage } from '@jetlinks/utils'
 
 const flowStore = useFlowStore()
@@ -83,7 +83,22 @@ const nodeDel = (node) => {
     parentNode.type === 'DEAL' &&
     parentNode.props.freeChoiceUser === node.id
   ) {
+    // 如果父节点为办理节点, 并且"办理成员可以自由选择下一节点办理人"开关处于开启状态的值为当前删除节点的id
     parentNode.props.freeChoiceUser = undefined
+  }
+  // 如果父节点为空节点, 则上面一定为分支,
+  // 关闭所有分支最后一个节点为办理节点的"办理成员可以自由选择下一节点办理人"开关
+  if (parentNode.type === 'EMPTY') {
+    const _branchNodes = findNodeById(
+      flowStore.model.nodes,
+      parentNode.parentId,
+    )
+    _branchNodes?.branches?.forEach((node) => {
+      const _lastNode = findBranchLastNode(node)
+      if (_lastNode.type === 'DEAL') {
+        _lastNode.props.freeChoiceUser = undefined
+      }
+    })
   }
 }
 
