@@ -101,7 +101,7 @@
               <j-switch
                 size="small"
                 v-model:checked="memberFormData.freeChoiceUser"
-                :checkedValue="flowStore.selectedNode.children?.id"
+                :checkedValue="checkValue"
                 :unCheckedValue="undefined"
                 @change="handleSwitchChange"
               ></j-switch>
@@ -120,6 +120,7 @@ import {
   setDefaultFormBinds,
   isSelectMember,
   handleFormList,
+  findBranchLastNode,
 } from './utils'
 import { useFlowStore } from '@/store/flow'
 import { onlyMessage } from '@jetlinks/utils'
@@ -145,7 +146,6 @@ const basicFormData = reactive({
   ),
 })
 const collapseActive = ref(['1', '2', '3'])
-
 // 成员配置
 const memberFormRef = ref()
 const memberFormData = reactive({
@@ -154,18 +154,78 @@ const memberFormData = reactive({
   authButtons: props.node?.props?.authButtons || ['submit'],
   freeChoiceUser: props.node?.props?.freeChoiceUser,
 })
-
 const allButtons = ref([{ label: '提交', value: 'submit' }])
-const nodeList = ref([
-  { label: '审批节点', value: 'approval' },
-  { label: '处理节点', value: 'deal' },
-])
+
+// 选中的值默认为下一个节点的id
+const checkValue = computed(() => {
+  let _result
+  const _currentNode = flowStore.selectedNode
+  // 当前节点属于分支内部节点, 并且为分支最后一个节点
+  let _isLastNode = false
+  if (_currentNode.props.branchBy) {
+    _isLastNode = _currentNode.id === findBranchLastNode(_currentNode).id
+  }
+  if (_currentNode.props.branchBy && _isLastNode) {
+    // 分支上的办理节点, 并且为该分支最后一个节点,
+    // 则判断整个分支的children(空节点).children是否为审批节点
+    const _branchNode = findNodeById(
+      flowStore.model.nodes,
+      _currentNode.props.branchBy,
+    )
+    // 分支节点的子节点(空节点)
+    const _emptyNode = _branchNode.children
+    // 分支空节点后的节点为审批节点, 开关默认值为此节点的id
+    if (_emptyNode?.children?.type === 'APPROVAL') {
+      _result = _emptyNode.children.id
+    }
+  } else {
+    // 非分支上的办理节点, 或者分支上的非最后一个节点, 开关默认值为下个审批节点的id
+    if (_currentNode?.children?.type === 'APPROVAL') {
+      _result = _currentNode.children.id
+    }
+  }
+
+  return _result
+})
+
 
 const handleSwitchChange = () => {
-  const child = flowStore.selectedNode.children
-  if (!child || !Object.keys(child).length || child.type !== 'APPROVAL') {
-    onlyMessage('下一节点为审批节点时可配置', 'warning')
-    memberFormData.freeChoiceUser = undefined
+  const _currentNode = flowStore.selectedNode
+  // 通用条件: 当前办理节点不存在子节点或者子节点非审批节点
+  const _globalCondition = Boolean(
+    !_currentNode.children ||
+      !Object.keys(_currentNode.children).length ||
+      _currentNode.children.type !== 'APPROVAL',
+  )
+  // 当前节点属于分支内部节点, 并且为分支最后一个节点
+  let _isLastNode = false
+  if (_currentNode.props.branchBy) {
+    _isLastNode = _currentNode.id === findBranchLastNode(_currentNode).id
+  }
+
+  if (_currentNode.props.branchBy && _isLastNode) {
+    // 分支上的办理节点, 并且为该分支最后一个节点,
+    // 则判断整个分支的children(空节点).children是否为审批节点
+    const _branchNode = findNodeById(
+      flowStore.model.nodes,
+      _currentNode.props.branchBy,
+    )
+    // 分支节点的子节点(空节点)
+    const _emptyNode = _branchNode.children
+    if (
+      !_emptyNode.children ||
+      !Object.keys(_emptyNode.children).length ||
+      _emptyNode.children.type !== 'APPROVAL'
+    ) {
+      onlyMessage('下一节点为审批节点时可配置', 'warning')
+      memberFormData.freeChoiceUser = undefined
+    }
+  } else {
+    // 非分支上的办理节点, 或者分支上的非最后一个节点, 正常判断
+    if (_globalCondition) {
+      onlyMessage('下一节点为审批节点时可配置', 'warning')
+      memberFormData.freeChoiceUser = undefined
+    }
   }
 }
 
