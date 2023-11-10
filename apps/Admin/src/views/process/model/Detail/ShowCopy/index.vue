@@ -105,7 +105,7 @@ import { queryVariables_api } from '@/api/process/model'
 import FormVariables from './components/FormVariables.vue'
 import { useFlowStore } from '@/store/flow'
 import { separateData } from './utils'
-import TemplateText from './components/TemplateText.vue'
+import TemplateText from './components/TemplateText1.vue'
 
 const flowStore = useFlowStore()
 
@@ -200,20 +200,20 @@ const formData = reactive({
       flowStore.model.config.variables = [...initVariables.value, ...val]
     },
   }),
-  nameGenerator: computed({
-    get: () => formatToName(flowStore.model.config.nameGenerator),
-    set: (val) => {
-      flowStore.model.config.nameGenerator = formatToVariable(val)
-    },
-  }),
-  // nameGenerator: flowStore.model.config.nameGenerator,
-  summaryGenerator: computed({
-    get: () => formatToName(flowStore.model.config.summaryGenerator),
-    set: (val) => {
-      flowStore.model.config.summaryGenerator = formatToVariable(val)
-    },
-  }),
-  // summaryGenerator: flowStore.model.config.summaryGenerator,
+  // nameGenerator: computed({
+  //   get: () => formatToName(flowStore.model.config.nameGenerator),
+  //   set: (val) => {
+  //     flowStore.model.config.nameGenerator = formatToVariable(val)
+  //   },
+  // }),
+  nameGenerator: flowStore.model.config.nameGenerator,
+  // summaryGenerator: computed({
+  //   get: () => formatToName(flowStore.model.config.summaryGenerator),
+  //   set: (val) => {
+  //     flowStore.model.config.summaryGenerator = formatToVariable(val)
+  //   },
+  // }),
+  summaryGenerator: flowStore.model.config.summaryGenerator,
   ccMember: computed({
     get: () => flowStore.model.config.ccMember,
     set: (val) => {

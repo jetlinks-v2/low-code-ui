@@ -277,6 +277,7 @@ const getFormList = async () => {
   //   console.log('filterFormList.value: ', filterFormList.value)
   // 右侧预览数据处理
   initPreviewData(_sortResult)
+  handleSearch()
 }
 
 /**
@@ -383,7 +384,7 @@ const getTableColumns = (fields: any[]) => {
     form: {
       rules: [
         ...m.formItemProps?.rules,
-        { required: m.formItemProps?.required || false },
+        { required: m.formItemProps?.required || false, message: '此项为必填' },
       ],
     },
   }))
