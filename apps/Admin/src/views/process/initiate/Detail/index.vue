@@ -137,7 +137,6 @@ const getTableColumns = (
   data: any = {},
   multiple: boolean,
 ) => {
-  console.log(`output->fields`, fields)
   const _columns = fields?.map((m) => ({
     title: m.formItemProps?.label,
     dataIndex: m.formItemProps?.name,
@@ -151,7 +150,7 @@ const getTableColumns = (
         ...(m.formItemProps?.rules ?? []),
         {
           required: m.formItemProps?.required,
-          message: `请输入${m.formItemProps?.label}`,
+          message: `该项不能为空`,
         },
       ],
     },
