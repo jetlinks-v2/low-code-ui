@@ -113,6 +113,9 @@ const queryUser = () => {
 }
 
 const cancelSelect = (val: string) => {
+  if(props.disabled){
+    return
+  }
   const arr = selectData.value.filter((item: any) => item?.id !== val)
   saveData(arr)
 }
