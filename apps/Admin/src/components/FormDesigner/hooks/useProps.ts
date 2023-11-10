@@ -35,7 +35,7 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
       trigger,
       async validator(rule, value, cb) {
         // 当输入框非必填的时候需要判断
-        if((value === undefined || value === null) && !element?.formItemProps?.required) {
+        if ((value === undefined || value === null) && !element?.formItemProps?.required) {
           return Promise.resolve()
         }
         const errorMessage: Array<string> = []
@@ -97,8 +97,12 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
     disabled: _disabled
   }
 
-  if(element.type === 'tree-select' && element.componentProps.showSearch){
+  if (element.type === 'tree-select' && element.componentProps.showSearch) {
     _componentProps.treeNodeFilterProp = 'label'
+  }
+
+  if (element.type === 'select' && element.componentProps?.mode === 'multiple') {
+    _componentProps.maxTagCount = "responsive"
   }
 
   if (element?.componentProps?.options) {

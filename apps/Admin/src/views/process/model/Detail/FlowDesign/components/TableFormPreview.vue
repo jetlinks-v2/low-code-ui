@@ -1,7 +1,6 @@
 <!-- 表格表单预览 -->
 <template>
   <QuickEditTable
-    serial
     validate
     ref="tableRef"
     :data="myDataSource"

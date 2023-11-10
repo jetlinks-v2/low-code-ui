@@ -117,7 +117,7 @@ const handleAddConcurrents = () => {
     }
     &.concurrents {
       .node-icon {
-        background: #1890ff;
+        background: #cece25;
       }
     }
     &.disabled {
