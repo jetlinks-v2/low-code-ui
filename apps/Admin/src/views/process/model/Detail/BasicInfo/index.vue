@@ -36,6 +36,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { cloneDeep } from 'lodash-es'
 import { advancedComponents } from '../FlowDesign/components/const'
 import {
   handleFormList,
@@ -133,6 +134,9 @@ const nodeLoop = (forms, node) => {
  * @param node 节点
  */
 const updateNodesFormBinds = (forms, node) => {
+  // 清空原有数据之前, 固定的表单配置, 用于回显读写勾选状态
+  const _fixedFormBinds = cloneDeep(node.props.formBinds)
+  // 清空原有数据, 根据最新的表单配置, 更新节点的表单配置
   node.props.formBinds = {}
   forms?.forEach((item) => {
     node.props.formBinds[item.key] = []
@@ -150,7 +154,12 @@ const updateNodesFormBinds = (forms, node) => {
           node.props.formBinds[item.key].push({
             id: k.config.source,
             required: p.formItemProps.required,
-            accessModes: p.accessModes,
+            // accessModes: p.accessModes,
+            accessModes: _fixedFormBinds
+              ? _fixedFormBinds[item.key]?.find(
+                  (f) => f.id === p.formItemProps.name,
+                )?.accessModes || ['read']
+              : ['read'],
             ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
           })
         })
@@ -158,8 +167,8 @@ const updateNodesFormBinds = (forms, node) => {
         node.props.formBinds[item.key].push({
           id: p.formItemProps.name,
           required: p.formItemProps.required,
-          accessModes: node.props.formBinds
-            ? node.props.formBinds[item.key]?.find(
+          accessModes: _fixedFormBinds
+            ? _fixedFormBinds[item.key]?.find(
                 (f) => f.id === p.formItemProps.name,
               )?.accessModes || ['read']
             : ['read'],
@@ -194,10 +203,16 @@ const getLatestFormList = () => {
     configFormRef.value
       .getFormList()
       .then((res) => {
-        formData.forms = formData.forms.map((m) => ({
-          ...m,
-          isDelete: !res.includes(m.formId),
-        }))
+        formData.forms = formData.forms.map((m) => {
+          const row = res.find((k) => k.key === m.formId)
+          return {
+            ...m,
+            formName: row?.name || m.formName,
+            fullInfo: row || m,
+            isDelete: !row,
+            // isDelete: !res.includes(m.formId),
+          }
+        })
         resolve(formData.forms)
       })
       .catch((err) => {
