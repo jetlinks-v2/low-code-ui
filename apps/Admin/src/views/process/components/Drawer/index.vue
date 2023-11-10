@@ -20,7 +20,7 @@
           </div>
         </template>
         <div class="content">
-          <j-scrollbar style="height: calc(100vh - 225px)">
+          <!-- <j-scrollbar style="height: calc(100vh - 225px)"> -->
             <div v-for="item in formData">
               <div class="title">
                 <j-space>
@@ -45,7 +45,7 @@
                 "
               />
             </div>
-          </j-scrollbar>
+          <!-- </j-scrollbar> -->
         </div>
       </j-tab-pane>
       <j-tab-pane key="flow">

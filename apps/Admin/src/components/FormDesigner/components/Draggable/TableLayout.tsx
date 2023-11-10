@@ -191,7 +191,7 @@ export default defineComponent({
             if (element.children?.[0]?.type === 'table-item-index') {
                 return (dt?.index || 0) + 1
             } else if (element.children?.[0]?.type === 'table-item-actions') {
-                return <Button onClick={() => {
+                return <Button disabled={props.data.componentProps?.disabled} onClick={() => {
                     const arr = cloneDeep(get(designer.formState, __path.value) || [])
                     arr.splice(dt?.index, 1)
                     set(designer.formState, __path.value, arr)
@@ -249,7 +249,7 @@ export default defineComponent({
                                 !unref(isEditModel) && <Button onClick={() => {
                                     const arr = get(designer.formState, __path.value) || []
                                     set(designer.formState, __path.value, [...arr, {}])
-                                }} style={{ width: '100%', marginTop: '10px' }}><AIcon type="PlusOutlined" />新增</Button>
+                                }} style={{ width: '100%', marginTop: '10px' }} disabled={props.data.componentProps?.disabled}><AIcon type="PlusOutlined" />新增</Button>
                             }
                             {
                                 unref(isEditModel) &&
