@@ -77,7 +77,6 @@ const onClick = (data) => {
 watch(
   () => [activeFile.value, product.data],
   (val) => {
-    // console.log('val',val)
     if (val) {
       activeData.value = product.getById(val[0])
       path.value = product.getParent(activeData.value)

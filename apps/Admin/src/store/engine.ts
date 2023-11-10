@@ -219,7 +219,17 @@ export const useEngine = defineStore('engine', () => {
           }
         })
       } else {
+        console.log('record========',record)
         files.value[index] = record
+        // const item = product.data[0]
+        // product.update({
+        //   ...item,
+        //   others: {
+        //     ...item?.others,
+        //     activeFile: activeFile.value,
+        //     files: files.value
+        //   }
+        // })
       }
     } else if (type === 'add') {
       addFile(record, open) 
