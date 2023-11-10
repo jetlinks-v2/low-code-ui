@@ -22,10 +22,13 @@
 <script setup name="EngineHeader">
 import { useProduct, useEngine, useMenuStore } from '@/store'
 import { getImage } from '@jetlinks/utils';
+import { storeToRefs } from 'pinia'
 
 const product = useProduct()
 const engine = useEngine()
 const menu = useMenuStore()
+
+const { files, activeFile } = storeToRefs(engine)
 
 const router = useRouter()
 const route = useRoute()
@@ -40,7 +43,19 @@ const onRelease = () => {
 
 const quit = async () => {
   // router.push('/delivery/center')
-  menu.jumpPage('center')
+  const item = product.data[0]
+  product.update({
+    ...item,
+    others: {
+      ...item?.others,
+      activeFile: activeFile.value,
+      files: files.value
+    }
+  },()=>{
+    menu.jumpPage('center')
+  })
+ 
+  console.log(engine.files)
 }
 
 onMounted(() => {
