@@ -157,8 +157,10 @@ export const handleData = (data,map)=>{
 
 export const handleSingleData = (form: any) =>{
     const  formObj = fromItem(form)
+    console.log(form,'form')
     return form.data.map((item=>{
-        const obj = item.data.map(i=>handleData(i,formObj))
+        // const obj = item.data.map(i=>handleData(i,formObj))
+        const obj = handleData(item,formObj)
         return obj
     }))
 }

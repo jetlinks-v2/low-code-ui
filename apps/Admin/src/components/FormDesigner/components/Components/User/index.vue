@@ -1,6 +1,6 @@
 <template>
   <div>
-    <j-button type="primary" @click="showModal">用户选择</j-button>
+    <j-button :disabled="disabled" type="primary" @click="showModal">用户选择</j-button>
     <div style="margin-top: 10px">
       <j-tag v-for="item in __value" :key="item?.value">
         <div style="display: flex">
