@@ -4,11 +4,14 @@ import type { Ref } from 'vue'
 
 type SelectionFn = {
   insertNode: (node: HTMLElement) => void
+  handlePointerup: () => void
+  status: Ref<boolean>
 }
 
 export const useSelection = (El: Ref<HTMLDivElement>): SelectionFn => {
   let selection:Selection | null = null
   let range: Range | undefined = undefined
+  const status = ref<boolean>(false)
 
   const insertNode = (node) => {
     if (node && range) {
@@ -18,9 +21,10 @@ export const useSelection = (El: Ref<HTMLDivElement>): SelectionFn => {
     }
   }
 
-  const handlePointerup = (e) => {
+  const handlePointerup = () => {
     selection = getSelection()
     range = selection?.getRangeAt(0)
+    status.value = true
   }
 
   const bindEventListener = () => {
@@ -41,6 +45,8 @@ export const useSelection = (El: Ref<HTMLDivElement>): SelectionFn => {
   })
 
   return {
-    insertNode
+    status,
+    insertNode,
+    handlePointerup
   }
 }
