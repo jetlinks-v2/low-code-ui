@@ -18,6 +18,9 @@ const defaultVueRuntimeURL = `https://unpkg.com/@vue/runtime-dom@${version}/dist
 export const defaultVueCode = `
 <script setup>
 import { ref } from 'vue'
+import { installJetlinksPlugin } from './${jetlinksPluginFile}'
+//注册内部插件，ant-design-vue、axios
+installJetlinksPlugin();
 
 const msg = ref('Hello World!')
 </script>
@@ -30,12 +33,10 @@ const msg = ref('Hello World!')
 <style scoped></style>
 `.trim()
 
-// https://unpkg.com/jetlinks-ui-components@1.0.28/es/index.js
 const jetlinksImports = {
-  // 'ant-design-vue': 'http://localhost:8080/src/components/CustomHTML/ant-design-vue',
-  // '@ant-design/icons-vue': 'http://localhost:8080/src/components/CustomHTML/@ant-design/icons-vue',
-  // '@ant-design/icons-svg': 'http://localhost:8080/src/components/CustomHTML/@ant-design/icons-svg',
-  // '@ant-design/colors': 'http://localhost:8080/src/components/CustomHTML/@ant-design/colors',
+  'ant-design-vue': 'https://cdn.jsdelivr.net/npm/ant-design-vue@3.2.15/+esm',
+  // '@jetlinks/ui': 'https://cdn.jsdelivr.net/npm/jetlinks-ui-components@1.0.34-8/+esm',
+  'axios': 'https://cdn.jsdelivr.net/npm/axios@1.6.1/+esm',
 }
 
 const tsconfig = {
@@ -59,7 +60,7 @@ export class ReplStore implements Store {
   compiler = defaultCompiler
   vueVersion = version
 
-  private defaultVueRuntimeURL: string
+  private readonly defaultVueRuntimeURL: string
   constructor(code?: string) {
     const files: StoreState['files'] = {}
     if (!code) {
@@ -72,7 +73,7 @@ export class ReplStore implements Store {
       setFile(
         files,
         jetlinksPluginFile,
-        getJetlinksPluginCode('latest'),
+        getJetlinksPluginCode('3.2.15'),
         !import.meta.env.DEV,
       )
     }
@@ -243,13 +244,14 @@ function stripSrcPrefix(file: string) {
 function getJetlinksPluginCode(version: string | 'latest' | 'preview') {
   let jetlinksCss: string
   if (version === 'latest') {
-    jetlinksCss = 'https://unpkg.com/browse/jetlinks-ui-components/es/style.js'
+    jetlinksCss = 'https://cdn.jsdelivr.net/npm/ant-design-vue@latest/dist/antd.min.css'
   } else {
-    jetlinksCss = `https://unpkg.com/browse/jetlinks-ui-components@${version}/es/style.js`
+    jetlinksCss = `https://cdn.jsdelivr.net/npm/ant-design-vue@${version}/dist/antd.min.css`
   }
 
-  return `\
-// import JetlinksUI from '@jetlinks/ui'
+  return `
+import AntDesignVue from 'ant-design-vue'
+// import JetLinksUI from '@jetlinks/ui'
 import { getCurrentInstance } from 'vue'
 
 const jetlinksCss = '${jetlinksCss}'
@@ -257,8 +259,9 @@ const jetlinksCss = '${jetlinksCss}'
 await appendStyle()
 
 export function installJetlinksPlugin() {
-  // const instance = getCurrentInstance()
-  // instance.appContext.app.use(JetlinksUI)
+  const instance = getCurrentInstance()
+  // instance.appContext.app.use(JetLinksUI)
+  instance.appContext.app.use(AntDesignVue)
 }
 
 export function appendStyle() {
