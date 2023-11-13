@@ -2,13 +2,13 @@
   <j-spin :spinning='loading' :delay='300'>
     <div class='container'>
       <div class='left'>
-        <img :src='systemInfo?.backgroud || bgImage' alt=''>
+        <img :src='systemInfo?.backgroud || "/images/login.png"' alt=''>
         <a href="https://beian.miit.gov.cn/#/Integrated/index" target="_blank" rel="noopener noreferrer" class="records">
           备案：渝ICP备19017719号-1
         </a>
       </div>
       <div class='right'>
-        <Right :logo="systemInfo?.logo" :title="systemInfo?.title" :loading="loading" @submit="submit" />
+        <Right ref="rightRef" :logo="systemInfo?.logo" :title="systemInfo?.title" :loading="loading" @submit="submit" />
       </div>
     </div>
   </j-spin>
@@ -30,6 +30,9 @@ const { systemInfo } = storeToRefs(systemStore)
 
 // const { data: sysVersion } = useRequest<any, { version: string}>(systemVersion)
 
+const rightRef = ref()
+const { data: encryption, run: encryptionRun } = useRequest(encryptionConfig)
+
 const { loading, run } = useRequest(login, {
   immediate: false,
   onSuccess(res) {
@@ -38,12 +41,14 @@ const { loading, run } = useRequest(login, {
       userStore.getUserInfo()
       window.location.href = '/'
     }
+  },
+  onError() {
+    rightRef.value?.reload()
+    encryptionRun?.()
   }
 })
 
-const { data: encryption } = useRequest(encryptionConfig)
 
-const bgImage = getImage('/login/login.png')
 
 const submit = (data: any) => {
   const copyData = cloneDeep(data)
@@ -87,7 +92,7 @@ systemStore.queryInfo()
   .right {
     min-width: 400px;
     width: 27%;
-    display: flex;  
+    display: flex;
     flex-direction: column;
     justify-content: space-between;
   }

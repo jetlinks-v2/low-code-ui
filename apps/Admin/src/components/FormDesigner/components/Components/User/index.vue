@@ -1,30 +1,32 @@
 <template>
-  <j-select
-    placeholder="请选择"
-    v-model:value="selectData"
-    :open="false"
-    :showArrow="false"
-    @focus="showModal"
-    :options="selectOptions"
-    :mode="mode"
-    :disabled="disabled"
-    :size="size"
-    style="min-width: 230px;"
-  >
-  </j-select>
-  <UserChoice
-    v-if="modalVisible"
-    @closeModal="closeModal"
-    @selectedUser="selectedUser"
-    :selected="selectData"
-    :mode="mode"
-  ></UserChoice>
+  <div>
+    <j-button type="primary" @click="showModal">用户选择</j-button>
+    <div style="margin-top: 10px">
+      <j-tag v-for="item in __value" :key="item?.value">
+        <div style="display: flex">
+          {{ item?.label }}
+          <div @click="cancelSelect(item?.value)" style="margin-left: 10px">
+            <AIcon type="CloseOutlined" class="selectItemIcon" />
+          </div>
+        </div>
+      </j-tag>
+    </div>
+    <UserChoice
+      v-if="modalVisible"
+      @closeModal="closeModal"
+      @selectedUser="selectedUser"
+      :selected="selectData"
+      :mode="mode"
+    ></UserChoice>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import UserChoice from './UserChoice.vue'
 import { getUser_PaginateNot } from '@/api/form'
-import { ref, watch } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
+import { cloneDeep, map } from 'lodash-es'
+
 const props = defineProps({
   value: {
     type: Array,
@@ -42,11 +44,15 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  keys: {
+    type: Array,
+    default: () => [],
+  },
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value', 'change'])
 
-const selectData: any = ref([])
+const selectData = ref([])
 const modalVisible = ref(false)
 const selectOptions = ref([])
 
@@ -57,9 +63,38 @@ const closeModal = () => {
   modalVisible.value = false
 }
 
-const selectedUser = (data: any) => {
+const __value = computed(() => {
+  let arr: any[] = map(selectData.value, 'id')
+  return selectOptions.value.filter((item: any) => {
+    return arr.includes(item?.value)
+  })
+})
+
+const _getObj = (value: any) => {
+  const obj = {}
+  props.keys.map((item: any) => {
+    if (item?.key) {
+      obj[item.key] = value?.[item?.key]
+    }
+  })
+  return obj
+}
+
+const saveData = (data: any[]) => {
+  if (props.mode !== 'multiple') {
+    emit('update:value', _getObj(data?.[0]))
+  } else {
+    const arr = data.map((i) => {
+      return _getObj(i)
+    })
+    emit('update:value', arr)
+  }
+  emit('change')
+}
+
+const selectedUser = (data: any[]) => {
+  saveData(cloneDeep(data))
   modalVisible.value = false
-  emit('update:value', data)
 }
 
 const queryUser = () => {
@@ -76,18 +111,39 @@ const queryUser = () => {
     }
   })
 }
-queryUser()
+
+const cancelSelect = (val: string) => {
+  if(props.disabled){
+    return
+  }
+  const arr = selectData.value.filter((item: any) => item?.id !== val)
+  saveData(arr)
+}
 
 watch(
   () => props.value,
   () => {
-    selectData.value = props.value
+    if (props.mode !== 'multiple') {
+      selectData.value = Array.isArray(props?.value)
+        ? [props.value?.[0]]
+        : [props.value]
+    } else {
+      selectData.value = Array.isArray(props?.value) ? props?.value : []
+    }
   },
   {
     deep: true,
     // immediate:true
   },
 )
+
+onMounted(() => {
+  queryUser()
+})
 </script>
 <style lang="less" scoped>
+.selectItemIcon {
+  color: #333333;
+  font-size: 10px;
+}
 </style>

@@ -5,7 +5,7 @@
   "main": "index.ts",
   "module": "index.ts",
   "scripts": {
-    "clean": "pnpm rimraf node_modules && pnpm rimraf dist && pnpm rimraf .turbo"
+    "clean": "pnpm rimraf node_modules"
   },
   "keywords": [],
   "files": [
@@ -22,7 +22,8 @@
     "@types/lodash-es": "^4.17.7",
     "@types/node": "^20.2.5",
     "axios": "^1.4.0",
-    "jetlinks-ui-components": "^1.0.29",
+    "jetlinks-ui-components": "1.0.34-8",
+    "json-bigint": "^1.0.0",
     "lodash-es": "^4.17.21",
     "rxjs": "^7.8.1"
   }

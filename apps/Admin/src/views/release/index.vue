@@ -23,9 +23,9 @@
 
       <CardBox class="release-content"  v-if="loading">
         <div class="release-step-content">
-          <Status v-show="step === 0" v-model:status="status" />
+          <Status v-show="step === 0" v-model:status="status" v-model:theme="themeColor" />
           <Tree v-show="step === 1" ref="treeRef" @change="treeChange" />
-          <Finish v-show="step === 2" ref="finishRef"  v-model:value="finishStatus" :tree="tree" @statusChange="e => releaseStatus = e" />
+          <Finish v-show="step === 2" ref="finishRef"  v-model:value="finishStatus" :theme="themeColor" :tree="tree" @statusChange="e => releaseStatus = e" />
         </div>
         <div class="release-footer">
           <j-button v-if="step === 0" @click="cancel">取消</j-button>
@@ -65,6 +65,7 @@ const router = useRouter()
 
 const status = ref(true)
 const finishStatus = ref(false)
+const themeColor = ref('#1677ff')
 
 const releaseStatus = ref('')
 
@@ -84,11 +85,8 @@ const treeChange = (data) => {
 }
 
 const cancel = () => {
-  // 清空engine中的状态
-  engine.initEngineState()
-
   router.replace({
-    name: 'Engine',
+    name: 'engine',
     params: {
       id: route.params.id
     }
@@ -97,10 +95,13 @@ const cancel = () => {
 
 const release = () => {
   step.value += 1
+  console.log('release----releaseStart')
   finishRef.value?.releaseStart()
 }
 
 product.queryProduct(route.params.id, () => {
+  console.log('product.info', product.info)
+  themeColor.value = product.info.others?.theme
   loading.value = true
 })
 

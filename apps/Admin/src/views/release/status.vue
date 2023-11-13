@@ -36,10 +36,11 @@
                 <div v-else-if="status[node.id] === 1" @click="() => showModal(node.id)">
                   <AIcon style="color: #FF3333" type="CloseCircleFilled"/>
                   <span style="color: #FF3333;padding-left: 4px;">
-                    {{ statusMsg[node.id][0] }}
-                    <span v-if="statusMsg[node.id].length > 1">
-                      等{{ statusMsg[node.id].length }}个问题
-                    </span>
+                    未完成合规性校验
+<!--                    {{ statusMsg[node.id][0] }}-->
+<!--                    <span v-if="statusMsg[node.id].length > 1">-->
+<!--                      等{{ statusMsg[node.id].length }}个问题-->
+<!--                    </span>-->
                   </span>
                 </div>
                 <div v-else-if="status[node.id] === 2">
@@ -56,33 +57,42 @@
       <div style="margin-bottom: 4px">
         主题色
       </div>
-      <a-select
-        v-model:value="theme"
-        option-label-prop="label"
-        :options="options"
-        style="width: 100%"
-        @change="themeChange"
-      >
-        <template #option="{ value, label }">
-          <div style="display: flex;gap: 24px;" >
-            <div :style="{ width: '24px', height: '24px', backgroundColor: value}"></div>
-            {{ label }}
-          </div>
+      <div class="theme-select">
+        <div class="color" :style="{ backgroundColor: theme }">
 
-        </template>
-      </a-select>
+        </div>
+        <div style="flex: 1;">
+          <a-select
+            v-model:value="theme"
+            option-label-prop="label"
+            :options="options"
+            style="width: 100%"
+            @change="themeChange"
+          >
+            <template #option="{ value, label }">
+              <div style="display: flex;gap: 24px;" >
+                <div :style="{ width: '24px', height: '24px', backgroundColor: value}"></div>
+                {{ label }}
+              </div>
+            </template>
+          </a-select>
+        </div>
+      </div>
     </div>
     <div class="update-modal" v-show="visible">
       <div class="update-modal-header">
-        <span>快速修改</span>
+        <span>
+          快速修改
+          <span style="padding: 24px;color: #777;font-size: 14px; font-weight: 400;">修改完成后，请点击校验</span>
+        </span>
         <div class="update-modal-header-close" @click="cancel">
           <AIcon type="CloseOutlined" />
         </div>
       </div>
       <div class="update-modal-body">
         <FormDesigner v-if="modelData.type === providerEnum.FormPage" :key="modelData.data.id" :data="modelData.data" ref="modelRef"/>
-        <CustomHTML v-else-if="modelData.type === providerEnum.HtmlPage" :key="modelData.data.id" :data="modelData.data" ref="modelRef"/>
-        <CRUD v-else-if="modelData.type === providerEnum.CRUD" v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
+        <CustomHTML v-else-if="modelData.type === providerEnum.HtmlPage" :key="modelData.data.id" :data="modelData.data" ref="modelRef" />
+        <CRUD v-else-if="modelData.type === providerEnum.CRUD" v-bind="modelData.data" :key="modelData.data.id" ref="modelRef" />
         <ListPage v-else-if="modelData.type === providerEnum.ListPage" :data="modelData.data" :key="modelData.data.id" ref="modelRef"/>
         <SQLCode v-else-if="modelData.type === providerEnum.SQL"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
         <FunctionCode v-else-if="modelData.type === providerEnum.Function"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
@@ -90,9 +100,9 @@
     </div>
     <div class="release-validate-box">
       <FormDesigner v-if="validateContent.type === providerEnum.FormPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef"/>
-      <CustomHTML v-else-if="validateContent.type === providerEnum.HtmlPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef"/>
-      <CRUD v-else-if="validateContent.type === providerEnum.CRUD" :key="validateContent.key" v-bind="validateContent.data" ref="validateRef"/>
-      <ListPage v-else-if="validateContent.type === providerEnum.ListPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef"/>
+      <CustomHTML v-else-if="validateContent.type === providerEnum.HtmlPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef" :showTip="false"/>
+      <CRUD v-else-if="validateContent.type === providerEnum.CRUD" :key="validateContent.key" v-bind="validateContent.data" ref="validateRef" :showTip="false"/>
+      <ListPage v-else-if="validateContent.type === providerEnum.ListPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef" :showTip="false"/>
     </div>
   </div>
 </template>
@@ -103,7 +113,17 @@ import { providerEnum } from '@/components/ProJect/index'
 import { validateDraft } from "@/api/project";
 import { regular } from '@jetlinks/utils'
 
-const emit = defineEmits(['update:status'])
+const props = defineProps({
+  status: {
+    type: Number,
+  },
+  theme: {
+    type: String,
+    default: '#1677ff'
+  }
+})
+
+const emit = defineEmits(['update:status', 'update:theme'])
 
 const engine = useEngine()
 const product = useProduct()
@@ -127,7 +147,7 @@ const options = [
   { label: '海棠', value: '#eb2f96' },
 ]
 
-const theme = ref('#1677ff')
+const theme = ref(props.theme || '#1677ff')
 
 const check = reactive({
   success: 0,
@@ -286,20 +306,22 @@ const validateAll = async (id, cb) => {
 }
 
 const themeChange = (e) =>{
-  const item = product.getById(product.info.id)
-
-  item.others = {
-    ...(item.others || {}),
-    theme: e
-  }
-
-  product.update(item)
+  emit('update:theme', e)
+  // const item = product.getById(product.info.id)
+  //
+  // item.others = {
+  //   ...(item.others || {}),
+  //   theme: e
+  // }
+  //
+  // product.update(item)
 }
 
-const cancel = () => {
+const cancel = async () => {
   visible.value = false
   status[modelData.id] = 0
-  validateAll(modelData.id)
+  await validateDraftFn() // 重新查询错误信息
+  await validateAll(modelData.id)
 }
 
 const showModal = (id) => {
@@ -399,6 +421,16 @@ watch( () => JSON.stringify(status), () => {
     min-width: 300px;
     padding-left: 24px;
     border-left: 1px solid #e9e9e9;
+
+    .theme-select {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      .color {
+        width: 30px;
+        height: 30px;
+      }
+    }
   }
 }
 

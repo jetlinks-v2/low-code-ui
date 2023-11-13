@@ -7,7 +7,7 @@
             left: x + 'px',
             top: y + 'px'
          }">
-            <j-menu v-if="props.type === 'list'" @click="handleClick">
+            <j-menu v-if="props.type === 'list'" :selectedKeys="[]" @click="handleClick">
                <j-menu-item :key="actionMap['Profile'].key">{{ actionMap['Profile'].value }}</j-menu-item>
                <!-- <j-menu-item key="Cut">剪切</j-menu-item> -->
                <j-menu-item :key="actionMap['Copy'].key">{{ actionMap['Copy'].value }}</j-menu-item>
@@ -16,9 +16,26 @@
                <j-menu-item :key="actionMap['Delete'].key">{{ actionMap['Delete'].value }}</j-menu-item>
             </j-menu>
 
-            <j-menu v-else @click="handleClick">
-               <j-sub-menu :key="actionMap['Add'].key" :title="actionMap['Add'].value" style="width: 150px;">
-                  <j-menu-item :key="providerEnum.Module">
+            <j-menu v-else @click="handleClick" :selectedKeys="['']">
+               <j-sub-menu :key="actionMap['Add'].key" :title="actionMap['Add'].value" style="width: 150px; ">
+                  <template #icon>
+                     <img :src="getImage('/project/add.png')" style="width: 18px; height: 21px;margin-right: 6px;">
+                  </template>
+                  <div v-for="item in projectListMenu">
+                     <j-menu-item :key="item.type" style="line-height: 26px;height: 26px;font-size: 16px;">
+                        <template #icon>
+                           <img :src="item.img" style="width: 24px; height: 24px;">
+                        </template>
+                        {{ providerMap[item.type] }}
+                     </j-menu-item>
+                     <j-menu-item :key="item.type" style="height: 16px;line-height: 16px;">
+                        <div class="menu-text">{{ item.text }}</div>
+                     </j-menu-item>
+                  </div>
+               </j-sub-menu>
+
+               <!-- <j-sub-menu :key="actionMap['Add'].key" :title="actionMap['Add'].value" style="width: 150px; ">
+                  <j-menu-item :key="providerEnum.Module" >
                      <template #icon>
                         <img :src="getImage('/project/module.png')" style="width: 24px; height: 24px;">
                      </template>
@@ -60,9 +77,13 @@
                      </template>
                      {{ providerMap[providerEnum.Function] }}
                   </j-menu-item>
-               </j-sub-menu>
-               <j-menu-item :key="actionMap['Paste'].key" :disabled="disabled" v-if="type !== 'project'">{{
-                  actionMap['Paste'].value }}</j-menu-item>
+               </j-sub-menu> -->
+               <j-menu-item :key="actionMap['Paste'].key" :disabled="disabled" v-if="type !== 'project'">
+                  <template #icon>
+                     <img :src="getImage('/project/paste.png')" style="width: 24px; height: 24px;">
+                  </template>
+                  {{actionMap['Paste'].value }}
+               </j-menu-item>
             </j-menu>
          </div>
       </Teleport>
@@ -72,7 +93,7 @@
 <script setup lang='ts' name="ContextMenu">
 import { useContextMenu } from '@/hooks/useContextMenu';
 import { useEngine } from '@/store'
-import { providerEnum, providerMap, actionMap } from '../../index'
+import { providerEnum, providerMap, actionMap, projectListMenu } from '../../index'
 import { getImage } from '@jetlinks/utils';
 
 const engine = useEngine()
@@ -133,11 +154,23 @@ watch(
 
    :deep(.ant-menu) {
       border: 1px solid #eee;
+
+      .ant-menu-vertical>.ant-menu-submenu>.ant-menu-submenu-title {
+         line-height: 26px;
+         height: 26px;
+      }
    }
 
    .menu-img {
       width: 24px;
       height: 24px;
    }
+}
+
+.menu-text {
+   color: rgba(0, 0, 0, 0.55);
+   font-size: 14px;
+   line-height: 14px;
+   margin-left: 40px;
 }
 </style>

@@ -29,6 +29,14 @@ export default defineComponent({
     index: {
       type: Number,
       default: 0
+    },
+    visible: {
+      type: Boolean,
+      default: true
+    },
+    editable: {
+      type: Boolean,
+      default: true
     }
   },
   setup(props) {
@@ -45,10 +53,11 @@ export default defineComponent({
         type: props.data?.type + '-item',
         children: [],
         formItemProps: {
-          name: uid(6)
+          name: props.data?.type + '-item' + '_' + uid(6),
+          isLayout: true
         },
         componentProps: {
-          name: 'Collapse' + uid(6)
+          name: 'Title'
         }
       })
       designer.onAddChild(_item, props.data)
@@ -81,6 +90,8 @@ export default defineComponent({
           unref(list)?.length ? <Collapse data-layout-type={'collapse'} {...props.data.componentProps}>
             {
               unref(list).map((element) => {
+                const __path = [..._path, element.formItemProps?.name]
+
                 return (
                   <CollapsePanel key={element.key} {...omit(element.componentProps, 'header')} header={element.componentProps?.name}>
                     <Selection
@@ -98,8 +109,11 @@ export default defineComponent({
                         data={element.children}
                         data-layout-type={'item'}
                         parent={element}
-                        path={_path}
-                        index={_index + 1}
+                        path={__path}
+                        index={unref(_isLayout) ? _index + 2 : _index + 1}
+                        index={_index + 2}
+                        visible={props.visible}
+                        editable={props.editable}
                       />
                     </Selection>
                   </CollapsePanel>

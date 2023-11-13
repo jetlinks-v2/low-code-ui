@@ -27,6 +27,14 @@ export default defineComponent({
         index: {
             type: Number,
             default: 0
+        },
+        visible: {
+            type: Boolean,
+            default: true
+        },
+        editable: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
@@ -51,7 +59,10 @@ export default defineComponent({
                 const _item = generatorData({
                     type: props.data?.type + '-item',
                     children: [],
-                    componentProps: {}
+                    componentProps: {},
+                    formItemProps: {
+                        isLayout: false
+                    },
                 })
                 designer.onAddChild(_item, props.data)
             }
@@ -77,7 +88,9 @@ export default defineComponent({
                                                     data={element.children}
                                                     parent={element}
                                                     path={_path}
-                                                    index={_index + 1}
+                                                    index={_index}
+                                                    visible={props.visible}
+                                                    editable={props.editable}
                                                 />
                                             </Selection>
                                         </div>

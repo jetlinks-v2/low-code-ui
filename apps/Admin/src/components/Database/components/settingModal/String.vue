@@ -5,7 +5,7 @@
   <j-form-item label="校验规则" :name="['validator', 'provider']">
     <SelectNull
       :options="rulesOptions"
-      v-model:value="model.validator.provider"
+      v-model:value="model.validator.providerType"
       @change="providerChange"
     />
   </j-form-item>
@@ -38,7 +38,7 @@
       v-model:value="model.validator.configuration.group"
     />
   </j-form-item>
-  <j-form-item v-if="model.validator.provider" label="校验不通过时提示语" :name="['validator', 'configuration', 'message']" :rules="rules.message">
+  <j-form-item v-if="model.validator.providerType" label="校验不通过时提示语" :name="['validator', 'configuration', 'message']" :rules="rules.message">
     <j-input v-model:value="model.validator.configuration.message" />
   </j-form-item>
 <!--  <j-form-item label="最大长度" :name="['validator', 'configuration', 'message']">-->
@@ -59,17 +59,17 @@ import SelectNull from './SelectNull.vue'
 const model = inject(SETTING_FORM_MODEL, {})
 
 const showRegexp = computed(() => {
-  return model.value.validator.provider === 'pattern'
+  return model.value.validator.providerType === 'pattern'
 })
 
 const showGroup = computed(() => {
-  return model.value.validator.provider
+  return model.value.validator.providerType
 })
 
 const rulesOptions = [
   {
     label: '非空',
-    value: 'noEmpty'
+    value: 'notEmpty'
   },
   {
     label: '正则表达式',
@@ -127,32 +127,40 @@ const rules = {
 const providerChange = (key) => {
   const configuration = model.value.validator.configuration
   const _group = configuration.group || ['save', 'update', 'insert']
+  const message = configuration.message || '数据格式错误'
+
+  if (['email', 'phone'].includes(key)) {
+    model.value.validator.provider = 'pattern'
+  } else {
+    model.value.validator.provider = key
+  }
+
   switch (key) {
-    case 'noEmpty':
+    case 'notEmpty':
       model.value.validator.configuration = {
-        message: configuration.message,
+        message: message,
         group: _group
       }
       break;
     case 'pattern':
       model.value.validator.configuration = {
-        message: configuration.message,
+        message: message,
         group: _group,
         regexp: undefined
       }
       break;
     case 'email':
       model.value.validator.configuration = {
-        message: configuration.message,
+        message: message,
         group: _group,
-        regexp: regular.emailReg
+        regexp: `^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$`
       }
       break;
     case 'phone':
       model.value.validator.configuration = {
-        message: configuration.message,
+        message: message,
         group: _group,
-        regexp: regular.cellphoneReg
+        regexp: `^(((\\+86)|(\\+86-))|((86)|(86\\-))|((0086)|(0086\\-)))?1[3|5|7|8|9]\\d{9}$`
       }
       break;
     default:

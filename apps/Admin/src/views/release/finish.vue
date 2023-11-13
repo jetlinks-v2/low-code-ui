@@ -35,11 +35,17 @@ import { releaseDraft } from '@/api/project'
 import { saveMenu } from '@/api/menu'
 import { useIntervalFn } from '@vueuse/core'
 import { useNetwork } from '@jetlinks/hooks'
+import { useProduct } from '@/store'
+import { updateButtons } from '@/components/Menu'
 
 const props = defineProps({
   tree: {
     type: Array,
     default: () => []
+  },
+  theme: {
+    type: String,
+    default: ''
   }
 })
 
@@ -47,7 +53,7 @@ const emit = defineEmits(['update:value', 'statusChange'])
 
 useNetwork({
   onLine() {
-    if (status.value !== 'success') { // 网络重连，并且状态不是成功时
+    if (status.value !== 'success' && width.value !== 100) { // 网络重连，并且状态不是成功时
       restart()
     }
   }
@@ -58,6 +64,8 @@ const status = ref('')
 const loading = ref(true)
 const errorMsg = ref('')
 const route = useRoute()
+const product = useProduct()
+
 let count = 0
 
 const { pause, resume } = useIntervalFn(() => {
@@ -81,13 +89,69 @@ const releaseDraftFn = (id) => {
     pause()
   })
 }
+
+const themeChange = () =>{
+  const item = product.getById(product.info.id)
+
+  item.others = {
+    ...(item.others || {}),
+    theme: props.theme
+  }
+
+  product.update(item, () => {
+    const { id } = route.params
+
+    if (id) {
+      status.value = 'loading'
+      releaseDraftFn(id)
+    }
+  })
+}
+
+/**
+ * 更新crud中发的列
+ */
+// const updateCrudOther = (data) => {
+//   return data.map(item => {
+//     if (item.others.type === providerEnum.CRUD) {
+//       const columnsKeys = item.configuration.columns?.map(item => item.name)
+//       item.others = {
+//         ...item.others,
+//         columns: columnsKeys
+//       }
+//     }
+//
+//     if (item.children) {
+//       item.children = updateCrudOther(item.children)
+//     }
+//
+//     return item
+//   })
+// }
+
+const getTree = () => {
+  const maps = product.getDataMap()
+  const copyData = JSON.parse(JSON.stringify([...maps.values()]))
+
+  return copyData.filter(item => {
+    return item.others && item.others?.menu && item.others?.menu.main
+  }).map(item => {
+    item.parentFullId = maps.get(item.parentId).fullId || item.parentId
+    return item
+  })
+}
 const saveMenuFn = (id) => {
   count = 90
-  saveMenu(props.tree).then(resp => {
+  const sourceTree = getTree()
+  const _tree = updateButtons(sourceTree, props.tree)
+  console.log(_tree)
+  saveMenu(_tree).then(resp => {
     width.value = 100
     count = 100
     loading.value = true
     status.value = 'success'
+    // const arr = updateCrudOther(product.data)
+    // product.update(arr[0])
     pause()
   }).catch((e) => {
     width.value = 90
@@ -99,12 +163,7 @@ const saveMenuFn = (id) => {
 }
 
 const releaseStart = async () => {
-  const { id } = route.params
-
-  if (id) {
-    status.value = 'loading'
-    releaseDraftFn(id)
-  }
+  themeChange()
 }
 
 const restart = () => {

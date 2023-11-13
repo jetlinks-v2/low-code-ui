@@ -1,16 +1,10 @@
 export const validListForm = (data1, data2) => {
   let errorList: any = []
   if(data1.configured.includes('card')) {
-    if(!data2.field1) errorList.push({
+    if(!data2.field1?.length) errorList.push({
       key: 'field1',
       message: '字段1必填'
     })
-    if(data2.specialStyle?.length && !data2.emphasisField?.length) {
-      errorList.push({
-        key: 'emphasisField',
-        message: '请配置'
-      })
-    }
   }
   return errorList
 }

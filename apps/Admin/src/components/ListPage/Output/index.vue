@@ -1,40 +1,47 @@
 <template>
-  <div class="preview">
-    <div style="padding: 30px; background-color: #f2f2f2">
+  <div class="list-page-output">
+    <CardBox padding="0">
       <pro-search
         :columns="searchColumns"
-        target="code"
+        :target="target"
         @search="handleSearch"
       />
-
-      <div style="background-color: #ffffff">
-        <ProTable
-          :query="query"
-          :pagination="pagination"
-          :model="tableForm"
-          :cardConfig="cardConfig"
-          :dataColumns="dataColumns"
-          :headerActions="headerActions"
-          :defaultFormType="defaultFormType"
-          :params='params'
-          :tableActions="actions"
-          @openJson="(newValue) => (jsonData = newValue)"
-          ref="tableRef"
-        />
-      </div>
-    </div>
+    </CardBox>
+    <CardBox style="margin-top: 24px" padding="0">
+      <ProTable
+        :query="query"
+        :pagination="pagination"
+        :model="tableForm"
+        :cardConfig="cardConfig"
+        :dataColumns="dataColumns"
+        :headerActions="headerActions"
+        :defaultFormType="defaultFormType"
+        :params="params"
+        :tableActions="actions"
+        :projectId="projectId"
+        :pageId="pageId"
+        :showColumnOptions="allData.showType?.showColumns"
+        @openJson="(newValue) => (jsonData = newValue)"
+        ref="tableRef"
+      />
+    </CardBox>
   </div>
   <!-- 批量导入 -->
   <Import
     v-model:open="importVisible"
+    :popData="popData"
+    :projectId="projectId"
     @close="importVisible = false"
-    @save="importVisible = false"
+    @save="handleImportOk"
   />
   <!-- 批量导出 -->
   <Export
     v-model:open="exportVisible"
+    :popData="popData"
+    :projectId="projectId"
+    :selectedRowKeys="$refs.tableRef?._selectedRowKeys"
     @close="exportVisible = false"
-    @save="exportVisible = false"
+    @save="handleExportOk()"
   />
   <!-- 新增 -->
   <CallPage
@@ -42,6 +49,8 @@
     :resource="popResource"
     :type="commandType"
     :popData="popData"
+    :dataColumns="dataColumns"
+    :projectId="projectId"
     @close="addVisible = false"
     @save="addVisible = false"
     @reload="reloadTable"
@@ -52,30 +61,52 @@
     :json="jsonData.value"
     @close="jsonData.previewVisible = false"
   />
+  <Relation 
+    v-model:open="relationVisible" 
+    :config="columnOperation"
+    :preview="false"
+    :data="popData" 
+    :projectId="projectId"
+  />
 </template>
 
 <script setup lang="ts" name="Preview">
 import ProTable from '../Preview/components/tableModel.vue'
 import dayjs from 'dayjs'
-import Import from '../Preview/components/Import.vue'
-import Export from '../Preview/components/Export.vue'
+import Import from './components/Import.vue'
+import Export from './components/Export.vue'
 import CallPage from './components/CallPages.vue'
+import Relation from './components/Relation/index.vue'
 import JsonPreview from '../Preview/components/JsonPreview.vue'
 import { queryRuntime } from '@/api/form'
-import { useProduct } from '@/store';
+import { onlyMessage } from '@jetlinks/utils'
+import { dictionaryItemList } from '@/api/list'
+import { request } from '@jetlinks/core'
 
 const props = defineProps({
   data: {
     type: String,
-    default: '{}'
-  }
+    default: '{}',
+  },
+  projectId: {
+    type: String,
+    default: '',
+  },
+  pageId: {
+    type: String,
+    default: '',
+  },
 })
 
+const route = useRoute()
 const importVisible = ref<boolean>(false)
 const exportVisible = ref<boolean>(false)
 const addVisible = ref<boolean>(false)
-const productStore = useProduct();
-const { info } = productStore
+const relationVisible = ref(false)
+const sid = ref(route.params.sid)
+const target = computed(() => {
+  return `${props.projectId}.${props.pageId}`
+})
 
 const allData = computed(() => {
   return JSON.parse(props.data || '{}')
@@ -83,11 +114,15 @@ const allData = computed(() => {
 
 const tableRef = ref()
 const tableForm = computed(() => {
-  return allData.value?.showType?.configured.length == 2 ? '' : allData.value?.showType?.configured.includes('list') ? 'TABLE' : 'CARD'
+  return allData.value?.showType?.configured.length == 2
+    ? ''
+    : allData.value?.showType?.configured.includes('list')
+    ? 'TABLE'
+    : 'CARD'
 })
 
 const defaultFormType = computed(() => {
-  return allData.value?.showType?.defaultForm == 'list' ? 'TABLE' : 'CARD';
+  return allData.value?.showType?.defaultForm == 'list' ? 'TABLE' : 'CARD'
 })
 const jsonData = ref<any>({
   previewVisible: false,
@@ -102,10 +137,21 @@ const dataColumns: any = computed(() => {
       title: item.name,
       dataIndex: item.id,
       key: item.id,
-      ellipsis: true,
+      ellipsis: false,
       scopedSlots: true,
       align: item?.config?.colLayout,
       config: item.config,
+      width: 200,
+      sorter: item.config?.checked,
+      customHeaderCell: column => {
+        return {
+          style: {
+            'min-width': "200px",
+            "white-space": "nowrap",
+            "text-overflow": "ellipsis"
+          }
+        };
+      }
     }
   })
   if (actions.value?.length !== 0 && allData.value?.showColumns) {
@@ -113,13 +159,22 @@ const dataColumns: any = computed(() => {
       title: '操作',
       key: 'action',
       scopedSlots: true,
-      width: actions.value?.length * 80 + `px`,
+      width: actions.value.length > 3 ? '192px' : actions.value?.length * 40 + 32 + `px`,
+      customHeaderCell: column => {
+        return {
+          style: {
+            'max-width': "192px",
+            "white-space": "nowrap",
+            "text-overflow": "ellipsis"
+          }
+        };
+      },
+      fixed: 'right',
     })
   }
   return arr
 })
 const searchColumns: any = ref([])
-const typeChangeShow = ref(false)
 //操作按钮
 const actions = ref([])
 //table头部按钮
@@ -137,9 +192,20 @@ const cardConfig = ref({
   specialStyle: '',
 })
 
-const popResource= ref<Record<string, any>>({})
+const popResource = ref<Record<string, any>>({})
+const columnOperation = ref<Record<string, any>>({})
 const commandType = ref<string>('')
 const popData = ref<Record<string, any>>({})
+
+const handleImportOk = () => {
+  importVisible.value = false
+  tableRef.value?.reload()
+}
+
+const handleExportOk = () => {
+  exportVisible.value = false
+  tableRef.value._selectedRowKeys = []
+}
 
 //分页
 const pagination = reactive({
@@ -165,7 +231,7 @@ const tableHeader = () => {
       title: item.name,
       dataIndex: item.id,
       key: item.id,
-      ellipsis: true,
+      ellipsis: false,
       scopedSlots: true,
       align: item?.config?.colLayout,
       config: item.config,
@@ -177,6 +243,7 @@ const tableHeader = () => {
       key: 'action',
       scopedSlots: true,
       width: actions.value?.length * 80 + `px`,
+      fixed: 'right',
     })
   }
 }
@@ -187,7 +254,7 @@ const componentPropsSwitch = (item: any) => {
   switch (type) {
     case 'date':
       const format =
-        item?.config?.accuracy === 'hour' ? 'HH:mm:ss' : 'YYYY-MM-DD'
+        item?.config?.accuracy === 'hour' ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD'
       const type = item?.config?.accuracy === 'hour' ? 'time' : 'date'
       const defaultValue =
         item?.config?.defaultValue === 'not'
@@ -196,9 +263,10 @@ const componentPropsSwitch = (item: any) => {
           ? dayjs(new Date())
           : dayjs(new Date()).format(format)
       data = {
-        format: format,
+        valueFormat: format,
         type: type,
         defaultValue: defaultValue,
+        showTime: item?.config?.accuracy === 'hour'
       }
       break
     case 'enum':
@@ -223,12 +291,42 @@ const searchData = () => {
       title: item.name,
       dataIndex: item.id,
       key: item.id,
-      ellipsis: true,
+      ellipsis: false,
       search: {
         type: searchType(item.type),
         componentProps: {
           placeholder: placeholder,
           ...componentProps,
+        },
+        options: () => {
+          if (item.config?.value === 'data') {
+            return new Promise((resolve) => {
+              dictionaryItemList(item.config?.dataValue).then((resp: any) => {
+                if(resp.success) {
+                  resolve(resp.result?.map(item => {
+                    return {
+                      value: item.value,
+                      label: item.text
+                    }
+                  }))
+                }
+              })
+            })
+          } else if(item.config?.value == 'rearEnd') {
+            return new Promise((resolve) => {
+              queryRuntime(props.projectId, item.config?.abilityValue, item.config?.instructValue, {}).then((resp: any) => {
+                let result = (resp.result?.data || resp.result)
+                .filter((val) => val[item.config?.outputKey])
+                .map(val => {
+                  return {
+                    label: val[item.config?.outputKey],
+                    value: val[item.config?.outputKey]
+                  }
+                })
+                resolve(result)
+              })
+            })
+          }
         },
       },
     }
@@ -236,26 +334,26 @@ const searchData = () => {
 }
 
 const searchType = (type_: string) => {
-  let type = '';
-  switch(type_) {
+  let type = ''
+  switch (type_) {
     case 'enum':
       type = 'select'
-    break;
+      break
     default:
       type = type_
-    break
+      break
   }
-  return type;
+  return type
 }
-const router = useRouter()
 
-const actionsBtnFormat = (data: any) => {
+const actionsBtnFormat = (data: any, type: string) => {
   const finalData = data?.map((item: any) => {
-    return {
+    let result = {
       ...item,
-      key: item?.key,
+      key: item?.command === 'Delete' ? 'delete' : item?.key,
+      id: item?.key,
       text: item?.title,
-      icon: item?.icon,
+      icon: type == 'actions' ? item?.icon || 'SettingOutlined' : item?.icon,
       type: item?.type,
       command: item?.command,
       pages: item?.pages,
@@ -263,55 +361,159 @@ const actionsBtnFormat = (data: any) => {
         tooltip: {
           title: item?.title,
         },
-        hasPermission: false,
+        hasPermission: route.params.sid ? `${route.params.sid}:${item.type === 'Delete' ? 'delete' : item?.key}` : true,
         popConfirm:
-          item?.command === 'Delete'
+          item?.command === 'Delete' && item?.title !== '批量删除'
             ? {
                 title: data?.status === 'error' ? '禁用' : '确认删除？',
                 onConfirm: async () => {
-                  const res = await queryRuntime(info.id, item.functions, item.command, {terms: [{column: 'id', termType: 'eq', value: data.id}]})
-                  if(res.success) {
-                    tableRef.value?.reload?.();
+                  const res = await queryRuntime(
+                    props.projectId,
+                    item.functions,
+                    item.command,
+                    {
+                      terms: [{ column: 'id', termType: 'eq', value: data.id }],
+                    },
+                  )
+                  if (res.success) {
+                    tableRef.value?.reload?.()
                   }
                 },
               }
             : false,
         onClick: () => {
-          if(item.script) {
-            eval(item.script)
-          }
-          console.log(data, item);
-          importVisible.value = data?.command === 'Import'
-          exportVisible.value = data?.command === 'Export'
-          addVisible.value = !!item.pages
-          popResource.value = {
-            callPage: item.resource || [],
-            function: item.functions,
-            command: item.command
-          }
-          popData.value = item?.command === 'Update' ? data : undefined
-          commandType.value = item.command
+          handleActions(data, item)
         },
       }),
-      children: actionsBtnFormat(item?.children || []),
+      children: actionsBtnFormat(item?.children || [], type),
     }
+    if (item.title == '批量删除') {
+      result['selected'] = {
+        popConfirm: {
+          title: '确认删除吗？',
+          onConfirm: async () => {
+            if (!tableRef.value?._selectedRowKeys.length) {
+              onlyMessage('请选择删除项', 'error')
+              return
+            }
+            const params = {
+              terms: [
+                ...tableRef.value?._selectedRowKeys.map((item) => {
+                  return {
+                    value: item,
+                    termType: 'eq',
+                    column: 'id',
+                    type: 'or',
+                  }
+                }),
+              ],
+            }
+            const res = await queryRuntime(
+              props.projectId,
+              item.functions,
+              item.command,
+              params,
+            )
+            if (res.success) {
+              tableRef.value._selectedRowKeys = []
+              tableRef.value?.reload()
+            }
+          },
+        },
+      }
+    } else if (item.title === '批量导出') {
+      result['selected'] = {
+        popConfirm: {
+          title: '确认导出吗？',
+          onConfirm: async () => {
+            handleActions(item, item)
+            // const res = await queryRuntime(
+            //   props.projectId,
+            //   item.functions,
+            //   item.command,
+            //   params,
+            // )
+            // if(res.success) {
+            //   tableRef.value._selectedRowKeys = [];
+            //   tableRef.value?.reload();
+            // }
+          },
+        },
+      }
+    } else {
+      result['onClick'] = (data_) => {
+        handleActions(data_, item)
+      }
+    }
+    return result
   })
   return finalData
+}
+
+//按钮操作
+const handleActions = (
+  data: Record<string, any>,
+  config: Record<string, any>,
+) => {
+  if(config.script) {
+    const _this = {
+      request: request,
+      onlyMessage: onlyMessage
+    }
+    let customFn = new Function('data', 'callback', config.script)
+    customFn.call(_this, data, () => {
+      tableRef.value.reload()
+    })
+  }
+  columnOperation.value = config
+  popData.value = data
+  if (
+    config.type === 'Add' ||
+    config.type === 'Update' ||
+    config.type === 'Detail'
+  ) {
+    // if(config.resource.type === providerEnum.FormPage) {
+    addVisible.value = true
+    popResource.value = {
+      callPage: config.resource || [],
+      function: config.functions,
+      command: config.command,
+      modalWidth: config.modalWidth,
+      modalWidthUnit: config.modalWidthUnit,
+    }
+    commandType.value = config.type
+    // } else if(config.resource.type === providerEnum.HtmlPage) {
+    //   router.push(`/preview/${config.resource.projectId}/${config.resource.parentId}/${config.resource.id}/html/${randomString(8)}`)
+    // }
+  }
+  if (config.command === 'Import') {
+    importVisible.value = data?.command === 'Import'
+  }
+  if (config.command === 'Export') {
+    exportVisible.value = data?.command === 'Export'
+  }
+  if(config.type === 'Relation') {
+    relationVisible.value = true
+  }
 }
 //表头按钮
 const handleHeaderActions = () => {
   const btnData = allData.value?.addButton || []
-  console.log(`output->btnData`,btnData)
-  headerActions.value = actionsBtnFormat(btnData)
+  headerActions.value = actionsBtnFormat(btnData, 'headerActions')
 }
 //table操作按钮
 const handleRowActions = () => {
   const btnData = allData.value?.actionsButton || []
-  actions.value = actionsBtnFormat(btnData)
+  actions.value = actionsBtnFormat(btnData, 'actions')
 }
 //table数据
 const query = (_params: Record<string, any>) => {
-  return queryRuntime(info.id, allData.value?.dataBind.data.function, allData.value?.dataBind.data.command, _params)
+  return queryRuntime(
+    props.projectId,
+    allData.value?.dataBind.data.function,
+    allData.value?.dataBind.data.command,
+    _params,
+  )
 }
 const params = ref()
 const handleSearch = (data: any) => {
@@ -319,45 +521,58 @@ const handleSearch = (data: any) => {
 }
 
 const reloadTable = () => {
-  tableRef.value?.reload();
-  addVisible.value = false;
+  tableRef.value?.reload()
+  addVisible.value = false
 }
-watch(() => JSON.stringify(allData.value), () => {
-  console.log(`output->allData.value`,allData.value)
-  //分页
-  pagingData()
-  //卡片样式
-  cardConfig.value = allData.value?.listFormInfo || {}
-  //列表头部
-  tableHeader()
-  //筛选search
-  searchData()
-  //table形态选择
-  //table头部按钮
-  handleHeaderActions()
-  //table操作按钮
-  handleRowActions()
-}, { immediate: true })
+watch(
+  () => JSON.stringify(allData.value),
+  () => {
+    //分页
+    pagingData()
+    //卡片样式
+    cardConfig.value = allData.value?.listFormInfo || {}
+    //列表头部
+    tableHeader()
+    //筛选search
+    searchData()
+    //table形态选择
+    //table头部按钮
+    handleHeaderActions()
+    //table操作按钮
+    handleRowActions()
+  },
+  { immediate: true },
+)
+
+
+provide('pageId', props.pageId)
+provide('projectId', props.projectId)
+provide('sid', sid)
+
+console.log();
 </script>
 
 <style lang="less" scoped>
-.ant-page-header {
-  padding: 2px 20px 2px 20px;
-}
-.header {
-  background-color: #808080;
-  .sub-title {
-    color: #f5f5f5;
-    font-size: 20px;
+.list-page-output {
+  height: 100%;
+  overflow: auto;
+  .ant-page-header {
+    padding: 2px 20px 2px 20px;
   }
-}
-.right-button {
-  padding: 16px 24px 0px;
-  width: 100%;
-  display: flex;
-  justify-content: end;
-  .right-button-icon {
-    font-size: 16px;
+  .header {
+    .sub-title {
+      color: #f5f5f5;
+      font-size: 20px;
+    }
+  }
+  .right-button {
+    padding: 16px 24px 0px;
+    width: 100%;
+    display: flex;
+    justify-content: end;
+    .right-button-icon {
+      font-size: 16px;
+    }
   }
 }
 </style>

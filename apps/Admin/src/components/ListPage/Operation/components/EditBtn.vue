@@ -47,7 +47,7 @@ const handleBack = () => {
   }
 }
 
-const save = async (callback: () => void) => {
+const save = async (callback: (...any) => void) => {
   const valid = await EditRef.value?.submit()
   if(valid) {
     if(editType!.value == 'add'){
@@ -73,7 +73,7 @@ const save = async (callback: () => void) => {
         }
       })
     }
-    callback && callback();
+    callback && callback(EditRef.value?.jsError, EditRef.value?.cssError);
   }
 }
 

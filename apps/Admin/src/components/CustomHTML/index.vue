@@ -6,7 +6,7 @@ import Preview from './output/Preview.vue'
 import MenuList from '@/components/ListPage/MenuConfig/components/menu.vue'
 import { debounce } from './utils'
 import MonacoEditor from './editor/MonacoEditor.vue'
-import { ReplStore } from './store'
+import {defaultMainFile, ReplStore} from './store'
 import 'splitpanes/dist/splitpanes.css'
 import { useProduct } from '@/store/product'
 import { storeToRefs } from 'pinia'
@@ -14,7 +14,11 @@ import { onlyMessage } from '@jetlinks/utils'
 import { BASE_INFO, MENU_CONFIG } from "@/components/ListPage/keys";
 
 const props = defineProps({
-  data: Object
+  data: Object,
+  showTip: {
+    type: Boolean,
+    default: true
+  }
 })
 
 
@@ -32,6 +36,7 @@ enum OperType {
 }
 
 const onChange = debounce((code: string) => {
+  store.state.activeFile.code = code
   productStore.update({
     ...props.data,
     configuration: {
@@ -39,7 +44,6 @@ const onChange = debounce((code: string) => {
       code
     }
   })
-
 }, 250)
 
 // const onBlur = debounce(() => updateStoreCode(), 250)
@@ -85,7 +89,6 @@ const handleOperClick = (type: OperType) => {
   } else if (type === OperType.Menu) {
     drawerTitle.value = '菜单配置'
   }
-  console.log(drawerVisible.value)
   !drawerVisible.value && (activeOper.value = '')
 }
 
@@ -105,7 +108,7 @@ const runCode = () => {
   previewRef.value.updatePreview()
   window.addEventListener('message', (ac) => {
     runLoading.value = false
-    if (ac.data.action === 'error') {
+    if (ac.data.action === 'error' && ac.data.error) {
       store.state.errors = [ac.data.error]
     }
   })
@@ -113,14 +116,16 @@ const runCode = () => {
 
 const handleValidate = async () => {
   const menuStatus = await validateMenu()
-  if (menuStatus) {
-    // onlyMessage(errors.value[0].errors[0], 'error')
-  } else if(!store.state.activeFile.code){
-    onlyMessage('页面代码为空', 'error')
-  } else if(store.state.errors?.length > 0) {
-    onlyMessage('运行日志报错', 'error');
-  } else {
-    onlyMessage('校验成功', 'success')
+  if (props.showTip) {
+    if (menuStatus) {
+      // onlyMessage(errors.value[0].errors[0], 'error')
+    } else if(!store.state.activeFile.code){
+      onlyMessage('页面代码为空', 'error')
+    } else if(store.state.errors?.length > 0) {
+      onlyMessage('运行日志报错', 'error');
+    } else {
+      onlyMessage('校验通过', 'success')
+    }
   }
 }
 
@@ -129,7 +134,6 @@ provide(MENU_CONFIG, menuFormData)
 
 const validateMenu = async () => {
   const resp = await menuListRef.value?.vaildate()
-  console.log(resp)
   if (resp.errorFields) {
     menuError.value = resp.errorFields.length
     return true
@@ -178,7 +182,7 @@ const errorValidate = async () => {
   if (!store.state.activeFile.code) {
     err.push({message: '页面代码为空'})
   }
-  console.log('errorValidate',err)
+
   return new Promise((resolve, reject) => {
     if (err.length) {
       reject(err)
@@ -198,6 +202,17 @@ const submit = () => {
   cancel()
 }
 
+const editorFocus = () => {
+  if (activeOper.value === OperType.Menu) {
+    drawerVisible.value = false
+    activeOper.value = ''
+  }
+}
+
+const errorChange = (e) => {
+  console.log('errorChange', e)
+}
+
 watch(() => props.data?.title, () => {
   menuFormData.value = {
     ...props.data.others.menu,
@@ -212,11 +227,12 @@ defineExpose({
 
 <template>
   <div class="jetlinks-repl" ref="replRef">
-    <SplitPane class="split-pane">
+    <SplitPane class="split-pane" @click="editorFocus">
       <template #editor>
         <EditorContainer @dbClick="handleDbCLickEditor">
           <MonacoEditor
             @change="onChange"
+            @errorChange="errorChange"
             :filename="store.state.activeFile.filename"
             :value="store.state.activeFile.code"
           />
@@ -277,17 +293,18 @@ defineExpose({
         </div>
       </div>
       <div class="drawer-body">
-        <Preview v-if="activeOper === OperType.View" ref="previewRef" :code="data?.configuration?.code" />
-        <MenuList
-          v-show="activeOper === OperType.Menu"
-          ref="menuListRef"
-          @change="updateMenuFormData"
-        />
+        <Preview v-if="activeOper === OperType.View" ref="previewRef" />
+        <div v-show="activeOper === OperType.Menu">
+          <MenuList
+            ref="menuListRef"
+            @change="updateMenuFormData"
+          />
+        </div>
       </div>
-      <div class="drawer-footer" v-show="activeOper === OperType.Menu">
-        <j-button @click="cancel">取消</j-button>
-        <j-button type="primary"  @click="submit">确认</j-button>
-      </div>
+<!--      <div class="drawer-footer" v-show="activeOper === OperType.Menu">-->
+<!--        <j-button @click="cancel">取消</j-button>-->
+<!--        <j-button type="primary"  @click="submit">确认</j-button>-->
+<!--      </div>-->
     </div>
   </div>
 </template>

@@ -45,7 +45,7 @@
             onVisibleChange: setVisible,
         }" 
         :src="getImage('/menu/menu.png')" />
-    <Save v-if="visible" @close="visible = false" :data="treeItem" @ok="onOk" />
+    <Save v-if="visible" @close="visible = false" :data="treeItem" @ok="onOk" :projectId="projectId"/>
     <DelModal v-if="visibleDel" @close="visibleDel = false" @ok="onDel" :data="treeItem" />
 </template>
 
@@ -147,7 +147,7 @@ const setVisible = (value) => {
 
 //拖拽
 const onDrop = (info: AntTreeNodeDropEvent) => {
-    // console.log('info-----------', info.dropToGap,info)
+    console.log('info-----------', info.dropToGap,info)
     const dropKey = info.node.key;
     const dragKey = info.dragNode.key;
     const dropPos: any = info.node.pos?.split('-');

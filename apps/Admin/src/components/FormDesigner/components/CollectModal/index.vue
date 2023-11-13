@@ -45,7 +45,7 @@ const handleOk = () => {
       emits('save', _data?.name)
     })
     .catch((err: any) => {
-      console.log('error', err)
+      console.error('error', err)
     })
 }
 </script>

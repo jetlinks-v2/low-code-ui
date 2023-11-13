@@ -1,20 +1,21 @@
 <template>
   <div class="data-warp">
     <div class="tips">
-      <span v-if="project.published">
-        正在查看 {{ project.info.version }} 发布版本下的 {{total}} 条数据
+      <span v-if="published">
+        正在查看 {{ deployTime }} 发布版本下的 {{total}} 条数据
       </span>
       <span v-else>
         暂无数据，请在项目发布后查看
       </span>
     </div>
-    <div class="table" v-if="project.published">
+    <div class="table" v-if="published">
       <j-pro-table
         model="TABLE"
         :columns="myColumns"
         :request="getData"
         :scroll="{x: 1300, y: 500}"
-      />
+      >
+      </j-pro-table>
     </div>
   </div>
 </template>
@@ -23,6 +24,8 @@
 import { CRUD_COLUMNS } from "@/components/Database/util";
 import { queryRuntime } from '@/api/form'
 import { useProduct } from '@/store'
+import {isArray, isBoolean, isObject} from "lodash-es";
+import dayjs from "dayjs";
 
 const props = defineProps({
   id: {
@@ -32,6 +35,10 @@ const props = defineProps({
   parentId: {
     type: String,
     default: undefined
+  },
+  createTime: {
+    type: String,
+    default: undefined
   }
 })
 
@@ -39,14 +46,29 @@ const columns = inject(CRUD_COLUMNS)
 
 const project = useProduct()
 const total = ref(0)
+const deployTime = computed(() => {
+  return timeFormat(project.info.deployTime)
+})
+
+const published = computed(() => {
+  return project.published ? new Date(props.createTime).getTime() < project.info.deployTime : false
+})
+
+const timeFormat = (t) => {
+  console.log(t)
+  return dayjs(t).format('YYYY-MM-DD HH:mm:ss')
+}
 
 const myColumns = computed(() => {
   return columns.value.map(item => {
+    item.dataIndex = item.alias
+
     if (item.width) {
       return item
     }
     return {
       ...item,
+      dataIndex: item.alias,
       width: 140,
       ellipsis: true,
     }
@@ -55,7 +77,23 @@ const myColumns = computed(() => {
 const getData = async (params) => {
   const resp = await queryRuntime(project.info.id, props.parentId, 'QueryPager', params)
   total.value = resp.result?.total || 0
-  console.log(resp)
+  if (resp?.result?.data && resp?.result?.data?.length) {
+    resp.result.data = resp.result.data.map(item => {
+      Object.keys(item).forEach(k => {
+        const v = item[k]
+        if (isArray(v) || isObject(v)) {
+          item[k] = JSON.stringify(v)
+        }
+        if(isBoolean(v)) {
+          item[k] = `${v}`
+        }
+        if (['createTime', 'modifyTime'].includes(k)) {
+          item[k] = dayjs(item[k]).format('YYYY-MM-DD HH:mm:ss')
+        }
+      })
+      return item
+    })
+  }
   return {
     ...resp
   }

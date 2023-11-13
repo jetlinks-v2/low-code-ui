@@ -12,3 +12,6 @@ export const getAllMenuTree = (data: any) => request.post<any>('/menu/_all/tree'
 
 //修改菜单
 export const saveMenu = (data: any) => request.patch(`/menu/iot/_all`, data);
+
+//删除菜单
+export const delMenu = (data: any) => request.post<any>('/menu/_delete', data)

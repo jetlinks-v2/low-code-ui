@@ -20,26 +20,59 @@
 </template>
 
 <script setup name="EngineHeader">
-import { useProduct } from '@/store'
+import { useProduct, useEngine, useMenuStore } from '@/store'
 import { getImage } from '@jetlinks/utils';
+import { storeToRefs } from 'pinia'
 
 const product = useProduct()
+const engine = useEngine()
+const menu = useMenuStore()
+
+const { files, activeFile } = storeToRefs(engine)
 
 const router = useRouter()
 const route = useRoute()
 const onRelease = () => {
   router.replace({
-    name: 'Release',
+    name: 'release',
     params: {
       id: route.params.id
     }
   })
 }
 
-const quit = () => {
-  router.push('/delivery/center')
-  product.initProjectState()
+const quit = async () => {
+  // router.push('/delivery/center')
+  const item = product.data[0]
+  product.update({
+    ...item,
+    others: {
+      ...item?.others,
+      activeFile: activeFile.value,
+      files: files.value
+    }
+  },()=>{
+    menu.jumpPage('center')
+  })
+ 
+  console.log(engine.files)
 }
+
+onMounted(() => {
+  setTimeout(() => {
+    const data = product.data[0]
+    // console.log('data',data)
+    if (data?.state?.value !== 'published') {
+      engine.selectFiles(data?.others?.files || [])
+      engine.setActiveFile(data?.others?.activeFile || data?.id)
+      engine.selectFile(data?.others?.activeFile)
+    } else {
+      engine.setActiveFile(data?.id)
+      engine.selectFile(data.id)
+    }
+  }, 300)
+})
+
 </script>
 
 <style scoped lang="less">
@@ -61,6 +94,7 @@ const quit = () => {
     .btn {
       display: flex;
       color: #333333;
+
       .out {
         width: 18px;
         height: 15px;
@@ -70,13 +104,15 @@ const quit = () => {
           height: 100%;
         }
       }
-      p{
+
+      p {
         line-height: 22px;
         font-size: 16px;
         margin-left: 10px;
       }
     }
-    .title{
+
+    .title {
       font-size: 18px;
       line-height: 22px;
       display: flex;

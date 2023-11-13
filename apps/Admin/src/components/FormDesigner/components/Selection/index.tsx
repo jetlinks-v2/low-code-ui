@@ -3,7 +3,7 @@ import { withModifiers } from 'vue'
 import './index.less'
 import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import { checkIsField, copyDataByKey, extractCssClass, findParentById, handleCopyData, insertCustomCssToHead, updateData } from '../../utils/utils'
-import { map, set } from 'lodash-es'
+import { map, set, cloneDeep } from 'lodash-es'
 import { uid } from '../../utils/uid'
 
 const Selection = defineComponent({
@@ -75,7 +75,11 @@ const Selection = defineComponent({
 
     const _error = computed(() => {
       const arr = map(designer.errorKey?.value, 'key')
-      return arr.includes(props.data?.key)
+      if (props?.data?.type === 'table-item') {
+        return arr.includes(props.data?.children?.[0]?.key)
+      } else {
+        return arr.includes(props.data?.key)
+      }
     })
 
     watchEffect(() => {
@@ -89,13 +93,17 @@ const Selection = defineComponent({
     }
 
     const setOptions = (arr: any[]) => {
-      const _list = updateData(unref(designer.formData)?.children, {
+      const obj = {
         ...props.data,
-        componentProps: {
+        componentProps: props.data.type === 'tree-select' ? {
           ...props.data.componentProps,
           options: arr
+        } : {
+          ...props.data.componentProps,
+          treeData: arr
         }
-      })
+      }
+      const _list = updateData(unref(designer.formData)?.children, obj)
       designer.formData.value = {
         ...designer.formData.value,
         children: _list || [],
@@ -127,14 +135,15 @@ const Selection = defineComponent({
     // 复制
     const onCopy = () => {
       const _data: any = {
-        ...props.data,
+        ...cloneDeep(props.data),
         key: props.data?.key + '_' + uid(),
         children: handleCopyData(props.data?.children || []),
       }
       if (!['grid-item'].includes(props.data?.type)) {
         _data.formItemProps = {
           ...props.data?.formItemProps,
-          name: props.data?.formItemProps?.name + 'copy',
+          label: 'copy_' + props.data?.formItemProps?.label,
+          name: 'copy_' + props.data?.formItemProps?.name
         }
       }
       const dt = findParentById(designer.formData.value, props.data)
@@ -188,7 +197,7 @@ const Selection = defineComponent({
                 <MenuItem key="paste"><Button type="link" onClick={onPaste}>粘贴</Button></MenuItem>
                 <MenuItem key="shear"><Button type="link" onClick={onShear}>剪切</Button></MenuItem>
                 <MenuItem key="delete"><Button danger type="link" onClick={onDelete}>删除</Button></MenuItem>
-                <MenuItem key="collect"><Button type="link" onClick={onCollect}>收藏为模版</Button></MenuItem>
+                {designer?.type === 'low-code' && <MenuItem key="collect"><Button type="link" onClick={onCollect}>收藏为模版</Button></MenuItem>}
               </Menu>
             )
           }
@@ -201,11 +210,16 @@ const Selection = defineComponent({
       </Dropdown>
     }
 
+    const isInline = computed(() => {
+      return designer.formData?.value?.componentProps?.layout === 'inline'
+    })
+
     const renderSelected = () => {
       return <TagComponent
         data-id={props.data?.key}
         class={[
           'selectElement',
+          unref(isInline) && 'inlineElement',
           unref(isEditModel) && unref(_hasDrag) && 'handle',
           !isField && 'borderless',
           unref(isEditModel) && Selected.value && 'Selected',

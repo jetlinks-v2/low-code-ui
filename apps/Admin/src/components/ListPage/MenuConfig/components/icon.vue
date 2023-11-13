@@ -3,11 +3,12 @@
     :visible="props.visible"
     title="菜单图标"
     width="416px"
-    @cancel="emits('update:visible', false)"
-    @ok="confirm"
+    :maskClosable="false"
     :getContainer='() => refs'
     :wrap-style="{ position: 'absolute', zIndex: 1001 }"
     :mask-style="{ position: 'absolute' }"
+    @cancel="emits('update:visible', false)"
+    @ok="confirm"
   >
     <j-scrollbar>
       <j-radio-group v-model:value="selected" class="radio">
@@ -35,22 +36,15 @@ const props = defineProps<{
   type: string,
 }>()
 
-const selected = computed({
-  get() {
-    console.log(`output->props.type`,props.type)
-    return props.type
-  },
-  set(val) {
-    emits('update:type', val)
-  }
-})
+const selected = ref(props.type)
 const confirm = () => {
+  emits('update:type', selected.value)
   emits('update:visible', false)
 }
 
 
-watch(() => props.refs, () => {
-  console.log(`output->props.refs`,props.refs)
+watch(() => props.visible, () => {
+  selected.value = props.type
 })
 </script>
 

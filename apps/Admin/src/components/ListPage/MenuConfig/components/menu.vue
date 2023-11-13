@@ -16,7 +16,7 @@
             :rules="[
               {
                 required: true,
-                message: '',
+                message: errorData('name') ? '' : '请输入2-16个字符',
                 trigger: 'change',
               },
             ]"
@@ -35,7 +35,11 @@
               </span>
             </template>
             <ErrorItem :error-data="errorData('name')">
-              <j-input v-model:value="form!.name" :maxLength="16"/>
+              <j-input
+                v-model:value="form!.name"
+                :maxLength="16"
+                placeholder="请输入菜单名称"
+              />
             </ErrorItem>
           </j-form-item>
           <j-form-item
@@ -44,29 +48,23 @@
             :rules="[
               {
                 required: true,
-                message: '请上传图标',
+                message: errorData('name') ? '' : '请配置图标',
                 trigger: 'change',
               },
             ]"
             style="flex: 0 0 186px"
           >
+          <ErrorItem :border="false" :error-data="errorData('icon')">
             <div class="icon-upload has-icon" v-if="form!.icon">
               <AIcon :type="form!.icon" style="font-size: 20px" />
               <span class="mark" @click="dialogVisible = true"></span>
             </div>
-
-            <div class="icon-upload no-icon" v-else>
-              <ErrorItem :error-data="errorData('icon')">
-                <div
-                  @click="dialogVisible = true"
-                  class="choose-icon"
-                >
-                  <span>
-                    <AIcon type="PlusOutlined" style="font-size: 20px" />
-                  </span>
-                </div>
-              </ErrorItem>
-            </div>
+              <div class="icon-upload no-icon" v-else @click="dialogVisible = true">
+                <span>
+                  <AIcon type="PlusOutlined" style="font-size: 20px" />
+                </span>
+              </div>
+            </ErrorItem>
           </j-form-item>
         </template>
       </j-form>
@@ -92,7 +90,7 @@ const props = defineProps({
   },
   refs: {
     type: Object,
-  }
+  },
 })
 
 const dialogVisible = ref<boolean>(false)
@@ -146,7 +144,7 @@ defineExpose({
 
     &::before {
       position: absolute;
-      top: 5px px;
+      top: 5px 0px;
       left: 0;
       width: 4px;
       height: calc(100% - 10px);

@@ -1,8 +1,13 @@
 
 <template>
-  <j-modal visible :width="300" @cancel="emit('close')"  :footer="null">
+  <j-modal visible :width="300" @cancel="emit('close')" :footer="null">
     <div class="item">
-      <div class="item-text">确定删除“{{ props.data.name }}”?</div>
+      <div class="item-text">确定删除</div>
+      <div class="item-title">
+        <j-ellipsis>
+         "{{ props.data.name }}"?
+        </j-ellipsis>
+      </div>
       <div class="item-btn">
         <j-button @click="emit('close')" style="margin-right: 10px;">取消</j-button>
         <j-button type="primary" @click="emit('save', props.data)">确定</j-button>
@@ -40,6 +45,10 @@ const emit = defineEmits<Emits>();
     margin-top: 20px;
   }
 
+  .item-title{
+    width: 200px;
+    text-align: center;
+  }
   .item-btn {
     margin-top: 20px;
   }

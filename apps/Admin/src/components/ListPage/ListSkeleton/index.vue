@@ -215,7 +215,7 @@ watchEffect(() => {
   steps.value = [
     {
       title: '步骤1',
-      description: '选择后端功能作为列表页的数据来源',
+      description: '选择后端功能作为标准列表页的数据来源',
       placement: 'bottom',
       target: () => [
         {
@@ -225,7 +225,7 @@ watchEffect(() => {
     },
     {
       title: '步骤2',
-      description: '不同色块代表列表页的不同功能，你可以根据业务需要自由选配',
+      description: '不同色块代表标准列表页的不同功能，你可以根据业务需要自由选配',
       placement: 'top',
       target: () => [
         {
@@ -291,6 +291,7 @@ watchEffect(() => {
 @columnDataBg: #c3d1ff;
 @columnOperationBg: #c3d1ff;
 @paginationBg: #c3d1ff;
+@bg: #c3d1ff;
 
 .list-skeleton {
   height: calc(100% - 70px);
@@ -366,66 +367,79 @@ watchEffect(() => {
   .config-item {
     cursor: pointer;
     border-radius: 4px;
+    position: relative;
     &.animation {
       animation: blink 1s infinite;
       &.filter {
-        background-color: @filterBg;
+        background-color: @bg;
       }
       &.btn {
-        background-color: @btnBg;
+        background-color: @bg;
       }
       &.type {
-        background-color: @typeBg;
+        background-color: @bg;
       }
       &.column-data {
-        background-color: @columnDataBg;
+        background-color: @bg;
       }
       &.column-operation {
-        background-color: @columnOperationBg;
+        background-color: @bg;
       }
       &.pagination {
-        background-color: @paginationBg;
+        background-color: @bg;
       }
     }
-    &.filter:hover {
-      background-color: @filterBg !important;
+    &:hover {
+      background-color: @primary-color !important;
+      &::after{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        left: 0;
+        top: 0;
+        color: #FFFFFF;
+      }
+      &.filter::after {
+        content: '\7b5b\9009\9879';
+      }
+      &.btn::after {
+        content: '\64cd\4f5c\6309\94ae';
+      }
+      &.type::after {
+        content: '\5c55\793a\683c\5f0f';
+      }
+      &.column-data::after {
+        content: '\6570\636e\5217\8868\5934';
+      }
+      &.column-operation::after {
+        content: '\64cd\4f5c\5217';
+      }
+      &.pagination::after {
+        content: '\5206\9875\5668';
+      }
     }
-    &.btn:hover {
-      background-color: @btnBg !important;
-    }
-    &.type:hover {
-      background-color: @typeBg !important;
-    }
-    &.column-data:hover {
-      background-color: @columnDataBg !important;
-    }
-    &.column-operation:hover {
-      background-color: @columnOperationBg !important;
-    }
-    &.pagination:hover {
-      background-color: @paginationBg !important;
-    }
+    // &.btn:hover {
+    //   background-color: @btnBg !important;
+    // }
+    // &.type:hover {
+    //   background-color: @typeBg !important;
+    // }
+    // &.column-data:hover {
+    //   background-color: @columnDataBg !important;
+    // }
+    // &.column-operation:hover {
+    //   background-color: @columnOperationBg !important;
+    // }
+    // &.pagination:hover {
+    //   background-color: @paginationBg !important;
+    // }
   }
 }
 .config-done {
-  &.filter {
-    background-color: @filterBg;
-  }
-  &.btn {
-    background-color: @btnBg;
-  }
-  &.type {
-    background-color: @typeBg;
-  }
-  &.column-data {
-    background-color: @columnDataBg;
-  }
-  &.column-operation {
-    background-color: @columnOperationBg;
-  }
-  &.pagination {
-    background-color: @paginationBg;
-  }
+  background-color: @bg;
 }
 
 @keyframes blink {

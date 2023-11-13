@@ -1,86 +1,88 @@
 
 <template>
-  <div class="title">
-    <a-radio-group v-model:value="viewType">
-      <a-radio-button value="table">
-        <AIcon type="UnorderedListOutlined" />
-      </a-radio-button>
-      <a-radio-button value="card">
-        <AIcon type="AppstoreOutlined" />
-      </a-radio-button>
-    </a-radio-group>
-    <j-select v-model:value="sorts" class="title-sorts" placeholder="排序方式" @change="handleSorts">
-      <j-select-option value="default">默认排序</j-select-option>
-      <j-select-option value="type">种类</j-select-option>
-      <j-select-option value="name">名称</j-select-option>
-      <j-select-option value="createTime">添加日期</j-select-option>
-      <j-select-option value="modifyTime">修改日期</j-select-option>
-    </j-select>
-  </div>
-  <div class="content" v-if="viewType === 'card'">
-    <ContextMenu type="empty" @select="handleChange" @show="onShow">
-      <j-scrollbar>
-        <a-row>
-          <a-col :span="3" v-for="item in list" class="content-col">
-            <div @click="onClick(item.id)" @dblclick="onDbClick(item)" class="content-item">
-              <ContextMenu type="list" :data="item" @select="handleChange">
-                <div :class="{
-                  'box': true,
-                  'active': selectKey === item.id
-                }">
-                  <div class="box-img">
-                    <img :src="typeImages[item.type]">
+  <div>
+    <div class="title">
+      <a-radio-group v-model:value="viewType" @change="handleSorts">
+        <a-radio-button value="table">
+          <AIcon type="UnorderedListOutlined" />
+        </a-radio-button>
+        <a-radio-button value="card">
+          <AIcon type="AppstoreOutlined" />
+        </a-radio-button>
+      </a-radio-group>
+      <j-select v-model:value="sorts" class="title-sorts" placeholder="排序方式" @change="handleSorts">
+        <j-select-option value="default">默认排序</j-select-option>
+        <j-select-option value="type">种类</j-select-option>
+        <j-select-option value="name">名称</j-select-option>
+        <j-select-option value="createTime">添加日期</j-select-option>
+        <j-select-option value="modifyTime">修改日期</j-select-option>
+      </j-select>
+    </div>
+    <div class="content" v-if="viewType === 'card'">
+      <ContextMenu type="empty" @select="handleChange" @show="onShow">
+        <j-scrollbar>
+          <a-row>
+            <a-col :span="3" v-for="item in list" class="content-col">
+              <div @click="onClick(item.id)" @dblclick="onDbClick(item)" class="content-item">
+                <ContextMenu type="list" :data="item" @select="handleChange">
+                  <div :class="{
+                    'box': true,
+                    'active': selectKey === item.id
+                  }">
+                    <div class="box-img">
+                      <img :src="typeImages[item.type]">
+                    </div>
+                    <j-ellipsis style="max-width: 100px" placement="leftTop">{{ item.name }}</j-ellipsis>
                   </div>
-                  <j-ellipsis style="max-width: 100px" placement="leftTop">{{ item.name }}</j-ellipsis>
-                </div>
-              </ContextMenu>
+                </ContextMenu>
+              </div>
+            </a-col>
+          </a-row>
+        </j-scrollbar>
+      </ContextMenu>
+      <!-- <a-drawer title="添加项目说明" :closable="false" :visible="showMenu" :style="{ position: 'absolute' }" :getContainer="false"
+        @close="showMenu = false" :mask="false">
+        <div class="drawer" v-for="items in projectList">
+          <div class="drawer-title">{{ items.title }}</div>
+          <div class="drawer-items" v-for="item in items.children">
+            <div class="items-img">
+              <img :src="item.img">
             </div>
-          </a-col>
-        </a-row>
-      </j-scrollbar>
-    </ContextMenu>
-    <a-drawer title="添加项目说明" :closable="false" :visible="showMenu" :style="{ position: 'absolute' }" :getContainer="false"
-      @close="showMenu = false" :mask="false">
-      <div class="drawer" v-for="items in projectList">
-        <div class="drawer-title">{{ items.title }}</div>
-        <div class="drawer-items" v-for="item in items.children">
-          <div class="items-img">
-            <img :src="item.img">
-          </div>
-          <div class="items-text">
-            <div class="text">{{ providerMap[item.type] }}</div>
-            <span>{{ item.text }}</span>
+            <div class="items-text">
+              <div class="text">{{ providerMap[item.type] }}</div>
+              <span>{{ item.text }}</span>
+            </div>
           </div>
         </div>
+      </a-drawer> -->
+    </div>
+
+    <div v-else>
+      <j-pro-table :columns="columns" :dataSource="list" model="TABLE" :noPagination="true" :childrenColumnName="'list'"
+        :scroll="{ y: 'calc(100vh - 300px)' }" :customRow="(record) => ({
+          onContextmenu: (e) => onContextmenu(e, record),
+          onDblclick: () => onDbClick(record)
+        })">
+        <template #type="{ type }">
+          {{ providerMap[type] }}
+        </template>
+        <template #modifyTime="record">{{ record?.others?.modifyTime }}</template>
+      </j-pro-table>
+      <div v-if="visibleMenu" style="width: 150px;">
+        <j-menu @click="(e) => handleChange(e.key, menuData.data)" :style="menuData.style" class="tableMenu">
+          <j-menu-item :key="actionMap['Profile'].key">{{ actionMap['Profile'].value }}</j-menu-item>
+          <j-menu-item :key="actionMap['Copy'].key">{{ actionMap['Copy'].value }}</j-menu-item>
+          <j-menu-item :key="actionMap['Paste'].key" :disabled="engine.copyFile === ''">{{ actionMap['Paste'].value
+          }}</j-menu-item>
+          <j-menu-item :key="actionMap['Rename'].key">{{ actionMap['Rename'].value }}</j-menu-item>
+          <j-menu-item :key="actionMap['Delete'].key">{{ actionMap['Delete'].value }}</j-menu-item>
+        </j-menu>
       </div>
-    </a-drawer>
+
+    </div>
     <FileDrawer v-if="visibleFile" @close="visibleFile = false" :data="current" />
   </div>
-  
-  <div v-else>
-    <j-pro-table :columns="columns" :dataSource="list" model="TABLE" :noPagination="true" :childrenColumnName="'list'"
-      :scroll="{ y: 'calc(100vh - 300px)' }"
-      :customRow="(record) => ({ 
-        onContextmenu: (e) => onContextmenu(e, record),
-        onDblclick:()=>onDbClick(record)
-       })">
-      <template #type="{ type }">
-        {{ providerMap[type] }}
-      </template>
-      <template #modifyTime="record">{{ record?.others?.modifyTime }}</template>
-    </j-pro-table>
-    <div v-if="visibleMenu" style="width: 150px;">
-      <j-menu @click="(e) => handleChange(e.key, menuData.data)" :style="menuData.style" class="tableMenu">
-        <j-menu-item :key="actionMap['Profile'].key">{{ actionMap['Profile'].value }}</j-menu-item>
-        <j-menu-item :key="actionMap['Copy'].key">{{ actionMap['Copy'].value }}</j-menu-item>
-        <j-menu-item :key="actionMap['Paste'].key" :disabled="engine.copyFile === ''">{{ actionMap['Paste'].value
-        }}</j-menu-item>
-        <j-menu-item :key="actionMap['Rename'].key">{{ actionMap['Rename'].value }}</j-menu-item>
-        <j-menu-item :key="actionMap['Delete'].key">{{ actionMap['Delete'].value }}</j-menu-item>
-      </j-menu>
-    </div>
-  </div>
-  
+
   <InputModal v-if="visible" @close="visible = false" @save="onSave" :provider="provider" :data="current" :type="type"
     :name-list="nameList" />
   <ToastModal v-if="visibleToast" @close="visibleToast = false" @save="onSave" :data="current" />
@@ -97,6 +99,7 @@ import { onlyMessage } from '@jetlinks/utils';
 import { providerMap, restId, actionMap, typeImages, projectList } from '../index'
 import { onKeyStroke, useMagicKeys } from '@vueuse/core'
 import { useProduct, useEngine } from '@/store'
+import { delMenu } from '@/api/menu'
 
 const product = useProduct()
 const engine = useEngine()
@@ -117,7 +120,7 @@ const visibleMenu = ref<boolean>(false)
 const provider = ref<string>('')
 const current = ref<any>({})
 const type = ref<string>('Add')
-const selectKey = ref<string>('')
+const selectKey = ref<string>(props.data[0]?.id)
 const selectSort = ref<number>(0)
 const list = ref<any>([])
 const nameList = ref<any>([])
@@ -164,22 +167,41 @@ const onShow = (val) => {
 const onSave = (data?: any) => {
   if (data) {
     visible.value = false
-    type.value === 'Add' ? product.add(data,data.parentId,true) : product.update(data)
+    type.value === 'Add' ? product.add(data, data.parentId, data.type === 'module') : product.update(data)
+    setTimeout(() => {
+      selectKey.value = data.id
+    }, 300)
   }
 }
 
-const onDel = (data: any) => {
+const onDel = async (data: any) => {
   product.remove(data)
   visibleDel.value = false
+  await delMenu({
+    "paging": false,
+    "terms": [{
+      "terms": [{
+        "type": "or",
+        "value": `%pageId":"${data.id}%`,
+
+        "termType": "like",
+        "column": "options"
+      }]
+    }]
+
+  })
 }
 
-const onPaste = (parentId?: string) => {
+const onPaste = (parentId?: string, type?: string) => {
   const copyItem = product.getById(engine.copyFile)
   provider.value = copyItem.type
+  // console.log('onPaste', type, parentId)
   current.value = {
     title: `copy_${copyItem.name}`,
     children: copyItem.children ? restId(copyItem.children) : undefined,
-    parentId: parentId ? parentId : undefined
+    parentId: type ? copyItem.parentId || parentId : parentId ? parentId : undefined,
+    configuration: copyItem.configuration ? copyItem.configuration : undefined,
+    others: copyItem.others ? copyItem.others : undefined
   }
   visible.value = true
 }
@@ -191,7 +213,7 @@ const onContextmenu = (e, record) => {
   menuData.style = {
     position: 'absolute',
     left: e.clientX - 300 + "px",
-    top: e.clientY -210  + "px",
+    top: e.clientY - 210 + "px",
   }
   menuData.data = record
   //点击取消菜单
@@ -203,7 +225,7 @@ const onContextmenu = (e, record) => {
 }
 
 const handleChange = (key: any, data?: any) => {
-  // console.log('key',key)
+
   provider.value = key
   if (!data) {
     if (key === 'Paste') {
@@ -224,9 +246,10 @@ const handleChange = (key: any, data?: any) => {
         onlyMessage('复制成功')
         break;
       case 'Paste':
-        onPaste(data.id)
+        onPaste(data.id, data.others?.type)
         break;
       case 'Rename':
+        // visibleFile.value = false;
         visible.value = true
         type.value = 'Rename'
         provider.value = data.type
@@ -249,14 +272,15 @@ const onDbClick = (data: any) => {
   engine.addFile(data)
 }
 
-//排序方式
+//排序方式-table切换
 const handleSorts = () => {
   const data = product.getById(engine.activeFile)
   product.update({
     ...data,
     others: {
       ...data.others,
-      sorts: sorts.value
+      sorts: sorts.value,
+      viewType: viewType.value
     }
   })
 }
@@ -305,7 +329,6 @@ watchEffect(() => {
 watchEffect(() => {
   if (props.data.length !== 0) {
     // console.log(props.data)
-    selectKey.value = props.data[0].id
     selectSort.value = 0
     nameList.value = props.data.map(item => item.name)
     list.value = props.data.map((item, index) => {
@@ -313,8 +336,17 @@ watchEffect(() => {
       return item
     })
   }
-  sorts.value = product.getById(engine.activeFile)?.others?.sorts || 'default'
 })
+
+watch(
+  () => props.data,
+  () => {
+    const item = product.getById(engine.activeFile)
+    sorts.value = item.others?.sorts || 'default'
+    viewType.value = item.others?.viewType || 'card'
+  },
+  { deep: true, immediate: true }
+)
 
 
 
@@ -339,54 +371,55 @@ watchEffect(() => {
   // background-color: #f5f5f5;
   height: calc(100vh - 140px);
   padding: 12px;
-  
+
   :deep(.ant-drawer-wrapper-body) {
+    background-color: #FAFAFA;
+
+    .ant-drawer-header {
       background-color: #FAFAFA;
+    }
+  }
 
-      .ant-drawer-header {
-         background-color: #FAFAFA;
-      }
-   }
-   .drawer {
+  .drawer {
 
-.drawer-title {
-   font-size: 14px;
-   font-weight: 500;
-   line-height: 24px;
-   margin: 10px 0;
-}
+    .drawer-title {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 24px;
+      margin: 10px 0;
+    }
 
-.drawer-items {
-   height: 64px;
-   display: flex;
-   background-color: #FFF;
-   align-items: center;
-   padding: 0 12px;
+    .drawer-items {
+      height: 64px;
+      display: flex;
+      background-color: #FFF;
+      align-items: center;
+      padding: 0 12px;
 
-   .items-img {
-      height: 24px;
-      width: 24px;
+      .items-img {
+        height: 24px;
+        width: 24px;
 
-      img {
-         width: 100%;
-         height: 100%;
-      }
-   }
-
-   .items-text {
-      margin-left: 10px;
-
-      .text {
-         font-size: 14px;
-         line-height: 14px;
+        img {
+          width: 100%;
+          height: 100%;
+        }
       }
 
-      span {
-         color: #666666;
+      .items-text {
+        margin-left: 10px;
+
+        .text {
+          font-size: 14px;
+          line-height: 14px;
+        }
+
+        span {
+          color: #666666;
+        }
       }
-   }
-}
-}
+    }
+  }
 
   .content-col {
     display: flex;

@@ -2,7 +2,8 @@
   <div class="list-page">
     <Preview
       :show="showPreview"
-      :id="props.data.id"
+      :pageId="props.data.id"
+      :projectId="info.id"
       :data="props.data?.configuration?.code"
       @back="() => (showPreview = false)"
     />
@@ -64,6 +65,7 @@
       :data="props.data"
       ref="menuConfigRef"
     />
+    <CheckSpin :spinning="spinning" />
   </div>
 </template>
 
@@ -88,10 +90,12 @@ import {
   DATA_SOURCE,
   showColumnsKey,
   ACTION_CONFIG_KEY,
+  SEARCH_DATA,
 } from './keys'
 import { useProduct } from '@/store'
-import { omit, debounce } from 'lodash-es'
+import { isEmpty, omit, throttle } from 'lodash-es'
 import { onlyMessage } from '@jetlinks/utils'
+import { storeToRefs } from 'pinia'
 
 const spinning = ref(false)
 const props = defineProps({
@@ -99,8 +103,13 @@ const props = defineProps({
     type: Object,
     default: () => {},
   },
+  showTip: {
+    type: Boolean,
+    default: true,
+  },
 })
 const productStore = useProduct()
+const { info } = storeToRefs(productStore)
 
 const showPreview = ref(false)
 const menuRef = ref()
@@ -139,9 +148,7 @@ const menuConfig = reactive({
     get() {
       return props.data.title
     },
-    set(val) {
-      
-    }
+    set(val) {},
   }),
   main: true,
   name: '',
@@ -156,13 +163,18 @@ const listFormInfo = reactive({
   field2: '',
   field3: '',
   emphasisField: '',
-  specialStyle: ``,
+  specialStyle: `{
+      "error": "#ff0000",
+      "offline": "#999999",
+      "warning": "#13c2c2"
+    }`,
 })
 const showType = reactive({
   type: 'list',
   configured: ['list'],
   configurationShow: false,
   defaultForm: 'list',
+  showColumns: false,
 })
 const listPageData = computed(() => {
   return {
@@ -194,20 +206,26 @@ const validate = async () => {
   const errorList = [
     ...btnTreeRef.value?.valid(),
     ...columnsRef.value?.valid(),
-    ...filterModuleRef.value?.valid(),
     ...pagingConfigRef.value?.valid(),
     ...listFormRef.value?.valid(),
     ...listDataRef.value?.valid(),
     ...menuConfigRef.value?.valid(),
     ...dataBindRef.value?.valid(),
   ]
-  console.log(errorList)
+
   return new Promise((resolve, reject) => {
-    if (errorList.length) {
-      reject(errorList)
-    } else {
-      resolve([])
-    }
+    filterModuleRef.value?.valid().then((res) => {
+      errorList.push(...res)
+      if (errorList.length) {
+        reject(errorList)
+      } else {
+        if (props.showTip) {
+          onlyMessage('校验通过')
+        }
+        resolve([])
+      }
+      spinning.value = false
+    })
     // Promise.all(promiseArr)
     //   .then((res) => {
     //     resolve(res)
@@ -251,10 +269,8 @@ const dataBind = reactive({
     command: null,
     dataSource: [],
   },
-  filterBind: [],
-  columnBind: [],
-  filterAsync: false,
-  columnAsync: false,
+  dataFrom: null,
+  async: false,
 })
 
 provide(DATA_BIND, dataBind)
@@ -264,6 +280,7 @@ provide(MENU_CONFIG, menuConfig)
 provide(LIST_PAGE_DATA_KEY, listPageData)
 provide(LIST_FORM_INFO, listFormInfo)
 provide(DATA_SOURCE, dataSource)
+provide(SEARCH_DATA, searchData)
 provide(showColumnsKey, showColumns)
 provide(ACTION_CONFIG_KEY, actionsConfig)
 // watch(
@@ -296,7 +313,7 @@ const arrFlat = (arr: any[]) => {
   const arr_: any[] = []
   function flat(arr: any[]) {
     arr.forEach((item) => {
-      arr_.push({ id: item.key, name: item.title })
+      arr_.push({ id: item.type === 'Delete' ? 'delete' : item.key, name: item.type === 'Delete' ? '删除' : item.title })
       if (item.children) {
         flat(item.children)
       }
@@ -319,12 +336,16 @@ onMounted(() => {
     actionsConfig.value = initData?.actionsButton || []
     searchData.value = initData?.searchData || []
     dataSource.value = initData?.dataSource || []
-    showColumns.value = initData?.showColumns
+    showColumns.value =
+      initData?.showColumns !== undefined
+        ? initData?.showColumns
+        : showColumns.value
   }
   setTimeout(() => {
     watch(
       () => JSON.stringify(listPageData.value),
       () => {
+        filterQuote()
         if (!listPageData.value.dataBind.data.function) {
           listFormInfo.field1 =
             listFormInfo.field2 =
@@ -347,16 +368,16 @@ onMounted(() => {
               buttons: [
                 ...arrFlat(buttonsConfig.value),
                 ...arrFlat(actionsConfig.value),
-              ],
+              ].filter((item, index) => {
+                return index === [...arrFlat(buttonsConfig.value), ...arrFlat(actionsConfig.value)].findIndex((obj) => obj.id === item.id)
+              }),
             },
             useList: Array.from(
               new Set([
-                ...actionsConfig.value
-                  .filter((item) => item.pages && item.pages !== '')
-                  ?.map((item) => item.pages),
-                ...buttonsConfig.value
-                  .filter((item) => item.pages && item.pages !== '')
-                  ?.map((item) => item.pages),
+                ...actionsQuote(actionsConfig.value),
+                ...actionsQuote(buttonsConfig.value),
+                  ...filterQuote(),
+                  dataBindQuote()
               ]),
             ),
           },
@@ -366,6 +387,36 @@ onMounted(() => {
     )
   })
 })
+
+const filterQuote = () => {
+  return searchData.value
+    .filter((item) => item.config?.abilityValue)
+    ?.map((item) => findFunctionId(item.config?.abilityValue)?.id)
+}
+
+const dataBindQuote = () => {
+  return findFunctionId(dataBind.data.function!)?.id
+}
+
+const actionsQuote = (arr: any[]) => {
+  let pages: string[] = [];
+  let functions: string[] = [];
+  arr.forEach((item) => {
+    if(!isEmpty(item.pages)) {
+      pages.push(item.pages)
+    }
+    if(!isEmpty(item.functions)) {
+      functions.push(findFunctionId(item.functions)?.id)
+    }
+  })
+  return [...pages, ...functions]
+}
+
+
+const findFunctionId = (fullId: string) => {
+  const functionArr = [...productStore.getDataMap().values()];
+  return functionArr.find(item => item.fullId === fullId)
+}
 
 // watch(() => JSON.stringify(allListData.value), () => {
 //   const record = {
@@ -384,7 +435,7 @@ onMounted(() => {
 //   productStore.update(record)
 // })
 
-const onSave = debounce((record) => {
+const onSave = throttle((record) => {
   productStore.update(record)
 }, 1000)
 
@@ -393,10 +444,13 @@ defineExpose({
 })
 </script>
 
-<style scoped lang="less">
+<style lang="less">
 .list-page {
   height: 100%;
   position: relative;
   background-color: #e9e9e9;
+}
+.options-img {
+  width: 20px;
 }
 </style>

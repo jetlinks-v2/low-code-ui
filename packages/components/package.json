@@ -5,7 +5,7 @@
   "main": "index.ts",
   "module": "index.ts",
   "scripts": {
-    "clean": "pnpm rimraf node_modules && pnpm rimraf .turbo"
+    "clean": "pnpm rimraf node_modules"
   },
   "keywords": [],
   "files": [
@@ -20,7 +20,7 @@
     "@vuemap/vue-amap": "^2.0.13",
     "@vueuse/core": "^10.1.2",
     "ant-design-vue": "^3.2.15",
-    "jetlinks-ui-components": "^1.0.29",
+    "jetlinks-ui-components": "1.0.34-8",
     "lodash-es": "^4.17.21",
     "pinia": "^2.1.3",
     "vue": "^3.3.4",

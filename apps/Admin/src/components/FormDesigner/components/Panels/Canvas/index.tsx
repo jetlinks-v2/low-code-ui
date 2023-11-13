@@ -31,50 +31,50 @@ const Canvas = defineComponent({
     })
 
     watch(
-      () => [keys['Ctrl']?.value, keys['Meta']?.value],
+      () => [keys?.['Ctrl']?.value, keys?.['Meta']?.value],
       ([v1, v2]) => {
         designer._ctrl.value = v1 || v2
       },
     )
 
     watch(
-      () => [keys['Ctrl+C']?.value, keys['Meta+C']?.value],
+      () => [keys?.['Ctrl+C']?.value, keys?.['Meta+C']?.value],
       ([v1, v2]) => {
         designer._other.value = v1 || v2
-        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
-          designer.onCopy()
+        if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
+          designer?.onCopy?.()
         }
       },
     )
 
     watch(
-      () => [keys['Ctrl+X']?.value, keys['Meta+X']?.value],
+      () => [keys?.['Ctrl+X']?.value, keys?.['Meta+X']?.value],
       ([v1, v2]) => {
         designer._other.value = v1 || v2
-        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
-          designer.onShear()
+        if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
+          designer?.onShear?.()
         }
       },
     )
 
     watch(
-      () => [keys['Ctrl+V']?.value, keys['Meta+V']?.value],
+      () => [keys?.['Ctrl+V']?.value, keys?.['Meta+V']?.value],
       ([v1, v2]) => {
         designer._other.value = v1 || v2
-        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
-          designer.onPaste()
+        if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
+          designer?.onPaste?.()
         }
       },
     )
 
     // 删除
     watch(
-      () => [keys['Backspace'].value, keys['Delete'].value],
+      () => [keys?.['Backspace']?.value, keys?.['Delete']?.value],
       ([v1, v2]) => {
         designer._other.value = v1 || v2
         if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
-          if (!designer.delVisible.value) {
-            designer.onDelete()
+          if (!designer?.delVisible?.value) {
+            designer?.onDelete?.()
           }
         }
       },
@@ -90,7 +90,7 @@ const Canvas = defineComponent({
     })
 
     const onPaste = () => {
-      designer.onPaste()
+      designer?.onPaste?.()
     }
 
     watchEffect(() => {
@@ -124,8 +124,8 @@ const Canvas = defineComponent({
             height: '100%',
             width: unref(_width)
           }}
-          data={unref(designer.formData)?.children}
-          parent={unref(designer.formData)}
+          data={designer.formData.value?.children || []}
+          parent={designer.formData.value}
           isRoot
         ></DraggableLayout>
       )
@@ -134,14 +134,18 @@ const Canvas = defineComponent({
         <Form
           ref={designer.formRef}
           model={designer.formState}
-          {...omit(unref(designer.formData)?.componentProps, ['size', 'cssCode', 'eventCode'])}
+          {...omit(designer.formData.value?.componentProps, ['size', 'cssCode', 'eventCode'])}
           onClick={unref(isEditModel) && handleClick}
           class={[...unref(cssClassList)]}
           onValidate={(name, status, errorMsgs) => {
-            if (unref(designer.formData)?.componentProps?.eventCode) {
-              let customFn = new Function('e', unref(designer.formData)?.componentProps?.eventCode)
+            if (designer.formData.value?.componentProps?.eventCode) {
+              let customFn = new Function('e', designer.formData.value?.componentProps?.eventCode)
               customFn.call({ getWidgetRef: getWidgetRef }, name, status, errorMsgs)
             }
+          }}
+          style={{
+            height: "100%",
+            width: "100%"
           }}
         >
           {Layout}
@@ -174,12 +178,8 @@ const Canvas = defineComponent({
 
     return () => {
       return (
-        <div ref={canvasRef} class={['canvas-box', unref(isEditModel) && 'editModel']}>
-          <div class="container">
-            <div class="subject">
-              {unref(isEditModel) ? renderChildren() : renderContent()}
-            </div>
-          </div>
+        <div class="subject" ref={canvasRef}>
+          {unref(isEditModel) ? renderChildren() : renderContent()}
           {unref(designer.collectVisible) && unref(isEditModel) && <CollectModal
             onSave={(name: string) => {
               const obj = {

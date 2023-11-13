@@ -3,16 +3,17 @@
     <j-space>
       <div v-for="item in props.headerActions" :key="item.key">
         <PermissionButton
+          v-if="item?.children?.length === 0"
           type="primary"
           :class="className(item.style)"
           v-bind:="handleFunction(item.permissionProps, item, item)"
           :danger="item.command === 'Delete'"
-          :popConfirm="handleFunction(item.permissionProps)?.popConfirm"
-          v-if="item?.children?.length === 0"
+          :hasPermission="route.params.sid ? `${route.params.sid}:${item.key}` : true"
+          :data-id="item.id"
         >
           <j-space>
             <template v-if="item.icon">
-              <img :src="item.icon" alt="" v-if="item.icon.includes('http')" style="width: 14px;height: 14px;">
+              <img :src="item.icon" alt="" v-if="item.icon.includes('http')" class="image-icon">
               <AIcon v-else :type="item?.icon" />
             </template>
             {{ item?.text }}
@@ -23,40 +24,27 @@
         <BatchDropdown
             v-model:isCheck="isCheck"
             :actions="item?.children"
-            @change="onCheckChange"
             v-else
         >
-          <j-button>{{ item.title }} <AIcon type="DownOutlined" /></j-button>
+        <PermissionButton
+        :key="item.key"
+        :danger="item.command === 'Delete'"
+        :class="extractCssClass(item.style)"
+        :hasPermission="route.params.sid ? `${route.params.sid}:${item.key}` : true"
+        :data-id="item.id"
+      >
+        <template v-if="item.icon">
+          <img
+            :src="item.icon"
+            alt=""
+            v-if="item.icon.includes('http')"
+            class="image-icon"
+          />
+          <AIcon v-else :type="item?.icon" />
+        </template>
+        {{ item.title }} <AIcon type="DownOutlined" />
+      </PermissionButton>
         </BatchDropdown>
-        <!-- <j-dropdown
-          :trigger="['click']"
-          placement="bottomLeft"
-          v-if="item?.children?.length !== 0"
-        >
-          <j-button class="childBtn">
-            {{ item.text }}
-            <AIcon type="DownOutlined" />
-          </j-button>
-          <template #overlay>
-            <j-menu>
-              <j-menu-item v-for="child in item?.children" :key="child.key">
-                <PermissionButton
-                  v-bind:="handleFunction(child.permissionProps, child)"
-                  :danger="child.command === 'Delete'"
-                  style="width: 100%"
-                  :popConfirm="
-                    
-                    handleFunction(child.permissionProps, child, child)?.popConfirm
-                  
-                  "
-                >
-                  <AIcon v-if="child.icon" :type="child?.icon" />
-                  {{ child?.text }}
-                </PermissionButton>
-              </j-menu-item>
-            </j-menu>
-          </template>
-        </j-dropdown> -->
       </div>
     </j-space>
   </div>
@@ -68,11 +56,7 @@ import { extractCssClass, insertCustomCssToHead } from '@/components/FormDesigne
 import BatchDropdown from './BatchDropdown/index.vue'
 
 const isCheck = ref(false)
-const onCheckChange = () => {
-
-  
-}
-
+const route = useRoute()
 const props = defineProps({
   headerActions: {
     type: Array as PropType<Record<string, any>[]>,
@@ -85,6 +69,7 @@ const className = computed(() => {
     return extractCssClass(val)
   }
 })
+
 const handleFunction = (item: any, data?: any) => {
   if (isFunction(item)) {
     return item(data)
@@ -97,8 +82,12 @@ const handleFunction = (item: any, data?: any) => {
 
 watchEffect(() => {
   props.headerActions.forEach((item) => {
-    insertCustomCssToHead(item.style, item.key)
+    insertCustomCssToHead(item.style, item.key, 'dataid')
   })
+})
+
+defineExpose({
+  isCheck
 })
 </script>
 <style lang="less" scoped>

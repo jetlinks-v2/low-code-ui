@@ -2,7 +2,12 @@
 <template>
   <div>
     <template v-if="['input-number'].includes(type)">
-      <j-form-item :validateFirst="true" :rules="maxRules" label="最大值" :name="['componentProps', 'max']">
+      <j-form-item
+        :validateFirst="true"
+        :rules="maxRules"
+        label="最大值"
+        :name="['componentProps', 'max']"
+      >
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.max"
@@ -11,7 +16,12 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item :validateFirst="true" :rules="minRules" label="最小值" :name="['componentProps', 'min']">
+      <j-form-item
+        :validateFirst="true"
+        :rules="minRules"
+        label="最小值"
+        :name="['componentProps', 'min']"
+      >
         <j-input-number
           style="width: 100%"
           v-model:value="target.componentProps.min"
@@ -39,26 +49,22 @@
     </template>
     <template
       v-if="
-        [
-          'select-card',
-          'select',
-          'org',
-          'role',
-          'user',
-          'product',
-          'device',
-        ].includes(type)
+        ['select', 'org', 'role', 'user', 'product', 'device'].includes(type)
       "
     >
-      <j-form-item :validateFirst="true" label="类型" :name="['componentProps', 'mode']">
-        <j-radio-group
+      <j-form-item
+        :validateFirst="true"
+        label="类型"
+        :name="['componentProps', 'mode']"
+      >
+        <CheckButton
+          :options="[
+            { label: '单选项', value: undefined },
+            { label: '多选项', value: 'multiple' },
+          ]"
+          @change="onModeChange"
           v-model:value="target.componentProps.mode"
-          button-style="solid"
-          @change="onDataChange"
-        >
-          <j-radio-button :value="undefined">单选项</j-radio-button>
-          <j-radio-button :value="'multiple'">多选项</j-radio-button>
-        </j-radio-group>
+        />
       </j-form-item>
     </template>
     <template v-if="['upload'].includes(type)">
@@ -73,14 +79,14 @@
           },
         ]"
       >
-        <j-radio-group
-          v-model:value="target.componentProps.listType"
+        <CheckButton
+          :options="[
+            { label: '文件', value: 'text' },
+            { label: '图片', value: 'picture' },
+          ]"
           @change="onChange"
-          button-style="solid"
-        >
-          <j-radio-button :value="'text'">文件</j-radio-button>
-          <j-radio-button :value="'picture'">图片</j-radio-button>
-        </j-radio-group>
+          v-model:value="target.componentProps.listType"
+        />
       </j-form-item>
       <j-form-item
         label="上传个数"
@@ -97,7 +103,11 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item :validateFirst="true" :name="['componentProps', 'accept']" label="格式">
+      <j-form-item
+        :validateFirst="true"
+        :name="['componentProps', 'accept']"
+        label="格式"
+      >
         <j-select
           mode="multiple"
           placeholder="请选择"
@@ -135,38 +145,44 @@
         </j-input-group>
       </j-form-item>
     </template>
-    <template v-if="['tree-select'].includes(type)">
-      <j-form-item :validateFirst="true" label="类型" :name="['componentProps', 'multiple']">
-        <j-radio-group
-          v-model:value="target.componentProps.multiple"
-          button-style="solid"
-          @change="onMultipleChange"
-        >
-          <j-radio-button :value="false">单选项</j-radio-button>
-          <j-radio-button :value="true">多选项</j-radio-button>
-        </j-radio-group>
-      </j-form-item>
+    <template v-if="['tree-select', 'select-card'].includes(type)">
       <j-form-item
-        label="可选节点"
-        v-if="target.componentProps.multiple"
-        :name="['componentProps', 'treeCheckStrictly']"
         :validateFirst="true"
-        :rules="[
-          {
-            required: true,
-            message: '请选择',
-          },
-        ]"
+        label="类型"
+        :name="['componentProps', 'multiple']"
       >
-        <j-select
-          v-model:value="target.componentProps.treeCheckStrictly"
-          placeholder="请选择"
-          @change="onDataChange"
-        >
-          <j-select-option :value="false">联动选择</j-select-option>
-          <j-select-option :value="true">仅选子节点</j-select-option>
-        </j-select>
+        <CheckButton
+          :options="[
+            { label: '单选项', value: false },
+            { label: '多选项', value: true },
+          ]"
+          @change="onMultipleChange"
+          v-model:value="target.componentProps.multiple"
+        />
       </j-form-item>
+      <template v-if="['tree-select'].includes(type)">
+        <j-form-item
+          label="可选节点"
+          v-if="target.componentProps.multiple"
+          :name="['componentProps', 'treeCheckStrictly']"
+          :validateFirst="true"
+          :rules="[
+            {
+              required: true,
+              message: '请选择',
+            },
+          ]"
+        >
+          <j-select
+            v-model:value="target.componentProps.treeCheckStrictly"
+            placeholder="请选择"
+            @change="onDataChange"
+          >
+            <j-select-option :value="false">联动选择</j-select-option>
+            <j-select-option :value="true">仅选子节点</j-select-option>
+          </j-select>
+        </j-form-item>
+      </template>
     </template>
     <template v-if="['tree-select', 'select'].includes(type)">
       <j-form-item
@@ -187,7 +203,11 @@
       </j-form-item>
     </template>
     <template v-if="['table'].includes(type)">
-      <j-form-item :validateFirst="true" label="内容对齐" :name="['componentProps', 'align']">
+      <j-form-item
+        :validateFirst="true"
+        label="内容对齐"
+        :name="['componentProps', 'align']"
+      >
         <j-select
           v-model:value="target.componentProps.align"
           placeholder="请选择"
@@ -198,7 +218,11 @@
           <j-select-option :value="'center'">中</j-select-option>
         </j-select>
       </j-form-item>
-      <j-form-item :validateFirst="true" label="表格高度" :name="['componentProps', 'height']">
+      <j-form-item
+        :validateFirst="true"
+        label="表格高度"
+        :name="['componentProps', 'height']"
+      >
         <j-input-number
           v-model:value="target.componentProps.height"
           placeholder="请输入"
@@ -240,6 +264,30 @@
         </j-select>
       </j-form-item>
     </template>
+    <template v-if="['date-picker'].includes(type)">
+      <j-form-item
+        label="精度"
+        :name="['componentProps', 'format']"
+        :validateFirst="true"
+        :rules="[
+          {
+            required: true,
+            message: '请选择',
+          },
+        ]"
+      >
+        <j-select
+          :defaultValue="'M'"
+          @change="onDateChange"
+          v-model:value="target.componentProps.format"
+        >
+          <j-select-option value="YYYY-MM-DD">年-月-日</j-select-option>
+          <j-select-option value="YYYY-MM-DD HH:mm:ss"
+            >时-分-秒</j-select-option
+          >
+        </j-select>
+      </j-form-item>
+    </template>
     <template
       v-if="
         [
@@ -254,7 +302,7 @@
           'select',
           'date-picker',
           'time-picker',
-          'table',
+          // 'table',
           'org',
           'role',
           'user',
@@ -276,14 +324,63 @@
           },
         ]"
       >
-        <j-radio-group
+        <!-- <j-radio-group
           v-model:value="target.formItemProps.required"
           button-style="solid"
           @change="onDataChange"
         >
           <j-radio-button :value="true">必填</j-radio-button>
           <j-radio-button :value="false">非必填</j-radio-button>
-        </j-radio-group>
+        </j-radio-group> -->
+        <CheckButton
+          :options="[
+            { label: '必填', value: true },
+            { label: '非必填', value: false },
+          ]"
+          @change="onDataChange"
+          v-model:value="target.formItemProps.required"
+        />
+      </j-form-item>
+    </template>
+    <template
+      v-if="
+        [
+          'input',
+          'textarea',
+          'input-number',
+          'input-password',
+          'tree-select',
+          'select',
+          'date-picker',
+          'time-picker',
+        ].includes(type)
+      "
+    >
+      <j-form-item
+        :validateFirst="true"
+        label="占位提示"
+        :name="['componentProps', 'placeholder']"
+      >
+        <j-input
+          placeholder="请输入"
+          v-model:value="target.componentProps.placeholder"
+          :maxlength="32"
+          @change="onDataChange"
+        />
+      </j-form-item>
+    </template>
+    <!-- 规则校验 -->
+    <template v-if="rulesVisible">
+      <j-form-item
+        :rules="ruleRules"
+        :name="['formItemProps', 'rules']"
+        :validateFirst="true"
+      >
+        <Rule
+          :type="type"
+          v-model:value="target.formItemProps.rules"
+          @change="onChange"
+        />
       </j-form-item>
     </template>
   </div>
@@ -291,9 +388,11 @@
 
 <script lang="ts" setup>
 import { useTarget } from '../../../../hooks'
-import { computed, watchEffect } from 'vue'
+import { computed, unref, watchEffect } from 'vue'
 import { useRequest } from '@jetlinks/hooks'
 import { getGeoType } from '@/api/form'
+import Rule from './Rules/Rule.vue'
+import { uid } from '@/components/FormDesigner/utils/uid'
 
 const { target } = useTarget()
 
@@ -319,6 +418,16 @@ const { data: options, run } = useRequest(getGeoType, {
   immediate: false,
 })
 
+const rulesVisible = computed(() => {
+  return [
+    'input',
+    'textarea',
+    'input-password',
+    'date-picker',
+    'time-picker',
+  ].includes(unref(type))
+})
+
 const rules = [
   {
     required: true,
@@ -326,7 +435,7 @@ const rules = [
   },
   {
     validator(_: any, value: number) {
-      if(value === null || value === undefined) return Promise.resolve()
+      if (value === null || value === undefined) return Promise.resolve()
       if (value === 0) return Promise.reject(`单个大小应该大于0`)
       return Promise.resolve()
     },
@@ -341,8 +450,9 @@ const maxRules = [
   },
   {
     validator(_: any, value: number) {
-      if(value === null || value === undefined) return Promise.resolve()
-      if (value < target.value.componentProps.min) return Promise.reject(`最大值必须大于最小值`)
+      if (value === null || value === undefined) return Promise.resolve()
+      if (value < target.value.componentProps.min)
+        return Promise.reject(`最大值必须大于最小值`)
       return Promise.resolve()
     },
     trigger: 'change',
@@ -356,8 +466,24 @@ const minRules = [
   },
   {
     validator(_: any, value: number) {
-      if(value === null || value === undefined) return Promise.resolve()
-      if (value > target.value.componentProps.max) return Promise.reject(`最大值必须大于最小值`)
+      if (value === null || value === undefined) return Promise.resolve()
+      if (value > target.value.componentProps.max)
+        return Promise.reject(`最大值必须大于最小值`)
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
+
+const ruleRules = [
+  {
+    validator(_: any, value: any) {
+      const _value = (value || []).find((item) => {
+        return !item.trigger?.length
+      })
+      if (_value) {
+        return Promise.reject(`请正确填写规则配置`)
+      }
       return Promise.resolve()
     },
     trigger: 'change',
@@ -368,13 +494,27 @@ const onDataChange = () => {
   emits('refresh', target.value)
 }
 
+const onModeChange = () => {
+  if (unref(type) !== 'select') {
+    target.value.formItemProps.name = `${type.value}_${uid()}`
+  }
+  emits('refresh', target.value)
+}
+
 const onMultipleChange = (e) => {
-  if (e.target.value) {
+  if (e) {
     target.value.componentProps.treeCheckable = true
   } else {
     target.value.componentProps.treeCheckable = false
     target.value.componentProps.treeCheckStrictly = false
   }
+  emits('refresh', target.value)
+}
+
+const onDateChange = (e) => {
+  target.value.componentProps.format = e
+  target.value.componentProps.valueFormat = e
+  target.value.componentProps.showTime = !(e === 'YYYY-MM-DD')
   emits('refresh', target.value)
 }
 

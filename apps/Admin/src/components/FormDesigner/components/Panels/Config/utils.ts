@@ -1,4 +1,4 @@
-export const getConfigList = (_type: string) => {
+export const getConfigList = (_type: string, obj: any, type: 'workflow' | 'low-code') => {
     const arr: any[] = []
     if (['root'].includes(unref(_type))) {
         arr.push({
@@ -7,7 +7,7 @@ export const getConfigList = (_type: string) => {
         })
     }
 
-    if (!['root', 'grid-item'].includes(unref(_type))) {
+    if (!['root', 'grid-item', 'grid'].includes(unref(_type))) {
         arr.push({
             key: 'Base',
             header: '基础信息',
@@ -22,7 +22,7 @@ export const getConfigList = (_type: string) => {
             'input-password',
             'select-card',
             'upload',
-            'switch',
+            // 'switch',
             'tree-select',
             'select',
             'date-picker',
@@ -49,12 +49,12 @@ export const getConfigList = (_type: string) => {
         })
     }
 
-  if (unref(_type) === 'form') {
-    arr.push({
-      key: 'SourceForm',
-      header: '数据来源',
-    })
-  }
+    if (unref(_type) === 'form') {
+        arr.push({
+            key: 'SourceForm',
+            header: '数据来源',
+        })
+    }
 
     if (unref(_type) === 'grid' || unref(_type) === 'grid-item') {
         arr.push({
@@ -63,38 +63,45 @@ export const getConfigList = (_type: string) => {
         })
     }
 
-    if (
-        [
-            'root',
-            'text',
-            'input',
-            'textarea',
-            'input-number',
-            'input-password',
-            'select-card',
-            'upload',
-            'switch',
-            'tree-select',
-            'select',
-            'date-picker',
-            'time-picker',
-            'table',
-            'card',
-            'tabs',
-            'collapse',
-            'org',
-            'role',
-            'user',
-            'product',
-            'device',
-            'geo',
-            'form'
-        ].includes(unref(_type))
-    ) {
+    const list = [
+        'root',
+        'text',
+        'input',
+        'textarea',
+        'input-number',
+        'input-password',
+        'select-card',
+        'upload',
+        'switch',
+        'tree-select',
+        'select',
+        'date-picker',
+        'time-picker',
+        'table',
+        'card',
+        'tabs',
+        'collapse',
+        'form'
+    ]
+    const _list = ['geo', 'device', 'product', 'org', 'user', 'role']
+
+    if (([...list, ..._list].includes(unref(_type)) && type === 'low-code') || [...list].includes(unref(_type)) && type === 'workflow') {
         arr.push({
             key: 'Status',
             header: '高级配置',
         })
+    }
+    if (_type === 'table-item' && !['table-item-index', 'table-item-actions'].includes(obj?.children?.[0]?.type)) {
+        arr.push({
+            key: 'Table',
+            header: '组件属性',
+        })
+        if (['select', 'select-card', 'tree-select'].includes(obj?.children?.[0]?.type)) {
+            arr.push({
+                key: 'TableSource',
+                header: '数据来源',
+            })
+        }
     }
 
     return [...arr]

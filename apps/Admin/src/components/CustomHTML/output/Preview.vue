@@ -14,7 +14,7 @@ import { Store } from '../types'
 import { ReplStore } from '../store'
 
 const props = defineProps<{ code?: string }>()
-const useVueMode = <Ref<Boolean>>inject('useVueMode')
+// const useVueMode = <Ref<Boolean>>inject('useVueMode')
 let store = inject('store') as Store
 if (props.code) {
   store = new ReplStore(props.code)
@@ -36,9 +36,9 @@ watch(
   },
 )
 
-watch(useVueMode, () => {
-  createSandBox()
-})
+// watch(useVueMode, () => {
+//   createSandBox()
+// })
 
 onMounted(() => {
   createSandBox()
@@ -46,7 +46,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   sandBox.removeEventListener('load', () => {
-    updatePreview
+    updatePreview()
   })
 })
 
@@ -88,7 +88,7 @@ function createSandBox() {
 }
 
 function updatePreview() {
-  if (!useVueMode.value) return
+  // if (!useVueMode?.value) return
   if (import.meta.env.PROD) {
     console.clear()
   }
@@ -102,6 +102,7 @@ function updatePreview() {
         modules.length > 1 ? `s` : ``
       }.`,
     )
+
     const codeToEval = [
       `window.__modules__ = {};window.__css__ = [];` +
         `if (window.__app__) window.__app__.unmount();` +
@@ -117,6 +118,7 @@ function updatePreview() {
         import { createApp as _createApp } from "vue"
         const _mount = () => {
           const AppComponent = __modules__["${mainFile}"].default
+          if (!AppComponent) return
           AppComponent.name = 'Repl'
           const app = window.__app__ = _createApp(AppComponent)
           if (!app.config.hasOwnProperty('unwrapInjectedRef')) {

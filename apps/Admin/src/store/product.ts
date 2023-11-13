@@ -2,8 +2,8 @@ import { defineStore } from "pinia";
 import { queryProjectDraft, updateDraft} from "@/api/project";
 import { useEngine } from './engine'
 import dayjs from 'dayjs';
-import {throttle, cloneDeep, omit, result} from 'lodash-es'
-import { Integrate } from '@/utils/project'
+import {throttle, cloneDeep, omit, debounce} from 'lodash-es'
+import {Integrate, IntegrateFilterType} from '@/utils/project'
 import { providerEnum } from  '@/components/ProJect/index'
 import { filterTreeNodes } from '@jetlinks/utils'
 
@@ -61,24 +61,25 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
       })
     })
   }
-  return treeData
+  return treeData.sort((a,b) => a.others.tree_index - b.others.tree_index)
 }
 
 /**
  * 保存草稿
  */
-const updateProductReq = throttle((draftData: any[], cb) => {
+const updateProductReq = debounce((draftData: any[], cb) => {
   const integrateData = Integrate(draftData)
+  console.log('updateProductReq', new Date().getTime(),draftData)
   updateDraft(integrateData.draftId, integrateData).then(resp => {
     if (resp.success) {
-      const { children, ...oldProject } = data.value
+      const { children, ...oldProject } = draftData[0]
       cb?.({
         ...resp.result,
         ...oldProject
       })
     }
   })
-}, 1000)
+}, 100)
 
 export const useProduct = defineStore('product', () => {
   const data = ref<TreeData[]>([]) // 项目
@@ -111,7 +112,7 @@ export const useProduct = defineStore('product', () => {
 
   const findParent=(data, target, result) =>{
     for (let item of data) {
-      if (item.id === target.id) {
+      if (item.id === target?.id) {
         //将查找到的目标数据加入结果数组中
         result.unshift(item)
         return true
@@ -135,10 +136,10 @@ export const useProduct = defineStore('product', () => {
         const add = {
           ...record,
           others:{
-            ...record.others,
             createTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
             modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss'),
-            useList:[]
+            useList:[],
+            ...record.others,
           },
         }
         return {
@@ -157,8 +158,8 @@ export const useProduct = defineStore('product', () => {
     const arr= cloneDeep(data)
     return arr.map(item => {
       if (item.id === record.id) {
-        return { 
-          ...item, 
+        return {
+          ...item,
           ...record,
           others:{
             ...item.others,
@@ -226,13 +227,18 @@ export const useProduct = defineStore('product', () => {
     if (isActive) {
       engine.setActiveFile(treeData[0]?.id)
     }
-    info.value = extra
+    info.value = {
+      ...extra,
+      others: modules ? modules[0]?.others : {}
+    }
     published.value = extra.state?.value === 'published'
+
   }
 
   const add = (record: any, parentId: string,open?:any) => {
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
+    console.log('add',cloneDeep(data.value), record)
     updateDataCache()
     engine.updateFile(record,'add',open)
     updateProductReq(data.value, (result) => {
@@ -240,14 +246,16 @@ export const useProduct = defineStore('product', () => {
     })
   }
 
-  const update = (record: any) => {
-    // console.log('item---',record)
+  const update = async (record: any, cb?: Function) => {
+    console.log('item---',record)
     dataMap.set(record.id, omit(record, ['children']))
     data.value = updateProduct(data.value, record)
+    console.log('update',cloneDeep(data.value))
     updateDataCache()
     engine.updateFile(record, 'edit')
     updateProductReq(data.value, (result) => {
       handleProjectData(result)
+      cb?.()
     })
   }
 
@@ -272,21 +280,22 @@ export const useProduct = defineStore('product', () => {
     findParent(data.value,record,arr)
     return arr;
   }
-  
+
   //通过名称搜索
   const filterTree = (name) =>{
     data.value = name ? filterTreeNodes(JSON.parse(dataCache), name, 'title') : JSON.parse(dataCache)
     engine.expandedAll()
   }
 
-  const getServerModulesData = async () => {
-    const integrateData = Integrate(data.value)
+  const getServerModulesData = async (filter?: IntegrateFilterType) => {
+    const integrateData = Integrate(data.value, filter)
     return integrateData?.modules || []
   }
 
   const queryProduct = async (id?: string, cb?: () => void) => {
     if (!id) return
     dataMap.clear()
+    initProjectState()
     const resp = await queryProjectDraft(id)
     if (resp.success) {
       handleProjectData(resp.result, true)

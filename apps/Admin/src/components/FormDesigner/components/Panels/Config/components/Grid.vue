@@ -8,6 +8,7 @@
           @change="onDataChange"
           :min="1"
           :max="15"
+          :precision="0"
           style="width: 100%"
         />
       </j-form-item>
@@ -17,6 +18,8 @@
           v-model:value="target.componentProps.colSpan"
           @change="onDataChange"
           :min="0"
+          :max="99999999999999"
+          :precision="0"
           style="width: 100%"
         />
       </j-form-item>
@@ -26,6 +29,8 @@
           v-model:value="target.componentProps.rowSpan"
           @change="onDataChange"
           :min="0"
+          :max="99999999999999"
+          :precision="0"
           style="width: 100%"
         />
       </j-form-item>
@@ -36,7 +41,9 @@
           placeholder="请输入"
           v-model:value="target.componentProps.span"
           @change="onDataChange"
-          :min="0"
+          :min="1"
+          :max="99999999999999"
+          :precision="0"
           style="width: 100%"
         />
       </j-form-item>

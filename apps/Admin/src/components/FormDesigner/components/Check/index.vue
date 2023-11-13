@@ -1,43 +1,45 @@
 <template>
-  <div class="check" :style="{ height: _height }">
-    <div class="check-btn">
-      <j-button v-if="!checkVisible" type="primary" @click="checkVisible = true"
-        >数据校验</j-button
-      >
-      <j-space v-else>
-        <j-button class="btn" @click="onCancel">取消</j-button>
-        <j-button class="btn" @click="onInput('get')"
-          >获取数据<j-tooltip title="将表单中填写的所有数据获取到代码框中">
-            <AIcon type="QuestionCircleOutlined" /> </j-tooltip
-        ></j-button>
-        <j-button :disabled="disabled" class="btn" @click="onInput('set')"
-          >加载数据<j-tooltip title="将代码框输入的模拟数据反显到表单">
-            <AIcon type="QuestionCircleOutlined" /> </j-tooltip
-        ></j-button>
-      </j-space>
-    </div>
-    <div class="check-editor" v-if="checkVisible">
-      <j-monaco-editor
-        @change="onChange"
-        v-model="editData"
-        :language="'json'"
-      />
-    </div>
+  <div class="check" :style="{ height: height + 'px' }">
+    <drag-box position="top" @move="move">
+      <div class="check-btn">
+        <j-button
+          v-if="!checkVisible"
+          type="primary"
+          @click="onClick"
+          >数据校验</j-button
+        >
+        <j-space v-else>
+          <j-button class="btn" @click="onCancel">取消</j-button>
+          <j-button class="btn" @click="onInput('get')"
+            >获取数据<j-tooltip title="将表单中填写的所有数据获取到代码框中">
+              <AIcon type="QuestionCircleOutlined" /> </j-tooltip
+          ></j-button>
+          <j-button :disabled="disabled" class="btn" @click="onInput('set')"
+            >加载数据<j-tooltip title="将代码框输入的模拟数据反显到表单" placement="topRight">
+              <AIcon type="QuestionCircleOutlined" /> </j-tooltip
+          ></j-button>
+        </j-space>
+      </div>
+      <div class="check-editor" v-if="checkVisible">
+        <j-monaco-editor
+          @change="onChange"
+          v-model="editData"
+          :language="'json'"
+        />
+      </div>
+    </drag-box>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, unref, ref, inject, watch } from 'vue'
+import { ref, inject } from 'vue'
 
 const designer: any = inject('FormDesigner')
 
 const editData = ref<string>()
 const checkVisible = ref<boolean>(false)
 const disabled = ref<boolean>(true)
-
-const _height = computed(() => {
-  return !unref(checkVisible) ? '40px' : '248px'
-})
+const height = ref<number>(40)
 
 // 获取数据
 const onInput = async (type: 'get' | 'set') => {
@@ -46,8 +48,9 @@ const onInput = async (type: 'get' | 'set') => {
     Object.assign(designer.formState, obj)
   } else {
     const obj = await designer.onSave()?.catch(() => {})
+    console.log(obj, 'obj')
     if (obj) {
-      editData.value = JSON.stringify(obj)
+      editData.value = JSON.stringify(obj, (key, value) => typeof value === 'undefined' ? null : value)
     }
   }
 }
@@ -62,9 +65,25 @@ const onChange = (e) => {
   }
 }
 
+const onClick = () => {
+    checkVisible.value = true
+    height.value = 200
+}
+
 const onCancel = () => {
   checkVisible.value = false
   editData.value = ''
+  height.value = 40
+}
+
+const move = (v) => {
+  if (checkVisible.value) {
+    const _height = window.innerHeight - v;
+    const _h = _height < 240 ? 240 : (_height > 500 ? 500 : _height)
+    height.value = _h
+  } else {
+    height.value = 40
+  }
 }
 </script>
 
@@ -88,7 +107,7 @@ const onCancel = () => {
   }
 
   .check-editor {
-    height: 200px;
+    height: calc(100% - 40px);
     overflow: hidden;
   }
 }

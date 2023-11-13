@@ -1,55 +1,62 @@
 <template>
   <div class="crud-warp" ref="warpRef">
-    <div class="crud-header">
-      <div class="crud-tabs">
-        <j-badge :count="errorDataTableLength" >
-          <div :class="{'crud-tabs-item': true, 'active': activeKey === 'table'}" @click=" activeKey = 'table'">
-            表结构
+
+      <div class="crud-header">
+        <div class="crud-tabs">
+          <j-badge :count="errorDataTableLength" >
+            <div :class="{'crud-tabs-item': true, 'active': activeKey === 'table'}" @click=" activeKey = 'table'">
+              表结构
+            </div>
+          </j-badge>
+          <div :class="{'crud-tabs-item': true, 'active': activeKey === 'data'}" @click=" activeKey = 'data'">
+            数据
           </div>
-        </j-badge>
-        <div :class="{'crud-tabs-item': true, 'active': activeKey === 'data'}" @click=" activeKey = 'data'">
-          数据
+          <j-badge :count="errorRelationLength" >
+            <div :class="{'crud-tabs-item': true, 'active': activeKey === 'adv'}" @click=" activeKey = 'adv'">
+              高级配置
+            </div>
+          </j-badge>
         </div>
-        <j-badge :count="errorRelationLength" >
-          <div :class="{'crud-tabs-item': true, 'active': activeKey === 'adv'}" @click=" activeKey = 'adv'">
-            高级配置
-          </div>
-        </j-badge>
+        <j-button class="extra-check" type="primary" @click="validate">校验</j-button>
       </div>
-      <j-button class="extra-check" type="primary" @click="validate">校验</j-button>
-    </div>
-    <div class="crud-body">
-      <CardBox  v-show="activeKey === 'table'" style="height: 100%">
-        <DataTable
+      <div class="crud-body">
+        <CardBox v-show="activeKey === 'table'" style="height: 100%">
+          <DataTable
 
-          ref="dataTableRef"
-          v-model:tableName="tableName"
-          v-model:columns="columns"
-          :tree="tree"
-          :ownerId="ownerId"
-          @update="update"
-        />
-      </CardBox>
-      <CardBox v-show="activeKey === 'data'" style="height: 100%">
-        <DataSetting
-
-          :id="props.id"
-          :parentId="props.parentId"
-        />
-      </CardBox>
-        <j-scrollbar>
-          <Advanced
-            v-show="activeKey === 'adv'"
-            ref="advancedRef"
-            v-model:tree="tree"
-            v-model:asset="asset"
-            v-model:relation="relation"
-            :id="props.id"
-            :parentId="props.parentId"
+            ref="dataTableRef"
+            v-model:tableName="tableName"
+            v-model:columns="columns"
+            :tree="tree"
+            :ownerId="ownerId"
+            :publishColumns="publishColumns"
             @update="update"
           />
-        </j-scrollbar>
-    </div>
+        </CardBox>
+        <CardBox v-show="activeKey === 'data'" style="height: 100%">
+          <DataSetting
+
+            :id="props.id"
+            :createTime="others?.createTime"
+            :parentId="props.fullId"
+          />
+        </CardBox>
+        <div style="height: 100%;" v-show="activeKey === 'adv'">
+          <j-scrollbar>
+            <Advanced
+
+              ref="advancedRef"
+              v-model:tree="tree"
+              v-model:asset="asset"
+              v-model:relation="relation"
+              :id="props.id"
+              :parentId="props.parentId"
+              @update="update"
+            />
+          </j-scrollbar>
+        </div>
+
+      </div>
+    <CheckSpin :spinning="loading" />
   </div>
 </template>
 
@@ -60,6 +67,9 @@ import DataSetting from './data.vue'
 import Advanced from './advanced.vue'
 import { useProduct } from '@/store'
 import { defaultSetting } from './setting'
+import {onlyMessage} from "@/utils/comm";
+import { useRequest } from '@jetlinks/hooks'
+import {executeReq} from "@/api/basis";
 
 const props = defineProps({
   configuration: {
@@ -82,6 +92,10 @@ const props = defineProps({
     type: String,
     default: undefined
   },
+  fullId: {
+    type: String,
+    default: undefined
+  },
   id: {
     type: String,
     default: undefined
@@ -89,6 +103,10 @@ const props = defineProps({
   others: {
     type: Object,
     default: () => ({})
+  },
+  showTip: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -100,11 +118,19 @@ const activeKey = ref('table')
 
 const project = useProduct()
 
+const { data: publishColumns, run } = useRequest(executeReq, {
+  immediate: false,
+  onSuccess(resp) {
+    return resp.result.map?.(item => item.id) || []
+  }
+})
+
 provide(CRUD_COLUMNS, tableColumns)
 provide(WARP_REF, warpRef)
 
 const ownerId = computed(() => {
-  return `${project.info?.id}.${props.parentId}.${props.id}`
+  const stId = project.info?.id === props.parentId ? [project.info?.id,project.info?.id] : [project.info?.id,project.info?.id,props.parentId]
+  return `${stId.join('.')}.${props.id}`
 })
 
 const tableName = ref(props.configuration.tableName)
@@ -147,15 +173,21 @@ const errorRelationLength = computed(() =>{
   return errorTips.dataTable ? Object.keys(errorTips.relation).length : 0
 })
 
+if (props.configuration?.tableName) {
+  run('rdb-crud', 'GetColumns', { tableName: props.configuration?.tableName})
+}
+
 const validate = async () => {
-  loading.value = ref(true)
+  loading.value = true
   errorTips.relation = {}
+  let validateStatus = false
 
   try {
     await advancedRef.value.validates()
     errorTips.relation = {}
   } catch (e) {
     errorTips.relation = e
+    validateStatus = true
   }
 
   try {
@@ -163,14 +195,20 @@ const validate = async () => {
     errorTips.dataTable = {}
   } catch (e) {
     errorTips.dataTable = e || {}
+    validateStatus = true
   }
 
   loading.value = false
+
+  if (props.showTip && !validateStatus) {
+    onlyMessage('校验通过')
+  }
 }
 
 defineExpose({
   validate: () => {
     return new Promise(async (resolve, reject) => {
+
       await validate()
       const err = []
 
@@ -185,7 +223,6 @@ defineExpose({
           err.push(a[0])
         })
       }
-
       !err.length ? resolve() : reject(err)
     })
   }
@@ -198,6 +235,13 @@ defineExpose({
   height: 100%;
   position: relative;
   width: 100% !important;
+
+  .loading {
+    height: 100%;
+    :deep(.ant-spin-container) {
+      height: 100%;
+    }
+  }
 
   .crud-header {
     padding: 4px 24px;

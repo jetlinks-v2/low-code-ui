@@ -27,8 +27,6 @@
           <div class="item-body">
             <slot name="content"></slot>
           </div>
-          <!-- 勾选 -->
-          <Active v-show="active"/>
           <!-- 状态 -->
           <div v-if="showStatus" class="item-state" :style="{ backgroundColor: `rgba(${stateColor}, .1)`}">
             <div class="item-state-content">
@@ -41,7 +39,8 @@
             </div>
           </div>
         </div>
-
+        <!-- 勾选 -->
+        <Active v-show="active"/>
       </div>
     </div>
     <ResizeObserver :onResize="onResize">
@@ -58,9 +57,16 @@
             v-bind:="handleFunction(item.permissionProps)"
             :danger="item.key === 'delete'"
             style="width: 100%"
+            :data-id="item.key"
+            :class="extractCssClass(item.style)"
           >
             <template #icon v-if="item.icon || item.key === 'delete'">
-              <AIcon :type="item.icon ? item.icon : 'DeleteOutlined'" />
+              <img
+                :src="item.icon"
+                v-if="item.icon?.includes('http')"
+                class="image-icon"
+              />
+              <AIcon v-else :type="item.icon ? item.icon : 'DeleteOutlined'" />
             </template>
             <span v-if="item.key !== 'delete'">
               {{ item.text }}
@@ -82,6 +88,7 @@ import {isFunction, isObject, debounce, cloneDeep} from "lodash-es";
 import Active from './active.vue'
 import OtherActions from './otherActions.vue'
 import { hexToRgb } from '@jetlinks/utils'
+import { extractCssClass, insertCustomCssToHead } from '../FormDesigner/utils/utils';
 
 const props = defineProps({
   ...BadgeProps(),
@@ -127,6 +134,11 @@ const myActions = ref([])
 const widthCount = ref(0)
 const max = ref(0)
 
+const deleteWidth = computed(() => {
+  const hasDelete = props.actions.some(item => item.key === 'delete')
+  return hasDelete ? 60 : 0
+})
+
 const bodyClass = computed(() => {
   return {
     'card-body': true,
@@ -137,8 +149,8 @@ const bodyClass = computed(() => {
 
 const actionsList = computed(() => {
   const maxLength = parseInt(String(max.value / 100))
-  console.log(maxLength)
-  if (widthCount.value && widthCount.value > max.value && maxLength > 1) {
+  console.log('card',maxLength, widthCount.value, max.value )
+  if (widthCount.value && widthCount.value > (max.value + deleteWidth.value) && maxLength > 1) {
     const cloneActions = cloneDeep(props.actions)
     const newActions = cloneActions.splice(0, maxLength - 1)
     newActions.push({
@@ -175,15 +187,17 @@ const handleFunction = (item) => {
   return undefined
 }
 
-
-
 const onResize = debounce((e) => {
   const len = props.actions?.length || 0
-  const hasDelete = props.actions.some(item => item.key === 'delete')
-  const deleteWidth = hasDelete ? 60 : 0
   max.value = e.width
-  widthCount.value = 100 * len + deleteWidth
+  widthCount.value = 100 * len + deleteWidth.value
 }, 100)
+
+watchEffect(() => {
+  props.actions?.forEach((item) => {
+    insertCustomCssToHead(item.style, item.key, 'dataid')
+  })
+})
 
 </script>
 
@@ -210,6 +224,7 @@ const onResize = debounce((e) => {
     &.active {
       position: relative;
       border: 1px solid #2f54eb;
+      border-color: var(--ant-primary-color-active);
     }
 
     .card-type {
@@ -238,6 +253,8 @@ const onResize = debounce((e) => {
 
       .content-item {
         display: flex;
+        position: relative;
+        z-index: 4;
       }
 
       .item-avatar {
@@ -255,17 +272,17 @@ const onResize = debounce((e) => {
 
       .item-state {
         position: absolute;
-        top: 30px;
-        right: -12px;
+        top: -24px;
+        right: -26px;
         display: flex;
         justify-content: center;
-        width: 100px;
+        width: 110px;
         padding: 2px 0;
         background-color: rgba(#5995f5, 0.15);
         transform: skewX(45deg);
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+        // overflow: hidden;
+        // white-space: nowrap;
+        // text-overflow: ellipsis;
         &.success {
           background-color: @success-color-deprecated-bg;
         }
@@ -297,6 +314,7 @@ const onResize = debounce((e) => {
 
       .bg-gradient {
         position: absolute;
+        z-index: 2;
         top: 0;
         right: -5%;
         height: 100%;
@@ -324,7 +342,7 @@ const onResize = debounce((e) => {
         border-radius: 0;
         background: #f6f6f6;
         border: 1px solid #e6e6e6;
-        color: #2f54eb;
+        color: var(--ant-primary-color);
       }
 
       :deep(.ant-tooltip-disabled-compatible-wrapper){
@@ -366,6 +384,19 @@ const onResize = debounce((e) => {
             color: #fff !important;
           }
         }
+        :deep(.ant-btn[disabled]) {
+          background: #f5f5f5;
+          border-color: #00000040;
+          color: #00000040!important;
+            svg{
+              color: #00000040;
+            }
+        }
+      }
+      .image-icon {
+        width: 14px;
+        height: 14px;
+        margin-right: 10px;
       }
     }
   }

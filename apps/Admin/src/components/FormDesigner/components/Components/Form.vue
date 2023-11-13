@@ -4,52 +4,86 @@
       :value="myValue"
       :mode="mode"
       :data="config"
-      @valueChange="valueChange"
+      ref="formRef"
+      :disabled="disabled"
+      @stateChange="onValueChange"
+      :formStyle="formStyle"
     />
   </div>
-
 </template>
 <script lang="ts" setup>
 import FormPreview from '@/components/FormDesigner/preview.vue'
+import { watch, computed, ref, inject } from 'vue'
 
+const designer: any = inject('FormDesigner')
 const props = defineProps({
-  value:{
-    type:Array,
-    default:[]
+  value: {
+    type: Array,
+    default: [],
   },
   mode: {
-    type:String,
-    default:''
+    type: String,
+    default: '',
   },
-  disabled:{
-    type:Boolean,
-    default:false
+  disabled: {
+    type: Boolean,
+    default: false,
   },
-  data: {
+  source: {
     type: Object,
-    default: () =>({})
+    default: () => ({}),
   },
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value', 'change'])
 
 const myValue = ref(props.value)
-
+const formRef = ref<any>(null)
 const config = computed(() => {
-  return JSON.parse(props.data.componentProps?.source?.code || '{}')
+  return JSON.parse(props.source?.code || '{}')
 })
 
-const valueChange = (e) => {
+const onValueChange = (e) => {
   emit('update:value', e)
+  emit('change', e)
 }
 
-watch(() => JSON.stringify(props.value), () => {
-  myValue.value = props.value
+const formStyle = computed(() => {
+  return {
+    layout: designer?.formData.value?.componentProps?.layout,
+    size: designer?.formData.value?.componentProps?.size,
+  }
 })
 
+watch(
+  () => props.value,
+  (newVal) => {
+    myValue.value = newVal
+  },
+  {
+    deep: true,
+    immediate: true,
+  },
+)
+
+const onSave = () => {
+  return new Promise((resolve, reject) => {
+    formRef.value
+      ?.onSave()
+      .then((_data) => {
+        resolve(_data)
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  })
+}
+
+defineExpose({ onSave })
 </script>
 <style scoped>
 .form-warp {
   border: 1px solid #e6e6e6;
+  padding-bottom: 18px;
 }
 </style>

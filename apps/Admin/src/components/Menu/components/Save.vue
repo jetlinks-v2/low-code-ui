@@ -9,9 +9,9 @@
          ]">
             <template #label>
                <span>菜单名称</span>
-               <j-tooltip title="分组名称将应用于系统菜单名称、页面路径等位置，建议设置2-8个字符" >
-                <AIcon type="ExclamationCircleOutlined" style="margin-left: 5px;"/>
-              </j-tooltip>
+               <j-tooltip title="分组名称将应用于系统菜单名称、页面路径等位置，建议设置2-8个字符">
+                  <AIcon type="ExclamationCircleOutlined" style="margin-left: 5px;" />
+               </j-tooltip>
             </template>
             <j-input v-model:value="modelRef.name" placeholder="请输入菜单名称" />
          </j-form-item>
@@ -36,9 +36,10 @@
          </j-form-item>
       </j-form>
    </j-modal>
-   <SaveIcon v-if="dialogVisible" v-model:visible="dialogVisible" @confirm="(typeStr: string) => choseIcon(typeStr)" :selected="modelRef.icon"/>
+   <SaveIcon v-if="dialogVisible" v-model:visible="dialogVisible" @confirm="(typeStr: string) => choseIcon(typeStr)"
+      :selected="modelRef.icon" />
 </template>
-   
+
 <script setup lang='ts' name="Save">
 import { randomString } from '@jetlinks/utils';
 import SaveIcon from './SaveIcon.vue'
@@ -49,6 +50,7 @@ const props = defineProps({
       type: Object,
       default: {}
    },
+   projectId:String
 })
 type Emits = {
    (e: 'ok', data: any): void;
@@ -72,19 +74,25 @@ const choseIcon = (typeStr: string) => {
    uploadIcon.value?.clearValidate();
 }
 
-const onSave = async()=>{
+const onSave = async () => {
    const res = await formRef.value?.validate()
-   if(res){
-      const code =props.data.code ||  randomString(8)
+   if (res) {
+      const code = props.data.code || randomString(8)
       const id = props.data.id || randomString(16)
-      emit('ok',{
+      emit('ok', {
+         url: `/preview/${id}`,
          ...props.data,
          ...res,
          id,
-         owner:'iot',
+         owner: 'iot',
          code,
-         url:`/preview/${id}`,
-         children: props.data.children || []
+         children: props.data.children || [],
+         options: {
+            pageId: props.data.options?.pageId || id,
+            projectId: props.projectId,
+            LowCode: true,
+            show:true,
+         }
       })
    }
 }
@@ -94,7 +102,7 @@ const onSave = async()=>{
 //    console.log('props',props.data)
 // })
 </script>
-   
+
 <style scoped lang='less'>
 :deep(.ant-form-item-control-input-content) {
    .icon-upload {

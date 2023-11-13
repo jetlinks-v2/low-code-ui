@@ -1,11 +1,17 @@
 <template>
   <div>
-    <j-modal :visible="visible" @cancel="handleCancel">
+    <j-modal
+      :visible="visible"
+      title="数据展示"
+      destroyOnClose
+      @cancel="handleCancel"
+    >
       <template #footer>
         <a-button key="back" @click="handleCancel">关闭</a-button>
       </template>
-      <div class="content">
-        {{ props.json }}
+      <div style="height: 300px;">
+        <j-monaco-editor language="json" v-model="value">
+      </j-monaco-editor>
       </div>
     </j-modal>
   </div>
@@ -22,6 +28,9 @@ const props = defineProps({
   },
 })
 
+const value = computed(() => {
+  return JSON.stringify(props.json)
+})
 const visible = ref(false)
 const emit = defineEmits(['close', 'save'])
 const handleCancel = () => {
@@ -36,6 +45,6 @@ watch(
 </script>
 <style scoped>
 .content {
-  padding: 30px 20px 10px 20px
+  padding: 30px 20px 10px 20px;
 }
 </style>

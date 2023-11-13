@@ -7,18 +7,20 @@ interface RequestOptions<T, S> {
     immediate: boolean
     /**
      * 成功回调
-     * @param data 
-     * @returns 
+     * @param data
+     * @returns
      */
-    onSuccess: (data: AxiosResponseRewrite<S>) => S | void
+    onSuccess: (data: AxiosResponseRewrite<S>) => S | void | any
     /**
      * 返回参数处理
-     * @returns 
+     * @returns
      */
     formatName: string | [string]
     onError: (e: any) => void
 
     defaultParams: S | any | any[]
+
+    handleResponse: (data: any) => any
 }
 
 const defaultOptions: any = {
@@ -42,7 +44,7 @@ export const useRequest = <T = any, S = any>(
         ...defaultOptions,
         ...options
     }
-   
+
     async function run(...arg: any[]) {
         if (request && isFunction(request)) {
             loading.value = true
@@ -54,8 +56,7 @@ export const useRequest = <T = any, S = any>(
 
               if (resp?.success) {
                 const successData = await _options.onSuccess?.(resp)
-                data.value = successData || get(resp, _options.formatName!)
-                // console.log(data.value)
+                data.value = successData ?? get(resp, _options.formatName || defaultOptions.formatName)
               } else {
                 _options.onError?.(resp)
               }

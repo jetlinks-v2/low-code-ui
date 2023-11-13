@@ -15,7 +15,7 @@
                  v-if="myRelation.enabled">
               <div class="descriptions-item">
                 <div class="descriptions-title">
-                  关系标识
+                  关系对象标识
                 </div>
                 <div class="descriptions-content">
                   <j-form-item name="relationType"
@@ -28,7 +28,7 @@
               </div>
               <div class="descriptions-item">
                 <div class="descriptions-title">
-                  关系名称
+                  关系对象名称
                 </div>
                 <div class="descriptions-content">
                   <j-form-item name="relationTypeName"
@@ -113,7 +113,7 @@
           </div>
           <div>
             <div>
-              <j-switch v-model:checked="myAsset.enabled" style="margin-bottom: 16px"/>
+              <j-switch v-model:checked="myAsset.enabled" style="margin-bottom: 16px" @change="assetEnableChange"/>
             </div>
             <template v-if="myAsset.enabled">
               <div style="margin-bottom: 16px">
@@ -181,8 +181,8 @@
                     <j-form-item
                       name="assetType"
                       :rules="[{ required: true, message: '请选择资产标识'}]">
-                      <j-select style="width: 100%;" v-model:value="myAsset.assetType"
-                                :options="options" :fieldNames="{ label: 'name', value: 'id'}"
+                      <j-select showSearch style="width: 100%;" v-model:value="myAsset.assetType"
+                                :options="options"
                                 @change="assetChange"/>
                     </j-form-item>
                   </div>
@@ -218,7 +218,7 @@
         </div>
       </template>
       <div class="api">
-        <AIcon type="BarsOutlined"></AIcon>
+        <AIcon type="icon-rongqi"></AIcon>
       </div>
     </j-popover>
   </div>
@@ -264,7 +264,11 @@ const project = useProduct()
 const relationRef = ref()
 const assetRef = ref()
 
-const {data: options} = useRequest(getAssetType)
+const {data: options} = useRequest(getAssetType, {
+  onSuccess(resp) {
+    return resp.result?.map(item => ({ ...item, label: item.name, value: item.id})) || []
+  }
+})
 const {data: apiDataSource, run: apiRun} = useRequest(queryEndCommands,
   {
     immediate: false,
@@ -322,6 +326,12 @@ const assetChange = (v) => {
   }
 
   emit('update:asset', myAsset)
+  emit('update')
+}
+
+const assetEnableChange = (v) => {
+  myAsset.enabled = v
+  emit('update:asset', v ? myAsset : {})
   emit('update')
 }
 

@@ -3,7 +3,7 @@
     visible
     title="配置"
     placement="right"
-    :style="{ position: 'absolute' }"
+    :style="{ position: 'absolute', zIndex: 1030 }"
     :closable="false"
     :width="500"
     :get-container="warp"
@@ -14,7 +14,7 @@
       :model="formModel"
       layout="vertical"
     >
-      <component :is="componentName" />
+      <component :is="componentName" :warp="warp" :publish="publish" />
     </j-form>
     <template #footer>
       <j-button style="margin-right: 8px" @click="cancel">取消</j-button>
@@ -38,6 +38,10 @@ const props = defineProps({
   },
   warp: {
     type: Object
+  },
+  publish: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -48,11 +52,6 @@ const formModel = ref({})
 
 provide(SETTING_FORM_MODEL, formModel)
 provide(SETTING_FORM_REF, formRef)
-
-const getContainer = () => {
-  console.log(props.warp)
-  return document.querySelector('.crud-warp')
-}
 
 const componentName = computed(() => {
   const { javaType } = props.data
@@ -84,7 +83,7 @@ const componentName = computed(() => {
           provider: undefined,
           configuration: {
             message: '数据格式错误',
-            group: undefined
+            group: ['save', 'update', 'insert'],
           }
         },
         spec,
@@ -104,7 +103,7 @@ const componentName = computed(() => {
           provider: undefined,
           configuration: {
             message: '数据格式错误',
-            group: undefined,
+            group: ['save', 'update', 'insert'],
             classType: javaType,
             regexp: undefined,
             min: undefined,

@@ -1,24 +1,33 @@
 <template>
-  <j-spin :spinning="spinning">
-    <div class="container">
-      <Header @save="onSave" :data="data" @validate="onValidate" />
-      <div class="box">
-        <div class="left" v-if="model !== 'preview'"><Filed /></div>
-        <div
-          class="right"
-          :style="{
-            width: _width,
-          }"
-        >
-          <Canvas></Canvas>
-        </div>
-        <div class="config" v-if="isShowConfig && model !== 'preview'">
-          <Config ref="configRef" />
+  <div class="container">
+    <Header
+      @save="onWorkFlowSave"
+      :type="type"
+      :data="data"
+      @validate="onValid"
+      @back="emits('back')"
+    />
+    <div class="box">
+      <div class="left" v-if="model !== 'preview'"><Filed /></div>
+      <div
+        class="right"
+        :style="{
+          width: _width,
+        }"
+      >
+        <div class="canvas-box">
+          <div class="canvas-box-container">
+            <Canvas></Canvas>
+          </div>
         </div>
       </div>
-      <Check v-if="model === 'preview' && !mode" />
+      <div class="config" v-if="isShowConfig && model !== 'preview'">
+        <Config ref="configRef" />
+      </div>
     </div>
-  </j-spin>
+    <Check v-if="model === 'preview' && !mode" />
+    <CheckSpin :spinning="spinning" />
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -34,9 +43,8 @@ import {
   unref,
   computed,
   reactive,
-  onMounted,
 } from 'vue'
-import { debounce, map } from 'lodash-es'
+import { cloneDeep, debounce, map } from 'lodash-es'
 import { useProduct, useFormDesigner } from '@/store'
 import { Modal } from 'jetlinks-ui-components'
 import {
@@ -50,6 +58,9 @@ import {
 } from './utils/utils'
 import { uid } from './utils/uid'
 import Check from './components/Check/index.vue'
+import { onlyMessage } from '@jetlinks/utils'
+import { providerEnum } from '@/components/ProJect'
+import { proAll } from '../QuickEditTable/util'
 
 const props = defineProps({
   value: {
@@ -64,16 +75,23 @@ const props = defineProps({
   data: {
     type: Object,
   },
+  type: {
+    // 判断是工作流还是低代码
+    type: String as PropType<'workflow' | 'low-code'>,
+    default: 'low-code',
+  },
 })
 
+const emits = defineEmits(['saveData', 'back'])
 const model = ref<'preview' | 'edit'>(props.mode ? 'preview' : 'edit') // 预览；编辑
 const formData = ref<any>(initData) // 表单数据
 const isShowConfig = ref<boolean>(false) // 是否展示配置
 const selected = ref<any[]>([]) // 被选择数据,需要多选
-const errorKey = ref<string[]>([])
+const errorKey = ref<any[]>([])
 const configRef = ref<any>()
 const refList = ref<any>({})
 const formRef = ref<any>()
+const formRefList = ref<any>({})
 const formState = reactive({})
 const collectVisible = ref<boolean>(false)
 const collectData = ref<any[]>([])
@@ -125,8 +143,9 @@ const setSelection = (node: any) => {
       selected.value.push(node)
     }
   }
-  console.log(selected.value)
-  isShowConfig.value = !(selected.value?.length > 1) && !map(selected.value, 'type').includes('space-item')
+  isShowConfig.value =
+    !(selected.value?.length > 1) &&
+    !map(selected.value, 'type').includes('space-item')
   onSaveData()
 }
 
@@ -157,10 +176,14 @@ const onDelete = debounce(() => {
 
 // 复制
 const onCopy = () => {
-  const list = selected.value.filter((item) => {
-    return !['collapse-item', 'tabs-item', 'grid-item', 'table-item', 'space-item'].includes(
-      item.type,
-    )
+  const list = cloneDeep(selected.value).filter((item) => {
+    return ![
+      'collapse-item',
+      'tabs-item',
+      'grid-item',
+      'table-item',
+      'space-item',
+    ].includes(item.type)
   })
   if (unref(isSelectedRoot) || focused.value) return
   formDesigner.setCopyData(props.data?.id, list || [])
@@ -187,8 +210,14 @@ const onPaste = () => {
       ...item,
       formItemProps: {
         ...item?.formItemProps,
-        label: obj.key === props.data?.id ? item.formItemProps?.label + '_copy' : item.formItemProps?.label,
-        name: obj.key === props.data?.id ? item.formItemProps?.name + '_copy' : item.formItemProps?.name,
+        label:
+          obj.key === props.data?.id
+            ? 'copy_' + item.formItemProps?.label
+            : item.formItemProps?.label,
+        name:
+          obj.key === props.data?.id
+            ? 'copy_' + item.formItemProps?.name
+            : item.formItemProps?.name,
       },
       key: item.key + '_' + uid(),
       children: handleCopyData(item?.children || []),
@@ -220,8 +249,12 @@ const onCollect = () => {
 }
 
 // 添加子组件
-const onAddChild = (newData: any, parent: any, flag?: boolean) => {
-  const arr = appendChildItem(formData.value?.children, newData, parent, flag)
+const onAddChild = (
+  newData: any,
+  parent: any,
+  __flag?: 'start' | 'end' | undefined,
+) => {
+  const arr = appendChildItem(formData.value?.children, newData, parent, __flag)
   formData.value = {
     ...formData.value,
     children: arr || [],
@@ -233,14 +266,16 @@ const onAddChild = (newData: any, parent: any, flag?: boolean) => {
  * 保存数据
  */
 const onSaveData = () => {
-  const obj = {
-    ...props.data,
-    configuration: {
-      type: 'form',
-      code: JSON.stringify(unref(formData)),
-    },
+  if (props.type === 'low-code') {
+    const obj = {
+      ...props.data,
+      configuration: {
+        type: 'form',
+        code: JSON.stringify(unref(formData)),
+      },
+    }
+    product.update(obj)
   }
-  product.update(obj)
 }
 
 const setModel = (_type: 'preview' | 'edit') => {
@@ -249,22 +284,40 @@ const setModel = (_type: 'preview' | 'edit') => {
 
 const onSave = () => {
   if (model.value === 'preview') {
-    return new Promise((resolve, inject) => {
-      formRef.value
-        .validate()
-        .then((_data: any) => {
-          resolve(_data)
+    // 校验内嵌表单
+    const _func = Object.keys(formRefList.value || {}).map((item) => {
+      return formRefList.value[item]?.onSave()
+    })
+    // 主表单
+    _func.push(formRef.value?.validate())
+    return new Promise((resolve, reject) => {
+      proAll(_func)
+        .then(() => {
+          resolve(formState)
         })
-        .catch((err: any) => {
-          inject(err)
+        .catch((err) => {
+          reject(err)
         })
     })
   }
 }
 
+const getFormList = computed(() => {
+  const list = product.getDataMapByType(providerEnum.FormPage)
+  //   过滤掉自身
+  const filterList = list.filter((item) => item.id !== props.data?.id)
+  return filterList.map((item) => {
+    return {
+      label: item.title,
+      value: item.id,
+      code: item.configuration?.code,
+    }
+  })
+})
+
 provide('FormDesigner', {
-  tabsId: props.data?.id,
   model,
+  type: props?.type || 'low-code',
   formData,
   formState,
   formRef,
@@ -273,6 +326,7 @@ provide('FormDesigner', {
   errorKey,
   mode: props?.mode,
   refList,
+  formRefList,
   collectVisible,
   collectData,
   delVisible,
@@ -280,6 +334,7 @@ provide('FormDesigner', {
   _other,
   focus,
   focused, // 其他组件
+  formList: getFormList,
   setSelection,
   setModel,
   onSaveData,
@@ -289,7 +344,7 @@ provide('FormDesigner', {
   onShear,
   onCollect,
   onAddChild,
-  onSave
+  onSave,
 })
 
 watch(
@@ -310,9 +365,19 @@ watch(
 watch(
   () => props.data,
   (newVal) => {
-    try {
-      formData.value = JSON.parse(newVal?.configuration?.code) || initData
-    } catch (error) {}
+    if (props.type === 'workflow') {
+      formData.value =
+        newVal && Object.keys(newVal)?.length
+          ? cloneDeep(newVal)
+          : cloneDeep(initData)
+    } else {
+      try {
+        const obj = JSON.parse(newVal?.configuration?.code)
+        formData.value = Object.keys(obj).length ? obj : cloneDeep(initData)
+      } catch (error) {
+        formData.value = cloneDeep(initData)
+      }
+    }
   },
   {
     deep: true,
@@ -320,22 +385,20 @@ watch(
   },
 )
 
-onMounted(() => {
-  setSelection('root')
-})
-
 onUnmounted(() => {
   onSaveData()
 })
 
 // 校验
-const onValidate = () => {
-  spinning.value = true
-  errorKey.value = checkedConfig(unref(formData))
-  setTimeout(() => {
-    spinning.value = false
-  }, 100)
-  return new Promise((resolve, reject) => {
+const onValidate = async () => {
+  return new Promise(async (resolve, reject) => {
+    const resp: any = await checkedConfig(
+      product.info,
+      unref(formData),
+      getFormList.value,
+      props?.type
+    )
+    errorKey.value = resp
     if (errorKey.value?.length) {
       reject(errorKey.value)
     } else {
@@ -344,12 +407,32 @@ const onValidate = () => {
   })
 }
 
+const onWorkFlowSave = async () => {
+  const _val = await onValidate()
+  if (_val) {
+    emits('saveData', formData.value)
+  }
+}
+
+const onValid = async () => {
+  spinning.value = true
+  const _val = await onValidate().catch(() => {
+    spinning.value = false
+  })
+  spinning.value = false
+  if (_val) {
+    onlyMessage('校验通过')
+  }
+}
+
 defineExpose({ onSave, validate: onValidate })
 </script>
 
 <style lang="less" scoped>
 .container {
-  height: calc(100vh - 132px);
+  // height: calc(100vh - 132px);
+  height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -366,6 +449,20 @@ defineExpose({ onSave, validate: onValidate })
 
     .right {
       width: 100%;
+      .canvas-box {
+        width: 100%;
+        height: 100%;
+        padding: 24px;
+        background-color: #f6f6f6;
+
+        .canvas-box-container {
+          height: 100%;
+          background-color: #fff;
+          border-radius: 8px;
+          // padding: 18px;
+          // box-sizing: content-box;
+        }
+      }
     }
 
     .config {

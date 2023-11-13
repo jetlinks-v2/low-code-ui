@@ -58,22 +58,54 @@ export const handleTreeModal = (data, record) => {
   if (isIdInTree(arr, record.id)) {
     return arr
   } else {
-    return [...arr, record]
+    return [ record,...arr]
   }
 }
 
 //sortIndex
-export const handleSort = (tree) => {
+export const handleSort = (tree,parentId=null) => {
   return tree.map((item, index) => {
     if (item) {
       return {
         ...item,
-        sortIndex: index
+        sortIndex: index,
+        parentId:parentId?parentId:undefined,
       }
     }
     if (item.children) {
-      item.children = handleSort(item.children)
+      item.children = handleSort(item.children,item.id)
     }
     return item
   })
 }
+
+export const updateButtons = (sourceData, targetData) => {
+  const buttonMap = new Map()
+  const getButtonMap = (data) => {
+    data.forEach(item => {
+      if (item.others?.menu?.buttons) {
+        buttonMap.set(item.id, item.others.menu.buttons)
+      }
+      if (item.children) {
+        getButtonMap(item.children)
+      }
+    })
+  }
+
+  getButtonMap(sourceData)
+
+  const setButtons = (data) => {
+    return data.map(item => {
+      if (item.options?.pageId && buttonMap.has(item.options.pageId)) {
+        item.buttons = buttonMap.get(item.options.pageId)
+      }
+      if (item.children) {
+        item.children = setButtons(item.children)
+      }
+      return item
+    })
+  }
+
+  return setButtons(targetData)
+}
+

@@ -1,8 +1,7 @@
 
-import { cloneDeep, get, isEmpty, omit, set } from 'lodash-es';
+import { cloneDeep, isEmpty } from 'lodash-es';
 import DraggableWrap from './DragGableWrap'
 import Selection from '../Selection'
-import { FormItem } from 'jetlinks-ui-components'
 import componentMap from '../../utils/componentMap';
 import GridLayout from './GridLayout';
 import TabsLayout from './TabsLayout';
@@ -10,11 +9,10 @@ import CardLayout from './CardLayout';
 import SpaceLayout from './SpaceLayout';
 import CollapseLayout from './CollapseLayout';
 import TableLayout from './TableLayout'
-import { watch, PropType } from 'vue';
-import { queryOptions } from '../../utils/utils';
-import { useProduct } from '@/store';
+import CommLayout from './CommLayout';
+import { PropType } from 'vue';
 import { onEnd } from './ControlInsertionPlugin';
-import { useProps } from '../../hooks';
+import './index.less';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -45,13 +43,19 @@ const DraggableLayout = defineComponent({
         index: {
             type: Number,
             default: 0
+        },
+        visible: {
+            type: Boolean,
+            default: true
+        },
+        editable: {
+            type: Boolean,
+            default: true
         }
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
         const platform = navigator.platform.toLowerCase();
-
-        const product = useProduct()
 
         const isEditModel = computed(() => {
             return unref(designer.model) === 'edit'
@@ -62,151 +66,50 @@ const DraggableLayout = defineComponent({
                 const _path: string[] = cloneDeep(props?.path || []);
                 const _index: number = props?.index || 0;
 
-                const _hidden = computed(() => {
-                    return !unref(isEditModel) && !element.componentProps?.visible && unref(designer.mode) === 'add'
+                const _visible = computed(() => {
+                    if (!unref(isEditModel) && unref(designer.mode) === 'add') {
+                        if (props.visible === false) {
+                            return false
+                        }
+                        return element.componentProps?.visible
+                    }
+                    return true
                 })
 
-                if(unref(_hidden)) return ''
+                const _editable = computed(() => {
+                    if (!unref(isEditModel) && unref(designer.mode) === 'edit') {
+                        if (props?.editable === false) {
+                            return false
+                        }
+                        return element.componentProps?.editable
+                    }
+                    return true
+                })
+                
+                if (!unref(_visible)) return ''
 
                 switch (element.type) {
                     case 'text':
-                        if (unref(isEditModel) || componentMap?.[element?.type]) {
-                            const TypeComponent = componentMap?.[element?.type] || 'div'
-                            const params = {
-                                data: element,
-                                parent: props.data
-                            }
-                            return (
-                                <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                                    <TypeComponent data={element} {...element.componentProps} />
-                                </Selection>
-                            )
-                        }
-                        break
+                        const TypeComponent = componentMap?.[element?.type] || 'div'
+                        return (
+                            <Selection data={element} parent={props.data} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
+                                <TypeComponent {...element.componentProps} />
+                            </Selection>
+                        )
                     case 'card':
-                        return (<CardLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></CardLayout>)
+                        return (<CardLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></CardLayout>)
                     case 'space':
-                        return (<SpaceLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></SpaceLayout>)
+                        return (<SpaceLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></SpaceLayout>)
                     case 'grid':
-                        return (<GridLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></GridLayout>)
+                        return (<GridLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></GridLayout>)
                     case 'tabs':
-                        return (<TabsLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></TabsLayout>)
+                        return (<TabsLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></TabsLayout>)
                     case 'collapse':
-                        return (<CollapseLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></CollapseLayout>)
-                    case 'table': 
-                        return (<TableLayout index={_index} path={_path} key={element.key} data={element} parent={props.data}></TableLayout>)
+                        return (<CollapseLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></CollapseLayout>)
+                    case 'table':
+                        return (<TableLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></TableLayout>)
                     default:
-                        if (unref(isEditModel) || componentMap?.[element?.type]) {
-                            const TypeComponent = componentMap?.[element?.type] || 'div'
-                            const _props = useProps(element, unref(designer.formData), unref(isEditModel), unref(designer.mode))
-
-                            const selectRef = ref<any>(null)
-
-                            const params = {
-                                data: element,
-                                parent: props.data
-                            }
-
-                            if (element?.formItemProps?.name) {
-                                _path[_index] = element?.formItemProps?.name
-                            }
-
-                            const myValue = ref<any>(get(designer.formState, _path))
-                            const checked = ref<any>(get(designer.formState, _path))
-                            
-
-                            watch(
-                                () => myValue.value, 
-                                (newValue) => {
-                                    set(designer.formState, _path, newValue)
-                                }, 
-                                {
-                                    deep: true,
-                                    immediate: true
-                                }
-                            )
-                            watch(
-                                () => checked.value, 
-                                (newValue) => {
-                                    set(designer.formState, _path, newValue)
-                                }, 
-                                {
-                                    deep: true,
-                                    immediate: true
-                                }
-                            )
-
-                            const onChange = (...arg) => {
-                                const _this = {
-                                    getWidgetRef: (path) => {
-                                        let foundRef = unref(designer.refList)?.[path]
-                                        return foundRef
-                                    }
-                                }
-                                if(!element?.componentProps?.eventCode && !unref(isEditModel)) return 
-                                if(['input', 'textarea', 'input-password'].includes(element.type)){
-                                    let customFn = new Function('e', element?.componentProps?.eventCode)
-                                    customFn.call(_this, arg?.[0])
-                                }
-                                if(['input-number'].includes(element.type)){
-                                    let customFn = new Function('value', element?.componentProps?.eventCode)
-                                    customFn.call(_this, arg?.[0])
-                                }
-                                if(['select', 'switch', 'select-card', 'tree-select'].includes(element.type)){
-                                    let customFn = new Function('value', 'option', element?.componentProps?.eventCode)
-                                    customFn.call(_this, arg?.[0], arg?.[1])
-                                }
-                                if(['time-picker'].includes(element.type)){
-                                    let customFn = new Function('time', 'timeString', element?.componentProps?.eventCode)
-                                    customFn.call(_this, arg?.[0], arg?.[1])
-                                }
-                                if(['date-picker'].includes(element.type)){
-                                    let customFn = new Function('date', 'timeString', element?.componentProps?.eventCode)
-                                    customFn.call(_this, arg?.[0], arg?.[1])
-                                }
-                            }
-
-                            const registerToRefList = (path: string[], _ref: any) => {
-                                if(!unref(isEditModel) && Array.isArray(path) && path?.length && element?.formItemProps?.name && designer.refList){
-                                    const __path = path.join('.')
-                                    designer.refList.value[__path] = _ref
-                                }
-                            }
-
-                            watchEffect(() => {
-                                registerToRefList(_path, selectRef.value)
-                            })
-
-                            if(!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(element.type)) {
-                                queryOptions(element.componentProps.source, product.info?.id).then(resp => {
-                                    _props.componentProps.options = resp
-                                })
-                            }
-
-                            return (
-                                <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                                    <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true}>
-                                        {
-                                            unref(isEditModel) ? 
-                                            <TypeComponent
-                                                model={unref(designer.model)}
-                                                data={element}
-                                                {...omit(_props.componentProps, ['disabled'])}
-                                            ></TypeComponent> : 
-                                            <TypeComponent
-                                                data={element}
-                                                {..._props.componentProps}
-                                                v-model:value={myValue.value}
-                                                v-model:checked={checked.value}
-                                                onChange={onChange}
-                                            ></TypeComponent>
-                                        }
-                                        <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>{element.componentProps?.description}</div>
-                                    </FormItem>
-                                </Selection>
-                            )
-                        }
-                        break
+                        return (<CommLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.parent}></CommLayout>)
                 }
             },
             footer() {
@@ -233,7 +136,7 @@ const DraggableLayout = defineComponent({
             animation: 150,
             multiDrag: true,
             itemKey: 'key',
-            // selectedClass: "sortable-selected",
+            // dragClass, selectedClass
             multiDragKey: platform.includes('mac') ? "Meta" : "Ctrl",
             group: { name: "j-canvas" },
             //拖动结束

@@ -4,12 +4,7 @@
       label="数据绑定"
       :validateFirst="true"
       :name="['componentProps', 'source', 'value']"
-      :rules="[
-          {
-            required: true,
-            message: '请选择',
-          },
-        ]"
+      :rules="_rules"
     >
       <j-select
         allowClear
@@ -23,40 +18,37 @@
   </div>
 </template>
 
-<script setup name="SourceForm">
+<script setup name="SourceForm" lang="ts">
 import { useTarget } from '../../../../hooks'
-import { useProduct } from '@/store'
-import {providerEnum} from "@/components/ProJect";
+import { inject, ref } from 'vue'
 
-const options = ref([])
-const project = useProduct()
+const formDesigner = inject('FormDesigner')
+const options = ref<any[]>(formDesigner?.formList.value || [])
 const { target } = useTarget()
 
-const FormDesigner = inject('FormDesigner')
-
 const emits = defineEmits(['refresh'])
-const getFormList = () => {
-  const list = project.getDataMapByType(providerEnum.FormPage)
-  //   过滤掉自身
-  const filterList = list.filter(item => item.id !== FormDesigner.tabsId)
-  options.value = filterList.map(item => {
-    return {
-      label: item.title,
-      value: item.id,
-      code: item.configuration?.code
-    }
-  })
-}
+
+const _rules = [
+  {
+    required: true,
+    message: '请选择',
+  },
+  {
+    validator(_rule: any, value: string) {
+      if (!value) return Promise.resolve()
+      const flag = options.value.find((i) => i.value === value)
+      if (!flag) return Promise.reject(`表单已被删除`)
+      return Promise.resolve()
+    },
+    trigger: 'change',
+  },
+]
 
 const onDataChange = (e, node) => {
   target.value.componentProps.source.code = node?.code
   emits('refresh', target.value)
 }
-
-getFormList()
-
 </script>
 
 <style scoped>
-
 </style>
