@@ -155,7 +155,7 @@ const getFlowDetail = async () => {
   const { result } = await detail_api(route.query.id as string)
   flowDetail.value = result
   const model = JSON.parse(result.model || '{}')
-    console.log('model: ', model)
+  console.log('model: ', model)
   if (result.model !== '') {
     oldData.value = cloneDeep(model)
   }
@@ -190,31 +190,31 @@ const handleNext = async () => {
  * 保存模型数据, 无需校验数据
  */
 const handleSave = (type?: string) => {
-  const params = {
-    id: route.query.id,
-    state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
-    model: JSON.stringify(flowStore.model),
-  }
-  //   console.log('flowStore.model: ', flowStore.model)
-  //   type !== 'next' ? (saveLoading.value = true) : (nextLoading.value = true)
-  if (type !== 'next') {
-    saveLoading.value = true
-  } else {
-    nextLoading.value = true
-  }
-  update_api(params)
-    .then(() => {
-      if (type !== 'next') {
-        onlyMessage('保存成功', 'success')
-        isModal.value = true
-        router.go(-1)
-      }
-      //   getFlowDetail() #19297 此处调用详情会报错闪一下
-    })
-    .finally(() => {
-      saveLoading.value = false
-      nextLoading.value = false
-    })
+  step1.value.getLatestFormList().then(() => {
+    const params = {
+      id: route.query.id,
+      state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
+      model: JSON.stringify(flowStore.model),
+    }
+    if (type !== 'next') {
+      saveLoading.value = true
+    } else {
+      nextLoading.value = true
+    }
+    update_api(params)
+      .then(() => {
+        if (type !== 'next') {
+          onlyMessage('保存成功', 'success')
+          isModal.value = true
+          router.go(-1)
+        }
+        //   getFlowDetail() #19297 此处调用详情会报错闪一下
+      })
+      .finally(() => {
+        saveLoading.value = false
+        nextLoading.value = false
+      })
+  })
 }
 
 /**
