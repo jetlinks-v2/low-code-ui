@@ -1,16 +1,15 @@
 <!-- 表格表单预览 -->
 <template>
   <QuickEditTable
-    serial
     validate
     ref="tableRef"
     :data="myDataSource"
-    :columns="columns"
+    :columns="myColumns"
     :height="500"
     :scroll="{x: 1600}"
   >
-    <template v-for="item in columns" #[item.dataIndex]>
-      <FormItem :item-type="item.type" :disabled="item.componentProps?.disabled" :component-props="item.componentProps" />
+    <template v-for="item in myColumns" #[item.dataIndex]="{ valueChange, record }">
+      <FormItem v-model="record[item.dataIndex]" :item-type="item.type" :disabled="item.componentProps?.disabled" :component-props="item.componentProps" @change="() => { valueChange(record[item.dataIndex])}" />
     </template>
   </QuickEditTable>
 <!--  <j-table-->
@@ -55,6 +54,10 @@
 <script setup lang="ts">
 // import componentMap from '@/components/FormDesigner/utils/componentMap'
 import FormItem from '@/views/process/me/Detail/components/FormItem.vue'
+import {
+  handleFormToTable
+} from "./TableFormPreviewUtil";
+import {cloneDeep} from "lodash-es";
 
 type Emits = {
   (e: 'update:dataSource', data: any[]): void
@@ -77,6 +80,11 @@ const props = defineProps({
 })
 
 const myDataSource = ref<any>([])
+
+const myColumns = computed(() => {
+  console.log(cloneDeep(props.columns))
+  return handleFormToTable(cloneDeep(props.columns) as any[])
+})
 
 watch(
   () => props.dataSource,

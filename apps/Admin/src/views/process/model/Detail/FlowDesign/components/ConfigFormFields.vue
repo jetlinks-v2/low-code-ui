@@ -126,13 +126,8 @@
               <FormPreview v-if="!item.multiple" :data="item.configuration" />
               <TableFormPreview
                 v-model:data-source="tableData"
-                :columns="
-                  getTableColumns(
-                    item.configuration?.children?.filter(
-                      (f) => !unDisplayFieldsType.includes(f.type),
-                    ),
-                  )
-                "
+                :columns="getTableColumns(item.configuration?.children)"
+                :hasRules="true"
                 v-else
               />
             </div>
@@ -214,8 +209,16 @@ const getFormList = async () => {
     ],
   }
   const { result } = await queryFormNoPage_api(params)
+  // 基础信息配置的表单key, 用于节点配置表单的排序
+  const _formKeys = flowStore.model.config.forms?.map((m) => m.formId)
+  const _sortResult = result
+    ?.map((m) => ({
+      ...m,
+      sort: _formKeys?.indexOf(m.key),
+    }))
+    .sort((a, b) => a.sort - b.sort)
   // 左侧表单读写操作列表
-  filterFormList.value = result?.map((m) => {
+  filterFormList.value = _sortResult?.map((m) => {
     // 布局组件内部字段, 取出平铺
     let _layoutFields = cloneDeep(
       m.configuration?.children?.filter(
@@ -244,9 +247,21 @@ const getFormList = async () => {
     const existFields = forms.value[m.key]
     if (existFields && existFields.length) {
       flattenFields?.forEach((p) => {
-        const _currentField = existFields.find(
-          (f) => f.id === p.formItemProps.name,
-        )
+        const _currentField = existFields.find((f) => {
+          if (
+            !(
+              p.componentProps.hasOwnProperty('mode') &&
+              p.componentProps.mode === 'multiple'
+            ) &&
+            advancedComponents.includes(p.type)
+          ) {
+            return p.componentProps?.keys
+              ?.map((source) => source.config.source)
+              ?.includes(f.id)
+          } else {
+            return f.id === p.formItemProps.name
+          }
+        })
         p['accessModes'] = _currentField ? _currentField.accessModes : ['read']
       })
 
@@ -273,7 +288,8 @@ const getFormList = async () => {
   allFormList.value = cloneDeep(filterFormList.value)
   //   console.log('filterFormList.value: ', filterFormList.value)
   // 右侧预览数据处理
-  initPreviewData(result)
+  initPreviewData(_sortResult)
+  handleSearch()
 }
 
 /**
@@ -336,8 +352,6 @@ const handleFormCheck = (form: any) => {
     // 右侧预览数据更新
     updatePreviewData(form, p)
   })
-  // 设置全部内容全选状态
-  setCheckAll()
 }
 
 /**
@@ -377,6 +391,12 @@ const getTableColumns = (fields: any[]) => {
     ellipsis: true,
     width: 200,
     ...m,
+    form: {
+      rules: [
+        ...(m.formItemProps?.rules || []),
+        { required: m.formItemProps?.required || false, message: '此项为必填' },
+      ],
+    },
   }))
 
   _columns?.forEach((item) => {
@@ -394,12 +414,6 @@ const handleOk = () => {
     forms.value[item.key] = []
     item.flattenFields?.forEach((p) => {
       if (p.accessModes.length) {
-        // forms.value[item.key].push({
-        //   id: p.formItemProps.name,
-        //   required: p.formItemProps.required,
-        //   accessModes: p.accessModes,
-        // })
-        
         // 处理单选高级组件, 平铺keys至formBinds
         if (
           !(
@@ -414,7 +428,7 @@ const handleOk = () => {
               id: k.config.source,
               required: p.formItemProps.required,
               accessModes: p.accessModes,
-              //   ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
+              ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
             })
           })
         } else {
@@ -428,8 +442,8 @@ const handleOk = () => {
     })
   })
   visible.value = false
-  console.log('filterFormList.value: ', filterFormList.value)
-  console.log('forms.value: ', forms.value)
+  //   console.log('filterFormList.value: ', filterFormList.value)
+  //   console.log('forms.value: ', forms.value)
 }
 
 watch(

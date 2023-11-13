@@ -2,13 +2,13 @@
 <template>
   <page-container>
     <FullPage class="page">
-      <div class="type-item" v-for="key of Object.keys(data)">
-        <div v-if="getText(key)" class="type-title">
-          {{ getText(key) }}
+      <div class="type-item" v-for="j of list">
+        <div v-if="getText(j.key)" class="type-title">
+          {{ getText(j.key) }}
         </div>
         <div v-else class="type-title-del">
           <div>
-            流程分类已被删除, 请 <span @click="handleAdd(key)">重新添加</span>
+            流程分类已被删除, 请 <span @click="handleAdd(j.key)">重新添加</span>
           </div>
         </div>
         <div class="process">
@@ -16,7 +16,7 @@
             hoverable
             class="process-item"
             @click="handleDetail(item)"
-            v-for="item of data[key]"
+            v-for="item of j[j.key]"
           >
             <div class="icon">
               <ProImage
@@ -49,11 +49,12 @@ import { isImg } from '@/utils/comm'
 import { useMenuStore } from '@/store'
 
 const menu = useMenuStore()
-const { getText } = useClassified()
+const { getText, classified } = useClassified()
 const data = reactive({})
 const loading = ref(true)
 getList_api({
   paging: false,
+  sorts: [{ name: 'createTime', order: 'asc' }],
   terms: [
     {
       value: 'enabled',
@@ -66,8 +67,17 @@ getList_api({
   loading.value = false
 })
 
+const list = computed(() => {
+  return Object.keys(data)
+    ?.map((j) => {
+      const item = classified.value.find((k) => k.value === j)
+      return { [j]: data[j], ordinal: item?.extra?.ordinal, key: j }
+    })
+    ?.sort((a, b) => a.ordinal - b.ordinal)
+})
+
 const handleDetail = (data) => {
-  menu.jumpPage('process/initiate/Detail',{
+  menu.jumpPage('process/initiate/Detail', {
     query: {
       id: data.id,
       isDraft: false,

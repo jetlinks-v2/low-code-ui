@@ -210,10 +210,11 @@ const basicFormData = reactive({
   //   formBinds:
   //     props.node?.props?.formBinds ||
   //     setDefaultFormBinds(flowStore.model.config?.forms),
-  formBinds: setDefaultFormBinds(
-    handleFormList(flowStore.model.config.forms?.map((i) => i.fullInfo)),
-    props.node?.props?.formBinds,
-  ),
+//   formBinds: setDefaultFormBinds(
+//     handleFormList(flowStore.model.config.forms?.map((i) => i.fullInfo)),
+//     props.node?.props?.formBinds,
+//   ),
+  formBinds: props.node?.props?.formBinds,
   autoComplete: props.node?.props?.autoComplete,
   dealRequired: props.node?.props?.dealRequired,
   others: props.node?.props?.others || { defaultComment: '同意' },

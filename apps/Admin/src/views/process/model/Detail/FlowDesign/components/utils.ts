@@ -1,12 +1,12 @@
-import { cloneDeep } from 'lodash-es'
+import {cloneDeep, pick} from 'lodash-es'
 import { advancedComponents } from './const'
 
 /**
  * 通过节点id查找对应节点
  * 节点存在branches[]和children{}下级关系
- * @param node 
- * @param id 
- * @returns 
+ * @param node
+ * @param id
+ * @returns
  */
 export function findNodeById(node, id) {
     if (node.id === id) {
@@ -29,8 +29,8 @@ export function findNodeById(node, id) {
 
 /**
  * 获取条件分支下所有节点id
- * @param branches 
- * @returns 
+ * @param branches
+ * @returns
  */
 function getBranchNodeIds(branches: any[]) {
     let branchNodeIds: string[] = []
@@ -60,6 +60,11 @@ export function setEmptyNodeProps(nodes: any) {
             complexType: 'allComplete',
             allCompleteNodeId: branchNodeIds
         }
+    } else if (nodes.type === 'CONCURRENTS') {
+      nodes.children.props = {
+        ...nodes.children.props,
+        ...pick(nodes.props, ['type','complexType', 'weight'])
+      }
     } else {
         setEmptyNodeProps(nodes.children)
     }
@@ -68,7 +73,7 @@ export function setEmptyNodeProps(nodes: any) {
 
 /**
  * 通过变量id, 递归查找对应变量
- * @param vars 
+ * @param vars
  * @param id
  */
 export function findVariableById(vars, id) {
@@ -84,7 +89,7 @@ export function findVariableById(vars, id) {
 
 /**
  * 查找分支最后一个节点
- * @param node 
+ * @param node
  */
 export function findBranchLastNode(node) {
     return !Object.keys(node.children).length ? node : findBranchLastNode(node.children)
@@ -92,8 +97,8 @@ export function findBranchLastNode(node) {
 
 /**
  * 将数组处理为特殊字符串, 如: [node1, node2] => '[node1]&[node2]'
- * @param arr 
- * @returns 
+ * @param arr
+ * @returns
  */
 export function handleArrToStr(arr: string[] = []) {
     let str = ``
@@ -105,21 +110,21 @@ export function handleArrToStr(arr: string[] = []) {
 
 /**
  * 将特殊字符串处理为数组, 如: '[node1]&[node2]' => [node1, node2]
- * @param str 
- * @returns 
+ * @param str
+ * @returns
  */
 export function handleStrToArr(str: string = '') {
     return str.replace(/\[/g, '').replace(/\]/g, '').split('&')
 }
 /**
- * 将对象数据里面节点id提取并处理为数组, 
+ * 将对象数据里面节点id提取并处理为数组,
  * 如: {
         "node1$eq": true,
         "node2$eq": true,
-       } 
+       }
        => [node1, node2]
- * @param str 
- * @returns 
+ * @param str
+ * @returns
  */
 export function handleObjToArr(obj: { [key: string]: boolean }) {
     const arr: string[] = []
@@ -131,13 +136,13 @@ export function handleObjToArr(obj: { [key: string]: boolean }) {
 }
 /**
  * 将节点id数组处理为对象结构
- * 如: [node1, node2] 
+ * 如: [node1, node2]
        => {
             "node1$eq": true,
             "node2$eq": true,
-          } 
- * @param str 
- * @returns 
+          }
+ * @param str
+ * @returns
  */
 export function handleArrToObj(arr: string[] = []) {
     const obj: { [key: string]: boolean } = {}
@@ -149,9 +154,9 @@ export function handleArrToObj(arr: string[] = []) {
 
 /**
  * 前端筛选字段名称
- * @param list 
- * @param name 
- * @returns 
+ * @param list
+ * @param name
+ * @returns
  */
 export function filterFormByName(list, name) {
     // console.log('list: ', list);
@@ -159,7 +164,7 @@ export function filterFormByName(list, name) {
     list?.forEach(item => {
         const _fields = item.flattenFields || []
         const _filterFields = _fields.filter(f => {
-            return f.formItemProps.label.includes(name)
+            return f.formItemProps.label?.includes(name)
         })
         if (_filterFields.length) {
             // @ts-ignore
@@ -174,8 +179,8 @@ export function filterFormByName(list, name) {
 
 /**
  * 对象求和
- * @param data 
- * @returns 
+ * @param data
+ * @returns
  */
 export function sumValues(data: { [key: string]: number }) {
     let sum = 0;
@@ -190,10 +195,10 @@ export function sumValues(data: { [key: string]: number }) {
 
 /**
  * 表单字段全部默认有"读"权限, 设置formBinds字段初始值
- * @param forms 
+ * @param forms
  * @param type conditionSelect: 条件节点设置默认值, forms为接口返回的数据
  * @param oldFormBinds 根节点配置好的表单
- * @returns 
+ * @returns
  */
 export function setDefaultFormBinds(forms, oldFormBinds?: any) {
     console.log('forms: ', forms);
@@ -257,10 +262,10 @@ export const isSelectMember = async (_, value) => {
 
 /**
  * 表单字段, 树形数据扁平化
- * @param fields 
- * @param parent 
- * @param depth 
- * @returns 
+ * @param fields
+ * @param parent
+ * @param depth
+ * @returns
  */
 export function flattenTree(fields, parent = null, depth = 0) {
     let flattened: any[] = []
@@ -314,8 +319,8 @@ export function updateFieldDisabled(fields, currentField) {
 
 /**
  * 处理表单数据, 用于变量查询接口参数数据结构处理
- * @param data 
- * @returns 
+ * @param data
+ * @returns
  */
 export function handleFormList(data) {
     return data?.map((m) => {

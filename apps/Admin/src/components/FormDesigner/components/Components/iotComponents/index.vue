@@ -55,6 +55,9 @@ const updateData = (data: any) => {
     : emit('updateValue', data?.[0])
 }
 const cancelSelect = (id: string) => {
+  if(props.disabled){
+    return
+  }
   const index = selectIds.value.findIndex((item: any) => item?.id === id)
   selectIds.value.splice(index, 1)
 }

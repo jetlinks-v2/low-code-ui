@@ -10,7 +10,7 @@
         @change="onChange"
         @focus="focus"
         @blur="focus"
-        :maxlength="256"
+        :maxlength="maxlength"
       />
       <div class="html">
         <span v-html="titleHtml"></span>
@@ -114,7 +114,7 @@ const insertText = (val) => {
   const len = offset.end - offset.start
   valArr.splice(offset.start, len, val)
   // hide.value = valArr.join('').substring(0, 256)
-  emits('update:value', valArr.join('').substring(0, 256))
+  emits('update:value', valArr.join('').substring(0, props.maxlength))
 }
 
 const selectVariable = (_, { label }) => {

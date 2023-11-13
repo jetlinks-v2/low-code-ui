@@ -1,8 +1,8 @@
 <!-- 参数类型输入组件 -->
 <template>
   <div class="value-item-warp">
-    <TreeSelect v-if="itemType === 'tree-select'" :tree-data="treeData" v-model:value="myValue" style="width: 100%;"
-      v-bind="props.componentProps" :disabled="disabled"  @change="onChange"/>
+    <TreeSelect v-if="itemType === 'tree-select'" v-bind="props.componentProps" :tree-data="treeData" v-model:value="myValue" style="width: 100%;"
+       :disabled="disabled"  @change="onChange"/>
     <Textarea v-else-if="itemType === 'textarea'" v-model:value="myValue" v-bind="props.componentProps"
       :disabled="disabled"  @change="onChange"></Textarea>
     <DatePicker v-else-if="itemType === 'date-picker'" v-bind="props.componentProps" v-model:value="myValue"
@@ -11,7 +11,7 @@
       :disabled="disabled" @change="onChange" />
     <InputNumber v-else-if="itemType === 'input-number'" v-bind="props.componentProps" v-model:value="myValue" allowClear
       :disabled="disabled" @change="onChange" />
-    <InputPassword v-else-if="itemType === 'input-password'" allowClear v-bind="props" v-model:value="myValue"
+    <InputPassword v-else-if="itemType === 'input-password'" allowClear v-bind="props.componentProps" v-model:value="myValue"
       :disabled="disabled" @change="onChange" />
     <Product v-else-if="itemType === 'product'" v-model:value="myValue" v-bind="props.componentProps" @change="onChange" />
     <Device v-else-if="itemType === 'device'" v-model:value="myValue" v-bind="props.componentProps" @change="onChange" />
@@ -24,11 +24,12 @@
       :disabled="disabled" @change="onChange" />
     <Select v-else-if="itemType === 'select' || itemType === 'select-card'" v-bind="props.componentProps" v-model:value="myValue"
       :options="options" :disabled="disabled" @change="onChange" style="width: 100%;" />
-    <Upload v-else-if="itemType === 'upload'" :value="myValue" v-bind="props.componentProps" @change="onChange" style="width: 100%;"/>
+    <Upload v-else-if="itemType === 'upload'" v-bind="props.componentProps" :value="myValue" @change="onChange" style="width: 100%;"/>
     <div v-else>--</div>
+    <div class="itemDescription" v-if="props?.componentProps?.description">{{ props?.componentProps?.description }}</div>
   </div>
 </template>
-  
+
 <script setup lang="ts">
 import { CSSProperties, PropType } from 'vue'
 import Product from '@/components/FormDesigner/components/Components/Product.vue'
@@ -68,7 +69,7 @@ const props = defineProps({
 
 const myValue = ref(undefined)
 const options = ref<any>([])
-const treeData = ref()
+const treeData = ref<any>()
 const onChange = (e) => {
   if(props.itemType === 'upload'){
     myValue.value = e && e?.length > 0 ? JSON.stringify(e) : null
@@ -101,11 +102,13 @@ onMounted(() => {
   }
 })
 </script>
-  
+
 <style lang="less" scoped>
 .value-item-warp{
   overflow: scroll;
   height: 40px;
 }
+.itemDescription{
+  color: rgb(192, 192, 192);
+}
 </style>
-  

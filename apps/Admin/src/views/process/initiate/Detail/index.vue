@@ -9,38 +9,50 @@
           <j-col :span="12">
             <j-scrollbar style="height: calc(100vh - 225px)">
               <div class="form">
-                <j-form ref="formRef" :model="tableData" autocomplete="off">
-                  <template v-for="(item, index) in formList" :key="index">
-                    <j-space>
-                      <img
-                        :src="getImage(`/flow-designer/preview-form.png`)"
-                        style="height: 16px"
+                <template v-for="(item, index) in formList" :key="index">
+                  <j-space>
+                    <img
+                      :src="getImage(`/flow-designer/preview-form.png`)"
+                      style="height: 16px"
+                    />
+                    <span>
+                      {{ item.formName }}
+                    </span>
+                  </j-space>
+                  <FormPreview
+                    v-if="!item.multiple"
+                    ref="previewRef"
+                    :value="item.data"
+                    :data="item.fullInfo?.configuration"
+                  />
+                  <QuickEditTable
+                    v-else
+                    serial
+                    validate
+                    ref="tableRef"
+                    :data="tableData[item.formId]"
+                    :columns="item._columns"
+                    :height="500"
+                    :scroll="{ x: 1600 }"
+                  >
+                    <template
+                      v-for="j in item._columns"
+                      #[j.dataIndex]="{ index, record, valueChange }"
+                    >
+                      <FormItem
+                        v-model="record[j.dataIndex]"
+                        :item-type="j.type"
+                        :disabled="j.componentProps?.disabled"
+                        :component-props="j.componentProps"
+                        @change="
+                          () => {
+                            valueChange(record[j.dataIndex])
+                          }
+                        "
                       />
-                      <span>
-                        {{ item.formName }}
-                      </span>
-                    </j-space>
-                    <FormPreview
-                      v-if="!item.multiple"
-                      ref="previewRef"
-                      :value="item.data"
-                      :data="item.fullInfo?.configuration"
-                    />
-                    <TableFormPreview
-                      v-else
-                      v-model:data-source="tableData[item.formId]"
-                      :hasRules="true"
-                      :columns="
-                        getTableColumns(
-                          item.fullInfo?.configuration?.children,
-                          item.formId,
-                          item.data,
-                          item.multiple,
-                        )
-                      "
-                    />
-                  </template>
-                </j-form>
+                    </template>
+                  </QuickEditTable>
+                </template>
               </div>
             </j-scrollbar>
           </j-col>
@@ -81,19 +93,22 @@ import {
   processDetail_api,
   save_api,
 } from '@/api/process/initiate'
-import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
+// import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import md5 from 'md5'
 import { getMeProcessList } from '@/api/process/me'
 import { getImage } from '@jetlinks/utils'
 import { useMenuStore } from '@/store'
+import FormItem from '@/views/process/me/Detail/components/FormItem.vue'
 
 interface FormsProps {
   formId: string
+  formKey?: string
   formName: string
   fullInfo: any
   multiple: boolean
   data?: any
+  _columns?: any[]
 }
 
 const menu = useMenuStore()
@@ -102,6 +117,7 @@ const router = useRouter()
 const route = useRoute()
 const previewRef = ref<any>()
 const formRef = ref<any>()
+const tableRef = ref()
 
 const spinning = ref<boolean>(false)
 // 流程图
@@ -129,6 +145,15 @@ const getTableColumns = (
     multiple,
     width: 200,
     ...m,
+    form: {
+      rules: [
+        ...(m.formItemProps?.rules ?? []),
+        {
+          required: m.formItemProps?.required,
+          message: `该项不能为空`,
+        },
+      ],
+    },
   }))
 
   _columns?.forEach((item) => {
@@ -179,15 +204,15 @@ const cancel = () => {
         const param = startProcess(list)
         // 没有草稿_create
         const res = draftId.value
-          ? await save_api({...param, id: draftId.value})
+          ? await save_api({ ...param, id: draftId.value })
           : await create_api({ ...param, start: false, id: route.query.id })
 
         if (res.success) {
           onlyMessage('保存成功')
-          menu.jumpPage('process/me/initiate',{
-              query: {
-                state: 'ready',
-              },
+          menu.jumpPage('process/me/initiate', {
+            query: {
+              state: 'ready',
+            },
           })
         }
       },
@@ -196,7 +221,7 @@ const cancel = () => {
         router.back()
       },
     })
-        // 关闭弹窗并返回发起申请页
+    // 关闭弹窗并返回发起申请页
   } else {
     router.back()
   }
@@ -206,13 +231,15 @@ const cancel = () => {
  */
 const submit = async () => {
   loading.value = true
-  const list = previewRef.value?.map((item) => item.onSave()) || []
-  Promise.all([...list, formRef.value.validate()])
+  const baseForm = previewRef.value?.map((item) => item.onSave()) || []
+  const tableForm = tableRef.value?.map((i) => i.validates()) || []
+
+  Promise.all([...baseForm, ...tableForm])
     .then(async (res) => {
       const param = startProcess(res, true)
       const resp = editDraft.value
-        ? await start_api({...param, id: draftId.value})
-        : await create_api({...param, id: route.query.id})
+        ? await start_api({ ...param, id: draftId.value })
+        : await create_api({ ...param, id: route.query.id })
       if (resp.success) {
         onlyMessage('提交成功')
         menu.jumpPage('process/me/initiate', {})
@@ -290,7 +317,7 @@ const startProcess = (list: any, start: boolean | undefined = undefined) => {
           ? i.formId
           : md5(i.formId + '|' + formVersion[i.formId]),
         data: i.multiple ? tableData[i.formId][0] : list[flag++],
-        formKey: Object.keys(formVersion).toString()
+        formKey: i.formKey ?? i.formId,
       })),
       variables: {},
     },
@@ -317,9 +344,6 @@ const handleData = (data: any, model: string) => {
     const forms = editDraft.value ? data.form : obj.config.forms
 
     formList.value = forms?.map((m) => {
-      if (m.multiple) {
-        tableData[m.formId] = [{}]
-      }
       const _fields = editDraft.value
         ? m.configuration?.children
         : m.fullInfo.configuration?.children
@@ -329,6 +353,10 @@ const handleData = (data: any, model: string) => {
           ?.find((k) => k.id === p.formItemProps.name)?.accessModes
         p.componentProps.disabled = !accessModes?.includes('write')
       })
+      if (m.multiple) {
+        tableData[m.formId] = [{}]
+        m._columns = getTableColumns(_fields, m.formId, m.data, m.multiple)
+      }
       return {
         accessModes: [],
         fullInfo: { configuration: m.configuration },

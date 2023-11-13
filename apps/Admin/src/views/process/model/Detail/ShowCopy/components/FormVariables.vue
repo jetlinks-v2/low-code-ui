@@ -126,9 +126,15 @@ const getFormFields = async () => {
     paging: false,
     terms: [
       {
-        column: 'id',
+        column: 'key',
         termType: 'in',
         value: props.treeData?.map((m) => m.id),
+      },
+      {
+        value: true,
+        termType: 'eq',
+        type: 'and',
+        column: 'latest',
       },
     ],
   }

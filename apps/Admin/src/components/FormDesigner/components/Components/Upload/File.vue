@@ -25,9 +25,10 @@
             v-model:value="file.name"
             v-if="dbId === file.uid && dbRef"
             @blur="onBlur"
+            class="render-left"
             ref="nameRef"
           ></j-input>
-          <div @dblclick="onDbClick(file)" v-else>{{ file.name }}</div>
+          <div class="render-left" @dblclick="onDbClick(file)" v-else><j-ellipsis>{{ file.name }}</j-ellipsis></div>
           <j-button type="link" style="width: 10%" @click="onDelete(file)" :disabled="disabled">
             <AIcon type="DeleteOutlined" />
           </j-button>
@@ -176,6 +177,7 @@ watch(
 
 :deep(.ant-upload-list-text-container) {
   display: flex;
+  width: 100%;
 }
 
 .render {
@@ -183,5 +185,9 @@ watch(
   align-items: center;
   justify-content: space-around;
   width: 100%;
+
+  .render-left {
+    width: 50%;
+  }
 }
 </style>
