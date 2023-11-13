@@ -99,7 +99,13 @@ const visible = ref(false)
 
 const list = ref<DataSourceProps[]>([])
 const initList = computed(() => {
-  return list.value?.map((i) => ({ ...i, isDel: isDel(i) }))
+  const arr = list.value?.map((i) => ({ ...i, isDel: isDel(i) }))
+  if (props.isNode) {
+    emits('update:members', groupedData(arr, 'groupField'))
+  }else{
+    emits('update:members', arr)
+  }
+  return arr
 })
 // 固定/变量/关系数据
 const dataMap = ref<Map<string, any>>(new Map())
@@ -113,12 +119,12 @@ const getData = (data: DataSourceProps[], type: string) => {
     // 暂存其他维度数据
     const newList = list.value.filter((item) => item.type != type)
     list.value = uniqBy([...data, ...newList], 'id')
-    emits('update:members', groupedData(list.value, 'groupField'))
+    // emits('update:members', groupedData(list.value, 'groupField'))
   } else {
     // 基础信息
-    const arr = data.map((i) => omit(i, ['isDel']))
+    const arr = data.map((i) => omit(i))
     list.value = uniqBy([...arr], 'id')
-    emits('update:members', list.value)
+    // emits('update:members', list.value)
   }
 }
 /**
@@ -133,7 +139,7 @@ const groupedData = (array: any[], field: string) => {
     if (!acc[key]) {
       acc[key] = []
     }
-    const { others, groupField, isDel, ...rest } = curr
+    const { others, groupField, ...rest } = curr
     acc[key].push({ ...others, ...rest })
     return acc
   }, {})
@@ -270,14 +276,6 @@ const getRelation = async () => {
 
 getTreeData()
 
-/**
- * 判断是否全被删除
- */
-const isAllDel = () => {
-  if (initList.value.length < 1) return false
-  return !initList.value.some((i) => !i.isDel)
-}
-
 provide('infoState', {
   dataMap: dataMap,
   members: initList,
@@ -290,6 +288,7 @@ provide('infoState', {
 watch(
   () => props.members,
   (val) => {
+    if(list.value.length > 0) return
     if (isArray(val)) {
       list.value = val
     } else if (isObject(val)) {
@@ -315,7 +314,6 @@ watch(
   { immediate: true },
 )
 
-defineExpose({ isAllDel })
 </script>
 <style scoped lang="less">
 .member {
