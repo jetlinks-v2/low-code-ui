@@ -1,7 +1,7 @@
 import {ISchema} from "@/components/FormDesigner/typings";
 
 const filterKey = ['text', 'table']
-const layoutKey = ['card', 'grid', 'tabs', 'collapse', 'space', 'tabs-item', 'collapse-item', 'space-item', 'grid-item']
+const layoutKey = ['card', 'grid', 'tabs', 'collapse', 'space', 'tabs-item', 'card-item', 'collapse-item', 'space-item', 'grid-item']
 
 const filter = (columns:  ISchema[]) => {
   return columns.filter(item => !filterKey.includes(item.type))
@@ -10,14 +10,16 @@ const filter = (columns:  ISchema[]) => {
 export const handleFormToTable = (columns: ISchema[]) => {
   let array: any = []
   filter(columns).forEach(item => {
-    if (layoutKey.includes(item.type) && item.children) {
-      const newArr = handleFormToTable(item.children)
-      array.concat(newArr)
+    if (layoutKey.includes(item.type)) {
+      const newArr = handleFormToTable(item.children || [])
+      array = [...array, ...newArr]
+      console.log(array)
     } else {
       const rules = item.formItemProps.rules
       array.push({
         ...item,
-        dataIndex: item.key,
+        title: item.formItemProps?.label,
+        dataIndex: item.formItemProps?.name || item.key,
         form: { rules }
       })
     }
