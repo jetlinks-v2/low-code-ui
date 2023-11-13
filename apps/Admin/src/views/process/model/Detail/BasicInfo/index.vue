@@ -153,7 +153,7 @@ const updateNodesFormBinds = (forms, node) => {
         p.componentProps.keys?.forEach((k) => {
           node.props.formBinds[item.key].push({
             id: k.config.source,
-            required: p.formItemProps.required,
+            required: p.formItemProps.required || false,
             // accessModes: p.accessModes,
             accessModes: _fixedFormBinds
               ? _fixedFormBinds[item.key]?.find(
@@ -166,7 +166,7 @@ const updateNodesFormBinds = (forms, node) => {
       } else {
         node.props.formBinds[item.key].push({
           id: p.formItemProps.name,
-          required: p.formItemProps.required,
+          required: p.formItemProps.required || false,
           accessModes: _fixedFormBinds
             ? _fixedFormBinds[item.key]?.find(
                 (f) => f.id === p.formItemProps.name,

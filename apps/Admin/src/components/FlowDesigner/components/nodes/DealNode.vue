@@ -68,7 +68,6 @@ const validate = (err) => {
   const { name } = props.config
   // 节点配置信息校验
   const { formBinds, candidates, authButtons } = props.config.props
-  console.log('candidates: ', candidates)
 
   showError.value = true
   errorInfo.value = '未填写必填配置项'
