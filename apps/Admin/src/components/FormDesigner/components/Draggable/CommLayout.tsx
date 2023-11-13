@@ -119,9 +119,11 @@ export default defineComponent({
                 const val = get(designer.formState, _path)
                 if (typeof val === 'number') {
                     __value.value = dayjs(val).format(props.data.componentProps?.format || 'YYYY-MM-DD HH:mm:ss')
-                } else if (typeof val === 'string') {
-                    __value.value = val
-                } else {
+                } 
+                // else if (typeof val === 'string') {
+                //     __value.value = val
+                // } 
+                else {
                     __value.value = val
                 }
             } else if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && props.data?.componentProps?.mode !== "multiple") {

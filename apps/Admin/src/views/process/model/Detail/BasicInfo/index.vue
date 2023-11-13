@@ -157,7 +157,7 @@ const updateNodesFormBinds = (forms, node) => {
             // accessModes: p.accessModes,
             accessModes: _fixedFormBinds
               ? _fixedFormBinds[item.key]?.find(
-                  (f) => f.id === p.formItemProps.name,
+                  (f) => f.id === k.config.source,
                 )?.accessModes || ['read']
               : ['read'],
             ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
