@@ -129,11 +129,12 @@ watch(
         : [props.value]
     } else {
       selectData.value = Array.isArray(props?.value) ? props?.value : []
+      
     }
   },
   {
     deep: true,
-    // immediate:true
+    immediate:true
   },
 )
 
