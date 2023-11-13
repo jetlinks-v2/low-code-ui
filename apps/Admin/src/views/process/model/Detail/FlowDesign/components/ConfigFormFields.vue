@@ -340,8 +340,6 @@ const handleFormCheck = (form: any) => {
     // 右侧预览数据更新
     updatePreviewData(form, p)
   })
-  // 设置全部内容全选状态
-  setCheckAll()
 }
 
 /**
