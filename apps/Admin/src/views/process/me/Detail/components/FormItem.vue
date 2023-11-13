@@ -11,7 +11,7 @@
       :disabled="disabled" @change="onChange" />
     <InputNumber v-else-if="itemType === 'input-number'" v-bind="props.componentProps" v-model:value="myValue" allowClear
       :disabled="disabled" @change="onChange" />
-    <InputPassword v-else-if="itemType === 'input-password'" allowClear v-bind="props.componentProps" v-model:value="myValue"  
+    <InputPassword v-else-if="itemType === 'input-password'" allowClear v-bind="props.componentProps" v-model:value="myValue"
       :disabled="disabled" @change="onChange" />
     <Product v-else-if="itemType === 'product'" v-model:value="myValue" v-bind="props.componentProps" @change="onChange" />
     <Device v-else-if="itemType === 'device'" v-model:value="myValue" v-bind="props.componentProps" @change="onChange" />
@@ -92,14 +92,12 @@ onMounted(() => {
     if (props.componentProps?.treeData) {
       treeData.value = props.componentProps?.treeData
     }
-    console.log(treeData.value)
     queryOptions(props.componentProps.source).then(resp => {
       if (['select', 'select-card'].includes(props.itemType)) {
         options.value = resp
       } else {
         treeData.value = resp
       }
-      console.log('res[', resp)
     })
   }
 })
