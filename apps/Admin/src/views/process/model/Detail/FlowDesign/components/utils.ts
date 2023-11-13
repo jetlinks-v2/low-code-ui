@@ -139,7 +139,7 @@ export function handleObjToArr(obj: { [key: string]: boolean }) {
             // 父节点为条件节点, 直接取父节点id
             arr.push(_parentNode.id)
         } else {
-            // 父节点为分支节点, 取唯一没有业务节点的分支节点id
+            // 父节点为分支, 取唯一没有业务节点的分支节点id
             const _noChild = _parentNode.branches?.filter(f => !Object.keys(f.children).length)[0]
             arr.push(_noChild.id)
         }
@@ -162,10 +162,10 @@ export function handleArrToObj(arr: string[] = []) {
         const _conditionNode = findNodeById(flowStore.model.nodes, item)
         let _id
         if (Object.keys(_conditionNode.children).length) {
-            // 条件节点下方有业务节点, 直接去第一个业务节点的id
+            // 条件节点下方节点存在, 直接去第一个节点的id
             _id = _conditionNode.children.id
         } else {
-            // 条件节点下方没有业务节点, 取整个分支下面的空节点id
+            // 条件节点下方没有节点, 取整个分支下面的空节点id
             const _branchNode = findNodeById(
                 flowStore.model.nodes,
                 _conditionNode.props.branchBy,
@@ -384,4 +384,22 @@ export function handleFormList(data) {
             flattenFields,
         }
     })
+}
+
+/**
+ * 查找所有分支节点
+ */
+export function findBranches(nodes, result: any[] = []) {
+    if (nodes.type === 'CONDITIONS') {
+        result.push(nodes)
+    }
+    if (nodes.branches?.length) {
+        for (let i = 0; i < nodes.branches.length; i++) {
+            findBranches(nodes.branches[i], result)
+        }
+    }
+    if (nodes.children && Object.keys(nodes.children).length) {
+        findBranches(nodes.children, result)
+    }
+    return result
 }
