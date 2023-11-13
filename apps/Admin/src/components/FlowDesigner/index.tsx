@@ -649,9 +649,9 @@ const FlowDesigner = defineComponent({
         ]),
       )
       //   console.log('dom.value: ', dom.value)
-      debounce(() => {
-        setEmptyNodeProps(dom.value)
-      }, 300)
+      // debounce(() => {
+      //   setEmptyNodeProps(dom.value)
+      // }, 300)
 
       return h('div', {
           ref: DragRef,
