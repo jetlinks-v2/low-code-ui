@@ -1,5 +1,8 @@
-import {cloneDeep, pick} from 'lodash-es'
+import { cloneDeep, pick } from 'lodash-es'
 import { advancedComponents } from './const'
+import { useFlowStore } from '@/store/flow'
+
+const flowStore = useFlowStore()
 
 /**
  * 通过节点id查找对应节点
@@ -61,10 +64,10 @@ export function setEmptyNodeProps(nodes: any) {
             allCompleteNodeId: branchNodeIds
         }
     } else if (nodes.type === 'CONCURRENTS') {
-      nodes.children.props = {
-        ...nodes.children.props,
-        ...pick(nodes.props, ['type','complexType', 'weight'])
-      }
+        nodes.children.props = {
+            ...nodes.children.props,
+            ...pick(nodes.props, ['type', 'complexType', 'weight'])
+        }
     } else {
         setEmptyNodeProps(nodes.children)
     }
@@ -130,7 +133,16 @@ export function handleObjToArr(obj: { [key: string]: boolean }) {
     const arr: string[] = []
     for (let key in obj) {
         const nodeId = key.split('$')[0]
-        arr.push(nodeId)
+        const _node = findNodeById(flowStore.model.nodes, nodeId)
+        const _parentNode = findNodeById(flowStore.model.nodes, _node.parentId)
+        if (_parentNode.type === 'CONDITION') {
+            // 父节点为条件节点, 直接取父节点id
+            arr.push(_parentNode.id)
+        } else {
+            // 父节点为分支节点, 取唯一没有业务节点的分支节点id
+            const _noChild = _parentNode.branches?.filter(f => !Object.keys(f.children).length)[0]
+            arr.push(_noChild.id)
+        }
     }
     return arr
 }
@@ -147,7 +159,20 @@ export function handleObjToArr(obj: { [key: string]: boolean }) {
 export function handleArrToObj(arr: string[] = []) {
     const obj: { [key: string]: boolean } = {}
     arr.forEach(item => {
-        obj[`${item}$eq`] = true
+        const _conditionNode = findNodeById(flowStore.model.nodes, item)
+        let _id
+        if (Object.keys(_conditionNode.children).length) {
+            // 条件节点下方有业务节点, 直接去第一个业务节点的id
+            _id = _conditionNode.children.id
+        } else {
+            // 条件节点下方没有业务节点, 取整个分支下面的空节点id
+            const _branchNode = findNodeById(
+                flowStore.model.nodes,
+                _conditionNode.props.branchBy,
+            )
+            _id = _branchNode.children.id
+        }
+        obj[`${_id}$eq`] = true
     })
     return obj
 }
