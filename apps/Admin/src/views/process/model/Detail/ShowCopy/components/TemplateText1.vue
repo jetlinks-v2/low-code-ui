@@ -106,26 +106,35 @@ const onKeypress = (e) => {
   }
 }
 
-const handleValue = (_children) => {
+const handleValue = (_children, key) => {
   let str = ''
   _children.forEach((item) => {
-    if(item.childNodes?.length > 1){
-      str += handleValue(item.childNodes)
-    }else if (item.nodeName === 'SPAN') {
+    if (item.nodeName === 'SPAN') {
       if (item.dataset?.id) {
-        str += item.innerText.replace(/\{(.*?)\}/g, ($1, $2) => {
-          const variable = props.variables.find((item) => item.label === $2)
-          if (variable) {
-            return `{var:${item.dataset?.id}:${$2}}`
-          } else {
-            return $1
-          }
-        })
+        if (item.childNodes?.length > 1) {
+          str += handleValue(item.childNodes, item.dataset?.id)
+        } else {
+          str += item.innerText.replace(/\{(.*?)\}/g, ($1, $2) => {
+            const variable = props.variables.find((item) => item.label === $2)
+            if (variable) {
+              return `{var:${item.dataset?.id}:${$2}}`
+            } else {
+              return $1
+            }
+          })
+        }
       } else {
         str += item.innerText
       }
+    } else if (item.childNodes?.length > 1) {
+      str += handleValue(item.childNodes)
     } else {
-      str += item?.textContent
+      str += item.textContent.replace(/\{(.*?)\}/g, ($1, $2) => {
+        if ($2 && key) {
+          return `{var:${key}:${$2}}`
+        }
+        return $1
+      })
     }
   })
   return str
@@ -142,6 +151,7 @@ const selectVariable = (key, { label }) => {
   spanNode.innerText = `{${label}}`
   spanNode.dataset.id = key
   selectionInsert(spanNode)
+  console.log(hide.value)
   const str = handleValue(hide.value?.childNodes)
   emits('update:value', str)
 }
