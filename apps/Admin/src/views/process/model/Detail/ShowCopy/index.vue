@@ -68,6 +68,7 @@
           :variables="formData.variables"
           :maxlength="64"
           name="标题"
+          @change="onNameChange"
         />
       </j-form-item>
       <j-form-item
@@ -85,6 +86,7 @@
           :variables="formData.variables"
           :maxlength="255"
           name="摘要"
+          @change="onSummaryChange"
         />
       </j-form-item>
       <TitleComponent data="抄送配置" />
@@ -127,23 +129,6 @@ const visible = ref(false)
 const formRef = ref()
 
 /**
- * 接收时格式转换, 用于展示:
- * {var:发起人fullId:发起人name}的{var:流程名称fullId:流程名称name}
- * -> {发起人name}的{流程名称name}
- */
-const formatToName = (val: string = '') => {
-  return (
-    val
-      // .replace(/-/g, '')
-      // .replace(/\n/g, '<br/>')
-      .replace(/\{(.*?)\}/g, ($1, $2) => {
-        const _$2 = $2.split(':')
-        return `{${_$2[_$2.length - 1]}}`
-      })
-  )
-}
-
-/**
  * 获取变量数据
  * 表单内的变量展示到弹窗
  * 其他变量展示到外面
@@ -168,33 +153,6 @@ const getVariables = async () => {
   initVariables.value = otherFields || []
 }
 
-/**
- * 输入时格式转换, 用于保存至接口:
- * {发起人name}的{流程名称name}
- * -> {var:发起人fullId:发起人name}的{var:流程名称fullId:流程名称name}
- */
-const formatToVariable = (val: string = '') => {
-  const str = val
-    .replace(/\{(.*?)\}/g, ($1, $2) => {
-      const variable = formData.variables.filter((item) => item.label === $2)[0]
-      return variable ? `{var:${variable.value}:${$2}}` : `{${$2}}`
-    })
-    // .replace(/--/g, () => {
-    //   return '-'
-    // })
-    .replace(/\n/g, () => {
-      return '' // 不需要支持换行的问题
-    })
-  // let a = str
-  // if(a.slice(-1) === '-'){
-  //   a = a.slice(0,a.length-1);
-  // }
-  // if(a.slice(0, 1) === '-'){
-  //   a = a.slice(1,a.length);
-  // }
-  return str
-}
-
 const formData = reactive({
   variables: computed({
     get: () =>
@@ -211,24 +169,14 @@ const formData = reactive({
   //     flowStore.model.config.nameGenerator = formatToVariable(val)
   //   },
   // }),
-  nameGenerator: computed({
-    get: () => flowStore.model.config.nameGenerator,
-    set: (val) => {
-      flowStore.model.config.nameGenerator = val
-    },
-  }),
+  nameGenerator: flowStore.model.config.nameGenerator,
   // summaryGenerator: computed({
   //   get: () => formatToName(flowStore.model.config.summaryGenerator),
   //   set: (val) => {
   //     flowStore.model.config.summaryGenerator = formatToVariable(val)
   //   },
   // }),
-  summaryGenerator: computed({
-    get: () => flowStore.model.config.summaryGenerator,
-    set: (val) => {
-      flowStore.model.config.summaryGenerator = val
-    },
-  }),
+  summaryGenerator: flowStore.model.config.summaryGenerator,
   ccMember: computed({
     get: () => flowStore.model.config.ccMember,
     set: (val) => {
@@ -254,6 +202,14 @@ const validateSteps = () => {
         reject(2)
       })
   })
+}
+
+const onNameChange = (val) => {
+  flowStore.model.config.nameGenerator = val
+}
+
+const onSummaryChange = (val) => {
+  flowStore.model.config.summaryGenerator = val
 }
 
 onMounted(() => {
