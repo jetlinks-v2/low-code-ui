@@ -295,8 +295,8 @@ const searchTree = (arr: any[], _item: any) => {
             _data = arr[i]
             break
         }
-        if (arr[i].children?.length) {
-            _data = searchTree(arr[i].children, _item)
+        if (arr[i].children?.length && !_data) {
+          _data = searchTree(arr[i].children, _item)
         }
     }
     return _data
