@@ -164,7 +164,13 @@ export function filterFormByName(list, name) {
     list?.forEach(item => {
         const _fields = item.flattenFields || []
         const _filterFields = _fields.filter(f => {
-            return f.formItemProps.label?.includes(name)
+            if (f.formItemProps.label) {
+                // 常规组件
+                return f.formItemProps.label.includes(name)
+            } else {
+                // 布局组件没有formItemProps.label, 直接用componentProps?.name匹配
+                return f.componentProps?.name?.includes(name)
+            }
         })
         if (_filterFields.length) {
             // @ts-ignore
