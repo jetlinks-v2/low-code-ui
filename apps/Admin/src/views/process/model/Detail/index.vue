@@ -123,6 +123,7 @@ import { useFlowStore, defaultModel } from '@/store/flow'
 import { Modal } from 'ant-design-vue'
 import { cloneDeep } from 'lodash-es'
 import { TOKEN_KEY } from '@jetlinks/constants'
+import {setEmptyNodeProps} from "@/views/process/model/Detail/FlowDesign/components/utils";
 
 const flowStore = useFlowStore()
 const route = useRoute()
@@ -190,6 +191,7 @@ const handleNext = async () => {
  * 保存模型数据, 无需校验数据
  */
 const handleSave = (type?: string) => {
+  setEmptyNodeProps(flowStore.model.nodes)
   const params = {
     id: route.query.id,
     state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
@@ -270,6 +272,7 @@ const handleDeploy = () => {
  * 保存数据并部署
  */
 const saveAndDeploy = () => {
+  setEmptyNodeProps(flowStore.model.nodes)
   const params = {
     id: route.query.id,
     state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
