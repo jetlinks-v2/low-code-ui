@@ -171,14 +171,13 @@ watch(
     () => props.value,
     (val) => {
        try{
-        fileList.value = JSON.parse(val || '[]')
+        fileList.value = val || []
        }catch(error){
         console.error(error)
        }
     },
     {
         immediate: true,
-        
     },
 )
 </script>

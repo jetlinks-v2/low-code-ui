@@ -51,7 +51,11 @@ watch(
   () => props.value,
   (val) => {
     try {
-      _value.value = JSON.parse(val || '[]')
+      if(Array.isArray(val)){
+      _value.value = val
+      }else{
+        _value.value = JSON.parse(val || '[]')
+      }
     } catch (error) {
       console.error(error)
     }
