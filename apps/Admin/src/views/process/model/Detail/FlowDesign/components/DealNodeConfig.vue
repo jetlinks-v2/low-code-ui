@@ -140,10 +140,11 @@ const basicFormData = reactive({
   //   formBinds:
   //     props.node?.props?.formBinds ||
   //     setDefaultFormBinds(flowStore.model.config?.forms),
-  formBinds: setDefaultFormBinds(
-    handleFormList(flowStore.model.config.forms?.map((i) => i.fullInfo)),
-    props.node?.props?.formBinds,
-  ),
+//   formBinds: setDefaultFormBinds(
+//     handleFormList(flowStore.model.config.forms?.map((i) => i.fullInfo)),
+//     props.node?.props?.formBinds,
+//   ),
+  formBinds: props.node?.props?.formBinds,
 })
 const collapseActive = ref(['1', '2', '3'])
 // 成员配置

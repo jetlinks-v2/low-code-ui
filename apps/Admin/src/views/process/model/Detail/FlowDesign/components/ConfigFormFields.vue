@@ -247,9 +247,21 @@ const getFormList = async () => {
     const existFields = forms.value[m.key]
     if (existFields && existFields.length) {
       flattenFields?.forEach((p) => {
-        const _currentField = existFields.find(
-          (f) => f.id === p.formItemProps.name,
-        )
+        const _currentField = existFields.find((f) => {
+          if (
+            !(
+              p.componentProps.hasOwnProperty('mode') &&
+              p.componentProps.mode === 'multiple'
+            ) &&
+            advancedComponents.includes(p.type)
+          ) {
+            return p.componentProps?.keys
+              ?.map((source) => source.config.source)
+              ?.includes(f.id)
+          } else {
+            return f.id === p.formItemProps.name
+          }
+        })
         p['accessModes'] = _currentField ? _currentField.accessModes : ['read']
       })
 
@@ -402,12 +414,6 @@ const handleOk = () => {
     forms.value[item.key] = []
     item.flattenFields?.forEach((p) => {
       if (p.accessModes.length) {
-        // forms.value[item.key].push({
-        //   id: p.formItemProps.name,
-        //   required: p.formItemProps.required,
-        //   accessModes: p.accessModes,
-        // })
-
         // 处理单选高级组件, 平铺keys至formBinds
         if (
           !(
@@ -422,7 +428,7 @@ const handleOk = () => {
               id: k.config.source,
               required: p.formItemProps.required,
               accessModes: p.accessModes,
-              //   ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
+              ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
             })
           })
         } else {
@@ -436,8 +442,8 @@ const handleOk = () => {
     })
   })
   visible.value = false
-  console.log('filterFormList.value: ', filterFormList.value)
-  console.log('forms.value: ', forms.value)
+  //   console.log('filterFormList.value: ', filterFormList.value)
+  //   console.log('forms.value: ', forms.value)
 }
 
 watch(
