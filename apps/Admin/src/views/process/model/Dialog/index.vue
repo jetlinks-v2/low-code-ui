@@ -37,9 +37,11 @@
         :rules="[{ required: true, message: '请选择流程分类' }]"
       >
         <a-select
+          showSearch
           v-model:value="form.classifiedId"
           placeholder="请选择流程分类"
           :options="classified"
+          :filterOption="filterOption"
           style="width: 576px"
         >
           <template #notFoundContent>
@@ -160,6 +162,10 @@ const form = reactive<Partial<FormType>>({
   provider: 'wflow',
   classifiedId: undefined
 })
+
+const filterOption = (input: string, option: any) => {
+  return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+}
 
 const { data: classified } = useRequest(providerEnum, {
   immediate: true,

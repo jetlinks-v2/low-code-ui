@@ -426,24 +426,24 @@ const handleOk = () => {
           p.componentProps.keys?.forEach((k) => {
             forms.value[item.key].push({
               id: k.config.source,
-              required: p.formItemProps.required,
-              accessModes: p.accessModes,
+              required: p.formItemProps.required || false,
+              accessModes: p.accessModes || ['read'],
               ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
             })
           })
         } else {
           forms.value[item.key].push({
             id: p.formItemProps.name,
-            required: p.formItemProps.required,
-            accessModes: p.accessModes,
+            required: p.formItemProps.required || false,
+            accessModes: p.accessModes || ['read'],
           })
         }
       }
     })
   })
   visible.value = false
-  //   console.log('filterFormList.value: ', filterFormList.value)
-  //   console.log('forms.value: ', forms.value)
+  // console.log('filterFormList.value: ', filterFormList.value)
+  // console.log('forms.value: ', forms.value)
 }
 
 watch(

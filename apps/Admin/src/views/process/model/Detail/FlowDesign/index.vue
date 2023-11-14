@@ -41,8 +41,13 @@
 import FlowDesigner from '@/components/FlowDesigner'
 import NodeConfig from './components/NodeConfig.vue'
 import { useFlowStore } from '@/store/flow'
-import { findBranchLastNode, findNodeById } from './components/utils'
+import {
+  findBranchLastNode,
+  findBranches,
+  findNodeById,
+} from './components/utils'
 import { onlyMessage } from '@jetlinks/utils'
+import { cloneDeep } from 'lodash-es'
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
@@ -161,6 +166,23 @@ watch(
 const validateSteps = (type?: string) => {
   return new Promise((resolve, reject) => {
     const err = flowDesignerRef.value.validateProcess()
+    const _branchNodes = cloneDeep(findBranches(flowStore.model.nodes, []))
+    // 没有子节点的条件节点
+    const _noChildBranchNodes: any[] = []
+    _branchNodes?.forEach((item) => {
+      _noChildBranchNodes.push(
+        item.branches.filter((f) => !Object.keys(f.children).length),
+      )
+    })
+    // 每一个条件分支, 只允许有一个条件直达分支下面的空节点
+    if (_noChildBranchNodes.some((s) => s.length > 1)) {
+      // 任何一个分支存在多个条件节点直达空节点, 校验不通过
+      err.push({
+        errors: ['条件节点下未配置执行节点'],
+        name: ['empty'],
+      })
+      onlyMessage('条件节点下未配置执行节点', 'warning')
+    }
     console.log('err: ', err)
 
     if (type && type === 'next' && err[0]?.name[0] === 'no-nodes') {
