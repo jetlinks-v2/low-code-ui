@@ -108,7 +108,7 @@ const relationList = ref<string[]>([])
 // 查询到的现存关系数据
 const existingRel = ref<any[]>([])
 
-const getData = (data: DataSourceProps[], type: string) => {
+const getData = async (data: DataSourceProps[], type: string) => {
   if (props.isNode) {
     // 暂存其他维度数据
     const newList = list.value.filter((item) => item.type != type)
@@ -120,6 +120,7 @@ const getData = (data: DataSourceProps[], type: string) => {
     list.value = uniqBy([...arr], 'id')
     // emits('update:members', list.value)
   }
+  await submit()
 }
 /**
  * 根据分组字段对数组进行分组
@@ -295,7 +296,7 @@ defineExpose({ submit })
 watch(
   () => props.members,
   (val) => {
-    if (list.value.length > 0) return
+    // if (list.value.length > 0) return
     if (isArray(val)) {
       list.value = val
     } else if (isObject(val)) {
