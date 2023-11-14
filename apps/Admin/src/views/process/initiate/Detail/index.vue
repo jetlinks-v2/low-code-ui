@@ -345,7 +345,7 @@ const handleData = (data: any, model: string) => {
       _fields?.forEach((p) => {
         const accessModes = bindMap
           .get(m.formId)
-          ?.find((k) => k.id === p.formItemProps.name)?.accessModes
+          ?.find((k) => (k.ownerBy ?? k.id) === p.formItemProps.name)?.accessModes
         p.componentProps.disabled = !accessModes?.includes('write')
       })
       if (m.multiple) {
