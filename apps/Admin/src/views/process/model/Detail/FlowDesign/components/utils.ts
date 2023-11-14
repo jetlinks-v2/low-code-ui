@@ -141,7 +141,7 @@ export function handleObjToArr(obj: { [key: string]: boolean }) {
         } else {
             // 父节点为分支, 取唯一没有业务节点的分支节点id
             const _noChild = _parentNode.branches?.filter(f => !Object.keys(f.children).length)[0]
-            arr.push(_noChild.id)
+            if (_noChild) arr.push(_noChild.id)
         }
     }
     return arr

@@ -120,6 +120,7 @@ const FlowDesigner = defineComponent({
                   round: true,
                   ref: node.id,
                   id: node.id,
+                  data: node,
                   text: isConditionNode(node) ? `条件分支` : `并行分支`,
                   isConditionNode: isConditionNode(node),
                   onAddBranchNode: (type) => addBranchNode(node, type),
