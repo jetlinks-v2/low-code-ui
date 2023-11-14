@@ -228,7 +228,7 @@
             v-model:value="target.componentProps.name"
           />
         </j-form-item>
-        <j-form-item
+        <!-- <j-form-item
           label="标识"
           :name="['formItemProps', 'name']"
           required
@@ -241,7 +241,7 @@
             @change="onDataChange"
             v-model:value="target.formItemProps.name"
           />
-        </j-form-item>
+        </j-form-item> -->
       </template>
       <template v-if="['tabs-item'].includes(type)">
         <j-form-item
@@ -263,7 +263,7 @@
             v-model:value="target.componentProps.name"
           />
         </j-form-item>
-        <j-form-item
+        <!-- <j-form-item
           label="标识"
           :name="['formItemProps', 'name']"
           required
@@ -276,7 +276,7 @@
             @change="onDataChange"
             v-model:value="target.formItemProps.name"
           />
-        </j-form-item>
+        </j-form-item> -->
       </template>
       <template v-if="['table-item'].includes(type)">
         <j-form-item
