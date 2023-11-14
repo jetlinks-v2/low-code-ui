@@ -220,7 +220,7 @@ const columns = [
               value: item.classifiedId,
             })
           })
-          return [...listMap.values()]
+          return [...listMap.values()].filter(i => i.label)
         }
         return []
       },
