@@ -28,10 +28,28 @@
             class="render-left"
             ref="nameRef"
           ></j-input>
-          <div class="render-left" @dblclick="onDbClick(file)" v-else><j-ellipsis>{{ file.name }}</j-ellipsis></div>
-          <j-button type="link" style="width: 10%" @click="onDelete(file)" :disabled="disabled">
-            <AIcon type="DeleteOutlined" />
-          </j-button>
+          <div class="render-left" @dblclick="onDbClick(file)" v-else>
+            <j-ellipsis>{{ file.name }}</j-ellipsis>
+          </div>
+          <j-space>
+            <j-button
+              type="link"
+              style="width: 10%"
+              @click="onDelete(file)"
+              :disabled="disabled"
+              danger
+            >
+              <AIcon type="DeleteOutlined" />
+            </j-button>
+            <j-button
+              type="link"
+              style="width: 10%"
+              @click="onLoad(file)"
+              :disabled="disabled"
+            >
+              <AIcon type="DownloadOutlined" />
+            </j-button>
+          </j-space>
         </div>
       </template>
     </a-upload-dragger>
@@ -70,10 +88,10 @@ const props = defineProps({
     },
   },
   value: Array,
-  disabled:{
-    type:Boolean,
-    default:false
-  }
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emits = defineEmits(['change'])
@@ -128,11 +146,21 @@ const handleDrop = (e) => {
 }
 
 const onDelete = (file: any) => {
-  const _index = fileList.value.findIndex(item => item.uid === file?.uid)
-  if(_index !== -1){
+  const _index = fileList.value.findIndex((item) => item.uid === file?.uid)
+  if (_index !== -1) {
     fileList.value.splice(_index, 1)
     emits('change', fileList.value)
   }
+}
+
+const onLoad = (_file: any) => {
+  const downNode = document.createElement('a');
+  downNode.style.display = 'none';
+  downNode.download = `${_file.name}`;
+  downNode.href = _file?.url;
+  document.body.appendChild(downNode);
+  downNode.click();
+  document.body.removeChild(downNode);
 }
 
 const onDbClick = (file) => {
