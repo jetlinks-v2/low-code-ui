@@ -217,8 +217,19 @@ const getFormList = async () => {
       sort: _formKeys?.indexOf(m.key),
     }))
     .sort((a, b) => a.sort - b.sort)
+  // 接口需要数据处理
+  handleFlattenFields(_sortResult)
+  // 右侧预览数据处理
+  initPreviewData(_sortResult)
+  handleSearch()
+}
+
+/**
+ * 左侧表单字段数据结构处理(后端需要的结构)
+ */
+const handleFlattenFields = (data) => {
   // 左侧表单读写操作列表
-  filterFormList.value = _sortResult?.map((m) => {
+  filterFormList.value = data?.map((m) => {
     // 布局组件内部字段, 取出平铺
     let _layoutFields = cloneDeep(
       m.configuration?.children?.filter(
@@ -230,7 +241,7 @@ const getFormList = async () => {
     _layoutFields = cloneDeep(flattenTree(_layoutFields))
 
     // 平铺字段
-    const flattenFields = [
+    const _flattenFields = [
       ...m.configuration?.children?.filter(
         // (f) => !f.formItemProps.hasOwnProperty('isLayout'),
         (f) =>
@@ -241,12 +252,12 @@ const getFormList = async () => {
       ),
       ..._layoutFields,
     ]
-    // console.log('flattenFields: ', flattenFields)
+    // console.log('_flattenFields: ', _flattenFields)
 
     // 已经存在的字段
     const existFields = forms.value[m.key]
     if (existFields && existFields.length) {
-      flattenFields?.forEach((p) => {
+      _flattenFields?.forEach((p) => {
         const _currentField = existFields.find((f) => {
           if (
             !(
@@ -267,29 +278,26 @@ const getFormList = async () => {
 
       return {
         ...m,
-        accessModes: flattenFields?.every((e) => e.accessModes.length === 2)
+        accessModes: _flattenFields?.every((e) => e.accessModes.length === 2)
           ? ['read', 'write']
           : ['read'],
         multiple: existForms.value?.find((f) => f.formId === m.key)?.multiple,
-        flattenFields,
+        flattenFields: _flattenFields,
       }
     } else {
-      flattenFields?.forEach((p) => {
+      _flattenFields?.forEach((p) => {
         p['accessModes'] = ['read']
       })
       return {
         ...m,
         accessModes: ['read'],
         multiple: existForms.value?.find((f) => f.formId === m.key)?.multiple,
-        flattenFields,
+        flattenFields: _flattenFields,
       }
     }
   })
   allFormList.value = cloneDeep(filterFormList.value)
-  //   console.log('filterFormList.value: ', filterFormList.value)
-  // 右侧预览数据处理
-  initPreviewData(_sortResult)
-  handleSearch()
+  console.log('filterFormList.value: ', filterFormList.value)
 }
 
 /**
