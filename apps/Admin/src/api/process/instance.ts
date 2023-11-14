@@ -7,6 +7,12 @@ import { request } from '@jetlinks/core'
 export const getList_api = (data: any) => request.post(`/process/deployment/detail/_query`,data);
 
 /**
+ * 条件查询所有实例
+ * @returns 
+ */
+export const getAllInstance_api = (data: any) => request.post(`/process/deployment/_query/no-paging`, data);
+
+/**
  * 复制为模型
  */
 export const copy_api = (data: any) => request.post(`/process/deployment/${data.id}/_convert_to_definition`, data);
