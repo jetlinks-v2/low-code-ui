@@ -7,7 +7,6 @@ import { withModifiers } from 'vue'
 import { cloneDeep, omit } from 'lodash-es'
 import { useTool } from '../../hooks'
 import generatorData from '../../utils/generatorData'
-import { uid } from '../../utils/uid'
 
 export default defineComponent({
   name: 'CollapseLayout',
