@@ -192,14 +192,6 @@ const onBack = async () => {
   }
 }
 
-onBeforeUnmount(() => {
-  console.log(1111)
-})
-
-onErrorCaptured(() => {
-  console.log(2222)
-})
-
 defineExpose({ onSave })
 </script>
   

@@ -27,6 +27,7 @@
         style="width: 120px; text-align: left"
         placeholder="添加变量"
         :options="variables"
+        showSearch
         @select="selectVariable"
       >
       </j-select>

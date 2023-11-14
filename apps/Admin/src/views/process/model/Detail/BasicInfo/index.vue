@@ -25,6 +25,7 @@
         <TitleComponent data="权限控制" />
         <j-form-item name="assignedUser" label="配置可以使用该流程的成员">
           <ConfigureMembers
+            ref="memberRef"
             :isNode="false"
             :hasWeight="false"
             :supCancel="false"
@@ -48,6 +49,7 @@ import { useFlowStore } from '@/store/flow'
 const flowStore = useFlowStore()
 const formRef = ref()
 const configFormRef = ref()
+const memberRef = ref()
 
 // const getData = (arr: any[]) => {
 //   return arr.map((i) => {
@@ -153,12 +155,11 @@ const updateNodesFormBinds = (forms, node) => {
         p.componentProps.keys?.forEach((k) => {
           node.props.formBinds[item.key].push({
             id: k.config.source,
-            required: p.formItemProps.required,
+            required: p.formItemProps.required || false,
             // accessModes: p.accessModes,
             accessModes: _fixedFormBinds
-              ? _fixedFormBinds[item.key]?.find(
-                  (f) => f.id === k.config.source,
-                )?.accessModes || ['read']
+              ? _fixedFormBinds[item.key]?.find((f) => f.id === k.config.source)
+                  ?.accessModes || ['read']
               : ['read'],
             ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
           })
@@ -166,7 +167,7 @@ const updateNodesFormBinds = (forms, node) => {
       } else {
         node.props.formBinds[item.key].push({
           id: p.formItemProps.name,
-          required: p.formItemProps.required,
+          required: p.formItemProps.required || false,
           accessModes: _fixedFormBinds
             ? _fixedFormBinds[item.key]?.find(
                 (f) => f.id === p.formItemProps.name,
@@ -221,7 +222,11 @@ const getLatestFormList = () => {
   })
 }
 
-defineExpose({ validateSteps, getLatestFormList })
+const memberSubmit = () => {
+  memberRef.value?.submit()
+}
+
+defineExpose({ validateSteps, getLatestFormList, memberSubmit })
 
 watch(
   () => formData.forms,
