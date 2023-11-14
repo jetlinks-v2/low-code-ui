@@ -521,7 +521,7 @@ const FlowDesigner = defineComponent({
      * @param node
      */
     const delNode = (node) => {
-      //   console.log('删除节点', node)
+        // console.log('删除节点', node)
       emit('delNode', node)
       // 获取该节点的父节点
       let parentNode = nodeMap.value.get(node.parentId)
@@ -558,11 +558,20 @@ const FlowDesigner = defineComponent({
             }
           }
         } else {
-          // 不是的话就直接删除
-          if (node.children && node.children.id) {
-            node.children.parentId = parentNode.id
-          }
-          parentNode.children = node.children
+            if (parentNode.type === 'EMPTY' && isBranchNode(node.children)) {
+                // 父节点和子节点都是分支节点时, 删除本节点, 同时删除下方分支节点
+                // node(本节点).children(分支节点).children(空节点)
+                if (node.children.children.children && node.children.children.children.id) {
+                    node.children.children.children.parentId = parentNode.id
+                }
+                parentNode.children = node.children.children.children
+            } else {
+                // 不是的话就直接删除
+                if (node.children && node.children.id) {
+                  node.children.parentId = parentNode.id
+                }
+                parentNode.children = node.children
+            }
         }
         proxy?.$forceUpdate()
       } else {
