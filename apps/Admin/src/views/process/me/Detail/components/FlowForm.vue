@@ -318,6 +318,9 @@ const dealTable = (disabled) => {
                 })
             })
             // console.log(tableColumn,'___')
+            //处理单选数据回显
+            i.data = handleSingleData(i)
+            // console.log(i,'value')
             i.configuration = tableColumn
         }
     })

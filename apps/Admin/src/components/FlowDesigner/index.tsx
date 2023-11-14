@@ -118,6 +118,8 @@ const FlowDesigner = defineComponent({
                   class: { 'add-branch-btn-el': true },
                   size: 'small',
                   round: true,
+                  ref: node.id,
+                  id: node.id,
                   text: isConditionNode(node) ? `条件分支` : `并行分支`,
                   isConditionNode: isConditionNode(node),
                   onAddBranchNode: (type) => addBranchNode(node, type),
@@ -583,6 +585,7 @@ const FlowDesigner = defineComponent({
     }
     const validateNode = (err, node) => {
       if (node.type === 'ROOT') return
+      console.log(proxy?.$refs)
       if (proxy?.$refs[node.id].validate) {
         valid.value = proxy?.$refs[node.id].validate(err)
       }
@@ -617,6 +620,7 @@ const FlowDesigner = defineComponent({
         validateNode(err, node)
         validate(err, node.children)
       } else if (isBranchNode(node)) {
+        validateNode(err, node)
         //校验每个分支
         node.branches.map((branchNode) => {
           //校验条件节点

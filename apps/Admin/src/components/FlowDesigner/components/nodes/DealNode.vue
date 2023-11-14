@@ -93,6 +93,16 @@ const validate = (err) => {
       errors: ['请选择可参与审批的候选成员'],
       name: ['candidates'],
     })
+  } else if (
+    candidates &&
+    Object.keys(candidates).length &&
+    Object.values(candidates).every((item: any) => item?.every((e) => e.isDel))
+  ) {
+    err.push({
+      errors: ['候选人已全部删除'],
+      name: ['candidates'],
+    })
+    errorInfo.value = '候选人已全部删除'
   } else if (name.length > 64) {
     err.push({
       errors: ['办理节点名称最多输入64个字符'],

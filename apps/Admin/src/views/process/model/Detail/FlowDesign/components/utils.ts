@@ -1,5 +1,8 @@
-import {cloneDeep, pick} from 'lodash-es'
+import { cloneDeep, pick } from 'lodash-es'
 import { advancedComponents } from './const'
+import { useFlowStore } from '@/store/flow'
+
+const flowStore = useFlowStore()
 
 /**
  * 通过节点id查找对应节点
@@ -61,10 +64,10 @@ export function setEmptyNodeProps(nodes: any) {
             allCompleteNodeId: branchNodeIds
         }
     } else if (nodes.type === 'CONCURRENTS') {
-      nodes.children.props = {
-        ...nodes.children.props,
-        ...pick(nodes.props, ['type','complexType', 'weight'])
-      }
+        nodes.children.props = {
+            ...nodes.children.props,
+            ...pick(nodes.props, ['type', 'complexType', 'weight'])
+        }
     } else {
         setEmptyNodeProps(nodes.children)
     }
@@ -130,7 +133,16 @@ export function handleObjToArr(obj: { [key: string]: boolean }) {
     const arr: string[] = []
     for (let key in obj) {
         const nodeId = key.split('$')[0]
-        arr.push(nodeId)
+        const _node = findNodeById(flowStore.model.nodes, nodeId)
+        const _parentNode = findNodeById(flowStore.model.nodes, _node.parentId)
+        if (_parentNode.type === 'CONDITION') {
+            // 父节点为条件节点, 直接取父节点id
+            arr.push(_parentNode.id)
+        } else {
+            // 父节点为分支, 取唯一没有业务节点的分支节点id
+            const _noChild = _parentNode.branches?.filter(f => !Object.keys(f.children).length)[0]
+            arr.push(_noChild.id)
+        }
     }
     return arr
 }
@@ -147,7 +159,20 @@ export function handleObjToArr(obj: { [key: string]: boolean }) {
 export function handleArrToObj(arr: string[] = []) {
     const obj: { [key: string]: boolean } = {}
     arr.forEach(item => {
-        obj[`${item}$eq`] = true
+        const _conditionNode = findNodeById(flowStore.model.nodes, item)
+        let _id
+        if (Object.keys(_conditionNode.children).length) {
+            // 条件节点下方节点存在, 直接去第一个节点的id
+            _id = _conditionNode.children.id
+        } else {
+            // 条件节点下方没有节点, 取整个分支下面的空节点id
+            const _branchNode = findNodeById(
+                flowStore.model.nodes,
+                _conditionNode.props.branchBy,
+            )
+            _id = _branchNode.children.id
+        }
+        obj[`${_id}$eq`] = true
     })
     return obj
 }
@@ -164,7 +189,13 @@ export function filterFormByName(list, name) {
     list?.forEach(item => {
         const _fields = item.flattenFields || []
         const _filterFields = _fields.filter(f => {
-            return f.formItemProps.label?.includes(name)
+            if (f.formItemProps.label) {
+                // 常规组件
+                return f.formItemProps.label.includes(name)
+            } else {
+                // 布局组件没有formItemProps.label, 直接用componentProps?.name匹配
+                return f.componentProps?.name?.includes(name)
+            }
         })
         if (_filterFields.length) {
             // @ts-ignore
@@ -353,4 +384,22 @@ export function handleFormList(data) {
             flattenFields,
         }
     })
+}
+
+/**
+ * 查找所有分支节点
+ */
+export function findBranches(nodes, result: any[] = []) {
+    if (nodes.type === 'CONDITIONS') {
+        result.push(nodes)
+    }
+    if (nodes.branches?.length) {
+        for (let i = 0; i < nodes.branches.length; i++) {
+            findBranches(nodes.branches[i], result)
+        }
+    }
+    if (nodes.children && Object.keys(nodes.children).length) {
+        findBranches(nodes.children, result)
+    }
+    return result
 }
