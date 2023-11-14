@@ -73,6 +73,7 @@ import FormPreview from '@/components/FormDesigner/preview.vue'
 import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
 import { getImage } from '@jetlinks/utils'
 import { queryFormNoPage_api } from '@/api/process/model'
+import {handleRules} from "@/components/FormDesigner/hooks/useProps";
 
 interface EmitProps {
   (e: 'update:visible', flag: boolean): void
@@ -109,23 +110,20 @@ const nodesData = ref<any>({})
 
 const tableData = ref<any>([{}])
 const getTableColumns = (fields: any[]) => {
-  const _columns = fields?.map((m) => ({
-    title: m.formItemProps?.label,
-    dataIndex: m.formItemProps?.name,
-    ellipsis: true,
-    // formId,
-    width: 200,
-    ...m,
-    form: {
-      rules: [
-        ...(m.formItemProps?.rules ?? []),
-        {
-          required: m.formItemProps?.required,
-          message: `该项不能为空`,
-        },
-      ],
-    },
-  }))
+  const _columns = fields?.map((m) => {
+
+    return {
+      title: m.formItemProps?.label,
+      dataIndex: m.formItemProps?.name,
+      ellipsis: true,
+      // formId,
+      width: 200,
+      ...m,
+      form: {
+        rules: handleRules(m)
+      },
+    }
+  })
   _columns?.forEach((item) => {
     tableData.value[0][item.dataIndex] = undefined
   })

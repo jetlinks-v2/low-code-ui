@@ -35,6 +35,7 @@ import { providerEnum } from '@/components/ProJect'
 import { ReplStore } from '@/components/CustomHTML/store'
 import { queryRuntime } from '@/api/form'
 import { clone, cloneDeep } from 'lodash-es'
+import { onlyMessage } from '@jetlinks/utils'
 
 const data = ref<any>()
 
@@ -137,6 +138,9 @@ const handleSubmit = async () => {
     props.resource.command,
     params,
   ).finally(() => (confirmLoading.value = false))
+  if(res.success) {
+    onlyMessage('保存成功')
+  }
   emit('reload')
 }
 

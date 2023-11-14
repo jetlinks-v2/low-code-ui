@@ -87,11 +87,11 @@ const handleDetail = (data) => {
 
 const handleAdd = (id) => {
   // 字典新增
-  // menu.jumpPage('process/initiate/Detail',{
-  //   query: {
-  //     id: id,
-  //   },
-  // })
+  menu.jumpPage('system/Dictionary',{
+    query: {
+      id: id,
+    },
+  })
 }
 </script>
 <style scoped lang="less">
