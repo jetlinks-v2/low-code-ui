@@ -150,6 +150,7 @@ watch(
     // !val ? saveNodeConfig() : validateNodeConfig()
     if (!val) {
       saveNodeConfig()
+      nodeConfigRef.value?.memberSubmit()
     } else {
       validateNodeConfig()
       nextTick(() => {

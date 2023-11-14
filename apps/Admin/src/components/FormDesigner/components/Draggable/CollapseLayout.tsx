@@ -53,8 +53,8 @@ export default defineComponent({
         type: props.data?.type + '-item',
         children: [],
         formItemProps: {
-          name: props.data?.type + '-item' + '_' + uid(6),
-          isLayout: true
+          // name: props.data?.type + '-item' + '_' + uid(6),
+          isLayout: false
         },
         componentProps: {
           name: 'Title'
@@ -72,8 +72,8 @@ export default defineComponent({
     })
 
     return () => {
-      const _path = cloneDeep(props?.path || []);
-      const _index = props?.index || 0;
+      let _path = cloneDeep(props?.path || []);
+      let _index:number = props?.index || 0;
       if (props.data?.formItemProps?.name) {
         _path[_index] = props.data.formItemProps.name
       }
@@ -90,7 +90,10 @@ export default defineComponent({
           unref(list)?.length ? <Collapse data-layout-type={'collapse'} {...props.data.componentProps}>
             {
               unref(list).map((element) => {
-                const __path = [..._path, element.formItemProps?.name]
+                if (element.formItemProps?.name) {
+                  _path = [..._path, element.formItemProps?.name]
+                  _index = _index + 1
+                }
 
                 return (
                   <CollapsePanel key={element.key} {...omit(element.componentProps, 'header')} header={element.componentProps?.name}>
@@ -109,9 +112,8 @@ export default defineComponent({
                         data={element.children}
                         data-layout-type={'item'}
                         parent={element}
-                        path={__path}
-                        index={unref(_isLayout) ? _index + 2 : _index + 1}
-                        index={_index + 2}
+                        path={_path}
+                        index={unref(_isLayout) ? _index + 1 : _index}
                         visible={props.visible}
                         editable={props.editable}
                       />
