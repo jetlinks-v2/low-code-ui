@@ -31,7 +31,7 @@
             defaultExpandAll
             :tree-data="treeDataFilter"
             :field-names="{ key: 'fullId', title: 'name' }"
-            v-model:checkedKeys="checkedKeys"
+            :checkedKeys="checkedKeys"
             v-if="treeDataFilter.length"
             @check="handleCheck"
           >
@@ -112,9 +112,16 @@ const searchValue = ref('')
 const previewData = ref<any[]>([])
 // 页面渲染的数据(可能是筛选过后的)
 const treeDataFilter = computed(() => {
-  return searchValue.value
-    ? treeFilter(props.treeData, searchValue.value, 'name')
-    : props.treeData
+  if(searchValue.value) {
+    return treeFilter(props.treeData, searchValue.value, 'name').map(item => {
+      return {
+        ...item,
+        disabled: !!item.children?.length
+      }
+    })
+  } else {
+    return props.treeData
+  }
 })
 
 /**
@@ -147,7 +154,8 @@ const getFormFields = async () => {
  * @param _
  * @param param1
  */
-const handleCheck = (_, { checkedNodes }) => {
+const handleCheck = (_checkedKeys, { checkedNodes }) => {
+  checkedKeys.value = _checkedKeys
   checkedLeafNode.value = checkedNodes
     ?.filter((f) => !f.children?.length)
     ?.map((m) => ({

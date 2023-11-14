@@ -99,13 +99,7 @@ const visible = ref(false)
 
 const list = ref<DataSourceProps[]>([])
 const initList = computed(() => {
-  const arr = list.value?.map((i) => ({ ...i, isDel: isDel(i) }))
-  if (props.isNode) {
-    emits('update:members', groupedData(arr, 'groupField'))
-  }else{
-    emits('update:members', arr)
-  }
-  return arr
+  return list.value?.map((i) => ({ ...i, isDel: isDel(i) }))
 })
 // 固定/变量/关系数据
 const dataMap = ref<Map<string, any>>(new Map())
@@ -114,7 +108,7 @@ const relationList = ref<string[]>([])
 // 查询到的现存关系数据
 const existingRel = ref<any[]>([])
 
-const getData = (data: DataSourceProps[], type: string) => {
+const getData = async (data: DataSourceProps[], type: string) => {
   if (props.isNode) {
     // 暂存其他维度数据
     const newList = list.value.filter((item) => item.type != type)
@@ -126,6 +120,7 @@ const getData = (data: DataSourceProps[], type: string) => {
     list.value = uniqBy([...arr], 'id')
     // emits('update:members', list.value)
   }
+  await submit()
 }
 /**
  * 根据分组字段对数组进行分组
@@ -285,10 +280,23 @@ provide('infoState', {
   supCancel: props.supCancel,
 })
 
+const submit = () => {
+  return new Promise((resolve, reject) => {
+    if (props.isNode) {
+      emits('update:members', groupedData(initList.value, 'groupField'))
+    } else {
+      emits('update:members', initList.value)
+    }
+    resolve(true)
+  })
+}
+
+defineExpose({ submit })
+
 watch(
   () => props.members,
   (val) => {
-    if(list.value.length > 0) return
+    // if (list.value.length > 0) return
     if (isArray(val)) {
       list.value = val
     } else if (isObject(val)) {
@@ -313,7 +321,6 @@ watch(
   },
   { immediate: true },
 )
-
 </script>
 <style scoped lang="less">
 .member {

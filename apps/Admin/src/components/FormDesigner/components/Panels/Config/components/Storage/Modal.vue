@@ -122,7 +122,7 @@
   
   <script lang="ts" setup>
 import { ref, computed, unref, watch } from 'vue'
-import { map } from 'lodash-es'
+import { cloneDeep, map } from 'lodash-es'
 import { onlyMessage } from '@jetlinks/utils'
 import { product, role, org, device, user } from './index'
 import { queryEndCommands, queryProject } from '@/api/form'
@@ -288,7 +288,8 @@ const onClick = (_val: any) => {
 }
 
 const onConfig = (_val: string) => {
-  config.value = _value.value?.find((item) => item?.key === _val)
+  const _dt = _value.value?.find((item) => item?.key === _val)
+  config.value = cloneDeep(_dt)
   configVisible.value = true
   if (!projectList.value?.length) {
     getProject()

@@ -47,7 +47,7 @@
 
 <script setup lang="ts" name="BranchButton">
 import { useFlowStore } from '@/store/flow'
-import { computed } from 'vue'
+import { computed, defineExpose } from 'vue'
 
 const emits = defineEmits(['addBranchNode', 'openConfig'])
 const props = defineProps({
@@ -59,6 +59,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  id: {
+    type: String,
+    default: undefined
+  },
+  data: {
+    type: Object,
+    default: () => ({})
+  }
 })
 
 const flowStore = useFlowStore()
@@ -82,6 +90,17 @@ const handleOpenConfig = () => {
   visible.value = false
   emits('openConfig')
 }
+
+// defineExpose({
+//   validate: () => {
+//     return new Promise((resolve, reject) => {
+//       console.log('BranchButton', props.id, props.data)
+//       const complexWeight = props.data?.props?.weight?.complexWeight
+//
+//       resolve()
+//     })
+//   }
+// })
 </script>
 
 <style lang="less" scoped>

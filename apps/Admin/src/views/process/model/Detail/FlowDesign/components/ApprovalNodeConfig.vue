@@ -79,6 +79,7 @@
               ]"
             >
               <ConfigureMembers
+                ref="memberRef"
                 v-model:members="memberFormData.candidates"
                 :nodeId="flowStore.selectedNode.id"
               />
@@ -222,6 +223,7 @@ const basicFormData = reactive({
 const collapseActive = ref(['1', '2', '3'])
 
 // 成员配置
+const memberRef = ref()
 const memberFormRef = ref()
 const memberFormData = reactive({
   candidates: props.node?.props?.candidates,
@@ -333,10 +335,13 @@ const validateConfig = () => {
       })
   })
 }
-
+const memberSubmit = () => {
+  memberRef.value?.submit()
+}
 defineExpose({
   saveConfigToStore,
   validateConfig,
+  memberSubmit,
 })
 onMounted(() => {
   getRejectNodes(props.node?.parentId)

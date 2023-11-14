@@ -155,8 +155,7 @@ import {
   deploy_api,
   del_api,
   detail_api,
-  update_api,
-  providerEnum
+  update_api
 } from '@/api/process/model'
 // import { useClassified } from '@/hooks/useClassified'
 import { isImg } from '@/utils/comm'
@@ -208,13 +207,16 @@ const columns = [
         placeholder: '请选择流程分类',
       },
       options: async () => {
-        const resp = await providerEnum()
+        const resp = await getProcess_api({
+          paging: false,
+          sorts: [{ name: 'createTime', order: 'desc' }],
+        })
         const listMap = new Map()
         if (resp.status === 200) {
-          resp.result.forEach((item) => {
-            listMap.set(item.id, {
-              label: item.text,
-              value: item.id,
+          resp.result.data.forEach((item) => {
+            listMap.set(item.classifiedId, {
+              label: item.classifiedName,
+              value: item.classifiedId,
             })
           })
           return [...listMap.values()]
@@ -403,7 +405,7 @@ const getActions = (record, type = 'card') => {
         // disabled: data.state.value === 'deployed',
         tooltip: {
           title: '删除',
-          placement: 'topRight'
+          placement: 'topRight',
         },
         hasPermission: 'process/model:delete',
         popConfirm: {
@@ -469,10 +471,10 @@ const _view = (data) => {
  * @param data
  */
 const handleView = (data) => {
-  menu.jumpPage('process/model/Detail',{
-      query: {
-        id: data.id,
-      },
+  menu.jumpPage('process/model/Detail', {
+    query: {
+      id: data.id,
+    },
   })
 }
 

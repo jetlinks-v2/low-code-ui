@@ -51,6 +51,9 @@
           type="primary"
           v-if="isEditModel"
           hasPermission="process/form:save"
+          :tooltip="{
+            placement: 'topLeft'
+          }"
         >
           保存
         </PermissionButton>

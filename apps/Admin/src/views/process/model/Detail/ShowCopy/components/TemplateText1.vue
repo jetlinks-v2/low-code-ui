@@ -6,6 +6,7 @@
         contentEditable="plaintext-only"
         ref="show"
         tabIndex="-1"
+        :spellcheck="false"
         :data-placeholder="placeholder"
       ></div>
       <div
@@ -14,6 +15,7 @@
         @input="onInput"
         :class="className"
         ref="hide"
+        :spellcheck="false"
         @keypress="onKeypress"
       ></div>
     </div>
@@ -25,6 +27,7 @@
         style="width: 120px; text-align: left"
         placeholder="添加变量"
         :options="variables"
+        showSearch
         @select="selectVariable"
       >
       </j-select>
@@ -36,6 +39,9 @@
 import { watch, ref, onMounted } from 'vue'
 import { randomString } from '@jetlinks/utils'
 import { useSelection } from '@/hooks'
+import { Form } from 'jetlinks-ui-components'
+
+const formItemContext = Form.useInjectFormItemContext()
 
 const props = defineProps({
   value: {
@@ -58,14 +64,18 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(['update:value'])
+const emits = defineEmits(['update:value', 'change'])
 const className = ref(`template-textarea--${randomString(4)}`)
 
 // 绑定节点
 const hide = ref() // 隐藏的输入框的节点
 const show = ref()
 
-const { insertNode: selectionInsert } = useSelection(hide)
+const {
+  insertNode: selectionInsert,
+  handlePointerup,
+  status: _status,
+} = useSelection(hide)
 
 const regHidden = (html) => {
   return html.replace(/\{(.*?)\}/g, ($1, $2) => {
@@ -80,14 +90,19 @@ const regHandle = (html) => {
   return html.replace(/{([^{}]+)}/g, ($1, $2) => {
     const _arr = $2.split(':')
     const variable = props.variables.find((i) => i.value === _arr?.[1])
-    return _arr?.length === 3 && variable
-      ? `<span style="color: ${variable?.color}">{${_arr[2]}}</span>`
-      : $1
+    if (_arr?.length === 3) {
+      if (variable) {
+        return `<span style="color: ${variable?.color}">{${_arr[2]}}</span>`
+      } else {
+        return `{${_arr[2]}}`
+      }
+    }
+    return $1
   })
 }
 
 watch(
-  () => [props.value, !!show.value, props.variables],
+  () => [props.value, !!show.value, !!props.variables],
   () => {
     if (show.value) {
       show.value.innerHTML = regHandle(props.value)
@@ -124,14 +139,26 @@ const handleValue = (_children, key) => {
           })
         }
       } else {
-        str += item.innerText
+        str += item.innerText.replace(/\{(.*?)\}/g, ($1, $2) => {
+          const variable = props.variables.find((i) => i.label === $2)
+          if (variable) {
+            return `{var:${variable.value}:${$2}}`
+          }
+          return $1
+        })
       }
     } else if (item.childNodes?.length > 1) {
       str += handleValue(item.childNodes)
     } else {
       str += item.textContent.replace(/\{(.*?)\}/g, ($1, $2) => {
-        if ($2 && key) {
-          return `{var:${key}:${$2}}`
+        if ($2) {
+          if (key) {
+            return `{var:${key}:${$2}}`
+          }
+          const variable = props.variables.find((i) => i.label === $2)
+          if (variable) {
+            return `{var:${variable.value}:${$2}}`
+          }
         }
         return $1
       })
@@ -141,19 +168,27 @@ const handleValue = (_children, key) => {
 }
 
 const onInput = () => {
+  handlePointerup()
   const _children = hide.value?.childNodes
   const str = handleValue(_children)
   emits('update:value', str)
+  emits('change', str)
+  formItemContext.onFieldChange()
 }
 
 const selectVariable = (key, { label }) => {
+  if (!_status.value) {
+    hide.value?.focus()
+    handlePointerup()
+  }
   const spanNode = document.createElement('span')
   spanNode.innerText = `{${label}}`
   spanNode.dataset.id = key
   selectionInsert(spanNode)
-  console.log(hide.value)
   const str = handleValue(hide.value?.childNodes)
   emits('update:value', str)
+  emits('change', str)
+  formItemContext.onFieldChange()
 }
 
 onMounted(() => {
@@ -178,10 +213,7 @@ onMounted(() => {
       padding: 12px 12px 0 12px;
       height: auto;
       min-height: 99px;
-      max-height: 70px;
       position: absolute;
-      overflow: auto;
-      overflow-x: hidden;
       color: transparent;
       background-color: transparent;
       caret-color: black; // 可能部分浏览器不生效
@@ -193,8 +225,6 @@ onMounted(() => {
       height: auto;
       min-height: 99px;
       position: absolute;
-      overflow: auto;
-      overflow-x: hidden;
       background-color: white;
 
       &:empty:before {
