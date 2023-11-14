@@ -118,7 +118,7 @@ defineExpose({
           errors: ['通过权重不能大于所有分支的权重总和'],
           name: ['weight', 'complexWeight']
         })
-        errorInfo.value = '通过权重不能大于所有分支的权重总和'
+        errorInfo.value = '配置项错误'
       }
     }
   }
