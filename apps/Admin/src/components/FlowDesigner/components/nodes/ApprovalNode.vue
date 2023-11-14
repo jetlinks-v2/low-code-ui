@@ -79,7 +79,7 @@ const validate = (err) => {
     rejectTo,
     others,
   } = props.config.props
-  console.log('others: ', others);
+  console.log('others: ', others)
   showError.value = true
   errorInfo.value = '未填写必填配置项'
   if (!name) {
@@ -116,6 +116,16 @@ const validate = (err) => {
       errors: ['请选择驳回至哪个节点'],
       name: ['gotoWhenReject'],
     })
+  } else if (
+    candidates &&
+    Object.keys(candidates).length &&
+    Object.values(candidates).every((item: any) => item?.every((e) => e.isDel))
+  ) {
+    err.push({
+      errors: ['候选人已全部删除'],
+      name: ['candidates'],
+    })
+    errorInfo.value = '候选人已全部删除'
   } else if (name.length > 64) {
     err.push({
       errors: ['审批节点名称最多输入64个字符'],

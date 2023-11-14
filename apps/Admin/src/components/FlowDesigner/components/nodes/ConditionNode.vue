@@ -141,11 +141,12 @@ const validate = (err) => {
   const { terms } = props.config.props?.condition?.configuration
 
   showError.value = true
-  errorInfo.value = '配置项错误'
+  errorInfo.value = '未填写必填配置项'
   if (
     !terms ||
     !terms.length ||
-    !terms.some((item) => Boolean(Object.keys(item).length))
+    !terms.some((item) => Boolean(Object.keys(item).length)) ||
+    terms.some(item => !item.column || !item.termType || !item.value)
   ) {
     err.push({
       errors: ['请配置进入下方节点的条件'],
