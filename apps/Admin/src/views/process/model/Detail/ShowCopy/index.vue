@@ -21,13 +21,13 @@
         </div>
         <div
           class="variable-item"
-          v-for="(item, index) of formData.variables"
+          v-for="(item, index) of _variables"
           :key="index"
           :style="{
             color: item.color,
             border: '1px solid ' + item.color,
             borderRadius: '3px',
-            paddingRight: index > 2 ? '30px' : '10px',
+            // paddingRight: index > 2 ? '30px' : '10px',
           }"
         >
           <span>{{ item.label }}</span>
@@ -65,7 +65,7 @@
         <TemplateText
           placeholder="{发起人}的{流程名称}"
           v-model:value="formData.nameGenerator"
-          :variables="formData.variables"
+          :variables="_variables"
           :maxlength="64"
           name="标题"
           @change="onNameChange"
@@ -83,7 +83,7 @@
         <TemplateText
           placeholder="{请假人}的{请假类型}"
           v-model:value="formData.summaryGenerator"
-          :variables="formData.variables"
+          :variables="_variables"
           :maxlength="255"
           name="摘要"
           @change="onSummaryChange"
@@ -183,6 +183,12 @@ const formData = reactive({
       flowStore.model.config.ccMember = val
     },
   }),
+})
+
+const _variables = computed(() => {
+  return formData.variables.filter(item => {
+    return !['process.var.processOwner', 'process.function.processOwnerOrgIds', 'process.function.now'].includes(item.value)
+  })
 })
 
 /**

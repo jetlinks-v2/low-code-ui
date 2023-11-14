@@ -248,7 +248,8 @@ export default defineComponent({
                             {
                                 !unref(isEditModel) && <Button onClick={() => {
                                     const arr = get(designer.formState, __path.value) || []
-                                    set(designer.formState, __path.value, [...arr, {}])
+                                    // 这里有个问题：当有列的key为id会出现问题，但是流程表单不会，因为不能为内置key
+                                    set(designer.formState, __path.value, [...arr, {id: uid(16)}])
                                 }} style={{ width: '100%', marginTop: '10px' }} disabled={props.data.componentProps?.disabled}><AIcon type="PlusOutlined" />新增</Button>
                             }
                             {

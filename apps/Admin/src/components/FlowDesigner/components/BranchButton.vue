@@ -62,6 +62,10 @@ const props = defineProps({
   id: {
     type: String,
     default: undefined
+  },
+  data: {
+    type: Object,
+    default: () => ({})
   }
 })
 
@@ -90,7 +94,9 @@ const handleOpenConfig = () => {
 // defineExpose({
 //   validate: () => {
 //     return new Promise((resolve, reject) => {
-//       console.log('BranchButton', props)
+//       console.log('BranchButton', props.id, props.data)
+//       const complexWeight = props.data?.props?.weight?.complexWeight
+//
 //       resolve()
 //     })
 //   }
