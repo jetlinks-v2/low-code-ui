@@ -27,7 +27,7 @@
             color: item.color,
             border: '1px solid ' + item.color,
             borderRadius: '3px',
-            // paddingRight: index > 2 ? '30px' : '10px',
+            // paddingRight: !item.isOther ? '30px' : '10px',
           }"
         >
           <span>{{ item.label }}</span>
@@ -36,9 +36,10 @@
             type="CloseOutlined"
             :style="{
               color: item.color,
+              
             }"
             v-if="!item.isOther"
-            @click="formData.variables.splice(index, 1)"
+            @click="onRemove(item)"
           />
         </div>
         <FormVariables
@@ -191,6 +192,11 @@ const _variables = computed(() => {
   })
 })
 
+const onRemove = (_item: any) => {
+  const _index = formData.variables.findIndex(i => i.value === _item.value)
+  formData.variables.splice(_index, 1)
+}
+
 /**
  * 当前步骤校验方法
  */
@@ -240,9 +246,10 @@ defineExpose({ validateSteps })
       padding: 2px 10px;
       position: relative;
       .close {
-        position: absolute;
-        right: 3px;
-        top: 6px;
+        // position: absolute;
+        // right: 3px;
+        // top: 6px;
+        margin-left: 5px;
       }
     }
   }
