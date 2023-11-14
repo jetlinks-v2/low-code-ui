@@ -270,7 +270,7 @@ enum filterType {
 }
 
 const handleSubmit = () => {
-  if(form.async) {
+  if(form.async && !reselect.value) {
     emits('update:open', false)
     return
   }
