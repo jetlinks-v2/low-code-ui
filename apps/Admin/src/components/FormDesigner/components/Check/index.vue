@@ -48,7 +48,6 @@ const onInput = async (type: 'get' | 'set') => {
     Object.assign(designer.formState, obj)
   } else {
     const obj = await designer.onSave()?.catch(() => {})
-    console.log(obj, 'obj')
     if (obj) {
       editData.value = JSON.stringify(obj, (key, value) => typeof value === 'undefined' ? null : value)
     }
