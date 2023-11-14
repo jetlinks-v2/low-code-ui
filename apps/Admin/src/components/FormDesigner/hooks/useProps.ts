@@ -10,6 +10,8 @@ export const handleRules = (element?: any) => {
     if (['org', 'user', 'role', 'device', 'product', 'select-card', 'switch', 'tree-select', 'select', 'date-picker', 'time-picker'].includes(element.type)) {
       ruleItem.message = `请选择${element?.formItemProps?.label}`
       return rules
+    } else {
+      rules.push(ruleItem)
     }
   }
 
