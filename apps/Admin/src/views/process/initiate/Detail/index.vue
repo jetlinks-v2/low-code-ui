@@ -100,6 +100,7 @@ import { getMeProcessList } from '@/api/process/me'
 import { getImage } from '@jetlinks/utils'
 import { useMenuStore } from '@/store'
 import FormItem from '@/views/process/me/Detail/components/FormItem.vue'
+import {handleRules} from "@/components/FormDesigner/hooks/useProps";
 
 interface FormsProps {
   formId: string
@@ -146,13 +147,7 @@ const getTableColumns = (
     width: 200,
     ...m,
     form: {
-      rules: [
-        ...(m.formItemProps?.rules ?? []),
-        {
-          required: m.formItemProps?.required,
-          message: `该项不能为空`,
-        },
-      ],
+      rules: handleRules(m)
     },
   }))
 
