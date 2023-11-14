@@ -43,7 +43,12 @@ const validateConfig = () => {
   return nodeConfigRef.value.validateConfig()
 }
 const memberSubmit = () => {
+  if (
+    selectedNode.value.type === 'DEAL' ||
+    selectedNode.value.type === 'APPROVAL'
+  ) {
     nodeConfigRef.value?.memberSubmit()
+  }
 }
 defineExpose({
   saveConfigToStore,
