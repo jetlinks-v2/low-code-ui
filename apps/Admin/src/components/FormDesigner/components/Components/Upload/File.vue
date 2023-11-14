@@ -61,9 +61,9 @@
 import { nextTick, ref, watch } from 'vue'
 import type { UploadProps, UploadChangeParam } from 'jetlinks-ui-components'
 import { _fileUpload } from '@/api/comm'
-import { onlyMessage } from '@/utils/comm'
 import { TOKEN_KEY } from '@jetlinks/constants'
 import { LocalStore } from '@jetlinks/utils/src/storage'
+import { downloadFileByUrl, onlyMessage } from '@jetlinks/utils'
 
 const props = defineProps({
   fileSize: {
@@ -154,13 +154,7 @@ const onDelete = (file: any) => {
 }
 
 const onLoad = (_file: any) => {
-  const downNode = document.createElement('a');
-  downNode.style.display = 'none';
-  downNode.download = `${_file.name}`;
-  downNode.href = _file?.url;
-  document.body.appendChild(downNode);
-  downNode.click();
-  document.body.removeChild(downNode);
+  downloadFileByUrl(_file?.url, _file.name)
 }
 
 const onDbClick = (file) => {
