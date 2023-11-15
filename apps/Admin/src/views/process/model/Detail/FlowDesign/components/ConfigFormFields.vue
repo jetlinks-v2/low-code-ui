@@ -203,7 +203,7 @@ import FormPreview from '@/components/FormDesigner/preview.vue'
 import TableFormPreview from './TableFormPreview.vue'
 import { PropType } from 'vue'
 import { getImage } from '@jetlinks/utils'
-import { advancedComponents } from './const'
+import { advancedComponents, layoutComponents } from './const'
 
 const flowStore = useFlowStore()
 
@@ -242,8 +242,6 @@ const filterFormList = ref<any[] | undefined>([])
 const allFormList = ref<any[] | undefined>([])
 // 右侧表单预览数据
 const previewData = ref<any[]>([])
-// 表单字段布局组件类型: 卡片, 网格, 选项卡, 折叠面板, 弹性间距...
-const layoutFields = ref(['card', 'grid', 'tabs', 'collapse', 'space'])
 // 过滤已经删除的表单
 const existForms = computed(() =>
   flowStore.model.config.forms?.filter((f) => !f.isDelete),
@@ -365,7 +363,7 @@ const handlePreviewFields = (data) => {
     // 所有布局组件内部字段, 添加isWrapOn字段, 用于判断容器开关是否开启
     let _layoutFields = cloneDeep(
       m.configuration?.children
-        ?.filter((f) => layoutFields.value.includes(f.type))
+        ?.filter((f) => layoutComponents.includes(f.type))
         ?.map((m) => ({
           ...m,
           isWrapOn: !(
@@ -392,7 +390,7 @@ const handlePreviewFields = (data) => {
     // 常规组件+布局组件item组合
     const _previewFields = [
       ...m.configuration?.children?.filter(
-        (f) => !layoutFields.value.includes(f.type),
+        (f) => !layoutComponents.includes(f.type),
       ),
       ..._layoutItems,
     ]
@@ -425,17 +423,14 @@ const handlePreviewFields = (data) => {
                 return f.id === p.parent.formItemProps.name
               } else {
                 // 布局组件容器组件开关关闭
-                if (p.type !== 'tabs-item') {
-                  // 读写权限设置标识, 此处单独设置
-                  p['accessDone'] = true
-                  p.children?.forEach((item) => {
-                    if (f.id === item.formItemProps.name) {
-                      item.accessModes = f.accessModes
-                    }
-                  })
-                } else {
-                  return p.formItemProps.name === f.id
-                }
+                // 读写权限设置标识, 此处单独设置
+                p['accessDone'] = true
+                p.children?.forEach((item) => {
+                  if (f.id === item.formItemProps.name) {
+                    item.accessModes = f.accessModes
+                  }
+                })
+                return p.formItemProps.name === f.id
               }
             }
           }
@@ -501,7 +496,7 @@ const handleSearch = () => {
   filterFormList.value = filterFormByName(allFormList.value, keywords.value)
   filterFormList.value?.forEach((item) => {
     item.accessModes = item.flattenFields?.every(
-      (e) => e.accessModes.length === 2,
+      (e) => e.accessModes?.length === 2,
     )
       ? ['read', 'write']
       : ['read']
@@ -514,7 +509,7 @@ const handleSearch = () => {
  */
 const setCheckAll = () => {
   checkAll.value =
-    filterFormList.value?.every((e) => e.accessModes.length === 2) || false
+    filterFormList.value?.every((e) => e.accessModes?.length === 2) || false
 }
 
 /**
@@ -532,29 +527,56 @@ const handleAllCheck = () => {
  * 表单读写勾选/取消勾选
  */
 const handleFormCheck = (form: any) => {
-  form.flattenFields?.forEach((p) => {
-    p.accessModes = form.accessModes
+  form.previewFields?.forEach((p) => {
+    if (p.type.includes('item')) {
+      // tabs collapse布局组件默认有交互权限
+      p.accessModes = ['read', 'write']
+      p.children?.forEach((item) => {
+        item.accessModes = form.accessModes
+      })
+    } else {
+      p.accessModes = form.accessModes
+    }
     // 右侧预览数据更新
     updatePreviewData(form, p)
   })
+  // 设置全部内容全选状态
+  setCheckAll()
 }
 
 /**
  * 字段勾选/取消"写", 自动勾选/取消"读"
  */
 const handleFieldCheck = (form, field) => {
+  // 所有布局组件内部字段
+  const _allFields = getAllFields(form)
   // 左侧读写操作交互
   // 设置表单全选状态
-  form.accessModes = form.flattenFields?.every(
-    (e) => e.accessModes.length === 2,
-  )
+  form.accessModes = _allFields?.every((e) => e.accessModes?.includes('write'))
     ? ['read', 'write']
     : ['read']
-  // 设置全部内容全选状态
-  setCheckAll()
 
   // 右侧预览数据更新
   updatePreviewData(form, field)
+  // 设置全部内容全选状态
+  setCheckAll()
+}
+
+/**
+ * 取出previewFields里面的所有字段, 平铺用于勾选交互
+ */
+const getAllFields = (form) => {
+  // 所有布局组件内部字段
+  const _allLayoutFields = form.previewFields
+    ?.filter((f) => f.type.includes('item'))
+    ?.map((m) => m.children)
+    ?.flat()
+  // 非布局组件字段
+  const _unLayoutFields = form.previewFields?.filter(
+    (f) => !f.type.includes('item'),
+  )
+
+  return [..._unLayoutFields, ..._allLayoutFields]
 }
 
 /**
@@ -616,7 +638,7 @@ const handleOk = () => {
           })
         })
       } else {
-        if (layoutFields.value.includes(p.type)) {
+        if (layoutComponents.includes(p.type)) {
           // 布局组件
           const _layoutField = cloneDeep(
             getFieldByKey(item.previewFields, p.formItemProps.name),
@@ -630,7 +652,7 @@ const handleOk = () => {
           // 布局组件中只要勾选了一个写, 布局组件就勾选写
           //   console.log('_flatLayout: ', _flatLayout)
           _layoutField.accessModes = _flatLayout?.some(
-            (s) => s.accessModes.length === 2,
+            (s) => s.accessModes?.length === 2,
           )
             ? ['read', 'write']
             : ['read']
@@ -641,7 +663,7 @@ const handleOk = () => {
             accessModes: _layoutField.accessModes,
             // 实际勾选的组件id, 用于回显
             realCheck: _flatLayout
-              ?.filter((f) => f.accessModes.length === 2)
+              ?.filter((f) => f.accessModes?.length === 2)
               ?.map((m) => m.formItemProps.name),
           })
         } else {

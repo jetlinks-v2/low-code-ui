@@ -1,6 +1,7 @@
 import { cloneDeep, pick } from 'lodash-es'
 import { advancedComponents } from './const'
 import { useFlowStore } from '@/store/flow'
+import { layoutComponents } from './const'
 
 const flowStore = useFlowStore()
 
@@ -330,15 +331,19 @@ export function flattenTree(fields, parent = null, depth = 0) {
 export function updateFieldDisabled(fields, currentField) {
     for (let i = 0; i < fields.length; i++) {
         if (fields[i].key === currentField.key) {
-            // 设置布局组件禁用状态
-            fields[i].componentProps.disabled = !currentField.accessModes?.includes('write')
-            // 设置布局组件内部组件禁用状态
-            fields[i].children?.forEach(item => {
-                item.componentProps.disabled = fields[i].componentProps.disabled
-                item.children?.forEach(inner => {
-                    inner.componentProps.disabled = fields[i].componentProps.disabled
+            if (!layoutComponents.includes(fields[i].type)) {
+                // 非布局组件
+                fields[i].componentProps.disabled = !currentField.accessModes?.includes('write')
+            } else {
+                // 布局组件
+                // 设置布局组件内部组件禁用状态
+                fields[i].children?.forEach(item => {
+                    item.componentProps.disabled = fields[i].componentProps.disabled
+                    item.children?.forEach(inner => {
+                        inner.componentProps.disabled = fields[i].componentProps.disabled
+                    })
                 })
-            })
+            }
             return
         }
         if (fields[i].children?.length) {
