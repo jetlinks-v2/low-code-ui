@@ -272,7 +272,7 @@ const getFormList = async () => {
     }))
     .sort((a, b) => a.sort - b.sort)
   // 接口需要数据处理
-  handleFlattenFields(_sortResult)
+  await handleFlattenFields(_sortResult)
   // 右侧预览数据处理
   initPreviewData(_sortResult)
   handleSearch()
@@ -378,8 +378,6 @@ const handlePreviewFields = (data) => {
       ?.map((lf) => {
         lf.children?.forEach((item) => {
           item.isWrapOn = lf.isWrapOn
-          // 如果是布局组件, 并且容器开关开启,
-          //   if (lf.isWrapOn) item.parent = lf
           // 将布局组件数据放入item, 作为parent
           item.parent = lf
         })
@@ -426,8 +424,16 @@ const handlePreviewFields = (data) => {
                 // 读写权限设置标识, 此处单独设置
                 p['accessDone'] = true
                 p.children?.forEach((item) => {
-                  if (f.id === item.formItemProps.name) {
-                    item.accessModes = f.accessModes
+                  if (p.type !== 'tabs-item') {
+                    if (f.id === item.formItemProps.name) {
+                      item.accessModes = f.accessModes
+                    }
+                  } else {
+                    item.accessModes = f.realCheck?.includes(
+                      item.formItemProps.name,
+                    )
+                      ? f.accessModes
+                      : ['read']
                   }
                 })
                 return p.formItemProps.name === f.id
@@ -478,7 +484,6 @@ const handlePreviewFields = (data) => {
  */
 const initPreviewData = (data) => {
   previewData.value = data.map((m) => {
-    // m.configuration.children = m.configuration.children
     return {
       ...m,
       multiple: existForms.value?.find((f) => f.formId === m.key)?.multiple,
@@ -493,7 +498,9 @@ const initPreviewData = (data) => {
 }
 
 const handleSearch = () => {
-  filterFormList.value = filterFormByName(allFormList.value, keywords.value)
+  filterFormList.value = cloneDeep(
+    filterFormByName(allFormList.value, keywords.value),
+  )
   filterFormList.value?.forEach((item) => {
     // 所有布局组件内部字段
     const _allFields = getAllFields(item)
@@ -540,7 +547,13 @@ const handleFormCheck = (form: any) => {
       p.accessModes = form.accessModes
     }
     // 右侧预览数据更新
-    updatePreviewData(form, p)
+    if (p.type.includes('item')) {
+      p.children?.forEach((item) => {
+        updatePreviewData(form, item)
+      })
+    } else {
+      updatePreviewData(form, p)
+    }
   })
   // 设置全部内容全选状态
   setCheckAll()
