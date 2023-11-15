@@ -5,14 +5,12 @@
             <j-tab-pane v-for="item in tabs" :key="item.key" :tab="item.label">
                 <j-scrollbar style="height: calc(100vh - 350px)">
                     <div v-for="item in formList">
-                        
-                        <div v-if="item.multiple">
+                        <div v-if="item.config.multiple">
                             <div>{{ item?.config.formName }}</div>
                             <JProTable :columns="item.columns" model="table" :scroll="{ x: 600 }"
                                 :dataSource="activeKey == 'before' ? item.beforeDataSource : item.afterDataSource"
                                 :noPagination="true" />
                         </div>
-
                         <div v-else>
                             <div>{{ item?.config.formName }}</div>
                             <Preview :value="activeKey == 'before' ? item.beforeData : item.afterData" :disabled="true"
@@ -65,11 +63,10 @@ const handleBefore = (val, newVal) => {
 
 onMounted(() => {
     console.log('history--------', props.current,props.info?.form)
-
     props.current.forEach(item => {
         props.info?.form.forEach(it => {
             if (item.others.formId === it.formId) {
-                console.log('====',it.formId,item.others.formId)
+                // console.log('====',it.formId,item.others.formId)
                 formMap.set(
                     item.others.formId,
                     {

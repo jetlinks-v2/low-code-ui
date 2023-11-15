@@ -94,6 +94,7 @@ actionType.set('auto', '自动通过')
 actionType.set('reject', '驳回')
 actionType.set('submit', '提交')
 actionType.set('initiate', '发起申请')
+actionType.set('again','重新发起')
 actionType.set('off', '关闭')
 
 
@@ -144,6 +145,9 @@ const nodeState = (nodeType, auto) => {
    }
    if (nodeType === 'DEAL') {
       return 'submit'
+   }
+   if(nodeType === 'ROOT'){
+      return 'again'
    }
    return 'pass'
 }

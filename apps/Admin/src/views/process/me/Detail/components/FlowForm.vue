@@ -334,7 +334,7 @@ const handleLayout = (arr, disabled) => {
     return arr.map(item => {
         item.componentProps.disabled = disabled
         if (item.children && item.children.length !== 0) {
-            item.children = handleDisabled(item.children, disabled)
+            item.children = handleLayout(item.children, disabled)
         }
         return item
     })
@@ -343,8 +343,8 @@ const handleLayout = (arr, disabled) => {
 //根据读写权限递归处理组件的disabled
 const handleDisabled = (arr, accessModes) => {
     const Modes = new Map()
-    accessModes.forEach(item => {
-        Modes.set(item.id, item.accessModes)
+    accessModes?.forEach(item => {
+        Modes.set(item.ownerBy || item.id, item.accessModes)
     })
     return arr.map(item => {
        const  disabled  = !Modes.get(item.formItemProps?.name)?.includes('write')
@@ -356,7 +356,6 @@ const handleDisabled = (arr, accessModes) => {
         if (item.children && item.children.length !== 0) {
             item.children = item.formItemProps?.isLayout ? handleLayout(item.children, disabled) : handleDisabled(item.children, accessModes)
         }
-        // console.log('====', item)
         return item
     })
 }
@@ -380,7 +379,7 @@ const dealForm = (nodes) => {
         btnList.value = nodes?.props?.authButtons
         //详情接口nodeId
         const bindMap = new Map()
-        // console.log('md5-----------',nodes.props?.formBinds)
+        console.log('md5-----------',nodes.props?.formBinds)
         Object.keys(nodes.props?.formBinds).forEach((item) => {
             //formid + formVersion
             const id = md5(item + '|' + props.info.others?.formVersion[item])
