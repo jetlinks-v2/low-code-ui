@@ -491,9 +491,7 @@ const initPreviewData = (data) => {
   })
   // 设置预览数据初始读写状态
   filterFormList.value?.forEach((form) => {
-    form.flattenFields?.forEach((field) => {
-      updatePreviewData(form, field)
-    })
+    handleFormCheck(form)
   })
 }
 
