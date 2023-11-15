@@ -2,7 +2,7 @@
   <div>
     <j-tree-select
       :tree-data="options"
-      :value="__value"
+      :value="_value"
       @change="valueChange"
       :multiple="mode === 'multiple'"
       :disabled="disabled"
@@ -18,7 +18,7 @@
 import { getDepartmentList_api } from '@/api/user'
 import { useRequest } from '@jetlinks/hooks'
 import { map } from 'lodash-es'
-import { ref, watch, computed, unref } from 'vue'
+import { ref, watch, unref } from 'vue'
 
 const props = defineProps({
   value: {
@@ -49,15 +49,6 @@ const props = defineProps({
 const emit = defineEmits(['update:value','change'])
 
 const _value = ref<any>()
-
-const __value = computed(() => {
-  if (props.mode !== 'multiple') {
-    return _value?.value?.id
-  } else {
-    const _val = Array.isArray(props.value) ? props.value : []
-    return map(_val, 'id')
-  }
-})
 
 const getObj = (arr: any[], _item: string) => {
   for (let index = 0; index < arr?.length; index++) {
