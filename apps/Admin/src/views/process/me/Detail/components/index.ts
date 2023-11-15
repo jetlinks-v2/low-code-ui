@@ -140,14 +140,20 @@ export const handleFormList = (form: any) => {
 }
 // data为可编辑表格单行数据 map：fromItem函数处理的source-key关系对象
 export const handleData = (data,map)=>{
-    console.log(data,map,'test')
     Object.keys(map).forEach(item=>{
         Object.keys(map[item].keysMap).forEach(i=>{
             Object.keys(data).forEach(e=>{
                 if(e === i){
                     let obj = {}
                     obj[map[item].keysMap[i]] = data[i]
-                    data[item] = obj
+                    if(data[item]){
+                        data[item] = {
+                            ...data[item],
+                            ...obj
+                        }
+                    }else{
+                        data[item] = obj
+                    }
                     delete data[i]
                 }
             })
@@ -158,7 +164,6 @@ export const handleData = (data,map)=>{
 
 export const handleSingleData = (form: any) =>{
     const  formObj = fromItem(form)
-    console.log(form,'form')
     return form.data.map((item=>{
         // const obj = item.data.map(i=>handleData(i,formObj))
         const obj = handleData(item,formObj)

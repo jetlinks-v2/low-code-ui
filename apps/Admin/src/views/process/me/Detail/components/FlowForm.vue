@@ -18,7 +18,7 @@
                     <div v-else style="background-color: #fff;">
                         <QuickEditTable validate ref="tableRef" :data="item.data" :columns="item.configuration"
                             :scroll="{ x: 1300, y: 700 }">
-                            <template v-for="(i, index) in item.configuration.filter(i=>convertType.includes(i.type))"
+                            <template v-for="(i, index) in item.configuration"
                                 #[i.dataIndex]="{ record, index, valueChange }">
                                 <!-- <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled">
@@ -104,7 +104,7 @@ const formData = ref({})
 //需要转换数据的组件类型
 const tableType = ["device", "product", "role", "user", "org"]
 //表格可转换的组件类型
-const convertType = ['tree-select','textarea','date-picker','time-picker','input-number','input-password','product','device','user','role', 'org','switch','input','select','select-card', 'upload']
+// const convertType = ['tree-select','textarea','date-picker','time-picker','input-number','input-password','product','device','user','role', 'org','switch','input','select','select-card', 'upload']
 const addTableData = (item) => {
     let obj = {}
     item.configuration.map((i) => {
@@ -325,7 +325,7 @@ const dealTable = (disabled) => {
             // console.log(tableColumn,'___')
             //处理单选数据回显
             i.data = handleSingleData(i)
-            console.log(i,'value')
+            // console.log(i.data,'value')
         }
     })
 }
@@ -391,7 +391,7 @@ const dealForm = (nodes) => {
             }
             return item
         })
-        console.log('formValue.value', formValue.value)
+        // console.log('formValue.value', formValue.value)
         dealTable()
     } else {
         nodes?.children ? dealForm(nodes.children) : ''
