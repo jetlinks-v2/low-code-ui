@@ -28,10 +28,27 @@
             class="render-left"
             ref="nameRef"
           ></j-input>
-          <div class="render-left" @dblclick="onDbClick(file)" v-else><j-ellipsis>{{ file.name }}</j-ellipsis></div>
-          <j-button type="link" style="width: 10%" @click="onDelete(file)" :disabled="disabled">
-            <AIcon type="DeleteOutlined" />
-          </j-button>
+          <div class="render-left" @dblclick="onDbClick(file)" v-else>
+            <j-ellipsis>{{ file.name }}</j-ellipsis>
+          </div>
+          <j-space>
+            <j-button
+              type="link"
+              style="width: 10%"
+              @click="onDelete(file)"
+              :disabled="disabled"
+              danger
+            >
+              <AIcon type="DeleteOutlined" />
+            </j-button>
+            <j-button
+              type="link"
+              style="width: 10%"
+              @click="onLoad(file)"
+            >
+              <AIcon type="DownloadOutlined" />
+            </j-button>
+          </j-space>
         </div>
       </template>
     </a-upload-dragger>
@@ -43,9 +60,10 @@
 import { nextTick, ref, watch } from 'vue'
 import type { UploadProps, UploadChangeParam } from 'jetlinks-ui-components'
 import { _fileUpload } from '@/api/comm'
-import { onlyMessage } from '@/utils/comm'
 import { TOKEN_KEY } from '@jetlinks/constants'
 import { LocalStore } from '@jetlinks/utils/src/storage'
+import { downloadFileByUrl, onlyMessage } from '@jetlinks/utils'
+import { downloadFile } from '@/api/form'
 
 const props = defineProps({
   fileSize: {
@@ -70,10 +88,10 @@ const props = defineProps({
     },
   },
   value: Array,
-  disabled:{
-    type:Boolean,
-    default:false
-  }
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emits = defineEmits(['change'])
@@ -128,11 +146,19 @@ const handleDrop = (e) => {
 }
 
 const onDelete = (file: any) => {
-  const _index = fileList.value.findIndex(item => item.uid === file?.uid)
-  if(_index !== -1){
+  const _index = fileList.value.findIndex((item) => item.uid === file?.uid)
+  if (_index !== -1) {
     fileList.value.splice(_index, 1)
     emits('change', fileList.value)
   }
+}
+
+const onLoad = (_file: any) => {
+  downloadFile(_file?.url).then(resp => {
+    const blob = new Blob([resp.data]);
+    const _url = URL.createObjectURL(blob);
+    downloadFileByUrl(_url, _file?.name)
+  })
 }
 
 const onDbClick = (file) => {

@@ -120,6 +120,7 @@ const FlowDesigner = defineComponent({
                   round: true,
                   ref: node.id,
                   id: node.id,
+                  data: node,
                   text: isConditionNode(node) ? `条件分支` : `并行分支`,
                   isConditionNode: isConditionNode(node),
                   onAddBranchNode: (type) => addBranchNode(node, type),
@@ -594,7 +595,6 @@ const FlowDesigner = defineComponent({
     }
     const validateNode = (err, node) => {
       if (node.type === 'ROOT') return
-      console.log(proxy?.$refs)
       if (proxy?.$refs[node.id].validate) {
         valid.value = proxy?.$refs[node.id].validate(err)
       }

@@ -187,12 +187,12 @@ const getFormFields = async () => {
       }
       if (['table', 'upload'].includes(list[i].others?.type)) {
         list.splice(i, 1)
-        return
       }
     }
     return list
   }
   conditionOptions.value = filter(result)
+  console.log(conditionOptions.value);
   conditionSelect.value.forEach((item, index) => {
     const node = findVariableById(conditionOptions.value, item?.column)
     if (!node) {

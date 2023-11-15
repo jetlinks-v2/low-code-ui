@@ -1,13 +1,12 @@
 
 import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
-import { Collapse, CollapsePanel, FormItem } from 'jetlinks-ui-components'
+import { Collapse, CollapsePanel, FormItem, Badge } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
-import { cloneDeep, omit } from 'lodash-es'
+import { cloneDeep, map, omit } from 'lodash-es'
 import { useTool } from '../../hooks'
 import generatorData from '../../utils/generatorData'
-import { uid } from '../../utils/uid'
 
 export default defineComponent({
   name: 'CollapseLayout',
@@ -73,7 +72,7 @@ export default defineComponent({
 
     return () => {
       let _path = cloneDeep(props?.path || []);
-      let _index:number = props?.index || 0;
+      let _index: number = props?.index || 0;
       if (props.data?.formItemProps?.name) {
         _path[_index] = props.data.formItemProps.name
       }
@@ -83,6 +82,17 @@ export default defineComponent({
           <div class="draggable-add">
             <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}><span>添加面板</span></div>
           </div>
+      }
+
+      const _headerContent = (_element: any) => {
+        if (unref(isEditModel)) {
+          const _arr = map(_element?.children || [], 'key').filter(i => map(designer.errorKey.value, 'key').includes(i))
+          return <div>
+            <Badge count={_arr?.length || 0}>{_element?.componentProps?.name}</Badge>
+          </div>
+        } else {
+          return _element?.componentProps?.name
+        }
       }
 
       const renderContent = () => {
@@ -96,7 +106,11 @@ export default defineComponent({
                 }
 
                 return (
-                  <CollapsePanel key={element.key} {...omit(element.componentProps, 'header')} header={element.componentProps?.name}>
+                  <CollapsePanel
+                    key={element.key}
+                    {...omit(element.componentProps, 'header')}
+                    header={_headerContent(element)}
+                  >
                     <Selection
                       class={unref(isDragArea) && 'drag-area'}
                       data={element}
