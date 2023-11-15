@@ -73,7 +73,7 @@
                       <j-checkbox-group
                         v-model:value="form.accessModes"
                         :options="permissions"
-                        @change="handleFormCheck(form)"
+                        @change="handleFormCheck(form, 'handle')"
                         @click="(event) => event.stopPropagation()"
                       />
                     </div>
@@ -533,7 +533,7 @@ const handleAllCheck = () => {
 /**
  * 表单读写勾选/取消勾选
  */
-const handleFormCheck = (form: any) => {
+const handleFormCheck = (form: any, opt?: string) => {
   form.previewFields?.forEach((p) => {
     if (p.type.includes('item')) {
       // tabs collapse布局组件默认有交互权限
@@ -553,8 +553,9 @@ const handleFormCheck = (form: any) => {
       updatePreviewData(form, p)
     }
   })
-  // 设置全部内容全选状态
-  setCheckAll()
+  // 设置全部内容全选状态, opt存在时, 手动勾选表单, 才触发全选交互
+  // 循环每个表单时不触发交互
+  if (opt) setCheckAll()
 }
 
 /**
