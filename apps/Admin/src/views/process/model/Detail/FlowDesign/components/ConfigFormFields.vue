@@ -48,7 +48,7 @@
               全部内容
             </j-checkbox>
           </div>
-          <j-scrollbar height="500">
+          <j-scrollbar height="500" style="padding: 0 10px">
             <div v-if="loading" style="text-align: center">
               <j-spin />
             </div>
@@ -79,9 +79,12 @@
                     </div>
                   </div>
                 </template>
+                <!-- 正常组件 -->
                 <div
                   class="form-fields"
-                  v-for="(field, idx) in form.flattenFields"
+                  v-for="(field, idx) in form.previewFields.filter(
+                    (field) => !field.type.includes('item'),
+                  )"
                   :key="'field' + idx"
                 >
                   <div class="field-title">
@@ -102,6 +105,59 @@
                     </div>
                   </div>
                 </div>
+                <!-- 布局组件item -->
+                <j-collapse
+                  v-model:activeKey="form.collapseActive"
+                  :bordered="false"
+                >
+                  <template #expandIcon="{ isActive }">
+                    <AIcon type="CaretRightOutlined" v-show="!isActive" />
+                    <AIcon type="CaretDownOutlined" v-show="isActive" />
+                  </template>
+                  <j-collapse-panel
+                    v-for="(field, idx) in form.previewFields.filter((field) =>
+                      field.type.includes('item'),
+                    )"
+                    :key="field.key"
+                    style="padding-left: 30px"
+                  >
+                    <template #header>
+                      <div class="layout-title">
+                        <div class="name">
+                          <j-ellipsis line-clamp="1">
+                            {{
+                              field.parent?.componentProps?.title ||
+                              field.componentProps?.name ||
+                              field.parent?.name ||
+                              '-'
+                            }}
+                          </j-ellipsis>
+                        </div>
+                      </div>
+                    </template>
+                    <div
+                      class="layout-fields"
+                      v-for="(layoutField, layoutFieldIdx) in field.children"
+                      :key="layoutField.key"
+                    >
+                      <div class="name">
+                        <j-ellipsis line-clamp="1">
+                          {{
+                            layoutField.formItemProps?.label ||
+                            layoutField.componentProps?.name
+                          }}
+                        </j-ellipsis>
+                      </div>
+                      <div class="permission">
+                        <j-checkbox-group
+                          v-model:value="layoutField.accessModes"
+                          :options="permissions"
+                          @change="handleFieldCheck(form, layoutField)"
+                        />
+                      </div>
+                    </div>
+                  </j-collapse-panel>
+                </j-collapse>
               </j-collapse-panel>
             </j-collapse>
           </j-scrollbar>
@@ -186,8 +242,8 @@ const filterFormList = ref<any[] | undefined>([])
 const allFormList = ref<any[] | undefined>([])
 // 右侧表单预览数据
 const previewData = ref<any[]>([])
-// 不用展示的表单字段类型: 卡片, 网格, 选项卡, 折叠面板, 弹性间距...
-const unDisplayFieldsType = ref(['card', 'grid', 'tabs', 'collapse', 'space'])
+// 表单字段布局组件类型: 卡片, 网格, 选项卡, 折叠面板, 弹性间距...
+const layoutFields = ref(['card', 'grid', 'tabs', 'collapse', 'space'])
 // 过滤已经删除的表单
 const existForms = computed(() =>
   flowStore.model.config.forms?.filter((f) => !f.isDelete),
@@ -225,12 +281,13 @@ const getFormList = async () => {
 }
 
 /**
- * 左侧表单字段数据结构处理(后端需要的结构)
+ * 左侧表单字段数据结构处理(添加后端需要的结构: flattenFields)
+ * @param data
  */
 const handleFlattenFields = (data) => {
   // 左侧表单读写操作列表
   filterFormList.value = data?.map((m) => {
-    // 布局组件内部字段, 取出平铺
+    // formItemProps.isLayout存在并且=false时, 布局组件内部字段, 取出平铺
     let _layoutFields = cloneDeep(
       m.configuration?.children?.filter(
         (f) =>
@@ -243,7 +300,6 @@ const handleFlattenFields = (data) => {
     // 平铺字段
     const _flattenFields = [
       ...m.configuration?.children?.filter(
-        // (f) => !f.formItemProps.hasOwnProperty('isLayout'),
         (f) =>
           !(
             f.formItemProps.hasOwnProperty('isLayout') &&
@@ -255,10 +311,10 @@ const handleFlattenFields = (data) => {
     // console.log('_flattenFields: ', _flattenFields)
 
     // 已经存在的字段
-    const existFields = forms.value[m.key]
-    if (existFields && existFields.length) {
+    const _existFields = forms.value[m.key]
+    if (_existFields && _existFields.length) {
       _flattenFields?.forEach((p) => {
-        const _currentField = existFields.find((f) => {
+        const _currentField = _existFields.find((f) => {
           if (
             !(
               p.componentProps.hasOwnProperty('mode') &&
@@ -278,7 +334,7 @@ const handleFlattenFields = (data) => {
 
       return {
         ...m,
-        accessModes: _flattenFields?.every((e) => e.accessModes.length === 2)
+        accessModes: _flattenFields?.every((e) => e.accessModes?.length === 2)
           ? ['read', 'write']
           : ['read'],
         multiple: existForms.value?.find((f) => f.formId === m.key)?.multiple,
@@ -296,8 +352,129 @@ const handleFlattenFields = (data) => {
       }
     }
   })
+  //   console.log('filterFormList.value1: ', filterFormList.value)
+  handlePreviewFields(filterFormList.value)
+}
+
+/**
+ * 左侧表单字段数据结构处理(添加页面展示需要的结构: _previewFields)
+ * @param data
+ */
+const handlePreviewFields = (data) => {
+  filterFormList.value = data?.map((m) => {
+    // 所有布局组件内部字段, 添加isWrapOn字段, 用于判断容器开关是否开启
+    let _layoutFields = cloneDeep(
+      m.configuration?.children
+        ?.filter((f) => layoutFields.value.includes(f.type))
+        ?.map((m) => ({
+          ...m,
+          isWrapOn: !(
+            m.formItemProps.hasOwnProperty('isLayout') &&
+            !m.formItemProps.isLayout
+          ),
+        })),
+    )
+    // console.log('_layoutFields: ', _layoutFields)
+    // 取出所有布局组件item, 和普通组件同级展示
+    const _layoutItems = _layoutFields
+      ?.map((lf) => {
+        lf.children?.forEach((item) => {
+          item.isWrapOn = lf.isWrapOn
+          // 如果是布局组件, 并且容器开关开启,
+          //   if (lf.isWrapOn) item.parent = lf
+          // 将布局组件数据放入item, 作为parent
+          item.parent = lf
+        })
+        return lf.children
+      })
+      .flat()
+    // console.log('_layoutItems: ', _layoutItems)
+    // 常规组件+布局组件item组合
+    const _previewFields = [
+      ...m.configuration?.children?.filter(
+        (f) => !layoutFields.value.includes(f.type),
+      ),
+      ..._layoutItems,
+    ]
+
+    // console.log('_previewFields: ', _previewFields)
+    const _existFields = forms.value[m.key]
+    // console.log('_existFields: ', _existFields)
+    if (_existFields && _existFields.length) {
+      _previewFields?.forEach((p) => {
+        const _currentField = _existFields.find((f) => {
+          if (
+            !(
+              p.componentProps.hasOwnProperty('mode') &&
+              p.componentProps.mode === 'multiple'
+            ) &&
+            advancedComponents.includes(p.type)
+          ) {
+            // 高级单选组件
+            return p.componentProps?.keys
+              ?.map((source) => source.config.source)
+              ?.includes(f.id)
+          } else {
+            if (!p.hasOwnProperty('isWrapOn')) {
+              // 非布局组件
+              return f.id === p.formItemProps.name
+            } else {
+              // 布局组件
+              if (p.isWrapOn) {
+                // 布局组件容器组件开关开启, 存的是布局组件, 取当前item的父级判断
+                return f.id === p.parent.formItemProps.name
+              } else {
+                // 布局组件容器组件开关关闭
+                if (p.type !== 'tabs-item') {
+                  // 读写权限设置标识, 此处单独设置
+                  p['accessDone'] = true
+                  p.children?.forEach((item) => {
+                    if (f.id === item.formItemProps.name) {
+                      item.accessModes = f.accessModes
+                    }
+                  })
+                } else {
+                  return p.formItemProps.name === f.id
+                }
+              }
+            }
+          }
+        })
+        p['accessModes'] = _currentField ? _currentField.accessModes : ['read']
+        // console.log('_currentField: ', _currentField)
+        // 设置布局组件item下的读写
+        if (!p.accessDone) {
+          p.children?.forEach((item) => {
+            if (_currentField?.realCheck) {
+              item.accessModes = _currentField.realCheck.includes(
+                item.formItemProps.name,
+              )
+                ? ['read', 'write']
+                : ['read']
+            } else {
+              item.accessModes = p.accessModes
+            }
+          })
+        }
+      })
+      return {
+        ...m,
+        previewFields: _previewFields,
+        collapseActive: _previewFields?.map((m) => m.key),
+      }
+    } else {
+      _previewFields?.forEach((p) => {
+        p['accessModes'] = ['read']
+      })
+      return {
+        ...m,
+        previewFields: _previewFields,
+        collapseActive: _previewFields?.map((m) => m.key),
+      }
+    }
+  })
   allFormList.value = cloneDeep(filterFormList.value)
-  console.log('filterFormList.value: ', filterFormList.value)
+  console.log('filterFormList.value2: ', filterFormList.value)
 }
 
 /**
@@ -421,37 +598,124 @@ const handleOk = () => {
   filterFormList.value?.forEach((item) => {
     forms.value[item.key] = []
     item.flattenFields?.forEach((p) => {
-      if (p.accessModes.length) {
-        // 处理单选高级组件, 平铺keys至formBinds
-        if (
-          !(
-            p.componentProps.hasOwnProperty('mode') &&
-            p.componentProps.mode === 'multiple'
-          ) &&
-          advancedComponents.includes(p.type)
-        ) {
-          // 高级组件, 并且为单选模式时, 将componentProps.keys平铺存入formBinds
-          p.componentProps.keys?.forEach((k) => {
-            forms.value[item.key].push({
-              id: k.config.source,
-              required: p.formItemProps.required || false,
-              accessModes: p.accessModes || ['read'],
-              ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
-            })
-          })
-        } else {
+      // 处理单选高级组件, 平铺keys至formBinds
+      if (
+        !(
+          p.componentProps.hasOwnProperty('mode') &&
+          p.componentProps.mode === 'multiple'
+        ) &&
+        advancedComponents.includes(p.type)
+      ) {
+        // 高级组件, 并且为单选模式时, 将componentProps.keys平铺存入formBinds
+        p.componentProps.keys?.forEach((k) => {
           forms.value[item.key].push({
-            id: p.formItemProps.name,
+            id: k.config.source,
             required: p.formItemProps.required || false,
             accessModes: p.accessModes || ['read'],
+            ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
           })
+        })
+      } else {
+        if (layoutFields.value.includes(p.type)) {
+          // 布局组件
+          const _layoutField = cloneDeep(
+            getFieldByKey(item.previewFields, p.formItemProps.name),
+          )
+          //   console.log('_layoutField: ', _layoutField)
+          // 折叠面板/选项卡
+          // 取出布局组件里面的所有组件平铺
+          const _flatLayout = _layoutField.children
+            ?.map((m) => m.children)
+            .flat()
+          // 布局组件中只要勾选了一个写, 布局组件就勾选写
+          //   console.log('_flatLayout: ', _flatLayout)
+          _layoutField.accessModes = _flatLayout?.some(
+            (s) => s.accessModes.length === 2,
+          )
+            ? ['read', 'write']
+            : ['read']
+
+          forms.value[item.key].push({
+            id: _layoutField.formItemProps.name,
+            required: _layoutField.formItemProps.required || false,
+            accessModes: _layoutField.accessModes,
+            // 实际勾选的组件id, 用于回显
+            realCheck: _flatLayout
+              ?.filter((f) => f.accessModes.length === 2)
+              ?.map((m) => m.formItemProps.name),
+          })
+        } else {
+          if (p.parent) {
+            // 存在parent时, 为布局组件内部item组件
+            const _layoutItemField = cloneDeep(
+              getFieldByKey(item.previewFields, p.formItemProps.name),
+            )
+            // console.log('_layoutItemField: ', _layoutItemField)
+            forms.value[item.key].push({
+              id: _layoutItemField.formItemProps.name,
+              required: _layoutItemField.formItemProps.required || false,
+              accessModes: !_layoutItemField.type.includes('item')
+                ? _layoutItemField.accessModes
+                : _layoutItemField.children?.some(
+                    (s) => s.accessModes?.length === 2,
+                  )
+                ? ['read', 'write']
+                : ['read'],
+              // 实际勾选的组件id, 用于回显
+              realCheck: !_layoutItemField.type.includes('item')
+                ? undefined
+                : _layoutItemField.children
+                    ?.filter((f) => f.accessModes?.length === 2)
+                    ?.map((m) => m.formItemProps.name),
+            })
+          } else {
+            // 常规组件或者高级多选组件
+            forms.value[item.key].push({
+              id: p.formItemProps.name,
+              required: p.formItemProps.required || false,
+              accessModes: p.accessModes || ['read'],
+            })
+          }
         }
       }
     })
   })
   visible.value = false
-  // console.log('filterFormList.value: ', filterFormList.value)
-  // console.log('forms.value: ', forms.value)
+  console.log('filterFormList.value: ', filterFormList.value)
+  console.log('forms.value: ', forms.value)
+}
+
+/**
+ * 从previewFields中查找字段
+ */
+const getFieldByKey = (data: any, key: string) => {
+  if (!data.length) return
+  let _res
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].formItemProps?.name === key) {
+      _res = data[i]
+      if (_res) break
+    } else {
+      if (data[i].type.includes('item')) {
+        if (data[i].isWrapOn) {
+          // formItemProps.isLayout不存在, 或者存在并且为true
+          if (data[i].parent?.formItemProps?.name === key) {
+            data[i].parent.accessModes = data[i].children?.some(
+              (s) => s.accessModes?.length === 2,
+            )
+              ? ['read', 'write']
+              : ['read']
+            _res = data[i].parent
+            if (_res) break
+          }
+        } else {
+          _res = getFieldByKey(data[i].children, key)
+          if (_res) break
+        }
+      }
+    }
+  }
+  return _res
 }
 
 watch(
@@ -506,6 +770,14 @@ watch(
       }
     }
   }
+  .layout-title {
+  }
+  .layout-fields {
+    padding-left: 18px;
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 5px;
+  }
 }
 
 .preview-title {
@@ -538,9 +810,14 @@ watch(
 }
 :deep(.ant-collapse-borderless > .ant-collapse-item .ant-collapse-header) {
   background: #fff;
-  padding: 0px 10px;
+  //   padding: 0px 10px;
+  padding: 0px;
 }
 :deep(.ant-collapse-content > .ant-collapse-content-box) {
-  padding: 10px;
+  //   padding: 10px;
+  padding: 0;
+}
+:deep(.ant-collapse-borderless) {
+  background-color: #fff;
 }
 </style>
