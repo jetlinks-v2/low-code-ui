@@ -152,6 +152,7 @@ import Drawer from '../components/Drawer/index.vue'
 import { isFunction, isObject } from 'lodash-es'
 import {
   getProcess_api,
+  getAllProcess_api,
   deploy_api,
   del_api,
   detail_api,
@@ -171,7 +172,7 @@ const flowStore = useFlowStore()
 const step1 = ref()
 const step2 = ref()
 const step3 = ref()
-// const { classified } = useClassified()
+// const { getText } = useClassified()
 const tableRef = ref()
 const params = ref({})
 const columns = [
@@ -207,13 +208,13 @@ const columns = [
         placeholder: '请选择流程分类',
       },
       options: async () => {
-        const resp = await getProcess_api({
+        const resp = await getAllProcess_api({
           paging: false,
           sorts: [{ name: 'createTime', order: 'desc' }],
         })
         const listMap = new Map()
         if (resp.status === 200) {
-          resp.result.data.forEach((item) => {
+          resp.result.forEach((item) => {
             listMap.set(item.classifiedId, {
               label: item.classifiedName,
               value: item.classifiedId,
@@ -254,13 +255,13 @@ const columns = [
         placeholder: '请选择创建人',
       },
       options: async () => {
-        const resp = await getProcess_api({
+        const resp = await getAllProcess_api({
           paging: false,
           sorts: [{ name: 'createTime', order: 'desc' }],
         })
         const listMap = new Map()
         if (resp.status === 200) {
-          resp.result.data.forEach((item) => {
+          resp.result.forEach((item) => {
             listMap.set(item.creatorId, {
               label: item.creatorName,
               value: item.creatorId,

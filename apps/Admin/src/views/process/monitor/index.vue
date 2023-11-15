@@ -5,19 +5,23 @@
       <j-tabs v-model:activeKey="history" @change="change">
         <j-tab-pane :key="false">
           <template #tab>
-          <div class="tab-item" :class="{active: !history }">
-            流转中
-          </div>
-        </template>
-          <pro-search :columns="columns" target="monitor-false" @search="handleSearch" />
+            <div class="tab-item" :class="{ active: !history }">流转中</div>
+          </template>
+          <pro-search
+            :columns="columns"
+            target="monitor-false"
+            @search="handleSearch"
+          />
         </j-tab-pane>
         <j-tab-pane :key="true">
           <template #tab>
-          <div class="tab-item" :class="{active: history }">
-            已完成
-          </div>
-        </template>
-          <pro-search :columns="columns" target="monitor-true" @search="handleSearch" />
+            <div class="tab-item" :class="{ active: history }">已完成</div>
+          </template>
+          <pro-search
+            :columns="columns"
+            target="monitor-true"
+            @search="handleSearch"
+          />
         </j-tab-pane>
       </j-tabs>
     </div>
@@ -29,17 +33,36 @@
       :request="getList_api"
       :defaultParams="{
         sorts: [{ name: 'deployTime', order: 'desc' }],
+        terms: history
+          ? []
+          : [
+              {
+                type: 'and',
+                value: 'running',
+                termType: 'eq',
+                column: 'state',
+              },
+            ],
       }"
     >
+      <template #headerTitle>
+        <j-space>
+          <PermissionButton
+            type="primary"
+            @click="handleTurn"
+            hasPermission="process/model:add"
+          >
+            转办</PermissionButton
+          >
+          <div>
+            <AIcon type="ExclamationCircleOutlined" />
+            <span
+              >原定节点办理人无法完成审办工作时，转办可将处于“流转中”状态的流程指派给其他成员。</span
+            >
+          </div>
+        </j-space>
+      </template>
       <template #state="{ state }">
-        <!-- <BadgeStatus
-          :status="state.value"
-          :text="state.text"
-          :statusNames="{
-            undeployed: 'error',
-            running: 'running',
-          }"
-        /> -->
         {{ state.text }}
       </template>
       <template #deployTime="{ deployTime }">
@@ -60,6 +83,7 @@
           <AIcon type="EyeOutlined" />
         </PermissionButton>
         <PermissionButton
+          :disabled="slotProps.state.value === 'repealed'"
           :hasPermission="false"
           type="link"
           danger
@@ -75,12 +99,11 @@
         </PermissionButton>
       </template>
     </JProTable>
-    <!-- <Drawer
-      v-if="drawer.visible"
-      v-model:visible="drawer.visible"
-      :data="drawer.selectItem"
-      :showRecords="true"
-    /> -->
+    <Dialog
+      v-if="dialog.visible"
+      v-model:visible="dialog.visible"
+      @refresh="refresh"
+    />
     <Drawer
       v-if="drawer.visible"
       type="card"
@@ -92,8 +115,8 @@
 </template>
 <script setup>
 import { onlyMessage } from '@jetlinks/utils'
-// import Drawer from './Drawer/index.vue'
-import { getList_api, close_api } from '@/api/process/monitor'
+import Dialog from './Dialog/index.vue'
+import { getList_api, getAllList_api, close_api } from '@/api/process/monitor'
 import dayjs from 'dayjs'
 import { useClassified } from '@/hooks/useClassified'
 import Drawer from '@/views/process/me/Detail/index.vue'
@@ -173,14 +196,24 @@ const defaultColumns = [
         placeholder: '请选择发起人',
       },
       options: async () => {
-        const resp = await getList_api({
+        const resp = await getAllList_api({
           paging: false,
           sorts: [{ name: 'createTime', order: 'desc' }],
+          terms: history.value
+            ? []
+            : [
+                {
+                  type: 'and',
+                  value: 'running',
+                  termType: 'eq',
+                  column: 'state',
+                },
+              ],
           history: history.value,
         })
         const listMap = new Map()
         if (resp.status === 200) {
-          resp.result.data.forEach((item) => {
+          resp.result.forEach((item) => {
             listMap.set(item.creatorId, {
               label: item.creatorName,
               value: item.creatorId,
@@ -226,19 +259,11 @@ const columns = computed(() => {
       )
 })
 
-const change = ()=>{
-  nextTick(()=>{
-    params.value={}
-  })
-  tableRef?.value?.reload()
-}
-
-const params = ref({})
-
-const tableParams = computed(()=>({
-  history: history.value,
-  ...params.value,
-}))
+// 弹窗
+const dialog = reactive({
+  selectItem: {},
+  visible: false,
+})
 
 // 抽屉
 const drawer = reactive({
@@ -246,8 +271,36 @@ const drawer = reactive({
   visible: false,
 })
 
+const params = ref({})
+
+const change = () => {
+  nextTick(() => {
+    params.value = {}
+  })
+  tableRef?.value?.reload()
+}
+
+const tableParams = computed(() => ({
+  history: history.value,
+  // terms: [
+  //   history.value
+  //     ? undefined
+  //     : {
+  //         type: 'and',
+  //         value: 'running',
+  //         termType: 'eq',
+  //         column: 'state',
+  //       },
+  // ],
+  ...params.value,
+}))
+
 const handleSearch = (data) => {
   params.value = data
+}
+
+const handleTurn = () => {
+  dialog.visible = true
 }
 
 // 关闭
@@ -267,7 +320,7 @@ const handleDetail = (row) => {
 }
 </script>
 <style scoped lang="less">
-.tabs{
+.tabs {
   :deep(.ant-tabs) {
     border: 1px solid #f0f0f0;
     .ant-tabs-nav {
@@ -276,7 +329,7 @@ const handleDetail = (row) => {
       margin: 0;
       border-bottom: 1px solid #d9d9d9;
 
-      .tab-item{
+      .tab-item {
         width: 96px;
         height: 28px;
         border-radius: 4px;
@@ -284,13 +337,12 @@ const handleDetail = (row) => {
         line-height: 28px;
         color: #333333;
         &:hover {
-          background: #E4EAFF;
+          background: #e4eaff;
         }
       }
-      .active{
-        color: #315EFB;
-        background: #E4EAFF;
-
+      .active {
+        color: #315efb;
+        background: #e4eaff;
       }
     }
     .ant-tabs-ink-bar {

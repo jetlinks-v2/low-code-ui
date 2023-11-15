@@ -29,6 +29,29 @@ export function isDarkColor(hexColor) {
 }
 
 /**
+ * 生成随机背景色，并且保证黑色文字可读性
+ */
+export function generateRandomColor() {
+    // Generate random values for red, green, and blue channels
+    let red = Math.floor(Math.random() * 256);
+    let green = Math.floor(Math.random() * 256);
+    let blue = Math.floor(Math.random() * 256);
+
+    // Calculate the luminance of the color
+    let luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
+
+    // If the luminance is too low, adjust the color to ensure readability
+    if (luminance < 0.5) {
+        red = Math.floor((red + 128) / 2);
+        green = Math.floor((green + 128) / 2);
+        blue = Math.floor((blue + 128) / 2);
+    }
+
+    // Return the generated color
+    return "rgb(" + red + ", " + green + ", " + blue + ")";
+}
+
+/**
  * 分离变量数据中的表单数据(弹窗展示), 和其他变量数据(页面展示)
  * @param treeData 
  * @returns 

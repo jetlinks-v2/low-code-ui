@@ -85,7 +85,7 @@ export const form = {
 //获取高级组件的source-key的对应关系
 const fromItem = (prams: any) => {
     const obj = {}
-    prams.configuration?.children?.forEach(item => {
+    prams.configuration?.forEach(item => {
         const keyObj = {}
         if (item.componentProps.keys) {
             item.componentProps.keys.forEach(i => {
@@ -146,7 +146,14 @@ export const handleData = (data,map)=>{
                 if(e === i){
                     let obj = {}
                     obj[map[item].keysMap[i]] = data[i]
-                    data[item] = obj
+                    if(data[item]){
+                        data[item] = {
+                            ...data[item],
+                            ...obj
+                        }
+                    }else{
+                        data[item] = obj
+                    }
                     delete data[i]
                 }
             })
@@ -157,7 +164,6 @@ export const handleData = (data,map)=>{
 
 export const handleSingleData = (form: any) =>{
     const  formObj = fromItem(form)
-    console.log(form,'form')
     return form.data.map((item=>{
         // const obj = item.data.map(i=>handleData(i,formObj))
         const obj = handleData(item,formObj)

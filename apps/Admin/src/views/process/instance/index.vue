@@ -153,7 +153,7 @@ import Dialog from './Dialog/index.vue'
 import Drawer from '../components/Drawer/index.vue'
 import PermissionDialog from './PermissionDialog/index.vue'
 import { isFunction, isObject } from 'lodash-es'
-import { getList_api, del_api, updateState_api } from '@/api/process/instance'
+import { getList_api, getAllInstance_api, del_api, updateState_api } from '@/api/process/instance'
 import { useClassified } from '@/hooks/useClassified'
 import { isImg } from '@/utils/comm'
 
@@ -220,13 +220,13 @@ const columns = [
         placeholder: '请选择部署人',
       },
       options: async () => {
-        const resp = await getList_api({
+        const resp = await getAllInstance_api({
           paging: false,
           sorts: [{ name: 'createTime', order: 'desc' }],
         })
         const listMap = new Map()
         if (resp.success) {
-          resp.result.data.forEach((item) => {
+          resp.result.forEach((item) => {
             listMap.set(item.creatorId, {
               label: item.creatorName,
               value: item.creatorId,
