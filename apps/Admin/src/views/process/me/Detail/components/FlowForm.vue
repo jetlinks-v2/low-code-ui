@@ -51,13 +51,14 @@
 <script setup>
 import FlowModal from './FlowModal.vue';
 import FormPreview from '@/components/FormDesigner/preview.vue'
-import { cloneDeep, keys } from 'lodash-es'
+import { cloneDeep } from 'lodash-es'
 import { _claim, _save, _complete, _reject } from '@/api/process/me'
 import { onlyMessage } from '@jetlinks/utils';
 import FormItem from './FormItem.vue'
 import md5 from 'md5'
 import { getImage } from '@jetlinks/utils'
 import { handleSingleData } from './index'
+import { handleFormToTable } from '../../../model/Detail/FlowDesign/components/TableFormPreviewUtil'
 
 const props = defineProps({
     info: {
@@ -102,6 +103,8 @@ const candidates = ref()
 const formData = ref({})
 //需要转换数据的组件类型
 const tableType = ["device", "product", "role", "user", "org"]
+//表格可转换的组件类型
+// const convertType = ['tree-select','textarea','date-picker','time-picker','input-number','input-password','product','device','user','role', 'org','switch','input','select','select-card', 'upload']
 const addTableData = (item) => {
     let obj = {}
     item.configuration.map((i) => {
@@ -165,6 +168,7 @@ const onSave = (value) => {
 }
 //处理可编辑表格数据
 const dealTableData = (value) => {
+    // console.log(value,'value')
     const keysMap = new Map()
     value.configuration.map((item) => {
         if (tableType.includes(item.type)) {
@@ -236,6 +240,7 @@ const onClick = async (value) => {
             })
         })
         submitData.value = data
+        console.log(submitData.value)
         btnLoading.value = true
         _save(props.info.currentTaskId, {
             form: submitData.value
@@ -295,33 +300,32 @@ const submitForm = async () => {
 }
 //根据配置项生成表格
 const dealTable = (disabled) => {
-    const tableColumn = []
     formValue.value.forEach((i) => {
         if (i.multiple) {
-            i?.configuration?.children.map((item) => {
-                let rules
-                if (item?.formItemProps?.rules) {
-                    rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }, ...item?.formItemProps?.rules] : [...item?.formItemProps?.rules]
-                } else {
-                    rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }] : []
-                }
-                tableColumn.push({
-                    title: item.formItemProps?.label,
-                    dataIndex: item.formItemProps?.name,
-                    type: item?.type,
-                    width: 200,
-                    disabled: disabled ? true : item.componentProps.disabled,
-                    form: {
-                        rules: rules
-                    },
-                    componentProps: item.componentProps,
-                })
-            })
+            // i?.configuration?.children.map((item) => {
+                // let rules
+                // if (item?.formItemProps?.rules) {
+                //     rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }, ...item?.formItemProps?.rules] : [...item?.formItemProps?.rules]
+                // } else {
+                //     rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }] : []
+                // }
+                // tableColumn.push({
+                //     title: item.formItemProps?.label,
+                //     dataIndex: item.formItemProps?.name,
+                //     type: item?.type,
+                //     width: 200,
+                //     disabled: disabled ? true : item.componentProps.disabled,
+                //     form: {
+                //         rules: rules
+                //     },
+                //     componentProps: item.componentProps,
+                // })
+            // })
+            i.configuration = handleFormToTable(i.configuration.children)
             // console.log(tableColumn,'___')
             //处理单选数据回显
             i.data = handleSingleData(i)
-            // console.log(i,'value')
-            i.configuration = tableColumn
+            // console.log(i.data,'value')
         }
     })
 }
@@ -330,7 +334,7 @@ const handleLayout = (arr, disabled) => {
     return arr.map(item => {
         item.componentProps.disabled = disabled
         if (item.children && item.children.length !== 0) {
-            item.children = handleDisabled(item.children, disabled)
+            item.children = handleLayout(item.children, disabled)
         }
         return item
     })
@@ -339,8 +343,8 @@ const handleLayout = (arr, disabled) => {
 //根据读写权限递归处理组件的disabled
 const handleDisabled = (arr, accessModes) => {
     const Modes = new Map()
-    accessModes.forEach(item => {
-        Modes.set(item.id, item.accessModes)
+    accessModes?.forEach(item => {
+        Modes.set(item.ownerBy || item.id, item.accessModes)
     })
     return arr.map(item => {
        const  disabled  = !Modes.get(item.formItemProps?.name)?.includes('write')
@@ -352,7 +356,6 @@ const handleDisabled = (arr, accessModes) => {
         if (item.children && item.children.length !== 0) {
             item.children = item.formItemProps?.isLayout ? handleLayout(item.children, disabled) : handleDisabled(item.children, accessModes)
         }
-        // console.log('====', item)
         return item
     })
 }
@@ -376,7 +379,7 @@ const dealForm = (nodes) => {
         btnList.value = nodes?.props?.authButtons
         //详情接口nodeId
         const bindMap = new Map()
-        // console.log('md5-----------',nodes.props?.formBinds)
+        console.log('md5-----------',nodes.props?.formBinds)
         Object.keys(nodes.props?.formBinds).forEach((item) => {
             //formid + formVersion
             const id = md5(item + '|' + props.info.others?.formVersion[item])
@@ -388,7 +391,7 @@ const dealForm = (nodes) => {
             }
             return item
         })
-        console.log('formValue.value', formValue.value)
+        // console.log('formValue.value', formValue.value)
         dealTable()
     } else {
         nodes?.children ? dealForm(nodes.children) : ''
