@@ -85,7 +85,7 @@ export const form = {
 //获取高级组件的source-key的对应关系
 const fromItem = (prams: any) => {
     const obj = {}
-    prams.configuration?.children?.forEach(item => {
+    prams.configuration?.forEach(item => {
         const keyObj = {}
         if (item.componentProps.keys) {
             item.componentProps.keys.forEach(i => {
@@ -140,6 +140,7 @@ export const handleFormList = (form: any) => {
 }
 // data为可编辑表格单行数据 map：fromItem函数处理的source-key关系对象
 export const handleData = (data,map)=>{
+    console.log(data,map,'test')
     Object.keys(map).forEach(item=>{
         Object.keys(map[item].keysMap).forEach(i=>{
             Object.keys(data).forEach(e=>{

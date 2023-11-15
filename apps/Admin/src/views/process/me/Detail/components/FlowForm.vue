@@ -18,7 +18,7 @@
                     <div v-else style="background-color: #fff;">
                         <QuickEditTable validate ref="tableRef" :data="item.data" :columns="item.configuration"
                             :scroll="{ x: 1300, y: 700 }">
-                            <template v-for="(i, index) in item.configuration"
+                            <template v-for="(i, index) in item.configuration.filter(i=>convertType.includes(i.type))"
                                 #[i.dataIndex]="{ record, index, valueChange }">
                                 <!-- <ValueItem :itemType="i.type" v-model:modelValue="record[i.dataIndex]"
                                     @change="() => { valueChange(record[i.dataIndex]) }" :disabled="i?.disabled">
@@ -51,13 +51,14 @@
 <script setup>
 import FlowModal from './FlowModal.vue';
 import FormPreview from '@/components/FormDesigner/preview.vue'
-import { cloneDeep, keys } from 'lodash-es'
+import { cloneDeep } from 'lodash-es'
 import { _claim, _save, _complete, _reject } from '@/api/process/me'
 import { onlyMessage } from '@jetlinks/utils';
 import FormItem from './FormItem.vue'
 import md5 from 'md5'
 import { getImage } from '@jetlinks/utils'
 import { handleSingleData } from './index'
+import { handleFormToTable } from '../../../model/Detail/FlowDesign/components/TableFormPreviewUtil'
 
 const props = defineProps({
     info: {
@@ -102,6 +103,8 @@ const candidates = ref()
 const formData = ref({})
 //需要转换数据的组件类型
 const tableType = ["device", "product", "role", "user", "org"]
+//表格可转换的组件类型
+const convertType = ['tree-select','textarea','date-picker','time-picker','input-number','input-password','product','device','user','role', 'org','switch','input','select','select-card', 'upload']
 const addTableData = (item) => {
     let obj = {}
     item.configuration.map((i) => {
@@ -165,6 +168,7 @@ const onSave = (value) => {
 }
 //处理可编辑表格数据
 const dealTableData = (value) => {
+    // console.log(value,'value')
     const keysMap = new Map()
     value.configuration.map((item) => {
         if (tableType.includes(item.type)) {
@@ -236,6 +240,7 @@ const onClick = async (value) => {
             })
         })
         submitData.value = data
+        console.log(submitData.value)
         btnLoading.value = true
         _save(props.info.currentTaskId, {
             form: submitData.value
@@ -295,33 +300,32 @@ const submitForm = async () => {
 }
 //根据配置项生成表格
 const dealTable = (disabled) => {
-    const tableColumn = []
     formValue.value.forEach((i) => {
         if (i.multiple) {
-            i?.configuration?.children.map((item) => {
-                let rules
-                if (item?.formItemProps?.rules) {
-                    rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }, ...item?.formItemProps?.rules] : [...item?.formItemProps?.rules]
-                } else {
-                    rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }] : []
-                }
-                tableColumn.push({
-                    title: item.formItemProps?.label,
-                    dataIndex: item.formItemProps?.name,
-                    type: item?.type,
-                    width: 200,
-                    disabled: disabled ? true : item.componentProps.disabled,
-                    form: {
-                        rules: rules
-                    },
-                    componentProps: item.componentProps,
-                })
-            })
+            // i?.configuration?.children.map((item) => {
+                // let rules
+                // if (item?.formItemProps?.rules) {
+                //     rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }, ...item?.formItemProps?.rules] : [...item?.formItemProps?.rules]
+                // } else {
+                //     rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }] : []
+                // }
+                // tableColumn.push({
+                //     title: item.formItemProps?.label,
+                //     dataIndex: item.formItemProps?.name,
+                //     type: item?.type,
+                //     width: 200,
+                //     disabled: disabled ? true : item.componentProps.disabled,
+                //     form: {
+                //         rules: rules
+                //     },
+                //     componentProps: item.componentProps,
+                // })
+            // })
+            i.configuration = handleFormToTable(i.configuration.children)
             // console.log(tableColumn,'___')
             //处理单选数据回显
             i.data = handleSingleData(i)
-            // console.log(i,'value')
-            i.configuration = tableColumn
+            console.log(i,'value')
         }
     })
 }
