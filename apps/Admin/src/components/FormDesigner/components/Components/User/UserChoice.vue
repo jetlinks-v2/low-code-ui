@@ -9,8 +9,8 @@
     :maskClosable="false"
   >
     <j-radio-group v-model:value="sourceType" @change="changeSourceType">
-      <a-radio-button value="tissue">按组织</a-radio-button>
-      <a-radio-button value="role">按角色</a-radio-button>
+      <j-radio-button value="tissue">按组织</j-radio-button>
+      <j-radio-button value="role">按角色</j-radio-button>
     </j-radio-group>
     <div style="display: flex; margin-top: 20px">
       <div class="leftTree">
@@ -42,12 +42,13 @@
           <j-spin :spinning="loading" :delay="300">
             <j-tree
               v-if="treeData.length > 0"
-              :tree-data="treeData"
-              @select="selectGroup"
-              :height="400"
               v-model:selectedKeys="selectedKeys"
               v-model:expandedKeys="expandedKeys"
+              :tree-data="treeData"
+              :height="400"
+              @select="selectGroup"
             > 
+            <!-- 不知道为什么把v-model的提上去了就不报错了 -->
               <template #title="{ title }">
                 <div class="treeItem">
                   <j-ellipsis>
