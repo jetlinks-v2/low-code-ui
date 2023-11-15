@@ -45,7 +45,7 @@ const props = defineProps({
   }
 })
 const _value: any = ref([])
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value', 'change'])
 
 watch(
   () => props.value,
@@ -69,6 +69,7 @@ watch(
 const onChange = (item: any) => {
   const _value = item && item?.length > 0 ? JSON.stringify(item) : null
   emit('update:value', _value)
+  emit('change', _value)
 }
 
 const _componentProps = computed(() => {
