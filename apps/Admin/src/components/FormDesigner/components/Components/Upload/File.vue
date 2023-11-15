@@ -45,7 +45,6 @@
               type="link"
               style="width: 10%"
               @click="onLoad(file)"
-              :disabled="disabled"
             >
               <AIcon type="DownloadOutlined" />
             </j-button>
@@ -64,6 +63,7 @@ import { _fileUpload } from '@/api/comm'
 import { TOKEN_KEY } from '@jetlinks/constants'
 import { LocalStore } from '@jetlinks/utils/src/storage'
 import { downloadFileByUrl, onlyMessage } from '@jetlinks/utils'
+import { downloadFile } from '@/api/form'
 
 const props = defineProps({
   fileSize: {
@@ -154,7 +154,11 @@ const onDelete = (file: any) => {
 }
 
 const onLoad = (_file: any) => {
-  downloadFileByUrl(_file?.url, _file.name)
+  downloadFile(_file?.url).then(resp => {
+    const blob = new Blob([resp.data]);
+    const _url = URL.createObjectURL(blob);
+    downloadFileByUrl(_url, _file?.name)
+  })
 }
 
 const onDbClick = (file) => {
