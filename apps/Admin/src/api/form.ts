@@ -102,4 +102,8 @@ export const queryProject = () => request.post(`/low-code/info/_query/no-paging`
     ],
 })
 
+// 下载文件
+export const downloadFile = (url: string) => request.getStream(url)
+
+
 
