@@ -248,7 +248,7 @@ const handleChange = (data) => {
   data = data.map((item) => {
     if(props.dataSource.find(val => val.id === item.id)?.type !== item.type) {
       console.log(item);
-      item.config = null
+      item.config = item.type === 'boolean' ? {trueValue: '是', falseValue: '否', type: 'boolean'} : null
     }
     return item
   })
