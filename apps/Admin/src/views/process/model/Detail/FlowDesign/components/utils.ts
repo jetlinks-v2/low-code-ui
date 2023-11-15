@@ -188,8 +188,8 @@ export function filterFormByName(list, name) {
     // console.log('list: ', list);
     const _res = []
     list?.forEach(item => {
-        const _fields = item.flattenFields || []
-        const _filterFields = _fields.filter(f => {
+        // 平铺字段
+        const _filterFields = item.flattenFields?.filter(f => {
             if (f.formItemProps.label) {
                 // 常规组件
                 return f.formItemProps.label.includes(name)
@@ -198,13 +198,29 @@ export function filterFormByName(list, name) {
                 return f.componentProps?.name?.includes(name)
             }
         })
-        if (_filterFields.length) {
-            // @ts-ignore
-            _res.push({
-                ...item,
-                flattenFields: _filterFields
-            })
-        }
+        // if (_filterFields.length) {
+        //     // @ts-ignore
+        //     _res.push({
+        //         ...item,
+        //         flattenFields: _filterFields
+        //     })
+        // }
+
+        // 预览字段
+        const _previewFields = item.previewFields?.filter(f => {
+            if (!f.type.includes('item')) {
+                // 常规组件
+                return f.formItemProps.label.includes(name)
+            } else {
+                // 布局组件从内部组件筛选
+                return f.children?.some(s => s.formItemProps.label.includes(name))
+            }
+        })
+        _res.push({
+            ...item,
+            flattenFields: _filterFields,
+            previewFields: _previewFields,
+        })
     })
     return _res
 }

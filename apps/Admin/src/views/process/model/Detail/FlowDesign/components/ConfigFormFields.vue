@@ -495,8 +495,10 @@ const initPreviewData = (data) => {
 const handleSearch = () => {
   filterFormList.value = filterFormByName(allFormList.value, keywords.value)
   filterFormList.value?.forEach((item) => {
-    item.accessModes = item.flattenFields?.every(
-      (e) => e.accessModes?.length === 2,
+    // 所有布局组件内部字段
+    const _allFields = getAllFields(item)
+    item.accessModes = _allFields?.every((e) =>
+      e.accessModes?.includes('write'),
     )
       ? ['read', 'write']
       : ['read']
