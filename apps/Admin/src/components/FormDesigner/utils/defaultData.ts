@@ -172,7 +172,8 @@ export const layout: ISchema[] = [
         name: '选项卡',
         children: [],
         formItemProps: {
-            isLayout: false
+            isLayout: false,
+            required: true
         },
         componentProps: {
             type: 'line',
@@ -187,7 +188,8 @@ export const layout: ISchema[] = [
         icon: 'CopyOutlined',
         children: [],
         formItemProps: {
-            isLayout: false
+            isLayout: false,
+            required: true
         },
         componentProps: {}
     },
