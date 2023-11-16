@@ -180,15 +180,17 @@ const formatText = (label) => {
   }
 }
 const onChange = (e, label) => {
-  emit('update:modelValue', myValue.value)
+  let _value = myValue.value
+  if (props.conditionType === 'switch') {
+    _value = myValue.value === 'true'
+  }
+  emit('update:modelValue', _value)
   if(label) {
     emit('update:selectedItem', formatText(label))
   } else {
     emit('update:selectedItem', undefined)
   }
 }
-
-
 
 const sourceMap = reactive({
   label: 'label',
@@ -232,7 +234,7 @@ const findValueOptions = async () => {
 watch(
   () => props.modelValue,
   () => {
-    myValue.value = props.modelValue
+    myValue.value = props.conditionType === 'switch' ? String(props.modelValue) : props.modelValue
   },
   { deep: true, immediate: true },
 )
