@@ -61,6 +61,7 @@
 import InsertButton from '../InsertButton.vue'
 import { useFlowStore } from '@/store/flow'
 import {queryVariables_api} from "@/api/process/model";
+import  { isArray } from 'lodash-es'
 
 const emits = defineEmits([
   'insertNode',
@@ -170,33 +171,59 @@ const validateFormItem = async () => {
   console.log(result, termsKeys)
   return validateVariables(result, termsKeys)
 }
+
+const isEmpty = (v) => {
+  return (
+    v === undefined ||
+    v === null ||
+    v === '' ||
+    (isArray(v) && v.length === 0)
+  );
+};
+
 /**
  * 校验节点
  */
-const validate = async (err) => {
+const validate = (err) => {
   const { terms } = props.config.props?.condition?.configuration
 
   showError.value = true
   errorInfo.value = '未填写必填配置项'
-  const hasVar = await validateFormItem()
-  console.log('hasVar', hasVar)
-  if (!hasVar){
-    errorInfo.value = '配置项错误'
-    err.push({
-      errors: ['配置项错误'],
-      name: ['condition', 'configuration', 'terms'],
-    })
-  } else if (
-    !terms ||
-    !terms.length ||
+  // const hasVar = await validateFormItem()
+  // console.log('hasVar', hasVar)
+  // if (!hasVar){
+  //   errorInfo.value = '配置项错误'
+  //   err.push({
+  //     errors: ['配置项错误'],
+  //     name: ['condition', 'configuration', 'terms'],
+  //   })
+  // } else if (
+  //   !terms ||
+  //   !terms.length ||
+  //   !terms.some((item) => Boolean(Object.keys(item).length)) ||
+  //   terms.some(item => !item.column || !item.termType || !item.value)
+  // ) {
+  //   err.push({
+  //     errors: ['请配置进入下方节点的条件'],
+  //     name: ['condition', 'configuration', 'terms'],
+  //   })
+  // } else {
+  //   showError.value = false
+  //   errorInfo.value = ''
+  // }
+  if (
+    !terms?.length ||
     !terms.some((item) => Boolean(Object.keys(item).length)) ||
-    terms.some(item => !item.column || !item.termType || !item.value)
+    terms.some(item => !isEmpty(item.value) || !item.termType)
   ) {
+    showError.value = true
+    errorInfo.value = '请配置进入下方节点的条件'
     err.push({
       errors: ['请配置进入下方节点的条件'],
       name: ['condition', 'configuration', 'terms'],
     })
   } else {
+    console.log('approvalNode no error')
     showError.value = false
     errorInfo.value = ''
   }
