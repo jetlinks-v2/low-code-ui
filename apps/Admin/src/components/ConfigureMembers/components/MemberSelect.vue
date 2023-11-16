@@ -59,7 +59,7 @@
             :fieldNames="{
               children: 'children',
               title: 'name',
-              key: 'id',
+              key: ['org','user','role'].includes(active) ? 'id': 'fullId',
             }"
             @select="onSelect"
           >
@@ -243,7 +243,8 @@ const setLevel = (data: any[]) => {
     cloneData.forEach((item) => {
       item.level = level
       item.id = item.fullId
-      item.type = item.others?.type || ''
+      // item.type = item.others?.type || ''
+      item.relation = item.others?.relation || ''
       if (level !== 4) {
         item.disabled = true
       }
@@ -253,7 +254,7 @@ const setLevel = (data: any[]) => {
     })
   }
   dealData(cloneData)
-  return cloneData
+  return props.type === 'user' ? cloneData : cloneData.filter(i => i.id !== 'task')
 }
 
 const onSelect = (keys: string[], { node, selected }) => {
@@ -333,7 +334,7 @@ watch(
       const tree = treeFilter(
         setLevel(infoState.dataMap.value.get('var')),
         props.type,
-        'type',
+        'relation',
       )
       currentVar.value = tree
     }

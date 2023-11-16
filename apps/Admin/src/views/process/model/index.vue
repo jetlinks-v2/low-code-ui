@@ -156,9 +156,9 @@ import {
   deploy_api,
   del_api,
   detail_api,
-  update_api
+  update_api,
 } from '@/api/process/model'
-// import { useClassified } from '@/hooks/useClassified'
+import { useClassified } from '@/hooks/useClassified'
 import { isImg } from '@/utils/comm'
 import BasicInfo from '@/views/process/model/Detail/BasicInfo/index.vue'
 import FlowDesign from '@/views/process/model/Detail/FlowDesign/index.vue'
@@ -172,7 +172,7 @@ const flowStore = useFlowStore()
 const step1 = ref()
 const step2 = ref()
 const step3 = ref()
-// const { getText } = useClassified()
+const { classified } = useClassified()
 const tableRef = ref()
 const params = ref({})
 const columns = [
@@ -220,7 +220,18 @@ const columns = [
               value: item.classifiedId,
             })
           })
-          return [...listMap.values()].filter(i => i.label)
+          const _keys = classified.value.map((m) => m.value)
+          if (listMap.size) {
+            return [...listMap.values()]
+              .map((m) => ({
+                ...m,
+                sort: _keys.indexOf(m.value),
+              }))
+              .sort((a, b) => a.sort - b.sort)
+              .filter((i) => i.label)
+          } else {
+            return []
+          }
         }
         return []
       },
