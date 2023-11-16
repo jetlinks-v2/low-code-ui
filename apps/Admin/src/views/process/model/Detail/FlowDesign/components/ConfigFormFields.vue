@@ -65,7 +65,7 @@
                 <template #header>
                   <div class="form-title">
                     <div class="name">
-                      <j-ellipsis line-clamp="1">
+                      <j-ellipsis line-clamp="1" style="width: 150px">
                         {{ form.name }}
                       </j-ellipsis>
                     </div>
@@ -89,7 +89,7 @@
                 >
                   <div class="field-title">
                     <div class="name">
-                      <j-ellipsis line-clamp="1">
+                      <j-ellipsis line-clamp="1" style="width: 130px">
                         {{
                           field.formItemProps?.label ||
                           field.componentProps?.name
@@ -124,7 +124,7 @@
                     <template #header>
                       <div class="layout-title">
                         <div class="name">
-                          <j-ellipsis line-clamp="1">
+                          <j-ellipsis line-clamp="1" style="width: 130px">
                             {{
                               field.parent?.componentProps?.title ||
                               field.componentProps?.name ||
@@ -141,7 +141,7 @@
                       :key="layoutField.key"
                     >
                       <div class="name">
-                        <j-ellipsis line-clamp="1">
+                        <j-ellipsis line-clamp="1" style="width: 120px">
                           {{
                             layoutField.formItemProps?.label ||
                             layoutField.componentProps?.name
