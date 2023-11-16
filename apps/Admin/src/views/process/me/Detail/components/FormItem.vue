@@ -25,7 +25,6 @@
     <Select v-else-if="itemType === 'select' || itemType === 'select-card'" v-bind="props.componentProps" v-model:value="myValue"
       :options="options" :disabled="disabled" @change="onChange" style="width: 100%;" />
     <Upload v-else-if="itemType === 'upload'" v-bind="props.componentProps" :value="myValue" @change="onChange" style="width: 100%;"/>
-    <div v-else>--</div>
     <div class="itemDescription" v-if="props?.componentProps?.description">{{ props?.componentProps?.description }}</div>
   </div>
 </template>

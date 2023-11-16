@@ -82,7 +82,7 @@ const props = defineProps({
 const myDataSource = ref<any>([])
 
 const myColumns = computed(() => {
-  console.log(cloneDeep(props.columns))
+  console.log(cloneDeep(props.columns),'columns')
   return handleFormToTable(cloneDeep(props.columns) as any[])
 })
 

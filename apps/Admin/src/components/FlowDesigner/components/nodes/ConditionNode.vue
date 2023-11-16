@@ -59,6 +59,8 @@
 
 <script setup lang="ts" name="ConditionNode">
 import InsertButton from '../InsertButton.vue'
+import { useFlowStore } from '@/store/flow'
+import {queryVariables_api} from "@/api/process/model";
 
 const emits = defineEmits([
   'insertNode',
@@ -91,7 +93,7 @@ const props = defineProps({
     default: false,
   },
 })
-
+const flow = useFlowStore()
 const ValueType = ref({
   string: 'String',
   object: 'Object',
@@ -129,20 +131,61 @@ const formatValue = (item) => {
       return ` ${condition} ${item.columnName || ''} 在 ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''} 之中`
     case 'nin':
       return ` ${condition} ${item.columnName || ''} 不在 ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''} 之中`
-    default: 
+    default:
       return ` ${condition} ${item.columnName || ''} ${item.termTypeName || ''} ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''}`
   }
 }
 
+const validateVariables = (data, keys) => {
+  return data.some(item => {
+    if (item.children) {
+      return validateVariables(item.children, keys)
+    }
+    return keys.some(a => a === item.id)
+  })
+}
+
+const validateFormItem = async () => {
+
+  const { id, name, key, model, provider } = flow.modelBaseInfo
+  const params = {
+    definition: {
+      id,
+      name,
+      key,
+      model: JSON.stringify(flow.model), // model不能取modelBaseInfo(接口保存才会有值), 直接取动态值flowStore.model
+      provider,
+    },
+    nodeId: props.config.parentId, // 条件节点配置, id传当前条件节点的branchBy
+    containThisNode: false, //变量来源是否包含本节点
+  }
+  const { result } = await queryVariables_api(params)
+
+  const { terms } = props.config.props?.condition?.configuration || []
+  const termsKeys:string[] = terms.filter(item => item.column).map(item => {
+    const _keys = item.column.split('.')
+    return _keys.pop()
+  })
+  console.log(result, termsKeys)
+  return validateVariables(result, termsKeys)
+}
 /**
  * 校验节点
  */
-const validate = (err) => {
+const validate = async (err) => {
   const { terms } = props.config.props?.condition?.configuration
 
   showError.value = true
   errorInfo.value = '未填写必填配置项'
-  if (
+  const hasVar = await validateFormItem()
+  console.log('hasVar', hasVar)
+  if (!hasVar){
+    errorInfo.value = '配置项错误'
+    err.push({
+      errors: ['配置项错误'],
+      name: ['condition', 'configuration', 'terms'],
+    })
+  } else if (
     !terms ||
     !terms.length ||
     !terms.some((item) => Boolean(Object.keys(item).length)) ||
