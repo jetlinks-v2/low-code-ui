@@ -15,7 +15,7 @@
           <span class="title">
             <AIcon type="FunnelPlotOutlined" style="font-size: 12px" />
             <j-ellipsis>
-              {{ config.name ? config.name : '条件' + level }}
+              {{ config.name }}
             </j-ellipsis>
           </span>
           <span
@@ -211,19 +211,21 @@ const validate = (err) => {
   //   showError.value = false
   //   errorInfo.value = ''
   // }
-  if (
+  if (!props.config?.name) {
+    err.push({
+      errors: ['条件节点名称不能为空'],
+      name: ['name'],
+    })
+  } else if (
     !terms?.length ||
     !terms.some((item) => Boolean(Object.keys(item).length)) ||
     terms.some(item => !isEmpty(item.value) || !item.termType)
   ) {
-    showError.value = true
-    errorInfo.value = '请配置进入下方节点的条件'
     err.push({
       errors: ['请配置进入下方节点的条件'],
       name: ['condition', 'configuration', 'terms'],
     })
   } else {
-    console.log('approvalNode no error')
     showError.value = false
     errorInfo.value = ''
   }
