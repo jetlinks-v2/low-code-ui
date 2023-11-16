@@ -12,7 +12,7 @@
   <j-modal
     :maskClosable="false"
     v-model:visible="visible"
-    width="900px"
+    width="1000px"
     @ok="handleOk"
     @cancel="visible = false"
   >
@@ -719,6 +719,7 @@ const handleOk = () => {
   visible.value = false
   console.log('filterFormList.value: ', filterFormList.value)
   console.log('forms.value: ', forms.value)
+  emits('update:value', forms.value)
 }
 
 /**
