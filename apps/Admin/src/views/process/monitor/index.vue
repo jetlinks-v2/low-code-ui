@@ -83,7 +83,7 @@
           <AIcon type="EyeOutlined" />
         </PermissionButton>
         <PermissionButton
-          v-if="slotProps.state.value !== 'repealed'"
+          v-if="!history"
           :hasPermission="false"
           type="link"
           danger
