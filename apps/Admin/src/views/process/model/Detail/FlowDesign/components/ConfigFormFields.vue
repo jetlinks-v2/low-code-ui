@@ -434,15 +434,21 @@ const handlePreviewFields = (data) => {
                       f.id === item.formItemProps.name ||
                       f.ownerBy === item.formItemProps.name
                     ) {
-                      // 高级组件在布局组件内部时, 取ownerBy字段判断
+                      // 高级组件在tabs布局组件内部时, 取ownerBy字段判断
                       item.accessModes = f.accessModes
                     }
                   } else {
-                    item.accessModes = f.realCheck?.includes(
-                      item.formItemProps.name,
-                    )
-                      ? f.accessModes
-                      : ['read']
+                    if (f.ownerBy === item.formItemProps.name) {
+                      // 高级组件在非tabs布局组件内部时, 取ownerBy字段判断
+                      item.accessModes = f.accessModes
+                    }
+                    if (f.realCheck) {
+                      item.accessModes = f.realCheck.includes(
+                        item.formItemProps.name,
+                      )
+                        ? f.accessModes
+                        : ['read']
+                    }
                   }
                 })
                 return p.formItemProps.name === f.id
