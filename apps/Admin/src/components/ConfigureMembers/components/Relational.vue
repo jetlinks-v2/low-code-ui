@@ -7,7 +7,11 @@
         block-node
         :tree-data="relationTreeData"
         :selectedKeys="selectedKeys"
-        :fieldNames="{ children: 'children', title: 'name', key: 'id' }"
+        :fieldNames="{
+          children: 'children',
+          title: 'name',
+          key: 'fullId',
+        }"
         :height="300"
         @select="onSelect"
       >
