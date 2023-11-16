@@ -22,7 +22,7 @@
                      <!-- <j-tag :color="colorMap.get('completed')" v-if="item.others.autoOperation">
                         {{ actionType.get('auto') }}
                      </j-tag> -->
-                     <j-tag :color="'default'" v-if="item.others.weight">权重{{ item.others.weight }}</j-tag>
+                     <j-tag :color="'default'" v-if="item.others.weight &&item.nodeType !== 'ROOT'">权重{{ item.others.weight }}</j-tag>
                   </div>
                   <div class="item-right">{{ dayjs(item.timestamp).format('YYYY-MM-DD HH:mm:ss') }}</div>
                </div>
@@ -41,11 +41,17 @@
                      {{ typeMap.get(item.childrenNode.others.afterState) }}
                   </j-tag>
                </div>
-               <div
-                  v-if="item.childrenNode?.others.afterState === 'rejected' && findRejectNode(item.childrenNode?.traceId)"
+               <div v-if="item.childrenNode?.others.afterState === 'rejected' && findRejectNode(item.childrenNode?.traceId)"
                   class="item-children">
                   <div style="margin-right: 10px;">
                      {{ item.others.taskName }} 已驳回至 {{ findRejectNode(item.childrenNode?.traceId) }}
+                  </div>
+               </div>
+               <div v-if="item.action==='taskTransfer'" class="item-children">
+                  <div>
+                     <div>任务转交由{{ item.others.target.name }}办理</div>
+                     <div>原办理人：{{ item.others.original.name }}</div>
+                     <div>转办原因：{{ item.others.message }}</div>
                   </div>
                </div>
             </div>
@@ -96,6 +102,7 @@ actionType.set('submit', '提交')
 actionType.set('initiate', '发起申请')
 actionType.set('again','重新发起')
 actionType.set('off', '关闭')
+actionType.set('wait','待办')
 
 
 const props = defineProps({
@@ -222,7 +229,14 @@ const filterLine = (item, index) => {
          actionColor: 'off',
          show: item.others.state.value === 'repealed' ? true : false
       }
-   } else {
+   }else if(item.action === 'taskTransfer'){
+      return {
+         ...item,
+         actionType:'wait',
+         operatorName: item.operator.name,
+      }
+   }
+    else {
       return {
          ...item,
          show: false,

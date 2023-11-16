@@ -2,7 +2,7 @@
     <a-upload name="file" v-model:file-list="fileList" :max-count="maxCount" :headers="{
         [TOKEN_KEY]: LocalStore.get(TOKEN_KEY),
     }" :before-upload="beforeUpload" :accept="accept" :disabled="fileList.length >= maxCount || disabled"  @change="handleChange" :action="listType ==='text' ? _fileUpload : ''">
-        <j-button type="primary">上传</j-button>
+        <j-button type="primary" :disabled="fileList.length >= maxCount || disabled">上传</j-button>
         <template #itemRender="{ file }">
             <div class="render">
                 <j-input
@@ -170,6 +170,7 @@ const onDelete = (file: any) => {
 watch(
     () => props.value,
     (val) => {
+        console.log('-----',props)
        try{
         fileList.value = val || []
        }catch(error){
