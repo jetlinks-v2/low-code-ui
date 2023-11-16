@@ -8,6 +8,7 @@ const filter = (columns:  ISchema[]) => {
 }
 
 export const handleFormToTable = (columns: ISchema[]) => {
+  console.log(columns,'--')
   let array: any = []
   filter(columns).forEach(item => {
     if (layoutKey.includes(item.type)) {

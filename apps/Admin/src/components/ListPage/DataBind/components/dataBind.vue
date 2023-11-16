@@ -288,10 +288,24 @@ const handleSubmit = () => {
     }
   }
   columnData.value = [...newColumnData, ...dataBind.data.dataSource.filter(item => newColumnData.findIndex(val => val.id === item.id) === -1).map(item => {
-    return {
+    if(item.type === 'boolean' && !item.config) {
+      return {
+        rowKey: randomString(8),
+        ...item,
+        type: javaType[item.type],
+        config: {
+          trueValue: '是',
+          falseValue:  '否',
+          type: 'boolean',
+          colLayout: 'left',
+        }
+      }
+    } else {
+      return {
       rowKey: randomString(8),
-      ...item,
-      type: javaType[item.type],
+        ...item,
+        type: javaType[item.type],
+      }
     }
   })]
 

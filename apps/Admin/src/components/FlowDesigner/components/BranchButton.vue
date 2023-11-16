@@ -41,7 +41,15 @@
         </div>
       </div>
     </template>
-    <j-button type="plain"> {{ text }} </j-button>
+    <div class="branch-box">
+      <div class="node-error" v-if="isDanger">
+        <j-tooltip>
+          <template #title>{{ errorInfo }}</template>
+          <AIcon type="WarningOutlined" />
+        </j-tooltip>
+      </div>
+      <j-button class="add-branch-btn-el" type="plain" :danger="isDanger"> {{ text }} </j-button>
+    </div>
   </j-popover>
 </template>
 
@@ -74,6 +82,9 @@ const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
 
 const visible = ref(false)
+
+const errorInfo = ref('')
+
 const handleAddBranch = () => {
   visible.value = false
   emits('addBranchNode', 'CONDITIONS')
@@ -91,16 +102,27 @@ const handleOpenConfig = () => {
   emits('openConfig')
 }
 
-// defineExpose({
-//   validate: () => {
-//     return new Promise((resolve, reject) => {
-//       console.log('BranchButton', props.id, props.data)
-//       const complexWeight = props.data?.props?.weight?.complexWeight
-//
-//       resolve()
-//     })
-//   }
-// })
+const isDanger = computed(() => {
+  return !!errorInfo.value
+})
+
+defineExpose({
+  validate: (err) => {
+    errorInfo.value = ''
+    const complexWeight = props.data?.props?.weight?.complexWeight
+    const inputNodeWeight = props.data?.props?.weight?.inputNodeWeight
+    if (inputNodeWeight !== undefined && complexWeight !== undefined) {
+      const _weight = Object.values(inputNodeWeight).reduce((prev: number, next) => prev + next, 0)
+      if (_weight < complexWeight) {
+        err.push({
+          errors: ['通过权重不能大于所有分支的权重总和'],
+          name: ['weight', 'complexWeight']
+        })
+        errorInfo.value = '配置项错误'
+      }
+    }
+  }
+})
 </script>
 
 <style lang="less" scoped>
@@ -150,4 +172,21 @@ const handleOpenConfig = () => {
     }
   }
 }
+
+.branch-box {
+  position: relative;
+
+  .node-error {
+    position: absolute;
+    right: -30px;
+    top: -20px;
+    font-size: 20px;
+    color: #f56c6c;
+  }
+}
+
+.add-branch-btn-el {
+  top: -8px;
+}
+
 </style>

@@ -1,12 +1,11 @@
 import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
-import { Tabs, TabPane, FormItem } from 'jetlinks-ui-components'
+import { Tabs, TabPane, FormItem, Badge } from 'jetlinks-ui-components'
 import './index.less'
 import { withModifiers } from 'vue'
-import { cloneDeep, omit } from 'lodash-es'
+import { cloneDeep, map, omit } from 'lodash-es'
 import { useTool } from '../../hooks'
 import generatorData from '../../utils/generatorData'
-import { uid } from '../../utils/uid'
 
 export default defineComponent({
     name: 'TabsLayout',
@@ -76,6 +75,17 @@ export default defineComponent({
                 _path[_index] = props.data.formItemProps.name
             }
 
+            const _tabContent = (_element: any) => {
+                if (unref(isEditModel)) {
+                    const _arr = map(_element?.children || [], 'key').filter(i => map(designer.errorKey.value, 'key').includes(i))
+                    return <div>
+                        <Badge count={_arr?.length || 0}>{_element.componentProps?.name}</Badge>
+                    </div>
+                } else {
+                    return _element.componentProps?.name
+                }
+            }
+
             const renderContent = () => {
                 return <>
                     {
@@ -85,9 +95,9 @@ export default defineComponent({
                                     if (element.formItemProps?.name) {
                                         _path = [..._path, element.formItemProps?.name]
                                         _index = _index + 1
-                                      }
+                                    }
                                     return (
-                                        <TabPane key={element.key} {...omit(element.componentProps, 'name')} tab={element.componentProps.name}>
+                                        <TabPane key={element.key} {...omit(element.componentProps, 'name')} tab={_tabContent(element)}>
                                             <Selection
                                                 class={unref(isDragArea) && 'drag-area'}
                                                 data={element}

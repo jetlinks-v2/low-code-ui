@@ -376,6 +376,7 @@ const actionsBtnFormat = (data: any, type: string) => {
                     },
                   )
                   if (res.success) {
+                    onlyMessage('操作成功')
                     tableRef.value?.reload?.()
                   }
                 },
@@ -416,6 +417,7 @@ const actionsBtnFormat = (data: any, type: string) => {
             )
             if (res.success) {
               tableRef.value._selectedRowKeys = []
+              onlyMessage('操作成功')
               tableRef.value?.reload()
             }
           },

@@ -67,7 +67,7 @@ import {
 import { queryFormNoPage_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { treeFilter } from 'jetlinks-ui-components/es/Tree'
-import { randomColor } from '../utils'
+import { generateRandomColor } from '../utils'
 
 type Emits = {
   (e: 'update:visible', data: boolean): void
@@ -161,7 +161,7 @@ const handleCheck = (_checkedKeys, { checkedNodes }) => {
     ?.map((m) => ({
       label: m.name,
       value: m.fullId,
-      color: randomColor(),
+      color: generateRandomColor(),
     }))
 }
 
