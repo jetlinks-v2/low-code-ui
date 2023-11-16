@@ -10,7 +10,7 @@ export const getProcess_api = (data: any) => request.post(`/process/definition/d
  * 条件查询所有流程模型
  * @returns 
  */
-export const getAllProcess_api = (data: any) => request.post(`/process/definition/_query/no-paging`, data);
+export const getAllProcess_api = (data: any) => request.post(`/process/definition/detail/_query/no-paging`, data);
 
 /**
  * 保存模型

@@ -1,6 +1,7 @@
-import { cloneDeep, pick } from 'lodash-es'
+import {cloneDeep, isString, pick} from 'lodash-es'
 import { advancedComponents } from './const'
 import { useFlowStore } from '@/store/flow'
+import { layoutComponents } from './const'
 
 const flowStore = useFlowStore()
 
@@ -133,16 +134,17 @@ export function handleObjToArr(obj: { [key: string]: boolean }) {
     const arr: string[] = []
     for (let key in obj) {
         const nodeId = key.split('$')[0]
-        const _node = findNodeById(flowStore.model.nodes, nodeId)
-        const _parentNode = findNodeById(flowStore.model.nodes, _node.parentId)
-        if (_parentNode.type === 'CONDITION') {
-            // 父节点为条件节点, 直接取父节点id
-            arr.push(_parentNode.id)
-        } else {
-            // 父节点为分支, 取唯一没有业务节点的分支节点id
-            const _noChild = _parentNode.branches?.filter(f => !Object.keys(f.children).length)[0]
-            if (_noChild) arr.push(_noChild.id)
-        }
+        // const _node = findNodeById(flowStore.model.nodes, nodeId)
+        // const _parentNode = findNodeById(flowStore.model.nodes, _node.parentId)
+        // if (_parentNode.type === 'CONDITION') {
+        //     // 父节点为条件节点, 直接取父节点id
+        //     arr.push(_parentNode.id)
+        // } else {
+        //     // 父节点为分支, 取唯一没有业务节点的分支节点id
+        //     const _noChild = _parentNode.branches?.filter(f => !Object.keys(f.children).length)[0]
+        //     if (_noChild) arr.push(_noChild.id)
+        // }
+        arr.push(nodeId)
     }
     return arr
 }
@@ -159,20 +161,21 @@ export function handleObjToArr(obj: { [key: string]: boolean }) {
 export function handleArrToObj(arr: string[] = []) {
     const obj: { [key: string]: boolean } = {}
     arr.forEach(item => {
-        const _conditionNode = findNodeById(flowStore.model.nodes, item)
-        let _id
-        if (Object.keys(_conditionNode.children).length) {
-            // 条件节点下方节点存在, 直接去第一个节点的id
-            _id = _conditionNode.children.id
-        } else {
-            // 条件节点下方没有节点, 取整个分支下面的空节点id
-            const _branchNode = findNodeById(
-                flowStore.model.nodes,
-                _conditionNode.props.branchBy,
-            )
-            _id = _branchNode.children.id
-        }
-        obj[`${_id}$eq`] = true
+        // const _conditionNode = findNodeById(flowStore.model.nodes, item)
+        // let _id
+        // if (Object.keys(_conditionNode.children).length) {
+        //     // 条件节点下方节点存在, 直接去第一个节点的id
+        //     _id = _conditionNode.children.id
+        // } else {
+        //     // 条件节点下方没有节点, 取整个分支下面的空节点id
+        //     const _branchNode = findNodeById(
+        //         flowStore.model.nodes,
+        //         _conditionNode.props.branchBy,
+        //     )
+        //     _id = _branchNode.children.id
+        // }
+        // obj[`${_id}$eq`] = true
+        obj[`${item}$eq`] = true
     })
     return obj
 }
@@ -187,8 +190,8 @@ export function filterFormByName(list, name) {
     // console.log('list: ', list);
     const _res = []
     list?.forEach(item => {
-        const _fields = item.flattenFields || []
-        const _filterFields = _fields.filter(f => {
+        // 平铺字段
+        const _filterFields = item.flattenFields?.filter(f => {
             if (f.formItemProps.label) {
                 // 常规组件
                 return f.formItemProps.label.includes(name)
@@ -197,13 +200,29 @@ export function filterFormByName(list, name) {
                 return f.componentProps?.name?.includes(name)
             }
         })
-        if (_filterFields.length) {
-            // @ts-ignore
-            _res.push({
-                ...item,
-                flattenFields: _filterFields
-            })
-        }
+        // if (_filterFields.length) {
+        //     // @ts-ignore
+        //     _res.push({
+        //         ...item,
+        //         flattenFields: _filterFields
+        //     })
+        // }
+
+        // 预览字段
+        const _previewFields = item.previewFields?.filter(f => {
+            if (!f.type.includes('item')) {
+                // 常规组件
+                return f.formItemProps.label.includes(name)
+            } else {
+                // 布局组件从内部组件筛选
+                return f.children?.some(s => s.formItemProps.label.includes(name))
+            }
+        })
+        _res.push({
+            ...item,
+            flattenFields: _filterFields,
+            previewFields: _previewFields,
+        })
     })
     return _res
 }
@@ -330,15 +349,19 @@ export function flattenTree(fields, parent = null, depth = 0) {
 export function updateFieldDisabled(fields, currentField) {
     for (let i = 0; i < fields.length; i++) {
         if (fields[i].key === currentField.key) {
-            // 设置布局组件禁用状态
-            fields[i].componentProps.disabled = !currentField.accessModes.includes('write')
-            // 设置布局组件内部组件禁用状态
-            fields[i].children?.forEach(item => {
-                item.componentProps.disabled = fields[i].componentProps.disabled
-                item.children?.forEach(inner => {
-                    inner.componentProps.disabled = fields[i].componentProps.disabled
+            if (!layoutComponents.includes(fields[i].type)) {
+                // 非布局组件
+                fields[i].componentProps.disabled = !currentField.accessModes?.includes('write')
+            } else {
+                // 布局组件
+                // 设置布局组件内部组件禁用状态
+                fields[i].children?.forEach(item => {
+                    item.componentProps.disabled = fields[i].componentProps.disabled
+                    item.children?.forEach(inner => {
+                        inner.componentProps.disabled = fields[i].componentProps.disabled
+                    })
                 })
-            })
+            }
             return
         }
         if (fields[i].children?.length) {
@@ -402,4 +425,63 @@ export function findBranches(nodes, result: any[] = []) {
         findBranches(nodes.children, result)
     }
     return result
+}
+
+
+/**
+ * 从previewFields中查找字段
+ */
+export function getFieldByKey(data: any, key: string) {
+    if (!data.length) return
+    let _res
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].formItemProps?.name === key) {
+            _res = data[i]
+            if (_res) break
+        } else {
+            if (data[i].type.includes('item')) {
+                if (data[i].isWrapOn) {
+                    // formItemProps.isLayout不存在, 或者存在并且为true
+                    if (data[i].parent?.formItemProps?.name === key) {
+                        data[i].parent.accessModes = data[i].children?.some(
+                            (s) => s.accessModes?.length === 2,
+                        )
+                            ? ['read', 'write']
+                            : ['read']
+                        _res = data[i].parent
+                        if (_res) break
+                    }
+                } else {
+                    _res = getFieldByKey(data[i].children, key)
+                    if (_res) break
+                }
+            }
+        }
+    }
+    return _res
+}
+
+export const handleLikeValue = (v: string) => {
+  if (isString(v)) {
+    return v.split('').reduce((pre: string, next: string) => {
+      let _next = next;
+      if (next === '\\') {
+        _next = '\\\\';
+      } else if (next === '%') {
+        _next = '\\%';
+      }
+      return pre + _next;
+    }, '');
+  }
+  return v;
+};
+
+
+export const handleTermsData = (terms) => {
+  return terms.map(item => {
+    if (['like', 'nlike'].includes(item.termType) && !!item.value) {
+      item.value = `%${handleLikeValue(item.value)}%`;
+    }
+    return item
+  })
 }

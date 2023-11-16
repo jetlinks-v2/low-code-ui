@@ -93,7 +93,7 @@ import {
   processDetail_api,
   save_api,
 } from '@/api/process/initiate'
-// import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
+import { handleFormToTable } from '@/views/process/model/Detail/FlowDesign/components/TableFormPreviewUtil'
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import md5 from 'md5'
 import { getMeProcessList } from '@/api/process/me'
@@ -160,7 +160,7 @@ const getTableColumns = (
       }
     }
   })
-  return _columns
+  return handleFormToTable(_columns)
 }
 
 /**

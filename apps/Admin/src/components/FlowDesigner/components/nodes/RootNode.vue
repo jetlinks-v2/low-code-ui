@@ -45,9 +45,22 @@ const content = computed(() => {
  * 校验节点
  */
 const validate = (err) => {
-  if (!props.config.props.assignedUser.length) {
+  console.log('validate',props.config?.name)
+  // if (!props.config.props.assignedUser.length) {
+  //   showError.value = true
+  //   errorInfo.value = '请在基础信息中配置成员'
+  //   err.push({
+  //     errors: [errorInfo.value],
+  //     name: ['assignedUser'],
+  //   })
+  // } else {
+  //   showError.value = false
+  //   errorInfo.value = ''
+  // }
+
+  if (!props.config?.name) {
     showError.value = true
-    errorInfo.value = '请在基础信息中配置成员'
+    errorInfo.value = '未填写必填配置项'
     err.push({
       errors: [errorInfo.value],
       name: ['assignedUser'],
