@@ -138,6 +138,7 @@ const columnsTodo = [
         ellipsis: true,
         search: {
             type: 'select',
+            termFilter: ['in', 'nin'],
             rename: 'classifiedId',
             componentProps: {
                 placeholder: '请选择流程分类',
@@ -227,6 +228,7 @@ const columnsFinished = [
         search: {
             type: 'select',
             rename: 'classifiedId',
+            termFilter: ['in', 'nin'],
             componentProps: {
                 placeholder: '请选择流程分类',
             },
@@ -330,6 +332,7 @@ const columnsInitiate = [
         search: {
             type: 'select',
             rename: 'classifiedId',
+            termFilter: ['in', 'nin'],
             componentProps: {
                 placeholder: '请选择流程分类',
             },
@@ -433,6 +436,7 @@ const columnsCc = [
         search: {
             type: 'select',
             rename: 'classifiedId',
+            termFilter: ['in', 'nin'],
             componentProps: {
                 placeholder: '请选择流程分类',
             },
@@ -547,9 +551,11 @@ const columnDraft = [
         dataIndex: 'classifiedName',
         key: 'classifiedName',
         ellipsis: true,
+        
         search: {
             type: 'select',
             rename: 'classifiedId',
+            termFilter: ['in', 'nin'],
             componentProps: {
                 placeholder: '请选择流程分类',
             },

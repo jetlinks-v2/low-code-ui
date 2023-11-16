@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { findNodeById } from './utils'
+import { findNodeById, handleTermsData } from './utils'
 import { useFlowStore } from '@/store/flow'
 import ConditionSelect from './ConditionSelect.vue'
 
@@ -55,7 +55,7 @@ const saveConfigToStore = () => {
       flowStore.selectedNode.id,
     )
     const { condition, terms } = basicFormData
-    condition.configuration.terms = terms
+    condition.configuration.terms = handleTermsData(terms)
     result.props = { ...result.props, condition }
     resolve(result)
   })

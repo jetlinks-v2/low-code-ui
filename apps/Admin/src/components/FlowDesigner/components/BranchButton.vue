@@ -111,7 +111,7 @@ defineExpose({
     errorInfo.value = ''
     const complexWeight = props.data?.props?.weight?.complexWeight
     const inputNodeWeight = props.data?.props?.weight?.inputNodeWeight
-    if (inputNodeWeight !== undefined && complexWeight !== undefined) {
+    if (inputNodeWeight !== undefined && Object.values(inputNodeWeight).length && complexWeight !== undefined) {
       const _weight = Object.values(inputNodeWeight).reduce((prev: number, next) => prev + next, 0)
       if (_weight < complexWeight) {
         err.push({

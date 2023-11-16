@@ -383,7 +383,10 @@ watch(
 watch(
   () => props.selected,
   (newVal) => {
-    _selectedRowKeys.value = cloneDeep(newVal || [])
+    const _newValue = newVal.filter(item => {
+      return item && Object.keys(item)?.length
+    })
+    _selectedRowKeys.value = cloneDeep(_newValue || [])
   },
   {
     deep: true,

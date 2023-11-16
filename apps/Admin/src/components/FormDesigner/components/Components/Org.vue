@@ -9,6 +9,8 @@
       placeholder="请选择"
       :size="size"
       style="width: 100%"
+      showSearch
+      treeNodeFilterProp="label"
     >
     </j-tree-select>
   </div>
