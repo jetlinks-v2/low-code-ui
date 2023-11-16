@@ -173,6 +173,12 @@ const updateNodesFormBinds = (forms, node) => {
                 (f) => f.id === p.formItemProps.name,
               )?.accessModes || ['read']
             : ['read'],
+          // 实际勾选的组件id, 用于回显
+          realCheck: _fixedFormBinds
+            ? _fixedFormBinds[item.key]?.find(
+                (f) => f.id === p.formItemProps.name,
+              )?.realCheck
+            : undefined,
         })
       }
     })

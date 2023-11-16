@@ -94,3 +94,6 @@ export const operatorMap = {
 export const advancedComponents = [
     'org', 'user', 'role', 'product', 'device'
 ]
+
+// 布局组件
+export const layoutComponents = ['card', 'grid', 'tabs', 'collapse', 'space']
