@@ -10,7 +10,7 @@ export const getList_api = (data: any) => request.post(`/process/deployment/deta
  * 条件查询所有实例
  * @returns 
  */
-export const getAllInstance_api = (data: any) => request.post(`/process/deployment/_query/no-paging`, data);
+export const getAllInstance_api = (data: any) => request.post(`/process/deployment/detail/_query/no-paging`, data);
 
 /**
  * 复制为模型

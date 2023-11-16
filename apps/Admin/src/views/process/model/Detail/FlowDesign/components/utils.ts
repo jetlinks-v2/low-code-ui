@@ -1,6 +1,7 @@
 import { cloneDeep, pick } from 'lodash-es'
 import { advancedComponents } from './const'
 import { useFlowStore } from '@/store/flow'
+import { layoutComponents } from './const'
 
 const flowStore = useFlowStore()
 
@@ -187,8 +188,8 @@ export function filterFormByName(list, name) {
     // console.log('list: ', list);
     const _res = []
     list?.forEach(item => {
-        const _fields = item.flattenFields || []
-        const _filterFields = _fields.filter(f => {
+        // 平铺字段
+        const _filterFields = item.flattenFields?.filter(f => {
             if (f.formItemProps.label) {
                 // 常规组件
                 return f.formItemProps.label.includes(name)
@@ -197,13 +198,29 @@ export function filterFormByName(list, name) {
                 return f.componentProps?.name?.includes(name)
             }
         })
-        if (_filterFields.length) {
-            // @ts-ignore
-            _res.push({
-                ...item,
-                flattenFields: _filterFields
-            })
-        }
+        // if (_filterFields.length) {
+        //     // @ts-ignore
+        //     _res.push({
+        //         ...item,
+        //         flattenFields: _filterFields
+        //     })
+        // }
+
+        // 预览字段
+        const _previewFields = item.previewFields?.filter(f => {
+            if (!f.type.includes('item')) {
+                // 常规组件
+                return f.formItemProps.label.includes(name)
+            } else {
+                // 布局组件从内部组件筛选
+                return f.children?.some(s => s.formItemProps.label.includes(name))
+            }
+        })
+        _res.push({
+            ...item,
+            flattenFields: _filterFields,
+            previewFields: _previewFields,
+        })
     })
     return _res
 }
@@ -330,15 +347,19 @@ export function flattenTree(fields, parent = null, depth = 0) {
 export function updateFieldDisabled(fields, currentField) {
     for (let i = 0; i < fields.length; i++) {
         if (fields[i].key === currentField.key) {
-            // 设置布局组件禁用状态
-            fields[i].componentProps.disabled = !currentField.accessModes.includes('write')
-            // 设置布局组件内部组件禁用状态
-            fields[i].children?.forEach(item => {
-                item.componentProps.disabled = fields[i].componentProps.disabled
-                item.children?.forEach(inner => {
-                    inner.componentProps.disabled = fields[i].componentProps.disabled
+            if (!layoutComponents.includes(fields[i].type)) {
+                // 非布局组件
+                fields[i].componentProps.disabled = !currentField.accessModes?.includes('write')
+            } else {
+                // 布局组件
+                // 设置布局组件内部组件禁用状态
+                fields[i].children?.forEach(item => {
+                    item.componentProps.disabled = fields[i].componentProps.disabled
+                    item.children?.forEach(inner => {
+                        inner.componentProps.disabled = fields[i].componentProps.disabled
+                    })
                 })
-            })
+            }
             return
         }
         if (fields[i].children?.length) {

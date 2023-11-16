@@ -57,7 +57,7 @@ import { onlyMessage } from '@jetlinks/utils';
 import FormItem from './FormItem.vue'
 import md5 from 'md5'
 import { getImage } from '@jetlinks/utils'
-import { handleSingleData } from './index'
+import {  handleSingleData } from './index'
 import { handleFormToTable } from '../../../model/Detail/FlowDesign/components/TableFormPreviewUtil'
 
 const props = defineProps({
@@ -100,7 +100,7 @@ const btnLoading = ref(false)
 //提交可选审批人条件
 const candidates = ref()
 //存放表单暂存数据
-const formData = ref({})
+const formData = ref([])
 //需要转换数据的组件类型
 const tableType = ["device", "product", "role", "user", "org"]
 //表格可转换的组件类型
@@ -225,6 +225,7 @@ const dealIotModuleData = (data, keys) => {
 //处理接受的可编辑表格数据
 const onClick = async (value) => {
     const promise = []
+    const memorizer = []
     modalType.value = value
     if (modalType.value === 'save') {
         let data = []
@@ -252,7 +253,25 @@ const onClick = async (value) => {
             }
         })
     } else {
-        formRef.value?.forEach((i, index) => {
+        formValue.value.forEach(i=>{
+            if(!i?.multiple){
+                const obj = {
+                    formId:i.formId,
+                    formKey:i.formKey
+                }
+                memorizer.push(obj)
+            }
+        })
+        formValue.value.forEach(i=>{
+            if(i.multiple){
+                const obj = {
+                    formId:i.formId,
+                    formKey:i.formKey
+                }
+                memorizer.push(obj)
+            }
+        })
+        formRef.value?.forEach((i) => {
             promise.push(i.onSave())
         })
         tableRef.value?.forEach((i) => {
@@ -262,8 +281,10 @@ const onClick = async (value) => {
             let data = []
             res.forEach((i, index) => {
                 data.push({
-                    formId: formValue.value[index].formId,
-                    formKey: formValue.value[index].formKey,
+                    // formId: formValue.value[index].formId,
+                    // formKey: formValue.value[index].formKey,
+                    formId:memorizer[index].formId,
+                    formKey:memorizer[index].formKey,
                     data: Array.isArray(i) ? i : {
                         ...formValue.value[index].data,
                         ...i
@@ -432,6 +453,11 @@ const dealForm = (nodes) => {
 //
 watch(() => props.info, () => {
     formValue.value = cloneDeep(props.info?.form)
+    props?.info?.form?.forEach((i)=>{
+        if(!Array.isArray(i?.data)){
+            formData.value.push(i?.data)
+        }
+    })
     nodes.value = JSON.parse(props.info.modelContent)?.nodes
     if (props.type === 'todo') {
         dealForm(nodes.value)
