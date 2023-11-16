@@ -232,7 +232,7 @@ const findValueOptions = async () => {
 }
 
 watch(
-  () => props.modelValue,
+  () => [props.modelValue, props.conditionType],
   () => {
     myValue.value = props.conditionType === 'switch' ? String(props.modelValue) : props.modelValue
   },

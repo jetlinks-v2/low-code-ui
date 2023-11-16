@@ -126,13 +126,14 @@ const content = computed(() => {
 
 const formatValue = (item) => {
   const condition = `${item.type === 'and' ? '并且' : item.type === 'or' ? '或者' : ''}`
+  const _viewValue = item.viewValue ?? item.value
   switch (item.termType) {
     case 'in':
-      return ` ${condition} ${item.columnName || ''} 在 ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''} 之中`
+      return ` ${condition} ${item.columnName || ''} 在 ${item.selectedItem ? item.selectedItem?.join('、') : _viewValue || ''} 之中`
     case 'nin':
-      return ` ${condition} ${item.columnName || ''} 不在 ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''} 之中`
+      return ` ${condition} ${item.columnName || ''} 不在 ${item.selectedItem ? item.selectedItem?.join('、') : _viewValue || ''} 之中`
     default:
-      return ` ${condition} ${item.columnName || ''} ${item.termTypeName || ''} ${item.selectedItem ? item.selectedItem?.join('、') : item.value || ''}`
+      return ` ${condition} ${item.columnName || ''} ${item.termTypeName || ''} ${item.selectedItem ? item.selectedItem?.join('、') : _viewValue || ''}`
   }
 }
 
