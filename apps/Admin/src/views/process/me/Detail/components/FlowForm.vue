@@ -51,7 +51,7 @@
 <script setup>
 import FlowModal from './FlowModal.vue';
 import FormPreview from '@/components/FormDesigner/preview.vue'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, isObject } from 'lodash-es'
 import { _claim, _save, _complete, _reject } from '@/api/process/me'
 import { onlyMessage } from '@jetlinks/utils';
 import FormItem from './FormItem.vue'
@@ -360,6 +360,31 @@ const handleDisabled = (arr, accessModes) => {
     })
 }
 
+//处理数据来源是枚举的情况
+const handleObject = (form)=>{
+
+    const findComponent = (key,arr)=>{
+        return arr.find(item=>{
+            if(key ===item.key){
+                return true
+            }
+            if(item.children && item.children.length!==0){
+                findComponent(key,item.children)
+            }
+        })
+    }
+   
+    for(const key in form.data){
+        if(isObject(form.data[key])){
+            const comment = findComponent(key,form.configuration.children)
+            if(comment && comment?.componentProps.source.type === 'dic'){
+                form.data[key] = form.data[key].value
+            }
+        }
+    }
+    
+}
+
 // 列表接口数据nodeId 对应form表单ID处理数据
 const dealForm = (nodes) => {
     console.log('nodes---', nodes, props.nodeId)
@@ -386,6 +411,7 @@ const dealForm = (nodes) => {
             bindMap.set(id, nodes.props.formBinds[item])
         })
         formValue.value = formValue.value.map(item => {
+            handleObject(item)
             if (bindMap.has(item.formId)) {
                 item.configuration.children = handleDisabled(item.configuration.children, bindMap.get(item.formId))
             }
@@ -411,6 +437,7 @@ watch(() => props.info, () => {
         dealForm(nodes.value)
     } else {
         formValue.value?.map((i) => {
+            handleObject(i)
             if (i.multiple) {
                 dealTable(true)
             } else {
@@ -421,7 +448,7 @@ watch(() => props.info, () => {
 
         })
     }
-    // console.log('formValue.value',formValue.value)
+    console.log('formValue.value',formValue.value)
 })
 </script>
 
