@@ -215,7 +215,7 @@ const getLatestFormList = () => {
           return {
             ...m,
             formName: row?.name || m.formName,
-            fullInfo: row || m,
+            fullInfo: row || m.fullInfo,
             isDelete: !row,
             // isDelete: !res.includes(m.formId),
           }
