@@ -86,8 +86,13 @@ const basicFormData = reactive({
 
 const allConditionBranches = computed(() => {
   const _res = flowStore.selectedNode.branches.map((m) => ({
+    // 选项名称取条件分支名称
     label: m.name,
-    value: m.id,
+    // value: m.id,
+    // 选项值取条件下第一个业务节点, 如果没有业务节点则取整个分支下的空节点
+    value: Object.keys(m.children).length
+      ? m.children.id
+      : flowStore.selectedNode.children.id,
   }))
 
   // 过滤已经删除的节点
