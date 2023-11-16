@@ -105,7 +105,7 @@ const handleProps = (node: any) => {
 const handleFormItemProps = (node: any) => {
     return {
         label: node?.name,
-        required: false,
+        required: node.type === 'switch' ? true : false,
         rules: [],
         name: node?.key,
         ...node?.formItemProps

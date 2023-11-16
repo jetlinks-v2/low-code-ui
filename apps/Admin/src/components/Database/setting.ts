@@ -12,8 +12,8 @@ export const defaultSetting = [
     "name":"create_time",
     "alias":"createTime",
     "comment":"创建时间",
-    "jdbcType":"BIGINT",
-    "javaType":"Long",
+    "jdbcType":"TIMESTAMP",
+    "javaType":"DateTime",
     "length":64,
     "updatable":false
   },
@@ -30,8 +30,8 @@ export const defaultSetting = [
     "name":"modify_time",
     "alias":"modifyTime",
     "comment":"修改时间",
-    "jdbcType":"BIGINT",
-    "javaType":"Long",
+    "jdbcType":"TIMESTAMP",
+    "javaType":"DateTime",
     "length":64
   },
   {
@@ -66,8 +66,8 @@ export const defaultTreeSetting = [
     "name":"create_time",
     "alias":"createTime",
     "comment":"创建时间",
-    "jdbcType":"BIGINT",
-    "javaType":"Long",
+    "jdbcType":"TIMESTAMP",
+    "javaType":"DateTime",
     "length":64,
     "updatable":false
   },
@@ -84,8 +84,8 @@ export const defaultTreeSetting = [
     "name":"modify_time",
     "alias":"modifyTime",
     "comment":"修改时间",
-    "jdbcType":"BIGINT",
-    "javaType":"Long",
+    "jdbcType":"TIMESTAMP",
+    "javaType":"DateTime",
     "length":64
   },
   {
