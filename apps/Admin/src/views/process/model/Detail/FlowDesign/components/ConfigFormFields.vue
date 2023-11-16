@@ -398,9 +398,9 @@ const handlePreviewFields = (data) => {
       ..._layoutItems,
     ]
 
-    // console.log('_previewFields: ', _previewFields)
+    console.log('_previewFields: ', _previewFields)
     const _existFields = forms.value[m.key]
-    // console.log('_existFields: ', _existFields)
+    console.log('_existFields: ', _existFields)
     if (_existFields && _existFields.length) {
       _previewFields?.forEach((p) => {
         const _currentField = _existFields.find((f) => {
@@ -430,7 +430,11 @@ const handlePreviewFields = (data) => {
                 p['accessDone'] = true
                 p.children?.forEach((item) => {
                   if (p.type !== 'tabs-item') {
-                    if (f.id === item.formItemProps.name) {
+                    if (
+                      f.id === item.formItemProps.name ||
+                      f.ownerBy === item.formItemProps.name
+                    ) {
+                      // 高级组件在布局组件内部时, 取ownerBy字段判断
                       item.accessModes = f.accessModes
                     }
                   } else {
@@ -480,7 +484,7 @@ const handlePreviewFields = (data) => {
     }
   })
   allFormList.value = cloneDeep(filterFormList.value)
-  //   console.log('filterFormList.value2: ', filterFormList.value)
+  console.log('filterFormList.value2: ', filterFormList.value)
 }
 
 /**
@@ -650,12 +654,17 @@ const handleOk = () => {
         ) &&
         advancedComponents.includes(p.type)
       ) {
+        // 高级组件是否在布局组件内部
+        const _advancedInLayout = cloneDeep(
+          getFieldByKey(item.previewFields, p.formItemProps.name),
+        )
         // 高级组件, 并且为单选模式时, 将componentProps.keys平铺存入formBinds
         p.componentProps.keys?.forEach((k) => {
           forms.value[item.key].push({
             id: k.config.source,
             required: p.formItemProps.required || false,
-            accessModes: p.accessModes || ['read'],
+            accessModes: _advancedInLayout?.accessModes ||
+              p.accessModes || ['read'],
             ownerBy: p.formItemProps.name, // key所属高级组件, 用于回显
           })
         })
