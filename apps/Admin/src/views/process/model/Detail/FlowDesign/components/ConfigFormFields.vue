@@ -722,7 +722,8 @@ const handleOk = () => {
                 : ['read'],
               // 实际勾选的组件id, 用于回显
               realCheck: !_layoutItemField.type.includes('item')
-                ? undefined
+                ? // ? undefined
+                  [_layoutItemField.formItemProps?.name]
                 : _layoutItemField.children
                     ?.filter((f) => f.accessModes?.length === 2)
                     ?.map((m) => m.formItemProps.name),
