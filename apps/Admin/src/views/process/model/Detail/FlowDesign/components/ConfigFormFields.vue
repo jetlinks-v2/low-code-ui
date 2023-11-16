@@ -197,7 +197,12 @@
 <script setup lang="ts">
 import { queryFormNoPage_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
-import { filterFormByName, updateFieldDisabled, flattenTree } from './utils'
+import {
+  filterFormByName,
+  updateFieldDisabled,
+  flattenTree,
+  getFieldByKey,
+} from './utils'
 import { cloneDeep } from 'lodash-es'
 import FormPreview from '@/components/FormDesigner/preview.vue'
 import TableFormPreview from './TableFormPreview.vue'
@@ -475,7 +480,7 @@ const handlePreviewFields = (data) => {
     }
   })
   allFormList.value = cloneDeep(filterFormList.value)
-  console.log('filterFormList.value2: ', filterFormList.value)
+  //   console.log('filterFormList.value2: ', filterFormList.value)
 }
 
 /**
@@ -614,8 +619,11 @@ const getTableColumns = (fields: any[]) => {
     ...m,
     form: {
       rules: [
+        {
+          required: m.formItemProps?.required || false,
+          message: `请输入${m.formItemProps?.label}`,
+        },
         ...(m.formItemProps?.rules || []),
-        { required: m.formItemProps?.required || false, message: '此项为必填' },
       ],
     },
   }))
@@ -720,39 +728,6 @@ const handleOk = () => {
   console.log('filterFormList.value: ', filterFormList.value)
   console.log('forms.value: ', forms.value)
   emits('update:value', forms.value)
-}
-
-/**
- * 从previewFields中查找字段
- */
-const getFieldByKey = (data: any, key: string) => {
-  if (!data.length) return
-  let _res
-  for (let i = 0; i < data.length; i++) {
-    if (data[i].formItemProps?.name === key) {
-      _res = data[i]
-      if (_res) break
-    } else {
-      if (data[i].type.includes('item')) {
-        if (data[i].isWrapOn) {
-          // formItemProps.isLayout不存在, 或者存在并且为true
-          if (data[i].parent?.formItemProps?.name === key) {
-            data[i].parent.accessModes = data[i].children?.some(
-              (s) => s.accessModes?.length === 2,
-            )
-              ? ['read', 'write']
-              : ['read']
-            _res = data[i].parent
-            if (_res) break
-          }
-        } else {
-          _res = getFieldByKey(data[i].children, key)
-          if (_res) break
-        }
-      }
-    }
-  }
-  return _res
 }
 
 watch(

@@ -426,3 +426,37 @@ export function findBranches(nodes, result: any[] = []) {
     }
     return result
 }
+
+
+/**
+ * 从previewFields中查找字段
+ */
+export function getFieldByKey(data: any, key: string) {
+    if (!data.length) return
+    let _res
+    for (let i = 0; i < data.length; i++) {
+        if (data[i].formItemProps?.name === key) {
+            _res = data[i]
+            if (_res) break
+        } else {
+            if (data[i].type.includes('item')) {
+                if (data[i].isWrapOn) {
+                    // formItemProps.isLayout不存在, 或者存在并且为true
+                    if (data[i].parent?.formItemProps?.name === key) {
+                        data[i].parent.accessModes = data[i].children?.some(
+                            (s) => s.accessModes?.length === 2,
+                        )
+                            ? ['read', 'write']
+                            : ['read']
+                        _res = data[i].parent
+                        if (_res) break
+                    }
+                } else {
+                    _res = getFieldByKey(data[i].children, key)
+                    if (_res) break
+                }
+            }
+        }
+    }
+    return _res
+}
