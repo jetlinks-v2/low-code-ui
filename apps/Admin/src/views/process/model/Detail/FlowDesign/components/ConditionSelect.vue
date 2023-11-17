@@ -67,7 +67,7 @@
         @change="handleTermTypeChange(item)"
       />
       <ConditionValueItem
-        v-model:modelValue="item.value"
+        v-model:modelValue="item.viewValue"
         v-model:selectedItem="item.selectedItem"
         :operator="item.selectedTermType"
         :formItemComponent="item.selectedNodeId"
@@ -106,6 +106,8 @@ interface IConditionSelect {
   column: string | undefined
   termType: string | undefined
   value: string | string[] | number | undefined
+
+  viewValue: string | string[] | number | undefined
   searchValue: string | undefined
   type?: string
 
@@ -160,7 +162,7 @@ const getLatestFormList = async () => {
   getFormFields()
 }
 
-/** 
+/**
  * 获取条件下拉数据
  */
 const getFormFields = async () => {
@@ -206,7 +208,7 @@ const getFormFields = async () => {
  * @param item
  */
 const handleConditionChange = (value, node, item, index) => {
-  item.value = item.selectedTermType = item.termType = item.termTypeName = item.selectedItem = undefined
+  item.value = item.viewValue = item.selectedTermType = item.termType = item.termTypeName = item.selectedItem = undefined
   item.column = node.fullId
   item.columnName = node.name
   item.selectedNodeId = node.id

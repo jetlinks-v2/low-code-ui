@@ -59,7 +59,7 @@
             :fieldNames="{
               children: 'children',
               title: 'name',
-              key: ['org','user','role'].includes(active) ? 'id': 'fullId',
+              key: ['org', 'user', 'role'].includes(active) ? 'id' : 'fullId',
             }"
             @select="onSelect"
           >
@@ -254,7 +254,9 @@ const setLevel = (data: any[]) => {
     })
   }
   dealData(cloneData)
-  return props.type === 'user' ? cloneData : cloneData.filter(i => i.id !== 'task')
+  return props.type === 'user'
+    ? cloneData
+    : cloneData.filter((i) => i.id !== 'task')
 }
 
 const onSelect = (keys: string[], { node, selected }) => {

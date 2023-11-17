@@ -63,3 +63,10 @@ export const process_list = (data: any) => request.post(`/process/runtime/proces
  * @returns 
  */
 export const process_tran = (data: any) => request.post(`/process/runtime/_transfer`, data)
+
+/**
+ * 原办理人
+ * @param data 
+ * @returns 
+ */
+export const original_list = (data: any) => request.post(`/process/runtime/identity/_query/no-paging?distinctBy=dimensionKey`, data)

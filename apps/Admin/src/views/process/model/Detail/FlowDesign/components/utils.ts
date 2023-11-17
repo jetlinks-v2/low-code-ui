@@ -1,4 +1,4 @@
-import { cloneDeep, pick } from 'lodash-es'
+import {cloneDeep, isString, pick} from 'lodash-es'
 import { advancedComponents } from './const'
 import { useFlowStore } from '@/store/flow'
 import { layoutComponents } from './const'
@@ -459,4 +459,32 @@ export function getFieldByKey(data: any, key: string) {
         }
     }
     return _res
+}
+
+export const handleLikeValue = (v: string) => {
+  if (isString(v)) {
+    return v.split('').reduce((pre: string, next: string) => {
+      let _next = next;
+      if (next === '\\') {
+        _next = '\\\\';
+      } else if (next === '%') {
+        _next = '\\%';
+      }
+      return pre + _next;
+    }, '');
+  }
+  return v;
+};
+
+
+export const handleTermsData = (terms) => {
+  return terms.map(item => {
+    if (['like', 'nlike'].includes(item.termType) && !!item.value) {
+      item.value = `%${handleLikeValue(item.value)}%`;
+    } else {
+      item.value = item.value || item.viewValue
+    }
+
+    return item
+  })
 }

@@ -65,7 +65,7 @@
                 <template #header>
                   <div class="form-title">
                     <div class="name">
-                      <j-ellipsis line-clamp="1">
+                      <j-ellipsis line-clamp="1" style="width: 150px">
                         {{ form.name }}
                       </j-ellipsis>
                     </div>
@@ -89,7 +89,7 @@
                 >
                   <div class="field-title">
                     <div class="name">
-                      <j-ellipsis line-clamp="1">
+                      <j-ellipsis line-clamp="1" style="width: 130px">
                         {{
                           field.formItemProps?.label ||
                           field.componentProps?.name
@@ -124,7 +124,7 @@
                     <template #header>
                       <div class="layout-title">
                         <div class="name">
-                          <j-ellipsis line-clamp="1">
+                          <j-ellipsis line-clamp="1" style="width: 130px">
                             {{
                               field.parent?.componentProps?.title ||
                               field.componentProps?.name ||
@@ -141,7 +141,7 @@
                       :key="layoutField.key"
                     >
                       <div class="name">
-                        <j-ellipsis line-clamp="1">
+                        <j-ellipsis line-clamp="1" style="width: 120px">
                           {{
                             layoutField.formItemProps?.label ||
                             layoutField.componentProps?.name
@@ -429,26 +429,25 @@ const handlePreviewFields = (data) => {
                 // 读写权限设置标识, 此处单独设置
                 p['accessDone'] = true
                 p.children?.forEach((item) => {
-                  if (p.type !== 'tabs-item') {
-                    if (
-                      f.id === item.formItemProps.name ||
-                      f.ownerBy === item.formItemProps.name
-                    ) {
-                      // 高级组件在tabs布局组件内部时, 取ownerBy字段判断
-                      item.accessModes = f.accessModes
-                    }
-                  } else {
-                    if (f.ownerBy === item.formItemProps.name) {
-                      // 高级组件在非tabs布局组件内部时, 取ownerBy字段判断
-                      item.accessModes = f.accessModes
-                    }
-                    if (f.realCheck) {
-                      item.accessModes = f.realCheck.includes(
-                        item.formItemProps.name,
-                      )
-                        ? f.accessModes
-                        : ['read']
-                    }
+                  if (
+                    f.id === item.formItemProps.name ||
+                    f.ownerBy === item.formItemProps.name
+                  ) {
+                    // 高级组件在tabs布局组件内部时, 取ownerBy字段判断
+                    item.accessModes = f.accessModes
+                  }
+                  if (
+                    !(
+                      p.formItemProps.hasOwnProperty('isLayout') &&
+                      !p.formItemProps.isLayout
+                    )
+                  ) {
+                    // 布局组件item没有isLayout字段或者有isLayout=true时
+                    item.accessModes = f.realCheck?.includes(
+                      item.formItemProps.name,
+                    )
+                      ? f.accessModes
+                      : ['read']
                   }
                 })
                 return p.formItemProps.name === f.id
@@ -722,7 +721,8 @@ const handleOk = () => {
                 : ['read'],
               // 实际勾选的组件id, 用于回显
               realCheck: !_layoutItemField.type.includes('item')
-                ? undefined
+                ? // ? undefined
+                  [_layoutItemField.formItemProps?.name]
                 : _layoutItemField.children
                     ?.filter((f) => f.accessModes?.length === 2)
                     ?.map((m) => m.formItemProps.name),
