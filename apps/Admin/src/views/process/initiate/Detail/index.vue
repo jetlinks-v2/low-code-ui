@@ -168,7 +168,7 @@ const getTableColumns = (
       rules: handleRules(m),
     },
   }))
-  if(isArray(data)){
+  if (isArray(data)) {
     tableData[formId] = data.reverse()
   }
   return handleFormToTable(_columns)
@@ -179,7 +179,7 @@ const getTableColumns = (
  * @param array
  */
 const hasData = (array: any[] = []) => {
-  const tableList = Object.values(tableData)
+  const tableList: any = Object.values(tableData)
 
   if (tableList.length < 1 && array?.length < 1) {
     return false
@@ -189,9 +189,14 @@ const hasData = (array: any[] = []) => {
       flag = Object.values(i).some((key: any) => key || key?.length > 0)
       if (flag) break
     }
-    tableList?.forEach((item: any) => {
-      flag = Object.values(item[0]).some((key: any) => key || key?.length > 0)
-    })
+    // tableList?.forEach((item: any) => {
+    // flag = Object.values(item[0]).some((key: any) => key || key?.length > 0)
+    // })
+    flag = tableList
+      .flat(2)
+      ?.some((item) =>
+        Object.values(item)?.some((key: any) => key || key?.length > 0),
+      )
     return flag
   }
 }
