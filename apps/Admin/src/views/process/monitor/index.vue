@@ -133,6 +133,7 @@ const defaultColumns = [
     scopedSlots: true,
     search: {
       type: 'select',
+      termFilter: ['in' , 'nin'],
       rename: 'classifiedId',
       componentProps: {
         placeholder: '请选择流程分类',
