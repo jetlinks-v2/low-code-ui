@@ -1,3 +1,4 @@
+import { advancedComponents } from "../FlowDesign/components/const"
 
 /**
  * 生成随机背景色，并且保证黑色文字可读性
@@ -87,7 +88,15 @@ export const filterFormVariables = (data: any[], id: string) => {
     if (children?.length) {
       return filterFormVariables(children, id)
     }
-    return key === id
+    if (!(
+        item.componentProps?.hasOwnProperty('mode') &&
+        item.componentProps?.mode === 'multiple'
+    ) && advancedComponents.includes(item.type)) {
+        // 高级组件单选模式
+        return item.componentProps?.keys?.some((s) => s.config.source === id)
+    } else {
+        return key === id
+    }
   })
 }
 
