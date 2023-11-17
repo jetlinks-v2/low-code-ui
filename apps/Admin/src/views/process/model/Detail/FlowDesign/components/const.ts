@@ -92,6 +92,7 @@ const operatorArray = [{
 export const operatorMap = {
     default: operatorInput,
     input: operatorInput,
+    string: operatorInput,
     password: operatorInput,
     number: operatorInput,
     textarea: operatorInput,
