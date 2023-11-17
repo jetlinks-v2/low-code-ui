@@ -245,10 +245,11 @@ const setLevel = (data: any[]) => {
       item.id = item.fullId
       // item.type = item.others?.type || ''
       item.relation = item.others?.relation || ''
-      if (level !== 4) {
-        item.disabled = true
-      }
+      // if (level !== 4) {
+      //   item.disabled = true
+      // }
       if (item.children && item.children.length > 0) {
+        item.disabled = true
         dealData(item.children, level + 1)
       }
     })

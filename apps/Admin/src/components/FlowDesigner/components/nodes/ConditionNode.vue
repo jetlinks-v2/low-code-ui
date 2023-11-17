@@ -62,6 +62,7 @@ import InsertButton from '../InsertButton.vue'
 import { useFlowStore } from '@/store/flow'
 import {queryVariables_api} from "@/api/process/model";
 import  { isArray } from 'lodash-es'
+import {filterFormVariables} from "@/views/process/model/Detail/ShowCopy/utils";
 
 const emits = defineEmits([
   'insertNode',
@@ -147,29 +148,15 @@ const validateVariables = (data, keys) => {
   })
 }
 
-const validateFormItem = async () => {
-
-  const { id, name, key, model, provider } = flow.modelBaseInfo
-  const params = {
-    definition: {
-      id,
-      name,
-      key,
-      model: JSON.stringify(flow.model), // model不能取modelBaseInfo(接口保存才会有值), 直接取动态值flowStore.model
-      provider,
-    },
-    nodeId: props.config.parentId, // 条件节点配置, id传当前条件节点的branchBy
-    containThisNode: false, //变量来源是否包含本节点
-  }
-  const { result } = await queryVariables_api(params)
-
-  const { terms } = props.config.props?.condition?.configuration || []
-  const termsKeys:string[] = terms.filter(item => item.column).map(item => {
-    const _keys = item.column.split('.')
-    return _keys.pop()
+const validateFormItem = async (data, keys) => {
+  return data.some(item => {
+    if (item.children?.length) {
+      return filterFormVariables(item.children, keys)
+    }
+    console.log('validateFormItem', item, keys)
+    return keys.every(k => k === item.key)
   })
-  console.log(result, termsKeys)
-  return validateVariables(result, termsKeys)
+
 }
 
 const isEmpty = (v) => {
@@ -181,41 +168,57 @@ const isEmpty = (v) => {
   );
 };
 
+
+const getFormIds = (data: any[], formKeySet: Set<string>) => {
+  data.forEach(item => {
+    if (item.children?.length) {
+      return getFormIds(item.children, formKeySet)
+    } else {
+      formKeySet.add(item.key)
+    }
+  })
+}
+
 /**
  * 校验节点
  */
 const validate = (err) => {
-  const { terms } = props.config.props?.condition?.configuration
+  const { terms } = props.config.props?.condition?.configuration || {}
 
   showError.value = true
   errorInfo.value = '未填写必填配置项'
-  // const hasVar = await validateFormItem()
-  // console.log('hasVar', hasVar)
-  // if (!hasVar){
-  //   errorInfo.value = '配置项错误'
-  //   err.push({
-  //     errors: ['配置项错误'],
-  //     name: ['condition', 'configuration', 'terms'],
-  //   })
-  // } else if (
-  //   !terms ||
-  //   !terms.length ||
-  //   !terms.some((item) => Boolean(Object.keys(item).length)) ||
-  //   terms.some(item => !item.column || !item.termType || !item.value)
-  // ) {
-  //   err.push({
-  //     errors: ['请配置进入下方节点的条件'],
-  //     name: ['condition', 'configuration', 'terms'],
-  //   })
-  // } else {
-  //   showError.value = false
-  //   errorInfo.value = ''
-  // }
+
+
+  const termsKeys:string[] = terms?.filter(item => {
+    return item.column && !item.column.includes('process.var')
+  }).map(item => {
+    const _keys = item.column.split('.')
+    return _keys.pop()
+  })
+
+  const formKeySet = new Set<string>();
+
+  (flow.model?.config?.forms || []).forEach(item => {
+    return getFormIds(item.fullInfo?.configuration?.children || [], formKeySet)
+  })
+
+  const hasVar = termsKeys.every(key => {
+    return formKeySet.has(key)
+  })
+
+  console.log('ConditionNode',hasVar, terms)
+
   if (!props.config?.name) {
     err.push({
       errors: ['条件节点名称不能为空'],
       name: ['name'],
     })
+  } else if (!hasVar) {
+    err.push({
+      errors: ['请配置进入下方节点的条件'],
+      name: ['condition', 'configuration', 'terms'],
+    })
+    errorInfo.value = '条件配置变量已删除'
   } else if (
     !terms?.length ||
     !terms.some((item) => Boolean(Object.keys(item).length)) ||
