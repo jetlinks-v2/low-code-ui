@@ -110,7 +110,7 @@ const relationTreeData = computed(() => {
     } else {
       return false
     }
-  })
+  })?.filter((i) => i.id !== 'task')
 })
 
 /**
