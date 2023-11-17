@@ -2,6 +2,9 @@
   <j-menu mode="vertical" :value="''" v-if="node.type !== 'project'"
     @click="({ key: menuKey }) => onContextMenuClick(node, menuKey)">
     <j-sub-menu :key="actionMap['Add'].key" :title="actionMap['Add'].value" style="width: 160px">
+      <template #icon>
+          <img :src="getImage('/project/tree-add.png')" style="width: 16px; height: 14px;">
+        </template>
       <j-menu-item :key="providerEnum.Module">
         <template #icon>
           <img :src="getImage('/project/module.svg')" style="width: 24px; height: 24px;">
@@ -45,11 +48,36 @@
         {{ providerMap[providerEnum.Function] }}
       </j-menu-item>
     </j-sub-menu>
-    <j-menu-item :key="actionMap['Profile'].key">{{ actionMap['Profile'].value }}</j-menu-item>
-    <j-menu-item :key="actionMap['Copy'].key">{{ actionMap['Copy'].value }}</j-menu-item>
-    <j-menu-item :key="actionMap['Paste'].key" :disabled="!copyFile">{{ actionMap['Paste'].value }}</j-menu-item>
-    <j-menu-item :key="actionMap['Rename'].key">{{ actionMap['Rename'].value }}</j-menu-item>
-    <j-menu-item :key="actionMap['Delete'].key">{{ actionMap['Delete'].value }}</j-menu-item>
+    <j-menu-item :key="actionMap['Profile'].key">
+      {{ actionMap['Profile'].value }}
+      <template #icon>
+          <img :src="getImage('/project/file.png')" style="width: 14px; height: 16px;">
+      </template>
+    </j-menu-item>
+    <j-menu-item :key="actionMap['Copy'].key">
+      <template #icon>
+          <img :src="getImage('/project/file-add.png')" style="width: 14px; height: 16px;">
+      </template>
+      {{ actionMap['Copy'].value }}
+    </j-menu-item>
+    <j-menu-item :key="actionMap['Paste'].key" :disabled="!copyFile">
+      {{ actionMap['Paste'].value }}
+      <template #icon>
+          <img :src="getImage('/project/file-copy.png')" style="width: 14px; height: 16px;">
+      </template>
+    </j-menu-item>
+    <j-menu-item :key="actionMap['Rename'].key">
+      <template #icon>
+          <img :src="getImage('/project/file-edit.png')" style="width: 14px; height: 16px;">
+      </template>
+      {{ actionMap['Rename'].value }}
+    </j-menu-item>
+    <j-menu-item :key="actionMap['Delete'].key">
+      <template #icon>
+          <img :src="getImage('/project/file-delete.png')" style="width: 14px; height: 16px;">
+      </template>
+      {{ actionMap['Delete'].value }}
+    </j-menu-item>
   </j-menu>
 </template>
 
