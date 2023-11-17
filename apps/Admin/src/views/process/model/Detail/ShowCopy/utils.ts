@@ -1,7 +1,7 @@
 
 /**
  * 生成随机背景色，并且保证黑色文字可读性
- * @returns 
+ * @returns
  */
 export function randomColor() {
     const letters = '0123456789ABCDEF'
@@ -17,8 +17,8 @@ export function randomColor() {
 }
 /**
  * 判断是否是深色
- * @param hexColor 
- * @returns 
+ * @param hexColor
+ * @returns
  */
 export function isDarkColor(hexColor) {
     const r = parseInt(hexColor.slice(1, 3), 16)
@@ -53,10 +53,10 @@ export function generateRandomColor() {
 
 /**
  * 分离变量数据中的表单数据(弹窗展示), 和其他变量数据(页面展示)
- * @param treeData 
- * @returns 
+ * @param treeData
+ * @returns
  */
-export function separateData(treeData: any[], result: { formList?: any[]; otherFields?: any[] }) {
+export function separateData(treeData: any[], result: { formList: any[]; otherFields: any[] }) {
     if (!result.otherFields) result.otherFields = []
     treeData.forEach(item => {
         if (item.children && item.children.length) {
@@ -75,4 +75,18 @@ export function separateData(treeData: any[], result: { formList?: any[]; otherF
         }
     })
     return result
+}
+
+
+export const filterFormVariables = (data: any[], id: string) => {
+  return data.some(item => {
+    if (item.configuration) {
+      return filterFormVariables(item.configuration?.children || [], id)
+    }
+    const { key, children } = item
+    if (children?.length) {
+      return filterFormVariables(children, id)
+    }
+    return key === id
+  })
 }

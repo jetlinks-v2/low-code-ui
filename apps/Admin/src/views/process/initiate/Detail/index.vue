@@ -25,33 +25,40 @@
                     :value="item.data"
                     :data="item.fullInfo?.configuration"
                   />
-                  <QuickEditTable
-                    v-else
-                    serial
-                    validate
-                    ref="tableRef"
-                    :data="tableData[item.formId]"
-                    :columns="item._columns"
-                    :height="500"
-                    :scroll="{ x: 1600 }"
-                  >
-                    <template
-                      v-for="j in item._columns"
-                      #[j.dataIndex]="{ index, record, valueChange }"
+                  <span v-else>
+                    <QuickEditTable
+                      serial
+                      validate
+                      ref="tableRef"
+                      :data="tableData[item.formId]"
+                      :columns="item._columns"
+                      :height="500"
+                      :scroll="{ x: 1600 }"
                     >
-                      <FormItem
-                        v-model="record[j.dataIndex]"
-                        :item-type="j.type"
-                        :disabled="j.componentProps?.disabled"
-                        :component-props="j.componentProps"
-                        @change="
-                          () => {
-                            valueChange(record[j.dataIndex])
-                          }
-                        "
-                      />
-                    </template>
-                  </QuickEditTable>
+                      <template
+                        v-for="j in item._columns"
+                        #[j.dataIndex]="{ index, record, valueChange }"
+                      >
+                        <FormItem
+                          v-model="record[j.dataIndex]"
+                          :item-type="j.type"
+                          :disabled="j.componentProps?.disabled"
+                          :component-props="j.componentProps"
+                          @change="
+                            () => {
+                              valueChange(record[j.dataIndex])
+                            }
+                          "
+                        />
+                      </template>
+                    </QuickEditTable>
+                    <j-button
+                      @click="() => addTableData(item)"
+                      block
+                      style="margin-top: 10px"
+                      >新增</j-button
+                    >
+                  </span>
                 </template>
               </div>
             </j-scrollbar>
@@ -100,7 +107,8 @@ import { getMeProcessList } from '@/api/process/me'
 import { getImage } from '@jetlinks/utils'
 import { useMenuStore } from '@/store'
 import FormItem from '@/views/process/me/Detail/components/FormItem.vue'
-import {handleRules} from "@/components/FormDesigner/hooks/useProps";
+import { handleRules } from '@/components/FormDesigner/hooks/useProps'
+import { isArray } from 'lodash-es'
 
 interface FormsProps {
   formId: string
@@ -132,10 +140,20 @@ const draftId = ref<string | undefined>('')
 const editDraft = ref<Boolean>(false)
 
 const tableData = reactive({})
+
+const addTableData = (item: any) => {
+  let obj = {}
+  item._columns.map((i) => {
+    const key = i.dataIndex
+    obj[key] = undefined
+  })
+  tableData[item.formId].push(obj)
+}
+
 const getTableColumns = (
   fields: any[],
   formId: string,
-  data: any = {},
+  data: any,
   multiple: boolean,
 ) => {
   const _columns = fields?.map((m) => ({
@@ -144,22 +162,15 @@ const getTableColumns = (
     ellipsis: true,
     formId,
     multiple,
-    width: 200,
+    // minWidth: 200,
     ...m,
     form: {
-      rules: handleRules(m)
+      rules: handleRules(m),
     },
   }))
-
-  _columns?.forEach((item) => {
-    if (tableData[formId]) {
-      if (multiple && data[0]) {
-        tableData[formId][0][item.dataIndex] = data[0][item.dataIndex]
-      } else {
-        tableData[formId][0][item.dataIndex] = data[item.dataIndex]
-      }
-    }
-  })
+  if(isArray(data)){
+    tableData[formId] = data.reverse()
+  }
   return handleFormToTable(_columns)
 }
 
@@ -311,7 +322,7 @@ const startProcess = (list: any, start: boolean | undefined = undefined) => {
         formId: editDraft.value
           ? i.formId
           : md5(i.formId + '|' + formVersion[i.formId]),
-        data: i.multiple ? tableData[i.formId][0] : list[flag++],
+        data: i.multiple ? tableData[i.formId] : list[flag++],
         formKey: i.formKey ?? i.formId,
       })),
       variables: {},
@@ -345,7 +356,9 @@ const handleData = (data: any, model: string) => {
       _fields?.forEach((p) => {
         const accessModes = bindMap
           .get(m.formId)
-          ?.find((k) => (k.ownerBy ?? k.id) === p.formItemProps.name)?.accessModes
+          ?.find(
+            (k) => (k.ownerBy ?? k.id) === p.formItemProps.name,
+          )?.accessModes
         p.componentProps.disabled = !accessModes?.includes('write')
       })
       if (m.multiple) {
