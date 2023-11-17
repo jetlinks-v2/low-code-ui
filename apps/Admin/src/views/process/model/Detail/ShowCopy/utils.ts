@@ -95,9 +95,8 @@ export const filterFormVariables = (data: any[], id: string, formItem: any) => {
         // 高级组件单选模式
         return item.componentProps?.keys?.some((s) => s.config.source === id)
     } else {
-        if (key === id) {
-          console.log(item, formItem)
-          formItem.label = item.name
+        if (key === id && item.formItemProps?.label) {
+          formItem.label = item.formItemProps.label
         }
         return key === id
     }
