@@ -26,13 +26,15 @@
             </template>
             <j-form-item name="autoComplete">
               <template #label>
-                自动通过
-                <j-tooltip placement="right">
-                  <template #title>
-                    某候选人在上一个审批/办理节点中担任过审批人角色，开启后其在当前节点的审批意见为自动通过
-                  </template>
-                  <AIcon type="InfoCircleOutlined" />
-                </j-tooltip>
+                <j-space>
+                  自动通过
+                  <j-tooltip placement="right">
+                    <template #title>
+                      某候选人在上一个审批/办理节点中担任过审批人角色，开启后其在当前节点的审批意见为自动通过
+                    </template>
+                    <AIcon type="InfoCircleOutlined" />
+                  </j-tooltip>
+                </j-space>
               </template>
               <j-switch
                 size="small"
@@ -94,13 +96,15 @@
               :rules="[{ required: true, message: '请输入通过权重' }]"
             >
               <template #label>
-                通过权重
-                <j-tooltip placement="right">
-                  <template #title>
-                    审批意见为“通过”的成员权重总和达到设定值时，审批通过
-                  </template>
-                  <AIcon type="InfoCircleOutlined" />
-                </j-tooltip>
+                <j-space>
+                    通过权重
+                    <j-tooltip placement="right">
+                      <template #title>
+                        审批意见为“通过”的成员权重总和达到设定值时，审批通过
+                      </template>
+                      <AIcon type="InfoCircleOutlined" />
+                    </j-tooltip>
+                </j-space>
               </template>
               <j-input-number
                 :min="1"
@@ -116,13 +120,15 @@
               :rules="[{ required: true, message: '请输入驳回权重' }]"
             >
               <template #label>
-                驳回权重
-                <j-tooltip placement="right">
-                  <template #title>
-                    审批意见为“驳回”的成员权重总和达到设定值时，审批驳回
-                  </template>
-                  <AIcon type="InfoCircleOutlined" />
-                </j-tooltip>
+                <j-space>
+                    驳回权重
+                    <j-tooltip placement="right">
+                      <template #title>
+                        审批意见为“驳回”的成员权重总和达到设定值时，审批驳回
+                      </template>
+                      <AIcon type="InfoCircleOutlined" />
+                    </j-tooltip>
+                </j-space>
               </template>
               <j-input-number
                 :min="1"
