@@ -234,7 +234,12 @@ const findValueOptions = async () => {
 watch(
   () => [props.modelValue, props.conditionType],
   () => {
-    myValue.value = props.conditionType === 'switch' ? String(props.modelValue) : props.modelValue
+    if (props.conditionType === 'switch') {
+      myValue.value = props.modelValue ? String(props.modelValue) : props.modelValue
+    } else {
+      myValue.value = props.modelValue
+    }
+
   },
   { deep: true, immediate: true },
 )
