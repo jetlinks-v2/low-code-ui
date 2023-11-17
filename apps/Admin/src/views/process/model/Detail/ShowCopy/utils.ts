@@ -56,7 +56,7 @@ export function generateRandomColor() {
  * @param treeData 
  * @returns 
  */
-export function separateData(treeData: any[], result: { formList?: any[]; otherFields?: any[] }) {
+export function separateData(treeData: any[], result: { formList: any[]; otherFields: any[] }) {
     if (!result.otherFields) result.otherFields = []
     treeData.forEach(item => {
         if (item.children && item.children.length) {
