@@ -243,7 +243,7 @@ const handleRemove = (index: number) => {
 
 const handleAdd = () => {
   const beforeDone = conditionSelect.value.every((item: any) => {
-    return item.selectedColumn && item.selectedTermType && item.value
+    return item.selectedColumn && item.selectedTermType && item.viewValue
   })
   if (!beforeDone) {
     onlyMessage('前置条件未配置完成', 'error')
