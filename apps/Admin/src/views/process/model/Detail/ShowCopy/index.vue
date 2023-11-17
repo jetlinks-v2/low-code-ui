@@ -122,6 +122,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  data: {
+    type: Object,
+    default: () => ({})
+  }
 })
 
 // 初始变量
@@ -141,6 +145,7 @@ const noShowFieldTypes = ['input-password', 'upload', 'switch', 'table', 'form']
  */
 const getVariables = async () => {
   const { id, name, key, model, provider } = flowStore.modelBaseInfo
+
   if (!id || props.noQuery) return
   const params = {
     definition: {
@@ -153,13 +158,14 @@ const getVariables = async () => {
     nodeId: flowStore.model.nodes.id || 'ROOT_1', // 展示及抄送直接传根节点id
   }
   const { result } = await queryVariables_api(params)
-
+  console.log('otherFields',result)
   const { formList, otherFields } = separateData(result, {formList: [], otherFields: []})
   //   treeData.value = formList || []
   treeData.value = formList.map(m => {
       m.children = m.children?.filter(f => !noShowFieldTypes.includes(f.others.type) && f.others.required)
       return m
   })?.filter(f => f.children.length)
+  console.log('otherFields',otherFields)
   initVariables.value = otherFields || []
   await getFormFields(treeData.value)
 }
@@ -204,14 +210,14 @@ const formData = reactive({
   //     flowStore.model.config.nameGenerator = formatToVariable(val)
   //   },
   // }),
-  nameGenerator: flowStore.model.config.nameGenerator,
+  nameGenerator: props.data?.nameGenerator,
   // summaryGenerator: computed({
   //   get: () => formatToName(flowStore.model.config.summaryGenerator),
   //   set: (val) => {
   //     flowStore.model.config.summaryGenerator = formatToVariable(val)
   //   },
   // }),
-  summaryGenerator: flowStore.model.config.summaryGenerator,
+  summaryGenerator: props.data?.summaryGenerator,
   ccMember: computed({
     get: () => flowStore.model.config.ccMember,
     set: (val) => {
@@ -220,6 +226,13 @@ const formData = reactive({
   }),
 })
 
+
+watch(() => props.noQuery, () => {
+  formData.variables = props.data?.variables?.length ? props.data?.variables : initVariables.value
+  formData.nameGenerator = props.data?.nameGenerator
+  formData.summaryGenerator = props.data?.summaryGenerator
+  formData.ccMember = props.data?.ccMember ?? flowStore.model.config.ccMember
+}, { immediate: true })
 
 
 const _variables = computed(() => {
@@ -269,10 +282,18 @@ const onSummaryChange = (val) => {
   flowStore.model.config.summaryGenerator = val
 }
 
-onMounted(() => {
-  getVariables()
-  validateSteps()
-})
+watch(() => props.noQuery, ( val ) => {
+  console.log('noQuery', val)
+  if (!val) {
+    getVariables()
+  }
+}, { immediate: true })
+
+// onMounted(() => {
+//   console.log('otherFields1')
+//   getVariables()
+//   // validateSteps()
+// })
 
 defineExpose({ validateSteps })
 </script>

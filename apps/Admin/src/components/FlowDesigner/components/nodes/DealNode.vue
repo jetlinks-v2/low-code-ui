@@ -20,6 +20,7 @@
 import Node from './Node.vue'
 import { useFlowStore } from '@/store/flow'
 import {USER_DATA} from "@/views/process/model/Detail/FlowDesign/util";
+import {includes} from "lodash-es";
 
 const userAllData = inject<any>(USER_DATA, {})
 const flowStore = useFlowStore()
@@ -66,6 +67,9 @@ const updateFormBinds = () => {
 const validateCandidates = (candidates) => {
   return Object.keys(candidates).some(key => {
     const data = userAllData.value?.[key]
+    if (['var', 'function', 'relation'].includes(key)) {
+      return true
+    }
     return candidates[key].some(a => data.some(b => b.id === a.id))
   })
 }
@@ -80,6 +84,8 @@ const validate = (err) => {
 
   showError.value = true
   errorInfo.value = '未填写必填配置项'
+
+  console.log('candidates', candidates)
   if (!name) {
     err.push({
       errors: ['办理节点名称不能为空'],

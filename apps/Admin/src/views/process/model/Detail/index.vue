@@ -75,7 +75,7 @@
 <!--        <component :key="current" ref="stepRef" :is="componentsMap[current]" />-->
         <BasicInfo v-show="current === 0" key="step11" ref="step1" />
         <FlowDesign v-show="current === 1" key="step12" ref="step2" />
-        <ShowCopy v-show="current === 2" key="step13" ref="step3" :noQuery="current !== 2" />
+        <ShowCopy v-show="current === 2" key="step13" ref="step3" :data="flowStore.model.config" :noQuery="current !== 2" />
       </div>
     </FullPage>
 

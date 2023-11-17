@@ -199,7 +199,7 @@ const validate = (err) => {
   (flow.model?.config?.forms || []).forEach(item => {
     return getFormIds(item.fullInfo?.configuration?.children || [], formKeySet)
   })
-
+  console.log(terms)
   const hasVar = termsKeys.every(key => {
     return formKeySet.has(key)
   })
