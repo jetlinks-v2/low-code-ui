@@ -8,12 +8,34 @@
             top: y + 'px'
          }">
             <j-menu v-if="props.type === 'list'" :selectedKeys="[]" @click="handleClick">
-               <j-menu-item :key="actionMap['Profile'].key">{{ actionMap['Profile'].value }}</j-menu-item>
+               <j-menu-item :key="actionMap['Profile'].key">
+                  <template #icon>
+                     <img :src="getImage('/project/file.png')" style="width: 14px; height: 16px">
+                  </template>
+                  {{ actionMap['Profile'].value }}
+               </j-menu-item>
                <!-- <j-menu-item key="Cut">剪切</j-menu-item> -->
-               <j-menu-item :key="actionMap['Copy'].key">{{ actionMap['Copy'].value }}</j-menu-item>
-               <j-menu-item :key="actionMap['Paste'].key" :disabled="disabled">{{ actionMap['Paste'].value }}</j-menu-item>
-               <j-menu-item :key="actionMap['Rename'].key">{{ actionMap['Rename'].value }}</j-menu-item>
-               <j-menu-item :key="actionMap['Delete'].key">{{ actionMap['Delete'].value }}</j-menu-item>
+               <j-menu-item :key="actionMap['Copy'].key">{{ actionMap['Copy'].value }} 
+                  <template #icon>
+                     <img :src="getImage('/project/file-add.png')" style="width: 14px; height: 16px">
+                  </template></j-menu-item>
+               <j-menu-item :key="actionMap['Paste'].key" :disabled="disabled">
+                  {{ actionMap['Paste'].value }} 
+                  <template
+                     #icon>
+                     <img :src="getImage('/project/file-copy.png')" style="width: 14px; height: 16px">
+                  </template></j-menu-item>
+               <j-menu-item :key="actionMap['Rename'].key">
+                  {{ actionMap['Rename'].value }} 
+                  <template #icon>
+                     <img :src="getImage('/project/file-edit.png')" style="width: 14px; height: 16px">
+                  </template></j-menu-item>
+               <j-menu-item :key="actionMap['Delete'].key">
+                  {{ actionMap['Delete'].value }} 
+                  <template #icon>
+                     <img :src="getImage('/project/file-delete.png')" style="width: 14px; height: 16px">
+                  </template>
+               </j-menu-item>
             </j-menu>
 
             <j-menu v-else @click="handleClick" :selectedKeys="['']">
@@ -82,7 +104,7 @@
                   <template #icon>
                      <img :src="getImage('/project/paste.png')" style="width: 24px; height: 24px;">
                   </template>
-                  {{actionMap['Paste'].value }}
+                  {{ actionMap['Paste'].value }}
                </j-menu-item>
             </j-menu>
          </div>

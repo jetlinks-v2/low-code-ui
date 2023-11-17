@@ -26,6 +26,7 @@
 
 <script setup lang='ts'>
 import Preview from '@/components/FormDesigner/preview.vue'
+import { isArray, isObject } from 'lodash-es';
 
 const props = defineProps({
     current: {
@@ -60,37 +61,100 @@ const handleBefore = (val, newVal) => {
 }
 
 
+const handleObject = (form, data) => {
+
+    const findComponent = (key, arr) => {
+        return arr.find(item => {
+            if (key === item.key) {
+                return true
+            }
+            if (item.children && item.children.length !== 0) {
+                findComponent(key, item.children)
+            }
+        })
+    }
+
+    for (const key in data) {
+        if (isObject(data[key])) {
+            const comment = findComponent(key, form.configuration.children)
+            console.log('======', comment)
+            if (comment && comment?.componentProps.source.type === 'dic') {
+                data[key] = data[key].value
+            }
+        }
+    }
+}
+
 
 onMounted(() => {
-    console.log('history--------', props.current,props.info?.form)
+    console.log('history--------', props.current)
     props.current.forEach(item => {
         props.info?.form.forEach(it => {
             if (item.others.formId === it.formId) {
-                // console.log('====',it.formId,item.others.formId)
-                formMap.set(
-                    item.others.formId,
-                    {
-                        ...item,
-                        config: it
-                    }
-                )
+                const data = {
+                    ...item,
+                    config: it
+                }
+                if (formMap.has(item.others.formId)) {
+                    const param = [formMap.get(item.others.formId), data]
+                    formMap.set(item.others.formId, param)
+                } else {
+                    formMap.set(item.others.formId, data)
+                }
+
             }
         })
     })
+    console.log('======', [...formMap.values()])
+    const arr = [...formMap.values()].map(item => {
+        if (isArray(item)) {
+           
+            const e = {
+                ...item[0],
+                afterDataSource: [...item.map(i=>i.others.after)],
+                beforeDataSource:[],
+                columns: item[0].config.configuration?.children?.map(e => ({
+                    title: e.formItemProps.label,
+                    dataIndex: e.formItemProps.name,
+                    ellipsis: true
+                })),
+            }
+            item = e
+        } else {
+            const e = {
+                ...item,
+                beforeData: handleBefore(item.others?.diff, item.others.after),
+                afterData: item.others.after,
+                columns: item.config.configuration?.children?.map(e => ({
+                    title: e.formItemProps.label,
+                    dataIndex: e.formItemProps.name,
+                    ellipsis: true
+                })),
+                beforeDataSource: [handleBefore(item.others?.diff, item.others.after)],
+                afterDataSource: [item.others.after]
+            }
+            item = e
+        }
+        return item
+    })
+    // const arr = [...formMap.values()].map(item => ({
+    //     ...item,
+    // beforeData: handleBefore(item.others?.diff, item.others.after),
+    // afterData: item.others.after,
+    // columns: item.config.configuration?.children?.map(e => ({
+    //     title: e.formItemProps.label,
+    //     dataIndex: e.formItemProps.name,
+    //     ellipsis: true
+    // })),
+    // beforeDataSource: [handleBefore(item.others?.diff, item.others.after)],
+    // afterDataSource: [item.others.after]
+    // }))
+    formList.value = arr.map(item => {
+        handleObject(item.config, item.beforeData)
+        return item
+    })
 
-    const arr = [...formMap.values()].map(item => ({
-        ...item,
-        beforeData: handleBefore(item.others?.diff, item.others.after),
-        afterData: item.others.after,
-        columns: item.config.configuration?.children?.map(e => ({
-            title: e.formItemProps.label,
-            dataIndex: e.formItemProps.name,
-            ellipsis: true
-        })),
-        beforeDataSource: [handleBefore(item.others?.diff, item.others.after)],
-        afterDataSource: [item.others.after]
-    }))
-    formList.value = arr
+    console.log('arr=====', arr)
 })
 </script>
 
