@@ -92,6 +92,7 @@ const operatorArray = [{
 export const operatorMap = {
     default: operatorInput,
     input: operatorInput,
+    string: operatorInput,
     password: operatorInput,
     number: operatorInput,
     textarea: operatorInput,
@@ -107,7 +108,7 @@ export const operatorMap = {
     'input-number': operatorInput,
     'product': operatorSelect,
     'user': operatorSelect,
-    'org': operatorSelect,
+    'org': operatorArray,
     'device': operatorSelect,
     'role': operatorSelect,
     'text': operatorInput,

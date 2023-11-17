@@ -172,8 +172,8 @@ const handleNext = async () => {
   // 点击下一步先保存数据, 再校验->#19300
   //   handleSave('next') #19300 恢复之前交互 下一步不保存数据
   // 从基础信息点击下一步前, 查询最新表单, 验证已选表单是否被全部删除
+  await step1.value.getLatestFormList()
   if (current.value === 0) {
-    await step1.value.getLatestFormList()
     await step1.value.memberSubmit()
   }
   // 触发校验
