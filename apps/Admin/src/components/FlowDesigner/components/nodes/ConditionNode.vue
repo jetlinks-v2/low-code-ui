@@ -228,7 +228,7 @@ const validate = (err) => {
   } else if (
     !terms?.length ||
     !terms.some((item) => Boolean(Object.keys(item).length)) ||
-    terms.some(item => isEmpty(item.value) || !item.termType)
+    terms.some(item => isEmpty(item.viewValue) || !item.termType)
   ) {
     err.push({
       errors: ['请配置进入下方节点的条件'],
