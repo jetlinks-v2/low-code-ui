@@ -148,16 +148,6 @@ const validateVariables = (data, keys) => {
   })
 }
 
-const validateFormItem = async (data, keys) => {
-  return data.some(item => {
-    if (item.children?.length) {
-      return filterFormVariables(item.children, keys)
-    }
-    return keys.every(k => k === item.key)
-  })
-
-}
-
 const isEmpty = (v) => {
   return (
     v === undefined ||
@@ -197,9 +187,8 @@ const validate = (err) => {
   showError.value = true
   errorInfo.value = '未填写必填配置项'
 
-
   const termsKeys:string[] = terms?.filter(item => {
-    return item.column && !item.column.includes('process.var')
+    return item.column && !['process.var', 'process.function'].some(c => item.column.includes(c))
   }).map(item => {
     const _keys = item.column.split('.')
     return _keys.pop()

@@ -264,6 +264,7 @@ const handleDeploy = () => {
       })
       .catch((err) => {
         //   console.log('handleDeploy err: ', err)
+          onlyMessage('部署失败，流程配置内容不合规', 'error')
       })
       .finally(() => {
         deployLoading.value = false
