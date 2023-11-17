@@ -116,7 +116,7 @@ defineExpose({
           errors: ['未填写必填配置项'],
           name: ['weight', 'complexWeight']
         })
-        errorInfo.value = '配置项错误'
+        errorInfo.value = '未填写必填配置项'
       }
     } else {
       const complexWeight = props.data?.props?.weight?.complexWeight
