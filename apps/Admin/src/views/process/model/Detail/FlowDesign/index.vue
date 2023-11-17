@@ -48,6 +48,7 @@ import {
 } from './components/utils'
 import { onlyMessage } from '@jetlinks/utils'
 import { cloneDeep } from 'lodash-es'
+import {USER_DATA} from "@/views/process/model/Detail/FlowDesign/util";
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
@@ -71,6 +72,11 @@ const flowDesignerRef = ref()
 const nameRef = ref()
 const nodeConfigRef = ref()
 const showConfig = ref(false)
+
+const userData = ref({})
+
+provide(USER_DATA, userData)
+
 const nodeSelected = (node) => {
   console.log('节点选中', node)
   showConfig.value = true
@@ -141,6 +147,10 @@ const validateNodeConfig = () => {
   setTimeout(() => {
     nodeConfigRef.value.validateConfig()
   }, 200)
+}
+
+const getUserAllData = async () => {
+
 }
 
 watch(
