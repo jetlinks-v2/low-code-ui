@@ -189,7 +189,9 @@ const validate = (err) => {
   errorInfo.value = '未填写必填配置项'
 
 
-  const termsKeys:string[] = terms?.filter(item => item.column).map(item => {
+  const termsKeys:string[] = terms?.filter(item => {
+    return item.column && !item.column.includes('process.var')
+  }).map(item => {
     const _keys = item.column.split('.')
     return _keys.pop()
   })
@@ -204,7 +206,7 @@ const validate = (err) => {
     return formKeySet.has(key)
   })
 
-  console.log('ConditionNode',hasVar)
+  console.log('ConditionNode',hasVar, terms)
 
   if (!props.config?.name) {
     err.push({
