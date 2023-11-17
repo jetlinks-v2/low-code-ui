@@ -48,6 +48,8 @@ import {
 } from './components/utils'
 import { onlyMessage } from '@jetlinks/utils'
 import { cloneDeep } from 'lodash-es'
+import {USER_DATA} from "@/views/process/model/Detail/FlowDesign/util";
+import {getAllDepartment_api, getAllRole_api, getAllUser_api} from "@/api/user";
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
@@ -71,9 +73,20 @@ const flowDesignerRef = ref()
 const nameRef = ref()
 const nodeConfigRef = ref()
 const showConfig = ref(false)
+
+const userData = ref<any>({})
+
+provide(USER_DATA, userData)
+
 const nodeSelected = (node) => {
   console.log('节点选中', node)
-  showConfig.value = true
+  if (node.type === 'CONDITIONS') {
+    validateSteps().then(() => {
+        showConfig.value = true
+    })
+  } else {
+      showConfig.value = true
+  }
 }
 
 /**
@@ -143,6 +156,55 @@ const validateNodeConfig = () => {
   }, 200)
 }
 
+const getUserAllData = async () => {
+  const apiList = [
+    getAllDepartment_api({
+      paging: false,
+      sorts: [
+        {
+          name: 'sortIndex',
+          order: 'asc',
+        },
+      ],
+    }),
+    getAllUser_api({
+      paging: false,
+      sorts: [
+        {
+          name: 'createTime',
+          order: 'desc',
+        },
+      ],
+    }),
+    getAllRole_api({
+      paging: false,
+      sorts: [
+        {
+          name: 'createTime',
+          order: 'desc',
+        },
+        {
+          name: 'id',
+          order: 'desc',
+        },
+      ],
+    }),
+  ]
+  Promise.all(apiList).then((res) => {
+    userData.value.org = res[0].result.sort((a: any, b: any) =>
+      a.sortIndex === b.sortIndex
+        ? b.createTime - a.createTime
+        : a.sortIndex - b.sortIndex,
+    )
+    userData.value.user = res[1].result
+    userData.value.role = res[2].result
+
+    console.log(userData.value)
+  })
+}
+
+getUserAllData()
+
 watch(
   () => showConfig.value,
   (val) => {
@@ -179,10 +241,10 @@ const validateSteps = (type?: string) => {
     if (_noChildBranchNodes.some((s) => s.length > 1)) {
       // 任何一个分支存在多个条件节点直达空节点, 校验不通过
       err.push({
-        errors: ['条件节点下未配置执行节点'],
+        errors: ['请在条件分支下添加审批/办理节点'],
         name: ['empty'],
       })
-      onlyMessage('条件节点下未配置执行节点', 'warning')
+      onlyMessage('请在条件分支下添加审批/办理节点', 'warning')
     }
 
 

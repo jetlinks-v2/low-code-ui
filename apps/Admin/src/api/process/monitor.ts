@@ -32,6 +32,7 @@ export const getAllList_api = (data: any) => {
     },
     {
       history,
+      distinctBy: 'creatorId'
     },
   )
 }

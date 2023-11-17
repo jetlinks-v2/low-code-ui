@@ -69,6 +69,7 @@
             trigger: ['blur', 'change'],
           },
         ]"
+        validateStatus=""
       >
         <pro-search
           class="pro-search"
@@ -86,6 +87,7 @@
           :request="_query"
           :defaultParams="{
             sorts: [{ name: 'deployTime', order: 'desc' }],
+            terms: [{ column: 'state', value: 'ready', termType: 'not' }],
           }"
           :scroll="{ y: 300 }"
           :rowSelection="{
@@ -108,6 +110,7 @@ import {
 } from '@/api/process/monitor'
 import { getAllUser_api, getUser_api } from '@/api/user'
 import { useClassified } from '@/hooks/useClassified'
+import { message } from 'ant-design-vue'
 
 type FormType = {
   original: string
@@ -371,6 +374,9 @@ const _query = async (e) => {
 }
 </script>
 <style scoped lang="less">
+:deep(.ant-form-item-explain, .ant-form-item-extra) {
+  color: var(--ant-error-color);
+}
 :deep(.pro-search) {
   padding-bottom: 0 !important;
   margin-bottom: 0;

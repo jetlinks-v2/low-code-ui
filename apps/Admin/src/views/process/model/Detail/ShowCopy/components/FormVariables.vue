@@ -39,7 +39,7 @@
           >
             <template #title="node">
               <div style="display: flex; justify-content: space-between">
-                <span style="margin-right: 20px">{{ node.name }}</span>
+                <j-ellipsis style="margin-right: 20px">{{ node.name }}</j-ellipsis>
               </div>
             </template>
           </j-tree>

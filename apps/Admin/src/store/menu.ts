@@ -77,7 +77,7 @@ export const useMenuStore = defineStore('menu', () => {
 
     if (resp.success) {
       const result = resp.result
-      const filterMenu = result.filter(item => ['process', 'web_ide'].includes(item.code)).map(item => {
+      const filterMenu = result.filter(item => ['process', 'web_ide', 'system'].includes(item.code)).map(item => {
         if (item.code === 'process') {
           item.redirect = `${item.url}/home`
           item.children =  [
@@ -95,6 +95,12 @@ export const useMenuStore = defineStore('menu', () => {
         }
         if (item.code === 'web_ide') {
           item.code = 'center'
+        }
+
+        if (item.code === 'system') {
+          item.meta = {
+            hideInMenu: true
+          }
         }
 
         return item
