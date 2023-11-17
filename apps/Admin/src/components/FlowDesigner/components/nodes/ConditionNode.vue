@@ -153,7 +153,6 @@ const validateFormItem = async (data, keys) => {
     if (item.children?.length) {
       return filterFormVariables(item.children, keys)
     }
-    console.log('validateFormItem', item, keys)
     return keys.every(k => k === item.key)
   })
 

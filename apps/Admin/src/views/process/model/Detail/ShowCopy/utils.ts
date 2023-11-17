@@ -79,14 +79,14 @@ export function separateData(treeData: any[], result: { formList: any[]; otherFi
 }
 
 
-export const filterFormVariables = (data: any[], id: string) => {
+export const filterFormVariables = (data: any[], id: string, formItem: any) => {
   return data.some(item => {
     if (item.configuration) {
-      return filterFormVariables(item.configuration?.children || [], id)
+      return filterFormVariables(item.configuration?.children || [], id, formItem)
     }
     const { key, children } = item
     if (children?.length) {
-      return filterFormVariables(children, id)
+      return filterFormVariables(children, id, formItem)
     }
     if (!(
         item.componentProps?.hasOwnProperty('mode') &&
@@ -95,6 +95,10 @@ export const filterFormVariables = (data: any[], id: string) => {
         // 高级组件单选模式
         return item.componentProps?.keys?.some((s) => s.config.source === id)
     } else {
+        if (key === id) {
+          console.log(item, formItem)
+          formItem.label = item.name
+        }
         return key === id
     }
   })
