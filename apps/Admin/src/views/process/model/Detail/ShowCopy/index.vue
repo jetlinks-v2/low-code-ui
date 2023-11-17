@@ -229,7 +229,7 @@ const _variables = computed(() => {
     const keys = item.value.split('.')
     if (keys.some(key => key.includes('form'))) { // 表单变量
       const _id = keys[keys.length - 1]
-      return filterFormVariables(previewData.value, _id)
+      return filterFormVariables(previewData.value, _id, item)
     }
 
     return true
