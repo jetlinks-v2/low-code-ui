@@ -21,10 +21,7 @@
           show-search
           v-model:value="form.original"
           placeholder="请选择原办理人"
-          :options="[
-            { label: '张三', value: 'zhangsan' },
-            { label: '李四', value: 'lisi' },
-          ]"
+          :options="originalOptions"
           :filterOption="filterOption"
           @select="originalSelect"
         />
@@ -104,8 +101,12 @@
 <script setup lang="ts">
 import { onlyMessage } from '@jetlinks/utils'
 import { useRequest } from '@jetlinks/hooks'
-import { process_list, process_tran } from '@/api/process/monitor'
-import { getAllUser_api } from '@/api/user'
+import {
+  original_list,
+  process_list,
+  process_tran,
+} from '@/api/process/monitor'
+import { getAllUser_api, getUser_api } from '@/api/user'
 import { useClassified } from '@/hooks/useClassified'
 
 type FormType = {
@@ -220,10 +221,7 @@ const columns = [
 ]
 
 const formRef = ref<any>()
-const form = reactive<Partial<FormType>>({
-  // original: '',
-  // target: '',
-})
+const form = reactive<Partial<FormType>>({})
 
 const params = ref({})
 const tableParams = computed(() => {
@@ -244,10 +242,48 @@ const tableParams = computed(() => {
 
 // 原办理人
 const identities = ref<IdentitiesType[]>([])
+const originalOptions = ref<any[]>([])
 const turnIdentities = ref<IdentitiesType>()
-const turnOptions = ref([])
+const turnOptions = ref<any[]>([])
 
-const originalSelect = (value: string, option: any) => {
+const terms = [
+  {
+    value: ['candidate', 'assignee'],
+    termType: 'in',
+    column: 'linkType',
+  },
+  {
+    type: 'and',
+    value: 'todo',
+    termType: 'eq',
+    column: 'state',
+  },
+  {
+    type: 'and',
+    value: {
+      types: ['assignee'],
+      states: ['completed', 'reject'],
+    },
+    termType: 'wf-identity-same-task-not',
+    column: 'taskId',
+  },
+  {
+    type: 'and',
+    value: 'user',
+    termType: 'eq',
+    column: 'dimensionType',
+  },
+]
+
+original_list({ paging: false, terms }).then((res) => {
+  originalOptions.value = res.result.map((i) => ({
+    label: i.dimensionName,
+    value: i.dimensionId,
+  }))
+})
+
+const originalSelect = async (value: string, option: any) => {
+  form.target = undefined
   form.processIds = []
   identities.value = [
     {
@@ -256,7 +292,10 @@ const originalSelect = (value: string, option: any) => {
       name: option.label,
     },
   ]
-  getTurnUser_api(value)
+  // 根据用户查组织
+  const { result } = await getUser_api(value)
+  const idList = result.orgList.map((i) => i.id)
+  getTurnUser_api(idList, value)
 }
 
 const turnSelect = (value: string, option: any) => {
@@ -270,13 +309,15 @@ const turnSelect = (value: string, option: any) => {
 /**
  * 获取转交办理人
  */
-const getTurnUser_api = (id: string) => {
+const getTurnUser_api = (id: string[], orId: string) => {
   getAllUser_api({
     paging: false,
     sorts: [{ name: 'createTime', order: 'desc' }],
     terms: [{ column: 'id$in-dimension$org', value: id }],
-  }).then(res => {
-    turnOptions.value = res.result.map(i => ({label: i.name, value: i.id}))
+  }).then((res) => {
+    turnOptions.value = res.result
+      ?.map((i) => ({ label: i.name, value: i.id }))
+      ?.filter((i) => i.value !== orId)
   })
 }
 
@@ -289,7 +330,6 @@ const filterOption = (input: string, option: any) => {
 }
 
 const handleSearch = (data) => {
-  console.log(`output->data`, data)
   params.value = data
 }
 
@@ -313,7 +353,6 @@ const confirm = () => {
       target: turnIdentities.value,
     }
     run(params)
-    console.log(`output->_data`, _data)
   })
 }
 

@@ -481,7 +481,10 @@ export const handleTermsData = (terms) => {
   return terms.map(item => {
     if (['like', 'nlike'].includes(item.termType) && !!item.value) {
       item.value = `%${handleLikeValue(item.value)}%`;
+    } else {
+      item.value = item.value || item.viewValue
     }
+
     return item
   })
 }
