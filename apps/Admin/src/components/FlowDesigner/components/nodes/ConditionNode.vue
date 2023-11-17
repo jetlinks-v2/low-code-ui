@@ -188,7 +188,7 @@ const validate = (err) => {
   errorInfo.value = '未填写必填配置项'
 
   const termsKeys:string[] = terms?.filter(item => {
-    return item.column && !['process.var', 'process.function'].includes(item.column)
+    return item.column && !['process.var', 'process.function'].some(c => item.column.includes(c))
   }).map(item => {
     const _keys = item.column.split('.')
     return _keys.pop()
