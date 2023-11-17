@@ -81,7 +81,7 @@ provide(USER_DATA, userData)
 const nodeSelected = (node) => {
   console.log('节点选中', node)
   if (node.type === 'CONDITIONS') {
-    validateSteps().then(() => {
+    validateCondition().then(() => {
         showConfig.value = true
     })
   } else {
@@ -229,23 +229,7 @@ watch(
 const validateSteps = (type?: string) => {
   return new Promise((resolve, reject) => {
     const err = flowDesignerRef.value.validateProcess()
-    const _branchNodes = cloneDeep(findBranches(flowStore.model.nodes, []))
-    // 没有子节点的条件节点
-    const _noChildBranchNodes: any[] = []
-    _branchNodes?.forEach((item) => {
-      _noChildBranchNodes.push(
-        item.branches.filter((f) => !Object.keys(f.children).length),
-      )
-    })
-    // 每一个条件分支, 只允许有一个条件直达分支下面的空节点
-    if (_noChildBranchNodes.some((s) => s.length > 1)) {
-      // 任何一个分支存在多个条件节点直达空节点, 校验不通过
-      err.push({
-        errors: ['请在条件分支下添加审批/办理节点'],
-        name: ['empty'],
-      })
-      onlyMessage('请在条件分支下添加审批/办理节点', 'warning')
-    }
+    validateCondition(err)
 
 
     if (type && type === 'next' && err[0]?.name[0] === 'no-nodes') {
@@ -258,6 +242,33 @@ const validateSteps = (type?: string) => {
     // reject时 返回当前步骤序号
     !err.length ? resolve(1) : reject(1)
   })
+}
+
+/**
+ * 校验是否存在多个条件节点下面没有业务节点
+ * @param err 
+ */
+const validateCondition = (err?) => {
+    const _branchNodes = cloneDeep(findBranches(flowStore.model.nodes, []))
+    // 没有子节点的条件节点
+    const _noChildBranchNodes: any[] = []
+    _branchNodes?.forEach((item) => {
+      _noChildBranchNodes.push(
+        item.branches.filter((f) => !Object.keys(f.children).length),
+      )
+    })
+    // 每一个条件分支, 只允许有一个条件直达分支下面的空节点
+    if (_noChildBranchNodes.some((s) => s.length > 1)) {
+      // 任何一个分支存在多个条件节点直达空节点, 校验不通过
+      err?.push({
+        errors: ['请在条件分支下添加审批/办理节点'],
+        name: ['empty'],
+      })
+      onlyMessage('请在条件分支下添加审批/办理节点', 'warning')
+      return Promise.reject('请在条件分支下添加审批/办理节点')
+    } else {
+        return Promise.resolve()
+    }
 }
 
 defineExpose({ validateSteps })

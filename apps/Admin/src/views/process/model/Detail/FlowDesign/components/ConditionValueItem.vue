@@ -51,7 +51,7 @@
     </template>
   </j-tree-select>
   <j-date-picker
-    v-else-if="conditionType === 'date-picker'"
+    v-else-if="['date', 'date-picker'].includes(conditionType)"
     :valueFormat="'YYYY-MM-DD HH:mm:ss'"
     v-model:value="myValue"
     class="value-select"
