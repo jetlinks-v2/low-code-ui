@@ -73,7 +73,13 @@ const nodeConfigRef = ref()
 const showConfig = ref(false)
 const nodeSelected = (node) => {
   console.log('节点选中', node)
-  showConfig.value = true
+  if (node.type === 'CONDITIONS') {
+    validateSteps().then(() => {
+        showConfig.value = true
+    })
+  } else {
+      showConfig.value = true
+  }
 }
 
 /**
@@ -179,10 +185,10 @@ const validateSteps = (type?: string) => {
     if (_noChildBranchNodes.some((s) => s.length > 1)) {
       // 任何一个分支存在多个条件节点直达空节点, 校验不通过
       err.push({
-        errors: ['条件节点下未配置执行节点'],
+        errors: ['请在条件分支下添加审批/办理节点'],
         name: ['empty'],
       })
-      onlyMessage('条件节点下未配置执行节点', 'warning')
+      onlyMessage('请在条件分支下添加审批/办理节点', 'warning')
     }
 
 
