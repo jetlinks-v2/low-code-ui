@@ -40,7 +40,8 @@
             <j-button type="primary" class="btn" @click="onClick('pass')"
                 v-if="nodeType === 'APPROVAL' && btnList.includes('pass')" :loading="btnLoading">通过</j-button>
             <j-button type="primary" class="btn" @click="onClick('submit')"
-                v-if="nodeType === 'ROOT'&& btnList.includes('submit') || nodeType === 'DEAL' && btnList.includes('submit')" :loading="btnLoading">提交</j-button>
+                v-if="nodeType === 'ROOT' && btnList.includes('submit') || nodeType === 'DEAL' && btnList.includes('submit')"
+                :loading="btnLoading">提交</j-button>
             <j-button type="primary" class="btn" @click="onClick('save')" :loading="btnLoading">保存</j-button>
         </div>
     </div>
@@ -57,7 +58,7 @@ import { onlyMessage } from '@jetlinks/utils';
 import FormItem from './FormItem.vue'
 import md5 from 'md5'
 import { getImage } from '@jetlinks/utils'
-import {  handleSingleData } from './index'
+import { handleSingleData } from './index'
 import { handleFormToTable } from '../../../model/Detail/FlowDesign/components/TableFormPreviewUtil'
 
 const props = defineProps({
@@ -253,20 +254,20 @@ const onClick = async (value) => {
             }
         })
     } else {
-        formValue.value.forEach(i=>{
-            if(!i?.multiple){
+        formValue.value.forEach(i => {
+            if (!i?.multiple) {
                 const obj = {
-                    formId:i.formId,
-                    formKey:i.formKey
+                    formId: i.formId,
+                    formKey: i.formKey
                 }
                 memorizer.push(obj)
             }
         })
-        formValue.value.forEach(i=>{
-            if(i.multiple){
+        formValue.value.forEach(i => {
+            if (i.multiple) {
                 const obj = {
-                    formId:i.formId,
-                    formKey:i.formKey
+                    formId: i.formId,
+                    formKey: i.formKey
                 }
                 memorizer.push(obj)
             }
@@ -283,21 +284,21 @@ const onClick = async (value) => {
                 data.push({
                     // formId: formValue.value[index].formId,
                     // formKey: formValue.value[index].formKey,
-                    formId:memorizer[index].formId,
-                    formKey:memorizer[index].formKey,
+                    formId: memorizer[index].formId,
+                    formKey: memorizer[index].formKey,
                     data: Array.isArray(i) ? i : {
                         ...formValue.value[index].data,
                         ...i
                     }
                 })
             })
-            submitData.value = data
-            if (modalType.value !== 'submit' || freeChoiceUser.value) {
-                visible.value = true
-            }
-            if (modalType.value === 'submit') {
-                submitForm()
-            }
+            // submitData.value = data
+            // if (modalType.value !== 'submit' || freeChoiceUser.value) {
+            //     visible.value = true
+            // }
+            // if (modalType.value === 'submit') {
+            //     submitForm()
+            // }
         })
     }
 }
@@ -324,25 +325,36 @@ const dealTable = (disabled) => {
     formValue.value.forEach((i) => {
         if (i.multiple) {
             // i?.configuration?.children.map((item) => {
-                // let rules
-                // if (item?.formItemProps?.rules) {
-                //     rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }, ...item?.formItemProps?.rules] : [...item?.formItemProps?.rules]
-                // } else {
-                //     rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }] : []
-                // }
-                // tableColumn.push({
-                //     title: item.formItemProps?.label,
-                //     dataIndex: item.formItemProps?.name,
-                //     type: item?.type,
-                //     width: 200,
-                //     disabled: disabled ? true : item.componentProps.disabled,
-                //     form: {
-                //         rules: rules
-                //     },
-                //     componentProps: item.componentProps,
-                // })
+            // let rules
+            // if (item?.formItemProps?.rules) {
+            //     rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }, ...item?.formItemProps?.rules] : [...item?.formItemProps?.rules]
+            // } else {
+            //     rules = item?.formItemProps?.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }] : []
+            // }
+            // tableColumn.push({
+            //     title: item.formItemProps?.label,
+            //     dataIndex: item.formItemProps?.name,
+            //     type: item?.type,
+            //     width: 200,
+            //     disabled: disabled ? true : item.componentProps.disabled,
+            //     form: {
+            //         rules: rules
+            //     },
+            //     componentProps: item.componentProps,
+            // })
             // })
             i.configuration = handleFormToTable(i.configuration.children)
+            i.configuration.forEach(item => {
+                if (item.formItemProps.rules.length === 0) {
+                    item.form.rules = item.formItemProps.required ? [{ required: true, message: `请输入${item?.formItemProps?.label}` }] : []
+                } else {
+                    item.form.rules = item.formItemProps.required ? 
+                    [
+                        { required: true, message: `请输入${item?.formItemProps?.label}` },
+                        ...item?.formItemProps?.rules
+                    ] : item.formItemProps?.rules
+                }
+            })
             // console.log(tableColumn,'___')
             //处理单选数据回显
             i.data = handleSingleData(i)
@@ -368,7 +380,7 @@ const handleDisabled = (arr, accessModes) => {
         Modes.set(item.ownerBy || item.id, item.accessModes)
     })
     return arr.map(item => {
-       const  disabled  = !Modes.get(item.formItemProps?.name)?.includes('write')
+        const disabled = !Modes.get(item.formItemProps?.name)?.includes('write')
         if (Modes.has(item.formItemProps?.name)) {
             if (!item.formItemProps.isLayout) {
                 item.componentProps.disabled = disabled
@@ -382,28 +394,28 @@ const handleDisabled = (arr, accessModes) => {
 }
 
 //处理数据来源是枚举的情况
-const handleObject = (form)=>{
+const handleObject = (form) => {
 
-    const findComponent = (key,arr)=>{
-        return arr.find(item=>{
-            if(key ===item.key){
+    const findComponent = (key, arr) => {
+        return arr.find(item => {
+            if (key === item.key) {
                 return true
             }
-            if(item.children && item.children.length!==0){
-                findComponent(key,item.children)
+            if (item.children && item.children.length !== 0) {
+                findComponent(key, item.children)
             }
         })
     }
-   
-    for(const key in form.data){
-        if(isObject(form.data[key])){
-            const comment = findComponent(key,form.configuration.children)
-            if(comment && comment?.componentProps.source.type === 'dic'){
+
+    for (const key in form.data) {
+        if (isObject(form.data[key])) {
+            const comment = findComponent(key, form.configuration.children)
+            if (comment && comment?.componentProps.source.type === 'dic') {
                 form.data[key] = form.data[key].value
             }
         }
     }
-    
+
 }
 
 // 列表接口数据nodeId 对应form表单ID处理数据
@@ -425,7 +437,7 @@ const dealForm = (nodes) => {
         btnList.value = nodes?.props?.authButtons
         //详情接口nodeId
         const bindMap = new Map()
-        console.log('md5-----------',nodes.props?.formBinds)
+        console.log('md5-----------', nodes.props?.formBinds)
         Object.keys(nodes.props?.formBinds).forEach((item) => {
             //formid + formVersion
             const id = md5(item + '|' + props.info.others?.formVersion[item])
@@ -453,8 +465,8 @@ const dealForm = (nodes) => {
 //
 watch(() => props.info, () => {
     formValue.value = cloneDeep(props.info?.form)
-    props?.info?.form?.forEach((i)=>{
-        if(!Array.isArray(i?.data)){
+    props?.info?.form?.forEach((i) => {
+        if (!Array.isArray(i?.data)) {
             formData.value.push(i?.data)
         }
     })
@@ -474,7 +486,7 @@ watch(() => props.info, () => {
 
         })
     }
-    console.log('formValue.value',formValue.value)
+    console.log('formValue.value', formValue.value)
 })
 </script>
 
