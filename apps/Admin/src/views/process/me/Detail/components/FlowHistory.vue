@@ -49,7 +49,7 @@
                </div>
                <div v-if="item.action==='taskTransfer'" class="item-children">
                   <div>
-                     <div>任务转交由{{ item.others.target.name }}办理</div>
+                     <div>任务转交由 <span style="color: blue;">{{ item.others.target.name }}</span>办理</div>
                      <div>原办理人：{{ item.others.original.name }}</div>
                      <div>转办原因：{{ item.others.message }}</div>
                   </div>
@@ -102,7 +102,7 @@ actionType.set('submit', '提交')
 actionType.set('initiate', '发起申请')
 actionType.set('again','重新发起')
 actionType.set('off', '关闭')
-actionType.set('wait','待办')
+actionType.set('wait','转办')
 
 
 const props = defineProps({
@@ -233,7 +233,9 @@ const filterLine = (item, index) => {
       return {
          ...item,
          actionType:'wait',
+         actionColor: 'completed',
          operatorName: item.operator.name,
+         show:true,
       }
    }
     else {

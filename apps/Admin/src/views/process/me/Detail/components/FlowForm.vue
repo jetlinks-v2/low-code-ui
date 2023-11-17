@@ -292,13 +292,13 @@ const onClick = async (value) => {
                     }
                 })
             })
-            // submitData.value = data
-            // if (modalType.value !== 'submit' || freeChoiceUser.value) {
-            //     visible.value = true
-            // }
-            // if (modalType.value === 'submit') {
-            //     submitForm()
-            // }
+            submitData.value = data
+            if (modalType.value !== 'submit' || freeChoiceUser.value) {
+                visible.value = true
+            }
+            if (modalType.value === 'submit') {
+                submitForm()
+            }
         })
     }
 }

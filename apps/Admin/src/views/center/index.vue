@@ -17,14 +17,14 @@
           <template #content>
             <div class="card-item">
               <div class="title">
-                <j-ellipsis style="max-width: 200px;">{{ record.id }}</j-ellipsis>
+                <j-ellipsis style="max-width: 200px;">{{ record.name }}</j-ellipsis>
                 <div class="title-tag"><j-tag :color="record.runningState.value === 'enabled' ? 'blue' : 'red'">{{
                   record.runningState.text }}</j-tag></div>
               </div>
               <div style="display: flex;position: relative;">
-                <span>项目名称：</span>
+                <span>项目标识：</span>
                 <j-ellipsis style="width: 200px;">
-                  {{ record.name }}
+                  {{ record.id }}
                 </j-ellipsis>
               </div>
               <div style="position: relative;">创建时间：{{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}</div>

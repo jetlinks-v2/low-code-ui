@@ -4,7 +4,7 @@
     v-model:visible="_visible"
     width="1000px"
     @ok="handleOk"
-    @cancel="_visible = false"
+    @cancel="handleCancel"
     :maskClosable="false"
     :destroyOnClose="true"
   >
@@ -178,6 +178,11 @@ const handleCheck = (_checkedKeys, { checkedNodes }) => {
  */
 const handleOk = () => {
   emits('update:variables', checkedLeafNode.value)
+  _visible.value = false
+}
+
+const handleCancel = ()=>{
+  emits('update:variables', [])
   _visible.value = false
 }
 
