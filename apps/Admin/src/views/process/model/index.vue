@@ -396,6 +396,8 @@ const getActions = (record, type = 'card') => {
                     onlyMessage('操作成功')
                     refresh()
                   }
+                }).finally(() => {
+                    data.loading = false
                 })
               } else {
                 Modal.error({
@@ -405,7 +407,7 @@ const getActions = (record, type = 'card') => {
             })
           } catch (error) {
           } finally {
-            data.loading = false
+            // data.loading = false
           }
         },
       }),

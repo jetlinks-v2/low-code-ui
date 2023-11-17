@@ -75,7 +75,6 @@
           class="pro-search"
           type="single"
           :columns="columns"
-          target="monitor-false"
           @search="handleSearch"
           :labelWidth="40"
         />
@@ -360,11 +359,12 @@ const confirm = () => {
 }
 
 const _query = async (e) => {
+  if(!form.original) return []
   const { linkTerms, ...rest } = e
   const resp = await process_list({ query: { ...rest }, linkTerms })
   return {
     result: {
-      data: resp.result.data.map((i) => ({ ...i, loading: false })),
+      data: resp.result.data,
       pageIndex: e.pageIndex,
       pageSize: e.pageSize,
       total: resp.result.total,

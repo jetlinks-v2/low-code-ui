@@ -123,12 +123,12 @@ interface IConditionSelect {
 const emit = defineEmits(['update:value'])
 const props = defineProps({
   value: {
-    type: Array as PropType<IConditionSelect[]>,
+    type: Array as PropType<any[]>,
     default: () => [],
   },
 })
 
-const conditionSelect = ref<IConditionSelect[]>([])
+const conditionSelect = ref<any[]>([])
 const conditionOptions = ref([])
 
 /**
@@ -234,7 +234,13 @@ const conditionType = (item) => {
   if (_var?.id === 'processOwnerName') {
     return 'input'
   }
-  return _var?.others?.type || _var?.others?.relation
+  let _type
+  if (_var?.others) {
+    _type = _var.others.type || _var.others.relation
+  } else {
+    _type = _var?.type.type
+  }
+  return _type
 }
 
 const handleRemove = (index: number) => {
