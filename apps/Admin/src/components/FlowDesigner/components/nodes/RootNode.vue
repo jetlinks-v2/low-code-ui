@@ -65,6 +65,13 @@ const validate = (err) => {
       errors: [errorInfo.value],
       name: ['assignedUser'],
     })
+  } else if (props.config?.name.length > 64) {
+    showError.value = true
+    errorInfo.value = '配置项错误'
+    err.push({
+      errors: [errorInfo.value],
+      name: ['assignedUser'],
+    })
   } else {
     showError.value = false
     errorInfo.value = ''

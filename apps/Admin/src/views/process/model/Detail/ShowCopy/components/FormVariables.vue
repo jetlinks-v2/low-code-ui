@@ -69,7 +69,7 @@ import {
 import { queryFormNoPage_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { treeFilter } from 'jetlinks-ui-components/es/Tree'
-import { generateRandomColor } from '../utils'
+import { generateRandomColor, rdmRgbColor } from '../utils'
 import { cloneDeep } from 'lodash-es'
 
 type Emits = {
@@ -169,7 +169,7 @@ const handleCheck = (_checkedKeys, { checkedNodes }) => {
     ?.map((m) => ({
       label: m.name,
       value: m.fullId,
-      color: generateRandomColor(),
+      color: rdmRgbColor(),
     }))
 }
 
