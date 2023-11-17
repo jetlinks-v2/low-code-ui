@@ -198,7 +198,7 @@ const filterLine = (item, index) => {
          }
       }
 
-   } else if (item.action === 'taskLinkChanged') {
+   } else if (item.action === 'taskLinkChanged' && item.others.type==='assignee') {
       if (item.others.afterState === 'completed' || item.others.afterState === 'reject') {
          return {
             ...item,

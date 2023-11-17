@@ -182,7 +182,9 @@ const handleOk = () => {
 }
 
 const handleCancel = ()=>{
-  emits('update:variables', [])
+  // console.log('props.variables',props.variables)
+  // emits('update:variables', props.variables.map((m) => m.value))
+  // checkedKeys.value = []
   _visible.value = false
 }
 
