@@ -9,6 +9,9 @@ export const _update = (data: any) => request.post('/process/form/new-version/_i
 // 查询
 export const _query = (data: any) => request.post('/process/form/latest/_query', data);
 
+//流程表单创建人
+export const _queryCreator = (data: any) => request.post('/process/form/latest/_query/no-paging?distinctBy=creatorId', data);
+
 // 删除
 export const _delete = (id: string) => request.remove(`/process/form/key/${id}`);
 
