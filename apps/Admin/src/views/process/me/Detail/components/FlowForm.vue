@@ -410,7 +410,7 @@ const handleObject = (form) => {
     for (const key in form.data) {
         if (isObject(form.data[key])) {
             const comment = findComponent(key, form.configuration.children)
-            if (comment && comment?.componentProps.source.type === 'dic') {
+            if (comment && comment?.componentProps.source?.type === 'dic') {
                 form.data[key] = form.data[key].value
             }
         }
@@ -449,7 +449,7 @@ const dealForm = (nodes) => {
             }
             return item
         })
-        // console.log('formValue.value', formValue.value)
+        console.log('formValue.value', formValue.value)
         dealTable()
     } else {
         nodes?.children ? dealForm(nodes.children) : ''
