@@ -174,7 +174,17 @@ const getFormIds = (data: any[], formKeySet: Set<string>) => {
     if (item.children?.length) {
       return getFormIds(item.children, formKeySet)
     } else {
-      formKeySet.add(item.key)
+      if (['device', 'product', 'role', 'user', 'org'].includes(item.type)) {
+        if(item.componentProps?.keys?.length) {
+          item.componentProps.keys.forEach((a) => {
+            formKeySet.add(a.config.source)
+          })
+        } else {
+          formKeySet.add(item.key)
+        }
+      } else {
+        formKeySet.add(item.key)
+      }
     }
   })
 }
@@ -205,8 +215,6 @@ const validate = (err) => {
   const hasVar = termsKeys.every(key => {
     return formKeySet.has(key)
   })
-
-  console.log('ConditionNode',hasVar, terms)
 
   if (!props.config?.name) {
     err.push({
