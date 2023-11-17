@@ -5,6 +5,8 @@
     width="1000px"
     @ok="handleOk"
     @cancel="_visible = false"
+    :maskClosable="false"
+    :destroyOnClose="true"
   >
     <template #title>
       <j-space>
@@ -68,6 +70,7 @@ import { queryFormNoPage_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { treeFilter } from 'jetlinks-ui-components/es/Tree'
 import { generateRandomColor } from '../utils'
+import { cloneDeep } from 'lodash-es'
 
 type Emits = {
   (e: 'update:visible', data: boolean): void
@@ -182,7 +185,7 @@ watch(
 watch(
   () => props.variables,
   (val) => {
-    checkedKeys.value = val.map((m) => m.value)
+    checkedKeys.value = cloneDeep(val.map((m) => m.value))
   },
   { immediate: true, deep: true },
 )
