@@ -43,6 +43,7 @@
           />
         </div>
         <FormVariables
+          v-if="visible"
           v-model:visible="visible"
           v-model:variables="formData.variables"
           :previewData="previewData"

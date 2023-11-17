@@ -92,7 +92,7 @@ const regHandle = (html) => {
     const variable = props.variables.find((i) => i.value === _arr?.[1])
     if (_arr?.length === 3) {
       if (variable) {
-        return `<span style="color: ${variable?.color}">{${_arr[2]}}</span>`
+        return `<span style="color: ${variable?.color}">{${variable.label}}</span>`
       } else {
         return `{${_arr[2]}}`
       }
