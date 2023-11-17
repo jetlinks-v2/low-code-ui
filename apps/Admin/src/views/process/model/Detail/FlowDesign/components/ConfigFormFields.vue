@@ -429,26 +429,25 @@ const handlePreviewFields = (data) => {
                 // 读写权限设置标识, 此处单独设置
                 p['accessDone'] = true
                 p.children?.forEach((item) => {
-                  if (p.type !== 'tabs-item') {
-                    if (
-                      f.id === item.formItemProps.name ||
-                      f.ownerBy === item.formItemProps.name
-                    ) {
-                      // 高级组件在tabs布局组件内部时, 取ownerBy字段判断
-                      item.accessModes = f.accessModes
-                    }
-                  } else {
-                    if (f.ownerBy === item.formItemProps.name) {
-                      // 高级组件在非tabs布局组件内部时, 取ownerBy字段判断
-                      item.accessModes = f.accessModes
-                    }
-                    if (f.realCheck) {
-                      item.accessModes = f.realCheck.includes(
-                        item.formItemProps.name,
-                      )
-                        ? f.accessModes
-                        : ['read']
-                    }
+                  if (
+                    f.id === item.formItemProps.name ||
+                    f.ownerBy === item.formItemProps.name
+                  ) {
+                    // 高级组件在tabs布局组件内部时, 取ownerBy字段判断
+                    item.accessModes = f.accessModes
+                  }
+                  if (
+                    !(
+                      p.formItemProps.hasOwnProperty('isLayout') &&
+                      !p.formItemProps.isLayout
+                    )
+                  ) {
+                    // 布局组件item没有isLayout字段或者有isLayout=true时
+                    item.accessModes = f.realCheck?.includes(
+                      item.formItemProps.name,
+                    )
+                      ? f.accessModes
+                      : ['read']
                   }
                 })
                 return p.formItemProps.name === f.id
