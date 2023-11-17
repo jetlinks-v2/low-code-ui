@@ -3,14 +3,16 @@
   <j-form ref="basicFormRef" :model="basicFormData" layout="vertical">
     <j-form-item name="complexType">
       <template #label>
-        请配置从并行分支进入下一个流程节点的条件
-        <j-tooltip placement="right">
-          <template #title>
-            审批节点被"驳回"时, 计为该分支未完成<br />
-            审批节点"通过"或办理节点"提交"时, 计为该分支完成
-          </template>
-          <AIcon type="InfoCircleOutlined" />
-        </j-tooltip>
+        <j-space>
+            请配置从并行分支进入下一个流程节点的条件
+            <j-tooltip placement="right">
+              <template #title>
+                审批节点被"驳回"时, 计为该分支未完成<br />
+                审批节点"通过"或办理节点"提交"时, 计为该分支完成
+              </template>
+              <AIcon type="InfoCircleOutlined" />
+            </j-tooltip>
+        </j-space>
       </template>
       <j-radio-group
         v-model:value="basicFormData.complexType"

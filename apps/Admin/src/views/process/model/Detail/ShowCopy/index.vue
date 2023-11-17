@@ -54,7 +54,7 @@
         :rules="[{ required: true, trigger: 'change' }]"
       >
         <template #label>
-          <div>
+          <j-space>
             <span>请配置标题模板</span>
             <j-tooltip placement="right">
               <template #title
@@ -62,7 +62,7 @@
               >
               <AIcon type="InfoCircleOutlined" />
             </j-tooltip>
-          </div>
+          </j-space>
         </template>
         <TemplateText
           placeholder="{发起人}的{流程名称}"
