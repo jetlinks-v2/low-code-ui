@@ -130,6 +130,8 @@ const treeData = ref<any[]>([])
 const previewData = ref<any[]>([])
 const visible = ref(false)
 const formRef = ref()
+// 不用展示的字段类型: 密码框, 上传, 开关, 表格, 内嵌表单
+const noShowFieldTypes = ['input-password', 'upload', 'switch', 'table', 'form']
 
 /**
  * 获取变量数据
@@ -151,8 +153,12 @@ const getVariables = async () => {
   }
   const { result } = await queryVariables_api(params)
 
-  const { formList, otherFields } = separateData(result, {})
-  treeData.value = formList || []
+  const { formList, otherFields } = separateData(result, {formList: [], otherFields: []})
+  //   treeData.value = formList || []
+  treeData.value = formList.map(m => {
+      m.children = m.children?.filter(f => !noShowFieldTypes.includes(f.others.type) && f.others.required)
+      return m
+  })?.filter(f => f.children.length)
   initVariables.value = otherFields || []
   await getFormFields(treeData.value)
 }
