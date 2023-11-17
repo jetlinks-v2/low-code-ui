@@ -19,7 +19,9 @@
 <script setup lang="ts" name="DealNode">
 import Node from './Node.vue'
 import { useFlowStore } from '@/store/flow'
+import {USER_DATA} from "@/views/process/model/Detail/FlowDesign/util";
 
+const userAllData = inject<any>(USER_DATA, {})
 const flowStore = useFlowStore()
 
 const emits = defineEmits(['selected', 'delNode', 'insertNode'])
@@ -61,6 +63,13 @@ const updateFormBinds = () => {
   })
 }
 
+const validateCandidates = (candidates) => {
+  return Object.keys(candidates).some(key => {
+    const data = userAllData.value?.[key]
+    return candidates[key].some(a => data.some(b => b.id === a.id))
+  })
+}
+
 /**
  * 校验节点
  */
@@ -96,7 +105,7 @@ const validate = (err) => {
   } else if (
     candidates &&
     Object.keys(candidates).length &&
-    Object.values(candidates).every((item: any) => item?.every((e) => e.isDel))
+    !validateCandidates(candidates)
   ) {
     err.push({
       errors: ['候选人已全部删除'],

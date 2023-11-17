@@ -111,6 +111,8 @@ export const rdmRgbColor = () => {
     arr.push(Math.floor(Math.random() * 128 + 64));
     // 亮色
     // arr.push(Math.floor(Math.random() * 128 + 128));
+    // 暗色
+    // arr.push(Math.floor(Math.random() * 128));
   }
 
   let [r, g, b] = arr;
