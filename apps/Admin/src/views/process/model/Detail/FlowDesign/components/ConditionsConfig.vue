@@ -37,12 +37,7 @@
         mode="multiple"
         placeholder="请选择"
         v-model:value="basicFormData.gotoNodes"
-        :options="[
-          { label: '任意节点', value: '@exclusive' },
-          ...allConditionBranches.filter((f) =>
-            basicFormData.condition.includes(f.value),
-          ),
-        ]"
+        :options="executeCondition"
       />
     </j-form-item>
   </j-form>
@@ -84,6 +79,7 @@ const basicFormData = reactive({
   gotoNodes: nodeProps.value?.inclusiveCondition?.gotoNodes || [],
 })
 
+// 当以下条件同时满足时
 const allConditionBranches = computed(() => {
   const _res = flowStore.selectedNode.branches.map((m) => ({
     // 选项名称取条件分支名称
@@ -100,6 +96,26 @@ const allConditionBranches = computed(() => {
     _res.map((m) => m.value).includes(f),
   )
   return _res
+})
+
+// 执行以下条件节点
+const executeCondition = computed(() => {
+  const _filterConditions = allConditionBranches.value
+    .filter((f) => basicFormData.condition.includes(f.value))
+    ?.map((m) => ({
+      ...m,
+      disabled: basicFormData.gotoNodes?.includes('@exclusive'),
+    }))
+  return [
+    {
+      label: '任意节点',
+      value: '@exclusive',
+      disabled: _filterConditions.some((s) =>
+        basicFormData.gotoNodes?.includes(s.value),
+      ),
+    },
+    ..._filterConditions,
+  ]
 })
 
 watch(
