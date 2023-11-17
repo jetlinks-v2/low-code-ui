@@ -213,6 +213,12 @@ const validate = (err) => {
       errors: ['条件节点名称不能为空'],
       name: ['name'],
     })
+  } else if (props.config?.name?.length > 64) {
+    err.push({
+      errors: ['配置项错误'],
+      name: ['name'],
+    })
+    errorInfo.value = '配置项错误'
   } else if (!hasVar) {
     err.push({
       errors: ['请配置进入下方节点的条件'],
