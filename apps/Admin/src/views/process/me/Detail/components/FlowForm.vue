@@ -410,7 +410,7 @@ const handleObject = (form) => {
     for (const key in form.data) {
         if (isObject(form.data[key])) {
             const comment = findComponent(key, form.configuration.children)
-            if (comment && comment?.componentProps.source.type === 'dic') {
+            if (comment && comment?.componentProps.source?.type === 'dic') {
                 form.data[key] = form.data[key].value
             }
         }
