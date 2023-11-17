@@ -16,7 +16,7 @@
                         </j-ellipsis>
 
                      </div>
-                     <j-tag :color="colorMap.get(item.actionColor)">
+                     <j-tag :color="item.nodeType !== 'ROOT'? colorMap.get(item.actionColor):'processing'">
                         {{ actionType.get(item.actionType) }}
                      </j-tag>
                      <!-- <j-tag :color="colorMap.get('completed')" v-if="item.others.autoOperation">
