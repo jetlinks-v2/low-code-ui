@@ -184,12 +184,15 @@ const validateSteps = (type?: string) => {
       })
       onlyMessage('条件节点下未配置执行节点', 'warning')
     }
-    console.log('err: ', err)
+
 
     if (type && type === 'next' && err[0]?.name[0] === 'no-nodes') {
       // 下一步校验才有此提示, 部署不需要此提示
       onlyMessage('请先添加节点', 'warning')
     }
+
+    console.log('err: ', err)
+
     // reject时 返回当前步骤序号
     !err.length ? resolve(1) : reject(1)
   })

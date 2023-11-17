@@ -236,7 +236,7 @@ const handleDeploy = () => {
       step2.value?.validateSteps(),
       step3.value?.validateSteps(),
     ])
-      .then((valid) => {
+      .then(async (valid) => {
         //   console.log('handleDeploy valid: ', valid)
         // 添加加载中动画, 适当给个延时
         setTimeout(() => {
@@ -250,7 +250,7 @@ const handleDeploy = () => {
           })
           validLoading.value = false
         }, 500)
-
+        console.log('valid', valid, await step2.value?.validateSteps())
         if (
           Array.isArray(valid) &&
           valid.every((item) => item.status === 'fulfilled')

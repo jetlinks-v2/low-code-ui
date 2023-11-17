@@ -89,6 +89,11 @@ const props = defineProps({
     type: Array as PropType<any[]>,
     default: () => [],
   },
+  previewData: {
+    type: Array as PropType<any[]>,
+    default: () => [],
+  },
+
 })
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance
@@ -109,7 +114,7 @@ const checkedLeafNode = ref<any[]>([])
 // 搜索字段
 const searchValue = ref('')
 // 表单预览数据
-const previewData = ref<any[]>([])
+// const previewData = ref<any[]>([])
 // 页面渲染的数据(可能是筛选过后的)
 const treeDataFilter = computed(() => {
   if(searchValue.value) {
@@ -127,27 +132,27 @@ const treeDataFilter = computed(() => {
 /**
  * 获取表单字段
  */
-const getFormFields = async () => {
-  if (!props.treeData?.length) return
-  const params = {
-    paging: false,
-    terms: [
-      {
-        column: 'key',
-        termType: 'in',
-        value: props.treeData?.map((m) => m.id),
-      },
-      {
-        value: true,
-        termType: 'eq',
-        type: 'and',
-        column: 'latest',
-      },
-    ],
-  }
-  const { result } = await queryFormNoPage_api(params)
-  previewData.value = result
-}
+// const getFormFields = async () => {
+//   if (!props.treeData?.length) return
+//   const params = {
+//     paging: false,
+//     terms: [
+//       {
+//         column: 'key',
+//         termType: 'in',
+//         value: props.treeData?.map((m) => m.id),
+//       },
+//       {
+//         value: true,
+//         termType: 'eq',
+//         type: 'and',
+//         column: 'latest',
+//       },
+//     ],
+//   }
+//   const { result } = await queryFormNoPage_api(params)
+//   previewData.value = result
+// }
 
 /**
  * 选择变量
@@ -173,12 +178,12 @@ const handleOk = () => {
   _visible.value = false
 }
 
-watch(
-  () => _visible.value,
-  (val) => {
-    if (val) getFormFields()
-  },
-)
+// watch(
+//   () => _visible.value,
+//   (val) => {
+//     if (val) getFormFields()
+//   },
+// )
 watch(
   () => props.variables,
   (val) => {

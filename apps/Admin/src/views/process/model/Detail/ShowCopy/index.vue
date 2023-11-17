@@ -36,7 +36,7 @@
             type="CloseOutlined"
             :style="{
               color: item.color,
-              
+
             }"
             v-if="!item.isOther"
             @click="onRemove(item)"
@@ -45,6 +45,7 @@
         <FormVariables
           v-model:visible="visible"
           v-model:variables="formData.variables"
+          :previewData="previewData"
           :treeData="treeData"
         />
       </j-form-item>
@@ -107,10 +108,10 @@
 </template>
 
 <script setup lang="ts">
-import { queryVariables_api } from '@/api/process/model'
+import { queryVariables_api, queryFormNoPage_api } from '@/api/process/model'
 import FormVariables from './components/FormVariables.vue'
 import { useFlowStore } from '@/store/flow'
-import { separateData } from './utils'
+import { separateData, filterFormVariables } from './utils'
 import TemplateText from './components/TemplateText1.vue'
 
 const flowStore = useFlowStore()
@@ -126,6 +127,7 @@ const props = defineProps({
 const initVariables = ref<any[]>([])
 // 表单树形数据, 用于弹窗左侧数据展示
 const treeData = ref<any[]>([])
+const previewData = ref<any[]>([])
 const visible = ref(false)
 const formRef = ref()
 
@@ -152,6 +154,31 @@ const getVariables = async () => {
   const { formList, otherFields } = separateData(result, {})
   treeData.value = formList || []
   initVariables.value = otherFields || []
+  await getFormFields(treeData.value)
+}
+/**
+ * 获取表单字段
+ */
+const getFormFields = async (data) => {
+  if (!data?.length) return
+  const params = {
+    paging: false,
+    terms: [
+      {
+        column: 'key',
+        termType: 'in',
+        value: data.map((m) => m.id),
+      },
+      {
+        value: true,
+        termType: 'eq',
+        type: 'and',
+        column: 'latest',
+      },
+    ],
+  }
+  const { result } = await queryFormNoPage_api(params)
+  previewData.value = result
 }
 
 const formData = reactive({
@@ -186,9 +213,20 @@ const formData = reactive({
   }),
 })
 
+
+
 const _variables = computed(() => {
   return formData.variables.filter(item => {
-    return !['process.var.processOwner', 'process.function.processOwnerOrgIds', 'process.function.now'].includes(item.value)
+    if (['process.var.processOwner', 'process.function.processOwnerOrgIds', 'process.function.now'].includes(item.value)) {
+      return false
+    }
+    const keys = item.value.split('.')
+    if (keys.some(key => key.includes('form'))) { // 表单变量
+      const _id = keys[keys.length - 1]
+      return filterFormVariables(previewData.value, _id)
+    }
+
+    return true
   })
 })
 
