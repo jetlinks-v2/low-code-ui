@@ -109,16 +109,27 @@ const isDanger = computed(() => {
 defineExpose({
   validate: (err) => {
     errorInfo.value = ''
-    const complexWeight = props.data?.props?.weight?.complexWeight
-    const inputNodeWeight = props.data?.props?.weight?.inputNodeWeight
-    if (inputNodeWeight !== undefined && Object.values(inputNodeWeight).length && complexWeight !== undefined) {
-      const _weight = Object.values(inputNodeWeight).reduce((prev: number, next) => prev + next, 0)
-      if (_weight < complexWeight) {
+    if (props.data.type === 'CONDITIONS' && props.data?.props.inclusiveType === 'condition') {
+      const { inclusiveCondition } = props.data?.props
+      if (!Object.values(inclusiveCondition?.condition || {}).length || !inclusiveCondition?.gotoNodes.length ) {
         err.push({
-          errors: ['通过权重不能大于所有分支的权重总和'],
+          errors: ['未填写必填配置项'],
           name: ['weight', 'complexWeight']
         })
         errorInfo.value = '配置项错误'
+      }
+    } else {
+      const complexWeight = props.data?.props?.weight?.complexWeight
+      const inputNodeWeight = props.data?.props?.weight?.inputNodeWeight
+      if (inputNodeWeight !== undefined && Object.values(inputNodeWeight).length && complexWeight !== undefined) {
+        const _weight = Object.values(inputNodeWeight).reduce((prev: number, next) => prev + next, 0)
+        if (_weight < complexWeight) {
+          err.push({
+            errors: ['通过权重不能大于所有分支的权重总和'],
+            name: ['weight', 'complexWeight']
+          })
+          errorInfo.value = '配置项错误'
+        }
       }
     }
   }
