@@ -348,7 +348,7 @@ const handleFunctionChange = () => {
     return
   }
   queryCommand(info.value.draftId, []).then(res => {
-    const result = res.result?.find(item => item.moduleId + '.' + item.id === form.data.function)?.command || []
+    const result = res.result?.find(item => form.data.function.includes(item.id) )?.command || []
     newData = result.find(item => item.id === form.data.command)?.output
     if(JSON.stringify(newData) !== JSON.stringify(form.dataFrom)) {
       changeModalVisible.value = true;
