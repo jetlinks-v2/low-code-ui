@@ -128,7 +128,7 @@ const content = computed(() => {
 
 const formatValue = (item) => {
   const condition = `${item.type === 'and' ? '并且' : item.type === 'or' ? '或者' : ''}`
-  const _viewValue = item.viewValue ?? item.value
+  const _viewValue = item.viewValue
   switch (item.termType) {
     case 'in':
       return ` ${condition} ${item.columnName || ''} 在 ${item.selectedItem ? item.selectedItem?.join('、') : _viewValue || ''} 之中`
