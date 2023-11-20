@@ -104,8 +104,8 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .value-item-warp{
-  overflow: scroll;
-  height: 50px;
+  //overflow: scroll;
+  //height: 50px;
 }
 .itemDescription{
   color: rgb(192, 192, 192);

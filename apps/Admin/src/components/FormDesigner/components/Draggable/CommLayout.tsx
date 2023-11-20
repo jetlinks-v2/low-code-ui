@@ -132,7 +132,7 @@ export default defineComponent({
                     }
                 })
                 __value.value = obj
-            } 
+            }
             // else if (['form'].includes(props?.data.type)) {// 会被置空
             //     __value.value = get(designer.formState, _path)
             // } 
@@ -149,6 +149,17 @@ export default defineComponent({
                 designer.formRefList.value[props.data?.key] = _formRef.value
             }
         })
+
+        const path_ = computed(() => {
+            if (props.data?.componentProps?.mode !== "multiple") {
+                const _key = (props.data?.componentProps.keys || [])?.find(i => i?.flag)
+                const __path = _path.slice(0, _path.length - 1) || []
+                __path.push(_key?.config?.source)
+                return __path
+            }
+            return _path
+        })
+
         return () => {
             const _props = useProps(props.data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
 
@@ -156,10 +167,10 @@ export default defineComponent({
                 data: props.data,
                 parent: props.parent
             }
-            
+
             return (
                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                    <FormItem {...unref(_props.formItemProps)} name={_path} validateFirst={true}>
+                    <FormItem {...unref(_props.formItemProps)} name={path_.value} validateFirst={true}>
                         {
                             unref(isEditModel) ? <TypeComponent
                                 model={unref(designer.model)}
@@ -170,7 +181,7 @@ export default defineComponent({
                                 props.data?.type === 'switch' ? <TypeComponent
                                     {..._props.componentProps}
                                     checked={__value.value}
-                                    onUpdate:checked={(newValue) => {
+                                    onUpdate: checked={(newValue) => {
                                         set(designer.formState, _path, newValue || false)
                                     }}
                                     onChange={onChange}
