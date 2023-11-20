@@ -118,10 +118,9 @@ import { onlyMessage } from '@jetlinks/utils'
 import Dialog from './Dialog/index.vue'
 import { getList_api, getAllList_api, close_api } from '@/api/process/monitor'
 import dayjs from 'dayjs'
-import { useClassified } from '@/hooks/useClassified'
+import { providerEnum } from '@/api/process/model'
 import Drawer from '@/views/process/me/Detail/index.vue'
 
-const { classified } = useClassified()
 const tableRef = ref()
 const history = ref(false)
 const defaultColumns = [
@@ -138,7 +137,21 @@ const defaultColumns = [
       componentProps: {
         placeholder: '请选择流程分类',
       },
-      options: classified,
+      options: () => new Promise((resolve, reject) => {
+        providerEnum().then(res => {
+          if (res.success) {
+            resolve(res.result.map((item) => {
+              return {
+                label: item.text,
+                value: item.id,
+                extra: item
+              }
+            }))
+          } else {
+            resolve([])
+          }
+        }).catch(() => { resolve([])})
+      }),
     },
   },
   {

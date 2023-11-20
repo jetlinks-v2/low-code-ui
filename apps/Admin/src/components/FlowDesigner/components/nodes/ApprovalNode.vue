@@ -68,6 +68,9 @@ const updateFormBinds = () => {
 const validateCandidates = (candidates) => {
   return Object.keys(candidates).some(key => {
     const data = userAllData.value?.[key]
+    if (['var', 'function', 'relation'].includes(key)) {
+      return true
+    }
     return candidates[key].some(a => data.some(b => b.id === a.id))
   })
 }

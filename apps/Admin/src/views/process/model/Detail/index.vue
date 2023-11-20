@@ -72,16 +72,19 @@
       <!--        <component ref="stepRef" :is="componentsMap[current]" />-->
       <!--      </j-card>-->
       <div style="height: 100%; padding: 24px">
-        <component ref="stepRef" :is="componentsMap[current]" />
+<!--        <component :key="current" ref="stepRef" :is="componentsMap[current]" />-->
+        <BasicInfo v-show="current === 0" key="step11" ref="step1" />
+        <FlowDesign v-show="current === 1" key="step12" ref="step2" />
+        <ShowCopy v-show="current === 2" key="step13" ref="step3" :data="flowStore.model.config" :noQuery="current !== 2" />
       </div>
     </FullPage>
 
     <!-- 隐藏域, 仅用于部署校验每一步数据, noQuery: 不查询接口 -->
-    <div class="validate-box">
-      <BasicInfo ref="step1" />
-      <FlowDesign ref="step2" />
-      <ShowCopy ref="step3" :noQuery="true" />
-    </div>
+<!--    <div class="validate-box">-->
+<!--      <BasicInfo key="step1" ref="step1" />-->
+<!--      <FlowDesign key="step2" ref="step2" />-->
+<!--      <ShowCopy key="step3" ref="step3" :noQuery="true" />-->
+<!--    </div>-->
 
     <j-modal
       v-model:visible="visible"
@@ -172,21 +175,27 @@ const handleNext = async () => {
   // 点击下一步先保存数据, 再校验->#19300
   //   handleSave('next') #19300 恢复之前交互 下一步不保存数据
   // 从基础信息点击下一步前, 查询最新表单, 验证已选表单是否被全部删除
+  await step1.value.getLatestFormList()
   if (current.value === 0) {
-    await step1.value.getLatestFormList()
     await step1.value.memberSubmit()
   }
+  let _stepRef = step1.value
   // 触发校验
-  stepRef.value
+  if (current.value === 1) {
+    _stepRef = step2.value
+  }
+
+  _stepRef
     ?.validateSteps('next')
-    .then((idx) => {
+    .then(() => {
       // 校验通过, 对应步骤恢复正常状态, 并进入下一步骤
-      stepStatus.value[idx] = ''
+      stepStatus.value[current.value] = ''
       current.value++
     })
-    .catch((idx) => {
+    .catch(() => {
       // 步骤校验失败, 返回的当前步骤序号, 直接将对应步骤标红提示
-      stepStatus.value[idx] = 'error'
+      console.log('111111111111111111111111111111')
+      stepStatus.value[current.value] = 'error'
     })
 }
 
@@ -226,11 +235,12 @@ const handleSave = (type?: string) => {
  * 部署, 校验所有步骤数据规范
  */
 const validLoading = ref(false)
-const handleDeploy = () => {
+const handleDeploy = async () => {
   deployLoading.value = true
   // 部署前, 查询表单是否被删除
   step1.value.getLatestFormList().then((res) => {
     validLoading.value = true
+
     Promise.allSettled([
       step1.value?.validateSteps(),
       step2.value?.validateSteps(),
@@ -264,6 +274,7 @@ const handleDeploy = () => {
       })
       .catch((err) => {
         //   console.log('handleDeploy err: ', err)
+        deployLoading.value = false
           onlyMessage('部署失败，流程配置内容不合规', 'error')
       })
       .finally(() => {

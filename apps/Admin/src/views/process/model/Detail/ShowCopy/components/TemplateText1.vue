@@ -40,6 +40,7 @@ import { watch, ref, onMounted } from 'vue'
 import { randomString } from '@jetlinks/utils'
 import { useSelection } from '@/hooks'
 import { Form } from 'jetlinks-ui-components'
+import {watchOnce} from "@vueuse/core";
 
 const formItemContext = Form.useInjectFormItemContext()
 
@@ -190,6 +191,10 @@ const selectVariable = (key, { label }) => {
   emits('change', str)
   formItemContext.onFieldChange()
 }
+
+watchOnce(() => props.value, () => {
+  hide.value.innerHTML = regHidden(props.value)
+})
 
 onMounted(() => {
   hide.value.innerHTML = regHidden(props.value)
