@@ -4,7 +4,7 @@
     v-model:visible="_visible"
     width="1000px"
     @ok="handleOk"
-    @cancel="_visible = false"
+    @cancel="handleCancel"
     :maskClosable="false"
     :destroyOnClose="true"
   >
@@ -39,7 +39,7 @@
           >
             <template #title="node">
               <div style="display: flex; justify-content: space-between">
-                <span style="margin-right: 20px">{{ node.name }}</span>
+                <j-ellipsis style="margin-right: 20px">{{ node.name }}</j-ellipsis>
               </div>
             </template>
           </j-tree>
@@ -69,7 +69,7 @@ import {
 import { queryFormNoPage_api } from '@/api/process/model'
 import { useFlowStore } from '@/store/flow'
 import { treeFilter } from 'jetlinks-ui-components/es/Tree'
-import { generateRandomColor } from '../utils'
+import { generateRandomColor, rdmRgbColor } from '../utils'
 import { cloneDeep } from 'lodash-es'
 
 type Emits = {
@@ -92,6 +92,11 @@ const props = defineProps({
     type: Array as PropType<any[]>,
     default: () => [],
   },
+  previewData: {
+    type: Array as PropType<any[]>,
+    default: () => [],
+  },
+
 })
 
 const { proxy } = getCurrentInstance() as ComponentInternalInstance
@@ -112,7 +117,7 @@ const checkedLeafNode = ref<any[]>([])
 // 搜索字段
 const searchValue = ref('')
 // 表单预览数据
-const previewData = ref<any[]>([])
+// const previewData = ref<any[]>([])
 // 页面渲染的数据(可能是筛选过后的)
 const treeDataFilter = computed(() => {
   if(searchValue.value) {
@@ -130,27 +135,27 @@ const treeDataFilter = computed(() => {
 /**
  * 获取表单字段
  */
-const getFormFields = async () => {
-  if (!props.treeData?.length) return
-  const params = {
-    paging: false,
-    terms: [
-      {
-        column: 'key',
-        termType: 'in',
-        value: props.treeData?.map((m) => m.id),
-      },
-      {
-        value: true,
-        termType: 'eq',
-        type: 'and',
-        column: 'latest',
-      },
-    ],
-  }
-  const { result } = await queryFormNoPage_api(params)
-  previewData.value = result
-}
+// const getFormFields = async () => {
+//   if (!props.treeData?.length) return
+//   const params = {
+//     paging: false,
+//     terms: [
+//       {
+//         column: 'key',
+//         termType: 'in',
+//         value: props.treeData?.map((m) => m.id),
+//       },
+//       {
+//         value: true,
+//         termType: 'eq',
+//         type: 'and',
+//         column: 'latest',
+//       },
+//     ],
+//   }
+//   const { result } = await queryFormNoPage_api(params)
+//   previewData.value = result
+// }
 
 /**
  * 选择变量
@@ -164,7 +169,7 @@ const handleCheck = (_checkedKeys, { checkedNodes }) => {
     ?.map((m) => ({
       label: m.name,
       value: m.fullId,
-      color: generateRandomColor(),
+      color: rdmRgbColor(),
     }))
 }
 
@@ -176,12 +181,19 @@ const handleOk = () => {
   _visible.value = false
 }
 
-watch(
-  () => _visible.value,
-  (val) => {
-    if (val) getFormFields()
-  },
-)
+const handleCancel = ()=>{
+  // console.log('props.variables',props.variables)
+  // emits('update:variables', props.variables.map((m) => m.value))
+  // checkedKeys.value = []
+  _visible.value = false
+}
+
+// watch(
+//   () => _visible.value,
+//   (val) => {
+//     if (val) getFormFields()
+//   },
+// )
 watch(
   () => props.variables,
   (val) => {

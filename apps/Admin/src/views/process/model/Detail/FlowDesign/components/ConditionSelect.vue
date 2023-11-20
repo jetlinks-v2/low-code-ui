@@ -123,12 +123,12 @@ interface IConditionSelect {
 const emit = defineEmits(['update:value'])
 const props = defineProps({
   value: {
-    type: Array as PropType<IConditionSelect[]>,
+    type: Array as PropType<any[]>,
     default: () => [],
   },
 })
 
-const conditionSelect = ref<IConditionSelect[]>([])
+const conditionSelect = ref<any[]>([])
 const conditionOptions = ref([])
 
 /**
@@ -208,7 +208,7 @@ const getFormFields = async () => {
  * @param item
  */
 const handleConditionChange = (value, node, item, index) => {
-  item.value = item.selectedTermType = item.termType = item.termTypeName = item.selectedItem = undefined
+  item.value = item.viewValue = item.selectedTermType = item.termType = item.termTypeName = item.selectedItem = undefined
   item.column = node.fullId
   item.columnName = node.name
   item.selectedNodeId = node.id
@@ -234,7 +234,13 @@ const conditionType = (item) => {
   if (_var?.id === 'processOwnerName') {
     return 'input'
   }
-  return _var?.others?.type || _var?.others?.relation
+  let _type
+  if (_var?.others) {
+    _type = _var.others.type || _var.others.relation
+  } else {
+    _type = _var?.type.type
+  }
+  return _type
 }
 
 const handleRemove = (index: number) => {
@@ -243,7 +249,7 @@ const handleRemove = (index: number) => {
 
 const handleAdd = () => {
   const beforeDone = conditionSelect.value.every((item: any) => {
-    return item.selectedColumn && item.selectedTermType && item.value
+    return item.selectedColumn && item.selectedTermType && item.viewValue
   })
   if (!beforeDone) {
     onlyMessage('前置条件未配置完成', 'error')

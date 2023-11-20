@@ -48,6 +48,8 @@ import {
 } from './components/utils'
 import { onlyMessage } from '@jetlinks/utils'
 import { cloneDeep } from 'lodash-es'
+import {USER_DATA} from "@/views/process/model/Detail/FlowDesign/util";
+import {getAllDepartment_api, getAllRole_api, getAllUser_api} from "@/api/user";
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
@@ -71,9 +73,20 @@ const flowDesignerRef = ref()
 const nameRef = ref()
 const nodeConfigRef = ref()
 const showConfig = ref(false)
+
+const userData = ref<any>({})
+
+provide(USER_DATA, userData)
+
 const nodeSelected = (node) => {
   console.log('节点选中', node)
-  showConfig.value = true
+  if (node.type === 'CONDITIONS') {
+    validateCondition().then(() => {
+        showConfig.value = true
+    })
+  } else {
+      showConfig.value = true
+  }
 }
 
 /**
@@ -143,6 +156,55 @@ const validateNodeConfig = () => {
   }, 200)
 }
 
+const getUserAllData = async () => {
+  const apiList = [
+    getAllDepartment_api({
+      paging: false,
+      sorts: [
+        {
+          name: 'sortIndex',
+          order: 'asc',
+        },
+      ],
+    }),
+    getAllUser_api({
+      paging: false,
+      sorts: [
+        {
+          name: 'createTime',
+          order: 'desc',
+        },
+      ],
+    }),
+    getAllRole_api({
+      paging: false,
+      sorts: [
+        {
+          name: 'createTime',
+          order: 'desc',
+        },
+        {
+          name: 'id',
+          order: 'desc',
+        },
+      ],
+    }),
+  ]
+  Promise.all(apiList).then((res) => {
+    userData.value.org = res[0].result.sort((a: any, b: any) =>
+      a.sortIndex === b.sortIndex
+        ? b.createTime - a.createTime
+        : a.sortIndex - b.sortIndex,
+    )
+    userData.value.user = res[1].result
+    userData.value.role = res[2].result
+
+    console.log(userData.value)
+  })
+}
+
+getUserAllData()
+
 watch(
   () => showConfig.value,
   (val) => {
@@ -167,6 +229,26 @@ watch(
 const validateSteps = (type?: string) => {
   return new Promise((resolve, reject) => {
     const err = flowDesignerRef.value.validateProcess()
+    validateCondition(err)
+
+
+    if (type && type === 'next' && err[0]?.name[0] === 'no-nodes') {
+      // 下一步校验才有此提示, 部署不需要此提示
+      onlyMessage('请先添加节点', 'warning')
+    }
+
+    console.log('err: ', err)
+
+    // reject时 返回当前步骤序号
+    !err.length ? resolve(1) : reject(1)
+  })
+}
+
+/**
+ * 校验是否存在多个条件节点下面没有业务节点
+ * @param err 
+ */
+const validateCondition = (err?) => {
     const _branchNodes = cloneDeep(findBranches(flowStore.model.nodes, []))
     // 没有子节点的条件节点
     const _noChildBranchNodes: any[] = []
@@ -178,21 +260,15 @@ const validateSteps = (type?: string) => {
     // 每一个条件分支, 只允许有一个条件直达分支下面的空节点
     if (_noChildBranchNodes.some((s) => s.length > 1)) {
       // 任何一个分支存在多个条件节点直达空节点, 校验不通过
-      err.push({
-        errors: ['条件节点下未配置执行节点'],
+      err?.push({
+        errors: ['请在条件分支下添加审批/办理节点'],
         name: ['empty'],
       })
-      onlyMessage('条件节点下未配置执行节点', 'warning')
+      onlyMessage('请在条件分支下添加审批/办理节点', 'warning')
+      return Promise.reject('请在条件分支下添加审批/办理节点')
+    } else {
+        return Promise.resolve()
     }
-    console.log('err: ', err)
-
-    if (type && type === 'next' && err[0]?.name[0] === 'no-nodes') {
-      // 下一步校验才有此提示, 部署不需要此提示
-      onlyMessage('请先添加节点', 'warning')
-    }
-    // reject时 返回当前步骤序号
-    !err.length ? resolve(1) : reject(1)
-  })
 }
 
 defineExpose({ validateSteps })

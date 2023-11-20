@@ -1,4 +1,4 @@
-import {cloneDeep, isString, pick} from 'lodash-es'
+import {cloneDeep, isArray, isString, pick} from 'lodash-es'
 import { advancedComponents } from './const'
 import { useFlowStore } from '@/store/flow'
 import { layoutComponents } from './const'
@@ -476,12 +476,23 @@ export const handleLikeValue = (v: string) => {
   return v;
 };
 
+const isEmpty = (v) => {
+  return (
+    v === undefined ||
+    v === null ||
+    v === '' ||
+    (isArray(v) && v.length === 0)
+  );
+};
 
 export const handleTermsData = (terms) => {
   return terms.map(item => {
-    if (['like', 'nlike'].includes(item.termType) && !!item.value) {
-      item.value = `%${handleLikeValue(item.value)}%`;
+    if (['like', 'nlike'].includes(item.termType) && !isEmpty(item.viewValue)) {
+      item.value = `%${handleLikeValue(item.viewValue)}%`;
+    } else {
+      item.value = item.value || item.viewValue
     }
+
     return item
   })
 }

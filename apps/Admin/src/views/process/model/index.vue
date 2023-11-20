@@ -203,6 +203,7 @@ const columns = [
     scopedSlots: true,
     search: {
       type: 'select',
+      termFilter: ['in' , 'nin'],
       rename: 'classifiedId',
       componentProps: {
         placeholder: '请选择流程分类',
@@ -395,6 +396,8 @@ const getActions = (record, type = 'card') => {
                     onlyMessage('操作成功')
                     refresh()
                   }
+                }).finally(() => {
+                    data.loading = false
                 })
               } else {
                 Modal.error({
@@ -404,7 +407,7 @@ const getActions = (record, type = 'card') => {
             })
           } catch (error) {
           } finally {
-            data.loading = false
+            // data.loading = false
           }
         },
       }),

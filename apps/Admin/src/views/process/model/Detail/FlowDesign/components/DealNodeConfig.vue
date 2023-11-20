@@ -63,13 +63,15 @@
               :rules="[{ required: true, message: '请输入通过权重' }]"
             >
               <template #label>
-                通过权重
-                <j-tooltip placement="right">
-                  <template #title>
-                    “提交”的办理成员权重总和达到设定值时，办理节点通过
-                  </template>
-                  <AIcon type="InfoCircleOutlined" />
-                </j-tooltip>
+                <j-space>
+                    通过权重
+                    <j-tooltip placement="right">
+                      <template #title>
+                        “提交”的办理成员权重总和达到设定值时，办理节点通过
+                      </template>
+                      <AIcon type="InfoCircleOutlined" />
+                    </j-tooltip>
+                </j-space>
               </template>
               <j-input-number
                 :min="1"

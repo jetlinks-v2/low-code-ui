@@ -67,12 +67,36 @@ const operatorDate = [
     }
 ]
 
+// 数组操作符
+const operatorArray = [{
+    value: 'eq',
+    label: '等于'
+},
+{
+    value: 'neq',
+    label: '不等于'
+},
+{
+    value: 'contains_all',
+    label: '全部包含在...之中'
+},
+{
+    value: 'contains_any',
+    label: '任意包含在...之中'
+},
+{
+    value: 'not_contains',
+    label: '不包含在...之中'
+}]
+
 export const operatorMap = {
     default: operatorInput,
     input: operatorInput,
+    string: operatorInput,
     password: operatorInput,
     number: operatorInput,
     textarea: operatorInput,
+    array: operatorArray,
     select: operatorSelect,
     switch: operatorSwitch,
     date: operatorDate,
@@ -84,7 +108,7 @@ export const operatorMap = {
     'input-number': operatorInput,
     'product': operatorSelect,
     'user': operatorSelect,
-    'org': operatorSelect,
+    'org': operatorArray,
     'device': operatorSelect,
     'role': operatorSelect,
     'text': operatorInput,

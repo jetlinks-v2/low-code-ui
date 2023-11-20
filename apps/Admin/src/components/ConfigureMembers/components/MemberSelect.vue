@@ -59,7 +59,7 @@
             :fieldNames="{
               children: 'children',
               title: 'name',
-              key: ['org','user','role'].includes(active) ? 'id': 'fullId',
+              key: ['org', 'user', 'role'].includes(active) ? 'id' : 'fullId',
             }"
             @select="onSelect"
           >
@@ -245,16 +245,19 @@ const setLevel = (data: any[]) => {
       item.id = item.fullId
       // item.type = item.others?.type || ''
       item.relation = item.others?.relation || ''
-      if (level !== 4) {
-        item.disabled = true
-      }
+      // if (level !== 4) {
+      //   item.disabled = true
+      // }
       if (item.children && item.children.length > 0) {
+        item.disabled = true
         dealData(item.children, level + 1)
       }
     })
   }
   dealData(cloneData)
-  return props.type === 'user' ? cloneData : cloneData.filter(i => i.id !== 'task')
+  return props.type === 'user'
+    ? cloneData
+    : cloneData.filter((i) => i.id !== 'task')
 }
 
 const onSelect = (keys: string[], { node, selected }) => {

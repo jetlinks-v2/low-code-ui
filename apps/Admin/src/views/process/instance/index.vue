@@ -154,10 +154,10 @@ import Drawer from '../components/Drawer/index.vue'
 import PermissionDialog from './PermissionDialog/index.vue'
 import { isFunction, isObject } from 'lodash-es'
 import { getList_api, getAllInstance_api, del_api, updateState_api } from '@/api/process/instance'
-import { useClassified } from '@/hooks/useClassified'
 import { isImg } from '@/utils/comm'
 
-const { classified } = useClassified()
+import { providerEnum } from '@/api/process/model'
+
 const tableRef = ref()
 const columns = [
   {
@@ -187,11 +187,26 @@ const columns = [
     scopedSlots: true,
     search: {
       type: 'select',
+      termFilter: ['in' , 'nin'],
       rename: 'classifiedId',
       componentProps: {
         placeholder: '请选择流程分类',
       },
-      options: classified,
+      options: () => new Promise((resolve, reject) => {
+        providerEnum().then(res => {
+          if (res.success) {
+            resolve(res.result.map((item) => {
+              return {
+                label: item.text,
+                value: item.id,
+                extra: item
+              }
+            }))
+          } else {
+            resolve([])
+          }
+        }).catch(() => { resolve([])})
+      }),
     },
   },
   {

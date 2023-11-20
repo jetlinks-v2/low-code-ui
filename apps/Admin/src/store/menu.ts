@@ -99,6 +99,16 @@ export const useMenuStore = defineStore('menu', () => {
 
         return item
       })
+
+      const systemMenu = result.find(item => item.code === 'system')
+
+      if (systemMenu) {
+        systemMenu.meta = {
+          hideInMenu: true
+        }
+
+        filterMenu.push(systemMenu)
+      }
       const workFlowMenu = [ ...filterMenu, ...BASIC_ROUTER_DATA]
       const routes = handleMenus(cloneDeep(workFlowMenu), extraMenu, asyncRoutes) // 处理路由
 

@@ -76,7 +76,7 @@
 <script lang="ts" setup>
 import Save from './Save/index.vue'
 import dayjs from 'dayjs'
-import { _query, _delete } from '@/api/process/form'
+import { _query, _delete, _queryCreator } from '@/api/process/form'
 import { onlyMessage } from '@/utils/comm'
 import { ref } from 'vue'
 import { useMenuStore } from '@/store'
@@ -86,6 +86,7 @@ const params = ref<any>({})
 const tableRef = ref<Record<string, any>>({})
 const current = ref({})
 const visible = ref<boolean>(false)
+const options = ref<any>([])
 
 const columns = [
   {
@@ -124,8 +125,17 @@ const columns = [
     dataIndex: 'creatorName',
     key: 'creatorName',
     ellipsis: true,
+  },
+  {
+    title: '创建人',
+    dataIndex: 'creatorId',
+    key: 'creatorId',
+    ellipsis: true,
+    hideInTable: true,
     search: {
-      type: 'string',
+      type: 'select',
+      termFilter: ['in', 'nin'],
+      options: options,
     },
   },
   {
@@ -226,6 +236,20 @@ const _del = async (id: string) => {
     tableRef.value?.reload()
   }
 }
+
+
+const getUser = async () => {
+    const res = await _queryCreator( {
+        paging: false
+    })
+    if (res.status === 200) {
+        options.value = res.result.map(item => ({
+            label: item.creatorName,
+            value: item.creatorId,
+        }))
+    }
+}
+getUser()
 </script>
 
 <style scoped lang="less">

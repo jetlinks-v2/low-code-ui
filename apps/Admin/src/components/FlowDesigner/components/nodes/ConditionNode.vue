@@ -15,7 +15,7 @@
           <span class="title">
             <AIcon type="FunnelPlotOutlined" style="font-size: 12px" />
             <j-ellipsis>
-              {{ config.name ? config.name : '条件' + level }}
+              {{ config.name }}
             </j-ellipsis>
           </span>
           <span
@@ -61,6 +61,8 @@
 import InsertButton from '../InsertButton.vue'
 import { useFlowStore } from '@/store/flow'
 import {queryVariables_api} from "@/api/process/model";
+import  { isArray } from 'lodash-es'
+import {filterFormVariables} from "@/views/process/model/Detail/ShowCopy/utils";
 
 const emits = defineEmits([
   'insertNode',
@@ -126,7 +128,7 @@ const content = computed(() => {
 
 const formatValue = (item) => {
   const condition = `${item.type === 'and' ? '并且' : item.type === 'or' ? '或者' : ''}`
-  const _viewValue = item.viewValue ?? item.value
+  const _viewValue = item.viewValue
   switch (item.termType) {
     case 'in':
       return ` ${condition} ${item.columnName || ''} 在 ${item.selectedItem ? item.selectedItem?.join('、') : _viewValue || ''} 之中`
@@ -146,51 +148,83 @@ const validateVariables = (data, keys) => {
   })
 }
 
-const validateFormItem = async () => {
+const isEmpty = (v) => {
+  return (
+    v === undefined ||
+    v === null ||
+    v === '' ||
+    (isArray(v) && v.length === 0)
+  );
+};
 
-  const { id, name, key, model, provider } = flow.modelBaseInfo
-  const params = {
-    definition: {
-      id,
-      name,
-      key,
-      model: JSON.stringify(flow.model), // model不能取modelBaseInfo(接口保存才会有值), 直接取动态值flowStore.model
-      provider,
-    },
-    nodeId: props.config.parentId, // 条件节点配置, id传当前条件节点的branchBy
-    containThisNode: false, //变量来源是否包含本节点
-  }
-  const { result } = await queryVariables_api(params)
 
-  const { terms } = props.config.props?.condition?.configuration || []
-  const termsKeys:string[] = terms.filter(item => item.column).map(item => {
-    const _keys = item.column.split('.')
-    return _keys.pop()
+const getFormIds = (data: any[], formKeySet: Set<string>) => {
+  data.forEach(item => {
+    if (item.children?.length) {
+      return getFormIds(item.children, formKeySet)
+    } else {
+      if (['device', 'product', 'role', 'user', 'org'].includes(item.type)) {
+        if(item.componentProps?.keys?.length) {
+          item.componentProps.keys.forEach((a) => {
+            formKeySet.add(a.config.source)
+          })
+        } else {
+          formKeySet.add(item.key)
+        }
+      } else {
+        formKeySet.add(item.key)
+      }
+    }
   })
-  console.log(result, termsKeys)
-  return validateVariables(result, termsKeys)
 }
+
 /**
  * 校验节点
  */
-const validate = async (err) => {
-  const { terms } = props.config.props?.condition?.configuration
+const validate = (err) => {
+  const { terms } = props.config.props?.condition?.configuration || {}
 
   showError.value = true
   errorInfo.value = '未填写必填配置项'
-  const hasVar = await validateFormItem()
-  console.log('hasVar', hasVar)
-  if (!hasVar){
-    errorInfo.value = '配置项错误'
+
+  const termsKeys:string[] = terms?.filter(item => {
+    return item.column && !['process.var', 'process.function'].some(c => item.column.includes(c))
+  }).map(item => {
+    const _keys = item.column.split('.')
+    return _keys.pop()
+  })
+
+  const formKeySet = new Set<string>();
+
+  (flow.model?.config?.forms || []).forEach(item => {
+    return getFormIds(item.fullInfo?.configuration?.children || [], formKeySet)
+  })
+  console.log(terms)
+  const hasVar = termsKeys.every(key => {
+    return formKeySet.has(key)
+  })
+
+  if (!props.config?.name) {
+    err.push({
+      errors: ['条件节点名称不能为空'],
+      name: ['name'],
+    })
+  } else if (props.config?.name?.length > 64) {
     err.push({
       errors: ['配置项错误'],
+      name: ['name'],
+    })
+    errorInfo.value = '配置项错误'
+  } else if (!hasVar) {
+    err.push({
+      errors: ['请配置进入下方节点的条件'],
       name: ['condition', 'configuration', 'terms'],
     })
+    errorInfo.value = '条件配置变量已删除'
   } else if (
-    !terms ||
-    !terms.length ||
+    !terms?.length ||
     !terms.some((item) => Boolean(Object.keys(item).length)) ||
-    terms.some(item => !item.column || !item.termType || !item.value)
+    terms.some(item => isEmpty(item.viewValue) || !item.termType)
   ) {
     err.push({
       errors: ['请配置进入下方节点的条件'],

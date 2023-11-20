@@ -36,15 +36,17 @@
             type="CloseOutlined"
             :style="{
               color: item.color,
-              
+
             }"
             v-if="!item.isOther"
             @click="onRemove(item)"
           />
         </div>
         <FormVariables
+          v-if="visible"
           v-model:visible="visible"
           v-model:variables="formData.variables"
+          :previewData="previewData"
           :treeData="treeData"
         />
       </j-form-item>
@@ -53,7 +55,7 @@
         :rules="[{ required: true, trigger: 'change' }]"
       >
         <template #label>
-          <div>
+          <j-space>
             <span>请配置标题模板</span>
             <j-tooltip placement="right">
               <template #title
@@ -61,7 +63,7 @@
               >
               <AIcon type="InfoCircleOutlined" />
             </j-tooltip>
-          </div>
+          </j-space>
         </template>
         <TemplateText
           placeholder="{发起人}的{流程名称}"
@@ -107,10 +109,10 @@
 </template>
 
 <script setup lang="ts">
-import { queryVariables_api } from '@/api/process/model'
+import { queryVariables_api, queryFormNoPage_api } from '@/api/process/model'
 import FormVariables from './components/FormVariables.vue'
 import { useFlowStore } from '@/store/flow'
-import { separateData } from './utils'
+import { separateData, filterFormVariables } from './utils'
 import TemplateText from './components/TemplateText1.vue'
 
 const flowStore = useFlowStore()
@@ -120,14 +122,21 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  data: {
+    type: Object,
+    default: () => ({})
+  }
 })
 
 // 初始变量
 const initVariables = ref<any[]>([])
 // 表单树形数据, 用于弹窗左侧数据展示
 const treeData = ref<any[]>([])
+const previewData = ref<any[]>([])
 const visible = ref(false)
 const formRef = ref()
+// 不用展示的字段类型: 密码框, 上传, 开关, 表格, 内嵌表单
+const noShowFieldTypes = ['input-password', 'upload', 'switch', 'table', 'form']
 
 /**
  * 获取变量数据
@@ -136,6 +145,7 @@ const formRef = ref()
  */
 const getVariables = async () => {
   const { id, name, key, model, provider } = flowStore.modelBaseInfo
+
   if (!id || props.noQuery) return
   const params = {
     definition: {
@@ -148,10 +158,40 @@ const getVariables = async () => {
     nodeId: flowStore.model.nodes.id || 'ROOT_1', // 展示及抄送直接传根节点id
   }
   const { result } = await queryVariables_api(params)
-
-  const { formList, otherFields } = separateData(result, {})
-  treeData.value = formList || []
+  console.log('otherFields',result)
+  const { formList, otherFields } = separateData(result, {formList: [], otherFields: []})
+  //   treeData.value = formList || []
+  treeData.value = formList.map(m => {
+      m.children = m.children?.filter(f => !noShowFieldTypes.includes(f.others.type) && f.others.required)
+      return m
+  })?.filter(f => f.children.length)
+  console.log('otherFields',otherFields)
   initVariables.value = otherFields || []
+  await getFormFields(treeData.value)
+}
+/**
+ * 获取表单字段
+ */
+const getFormFields = async (data) => {
+  if (!data?.length) return
+  const params = {
+    paging: false,
+    terms: [
+      {
+        column: 'key',
+        termType: 'in',
+        value: data.map((m) => m.id),
+      },
+      {
+        value: true,
+        termType: 'eq',
+        type: 'and',
+        column: 'latest',
+      },
+    ],
+  }
+  const { result } = await queryFormNoPage_api(params)
+  previewData.value = result
 }
 
 const formData = reactive({
@@ -170,14 +210,14 @@ const formData = reactive({
   //     flowStore.model.config.nameGenerator = formatToVariable(val)
   //   },
   // }),
-  nameGenerator: flowStore.model.config.nameGenerator,
+  nameGenerator: props.data?.nameGenerator,
   // summaryGenerator: computed({
   //   get: () => formatToName(flowStore.model.config.summaryGenerator),
   //   set: (val) => {
   //     flowStore.model.config.summaryGenerator = formatToVariable(val)
   //   },
   // }),
-  summaryGenerator: flowStore.model.config.summaryGenerator,
+  summaryGenerator: props.data?.summaryGenerator,
   ccMember: computed({
     get: () => flowStore.model.config.ccMember,
     set: (val) => {
@@ -186,9 +226,27 @@ const formData = reactive({
   }),
 })
 
+
+watch(() => props.noQuery, () => {
+  formData.variables = props.data?.variables?.length ? props.data?.variables : initVariables.value
+  formData.nameGenerator = props.data?.nameGenerator
+  formData.summaryGenerator = props.data?.summaryGenerator
+  formData.ccMember = props.data?.ccMember ?? flowStore.model.config.ccMember
+}, { immediate: true })
+
+
 const _variables = computed(() => {
   return formData.variables.filter(item => {
-    return !['process.var.processOwner', 'process.function.processOwnerOrgIds', 'process.function.now'].includes(item.value)
+    if (['process.var.processOwner', 'process.function.processOwnerOrgIds', 'process.function.now'].includes(item.value)) {
+      return false
+    }
+    const keys = item.value.split('.')
+    if (keys.some(key => key.includes('form'))) { // 表单变量
+      const _id = keys[keys.length - 1]
+      return filterFormVariables(previewData.value, _id, item)
+    }
+
+    return true
   })
 })
 
@@ -224,10 +282,18 @@ const onSummaryChange = (val) => {
   flowStore.model.config.summaryGenerator = val
 }
 
-onMounted(() => {
-  getVariables()
-  validateSteps()
-})
+watch(() => props.noQuery, ( val ) => {
+  console.log('noQuery', val)
+  if (!val) {
+    getVariables()
+  }
+}, { immediate: true })
+
+// onMounted(() => {
+//   console.log('otherFields1')
+//   getVariables()
+//   // validateSteps()
+// })
 
 defineExpose({ validateSteps })
 </script>

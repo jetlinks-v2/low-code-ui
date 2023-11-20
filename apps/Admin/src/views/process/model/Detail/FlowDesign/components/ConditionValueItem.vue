@@ -51,7 +51,7 @@
     </template>
   </j-tree-select>
   <j-date-picker
-    v-else-if="conditionType === 'date-picker'"
+    v-else-if="['date', 'date-picker'].includes(conditionType)"
     :valueFormat="'YYYY-MM-DD HH:mm:ss'"
     v-model:value="myValue"
     class="value-select"
@@ -97,6 +97,7 @@ import {
 import { queryRuntime, queryDictionaryData } from '@/api/form'
 import { useFlowStore } from '@/store/flow'
 import { dictionaryItemList } from '@/api/list'
+import {isBoolean} from "lodash-es";
 type Emits = {
   (e: 'update:modelValue', data: string | number | boolean): void
   (e: 'update:selectedItem', data?: string[]): void
@@ -182,7 +183,13 @@ const formatText = (label) => {
 const onChange = (e, label) => {
   let _value = myValue.value
   if (props.conditionType === 'switch') {
-    _value = myValue.value === 'true'
+    if (myValue.value === 'true') {
+      _value = true
+    } else if (myValue.value === 'false'){
+      _value = false
+    } else {
+      _value = undefined
+    }
   }
   emit('update:modelValue', _value)
   if(label) {
@@ -234,7 +241,12 @@ const findValueOptions = async () => {
 watch(
   () => [props.modelValue, props.conditionType],
   () => {
-    myValue.value = props.conditionType === 'switch' ? String(props.modelValue) : props.modelValue
+    if (props.conditionType === 'switch') {
+      myValue.value = isBoolean(props.modelValue) ? String(props.modelValue) : props.modelValue
+    } else {
+      myValue.value = props.modelValue
+    }
+
   },
   { deep: true, immediate: true },
 )

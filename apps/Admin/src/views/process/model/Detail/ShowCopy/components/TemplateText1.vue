@@ -40,6 +40,7 @@ import { watch, ref, onMounted } from 'vue'
 import { randomString } from '@jetlinks/utils'
 import { useSelection } from '@/hooks'
 import { Form } from 'jetlinks-ui-components'
+import {watchOnce} from "@vueuse/core";
 
 const formItemContext = Form.useInjectFormItemContext()
 
@@ -92,7 +93,7 @@ const regHandle = (html) => {
     const variable = props.variables.find((i) => i.value === _arr?.[1])
     if (_arr?.length === 3) {
       if (variable) {
-        return `<span style="color: ${variable?.color}">{${_arr[2]}}</span>`
+        return `<span style="color: ${variable?.color}">{${variable.label}}</span>`
       } else {
         return `{${_arr[2]}}`
       }
@@ -190,6 +191,10 @@ const selectVariable = (key, { label }) => {
   emits('change', str)
   formItemContext.onFieldChange()
 }
+
+watchOnce(() => props.value, () => {
+  hide.value.innerHTML = regHidden(props.value)
+})
 
 onMounted(() => {
   hide.value.innerHTML = regHidden(props.value)
