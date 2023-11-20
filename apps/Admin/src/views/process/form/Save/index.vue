@@ -104,7 +104,7 @@ const vailId = async (_: Record<string, any>, value: string) => {
   if (!props?.data?.key && value) {
     const resp = await isExists(value)
     if (resp.status === 200 && resp.result) {
-      return Promise.reject('ID重复')
+      return Promise.reject('表单标识已存在')
     } else {
       return Promise.resolve()
     }
