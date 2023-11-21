@@ -36,7 +36,7 @@
     "vue": "^3.3.4",
     "vue-cropper": "^1.0.9",
     "vue-router": "^4.2.2",
-    "vuedraggable": "^2.24.3"
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.11",
