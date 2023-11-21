@@ -78,9 +78,9 @@ import Export from './components/Export.vue'
 import CallPage from './components/CallPages.vue'
 import Relation from './components/Relation/index.vue'
 import JsonPreview from '../Preview/components/JsonPreview.vue'
-import { queryRuntime } from '@/api/form'
+import { queryRuntime } from '@LowCode/api/form'
 import { onlyMessage } from '@jetlinks-web/utils'
-import { dictionaryItemList } from '@/api/list'
+import { dictionaryItemList } from '@LowCode/api/list'
 import { request } from '@jetlinks-web/core'
 
 const props = defineProps({

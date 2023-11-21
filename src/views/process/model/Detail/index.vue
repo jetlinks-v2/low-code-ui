@@ -120,13 +120,13 @@ import { ref } from 'vue'
 import BasicInfo from './BasicInfo/index.vue'
 import FlowDesign from './FlowDesign/index.vue'
 import ShowCopy from './ShowCopy/index.vue'
-import { detail_api, update_api, deploy_api } from '@/api/process/model'
+import { detail_api, update_api, deploy_api } from '@LowCode/api/process/model'
 import { onlyMessage, LocalStore } from '@jetlinks-web/utils'
-import { useFlowStore, defaultModel } from '@/store/flow'
+import { useFlowStore, defaultModel } from '@LowCode/store/flow'
 import { Modal } from 'ant-design-vue'
 import { cloneDeep } from 'lodash-es'
 import { TOKEN_KEY } from '@jetlinks-web/constants'
-import {setEmptyNodeProps} from "@/views/process/model/Detail/FlowDesign/components/utils";
+import {setEmptyNodeProps} from "@LowCode/views/process/model/Detail/FlowDesign/components/utils";
 
 const flowStore = useFlowStore()
 const route = useRoute()

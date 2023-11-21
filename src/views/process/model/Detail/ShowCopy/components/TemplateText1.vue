@@ -38,7 +38,7 @@
 <script setup>
 import { watch, ref, onMounted } from 'vue'
 import { randomString } from '@jetlinks-web/utils'
-import { useSelection } from '@/hooks'
+import { useSelection } from '@LowCode/hooks'
 import { Form } from 'jetlinks-ui-components'
 import {watchOnce} from "@vueuse/core";
 

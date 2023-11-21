@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { _export } from '@/api/list'
+import { _export } from '@LowCode/api/list'
 import { downloadFileByUrl, onlyMessage } from '@jetlinks-web/utils'
 import { PropType } from 'vue'
 const emit = defineEmits(['close', 'save'])

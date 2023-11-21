@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang='ts'>
-import Preview from '@/components/FormDesigner/preview.vue'
+import Preview from '@LowCode/components/FormDesigner/preview.vue'
 import { isArray, isObject } from 'lodash-es';
 
 const props = defineProps({
@@ -108,7 +108,7 @@ onMounted(() => {
     console.log('======', [...formMap.values()])
     const arr = [...formMap.values()].map(item => {
         if (isArray(item)) {
-           
+
             const e = {
                 ...item[0],
                 afterDataSource: [...item.map(i=>i.others.after)],

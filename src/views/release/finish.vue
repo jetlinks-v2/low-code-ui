@@ -31,12 +31,12 @@
 </template>
 
 <script setup name="Finish">
-import { releaseDraft } from '@/api/project'
-import { saveMenu } from '@/api/menu'
+import { releaseDraft } from '@LowCode/api/project'
+import { saveMenu } from '@LowCode/api/menu'
 import { useIntervalFn } from '@vueuse/core'
 import { useNetwork } from '@jetlinks-web/hooks'
-import { useProduct } from '@/store'
-import { updateButtons } from '@/components/Menu'
+import { useProduct } from '@LowCode/store'
+import { updateButtons } from '@LowCode/components/Menu'
 
 const props = defineProps({
   tree: {

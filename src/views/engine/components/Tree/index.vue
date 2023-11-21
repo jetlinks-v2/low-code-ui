@@ -22,7 +22,7 @@
 <script setup name="EngineTree">
 import Search from './search.vue'
 import Tree from './tree.vue'
-import { useProduct } from "@/store";
+import { useProduct } from "@LowCode/store";
 import { storeToRefs } from 'pinia'
 
 const product = useProduct()

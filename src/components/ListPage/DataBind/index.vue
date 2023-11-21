@@ -21,7 +21,7 @@
 import DataBindModal from './components/dataBind.vue'
 import { DATA_BIND } from '../keys'
 import { validDataBind } from './utils/valid'
-import { useFunctions } from '@/hooks/useFunctions'
+import { useFunctions } from '@LowCode/hooks/useFunctions'
 
 const { functionOptions } = useFunctions()
 

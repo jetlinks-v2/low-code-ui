@@ -1,6 +1,6 @@
 import {cloneDeep, isArray, isString, pick} from 'lodash-es'
 import { advancedComponents } from './const'
-import { useFlowStore } from '@/store/flow'
+import { useFlowStore } from '@LowCode/store/flow'
 import { layoutComponents } from './const'
 
 const flowStore = useFlowStore()

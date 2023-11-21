@@ -78,8 +78,8 @@
 </template>
 
 <script lang="ts" setup>
-import { _save, isExists } from '@/api/process/form'
-import { onlyMessage } from '@/utils/comm'
+import { _save, isExists } from '@LowCode/api/process/form'
+import { onlyMessage } from '@LowCode/utils/comm'
 import { ref, reactive, watch } from 'vue'
 import { uid } from '../../../../components/FormDesigner/utils/uid'
 

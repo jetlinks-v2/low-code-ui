@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { PropType } from 'vue'
 import JsonPreview from '../JsonPreview.vue';
-import { isEmpty } from '@/components/ListPage/utils';
+import { isEmpty } from '@LowCode/components/ListPage/utils';
 
 const props = defineProps({
   config: {

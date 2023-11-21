@@ -6,7 +6,7 @@
 </template>
 
 <script setup name="DragBox">
-import { useDragBox } from '@/hooks'
+import { useDragBox } from '@LowCode/hooks'
 
 const props = defineProps({
   position: {

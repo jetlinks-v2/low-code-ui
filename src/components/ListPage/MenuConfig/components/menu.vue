@@ -79,7 +79,7 @@
   />
 </template>
 <script setup lang="ts">
-import ChooseIconDialog from '@/components/ListPage/MenuConfig/components/icon.vue'
+import ChooseIconDialog from '@LowCode/components/ListPage/MenuConfig/components/icon.vue'
 import { MENU_CONFIG } from '../../keys'
 import { ErrorItem } from '../..'
 

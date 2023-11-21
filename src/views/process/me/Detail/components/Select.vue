@@ -45,8 +45,8 @@
 
 <script setup>
 import { cloneDeep } from 'lodash-es';
-import { getUserList } from '@/api/process/me'
-import { getOrg_api } from '@/api/process/model'
+import { getUserList } from '@LowCode/api/process/me'
+import { getOrg_api } from '@LowCode/api/process/model'
 import { filterTreeNodes } from '@jetlinks-web/utils';
 
 const props = defineProps({

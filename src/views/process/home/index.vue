@@ -18,9 +18,9 @@
 </template>
 <script setup>
 import MyCard from '../components/MyCard/index.vue'
-import { getMeProcessList } from '@/api/process/me'
-import { useUserStore } from '@/store/user'
-import { useMenuStore } from '@/store'
+import { getMeProcessList } from '@LowCode/api/process/me'
+import { useUserStore } from '@LowCode/store/user'
+import { useMenuStore } from '@LowCode/store'
 
 const userStore = useUserStore()
 const menu = useMenuStore()

@@ -252,9 +252,9 @@
 </template>
 
 <script lang="ts" setup>
-import Upload from '@/components/Upload/Image/ImageUpload.vue'
+import Upload from '@LowCode/components/Upload/Image/ImageUpload.vue'
 import { ErrorItem } from '../..'
-import EditorButton from '@/components/EditorModal/EditorButton.vue'
+import EditorButton from '@LowCode/components/EditorModal/EditorButton.vue'
 import {
   LIST_FORM_INFO,
   ACTION_CONFIG_KEY,

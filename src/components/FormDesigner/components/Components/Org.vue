@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getDepartmentList_api } from '@/api/user'
+import { getDepartmentList_api } from '@LowCode/api/user'
 import { useRequest } from '@jetlinks-web/hooks'
 import { map } from 'lodash-es'
 import { ref, watch, unref } from 'vue'

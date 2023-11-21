@@ -94,10 +94,10 @@
 </template>
 
 <script lang="ts" setup>
-import { onlyMessage } from '@/utils/comm'
+import { onlyMessage } from '@LowCode/utils/comm'
 import { ErrorItem } from '../..'
 import type { PropType } from 'vue'
-import { useProduct } from '@/store';
+import { useProduct } from '@LowCode/store';
 import { getImage, randomString } from '@jetlinks-web/utils';
 import { cloneDeep } from 'lodash-es';
 import { DATA_BIND } from '../../keys';

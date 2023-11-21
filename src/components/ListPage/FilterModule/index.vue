@@ -83,13 +83,13 @@
 </template>
 
 <script lang="ts" setup>
-import Table from '@/components/ListPage/FilterModule/components/FilterTable.vue'
+import Table from '@LowCode/components/ListPage/FilterModule/components/FilterTable.vue'
 import {
   EnumType,
   StringType,
   NumberType,
   DateType,
-} from '@/components/ListPage/FilterModule/components/index'
+} from '@LowCode/components/ListPage/FilterModule/components/index'
 import { getImage, randomString } from '@jetlinks-web/utils';
 
 import { validFilterModule } from './utils/valid'

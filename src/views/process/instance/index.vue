@@ -153,10 +153,10 @@ import Dialog from './Dialog/index.vue'
 import Drawer from '../components/Drawer/index.vue'
 import PermissionDialog from './PermissionDialog/index.vue'
 import { isFunction, isObject } from 'lodash-es'
-import { getList_api, getAllInstance_api, del_api, updateState_api } from '@/api/process/instance'
-import { isImg } from '@/utils/comm'
+import { getList_api, getAllInstance_api, del_api, updateState_api } from '@LowCode/api/process/instance'
+import { isImg } from '@LowCode/utils/comm'
 
-import { providerEnum } from '@/api/process/model'
+import { providerEnum } from '@LowCode/api/process/model'
 
 const tableRef = ref()
 const columns = [

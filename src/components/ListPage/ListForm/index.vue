@@ -97,7 +97,7 @@
 </template>
 
 <script lang="ts" setup>
-import Card from '@/components/ListPage/ListForm/components/card.vue'
+import Card from '@LowCode/components/ListPage/ListForm/components/card.vue'
 import { clone, cloneDeep } from 'lodash-es'
 import { validListForm } from './utils/valid'
 import { LIST_FORM_INFO, SHOW_TYPE_KEY } from '../keys'

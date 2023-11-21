@@ -493,11 +493,11 @@
 <script lang="ts" setup>
 import { computed, inject, unref } from 'vue'
 import { useTarget } from '../../../../hooks'
-import { basic } from '@/components/FormDesigner/utils/defaultData'
-import generatorData from '@/components/FormDesigner/utils/generatorData'
+import { basic } from '@LowCode/components/FormDesigner/utils/defaultData'
+import generatorData from '@LowCode/components/FormDesigner/utils/generatorData'
 import { getBrotherList, queryKeys, updateData, _specialKeys } from '../../../../utils/utils'
 import Storage from './Storage/index.vue'
-import { uid } from '@/components/FormDesigner/utils/uid'
+import { uid } from '@LowCode/components/FormDesigner/utils/uid'
 import { cloneDeep, flatten, map } from 'lodash-es'
 
 const designer: any = inject('FormDesigner')

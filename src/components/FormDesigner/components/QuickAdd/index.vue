@@ -120,15 +120,15 @@
 </template>
   <script lang="ts" setup>
 import { ref, reactive, computed, inject, unref, watch } from 'vue'
-import Editor from '@/components/EditorModal'
-import { queryEndCommand } from '@/api/form'
-import { useProduct } from '@/store'
+import Editor from '@LowCode/components/EditorModal'
+import { queryEndCommand } from '@LowCode/api/form'
+import { useProduct } from '@LowCode/store'
 import { onlyMessage } from '@jetlinks-web/utils'
-import { providerEnum } from '@/components/ProJect'
+import { providerEnum } from '@LowCode/components/ProJect'
 import generatorData from '../../utils/generatorData'
 import { map, uniqBy } from 'lodash-es'
 import { uid } from '../../utils/uid'
-import { typeImages } from '@/components/ProJect/index'
+import { typeImages } from '@LowCode/components/ProJect/index'
 
 const product = useProduct()
 const designer: any = inject('FormDesigner')

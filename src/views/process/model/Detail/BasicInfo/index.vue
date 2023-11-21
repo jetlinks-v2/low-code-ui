@@ -44,7 +44,7 @@ import {
   setDefaultFormBinds,
 } from '../FlowDesign/components/utils'
 import ConfigForm from './components/ConfigForm.vue'
-import { useFlowStore } from '@/store/flow'
+import { useFlowStore } from '@LowCode/store/flow'
 
 const flowStore = useFlowStore()
 const formRef = ref()

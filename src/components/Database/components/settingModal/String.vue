@@ -50,7 +50,7 @@
 </template>
 
 <script  setup name="CRUDSettingString">
-import { SETTING_FORM_MODEL } from "@/components/Database/util";
+import { SETTING_FORM_MODEL } from "@LowCode/components/Database/util";
 import {inject} from "vue";
 import Spec from './Spec.vue'
 import { regular } from '@jetlinks-web/utils'

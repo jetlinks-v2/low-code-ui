@@ -4,9 +4,9 @@
      <FlowDesigner  :nodesData="nodesData" readOnly />
    </div>
   </template>
-  
+
   <script setup>
-  import FlowDesigner from '@/components/FlowDesigner'
+  import FlowDesigner from '@LowCode/components/FlowDesigner'
   const props = defineProps({
    info:{
       type:String,
@@ -27,7 +27,7 @@
   })
 
   </script>
-  
+
   <style scoped lang='less'>
-  
+
   </style>

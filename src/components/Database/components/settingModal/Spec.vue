@@ -3,7 +3,7 @@
 </template>
 
 <script setup name="SettingSpec">
-import { DataActions } from "@/components/Database/util";
+import { DataActions } from "@LowCode/components/Database/util";
 
 const emit = defineEmits(['update:value'])
 

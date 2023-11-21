@@ -58,7 +58,7 @@
 import Remember from './remember.vue'
 import { getImage } from '@jetlinks-web/utils'
 import { useRequest } from '@jetlinks-web/hooks'
-import {captchaConfig, codeUrl} from '@/api/login'
+import {captchaConfig, codeUrl} from '@LowCode/api/login'
 import { defineExpose } from 'vue'
 import { rules } from './util'
 

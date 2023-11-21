@@ -43,10 +43,10 @@
 </template>
 <script setup>
 import { groupBy } from 'lodash-es'
-import { getList_api } from '@/api/process/initiate'
-import { useClassified } from '@/hooks/useClassified'
-import { isImg } from '@/utils/comm'
-import { useMenuStore } from '@/store'
+import { getList_api } from '@LowCode/api/process/initiate'
+import { useClassified } from '@LowCode/hooks/useClassified'
+import { isImg } from '@LowCode/utils/comm'
+import { useMenuStore } from '@LowCode/store'
 
 const menu = useMenuStore()
 const { getText, classified } = useClassified()

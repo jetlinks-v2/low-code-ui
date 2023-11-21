@@ -1,9 +1,9 @@
 import {createAuthRoute, initRouteAssignStore} from '@jetlinks-web/router'
 import type { RouteLocationNormalized } from '@jetlinks-web/router'
-import { useUserStore } from '@/store/user'
-import { useMenuStore } from '@/store/menu'
-import { useSystemStore } from '@/store/system'
-import { useAuthStore } from '@/store/auth'
+import { useUserStore } from '@LowCode/store/user'
+import { useMenuStore } from '@LowCode/store/menu'
+import { useSystemStore } from '@LowCode/store/system'
+import { useAuthStore } from '@LowCode/store/auth'
 import { setToken } from '@jetlinks-web/utils'
 import {isString} from "lodash-es";
 

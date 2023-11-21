@@ -23,7 +23,7 @@
 
 <script lang="ts" setup>
 import SelectModal from './modal.vue'
-import { queryProductNoPage, queryDeviceNoPage } from '@/api/form'
+import { queryProductNoPage, queryDeviceNoPage } from '@LowCode/api/form'
 import { inject, ref, watch, computed } from 'vue'
 import { map } from 'lodash-es'
 

@@ -74,7 +74,7 @@
 import EditorBtn from './EditorBtn.vue'
 import { computed, inject, unref } from 'vue'
 import { useTarget } from '../../../../hooks'
-import { findParentById } from '@/components/FormDesigner/utils/utils'
+import { findParentById } from '@LowCode/components/FormDesigner/utils/utils'
 
 const designer: any = inject('FormDesigner')
 const { target } = useTarget()

@@ -176,15 +176,15 @@
 </template>
 
 <script setup lang="ts" name="Edit">
-import Upload from '@/components/Upload/Image/ImageUpload.vue'
+import Upload from '@LowCode/components/Upload/Image/ImageUpload.vue'
 
 import { FormInstance } from 'jetlinks-ui-components'
-import { useProduct } from '@/store'
-import EditorButton from '@/components/EditorModal/EditorButton.vue'
+import { useProduct } from '@LowCode/store'
+import EditorButton from '@LowCode/components/EditorModal/EditorButton.vue'
 import { activeBtnKey, errorListKey, editTypeKey, typeKey } from '../keys'
-import { providerEnum } from '@/components/ProJect'
+import { providerEnum } from '@LowCode/components/ProJect'
 import { ErrorItem } from '../..'
-import { useFunctions } from '@/hooks/useFunctions'
+import { useFunctions } from '@LowCode/hooks/useFunctions'
 import { useImages } from '../../hooks/useImages'
 import { pick } from 'lodash-es'
 

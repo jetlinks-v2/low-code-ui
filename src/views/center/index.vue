@@ -51,11 +51,11 @@
 <script lang="ts" setup name="index" >
 import Save from './Save/index.vue'
 import dayjs from 'dayjs';
-import { queryProject, delProject, enableProject, disabledProject } from '@/api/project'
-import { onlyMessage } from '@/utils/comm';
+import { queryProject, delProject, enableProject, disabledProject } from '@LowCode/api/project'
+import { onlyMessage } from '@LowCode/utils/comm';
 import { router } from '@jetlinks-web/router';
 import Menu from './Menu/index.vue'
-import { delMenu } from '@/api/menu';
+import { delMenu } from '@LowCode/api/menu';
 
 const params = ref<any>({})
 const tableRef = ref<Record<string, any>>({});

@@ -7,11 +7,11 @@
 </template>
 
 <script lang="ts" setup>
-import { _detail, _update } from '@/api/process/form'
+import { _detail, _update } from '@LowCode/api/process/form'
 import { onlyMessage } from '@jetlinks-web/utils'
 import { onMounted, ref } from 'vue'
 import { omit } from 'lodash-es'
-import { useMenuStore } from '@/store'
+import { useMenuStore } from '@LowCode/store'
 import { useRoute } from 'vue-router'
 
 const menu = useMenuStore()

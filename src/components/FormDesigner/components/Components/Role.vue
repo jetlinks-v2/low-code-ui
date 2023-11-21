@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getRoleList } from '@/api/form'
+import { getRoleList } from '@LowCode/api/form'
 import { useRequest } from '@jetlinks-web/hooks'
 import { map } from 'lodash-es'
 import { ref, watch } from 'vue'

@@ -25,7 +25,7 @@
 
 <script setup name="AddRemoveUpdateQuery">
 
-import {upperCase} from "@/utils/comm";
+import {upperCase} from "@LowCode/utils/comm";
 
 const columns = [
   {

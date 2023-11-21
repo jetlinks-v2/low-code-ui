@@ -1,7 +1,6 @@
 <template>
   <j-space align="end">
     <j-upload
-      v-model:fileList="modelValue.upload"
       :action="_fileUpload"
       :headers="headers"
       :maxCount="1"
@@ -34,25 +33,17 @@
 </template>
 
 <script lang="ts" setup>
-import { _fileUpload } from '@/api/comm'
+import { _fileUpload } from '@LowCode/api/comm'
 import { TOKEN_KEY } from '@jetlinks-web/constants'
 import { LocalStore } from '@jetlinks-web/utils/src/storage'
 import { onlyMessage } from '@jetlinks-web/utils'
-import { _import } from '@/api/list'
+import { _import } from '@LowCode/api/list'
 import { PropType } from 'vue'
 import { downloadFileByUrl } from '@jetlinks-web/utils'
 
-type Emits = {
-  (e: 'update:modelValue', data: string[]): void
-}
 const emit = defineEmits<Emits>()
 
 const props = defineProps({
-  // 组件双向绑定的值
-  modelValue: {
-    type: Array,
-    default: () => [],
-  },
   product: {
     type: String,
     default: '',

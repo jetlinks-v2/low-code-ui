@@ -45,7 +45,7 @@ import {
   reactive,
 } from 'vue'
 import { cloneDeep, debounce, map } from 'lodash-es'
-import { useProduct, useFormDesigner } from '@/store'
+import { useProduct, useFormDesigner } from '@LowCode/store'
 import { Modal } from 'jetlinks-ui-components'
 import {
   deleteDataByKey,
@@ -59,7 +59,7 @@ import {
 import { uid } from './utils/uid'
 import Check from './components/Check/index.vue'
 import { onlyMessage } from '@jetlinks-web/utils'
-import { providerEnum } from '@/components/ProJect'
+import { providerEnum } from '@LowCode/components/ProJect'
 import { proAll } from '../QuickEditTable/util'
 
 const props = defineProps({

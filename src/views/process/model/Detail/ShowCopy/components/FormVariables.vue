@@ -66,8 +66,8 @@ import {
   getCurrentInstance,
   ComponentInternalInstance,
 } from 'vue'
-import { queryFormNoPage_api } from '@/api/process/model'
-import { useFlowStore } from '@/store/flow'
+import { queryFormNoPage_api } from '@LowCode/api/process/model'
+import { useFlowStore } from '@LowCode/store/flow'
 import { treeFilter } from 'jetlinks-ui-components/es/Tree'
 import { generateRandomColor, rdmRgbColor } from '../utils'
 import { cloneDeep } from 'lodash-es'

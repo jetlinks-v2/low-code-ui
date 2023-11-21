@@ -2,10 +2,10 @@ import { Form, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import DraggableLayout from "../../Draggable/DraggableLayout"
 import './index.less'
 import { cloneDeep, omit } from "lodash-es"
-import { uid } from "@/components/FormDesigner/utils/uid"
+import { uid } from "@LowCode/components/FormDesigner/utils/uid"
 import CollectModal from '../../CollectModal/index.vue'
-import { useProduct } from "@/store"
-import { extractCssClass, insertCustomCssToHead } from "@/components/FormDesigner/utils/utils"
+import { useProduct } from "@LowCode/store"
+import { extractCssClass, insertCustomCssToHead } from "@LowCode/components/FormDesigner/utils/utils"
 import { useMagicKeys } from '@vueuse/core'
 import { useElementHover } from '@vueuse/core'
 

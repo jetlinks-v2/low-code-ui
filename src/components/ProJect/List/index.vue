@@ -86,8 +86,8 @@ import DelModal from '../components/Action/DelModal.vue'
 import { onlyMessage } from '@jetlinks-web/utils';
 import { providerMap, restId, actionMap, typeImages, projectList } from '../index'
 import { onKeyStroke, useMagicKeys } from '@vueuse/core'
-import { useProduct, useEngine } from '@/store'
-import { delMenu } from '@/api/menu'
+import { useProduct, useEngine } from '@LowCode/store'
+import { delMenu } from '@LowCode/api/menu'
 
 const product = useProduct()
 const engine = useEngine()

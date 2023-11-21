@@ -31,14 +31,14 @@
 
 <script setup lang="ts">
 import { CSSProperties, PropType } from 'vue'
-import Product from '@/components/FormDesigner/components/Components/Product.vue'
-import Device from '@/components/FormDesigner/components/Components/Device.vue'
-import User from '@/components/FormDesigner/components/Components/User/index.vue'
-import Role from '@/components/FormDesigner/components/Components/Role.vue'
-import Org from '@/components/FormDesigner/components/Components/Org.vue'
+import Product from '@LowCode/components/FormDesigner/components/Components/Product.vue'
+import Device from '@LowCode/components/FormDesigner/components/Components/Device.vue'
+import User from '@LowCode/components/FormDesigner/components/Components/User/index.vue'
+import Role from '@LowCode/components/FormDesigner/components/Components/Role.vue'
+import Org from '@LowCode/components/FormDesigner/components/Components/Org.vue'
 import Upload from './Upload.vue'
 import { InputNumber, Input, Textarea, Select, InputPassword, Switch, TreeSelect, DatePicker, TimePicker } from 'jetlinks-ui-components'
-import { queryOptions } from '@/components/FormDesigner/utils/utils'
+import { queryOptions } from '@LowCode/components/FormDesigner/utils/utils'
 type Emits = {
   (e: 'update:modelValue', data: string | number | boolean): void
   (e: 'change', data: any, item?: any): void

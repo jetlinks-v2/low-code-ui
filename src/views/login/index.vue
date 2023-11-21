@@ -15,11 +15,11 @@
 </template>
 <script setup name="Login" lang="ts">
 import { useRequest } from '@jetlinks-web/hooks'
-import { login, encryptionConfig } from '@/api/login'
+import { login, encryptionConfig } from '@LowCode/api/login'
 import { getImage, setToken, encrypt } from '@jetlinks-web/utils'
-// import { systemVersion, settingDetail } from '@/api/system'
-import { useUserStore } from '@/store/user'
-import { useSystemStore } from '@/store/system'
+// import { systemVersion, settingDetail } from '@LowCode/api/system'
+import { useUserStore } from '@LowCode/store/user'
+import { useSystemStore } from '@LowCode/store/system'
 import { storeToRefs } from 'pinia'
 import Right from './right.vue'
 import { cloneDeep } from "lodash-es";
@@ -33,6 +33,7 @@ const { systemInfo } = storeToRefs(systemStore)
 const rightRef = ref()
 const { data: encryption, run: encryptionRun } = useRequest(encryptionConfig)
 
+console.log(useRoute())
 const { loading, run } = useRequest(login, {
   immediate: false,
   onSuccess(res) {

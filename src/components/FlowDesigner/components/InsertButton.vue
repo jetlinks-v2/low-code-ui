@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts" name="InsertButton">
-import { useFlowStore } from '@/store/flow'
+import { useFlowStore } from '@LowCode/store/flow'
 import { computed } from 'vue'
 
 const emits = defineEmits(['insertNode'])

@@ -125,7 +125,7 @@ import { ref, computed, unref, watch } from 'vue'
 import { cloneDeep, map } from 'lodash-es'
 import { onlyMessage } from '@jetlinks-web/utils'
 import { product, role, org, device, user } from './index'
-import { queryEndCommands, queryProject } from '@/api/form'
+import { queryEndCommands, queryProject } from '@LowCode/api/form'
 
 const _key = 'id'
 const props = defineProps({

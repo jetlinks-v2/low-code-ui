@@ -12,8 +12,8 @@
 </template>
 
 <script setup name="ContentWarp">
-import { providerEnum } from '@/components/ProJect/index'
-import ProjectEmpty from '@/components/ProJect/Empty/index.vue'
+import { providerEnum } from '@LowCode/components/ProJect/index'
+import ProjectEmpty from '@LowCode/components/ProJect/Empty/index.vue'
 
 const props = defineProps({
   data: {

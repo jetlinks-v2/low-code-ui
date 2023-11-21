@@ -22,8 +22,8 @@
 <script setup lang="ts" name="HeaderUser">
 import { computed } from "vue";
 import { jumpLogin, useRouter } from '@jetlinks-web/router'
-import { useUserStore } from '@/store/user'
-import { logout } from '@/api/login'
+import { useUserStore } from '@LowCode/store/user'
+import { logout } from '@LowCode/api/login'
 
 const userStore = useUserStore()
 const router = useRouter()

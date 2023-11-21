@@ -11,8 +11,8 @@
 </template>
 
 <script setup name="SQL">
-import {useProduct} from '@/store'
-import { providerEnum } from '@/components/ProJect/index'
+import {useProduct} from '@LowCode/store'
+import { providerEnum } from '@LowCode/components/ProJect/index'
 import { debounce } from 'lodash-es'
 import { language as sqlLanguage } from './util'
 

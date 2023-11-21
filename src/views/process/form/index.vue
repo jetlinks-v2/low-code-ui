@@ -76,10 +76,10 @@
 <script lang="ts" setup>
 import Save from './Save/index.vue'
 import dayjs from 'dayjs'
-import { _query, _delete, _queryCreator } from '@/api/process/form'
-import { onlyMessage } from '@/utils/comm'
+import { _query, _delete, _queryCreator } from '@LowCode/api/process/form'
+import { onlyMessage } from '@LowCode/utils/comm'
 import { ref } from 'vue'
-import { useMenuStore } from '@/store'
+import { useMenuStore } from '@LowCode/store'
 
 const menu = useMenuStore()
 const params = ref<any>({})

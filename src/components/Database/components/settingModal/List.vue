@@ -15,9 +15,9 @@
 </template>
 
 <script  setup name="CRUDSettingList">
-import { SETTING_FORM_MODEL } from "@/components/Database/util";
+import { SETTING_FORM_MODEL } from "@LowCode/components/Database/util";
 import { inject } from "vue";
-import { basicField } from '@/api/dictionary'
+import { basicField } from '@LowCode/api/dictionary'
 import { useRequest } from '@jetlinks-web/hooks'
 import Spec from './Spec.vue'
 import 'jetlinks-ui-components/es/CheckButton/style'

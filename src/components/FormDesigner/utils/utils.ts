@@ -1,7 +1,7 @@
 import { uid } from "./uid"
 import componentMap from "./componentMap"
 import { ISchema } from "../typings"
-import { queryDictionary, queryDictionaryData, queryEndCommand, queryEndCommands, queryProject, queryRuntime } from "@/api/form"
+import { queryDictionary, queryDictionaryData, queryEndCommand, queryEndCommands, queryProject, queryRuntime } from "@LowCode/api/form"
 import { cloneDeep, flatten, isObject, map, omit } from "lodash-es"
 
 // 在流程表单中这些key在表中自动生成不能配置为name

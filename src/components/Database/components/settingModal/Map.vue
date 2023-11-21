@@ -29,10 +29,10 @@
 </template>
 
 <script  setup name="CRUDSettingMap">
-import { SETTING_FORM_MODEL } from "@/components/Database/util";
+import { SETTING_FORM_MODEL } from "@LowCode/components/Database/util";
 import { inject } from "vue";
 import Spec from './Spec.vue'
-import { basicField } from '@/api/dictionary'
+import { basicField } from '@LowCode/api/dictionary'
 import { useRequest } from '@jetlinks-web/hooks'
 
 const { data: options } = useRequest(basicField)

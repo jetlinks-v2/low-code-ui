@@ -59,10 +59,10 @@
 
 <script setup lang="ts" name="ConditionNode">
 import InsertButton from '../InsertButton.vue'
-import { useFlowStore } from '@/store/flow'
-import {queryVariables_api} from "@/api/process/model";
+import { useFlowStore } from '@LowCode/store/flow'
+import {queryVariables_api} from "@LowCode/api/process/model";
 import  { isArray } from 'lodash-es'
-import {filterFormVariables} from "@/views/process/model/Detail/ShowCopy/utils";
+import {filterFormVariables} from "@LowCode/views/process/model/Detail/ShowCopy/utils";
 
 const emits = defineEmits([
   'insertNode',

@@ -88,7 +88,7 @@ import { BatchActionsType } from './types'
 import {
   extractCssClass,
   insertCustomCssToHead,
-} from '@/components/FormDesigner/utils/utils'
+} from '@LowCode/components/FormDesigner/utils/utils'
 import { store } from '@jetlinks-web/stores'
 
 const props = defineProps({

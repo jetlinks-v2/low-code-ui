@@ -56,7 +56,7 @@ import { AntTreeNodeDropEvent, TreeProps } from 'ant-design-vue/es/tree/Tree';
 import { onlyMessage, getImage } from '@jetlinks-web/utils';
 import Save from '../components/Save.vue'
 import DelModal from '../components/DelModal.vue'
-import { getAllMenuTree } from '@/api/menu';
+import { getAllMenuTree } from '@LowCode/api/menu';
 
 type TreeDataItem = TreeProps['treeData'][];
 

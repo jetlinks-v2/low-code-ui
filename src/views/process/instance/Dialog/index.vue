@@ -122,10 +122,10 @@
 <script setup lang="ts">
 import { onlyMessage, getImage } from '@jetlinks-web/utils'
 import ChooseIcon from './ChooseIcon.vue'
-import { copy_api } from '@/api/process/instance'
+import { copy_api } from '@LowCode/api/process/instance'
 import { useRequest } from '@jetlinks-web/hooks'
-import { isImg } from '@/utils/comm'
-import { providerEnum } from '@/api/process/model'
+import { isImg } from '@LowCode/utils/comm'
+import { providerEnum } from '@LowCode/api/process/model'
 
 type FormType = {
   id: string

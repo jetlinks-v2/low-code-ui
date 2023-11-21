@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang='ts' name="Project">
-import { useProduct, useEngine } from '@/store';
+import { useProduct, useEngine } from '@LowCode/store';
 import List from './List/index.vue'
 import dayjs from 'dayjs'
 import { cloneDeep } from 'lodash-es';

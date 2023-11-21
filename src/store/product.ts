@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
-import { queryProjectDraft, updateDraft} from "@/api/project";
+import { queryProjectDraft, updateDraft} from "@LowCode/api/project";
 import { useEngine } from './engine'
 import dayjs from 'dayjs';
 import {throttle, cloneDeep, omit, debounce} from 'lodash-es'
-import {Integrate, IntegrateFilterType} from '@/utils/project'
-import { providerEnum } from  '@/components/ProJect/index'
+import {Integrate, IntegrateFilterType} from '@LowCode/utils/project'
+import { providerEnum } from  '@LowCode/components/ProJect/index'
 import { filterTreeNodes } from '@jetlinks-web/utils'
 
 type TreeData = {

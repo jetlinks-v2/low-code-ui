@@ -29,7 +29,7 @@ import { regular } from '@jetlinks-web/utils';
 // import { providerList } from './index';
 import { onKeyStroke } from '@vueuse/core'
 import { providerEnum, providerMap,typeImages } from '../../index'
-import { useEngine, useProduct } from '@/store'
+import { useEngine, useProduct } from '@LowCode/store'
 import { randomString, generateSerialNumber } from '@jetlinks-web/utils'
 
 const engine = useEngine()

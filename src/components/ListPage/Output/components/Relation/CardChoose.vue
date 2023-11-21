@@ -98,7 +98,7 @@
   </JProTable>
 </template>
 <script setup lang="ts">
-import { queryProductList, queryDeviceList } from '@/api/form'
+import { queryProductList, queryDeviceList } from '@LowCode/api/form'
 import { cloneDeep } from 'lodash-es';
 const props = defineProps({
   type: {

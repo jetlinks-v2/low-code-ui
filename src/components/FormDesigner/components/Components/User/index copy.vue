@@ -37,7 +37,7 @@
 
 <script lang="ts" setup>
 import UserChoice from './UserChoice.vue'
-import { getUser_PaginateNot } from '@/api/form'
+import { getUser_PaginateNot } from '@LowCode/api/form'
 import { ref, watch, computed } from 'vue'
 import { map } from 'lodash-es'
 

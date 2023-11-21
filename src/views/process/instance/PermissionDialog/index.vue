@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import { onlyMessage } from '@jetlinks-web/utils'
 import { useRequest } from '@jetlinks-web/hooks'
-import { getMembers_api, updateMembers_api } from '@/api/process/instance'
+import { getMembers_api, updateMembers_api } from '@LowCode/api/process/instance'
 
 const props = defineProps({
   data: {

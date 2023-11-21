@@ -12,7 +12,7 @@
 </template>
 
 <script  setup>
-import { getGeoTree, GeoTreeByName } from '@/api/form'
+import { getGeoTree, GeoTreeByName } from '@LowCode/api/form'
 import { debounce } from "lodash-es";
 
 

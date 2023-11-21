@@ -12,10 +12,10 @@
 </template>
 
 <script setup name="Functions">
-import { useProduct } from '@/store'
-import { executeReq } from '@/api/basis'
+import { useProduct } from '@LowCode/store'
+import { executeReq } from '@LowCode/api/basis'
 import { debounce } from 'lodash-es'
-import { providerEnum } from '@/components/ProJect/index'
+import { providerEnum } from '@LowCode/components/ProJect/index'
 
 const props = defineProps({
   configuration: {

@@ -113,8 +113,8 @@
 </template>
 
 <script setup lang='ts' name="ContextMenu">
-import { useContextMenu } from '@/hooks/useContextMenu';
-import { useEngine } from '@/store'
+import { useContextMenu } from '@LowCode/hooks/useContextMenu';
+import { useEngine } from '@LowCode/store'
 import { providerEnum, providerMap, actionMap, projectListMenu } from '../../index'
 import { getImage } from '@jetlinks-web/utils';
 

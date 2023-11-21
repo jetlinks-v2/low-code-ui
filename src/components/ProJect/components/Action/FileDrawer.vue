@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang='ts' name="FileDrawer">
-import { useProduct } from '@/store'
+import { useProduct } from '@LowCode/store'
 import { providerMap, providerEnum } from '../../index'
 import { cloneDeep } from 'lodash-es';
 

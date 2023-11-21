@@ -157,15 +157,15 @@ import {
   del_api,
   detail_api,
   update_api,
-} from '@/api/process/model'
-import { useClassified } from '@/hooks/useClassified'
-import { isImg } from '@/utils/comm'
-import BasicInfo from '@/views/process/model/Detail/BasicInfo/index.vue'
-import FlowDesign from '@/views/process/model/Detail/FlowDesign/index.vue'
-import ShowCopy from '@/views/process/model/Detail/ShowCopy/index.vue'
-import { useFlowStore } from '@/store/flow'
+} from '@LowCode/api/process/model'
+import { useClassified } from '@LowCode/hooks/useClassified'
+import { isImg } from '@LowCode/utils/comm'
+import BasicInfo from '@LowCode/views/process/model/Detail/BasicInfo/index.vue'
+import FlowDesign from '@LowCode/views/process/model/Detail/FlowDesign/index.vue'
+import ShowCopy from '@LowCode/views/process/model/Detail/ShowCopy/index.vue'
+import { useFlowStore } from '@LowCode/store/flow'
 import { Modal } from 'jetlinks-ui-components'
-import { useMenuStore } from '@/store'
+import { useMenuStore } from '@LowCode/store'
 
 const menu = useMenuStore()
 const flowStore = useFlowStore()

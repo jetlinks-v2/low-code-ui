@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { detail } from '@/api/user'
+import { detail } from '@LowCode/api/user'
 
 type UserInfo = {
     name: string

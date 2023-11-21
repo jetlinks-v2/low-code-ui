@@ -28,8 +28,8 @@
 
 <script setup lang='ts' name="Save">
 import { regular } from '@jetlinks-web/utils';
-import { queryProject, addProject, editProject } from '@/api/project'
-import { onlyMessage } from '@/utils/comm';
+import { queryProject, addProject, editProject } from '@LowCode/api/project'
+import { onlyMessage } from '@LowCode/utils/comm';
 import { useRequest } from '@jetlinks-web/hooks'
 
 const emit = defineEmits(['close']);

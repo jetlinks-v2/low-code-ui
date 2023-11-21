@@ -21,7 +21,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import Menu from '@/components/ListPage/MenuConfig/components/menu.vue'
+import Menu from '@LowCode/components/ListPage/MenuConfig/components/menu.vue'
 import { validMenu } from './utils/valid'
 import { MENU_CONFIG } from '../keys';
 interface Emit {

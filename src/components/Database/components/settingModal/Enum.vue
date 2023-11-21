@@ -40,11 +40,11 @@
 </template>
 
 <script setup name="CRUDSettingEnum">
-import { SETTING_FORM_MODEL } from "@/components/Database/util";
+import { SETTING_FORM_MODEL } from "@LowCode/components/Database/util";
 import Spec from './Spec.vue'
 import { inject } from "vue";
 import { useRequest } from '@jetlinks-web/hooks'
-import { dictionaryList } from "@/api/dictionary";
+import { dictionaryList } from "@LowCode/api/dictionary";
 
 const props = defineProps({
   warp: {

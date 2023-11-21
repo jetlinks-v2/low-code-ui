@@ -3,7 +3,7 @@ import type { CSSProperties, PropType } from "vue";
 import { Modal } from 'jetlinks-ui-components'
 import { VueCropper } from 'vue-cropper';
 import { useRequest } from '@jetlinks-web/hooks'
-import { fileUpload } from '@/api/comm'
+import { fileUpload } from '@LowCode/api/comm'
 import 'vue-cropper/dist/index.css'
 
 const CropperModalProps = {

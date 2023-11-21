@@ -1,5 +1,5 @@
 import { getImage } from '@jetlinks-web/utils';
-import { providerEnum } from '@/components/ProJect';
+import { providerEnum } from '@LowCode/components/ProJect';
 
 export const useImages = () => {
   const getImages = computed(() => {
@@ -18,8 +18,8 @@ export const useImages = () => {
         case providerEnum.SQL:
           image = getImage(`/project/sql.svg`)
         break;
-        case providerEnum.HtmlPage: 
-          image = getImage('/project/html.svg')  
+        case providerEnum.HtmlPage:
+          image = getImage('/project/html.svg')
         break
       }
       return image

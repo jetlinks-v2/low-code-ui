@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import ListPage from '@/components/ListPage/index.vue';
+import ListPage from '@LowCode/components/ListPage/index.vue';
 </script>
 
 <style scoped>

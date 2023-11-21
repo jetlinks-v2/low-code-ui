@@ -27,13 +27,13 @@
   </j-modal>
 </template>
 <script setup lang="ts">
-import { FormPreview } from '@/components/FormDesigner'
-import CustomHtml from '@/components/CustomHTML/output/Preview.vue'
+import { FormPreview } from '@LowCode/components/FormDesigner'
+import CustomHtml from '@LowCode/components/CustomHTML/output/Preview.vue'
 import { PropType } from 'vue'
-import { getResource } from '@/api/basis'
-import { providerEnum } from '@/components/ProJect'
-import { ReplStore } from '@/components/CustomHTML/store'
-import { queryRuntime } from '@/api/form'
+import { getResource } from '@LowCode/api/basis'
+import { providerEnum } from '@LowCode/components/ProJect'
+import { ReplStore } from '@LowCode/components/CustomHTML/store'
+import { queryRuntime } from '@LowCode/api/form'
 import { clone, cloneDeep } from 'lodash-es'
 import { onlyMessage } from '@jetlinks-web/utils'
 

@@ -451,16 +451,16 @@
   </div>
 </template>
 <script setup lang="ts">
-import Card from '@/components/Card'
-import HeaderButton from '@/components/ListPage/Preview/components/HederActions.vue'
+import Card from '@LowCode/components/Card'
+import HeaderButton from '@LowCode/components/ListPage/Preview/components/HederActions.vue'
 import { isFunction, isObject } from 'lodash-es'
-import Image from '@/components/Image/index.vue'
+import Image from '@LowCode/components/Image/index.vue'
 import OtherActions from './OtherActions.vue'
 import { PropType } from 'vue'
 import {
   extractCssClass,
   insertCustomCssToHead,
-} from '@/components/FormDesigner/utils/utils'
+} from '@LowCode/components/FormDesigner/utils/utils'
 import {
   ArrayFormat,
   BooleanFormat,

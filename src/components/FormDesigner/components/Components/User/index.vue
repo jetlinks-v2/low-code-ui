@@ -23,7 +23,7 @@
 
 <script lang="ts" setup>
 import UserChoice from './UserChoice.vue'
-import { getUser_PaginateNot } from '@/api/form'
+import { getUser_PaginateNot } from '@LowCode/api/form'
 import { ref, watch, computed, onMounted } from 'vue'
 import { cloneDeep, map } from 'lodash-es'
 
@@ -129,7 +129,7 @@ watch(
         : [props.value]
     } else {
       selectData.value = Array.isArray(props?.value) ? props?.value : []
-      
+
     }
   },
   {

@@ -6,7 +6,7 @@ import {
   PropType,
 } from 'vue'
 import { cloneDeep, debounce } from 'lodash-es'
-import { useFlowStore } from '@/store/flow'
+import { useFlowStore } from '@LowCode/store/flow'
 import './index.less'
 
 // 引入节点组件
@@ -21,8 +21,8 @@ import BranchButton from './components/BranchButton.vue'
 import DefaultProps from './DefaultNodeProps'
 import { onlyMessage } from '@jetlinks-web/utils'
 import { useMouseEvent } from './hooks/useMouseEvent'
-import type { INode } from '@/views/process/model/Detail/typings.d.ts'
-import { setEmptyNodeProps } from '@/views/process/model/Detail/FlowDesign/components/utils'
+import type { INode } from '@LowCode/views/process/model/Detail/typings.d.ts'
+import { setEmptyNodeProps } from '@LowCode/views/process/model/Detail/FlowDesign/components/utils'
 
 const componentsMap = {
   NODE: Node,

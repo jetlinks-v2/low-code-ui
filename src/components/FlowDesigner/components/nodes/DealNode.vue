@@ -18,8 +18,8 @@
 
 <script setup lang="ts" name="DealNode">
 import Node from './Node.vue'
-import { useFlowStore } from '@/store/flow'
-import {USER_DATA} from "@/views/process/model/Detail/FlowDesign/util";
+import { useFlowStore } from '@LowCode/store/flow'
+import {USER_DATA} from "@LowCode/views/process/model/Detail/FlowDesign/util";
 import {includes} from "lodash-es";
 
 const userAllData = inject<any>(USER_DATA, {})

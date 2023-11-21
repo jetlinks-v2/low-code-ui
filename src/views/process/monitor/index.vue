@@ -116,10 +116,10 @@
 <script setup>
 import { onlyMessage } from '@jetlinks-web/utils'
 import Dialog from './Dialog/index.vue'
-import { getList_api, getAllList_api, close_api } from '@/api/process/monitor'
+import { getList_api, getAllList_api, close_api } from '@LowCode/api/process/monitor'
 import dayjs from 'dayjs'
-import { providerEnum } from '@/api/process/model'
-import Drawer from '@/views/process/me/Detail/index.vue'
+import { providerEnum } from '@LowCode/api/process/model'
+import Drawer from '@LowCode/views/process/me/Detail/index.vue'
 
 const tableRef = ref()
 const history = ref(false)

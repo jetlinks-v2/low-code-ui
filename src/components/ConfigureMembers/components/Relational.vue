@@ -62,7 +62,7 @@
 <script setup lang="ts">
 import { onlyMessage } from '@jetlinks-web/utils'
 import { DataSourceProps } from '../types'
-import { getRelation_api } from '@/api/member'
+import { getRelation_api } from '@LowCode/api/member'
 import { cloneDeep } from 'lodash-es'
 
 const props = defineProps({

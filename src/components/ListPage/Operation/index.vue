@@ -51,9 +51,9 @@ import {
 import { validOperationsBtn } from './index'
 import { PropType } from 'vue'
 import { getImage } from '@jetlinks-web/utils';
-import { useFunctions } from '@/hooks'
-import { useProduct } from '@/store'
-import { providerEnum } from '@/components/ProJect'
+import { useFunctions } from '@LowCode/hooks'
+import { useProduct } from '@LowCode/store'
+import { providerEnum } from '@LowCode/components/ProJect'
 
 interface Emit {
   (e: 'update:open', value: boolean): void

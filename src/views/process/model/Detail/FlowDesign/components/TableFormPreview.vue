@@ -52,8 +52,8 @@
 </template>
 
 <script setup lang="ts">
-// import componentMap from '@/components/FormDesigner/utils/componentMap'
-import FormItem from '@/views/process/me/Detail/components/FormItem.vue'
+// import componentMap from '@LowCode/components/FormDesigner/utils/componentMap'
+import FormItem from '@LowCode/views/process/me/Detail/components/FormItem.vue'
 import {
   handleFormToTable
 } from "./TableFormPreviewUtil";

@@ -7,8 +7,8 @@
 </template>
 
 <script setup lang='ts'>
-import { saveMenu } from '@/api/menu';
-import { useProduct } from '@/store/product';
+import { saveMenu } from '@LowCode/api/menu';
+import { useProduct } from '@LowCode/store/product';
 
 
 const emits = defineEmits(['close'])

@@ -88,7 +88,7 @@
 
 <script setup lang="ts">
 import { useTransition } from '@vueuse/core'
-import { _export } from '@/api/list';
+import { _export } from '@LowCode/api/list';
 import { downloadFileByUrl } from '@jetlinks-web/utils'
 import UploadFile from '../../preview/components/UploadFile.vue';
 const props = defineProps({

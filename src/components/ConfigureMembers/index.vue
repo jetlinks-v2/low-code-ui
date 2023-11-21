@@ -65,11 +65,11 @@ import {
   getAllDepartment_api,
   getAllUser_api,
   getAllRole_api,
-} from '@/api/user'
-import { getVar_api, getAllRelation_api } from '@/api/member'
-import { detail_api } from '@/api/process/model'
+} from '@LowCode/api/user'
+import { getVar_api, getAllRelation_api } from '@LowCode/api/member'
+import { detail_api } from '@LowCode/api/process/model'
 import { cloneDeep, omit } from 'lodash-es'
-import { useFlowStore } from '@/store/flow'
+import { useFlowStore } from '@LowCode/store/flow'
 
 const props = withDefaults(
   defineProps<{

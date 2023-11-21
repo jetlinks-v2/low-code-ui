@@ -169,8 +169,8 @@
 </template>
 <script setup lang="ts">
 import { onlyMessage } from '@jetlinks-web/utils'
-import { queryFormNoPage_api } from '@/api/process/model'
-import { useFlowStore } from '@/store/flow'
+import { queryFormNoPage_api } from '@LowCode/api/process/model'
+import { useFlowStore } from '@LowCode/store/flow'
 import { getImage } from '@jetlinks-web/utils'
 
 const flowStore = useFlowStore()

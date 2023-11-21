@@ -47,7 +47,7 @@
               :tree-data="treeData"
               :height="400"
               @select="selectGroup"
-            > 
+            >
             <!-- 不知道为什么把v-model的提上去了就不报错了 -->
               <template #title="{ title }">
                 <div class="treeItem">
@@ -104,7 +104,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getUserList, getRoleList, getTissue } from '@/api/form'
+import { getUserList, getRoleList, getTissue } from '@LowCode/api/form'
 import { onMounted, ref, watch } from 'vue'
 import { cloneDeep, map } from 'lodash-es'
 

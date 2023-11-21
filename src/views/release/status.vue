@@ -108,9 +108,9 @@
 </template>
 
 <script setup name="ReleaseStatus">
-import { useEngine, useProduct } from '@/store'
-import { providerEnum } from '@/components/ProJect/index'
-import { validateDraft } from "@/api/project";
+import { useEngine, useProduct } from '@LowCode/store'
+import { providerEnum } from '@LowCode/components/ProJect/index'
+import { validateDraft } from "@LowCode/api/project";
 import { regular } from '@jetlinks-web/utils'
 
 const props = defineProps({

@@ -29,7 +29,7 @@
 import FlowForm from './components/FlowForm.vue'
 import FlowChart from './components/FlowChart.vue'
 import FlowHistory from './components/FlowHistory.vue'
-import { getProcessDetail, getProcessTodoDetail } from '@/api/process/me';
+import { getProcessDetail, getProcessTodoDetail } from '@LowCode/api/process/me';
 import { getImage } from '@jetlinks-web/utils'
 
 const props = defineProps({

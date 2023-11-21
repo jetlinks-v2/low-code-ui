@@ -23,8 +23,8 @@
 
 <script setup name="Engine">
 import { Header, Tree, Content } from './components'
-import { typeImages } from '@/components/ProJect/index'
-import { useEngine, useProduct } from '@/store'
+import { typeImages } from '@LowCode/components/ProJect/index'
+import { useEngine, useProduct } from '@LowCode/store'
 import {storeToRefs} from "pinia";
 
 const engine = useEngine()

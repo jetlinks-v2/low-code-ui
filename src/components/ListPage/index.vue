@@ -92,7 +92,7 @@ import {
   ACTION_CONFIG_KEY,
   SEARCH_DATA,
 } from './keys'
-import { useProduct } from '@/store'
+import { useProduct } from '@LowCode/store'
 import { isEmpty, omit, throttle } from 'lodash-es'
 import { onlyMessage } from '@jetlinks-web/utils'
 import { storeToRefs } from 'pinia'

@@ -1,4 +1,4 @@
-import { providerEnum } from  '@/components/ProJect/index'
+import { providerEnum } from  '@LowCode/components/ProJect/index'
 import { cloneDeep, omit } from "lodash-es";
 
 export type IntegrateFilterType = { key: string, value: Array<any>}

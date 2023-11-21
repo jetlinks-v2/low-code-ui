@@ -1,4 +1,4 @@
-import {ISchema} from "@/components/FormDesigner/typings";
+import {ISchema} from "@LowCode/components/FormDesigner/typings";
 
 const filterKey = ['text', 'table']
 const layoutKey = ['card', 'grid', 'tabs', 'collapse', 'space', 'tabs-item', 'card-item', 'collapse-item', 'space-item', 'grid-item']

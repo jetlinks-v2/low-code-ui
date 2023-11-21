@@ -1,10 +1,10 @@
 import './index.less';
 import { AIcon, Empty, Dropdown, Menu, MenuItem, Button, Modal } from 'jetlinks-ui-components';
-import { useProduct } from '@/store';
+import { useProduct } from '@LowCode/store';
 import { withModifiers } from 'vue';
-import { uid } from '@/components/FormDesigner/utils/uid';
+import { uid } from '@LowCode/components/FormDesigner/utils/uid';
 import { map } from 'lodash-es';
-import { copyDataByKey } from '@/components/FormDesigner/utils/utils';
+import { copyDataByKey } from '@LowCode/components/FormDesigner/utils/utils';
 
 const Template = defineComponent({
     name: 'Template',

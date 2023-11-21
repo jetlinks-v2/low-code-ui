@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts" setup>
-import EditorButton from '@/components/EditorModal/EditorButton.vue'
+import EditorButton from '@LowCode/components/EditorModal/EditorButton.vue'
 const props = defineProps({
   showSwitch: {
     type: Boolean,

@@ -12,7 +12,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import FormPreview from '@/components/FormDesigner/preview.vue'
+import FormPreview from '@LowCode/components/FormDesigner/preview.vue'
 import { watch, computed, ref, inject } from 'vue'
 
 const designer: any = inject('FormDesigner')

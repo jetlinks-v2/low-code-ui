@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import { getImage } from '@jetlinks-web/utils'
-import { settingDetail } from '@/api/system'
+import { settingDetail } from '@LowCode/api/system'
 
 interface LayoutType {
   siderWidth: number

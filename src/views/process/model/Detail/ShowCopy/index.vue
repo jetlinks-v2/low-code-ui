@@ -109,9 +109,9 @@
 </template>
 
 <script setup lang="ts">
-import { queryVariables_api, queryFormNoPage_api } from '@/api/process/model'
+import { queryVariables_api, queryFormNoPage_api } from '@LowCode/api/process/model'
 import FormVariables from './components/FormVariables.vue'
-import { useFlowStore } from '@/store/flow'
+import { useFlowStore } from '@LowCode/store/flow'
 import { separateData, filterFormVariables } from './utils'
 import TemplateText from './components/TemplateText1.vue'
 

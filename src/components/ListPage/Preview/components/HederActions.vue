@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { isFunction, isObject } from 'lodash-es'
 import { PropType } from 'vue';
-import { extractCssClass, insertCustomCssToHead } from '@/components/FormDesigner/utils/utils';
+import { extractCssClass, insertCustomCssToHead } from '@LowCode/components/FormDesigner/utils/utils';
 import BatchDropdown from './BatchDropdown/index.vue'
 
 const isCheck = ref(false)

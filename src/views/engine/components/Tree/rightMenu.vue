@@ -82,9 +82,9 @@
 </template>
 
 <script setup name="RightClickMenu">
-import { useProduct, useEngine } from "@/store";
+import { useProduct, useEngine } from "@LowCode/store";
 
-import { providerMap, providerEnum, actionMap, restId } from '@/components/ProJect/index'
+import { providerMap, providerEnum, actionMap, restId } from '@LowCode/components/ProJect/index'
 import { storeToRefs } from 'pinia'
 import { getImage } from '@jetlinks-web/utils';
 

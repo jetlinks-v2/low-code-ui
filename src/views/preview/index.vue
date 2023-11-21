@@ -10,10 +10,10 @@
 
 <script setup name="Preview">
 import {  ConfigProvider } from "ant-design-vue";
-import { getResource } from '@/api/basis'
-import ListPage from '@/components/ListPage/Output/index.vue'
-import HtmlPage from '@/components/CustomHTML/output/Preview.vue'
-import { queryProject } from "@/api/project";
+import { getResource } from '@LowCode/api/basis'
+import ListPage from '@LowCode/components/ListPage/Output/index.vue'
+import HtmlPage from '@LowCode/components/CustomHTML/output/Preview.vue'
+import { queryProject } from "@LowCode/api/project";
 import { Result } from 'jetlinks-ui-components'
 
 const route = useRoute()

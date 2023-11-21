@@ -55,9 +55,9 @@
 <script setup lang="ts">
 import ListType from './ListType.vue'
 import CardType from './CardType.vue'
-import { relationListApi, relationApi, relationTypeListApi, userList } from '@/api/list'
-import { queryRuntime } from '@/api/form'
-import { getRoleList_api, getDepartmentList_api } from '@/api/user'
+import { relationListApi, relationApi, relationTypeListApi, userList } from '@LowCode/api/list'
+import { queryRuntime } from '@LowCode/api/form'
+import { getRoleList_api, getDepartmentList_api } from '@LowCode/api/user'
 const props = defineProps({
   open: {
     type: Boolean,
@@ -93,7 +93,7 @@ const query = (targetType: string) => {
       return getRoleList_api
     case 'org':
       return getDepartmentList_api
-    default: 
+    default:
       return queryRuntime
   }
 }
@@ -106,7 +106,7 @@ const params = (targetType: string) => {
       return [{}]
     case 'org':
       return [{}]
-    default: 
+    default:
       return [props.projectId, props.config.functions, 'QueryList', {}]
   }
 }

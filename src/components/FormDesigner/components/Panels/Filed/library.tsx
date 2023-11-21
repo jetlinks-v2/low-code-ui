@@ -3,8 +3,8 @@ import { filedData } from '../../../utils/defaultData'
 import DraggableWrap from '../../Draggable/DraggableWrap'
 import { IconWidget } from '../../Icons';
 import './index.less';
-import { onEnd } from '@/components/FormDesigner/components/Draggable/ControlInsertionPlugin';
-import generatorData from '@/components/FormDesigner/utils/generatorData';
+import { onEnd } from '@LowCode/components/FormDesigner/components/Draggable/ControlInsertionPlugin';
+import generatorData from '@LowCode/components/FormDesigner/utils/generatorData';
 import { cloneDeep } from 'lodash-es';
 
 const Library = defineComponent({

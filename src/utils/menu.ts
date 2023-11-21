@@ -1,4 +1,4 @@
-import { BasicLayoutPage, BlankLayoutPage, Iframe } from '@/layout'
+import { BasicLayoutPage, BlankLayoutPage, Iframe } from '@LowCode/layout'
 import { shallowRef, h, defineAsyncComponent } from 'vue'
 
 type Buttons = Array<{ id: string }>

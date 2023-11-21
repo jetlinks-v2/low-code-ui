@@ -20,7 +20,7 @@
 </template>
 
 <script setup name="EngineHeader">
-import { useProduct, useEngine, useMenuStore } from '@/store'
+import { useProduct, useEngine, useMenuStore } from '@LowCode/store'
 import { getImage } from '@jetlinks-web/utils';
 import { storeToRefs } from 'pinia'
 
@@ -54,8 +54,6 @@ const quit = async () => {
   },()=>{
     menu.jumpPage('center')
   })
-
-  console.log(engine.files)
 }
 
 onMounted(() => {

@@ -61,15 +61,15 @@
 </template>
 
 <script setup class="CRUDBase">
-import {CRUD_COLUMNS, WARP_REF} from "@/components/Database/util";
+import {CRUD_COLUMNS, WARP_REF} from "@LowCode/components/Database/util";
 import DataTable from './table.vue'
 import DataSetting from './data.vue'
 import Advanced from './advanced.vue'
-import { useProduct } from '@/store'
+import { useProduct } from '@LowCode/store'
 import { defaultSetting } from './setting'
-import {onlyMessage} from "@/utils/comm";
+import {onlyMessage} from "@LowCode/utils/comm";
 import { useRequest } from '@jetlinks-web/hooks'
-import {executeReq} from "@/api/basis";
+import {executeReq} from "@LowCode/api/basis";
 
 const props = defineProps({
   configuration: {

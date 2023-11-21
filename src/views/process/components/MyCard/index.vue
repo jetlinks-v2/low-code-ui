@@ -12,7 +12,7 @@
 </template>
 <script setup lang="ts">
 import { getImage } from '@jetlinks-web/utils'
-import { useMenuStore } from '@/store'
+import { useMenuStore } from '@LowCode/store'
 
 const props = defineProps({
   data: {

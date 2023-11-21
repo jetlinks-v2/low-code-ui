@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { useFlowStore } from '@/store/flow'
+import { useFlowStore } from '@LowCode/store/flow'
 import ApprovalNodeConfig from './ApprovalNodeConfig.vue'
 import DealNodeConfig from './DealNodeConfig.vue'
 import ConditionNodeConfig from './ConditionNodeConfig.vue'

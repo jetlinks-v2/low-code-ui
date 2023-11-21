@@ -1,25 +1,25 @@
 import { h } from 'vue'
 import {initRequest, initWebSocket} from '@jetlinks-web/core'
-import {getGlobalConfig, getToken} from '@jetlinks-web/utils'
+import { getToken } from '@jetlinks-web/utils'
 import { TOKEN_KEY, BASE_API } from '@jetlinks-web/constants'
 import { Modal } from 'jetlinks-ui-components'
 
-const LicenseModal = () => {
-  Modal.error({
-    key: 'License',
-    title: 'License已到期或者错误',
-    content: h(
-      'a',
-      {
-        onClick: () => {
-          Modal.destroyAll?.()
-          window.location.href = '/#/init-license'
-        },
-      },
-      '请更新License',
-    ),
-  })
-}
+// const LicenseModal = () => {
+//   Modal.error({
+//     key: 'License',
+//     title: 'License已到期或者错误',
+//     content: h(
+//       'a',
+//       {
+//         onClick: () => {
+//           Modal.destroyAll?.()
+//           window.location.href = '/#/init-license'
+//         },
+//       },
+//       '请更新License',
+//     ),
+//   })
+// }
 
 /**
  * 初始化package

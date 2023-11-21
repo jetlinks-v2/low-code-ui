@@ -24,12 +24,12 @@
   </j-modal>
 </template>
 <script setup lang="ts">
-import { FormPreview } from '@/components/FormDesigner'
-import CustomHtml from '@/components/CustomHTML/output/Preview.vue'
+import { FormPreview } from '@LowCode/components/FormDesigner'
+import CustomHtml from '@LowCode/components/CustomHTML/output/Preview.vue'
 import { PropType } from 'vue'
-import { providerEnum } from '@/components/ProJect'
-import { ReplStore } from '@/components/CustomHTML/store'
-import { useProduct } from '@/store'
+import { providerEnum } from '@LowCode/components/ProJect'
+import { ReplStore } from '@LowCode/components/CustomHTML/store'
+import { useProduct } from '@LowCode/store'
 
 const data = ref<string>('')
 

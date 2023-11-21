@@ -1,7 +1,7 @@
-import { useProduct } from "@/store";
-import { queryCommand } from "@/api/project";
+import { useProduct } from "@LowCode/store";
+import { queryCommand } from "@LowCode/api/project";
 import { storeToRefs } from "pinia";
-import { providerEnum } from "@/components/ProJect";
+import { providerEnum } from "@LowCode/components/ProJect";
 
 type CommandType = {
   id: string

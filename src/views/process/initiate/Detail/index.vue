@@ -91,7 +91,7 @@
 </template>
 <script setup lang="ts">
 import { onlyMessage } from '@jetlinks-web/utils'
-import FlowDesigner from '@/components/FlowDesigner'
+import FlowDesigner from '@LowCode/components/FlowDesigner'
 import { Modal } from 'jetlinks-ui-components'
 import {
   create_api,
@@ -99,15 +99,15 @@ import {
   getList_api,
   processDetail_api,
   save_api,
-} from '@/api/process/initiate'
-import { handleFormToTable } from '@/views/process/model/Detail/FlowDesign/components/TableFormPreviewUtil'
-import FormPreview from '@/components/FormDesigner/preview.vue'
+} from '@LowCode/api/process/initiate'
+import { handleFormToTable } from '@LowCode/views/process/model/Detail/FlowDesign/components/TableFormPreviewUtil'
+import FormPreview from '@LowCode/components/FormDesigner/preview.vue'
 import md5 from 'md5'
-import { getMeProcessList } from '@/api/process/me'
+import { getMeProcessList } from '@LowCode/api/process/me'
 import { getImage } from '@jetlinks-web/utils'
-import { useMenuStore } from '@/store'
-import FormItem from '@/views/process/me/Detail/components/FormItem.vue'
-import { handleRules } from '@/components/FormDesigner/hooks/useProps'
+import { useMenuStore } from '@LowCode/store'
+import FormItem from '@LowCode/views/process/me/Detail/components/FormItem.vue'
+import { handleRules } from '@LowCode/components/FormDesigner/hooks/useProps'
 import { isArray } from 'lodash-es'
 
 interface FormsProps {

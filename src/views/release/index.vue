@@ -46,7 +46,7 @@
 import Status from './status.vue'
 import Tree from './projectTree.vue'
 import Finish from './finish.vue'
-import { useProduct, useEngine } from "@/store";
+import { useProduct, useEngine } from "@LowCode/store";
 import { getImage } from '@jetlinks-web/utils';
 
 const route = useRoute()

@@ -92,8 +92,8 @@
 </template>
 
 <script setup lang="ts">
-import { queryFormNoPage_api, queryVariables_api } from '@/api/process/model'
-import { useFlowStore } from '@/store/flow'
+import { queryFormNoPage_api, queryVariables_api } from '@LowCode/api/process/model'
+import { useFlowStore } from '@LowCode/store/flow'
 import ConditionValueItem from './ConditionValueItem.vue'
 import { operatorMap } from './const'
 import { findVariableById, handleFormList, setDefaultFormBinds } from './utils'

@@ -3,15 +3,15 @@ import SplitPane from './SplitPane.vue'
 import Console from './Console.vue'
 import EditorContainer from './editor/EditorContainer.vue'
 import Preview from './output/Preview.vue'
-import MenuList from '@/components/ListPage/MenuConfig/components/menu.vue'
+import MenuList from '@LowCode/components/ListPage/MenuConfig/components/menu.vue'
 import { debounce } from './utils'
 import MonacoEditor from './editor/MonacoEditor.vue'
 import {defaultMainFile, ReplStore} from './store'
 import 'splitpanes/dist/splitpanes.css'
-import { useProduct } from '@/store/product'
+import { useProduct } from '@LowCode/store/product'
 import { storeToRefs } from 'pinia'
 import { onlyMessage } from '@jetlinks-web/utils'
-import { BASE_INFO, MENU_CONFIG } from "@/components/ListPage/keys";
+import { BASE_INFO, MENU_CONFIG } from "@LowCode/components/ListPage/keys";
 
 const props = defineProps({
   data: Object,

@@ -1,6 +1,6 @@
-import { useProduct } from "@/store";
-import { providerEnum } from "@/components/ProJect";
-import { queryDictionary } from "@/api/form";
+import { useProduct } from "@LowCode/store";
+import { providerEnum } from "@LowCode/components/ProJect";
+import { queryDictionary } from "@LowCode/api/form";
 export const validFilterModule = async (list: any[]) => {
   const dictionaryList = await queryDictionary()
   return new Promise((resolve) => {

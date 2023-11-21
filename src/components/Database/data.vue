@@ -21,9 +21,9 @@
 </template>
 
 <script setup name="CRUDDataSetting">
-import { CRUD_COLUMNS } from "@/components/Database/util";
-import { queryRuntime } from '@/api/form'
-import { useProduct } from '@/store'
+import { CRUD_COLUMNS } from "@LowCode/components/Database/util";
+import { queryRuntime } from '@LowCode/api/form'
+import { useProduct } from '@LowCode/store'
 import {isArray, isBoolean, isObject} from "lodash-es";
 import dayjs from "dayjs";
 

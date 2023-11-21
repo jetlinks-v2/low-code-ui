@@ -390,9 +390,9 @@
 import { useTarget } from '../../../../hooks'
 import { computed, unref, watchEffect } from 'vue'
 import { useRequest } from '@jetlinks-web/hooks'
-import { getGeoType } from '@/api/form'
+import { getGeoType } from '@LowCode/api/form'
 import Rule from './Rules/Rule.vue'
-import { uid } from '@/components/FormDesigner/utils/uid'
+import { uid } from '@LowCode/components/FormDesigner/utils/uid'
 
 const { target } = useTarget()
 

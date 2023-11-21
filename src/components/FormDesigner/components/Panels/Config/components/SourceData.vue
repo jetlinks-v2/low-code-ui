@@ -160,17 +160,17 @@
     </template>
   </div>
 </template>
-    
+
 <script lang="ts" setup>
 import { watch, computed, reactive, ref } from 'vue'
-import { getArray, searchTree } from '@/components/FormDesigner/utils/utils'
+import { getArray, searchTree } from '@LowCode/components/FormDesigner/utils/utils'
 import {
   queryDictionary,
   queryEndCommand,
   queryEndCommands,
   queryProject,
-} from '@/api/form'
-import { useProduct } from '@/store'
+} from '@LowCode/api/form'
+import { useProduct } from '@LowCode/store'
 
 const product = useProduct()
 

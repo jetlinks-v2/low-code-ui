@@ -72,7 +72,7 @@
 </template>
 
 <script setup name="CRUDSettingNumber">
-import { SETTING_FORM_MODEL, SETTING_FORM_REF } from "@/components/Database/util";
+import { SETTING_FORM_MODEL, SETTING_FORM_REF } from "@LowCode/components/Database/util";
 import {inject} from "vue";
 import Spec from './Spec.vue'
 import SelectNull from './SelectNull.vue'

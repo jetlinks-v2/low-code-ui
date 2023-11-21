@@ -115,11 +115,11 @@
 <script setup lang="ts">
 import { ErrorItem } from '../../index'
 import { DATA_BIND, DATA_SOURCE, SEARCH_DATA } from '../../keys'
-import { useFunctions } from '@/hooks/useFunctions'
-import { useImages } from '@/components/ListPage/hooks/useImages'
+import { useFunctions } from '@LowCode/hooks/useFunctions'
+import { useImages } from '@LowCode/components/ListPage/hooks/useImages'
 import { cloneDeep } from 'lodash-es';
 import { onlyMessage, randomString } from '@jetlinks-web/utils';
-import { queryCommand } from '@/api/project';
+import { queryCommand } from '@LowCode/api/project';
 
 const { functionOptions, commandOptions, info, handleFunction } = useFunctions()
 const { getImages } = useImages()

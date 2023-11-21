@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { PropType } from 'vue'
 import { isEmpty } from '../../../utils'
-import Image from '@/components/Image/index.vue'
+import Image from '@LowCode/components/Image/index.vue'
 
 const visible = ref(false)
 

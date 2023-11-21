@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { findNodeById, handleTermsData } from './utils'
-import { useFlowStore } from '@/store/flow'
+import { useFlowStore } from '@LowCode/store/flow'
 import ConditionSelect from './ConditionSelect.vue'
 
 const flowStore = useFlowStore()

@@ -194,8 +194,8 @@
 </template>
 
 <script lang="ts" setup>
-import Table from '@/components/ListPage/FilterModule/components/FilterTable.vue'
-import Config from '@/components/ListPage/ListData/components/Configuration.vue'
+import Table from '@LowCode/components/ListPage/FilterModule/components/FilterTable.vue'
+import Config from '@LowCode/components/ListPage/ListData/components/Configuration.vue'
 import { DATA_BIND } from '../keys'
 import { validListData } from './utils/valid'
 import { PropType } from 'vue'

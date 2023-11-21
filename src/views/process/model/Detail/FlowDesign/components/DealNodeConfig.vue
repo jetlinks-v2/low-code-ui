@@ -125,7 +125,7 @@ import {
   handleFormList,
   findBranchLastNode,
 } from './utils'
-import { useFlowStore } from '@/store/flow'
+import { useFlowStore } from '@LowCode/store/flow'
 import { onlyMessage } from '@jetlinks-web/utils'
 
 const flowStore = useFlowStore()

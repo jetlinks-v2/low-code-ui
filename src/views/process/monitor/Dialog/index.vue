@@ -106,9 +106,9 @@ import {
   original_list,
   process_list,
   process_tran,
-} from '@/api/process/monitor'
-import { getAllUser_api, getUser_api } from '@/api/user'
-import { useClassified } from '@/hooks/useClassified'
+} from '@LowCode/api/process/monitor'
+import { getAllUser_api, getUser_api } from '@LowCode/api/user'
+import { useClassified } from '@LowCode/hooks/useClassified'
 import { message } from 'ant-design-vue'
 
 type FormType = {

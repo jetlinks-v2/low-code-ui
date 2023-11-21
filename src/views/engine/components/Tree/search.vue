@@ -30,7 +30,7 @@
 </template>
 
 <script setup name="TreeSearch">
-import { useEngine, useProduct } from '@/store'
+import { useEngine, useProduct } from '@LowCode/store'
 import {filterTreeNodes, getImage} from '@jetlinks-web/utils';
 import { debounce } from 'lodash-es'
 

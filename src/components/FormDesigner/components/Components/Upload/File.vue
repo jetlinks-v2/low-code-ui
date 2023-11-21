@@ -59,11 +59,11 @@
 <script lang="ts" setup>
 import { nextTick, ref, watch } from 'vue'
 import type { UploadProps, UploadChangeParam } from 'jetlinks-ui-components'
-import { _fileUpload } from '@/api/comm'
+import { _fileUpload } from '@LowCode/api/comm'
 import { TOKEN_KEY } from '@jetlinks-web/constants'
 import { LocalStore } from '@jetlinks-web/utils/src/storage'
 import { downloadFileByUrl, onlyMessage } from '@jetlinks-web/utils'
-import { downloadFile } from '@/api/form'
+import { downloadFile } from '@LowCode/api/form'
 
 const props = defineProps({
   fileSize: {

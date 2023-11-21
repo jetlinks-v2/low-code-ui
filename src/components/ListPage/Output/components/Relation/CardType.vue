@@ -27,8 +27,8 @@
 <script setup lang="ts">
 import Content from './Content.vue'
 import CardChoose from './CardChoose.vue'
-import { getDepartmentList_api } from '@/api/user'
-import { saveRelationApi } from '@/api/list'
+import { getDepartmentList_api } from '@LowCode/api/user'
+import { saveRelationApi } from '@LowCode/api/list'
 import { pick } from 'lodash-es';
 
 const props = defineProps({

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { cloneDeep } from 'lodash-es'
-import type { INode, IConfig, IModelBaseInfo } from '@/views/process/model/Detail/typings.d.ts'
+import type { INode, IConfig, IModelBaseInfo } from '@LowCode/views/process/model/Detail/typings.d.ts'
 interface IModel {
     config: Partial<IConfig>;
     nodes: Partial<INode>;

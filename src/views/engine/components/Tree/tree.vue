@@ -26,20 +26,20 @@
 </template>
 
 <script setup name="EngineTreeContent">
-import { useEngine, useProduct } from '@/store'
+import { useEngine, useProduct } from '@LowCode/store'
 import { storeToRefs } from 'pinia'
 import RightMenu from './rightMenu.vue'
-import InputModal from '@/components/ProJect/components/Action/InputModal.vue'
-import FileDrawer from '@/components/ProJect/components/Action/FileDrawer.vue'
-import DelModal from '@/components/ProJect/components/Action/DelModal.vue'
-import { providerEnum } from "@/components/ProJect/index";
+import InputModal from '@LowCode/components/ProJect/components/Action/InputModal.vue'
+import FileDrawer from '@LowCode/components/ProJect/components/Action/FileDrawer.vue'
+import DelModal from '@LowCode/components/ProJect/components/Action/DelModal.vue'
+import { providerEnum } from "@LowCode/components/ProJect/index";
 import { randomString } from '@jetlinks-web/utils'
-import { defaultSetting as CrudBaseData } from '@/components/Database/setting'
+import { defaultSetting as CrudBaseData } from '@LowCode/components/Database/setting'
 import { onlyMessage } from '@jetlinks-web/utils';
-import { typeImages } from '@/components/ProJect/index'
+import { typeImages } from '@LowCode/components/ProJect/index'
 import { restParentId } from './tree'
 import { cloneDeep } from 'lodash-es';
-import { delMenu } from '@/api/menu'
+import { delMenu } from '@LowCode/api/menu'
 import { Modal } from 'jetlinks-ui-components'
 import { h } from 'vue'
 

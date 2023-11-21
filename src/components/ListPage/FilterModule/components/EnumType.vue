@@ -102,8 +102,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useFunctions } from '@/hooks/useFunctions'
-import { queryDictionary } from '@/api/form'
+import { useFunctions } from '@LowCode/hooks/useFunctions'
+import { queryDictionary } from '@LowCode/api/form'
 import { useImages } from '../../hooks/useImages'
 import { ErrorItem } from '../..'
 interface Emit {

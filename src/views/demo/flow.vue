@@ -20,9 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import FlowDesigner from '@/components/FlowDesigner'
-import NodeConfig from '@/components/FlowDesigner/components/config/NodeConfig.vue'
-import { useFlowStore } from '@/store/flow'
+import FlowDesigner from '@LowCode/components/FlowDesigner'
+import NodeConfig from '@LowCode/components/FlowDesigner/components/config/NodeConfig.vue'
+import { useFlowStore } from '@LowCode/store/flow'
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)

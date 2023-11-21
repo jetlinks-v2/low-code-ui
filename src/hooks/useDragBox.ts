@@ -1,5 +1,5 @@
 import {onUnmounted, Ref} from "vue";
-import {DRAG_PROVIDE} from "@/components/DragBox/data";
+import {DRAG_PROVIDE} from "@LowCode/components/DragBox/data";
 
 type Options = {
   min: number

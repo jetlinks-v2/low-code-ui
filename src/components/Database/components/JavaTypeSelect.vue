@@ -11,7 +11,7 @@
 
 <script setup name="JavaTypeSelect">
 import { inject } from 'vue'
-import {TYPE_PROVIDE} from "@/components/Database/util";
+import {TYPE_PROVIDE} from "@LowCode/components/Database/util";
 
 const props = defineProps({
   value: {

@@ -63,10 +63,10 @@
 
 <script lang="ts" setup>
 import { nextTick, reactive, ref, watch } from 'vue'
-import { fileUpload } from '@/api/comm'
+import { fileUpload } from '@LowCode/api/comm'
 import { TOKEN_KEY } from '@jetlinks-web/constants'
 import { LocalStore } from '@jetlinks-web/utils/src/storage'
-import CropperModal from '@/components/Upload/Image/CropperModal'
+import CropperModal from '@LowCode/components/Upload/Image/CropperModal'
 import { getBase64ByImg, onlyMessage, randomString } from '@jetlinks-web/utils'
 import type { UploadProps } from 'jetlinks-ui-components'
 

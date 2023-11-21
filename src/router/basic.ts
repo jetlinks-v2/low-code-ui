@@ -1,5 +1,4 @@
-import { RouteRecordItem } from '@jetlinks/types'
-import { BasicLayoutPage } from '@/layout'
+import { BasicLayoutPage } from '@LowCode/layout'
 
 export const BASIC_ROUTER_DATA: any[] = [
   // {
@@ -128,7 +127,7 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
   {
     path: '/engine/:id',
     name: 'Engine',
-    component: () => import('@/views/engine/index.vue'),
+    component: () => import('@LowCode/views/engine/index.vue'),
     meta: {
       title: '项目编辑器',
     },
@@ -136,7 +135,7 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
   {
     path: '/release/:id',
     name: 'Release',
-    component: () => import('@/views/release/index.vue'),
+    component: () => import('@LowCode/views/release/index.vue'),
     meta: {
       title: '项目发布',
     },
@@ -147,6 +146,16 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
     meta: {
       title: '预览',
     },
-    component: () => import('@/views/preview/index.vue'),
+    component: () => import('@LowCode/views/preview/index.vue'),
   },
 ]
+
+export const LOGIN_ROUTE: any = {
+  path: '/login',
+  name: 'Login',
+  // @ts-ignore
+  component: () => import('@LowCode/views/login/index.vue'),
+  meta: {
+    title: '登录页'
+  }
+}

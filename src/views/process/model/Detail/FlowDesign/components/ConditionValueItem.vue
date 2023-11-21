@@ -93,10 +93,10 @@ import {
   getProduct_api,
   getDevice_api,
   queryFormNoPage_api
-} from '@/api/process/model'
-import { queryRuntime, queryDictionaryData } from '@/api/form'
-import { useFlowStore } from '@/store/flow'
-import { dictionaryItemList } from '@/api/list'
+} from '@LowCode/api/process/model'
+import { queryRuntime, queryDictionaryData } from '@LowCode/api/form'
+import { useFlowStore } from '@LowCode/store/flow'
+import { dictionaryItemList } from '@LowCode/api/list'
 import {isBoolean} from "lodash-es";
 type Emits = {
   (e: 'update:modelValue', data: string | number | boolean): void

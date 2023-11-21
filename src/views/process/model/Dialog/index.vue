@@ -111,10 +111,10 @@
 
 <script setup lang="ts">
 import { onlyMessage, randomString } from '@jetlinks-web/utils'
-import { saveProcess_api } from '@/api/process/model'
+import { saveProcess_api } from '@LowCode/api/process/model'
 import { useRequest } from '@jetlinks-web/hooks'
-import { isImg } from '@/utils/comm'
-import { providerEnum } from '@/api/process/model'
+import { isImg } from '@LowCode/utils/comm'
+import { providerEnum } from '@LowCode/api/process/model'
 import { getImage } from '@jetlinks-web/utils'
 
 type FormType = {

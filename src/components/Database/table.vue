@@ -121,8 +121,8 @@
 </template>
 
 <script setup name="CRUDTable">
-import { upperCase } from "@/utils/comm";
-import { executeReq } from '@/api/basis'
+import { upperCase } from "@LowCode/utils/comm";
+import { executeReq } from '@LowCode/api/basis'
 import { cloneDeep, debounce, omit } from 'lodash-es'
 import {
   TYPE_PROVIDE,
@@ -131,12 +131,12 @@ import {
   proAll,
   formErrorFieldsToObj,
   settingValidate
-} from "@/components/Database/util";
+} from "@LowCode/components/Database/util";
 import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly } from './components'
 import { provide } from 'vue'
 import { defaultSetting, defaultTreeSetting } from './setting'
 import { regular } from '@jetlinks-web/utils'
-import { useProduct } from '@/store'
+import { useProduct } from '@LowCode/store'
 
 const props = defineProps({
   tree: {

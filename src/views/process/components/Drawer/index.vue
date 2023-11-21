@@ -68,12 +68,12 @@
   </j-drawer>
 </template>
 <script setup lang="ts">
-import FlowDesigner from '@/components/FlowDesigner'
-import FormPreview from '@/components/FormDesigner/preview.vue'
-import TableFormPreview from '@/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
+import FlowDesigner from '@LowCode/components/FlowDesigner'
+import FormPreview from '@LowCode/components/FormDesigner/preview.vue'
+import TableFormPreview from '@LowCode/views/process/model/Detail/FlowDesign/components/TableFormPreview.vue'
 import { getImage } from '@jetlinks-web/utils'
-import { queryFormNoPage_api } from '@/api/process/model'
-import {handleRules} from "@/components/FormDesigner/hooks/useProps";
+import { queryFormNoPage_api } from '@LowCode/api/process/model'
+import {handleRules} from "@LowCode/components/FormDesigner/hooks/useProps";
 
 interface EmitProps {
   (e: 'update:visible', flag: boolean): void

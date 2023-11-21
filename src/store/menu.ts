@@ -3,12 +3,12 @@ import {router} from '@jetlinks-web/router'
 import {cloneDeep} from 'lodash-es'
 import {setParamsValue} from '@jetlinks-web/hooks'
 import {onlyMessage} from '@jetlinks-web/utils'
-import {handleMenus, handleMenusMap, handleSiderMenu} from '@/utils'
-import {getOwnMenuThree} from '@/api/menu'
-import {getGlobModules} from '@/router/globModules'
-import {extraMenu} from '@/router/extraMenu'
-import {BASIC_ROUTER_DATA, BASIC_ROUTERS} from "@/router/basic";
-import {useAuthStore} from '@/store/auth'
+import {handleMenus, handleMenusMap, handleSiderMenu} from '@LowCode/utils'
+import {getOwnMenuThree} from '@LowCode/api/menu'
+import {getGlobModules} from '@LowCode/router/globModules'
+import {extraMenu} from '@LowCode/router/extraMenu'
+import {BASIC_ROUTER_DATA, BASIC_ROUTERS} from "@LowCode/router/basic";
+import {useAuthStore} from '@LowCode/store/auth'
 
 const defaultOwnParams = [
   {

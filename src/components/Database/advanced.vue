@@ -225,12 +225,12 @@
 </template>
 
 <script setup name="CRUDAdvanced">
-import {getAssetType} from '@/api/basis'
+import {getAssetType} from '@LowCode/api/basis'
 import {useRequest} from '@jetlinks-web/hooks'
 import {regular} from '@jetlinks-web/utils'
-import {CRUD_COLUMNS, formErrorFieldsToObj, proAll} from "@/components/Database/util";
-import {queryEndCommands} from '@/api/form'
-import {useProduct} from '@/store'
+import {CRUD_COLUMNS, formErrorFieldsToObj, proAll} from "@LowCode/components/Database/util";
+import {queryEndCommands} from '@LowCode/api/form'
+import {useProduct} from '@LowCode/store'
 import {AdvancedApiColumns} from './util'
 
 const props = defineProps({

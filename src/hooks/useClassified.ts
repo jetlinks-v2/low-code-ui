@@ -1,5 +1,5 @@
 import { useRequest } from '@jetlinks-web/hooks'
-import { providerEnum } from '@/api/process/model'
+import { providerEnum } from '@LowCode/api/process/model'
 
 export function useClassified() {
   const map = ref<Map<string, any>>(new Map())

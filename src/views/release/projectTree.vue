@@ -5,7 +5,7 @@
 </template>
 
 <script setup name="projectTree">
-import { useProduct } from '@/store'
+import { useProduct } from '@LowCode/store'
 
 const emit = defineEmits(['change'])
 const product = useProduct()

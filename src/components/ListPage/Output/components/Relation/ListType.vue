@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import Content from './Content.vue'
 import ListChoose from './ListChoose.vue'
-import { saveRelationApi, relationStructureApi } from '@/api/list'
+import { saveRelationApi, relationStructureApi } from '@LowCode/api/list'
 
 const props = defineProps({
   relationList: {

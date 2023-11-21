@@ -38,11 +38,11 @@
 
 <script setup name="ContentTabs">
 import { storeToRefs } from 'pinia'
-import { useEngine, useProduct } from '@/store'
+import { useEngine, useProduct } from '@LowCode/store'
 // import Tabs from '../Tabs/tabs.vue'
 import Content from './content.vue'
-import ProjectEmpty from '@/components/ProJect/Empty/index.vue'
-import { typeImages } from '@/components/ProJect/index'
+import ProjectEmpty from '@LowCode/components/ProJect/Empty/index.vue'
+import { typeImages } from '@LowCode/components/ProJect/index'
 
 
 const engine = useEngine()

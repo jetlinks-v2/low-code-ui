@@ -108,11 +108,11 @@
 import { PropType } from 'vue'
 import { UploadChangeParam, UploadFile } from 'ant-design-vue'
 import { DefaultOptionType } from 'ant-design-vue/lib/select'
-// import GeoComponent from '@/components/GeoComponent/index.vue';
-// import { BASE_API_PATH, TOKEN_KEY } from '@/utils/variable';
-// import { LocalStore } from '@/utils/comm';
+// import GeoComponent from '@LowCode/components/GeoComponent/index.vue';
+// import { BASE_API_PATH, TOKEN_KEY } from '@LowCode/utils/variable';
+// import { LocalStore } from '@LowCode/utils/comm';
 import { ItemData, ITypes } from './types'
-// import { FILE_UPLOAD } from '@/api/comm';
+// import { FILE_UPLOAD } from '@LowCode/api/comm';
 // import { Upload } from 'jetlinks-ui-components'
 
 type Emits = {

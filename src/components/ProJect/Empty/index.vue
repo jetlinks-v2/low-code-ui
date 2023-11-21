@@ -34,7 +34,7 @@
 import { getImage } from '@jetlinks-web/utils';
 import InputModal from '../components/Action/InputModal.vue'
 import { projectList, providerMap } from '../index'
-import { useProduct } from '@/store'
+import { useProduct } from '@LowCode/store'
 import ContextMenu from '../components/ContextMenu/index.vue'
 
 const product = useProduct()

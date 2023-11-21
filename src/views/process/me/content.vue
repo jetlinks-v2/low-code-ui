@@ -79,11 +79,11 @@
 import { onlyMessage } from '@jetlinks-web/utils';
 import dayjs from 'dayjs';
 import Detail from './Detail/index.vue'
-import { getMeProcessList, _claim, _delete, getInitiatorList, _claimBatch, _rejectBatch, _completeBatch } from '@/api/process/me'
-import BatchDropdown from '@/components/BatchDropdown/index.vue';
+import { getMeProcessList, _claim, _delete, getInitiatorList, _claimBatch, _rejectBatch, _completeBatch } from '@LowCode/api/process/me'
+import BatchDropdown from '@LowCode/components/BatchDropdown/index.vue';
 import ActionModal from './ActionModal.vue';
-import { useMenuStore } from '@/store'
-import { useClassified } from '@/hooks/useClassified'
+import { useMenuStore } from '@LowCode/store'
+import { useClassified } from '@LowCode/hooks/useClassified'
 
 const menu = useMenuStore()
 const { classified } = useClassified()

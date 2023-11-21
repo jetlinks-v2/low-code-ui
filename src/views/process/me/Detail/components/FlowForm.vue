@@ -51,9 +51,9 @@
 
 <script setup>
 import FlowModal from './FlowModal.vue';
-import FormPreview from '@/components/FormDesigner/preview.vue'
+import FormPreview from '@LowCode/components/FormDesigner/preview.vue'
 import { cloneDeep, isObject } from 'lodash-es'
-import { _claim, _save, _complete, _reject } from '@/api/process/me'
+import { _claim, _save, _complete, _reject } from '@LowCode/api/process/me'
 import { onlyMessage } from '@jetlinks-web/utils';
 import FormItem from './FormItem.vue'
 import md5 from 'md5'

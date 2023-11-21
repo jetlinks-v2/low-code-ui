@@ -195,8 +195,8 @@
 </template>
 
 <script setup lang="ts">
-import { queryFormNoPage_api } from '@/api/process/model'
-import { useFlowStore } from '@/store/flow'
+import { queryFormNoPage_api } from '@LowCode/api/process/model'
+import { useFlowStore } from '@LowCode/store/flow'
 import {
   filterFormByName,
   updateFieldDisabled,
@@ -204,7 +204,7 @@ import {
   getFieldByKey,
 } from './utils'
 import { cloneDeep } from 'lodash-es'
-import FormPreview from '@/components/FormDesigner/preview.vue'
+import FormPreview from '@LowCode/components/FormDesigner/preview.vue'
 import TableFormPreview from './TableFormPreview.vue'
 import { PropType } from 'vue'
 import { getImage } from '@jetlinks-web/utils'

@@ -38,9 +38,9 @@
 </template>
 
 <script setup lang="ts">
-import FlowDesigner from '@/components/FlowDesigner'
+import FlowDesigner from '@LowCode/components/FlowDesigner'
 import NodeConfig from './components/NodeConfig.vue'
-import { useFlowStore } from '@/store/flow'
+import { useFlowStore } from '@LowCode/store/flow'
 import {
   findBranchLastNode,
   findBranches,
@@ -48,8 +48,8 @@ import {
 } from './components/utils'
 import { onlyMessage } from '@jetlinks-web/utils'
 import { cloneDeep } from 'lodash-es'
-import {USER_DATA} from "@/views/process/model/Detail/FlowDesign/util";
-import {getAllDepartment_api, getAllRole_api, getAllUser_api} from "@/api/user";
+import {USER_DATA} from "@LowCode/views/process/model/Detail/FlowDesign/util";
+import {getAllDepartment_api, getAllRole_api, getAllUser_api} from "@LowCode/api/user";
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)

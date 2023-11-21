@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts" name="BranchButton">
-import { useFlowStore } from '@/store/flow'
+import { useFlowStore } from '@LowCode/store/flow'
 import { computed, defineExpose } from 'vue'
 
 const emits = defineEmits(['addBranchNode', 'openConfig'])

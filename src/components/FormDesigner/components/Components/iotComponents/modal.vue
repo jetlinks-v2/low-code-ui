@@ -113,7 +113,7 @@
 </template>
 
 <script lang="ts" setup>
-import { queryProductList, queryDeviceList } from '@/api/form'
+import { queryProductList, queryDeviceList } from '@LowCode/api/form'
 import { map } from 'lodash-es'
 import { inject, ref, watch } from 'vue'
 const props = defineProps({

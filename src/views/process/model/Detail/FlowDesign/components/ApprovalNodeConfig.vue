@@ -199,7 +199,7 @@ import {
   isSelectMember,
   handleFormList,
 } from './utils'
-import { useFlowStore } from '@/store/flow'
+import { useFlowStore } from '@LowCode/store/flow'
 
 const flowStore = useFlowStore()
 

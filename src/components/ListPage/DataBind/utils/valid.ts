@@ -1,5 +1,3 @@
-import { providerEnum } from "@/components/ProJect";
-
 export const validDataBind = (data: any, functionOptions: any) => {
   const errorList: any = [];
   const isExist = functionOptions.find(item => item.fullId === data.function)

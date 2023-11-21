@@ -80,7 +80,7 @@
 import {
   extractCssClass,
   insertCustomCssToHead,
-} from '@/components/FormDesigner/utils/utils'
+} from '@LowCode/components/FormDesigner/utils/utils'
 import { isFunction, isObject } from 'lodash-es'
 
 const props = defineProps({
