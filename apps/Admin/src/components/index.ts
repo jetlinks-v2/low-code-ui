@@ -21,6 +21,7 @@ import OppositeSelect from './OppositeSelect/index.vue'
 import CardBox from './CardBox/index.vue'
 import CheckSpin from './CheckSpin/index.vue'
 import CheckButton from './CheckButton/index.vue'
+import PageDesigner from './PageDesigner/index.vue'
 
 export default  {
     install(app: App) {
@@ -47,5 +48,6 @@ export default  {
           .component('CardBox',CardBox)
           .component('CheckSpin', CheckSpin)
           .component('CheckButton', CheckButton)
+          .component('PageDesigner', PageDesigner)
     }
 }
