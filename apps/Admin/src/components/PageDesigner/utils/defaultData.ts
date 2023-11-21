@@ -59,13 +59,15 @@ export const layout: ISchema[] = [
                         children: [],
                         componentProps: {
                             label:'标题1',
-                            value: '123'
+                            value: '123',
+                            span:1
                         },
                     },
                 ],
                 componentProps: {
                     title:'标题1',
-                    bordered: true
+                    bordered: true,
+                    column:2
                 },
             },
             {
@@ -76,12 +78,15 @@ export const layout: ISchema[] = [
                         children: [],
                         componentProps: {
                             label:'标题2',
-                            value: '哈哈哈哈哈哈'
+                            value: '哈哈哈哈哈哈',
+                            span:1
                         },
                     },
                 ],
                 componentProps: {
                     title:'标题2',
+                    column:3,
+                    bordered:false
                 },
             },
         ]
