@@ -206,6 +206,25 @@ export const layout: ISchema[] = [
             isLayout: false
         },
     },
+    {
+        type: 'title',
+        name: '标题',
+        componentProps: {
+            title: 'Title',
+        },
+        formItemProps: {
+            isLayout: false
+        },
+        children: [
+            {
+                type: 'title-item',
+                children: [],
+                formItemProps: {
+                    isLayout: false
+                },
+            },
+        ]
+    },
 ]
 // 高级组件
 export const pro: ISchema[] = [

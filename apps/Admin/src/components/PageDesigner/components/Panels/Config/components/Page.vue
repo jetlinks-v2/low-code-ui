@@ -1,6 +1,7 @@
 <template>
   <div>
-    <j-form-item :validateFirst="true" label="组件布局" name="layout">
+    page
+    <!-- <j-form-item :validateFirst="true" label="组件布局" name="layout">
       <div class="layout-box">
         <div
           class="layout-item"
@@ -12,17 +13,8 @@
           <img :src="item.img" />
         </div>
       </div>
-    </j-form-item>
-    <j-form-item :validateFirst="true" label="组件尺寸" name="size">
-      <!-- <j-radio-group
-        v-model:value="target.componentProps.size"
-        button-style="solid"
-        @change="onDataChange"
-      >
-        <j-radio-button value="small">小</j-radio-button>
-        <j-radio-button value="default">中</j-radio-button>
-        <j-radio-button value="large">大</j-radio-button>
-      </j-radio-group> -->
+    </j-form-item> -->
+    <!-- <j-form-item :validateFirst="true" label="组件尺寸" name="size">
       <CheckButton
         :options="[
           { label: '小', value: 'small' },
@@ -32,7 +24,7 @@
         @change="onDataChange"
         v-model:value="target.componentProps.size"
       />
-    </j-form-item>
+    </j-form-item> -->
   </div>
 </template>
 
@@ -43,29 +35,29 @@ const { target } = useTarget()
 
 const emits = defineEmits(['refresh'])
 
-const list = [
-  {
-    value: 'horizontal',
-    img: '/images/form-designer/horizontal.png',
-  },
-  {
-    value: 'vertical',
-    img: '/images/form-designer/vertical.png',
-  },
-  {
-    value: 'inline',
-    img: '/images/form-designer/inline.png',
-  },
-]
+// const list = [
+//   {
+//     value: 'horizontal',
+//     img: '/images/form-designer/horizontal.png',
+//   },
+//   {
+//     value: 'vertical',
+//     img: '/images/form-designer/vertical.png',
+//   },
+//   {
+//     value: 'inline',
+//     img: '/images/form-designer/inline.png',
+//   },
+// ]
 
-const onDataChange = () => {
-  emits('refresh', target.value)
-}
+// const onDataChange = () => {
+//   emits('refresh', target.value)
+// }
 
-const onClick = (key: string) => {
-  target.value.componentProps.layout = key
-  emits('refresh', target.value)
-}
+// const onClick = (key: string) => {
+//   target.value.componentProps.layout = key
+//   emits('refresh', target.value)
+// }
 </script>
 
 <style lang="less" scoped>

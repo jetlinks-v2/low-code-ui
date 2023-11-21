@@ -79,6 +79,7 @@ export const getConfigList = (_type: string, obj: any, type: 'workflow' | 'low-c
         'time-picker',
         'table',
         'card',
+        'title',
         'tabs',
         'collapse',
         'form'

@@ -10,7 +10,7 @@ const Selection = defineComponent({
   props: {
     data: {
       type: Object,
-      default: () => { }
+      default: () => {}
     },
     tag: {
       type: String,
@@ -41,7 +41,8 @@ const Selection = defineComponent({
     const designer: any = inject('FormDesigner')
 
     const Selected = computed(() => {
-      return props?.data?.key !== undefined && designer.selected?.value?.key === props?.data?.key
+      const flag = designer.selected.value.find(item => props?.data?.key === item.key)
+      return props?.data?.key !== undefined && flag
     })
 
     const isEditModel = computed(() => {
@@ -58,11 +59,18 @@ const Selection = defineComponent({
 
     const _hasDrag = computed(() => { return props.hasDrag })
 
-
+    // 粘贴
+    const onPaste = () => {
+      designer?.onPaste()
+    }
+    // 删除
+    const onDelete = () => {
+      designer?.onDelete()
+    }
     return () => {
       return (
         <TagComponent
-          // data-id={props.data?.key}
+          data-id={props.data?.key}
           class={[
             'selectElement',
             unref(isEditModel) && unref(_hasDrag) && 'handle',
@@ -81,7 +89,7 @@ const Selection = defineComponent({
                     <div
                       class="action"
                       onClick={withModifiers(() => {
-
+                        onPaste()
                       }, ['stop'])}
                     >
                       <AIcon type="CopyOutlined" />
@@ -92,7 +100,7 @@ const Selection = defineComponent({
                   props.hasDel && (
                     <div
                       class="action"
-                      onClick={withModifiers(() => { }, ['stop'])}
+                      onClick={withModifiers(() => { onDelete() }, ['stop'])}
                     >
                       <AIcon type="DeleteOutlined" />
                     </div>
@@ -101,7 +109,7 @@ const Selection = defineComponent({
               </div>
             )
           }
-          {props.hasMask && <div class={['mask']}></div>}
+          {props.hasMask && unref(isEditModel) && <div class={['mask']}></div>}
         </TagComponent>
       )
     }
