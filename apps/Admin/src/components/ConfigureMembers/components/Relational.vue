@@ -42,7 +42,7 @@
           :selectedKeys="relSelectedKeys"
           :fieldNames="{
             children: 'children',
-            title: 'name',
+            title: 'reverseName',
             key: 'relation',
           }"
           :height="300"
@@ -101,6 +101,7 @@ const intermediateData = ref<any>({})
 const currentSub = ref<any>({})
 
 const relationTreeData = computed(() => {
+  console.log('props.treeData',props.treeData)
   return filterAndDeleteEmptyParents(cloneDeep(props.treeData), (item) => {
     if (item.others && item.others.relation) {
       return (
