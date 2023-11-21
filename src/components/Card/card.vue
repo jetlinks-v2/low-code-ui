@@ -89,6 +89,7 @@ import Active from './active.vue'
 import OtherActions from './otherActions.vue'
 import { hexToRgb } from '@jetlinks-web/utils'
 import { extractCssClass, insertCustomCssToHead } from '../FormDesigner/utils/utils';
+import { BadgeStatus } from '@LowCode/components/index'
 
 const props = defineProps({
   ...BadgeProps(),

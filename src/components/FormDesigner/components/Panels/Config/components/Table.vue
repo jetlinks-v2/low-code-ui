@@ -226,6 +226,7 @@ import { computed, unref } from 'vue'
 import { useTarget } from '../../../../hooks'
 import Config from './Config.vue'
 import Rule from './Rules/Rule.vue'
+import { CheckButton } from '@LowCode/components/index'
 
 const { target } = useTarget()
 

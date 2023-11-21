@@ -21,6 +21,7 @@ import MyCard from '../components/MyCard/index.vue'
 import { getMeProcessList } from '@LowCode/api/process/me'
 import { useUserStore } from '@LowCode/store/user'
 import { useMenuStore } from '@LowCode/store'
+import { TitleComponent } from '@LowCode/components/index'
 
 const userStore = useUserStore()
 const menu = useMenuStore()

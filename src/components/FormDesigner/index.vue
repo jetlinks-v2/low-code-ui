@@ -61,6 +61,7 @@ import Check from './components/Check/index.vue'
 import { onlyMessage } from '@jetlinks-web/utils'
 import { providerEnum } from '@LowCode/components/ProJect'
 import { proAll } from '../QuickEditTable/util'
+import { CheckSpin } from '@LowCode/components/index'
 
 const props = defineProps({
   value: {

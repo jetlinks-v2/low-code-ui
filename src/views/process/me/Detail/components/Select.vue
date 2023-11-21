@@ -48,6 +48,7 @@ import { cloneDeep } from 'lodash-es';
 import { getUserList } from '@LowCode/api/process/me'
 import { getOrg_api } from '@LowCode/api/process/model'
 import { filterTreeNodes } from '@jetlinks-web/utils';
+import { Search as ProSearch , BadgeStatus } from '@LowCode/components/index'
 
 const props = defineProps({
     type: {

@@ -38,6 +38,7 @@
 
 <script lang="ts" setup>
 import { useTarget } from '../../../../hooks'
+import { CheckButton } from '@LowCode/components/index'
 
 const { target } = useTarget()
 

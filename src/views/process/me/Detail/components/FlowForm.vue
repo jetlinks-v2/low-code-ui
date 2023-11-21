@@ -60,6 +60,7 @@ import md5 from 'md5'
 import { getImage } from '@jetlinks-web/utils'
 import { handleSingleData } from './index'
 import { handleFormToTable } from '../../../model/Detail/FlowDesign/components/TableFormPreviewUtil'
+import {QuickEditTable} from '@LowCode/components/index'
 
 const props = defineProps({
     info: {

@@ -499,6 +499,7 @@ import { getBrotherList, queryKeys, updateData, _specialKeys } from '../../../..
 import Storage from './Storage/index.vue'
 import { uid } from '@LowCode/components/FormDesigner/utils/uid'
 import { cloneDeep, flatten, map } from 'lodash-es'
+import { CheckButton } from '@LowCode/components/index'
 
 const designer: any = inject('FormDesigner')
 

@@ -33,6 +33,7 @@
 
 <script lang="ts" setup>
 import { ref, inject } from 'vue'
+import { DragBox } from '@LowCode/components/index'
 
 const designer: any = inject('FormDesigner')
 

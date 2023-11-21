@@ -45,6 +45,7 @@ import Spec from './Spec.vue'
 import { inject } from "vue";
 import { useRequest } from '@jetlinks-web/hooks'
 import { dictionaryList } from "@LowCode/api/dictionary";
+import { BooleanSelect } from '@LowCode/components/index'
 
 const props = defineProps({
   warp: {

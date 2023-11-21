@@ -70,6 +70,7 @@ import { defaultSetting } from './setting'
 import {onlyMessage} from "@LowCode/utils/comm";
 import { useRequest } from '@jetlinks-web/hooks'
 import {executeReq} from "@LowCode/api/basis";
+import { CardBox , CheckSpin} from '@LowCode/components/index'
 
 const props = defineProps({
   configuration: {

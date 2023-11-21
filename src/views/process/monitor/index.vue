@@ -120,6 +120,7 @@ import { getList_api, getAllList_api, close_api } from '@LowCode/api/process/mon
 import dayjs from 'dayjs'
 import { providerEnum } from '@LowCode/api/process/model'
 import Drawer from '@LowCode/views/process/me/Detail/index.vue'
+import { Search as ProSearch} from '@LowCode/components/index'
 
 const tableRef = ref()
 const history = ref(false)

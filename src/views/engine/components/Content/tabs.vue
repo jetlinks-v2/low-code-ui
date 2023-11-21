@@ -43,6 +43,7 @@ import { useEngine, useProduct } from '@LowCode/store'
 import Content from './content.vue'
 import ProjectEmpty from '@LowCode/components/ProJect/Empty/index.vue'
 import { typeImages } from '@LowCode/components/ProJect/index'
+import { Project } from '@LowCode/components/index'
 
 
 const engine = useEngine()

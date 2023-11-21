@@ -188,7 +188,7 @@
 </template>
 
 <script setup>
-
+import { Card , ProImage , OppositeSelect } from '@LowCode/components/index'
 const options = [
   {
     label:'选项1',

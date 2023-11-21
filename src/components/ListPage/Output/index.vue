@@ -82,6 +82,7 @@ import { queryRuntime } from '@LowCode/api/form'
 import { onlyMessage } from '@jetlinks-web/utils'
 import { dictionaryItemList } from '@LowCode/api/list'
 import { request } from '@jetlinks-web/core'
+import { Search as ProSearch , CardBox } from '@LowCode/components/index'
 
 const props = defineProps({
   data: {

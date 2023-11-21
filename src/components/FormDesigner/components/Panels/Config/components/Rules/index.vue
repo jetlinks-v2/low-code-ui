@@ -34,6 +34,7 @@
 <script lang="ts" setup>
 import Rule from './Rule.vue'
 import { useTarget } from '../../../../../hooks'
+import { CheckButton } from '@LowCode/components/index'
 
 const { target } = useTarget()
 

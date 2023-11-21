@@ -24,6 +24,7 @@ import Search from './search.vue'
 import Tree from './tree.vue'
 import { useProduct } from "@LowCode/store";
 import { storeToRefs } from 'pinia'
+import { DragBox } from '@LowCode/components/index'
 
 const product = useProduct()
 

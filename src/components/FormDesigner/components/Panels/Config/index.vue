@@ -56,6 +56,7 @@ import { useTarget } from '../../../hooks'
 import { updateData } from '../../../utils/utils'
 import { useFocusWithin } from '@vueuse/core'
 import Rules from './components/Rules/Rules.vue'
+import { TitleComponent } from '@LowCode/components/index'
 
 const formRef = ref<any>()
 const { focused } = useFocusWithin(formRef)

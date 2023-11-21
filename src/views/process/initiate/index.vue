@@ -47,6 +47,7 @@ import { getList_api } from '@LowCode/api/process/initiate'
 import { useClassified } from '@LowCode/hooks/useClassified'
 import { isImg } from '@LowCode/utils/comm'
 import { useMenuStore } from '@LowCode/store'
+import { ProImage } from '@LowCode/components/index'
 
 const menu = useMenuStore()
 const { getText, classified } = useClassified()

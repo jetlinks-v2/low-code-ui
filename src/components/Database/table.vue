@@ -137,6 +137,7 @@ import { provide } from 'vue'
 import { defaultSetting, defaultTreeSetting } from './setting'
 import { regular } from '@jetlinks-web/utils'
 import { useProduct } from '@LowCode/store'
+import {QuickEditTable} from '@LowCode/components/index'
 
 const props = defineProps({
   tree: {

@@ -116,6 +116,7 @@ import { useRequest } from '@jetlinks-web/hooks'
 import { isImg } from '@LowCode/utils/comm'
 import { providerEnum } from '@LowCode/api/process/model'
 import { getImage } from '@jetlinks-web/utils'
+import { ImageUpload ,  ProImage } from '@LowCode/components/index'
 
 type FormType = {
   key: string

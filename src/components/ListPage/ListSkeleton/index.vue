@@ -174,6 +174,7 @@
 <script setup lang="ts" name="listSkeleton">
 import Guide from '../Guide/index.vue'
 import type { GuideProps } from '../Guide/type'
+import { CardBox } from '@LowCode/components/index'
 
 interface Emit {
   (e: 'visibles', key: string, value: boolean): void

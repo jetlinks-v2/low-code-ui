@@ -171,6 +171,7 @@ import {
   queryProject,
 } from '@LowCode/api/form'
 import { useProduct } from '@LowCode/store'
+import { CheckButton } from '@LowCode/components/index'
 
 const product = useProduct()
 

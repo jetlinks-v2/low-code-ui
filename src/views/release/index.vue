@@ -48,6 +48,7 @@ import Tree from './projectTree.vue'
 import Finish from './finish.vue'
 import { useProduct, useEngine } from "@LowCode/store";
 import { getImage } from '@jetlinks-web/utils';
+import { CardBox } from '@LowCode/components/index';
 
 const route = useRoute()
 const product = useProduct()

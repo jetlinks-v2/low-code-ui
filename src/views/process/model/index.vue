@@ -166,6 +166,7 @@ import ShowCopy from '@LowCode/views/process/model/Detail/ShowCopy/index.vue'
 import { useFlowStore } from '@LowCode/store/flow'
 import { Modal } from 'jetlinks-ui-components'
 import { useMenuStore } from '@LowCode/store'
+import { Card , Search as ProSearch , BadgeStatus , ProImage} from '@LowCode/components/index'
 
 const menu = useMenuStore()
 const flowStore = useFlowStore()

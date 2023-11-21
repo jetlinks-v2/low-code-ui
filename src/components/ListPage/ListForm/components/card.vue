@@ -261,6 +261,8 @@ import {
   DATA_BIND,
   DATA_SOURCE,
 } from '../../keys'
+import { Card } from '@LowCode/components/index'
+
 const props = defineProps({
   id: {
     type: null,

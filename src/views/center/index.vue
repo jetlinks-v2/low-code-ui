@@ -56,6 +56,8 @@ import { onlyMessage } from '@LowCode/utils/comm';
 import { router } from '@jetlinks-web/router';
 import Menu from './Menu/index.vue'
 import { delMenu } from '@LowCode/api/menu';
+import { Search as ProSearch} from '@LowCode/components/index'
+import { Card } from '@LowCode/components/index'
 
 const params = ref<any>({})
 const tableRef = ref<Record<string, any>>({});

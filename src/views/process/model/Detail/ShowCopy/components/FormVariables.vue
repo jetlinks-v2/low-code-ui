@@ -71,6 +71,7 @@ import { useFlowStore } from '@LowCode/store/flow'
 import { treeFilter } from 'jetlinks-ui-components/es/Tree'
 import { generateRandomColor, rdmRgbColor } from '../utils'
 import { cloneDeep } from 'lodash-es'
+import  {FormPreview}  from '@LowCode/components/index'
 
 type Emits = {
   (e: 'update:visible', data: boolean): void

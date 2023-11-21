@@ -26,6 +26,7 @@ import { Header, Tree, Content } from './components'
 import { typeImages } from '@LowCode/components/ProJect/index'
 import { useEngine, useProduct } from '@LowCode/store'
 import {storeToRefs} from "pinia";
+import { DragContent } from '@LowCode/components/index'
 
 const engine = useEngine()
 const product = useProduct()

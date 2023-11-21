@@ -96,6 +96,7 @@ import { useProduct } from '@LowCode/store'
 import { isEmpty, omit, throttle } from 'lodash-es'
 import { onlyMessage } from '@jetlinks-web/utils'
 import { storeToRefs } from 'pinia'
+import { CheckSpin } from '@LowCode/components/index'
 
 const spinning = ref(false)
 const props = defineProps({

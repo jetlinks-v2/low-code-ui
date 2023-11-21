@@ -26,6 +26,7 @@
 <script setup name="AddRemoveUpdateQuery">
 
 import {upperCase} from "@LowCode/utils/comm";
+import {QuickEditTable} from '@LowCode/components/index'
 
 const columns = [
   {

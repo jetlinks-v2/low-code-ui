@@ -31,6 +31,7 @@
 import Content from './Content.vue'
 import ListChoose from './ListChoose.vue'
 import { saveRelationApi, relationStructureApi } from '@LowCode/api/list'
+import { TitleComponent } from '@LowCode/components/index'
 
 const props = defineProps({
   relationList: {

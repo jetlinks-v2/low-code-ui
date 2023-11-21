@@ -232,6 +232,7 @@ import {CRUD_COLUMNS, formErrorFieldsToObj, proAll} from "@LowCode/components/Da
 import {queryEndCommands} from '@LowCode/api/form'
 import {useProduct} from '@LowCode/store'
 import {AdvancedApiColumns} from './util'
+import { CardBox } from '@LowCode/components/index'
 
 const props = defineProps({
   tree: {

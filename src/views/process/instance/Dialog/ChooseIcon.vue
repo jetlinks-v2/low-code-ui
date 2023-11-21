@@ -22,6 +22,7 @@
 </template>
 <script setup>
 import iconKeys from './fields'
+import {ImageUpload} from '@LowCode/components/index';
 const props = defineProps({
   value: {
     type: String,

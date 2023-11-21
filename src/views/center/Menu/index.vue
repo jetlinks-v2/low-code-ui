@@ -9,6 +9,7 @@
 <script setup lang='ts'>
 import { saveMenu } from '@LowCode/api/menu';
 import { useProduct } from '@LowCode/store/product';
+import { Menu } from '@LowCode/components/index'
 
 
 const emits = defineEmits(['close'])

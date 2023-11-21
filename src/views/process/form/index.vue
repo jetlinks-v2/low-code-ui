@@ -80,6 +80,7 @@ import { _query, _delete, _queryCreator } from '@LowCode/api/process/form'
 import { onlyMessage } from '@LowCode/utils/comm'
 import { ref } from 'vue'
 import { useMenuStore } from '@LowCode/store'
+import { Search as ProSearch} from '@LowCode/components/index'
 
 const menu = useMenuStore()
 const params = ref<any>({})

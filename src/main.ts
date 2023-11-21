@@ -6,7 +6,7 @@ import { initPackages } from './package'
 import { setupRouter } from '@LowCode/router/guard'
 import { initStoreBus } from '@LowCode/store'
 import globalComponents from '@jetlinks-web/components'
-import components from './components'
+// import components from './components'
 import JComponents from 'jetlinks-ui-components'
 import 'ant-design-vue/dist/antd.variable.min.css'
 import './style.css'
@@ -28,7 +28,7 @@ import {LOGIN_ROUTE} from "@LowCode/router/basic";
 
     app.use(JComponents)
     app.use(globalComponents)
-    app.use(components)
+    // app.use(components)
 
     if (process.env.NODE_ENV === "development") { // 开启性能标记
       app.config.performance = true;

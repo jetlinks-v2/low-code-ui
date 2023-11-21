@@ -84,6 +84,7 @@ import BatchDropdown from '@LowCode/components/BatchDropdown/index.vue';
 import ActionModal from './ActionModal.vue';
 import { useMenuStore } from '@LowCode/store'
 import { useClassified } from '@LowCode/hooks/useClassified'
+import { Search as ProSearch} from '@LowCode/components/index'
 
 const menu = useMenuStore()
 const { classified } = useClassified()

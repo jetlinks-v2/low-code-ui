@@ -45,6 +45,7 @@ import {
 } from '../FlowDesign/components/utils'
 import ConfigForm from './components/ConfigForm.vue'
 import { useFlowStore } from '@LowCode/store/flow'
+import { TitleComponent } from '@LowCode/components/index'
 
 const flowStore = useFlowStore()
 const formRef = ref()

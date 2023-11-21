@@ -107,6 +107,7 @@
 import { getUserList, getRoleList, getTissue } from '@LowCode/api/form'
 import { onMounted, ref, watch } from 'vue'
 import { cloneDeep, map } from 'lodash-es'
+import { Search as ProSearch , BadgeStatus } from '@LowCode/components/index'
 
 const sourceType = ref('tissue')
 const props = defineProps({

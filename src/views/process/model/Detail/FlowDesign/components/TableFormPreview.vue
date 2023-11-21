@@ -58,6 +58,7 @@ import {
   handleFormToTable
 } from "./TableFormPreviewUtil";
 import {cloneDeep} from "lodash-es";
+import {QuickEditTable} from '@LowCode/components/index'
 
 type Emits = {
   (e: 'update:dataSource', data: any[]): void

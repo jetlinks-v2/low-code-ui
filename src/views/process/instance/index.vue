@@ -157,6 +157,7 @@ import { getList_api, getAllInstance_api, del_api, updateState_api } from '@LowC
 import { isImg } from '@LowCode/utils/comm'
 
 import { providerEnum } from '@LowCode/api/process/model'
+import { Card ,  Search as ProSearch , BadgeStatus , ProImage } from '@LowCode/components/index'
 
 const tableRef = ref()
 const columns = [

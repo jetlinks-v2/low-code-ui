@@ -13,6 +13,7 @@
 <script setup lang="ts">
 import { getImage } from '@jetlinks-web/utils'
 import { useMenuStore } from '@LowCode/store'
+import { ProImage } from '@LowCode/components/index'
 
 const props = defineProps({
   data: {

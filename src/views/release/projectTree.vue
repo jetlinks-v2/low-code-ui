@@ -6,6 +6,7 @@
 
 <script setup name="projectTree">
 import { useProduct } from '@LowCode/store'
+import { Menu } from '@LowCode/components/index'
 
 const emit = defineEmits(['change'])
 const product = useProduct()

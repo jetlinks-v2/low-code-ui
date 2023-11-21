@@ -116,6 +116,8 @@
 import { queryProductList, queryDeviceList } from '@LowCode/api/form'
 import { map } from 'lodash-es'
 import { inject, ref, watch } from 'vue'
+import { Card , BadgeStatus , Search as ProSearch } from '@LowCode/components/index'
+
 const props = defineProps({
   select: {
     type: Array,

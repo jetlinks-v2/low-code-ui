@@ -30,6 +30,7 @@ import CardChoose from './CardChoose.vue'
 import { getDepartmentList_api } from '@LowCode/api/user'
 import { saveRelationApi } from '@LowCode/api/list'
 import { pick } from 'lodash-es';
+import { TitleComponent } from '@LowCode/components/index'
 
 const props = defineProps({
   /**两个关系类型下的所有关系配置 */

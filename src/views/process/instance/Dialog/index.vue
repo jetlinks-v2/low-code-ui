@@ -126,6 +126,7 @@ import { copy_api } from '@LowCode/api/process/instance'
 import { useRequest } from '@jetlinks-web/hooks'
 import { isImg } from '@LowCode/utils/comm'
 import { providerEnum } from '@LowCode/api/process/model'
+import { ProImage } from '@LowCode/components/index'
 
 type FormType = {
   id: string

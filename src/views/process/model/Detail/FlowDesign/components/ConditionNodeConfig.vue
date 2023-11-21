@@ -26,6 +26,7 @@
 import { findNodeById, handleTermsData } from './utils'
 import { useFlowStore } from '@LowCode/store/flow'
 import ConditionSelect from './ConditionSelect.vue'
+import { TitleComponent } from '@LowCode/components/index'
 
 const flowStore = useFlowStore()
 const activeKey = ref('basic')

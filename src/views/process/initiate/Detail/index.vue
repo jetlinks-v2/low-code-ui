@@ -109,6 +109,7 @@ import { useMenuStore } from '@LowCode/store'
 import FormItem from '@LowCode/views/process/me/Detail/components/FormItem.vue'
 import { handleRules } from '@LowCode/components/FormDesigner/hooks/useProps'
 import { isArray } from 'lodash-es'
+import {QuickEditTable} from '@LowCode/components/index'
 
 interface FormsProps {
   formId: string

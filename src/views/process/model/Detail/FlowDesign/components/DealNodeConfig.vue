@@ -127,6 +127,7 @@ import {
 } from './utils'
 import { useFlowStore } from '@LowCode/store/flow'
 import { onlyMessage } from '@jetlinks-web/utils'
+import { TitleComponent } from '@LowCode/components/index'
 
 const flowStore = useFlowStore()
 

@@ -21,30 +21,54 @@ import CardBox from './CardBox/index.vue'
 import CheckSpin from './CheckSpin/index.vue'
 import CheckButton from './CheckButton/index.vue'
 
-export default  {
-    install(app: App) {
-        app.component('TitleComponent', TitleComponent)
-          .component('ImageUpload', ImageUpload)
-          .component('FormPreview', FormPreview)
-          .component('QuickEditTable', QuickEditTable)
-          .component('ProSearch', Search)
-          .component('DragBox', DragBox)
-          .component('DragContent', DragContent)
-          .component('Card', Card)
-          .component('BadgeStatus', BadgeStatus)
-          .component('ProImage', ProImage)
-          .component('EditorModal', EditorModal)
-          .component('ListPage', ListPage)
-          .component('CRUD', CRUD)
-          .component('Menu', Menu)
-          .component('Project',Project)
-          .component('EmptySelect',EmptySelect)
-          .component('BooleanSelect',BooleanSelect)
-          .component('SQLCode', SQLCode)
-          .component('FunctionCode', FunctionCode)
-          .component('OppositeSelect',OppositeSelect)
-          .component('CardBox',CardBox)
-          .component('CheckSpin', CheckSpin)
-          .component('CheckButton', CheckButton)
-    }
+export {
+    TitleComponent,
+    ImageUpload,
+    FormPreview,
+    QuickEditTable,
+    Search,
+    DragBox,
+    DragContent,
+    Card,
+    BadgeStatus,
+    ProImage,
+    EditorModal,
+    ListPage,
+    CRUD,
+    Menu,
+    Project,
+    EmptySelect,
+    BooleanSelect,
+    SQLCode,
+    FunctionCode,
+    OppositeSelect,
+    CardBox,
+    CheckSpin,
+    CheckButton
+    // install(app: App) {
+    //     app.component('TitleComponent', TitleComponent)
+    //       .component('ImageUpload', ImageUpload)
+    //       .component('FormPreview', FormPreview)
+    //       .component('QuickEditTable', QuickEditTable)
+    //       .component('ProSearch', Search)
+    //       .component('DragBox', DragBox)
+    //       .component('DragContent', DragContent)
+    //       .component('Card', Card)
+    //       .component('BadgeStatus', BadgeStatus)
+    //       .component('ProImage', ProImage)
+    //       .component('EditorModal', EditorModal)
+    //       .component('ListPage', ListPage)
+    //       .component('CRUD', CRUD)
+    //       .component('Menu', Menu)
+    //       .component('Project',Project)
+    //       .component('EmptySelect',EmptySelect)
+    //       .component('BooleanSelect',BooleanSelect)
+    //       .component('SQLCode', SQLCode)
+    //       .component('FunctionCode', FunctionCode)
+    //       .component('OppositeSelect',OppositeSelect)
+    //       .component('CardBox',CardBox)
+    //       .component('CheckSpin', CheckSpin)
+    //       .component('CheckButton', CheckButton)
+          
+    // }
 }
