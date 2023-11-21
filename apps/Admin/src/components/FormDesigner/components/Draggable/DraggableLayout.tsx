@@ -13,6 +13,7 @@ import CommLayout from './CommLayout';
 import { PropType } from 'vue';
 import { onEnd } from './ControlInsertionPlugin';
 import './index.less';
+import TitleLayout from './TitleLayout';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -85,7 +86,7 @@ const DraggableLayout = defineComponent({
                     }
                     return true
                 })
-                
+
                 if (!unref(_visible)) return ''
 
                 switch (element.type) {
@@ -98,6 +99,8 @@ const DraggableLayout = defineComponent({
                         )
                     case 'card':
                         return (<CardLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></CardLayout>)
+                    case 'title':
+                        return (<TitleLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></TitleLayout>)
                     case 'space':
                         return (<SpaceLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></SpaceLayout>)
                     case 'grid':

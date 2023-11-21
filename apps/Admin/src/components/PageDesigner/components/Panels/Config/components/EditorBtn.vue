@@ -21,8 +21,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect, watch, inject } from 'vue'
-import { useFocusWithin } from '@vueuse/core'
+import { ref, watchEffect, inject } from 'vue'
 import { onlyMessage } from '@jetlinks/utils'
 
 const designer: any = inject('FormDesigner')
@@ -46,8 +45,6 @@ const visible = ref<boolean>(false)
 const _value = ref<string>()
 const target = ref()
 const _error = ref<any[]>([])
-
-const { focused } = useFocusWithin(target)
 
 watchEffect(() => {
   _value.value = props?.value //
@@ -75,15 +72,4 @@ const handleCancel = () => {
   visible.value = false
   _value.value = ''
 }
-
-watch(
-  focused,
-  (v) => {
-    designer.focused.value = v
-  },
-  {
-    immediate: true,
-    deep: true,
-  },
-)
 </script>

@@ -7,6 +7,8 @@
           'tabs-item',
           'card',
           'card-item',
+          'title',
+          'title-item',
           'table-item',
           'grid-item',
           'space-item',
@@ -35,6 +37,7 @@
         ![
           'grid',
           'card',
+          'title',
           'tabs',
           'collapse',
           'space',
@@ -131,9 +134,9 @@
       </template>
     </template>
     <template v-else>
-      <template v-if="type === 'card'">
+      <template v-if="type === 'card' || type === 'title'">
         <j-form-item
-          label="卡片名称"
+          label="名称"
           :validateFirst="true"
           :name="['componentProps', 'title']"
           :rules="[
@@ -152,7 +155,7 @@
           />
         </j-form-item>
       </template>
-      <template v-if="['card', 'collapse', 'tabs'].includes(type)">
+      <template v-if="['card', 'collapse', 'tabs', 'title'].includes(type)">
         <j-form-item
           label="容器组件"
           :validateFirst="true"
@@ -532,6 +535,7 @@ const descVisible = computed(() => {
     'time-picker',
     'table',
     'card',
+    'title',
     'org',
     'role',
     'user',

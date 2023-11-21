@@ -18,13 +18,6 @@
           </j-collapse>
         </j-form>
       </div>
-      <Rules
-        v-if="visible"
-        :value="_rulesData.value"
-        :type="_rulesData.type"
-        @change="onChange"
-        @close="onBack"
-      />
     </div>
   </Scrollbar>
 </template>
@@ -38,27 +31,17 @@ import {
   watch,
   unref,
   reactive,
-  provide,
 } from 'vue'
 import { Scrollbar } from 'jetlinks-ui-components'
+import Page from './components/Page.vue'
 import Base from './components/Base.vue'
 import Status from './components/Status.vue'
-import Source from './components/Source.vue'
-import SourceForm from './components/SourceForm.vue'
-import Form from './components/Form.vue'
-import Grid from './components/Grid.vue'
-import Config from './components/Config.vue'
-import Table from './components/Table.vue'
-import TableSource from './components/TableSource.vue'
+import { useTarget } from '../../../hooks'
 import { map } from 'lodash-es'
 import { getConfigList } from './utils'
-import { useTarget } from '../../../hooks'
-import { updateData } from '../../../utils/utils'
-import { useFocusWithin } from '@vueuse/core'
-import Rules from './components/Rules/Rules.vue'
+import { updateData } from '@/components/PageDesigner/utils/utils'
 
 const formRef = ref<any>()
-const { focused } = useFocusWithin(formRef)
 
 const { target } = useTarget()
 const formState = reactive({ ...unref(target) })
@@ -68,28 +51,15 @@ const designer: any = inject('FormDesigner')
 const _type = computed(() => {
   return target?.value?.type || 'root'
 })
-const visible = ref<boolean>(false)
-
-const _rulesData = reactive<any>({
-  value: {},
-  type: 'root',
-  index: 0
-})
 
 const Panels = {
-  Form,
+  Page,
   Base,
-  Config,
-  Status,
-  Source,
-  Grid,
-  SourceForm,
-  Table,
-  TableSource
+  Status
 }
 
 const panelsList = computed(() => {
-  return getConfigList(_type.value, target.value, designer?.type)
+  return getConfigList(_type.value)
 })
 
 const activeKey = ref<string[]>(map(panelsList.value, 'key'))
@@ -98,28 +68,17 @@ watchEffect(() => {
   activeKey.value = map(panelsList.value, 'key')
 })
 
-const onSave = () => {
-  formRef.value
-    ?.validateFields()
-    .then((values) => {
-      // console.log('Received values of form: ', values)
-    })
-    .catch((info) => {
-      console.error('Validate Failed:', info)
-    })
-}
-
 const onRefresh = (obj: any) => {
   if (obj?.key) {
     if (obj.key === 'root') {
-      designer.formData.value = {
+      designer.pageData.value = {
         ...obj,
-        children: designer.formData.value?.children || [],
+        children: designer.pageData.value?.children || [],
       }
     } else {
-      const arr = updateData(unref(designer.formData)?.children, obj)
-      designer.formData.value = {
-        ...designer.formData.value,
+      const arr = updateData(unref(designer.pageData)?.children, obj)
+      designer.pageData.value = {
+        ...designer.pageData.value,
         children: arr,
       }
       designer.setSelection(obj)
@@ -127,65 +86,16 @@ const onRefresh = (obj: any) => {
   }
 }
 
-const onChange = (_data: any) => {
-  _rulesData.value = _data
-}
-
-provide('__rules', {
-  visible,
-  data: _rulesData,
-})
-
-watch(
-  () => designer.errorKey?.value,
-  (newValue) => {
-    if (unref(newValue)?.length) {
-      onSave()
-    }
-  },
-  {
-    immediate: true,
-    deep: true,
-  },
-)
-
-watch(
-  () => target.value?.key,
-  () => {
-    visible.value = false
-  }
-)
-
 watch(
   () => target.value,
   (newVal) => {
     Object.assign(formState, newVal)
-    if (unref(designer.errorKey)?.length) {
-      setTimeout(() => {
-        onSave()
-      })
-    }
   },
   {
     immediate: true,
     deep: true,
   },
 )
-
-watch(
-  () => focused.value,
-  (newValue) => {
-    designer.focused.value = newValue
-  },
-  {
-    immediate: true,
-    deep: true,
-  },
-)
-
-const onBack = () => {
-  visible.value = false
-}
 </script>
 
 <style lang="less" scoped>

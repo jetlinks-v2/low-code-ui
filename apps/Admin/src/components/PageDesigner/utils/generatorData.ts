@@ -5,15 +5,18 @@ const handleProps = (node: any) => {
     if (!result?.style) {
         result.style = {}
     }
-    // if (!result?.cssCode) {
-    //     result.cssCode = ''
-    // }
-    // if (!result?.onChange) {
-    //     result.onChange = ''
-    // }
-    // if (!result?.disabled) {
-    //     result.disabled = false
-    // }
+    if (!result?.cssCode) {
+        result.cssCode = ''
+    }
+    if (!result?.onChange) {
+        result.onChange = ''
+    }
+    if (!result?.onCreated) {
+        result.onCreated = ''
+    }
+    if (!result?.onMounted) {
+        result.onMounted = ''
+    }
     return result
 }
 

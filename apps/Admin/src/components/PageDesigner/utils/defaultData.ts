@@ -6,23 +6,23 @@ export const basic: ISchema[] = [
         type: 'input',
         name: '文本框',
     },
+    {
+        type: 'button',
+        name: '按钮',
+        componentProps: {
+            text: '按钮'
+        },
+    },
+    {
+        type: 'tag',
+        name: '标签',
+        componentProps: {
+            text: '标签'
+        },
+    },
 ]
 
 export const layout: ISchema[] = [
-    {
-        type: 'card',
-        name: '卡片',
-        componentProps: {
-            title: 'Title',
-            extra: ''
-        },
-        children: [
-            {
-                type: 'card-item',
-                children: [],
-            },
-        ]
-    },
     {
         type: 'steps',
         name: '步骤条',
@@ -40,6 +40,13 @@ export const layout: ISchema[] = [
                 children: [],
                 componentProps: {
                     title:'标题2'
+                },
+            },
+            {
+                type: 'steps-item',
+                children: [],
+                componentProps: {
+                    title:'标题3'
                 },
             },
         ]
@@ -93,6 +100,44 @@ export const layout: ISchema[] = [
     },
 ]
 
+export const _function: ISchema[] = [
+    {
+        type: 'search',
+        name: '搜索框',
+        componentProps: {
+            columns: [
+                {
+                    title: '搜索项1',
+                    dataIndex: 'id1',
+                    key: 'id1',
+                    search: {
+                        type: 'string',
+                        defaultTermType: 'eq',
+                    },
+                },
+                {
+                    title: '搜索项2',
+                    dataIndex: 'id2',
+                    key: 'id2',
+                    search: {
+                        type: 'string',
+                        defaultTermType: 'eq',
+                    },
+                },
+                {
+                    title: '搜索项3',
+                    dataIndex: 'id3',
+                    key: 'id3',
+                    search: {
+                        type: 'string',
+                        defaultTermType: 'eq',
+                    },
+                },
+            ]
+        },
+    },
+]
+
 export const filedData = [
     {
         id: 'basic',
@@ -103,5 +148,10 @@ export const filedData = [
         id: 'layout',
         name: '布局组件',
         children: [...layout]
+    },
+    {
+        id: '_function',
+        name: '功能组件',
+        children: [..._function]
     },
 ]
