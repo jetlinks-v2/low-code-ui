@@ -163,7 +163,7 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
   //   meta: {
   //     title: '页面设计器',
   //   },
-  //   component: () => import('@/views/components/PageDesigner/index.vue'),
+  //   component: () => import('@LowCode/views/components/PageDesigner/index.vue'),
   // },
 ]
 

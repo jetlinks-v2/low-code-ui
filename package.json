@@ -35,7 +35,8 @@
     "vite-plugin-progress": "^0.0.7",
     "vue": "^3.3.4",
     "vue-cropper": "^1.0.9",
-    "vue-router": "^4.2.2"
+    "vue-router": "^4.2.2",
+    "vuedraggable": "^2.24.3"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.11",

@@ -1,4 +1,4 @@
-import { extractCssClass, insertCustomCssToHead } from "@/components/PageDesigner/utils/utils"
+import { extractCssClass, insertCustomCssToHead } from "@LowCode/components/PageDesigner/utils/utils"
 import DraggableLayout from "../../Draggable/DraggableLayout"
 import './index.less'
 

@@ -22,7 +22,7 @@
 
 <script lang="ts" setup>
 import { ref, watchEffect, inject } from 'vue'
-import { onlyMessage } from '@jetlinks/utils'
+import { onlyMessage } from '@jetlinks-web/utils'
 
 const designer: any = inject('FormDesigner')
 

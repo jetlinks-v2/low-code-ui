@@ -21,7 +21,7 @@
     </div>
   </Scrollbar>
 </template>
-  
+
 <script lang="ts" setup>
 import {
   ref,
@@ -39,7 +39,7 @@ import Status from './components/Status.vue'
 import { useTarget } from '../../../hooks'
 import { map } from 'lodash-es'
 import { getConfigList } from './utils'
-import { updateData } from '@/components/PageDesigner/utils/utils'
+import { updateData } from '@LowCode/components/PageDesigner/utils/utils'
 
 const formRef = ref<any>()
 

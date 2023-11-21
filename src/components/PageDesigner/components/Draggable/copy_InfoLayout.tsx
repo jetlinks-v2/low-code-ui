@@ -1,6 +1,6 @@
 import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
-import TitleComponent from '@/components/TitleComponent/index.vue'
+import TitleComponent from '@LowCode/components/TitleComponent/index.vue'
 import './index.less'
 import { withModifiers } from 'vue'
 import { useTool } from '../../hooks'

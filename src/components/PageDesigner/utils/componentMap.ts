@@ -1,5 +1,5 @@
 import { Input } from 'jetlinks-ui-components'
-import Search from '@/components/Search/Search.vue'
+import Search from '@LowCode/components/Search/Search.vue'
 import { Button, Tag } from '../components/BaseComponent/index'
 
 const componentMap = {
