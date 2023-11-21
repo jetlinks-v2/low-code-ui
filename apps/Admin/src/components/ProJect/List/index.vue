@@ -2,7 +2,7 @@
 <template>
   <div>
     <div class="title">
-      <a-radio-group v-model:value="viewType" @change="handleSorts">
+      <a-radio-group v-model:value="viewType" @change="handleSorts" :disabled="loading">
         <a-radio-button value="table">
           <AIcon type="UnorderedListOutlined" />
         </a-radio-button>
@@ -18,43 +18,29 @@
         <j-select-option value="modifyTime">修改日期</j-select-option>
       </j-select>
     </div>
-    <div class="content" v-if="viewType === 'card'">
-      <ContextMenu type="empty" @select="handleChange" @show="onShow">
-        <j-scrollbar>
-          <a-row>
-            <a-col :span="3" v-for="item in list" class="content-col">
-              <div @click="onClick(item.id)" @dblclick="onDbClick(item)" class="content-item">
-                <ContextMenu type="list" :data="item" @select="handleChange">
-                  <div :class="{
-                    'box': true,
-                    'active': selectKey === item.id
-                  }">
-                    <div class="box-img">
-                      <img :src="typeImages[item.type]">
+    <j-spin :spinning="loading">
+      <div class="content" v-if="viewType === 'card'">
+        <ContextMenu type="empty" @select="handleChange" @show="onShow">
+          <j-scrollbar>
+            <a-row>
+              <a-col :span="3" v-for="item in list" class="content-col">
+                <div @click="onClick(item.id)" @dblclick="onDbClick(item)" class="content-item">
+                  <ContextMenu type="list" :data="item" @select="handleChange">
+                    <div :class="{
+                      'box': true,
+                      'active': selectKey === item.id
+                    }">
+                      <div class="box-img">
+                        <img :src="typeImages[item.type]">
+                      </div>
+                      <j-ellipsis style="max-width: 100px" placement="leftTop">{{ item.name }}</j-ellipsis>
                     </div>
-                    <j-ellipsis style="max-width: 100px" placement="leftTop">{{ item.name }}</j-ellipsis>
-                  </div>
-                </ContextMenu>
-              </div>
-            </a-col>
-          </a-row>
-        </j-scrollbar>
-      </ContextMenu>
-      <!-- <a-drawer title="添加项目说明" :closable="false" :visible="showMenu" :style="{ position: 'absolute' }" :getContainer="false"
-        @close="showMenu = false" :mask="false">
-        <div class="drawer" v-for="items in projectList">
-          <div class="drawer-title">{{ items.title }}</div>
-          <div class="drawer-items" v-for="item in items.children">
-            <div class="items-img">
-              <img :src="item.img">
-            </div>
-            <div class="items-text">
-              <div class="text">{{ providerMap[item.type] }}</div>
-              <span>{{ item.text }}</span>
-            </div>
-          </div>
-        </div>
-      </a-drawer> -->
+                  </ContextMenu>
+                </div>
+              </a-col>
+            </a-row>
+          </j-scrollbar>
+        </ContextMenu>
     </div>
 
     <div v-else>
@@ -80,6 +66,8 @@
       </div>
 
     </div>
+    </j-spin>
+   
     <FileDrawer v-if="visibleFile" @close="visibleFile = false" :data="current" />
   </div>
 
@@ -126,6 +114,7 @@ const list = ref<any>([])
 const nameList = ref<any>([])
 const sorts = ref<any>('default')
 const showMenu = ref(false)
+const loading = ref(false)
 
 const viewType = ref<string>('card')
 const menuData = reactive({
@@ -275,6 +264,7 @@ const onDbClick = (data: any) => {
 //排序方式-table切换
 const handleSorts = () => {
   const data = product.getById(engine.activeFile)
+  loading.value = true
   product.update({
     ...data,
     others: {
@@ -282,6 +272,8 @@ const handleSorts = () => {
       sorts: sorts.value,
       viewType: viewType.value
     }
+  },()=>{
+    loading.value = false
   })
 }
 
