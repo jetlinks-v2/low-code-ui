@@ -6,6 +6,7 @@ import './index.less';
 import componentMap from '../../utils/componentMap';
 import StepsLayout from './StepsLayout';
 import InfoLayout from './InfoLayout';
+import Info from './copy_InfoLayout'
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -40,7 +41,9 @@ const DraggableLayout = defineComponent({
                     case 'steps':
                         return (<StepsLayout data={element} parent={props.data}></StepsLayout>)
                     case 'info':
-                        return (<InfoLayout data={element} parent={props.data}></InfoLayout>)
+                        return (<Info data={element} parent={props.data}></Info>)
+                    // case 'info':
+                    //     return (<InfoLayout data={element} parent={props.data}></InfoLayout>)
                     default:
                         return <Selection data={element} parent={props.data} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                             <TypeComponent {...element.componentProps} />
