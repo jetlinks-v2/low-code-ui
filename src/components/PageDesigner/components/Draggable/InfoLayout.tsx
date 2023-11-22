@@ -23,8 +23,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const designer: any = inject('FormDesigner')
-        const { isEditModel, isDragArea } = useTool()
+        const { isEditModel, isDragArea, onAddChild } = useTool()
 
         const list = computed(() => {
             return props.data?.children || []
@@ -40,7 +39,7 @@ export default defineComponent({
                     column: 3
                 },
             })
-            designer.onAddChild(_item, props.data)
+            onAddChild(_item, props.data)
         }
 
         const handleAddItem = (item: any) => {
@@ -53,7 +52,7 @@ export default defineComponent({
                     span: 1
                 },
             })
-            designer.onAddChild(_item, item)
+            onAddChild(_item, item)
         }
 
         const handleBorder = (column: any, span: number, index: Number) => {

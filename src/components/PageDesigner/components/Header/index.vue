@@ -21,28 +21,23 @@
 </template>
   
 <script lang="ts" setup>
-import { cloneDeep } from 'lodash-es'
-import { inject, computed, unref } from 'vue'
-
-const designer: any = inject('FormDesigner')
+import { useTool } from "../../hooks";
 
 const props = defineProps({
   data: {
     type: Object,
     default: () => {},
   },
-})
+});
 
-const emits = defineEmits(['back'])
+const { isEditModel, setSelection, setModel } = useTool();
 
-const isEditModel = computed(() => {
-  return unref(designer?.model) === 'edit'
-})
+const emits = defineEmits(["back"]);
 
-const onPreview = (_type: 'preview' | 'edit') => {
-  designer.setModel(_type)
-  designer.setSelection('root')
-}
+const onPreview = (_type: "preview" | "edit") => {
+  setModel(_type);
+  setSelection("root");
+};
 </script>
   
 <style lang="less" scoped>

@@ -6,6 +6,8 @@ import './index.less';
 import componentMap from '../../utils/componentMap';
 import StepsLayout from './StepsLayout';
 import InfoLayout from './InfoLayout';
+import TimelineLayout from './TimelineLayout';
+import { useTool } from '../../hooks';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -31,7 +33,7 @@ const DraggableLayout = defineComponent({
         },
     },
     setup(props) {
-        const designer: any = inject('FormDesigner')
+        const { _model } = useTool()
 
         const slots = {
             item: ({ element }) => {
@@ -41,6 +43,8 @@ const DraggableLayout = defineComponent({
                         return (<StepsLayout data={element} parent={props.data}></StepsLayout>)
                     case 'info':
                         return (<InfoLayout data={element} parent={props.data}></InfoLayout>)
+                    case 'timeline':
+                        return (<TimelineLayout data={element} parent={props.data}></TimelineLayout>)
                     default:
                         return <Selection data={element} parent={props.data} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                             <TypeComponent {...element.componentProps} />
@@ -82,7 +86,7 @@ const DraggableLayout = defineComponent({
                     tag={props.tag}
                     v-slots={slots}
                     componentData={useAttrs()} // tag的props和event
-                    model={unref(designer.model)}
+                    model={unref(_model)}
                     {...options}
                 />
             )

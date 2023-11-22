@@ -85,6 +85,34 @@ export const layout: ISchema[] = [
             },
         ]
     },
+    {
+        type: 'timeline',
+        name: '时间轴',
+        componentProps: {},
+        children: [
+            {
+                type: 'timeline-item',
+                children: [],
+                componentProps: {
+                    label:'时间轴1'
+                },
+            },
+            {
+                type: 'timeline-item',
+                children: [],
+                componentProps: {
+                    label:'时间轴2'
+                },
+            },
+            {
+                type: 'timeline-item',
+                children: [],
+                componentProps: {
+                    label:'时间轴3'
+                },
+            },
+        ]
+    },
 ]
 
 export const _function: ISchema[] = [

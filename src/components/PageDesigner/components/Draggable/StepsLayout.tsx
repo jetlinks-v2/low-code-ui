@@ -22,8 +22,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const { isDragArea, isEditModel } = useTool()
-        const designer: any = inject('FormDesigner')
+        const { isDragArea, isEditModel, onAddChild } = useTool()
 
         const _data = computed(() => {
             return props.data
@@ -42,7 +41,7 @@ export default defineComponent({
                     title: '标题' + uid(4)
                 },
             })
-            designer.onAddChild(_item, props.data)
+            onAddChild(_item, props.data)
         }
 
         const onPrev = () => {

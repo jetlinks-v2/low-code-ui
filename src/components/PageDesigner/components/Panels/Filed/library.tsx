@@ -1,9 +1,9 @@
 
+import generatorData from '../../../utils/generatorData';
 import { filedData } from '../../../utils/defaultData'
 import DraggableWrap from '../../Draggable/DraggableWrap'
 import { IconWidget } from '../../Icons';
 import './index.less';
-import generatorData from '@LowCode/components/FormDesigner/utils/generatorData';
 import { cloneDeep } from 'lodash-es';
 
 const Library = defineComponent({
