@@ -3,14 +3,20 @@ import { ISchema } from "../typings";
 // 基础组件
 export const basic: ISchema[] = [
     {
-        type: 'input',
-        name: '文本框',
+        type: 'text',
+        name: '文本',
+        componentProps: {
+            value: '文本'
+        },
     },
     {
         type: 'button',
         name: '按钮',
         componentProps: {
-            text: '按钮'
+            text: '按钮',
+            shape: 'default',
+            size: 'middle',
+            type: 'default'
         },
     },
     {

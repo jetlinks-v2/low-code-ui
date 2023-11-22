@@ -24,6 +24,10 @@ const Canvas = defineComponent({
       insertCustomCssToHead(unref(designer.pageData)?.componentProps?.cssCode, 'root')
     })
 
+    const _padding = computed(() => {
+      return unref(designer.pageData)?.componentProps?.padding || 0
+    })
+
     return () => {
       return (
         <div
@@ -40,6 +44,7 @@ const Canvas = defineComponent({
             style={{
               height: '100%',
               width: '100%',
+              padding: `0 ${_padding.value}px`
             }}
             data={designer.pageData.value?.children || []}
             parent={designer.pageData.value}

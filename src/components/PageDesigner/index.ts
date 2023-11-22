@@ -1,7 +1,7 @@
-import FormPreview from './preview.vue'
-import FormDesigner from './index.vue'
+import PagePreview from './preview.vue'
+import PageDesigner from './index.vue'
 
 export {
-    FormPreview,
-    FormDesigner
+    PagePreview,
+    PageDesigner
 }
