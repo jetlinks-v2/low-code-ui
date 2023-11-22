@@ -226,11 +226,97 @@
         />
       </j-form-item>
     </template>
+    <template v-if="['info'].includes(target.type)"> info </template>
+    <template v-if="['info-item'].includes(target.type)">
+      <j-form-item
+        label="标题"
+        :name="['componentProps', 'title']"
+        required
+        :validateFirst="true"
+      >
+        <j-input
+          placeholder="请输入"
+          @change="onDataChange"
+          :maxlength="32"
+          v-model:value="target.componentProps.title"
+        />
+      </j-form-item>
+      <j-form-item
+        label="是否展示边框"
+        :validateFirst="true"
+        :name="['componentProps', 'bordered']"
+        required
+      >
+        <j-switch
+          v-model:checked="target.componentProps.bordered"
+          @change="onDataChange"
+        />
+      </j-form-item>
+      <j-form-item
+        label="一行的数量"
+        :name="['componentProps', 'column']"
+        required
+        :validateFirst="true"
+      >
+        <j-input-number
+          placeholder="请输入"
+          @change="onDataChange"
+          style="width: 100%"
+          :precision="0"
+          :min="1"
+          v-model:value="target.componentProps.column"
+        />
+      </j-form-item>
+    </template>
+    <template v-if="['info-item-item'].includes(target.type)">
+      <j-form-item
+        label="内容的描述"
+        :name="['componentProps', 'label']"
+        required
+        :validateFirst="true"
+      >
+        <j-input
+          placeholder="请输入"
+          @change="onDataChange"
+          :maxlength="32"
+          v-model:value="target.componentProps.label"
+        />
+      </j-form-item>
+      <j-form-item
+        label="包含列的数量"
+        :name="['componentProps', 'span']"
+        required
+        :validateFirst="true"
+      >
+        <j-input-number
+          placeholder="请输入"
+          @change="onDataChange"
+          style="width: 100%"
+          :precision="0"
+          :min="1"
+          v-model:value="target.componentProps.span"
+        />
+      </j-form-item>
+    </template>
+    <template v-if="['search'].includes(target.type)">
+      <j-form-item
+        label="搜索项"
+        :name="['componentProps', 'columns']"
+        required
+        :validateFirst="true"
+      >
+        <Search
+          @change="onDataChange"
+          v-model:value="target.componentProps.columns"
+        />
+      </j-form-item>
+    </template>
   </div>
 </template>
 
 <script lang="ts" setup>
 import Icon from "./Icon/index.vue";
+import Search from "./Search/index.vue";
 import { ColorPicker } from "jetlinks-ui-components";
 import { useTarget } from "../../../../hooks";
 

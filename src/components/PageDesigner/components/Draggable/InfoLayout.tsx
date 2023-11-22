@@ -6,6 +6,7 @@ import { withModifiers } from 'vue'
 import { useTool } from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import { uid } from '../../utils/uid'
+import { Row, Col } from 'jetlinks-ui-components'
 
 export default defineComponent({
     name: 'InfoLayout',
@@ -32,18 +33,11 @@ export default defineComponent({
         const handleAdd = () => {
             const _item = generatorData({
                 type: props.data?.type + '-item',
-                children: [
-                    {
-                        type: 'info-item-item',
-                        children: [],
-                        componentProps: {
-                            label: '标题1',
-                            value: '123'
-                        },
-                    },
-                ],
+                children: [],
                 componentProps: {
-                    title: '标题' + uid(4)
+                    title: '标题' + uid(4),
+                    bordered: true,
+                    column: 3
                 },
             })
             designer.onAddChild(_item, props.data)
@@ -54,14 +48,37 @@ export default defineComponent({
                 type: item?.type + '-item',
                 children: [],
                 componentProps: {
-                    label: '标题' + uid(4),
-                    value: '123'
+                    label: '标题item_' + uid(4),
+                    value: '123',
+                    span: 1
                 },
             })
             designer.onAddChild(_item, item)
         }
 
-        const a = () => {
+        const handleBorder = (column: any, span: number, index: Number) => {
+            const first = column - span
+            if (index <= first) {
+                return {
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '1px',
+                    borderTop: '#e5e5e5 solid 1px',
+                    borderRight: '#e5e5e5 solid 1px',
+                    borderBottom: '#e5e5e5 solid 1px'
+                }
+            } else {
+                return {
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '1px',
+                    borderRight: '#e5e5e5 solid 1px',
+                    borderBottom: '#e5e5e5 solid 1px'
+                }
+            }
+        }
+
+        const emptyRender = () => {
             if (unref(isEditModel)) {
                 return <div class="draggable-empty">描述列表</div>
             } else {
@@ -69,23 +86,18 @@ export default defineComponent({
             }
         }
 
-        const labelRender = (item, i) => {
-            return <Selection
-                class={unref(isDragArea) && 'drag-area'}
-                data={i}
-                tag="div"
-                hasCopy={true}
-                hasDel={true}
-                parent={item?.children || []}
-                style={{
-                    padding: '20px 10px'
-                }}
-            >{i.componentProps?.label}</Selection>
+        const borderStyle = () => {
+            return {
+                backgroundColor: '#fafafa',
+                padding: '16px 24px',
+                minWidth: '40%',
+                borderRight: '#e5e5e5 solid 1px'
+            }
         }
 
         const infoRender = () => {
             if (unref(list).length) {
-                return unref(list).map(item => {
+                return unref(list).map((item: any) => {
                     return <Selection
                         class={unref(isDragArea) && 'drag-area'}
                         data={item}
@@ -98,29 +110,39 @@ export default defineComponent({
                         }}
                     >
                         <div><TitleComponent data={item?.componentProps?.title} /></div>
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: `repeat(3, 1fr)`,
-                        }}>
-                            {
-                                item.children.map(i => {
-                                    return <Selection
-                                        class={unref(isDragArea) && 'drag-area'}
-                                        data={i}
-                                        tag="div"
-                                        hasCopy={true}
-                                        hasDel={true}
-                                        parent={item.children}
-                                        style={{
-                                            display: 'flex'
-                                        }}
-                                    >
-                                        <div style={{backgroundColor: '#fafafa', padding: '16px 24px',}}>{i.componentProps?.label}</div>
-                                        <div>{i.componentProps?.value}</div>
-                                    </Selection>
-                                })
-                            }
-                        </div>
+                        {
+                            item.children?.length ? <Row style={{
+                                borderLeft: item?.componentProps?.bordered ? '#e5e5e5 solid 1px' : 'none'
+                            }}>
+                                {
+                                    item.children.map((i: any, index: number) => {
+                                        return <Col span={24 / item?.componentProps?.column * i?.componentProps?.span} >
+                                            <Selection
+                                                class={unref(isDragArea) && 'drag-area'}
+                                                data={i}
+                                                tag="div"
+                                                hasCopy={true}
+                                                hasDel={true}
+                                                parent={item.children}
+                                                style={item?.componentProps?.bordered ? handleBorder(item?.componentProps?.column, i?.componentProps?.span, index) : {
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                }}
+                                            >
+                                                <div
+                                                    style={item?.componentProps?.bordered ? borderStyle() : { padding: '16px 24px', }}
+                                                    class={!item?.componentProps?.bordered && "info-label"}
+                                                >
+                                                    {i.componentProps?.label}
+                                                </div>
+                                                <div style={{ padding: '0 12px' }}>{i.componentProps?.value}</div>
+                                            </Selection>
+                                        </Col>
+                                    })
+                                }
+                            </Row>
+                                : emptyRender()
+                        }
                         {
                             unref(isEditModel) &&
                             <div class="draggable-add">
@@ -129,6 +151,8 @@ export default defineComponent({
                         }
                     </Selection>
                 })
+            } else {
+                return emptyRender()
             }
         }
 
