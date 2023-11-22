@@ -1,5 +1,12 @@
 <template>
-  <j-input v-model:value="_value" :placeholder="placeholder" @change="valueChange"></j-input>
+  <j-input v-bind=props   v-model:value="_value"   @change="valueChange" :prefix="prefix.text" :suffix="suffix.text">
+    <template #prefix v-if="prefix.icon">
+        <AIcon :type="prefix.icon"></AIcon>
+    </template>
+    <template #suffix  v-if="suffix.icon">
+        <AIcon :type="suffix.icon"></AIcon>
+    </template>
+  </j-input>
 </template>
 
 <script lang="ts" setup>
@@ -9,6 +16,28 @@ const props = defineProps({
         default:''
     },
     placeholder:{
+        type:String,
+        default:''
+    },
+    prefix:{
+        type:Object,
+        default:{
+            icon:'',
+            text:''
+        }
+    },
+    suffix:{
+        type:Object,
+        default:{
+            icon:'',
+            text:''
+        }
+    },
+    addonBefore:{
+        type:String,
+        default:''
+    },
+    addonAfter:{
         type:String,
         default:''
     }
@@ -26,4 +55,9 @@ watch(()=>props.value,(val)=>{
 })
 </script>
 <style lang="less" scoped>
+:deep(.ant-input-group-addon){
+    border: none;
+    background-color: #fff;
+}
+
 </style>
