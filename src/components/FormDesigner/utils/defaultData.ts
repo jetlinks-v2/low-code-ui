@@ -10,7 +10,15 @@ export const basic: ISchema[] = [
         type: 'text',
         name: '文本',
         componentProps: {
-            value: '文本'
+            value: '文本',
+            prefix:{
+                type:'',
+                text:''
+            },
+            suffix:{
+                type:'',
+                text:''
+            }
         },
     },
     {

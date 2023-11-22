@@ -369,6 +369,38 @@
         />
       </j-form-item>
     </template>
+    <template
+      v-if="
+        [
+          'input',
+        ].includes(type)
+      "
+    >
+      <j-form-item
+        :validateFirst="true"
+        label="前标签"
+        :name="['componentProps', 'addonBefore']"
+      >
+        <j-input
+          placeholder="请输入"
+          v-model:value="target.componentProps.addonBefore"
+          :maxlength="10"
+          @change="onDataChange"
+        />
+      </j-form-item>
+      <j-form-item
+        :validateFirst="true"
+        label="后标签"
+        :name="['componentProps', 'addonAfter']"
+      >
+        <j-input
+          placeholder="请输入"
+          v-model:value="target.componentProps.addonAfter"
+          :maxlength="10"
+          @change="onDataChange"
+        />
+      </j-form-item>
+    </template>
     <!-- 规则校验 -->
     <template v-if="rulesVisible">
       <j-form-item

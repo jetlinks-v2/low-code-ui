@@ -1,10 +1,10 @@
 <template>
-  <j-input v-bind=props   v-model:value="_value"   @change="valueChange" :prefix="prefix.text" :suffix="suffix.text">
-    <template #prefix v-if="prefix.icon">
-        <AIcon :type="prefix.icon"></AIcon>
+  <j-input v-bind=props   v-model:value="_value"   @change="valueChange" :prefix="prefix.type === 'string' ? prefix.content : ''" :suffix="suffix.type === 'string' ? suffix.content : ''">
+    <template #prefix v-if="prefix.type === 'icon'">
+        <AIcon :type="prefix.content"></AIcon>
     </template>
-    <template #suffix  v-if="suffix.icon">
-        <AIcon :type="suffix.icon"></AIcon>
+    <template #suffix  v-if="suffix.type === 'icon'">
+        <AIcon :type="suffix.content"></AIcon>
     </template>
   </j-input>
 </template>
@@ -15,6 +15,13 @@ const props = defineProps({
         type:String,
         default:''
     },
+    disabled:{
+        type:Boolean,
+        default:false
+    },
+    maxlength:{
+        type:Number,
+    },
     placeholder:{
         type:String,
         default:''
@@ -22,15 +29,15 @@ const props = defineProps({
     prefix:{
         type:Object,
         default:{
-            icon:'',
-            text:''
+            type:'',
+            content:''
         }
     },
     suffix:{
         type:Object,
         default:{
-            icon:'',
-            text:''
+            type:'',
+            content:''
         }
     },
     addonBefore:{
