@@ -87,7 +87,28 @@ export default defineComponent({
             >{i.componentProps?.label}</Selection>
         }
 
-
+        const handleBorder = (column, span, index) => {
+            const first = column - span
+            if (index <= first) {
+                return {
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '1px',
+                    borderTop: '#e5e5e5 solid 1px',
+                    borderRight: '#e5e5e5 solid 1px',
+                    borderBottom: '#e5e5e5 solid 1px'
+                } 
+            } else {
+                return {
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '1px',
+                    // borderTop: '#e5e5e5 solid 1px',
+                    borderRight: '#e5e5e5 solid 1px',
+                    borderBottom: '#e5e5e5 solid 1px'
+                }
+            }
+        }
 
         const infoRender = () => {
             if (unref(list).length) {
@@ -109,7 +130,7 @@ export default defineComponent({
                                 borderLeft: '#e5e5e5 solid 1px'
                             }}>
                                 {
-                                    item.children.map(i => {
+                                    item.children.map((i, index) => {
                                         return <Col span={24 / item?.componentProps?.column * i?.componentProps?.span} >
                                             <Selection
                                                 class={unref(isDragArea) && 'drag-area'}
@@ -118,14 +139,7 @@ export default defineComponent({
                                                 hasCopy={true}
                                                 hasDel={true}
                                                 parent={item.children}
-                                                style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    padding: '1px',
-                                                    borderTop: '#e5e5e5 solid 1px',
-                                                    borderRight: '#e5e5e5 solid 1px',
-                                                    borderBottom: '#e5e5e5 solid 1px'
-                                                }}
+                                                style={handleBorder(item?.componentProps?.column, i?.componentProps?.span, index) }
                                             >
                                                 <div style={{
                                                     backgroundColor: '#fafafa',

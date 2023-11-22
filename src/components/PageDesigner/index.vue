@@ -24,7 +24,9 @@ import { Modal } from 'jetlinks-ui-components'
 const initData = {
   type: 'root',
   key: 'root',
-  componentProps: {},
+  componentProps: {
+    padding: 0
+  },
   children: [],
 }
 
