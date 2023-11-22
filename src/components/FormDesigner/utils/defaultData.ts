@@ -5,12 +5,7 @@ export const basic: ISchema[] = [
     {
         type: 'input',
         name: '文本框',
-    },
-    {
-        type: 'text',
-        name: '文本',
-        componentProps: {
-            value: '文本',
+        componentProps:{
             prefix:{
                 type:'',
                 text:''
@@ -19,6 +14,13 @@ export const basic: ISchema[] = [
                 type:'',
                 text:''
             }
+        }
+    },
+    {
+        type: 'text',
+        name: '文本',
+        componentProps: {
+            value: '文本',
         },
     },
     {
