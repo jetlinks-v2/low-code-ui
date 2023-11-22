@@ -1,6 +1,7 @@
 import { extractCssClass, insertCustomCssToHead } from "@LowCode/components/PageDesigner/utils/utils"
 import DraggableLayout from "../../Draggable/DraggableLayout"
 import './index.less'
+import {PageProvider} from "../../../core";
 
 const Canvas = defineComponent({
   name: 'Canvas',
@@ -26,26 +27,28 @@ const Canvas = defineComponent({
 
     return () => {
       return (
-        <div
-          onClick={() => {
-            if (unref(isEditModel)) {
-              handleClick()
-            }
-          }}
-          data-id="root"
-          class={['subject', ...unref(cssClassList)]}
-        >
-          <DraggableLayout
-            data-layout-type={'root'}
-            style={{
-              height: '100%',
-              width: '100%',
-            }}
-            data={designer.pageData.value?.children || []}
-            parent={designer.pageData.value}
-            isRoot
-          ></DraggableLayout>
-        </div>
+          <PageProvider>
+            <div
+              onClick={() => {
+                if (unref(isEditModel)) {
+                  handleClick()
+                }
+              }}
+              data-id="root"
+              class={['subject', ...unref(cssClassList)]}
+            >
+              <DraggableLayout
+                data-layout-type={'root'}
+                style={{
+                  height: '100%',
+                  width: '100%',
+                }}
+                data={designer.pageData.value?.children || []}
+                parent={designer.pageData.value}
+                isRoot
+              ></DraggableLayout>
+            </div>
+          </PageProvider>
       )
     }
   }
