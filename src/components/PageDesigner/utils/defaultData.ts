@@ -161,7 +161,10 @@ export const _function: ISchema[] = [
                 { name: 'John Brown', age: 14, address: 'New York No. 1 Lake Park'},
                 { name: 'Jim Green', age: 32, address: 'London No. 1 Lake Park'},
                 { name: 'Joe Black', age: 45, address: 'Sidney No. 1 Lake Park'},
-            ]
+            ],
+            pagination: {
+                open: true
+            },
         }
     }
 ]

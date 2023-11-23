@@ -311,6 +311,43 @@
         />
       </j-form-item>
     </template>
+    <template v-if="['proTable'].includes(target.type)">
+      <j-form-item
+          label="表格列"
+          :name="['componentProps', 'columns']"
+          required
+          :validateFirst="true"
+      >
+        <Search
+            @change="onDataChange"
+            type="table"
+            v-model:value="target.componentProps.columns"
+        />
+      </j-form-item>
+      <j-form-item
+          label="数据源"
+          :name="['componentProps', 'request']"
+      >
+
+      </j-form-item>
+      <j-form-item
+        label="分页器"
+      >
+        <j-switch v-model:checked="target.componentProps.pagination.open" />
+      </j-form-item>
+      <j-form-item
+        label="展示格式"
+        :name="['componentProps', 'viewType']"
+      >
+
+      </j-form-item>
+      <j-form-item
+          label="操作列"
+          :name="['componentProps', 'action']"
+      >
+
+      </j-form-item>
+    </template>
   </div>
 </template>
 
