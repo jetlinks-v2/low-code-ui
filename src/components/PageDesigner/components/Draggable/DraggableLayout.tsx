@@ -1,13 +1,11 @@
 
 import { isEmpty } from 'lodash-es';
 import DraggableWrap from './DragGableWrap'
-import Selection from '../Selection'
 import './index.less';
-import componentMap from '../../utils/componentMap';
 import StepsLayout from './StepsLayout';
 import InfoLayout from './InfoLayout';
 import TimelineLayout from './TimelineLayout';
-import { useProps, useTool } from '../../hooks';
+import { useTool } from '../../hooks';
 import ProTableLayout from './ProTableLayout'
 import CommonLayout from './CommonLayout';
 
