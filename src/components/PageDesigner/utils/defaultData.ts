@@ -135,6 +135,10 @@ export const _function: ISchema[] = [
         type: 'proTable',
         name: '表格',
         componentProps: {
+            request: {
+                query: '',
+                handleResult: ''
+            },
             columns: [
                 {
                     title: 'Name',
@@ -148,10 +152,6 @@ export const _function: ISchema[] = [
                     title: 'Address',
                     dataIndex: 'address',
                     scopedSlots: 'address',
-                    render: (slotProps) => {
-                        console.log(slotProps)
-                        return (slotProps['address'] + '123123123123123')
-                    }
                 },
                 {
                     title: 'Action',

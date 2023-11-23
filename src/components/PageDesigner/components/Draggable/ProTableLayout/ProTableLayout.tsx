@@ -35,7 +35,6 @@ export default defineComponent({
         })
 
         const params = computed(() => {
-            console.log('pro-table-layout:params', params)
             return PageProvider.context.params
         })
 
@@ -53,7 +52,11 @@ export default defineComponent({
         })
 
         const headerTitleRender = () => {
-            return (<Button type="dashed" style={{ width: '100px' }}>+</Button>)
+            return (
+                <Selection {...useAttrs()}>
+                    <Button type="dashed" style={{ width: '100px' }}>+</Button>
+                </Selection>
+            )
         }
 
         return () => {

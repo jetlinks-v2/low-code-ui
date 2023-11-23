@@ -9,6 +9,7 @@ import InfoLayout from './InfoLayout';
 import TimelineLayout from './TimelineLayout';
 import { useTool } from '../../hooks';
 import ProTableLayout from './ProTableLayout'
+import SearchLayout from './SearchLayout'
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -48,6 +49,8 @@ const DraggableLayout = defineComponent({
                         return (<TimelineLayout data={element} parent={props.data}></TimelineLayout>)
                     case 'proTable':
                         return (<ProTableLayout data={element} parent={props.data} />)
+                    case 'search':
+                        return (<SearchLayout data={element} parent={props.data} />)
                     default:
                         return <Selection data={element} parent={props.data} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                             <TypeComponent {...element.componentProps} />

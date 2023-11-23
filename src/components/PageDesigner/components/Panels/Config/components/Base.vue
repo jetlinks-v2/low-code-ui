@@ -328,7 +328,7 @@
           label="数据源"
           :name="['componentProps', 'request']"
       >
-
+        <DataSource v-model:value="target.componentProps.request" />
       </j-form-item>
       <j-form-item
         label="分页器"
@@ -356,6 +356,7 @@ import Icon from "./Icon/index.vue";
 import Search from "./Search/index.vue";
 import { ColorPicker } from "jetlinks-ui-components";
 import { useTarget } from "../../../../hooks";
+import { DataSource } from './ProTable'
 
 const { target } = useTarget();
 
