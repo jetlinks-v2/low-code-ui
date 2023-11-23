@@ -1,7 +1,7 @@
 import { isHTMLTag } from '@vue/shared'
 import { withModifiers } from 'vue'
 import './index.less'
-import { AIcon } from 'jetlinks-ui-components'
+import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import { useTool } from '../../hooks'
 
 const Selection = defineComponent({
@@ -40,10 +40,10 @@ const Selection = defineComponent({
   },
   setup(props, { slots }) {
     const designer: any = inject('PageDesigner')
-    const { isEditModel, onPaste, onDelete, setSelection } = useTool()
+    const { isEditModel, onPaste, onDelete, setSelection, onCopy, onShear } = useTool()
 
     const Selected = computed(() => {
-      const flag = designer.selected.value.find(item => props?.data?.key === item.key)
+      const flag = designer.selected.value.find((item: any) => props?.data?.key === item.key)
       return props?.data?.key !== undefined && flag
     })
 
@@ -57,14 +57,35 @@ const Selection = defineComponent({
 
     const _hasDrag = computed(() => { return props.hasDrag })
 
-    // 粘贴
-    const _onPaste = () => {
-      onPaste()
+    const editNode = () => {
+      return <Dropdown
+        trigger={['contextmenu']}
+        onContextmenu={withModifiers(() => {
+          const flag = designer.selected.value.find((item: any) => item.key === props.data.key)
+          if (!flag) {
+            setSelection(props.data)
+          }
+        }, ['stop'])}
+        v-slots={{
+          overlay: () => {
+            return (
+              <Menu>
+                <MenuItem key="copy"><Button type="link" onClick={() => { onCopy() }}>复制</Button></MenuItem>
+                {!!designer.copyData.value?.length && <MenuItem key="paste"><Button type="link" onClick={onPaste}>粘贴</Button></MenuItem>}
+                <MenuItem key="shear"><Button type="link" onClick={onShear}>剪切</Button></MenuItem>
+                <MenuItem key="delete"><Button danger type="link" onClick={onDelete}>删除</Button></MenuItem>
+              </Menu>
+            )
+          }
+        }}
+      >
+        <div style={{ position: 'relative' }}>
+          {slots?.default()}
+          {props.hasMask && <div class={['mask']}></div>}
+        </div>
+      </Dropdown>
     }
-    // 删除
-    const _onDelete = () => {
-      onDelete()
-    }
+
     return () => {
       return (
         <TagComponent
@@ -78,7 +99,7 @@ const Selection = defineComponent({
           {...useAttrs()}
           onClick={withModifiers(handleClick, ['stop'])}
         >
-          {slots?.default()}
+          {unref(isEditModel) ? editNode() : slots?.default()}
           {
             unref(isEditModel) && Selected.value && (
               <div class="bottomRight">
@@ -87,7 +108,7 @@ const Selection = defineComponent({
                     <div
                       class="action"
                       onClick={withModifiers(() => {
-                        _onPaste()
+                        onPaste()
                       }, ['stop'])}
                     >
                       <AIcon type="CopyOutlined" />
@@ -98,7 +119,7 @@ const Selection = defineComponent({
                   props.hasDel && (
                     <div
                       class="action"
-                      onClick={withModifiers(() => { _onDelete() }, ['stop'])}
+                      onClick={withModifiers(() => { onDelete() }, ['stop'])}
                     >
                       <AIcon type="DeleteOutlined" />
                     </div>
@@ -107,7 +128,6 @@ const Selection = defineComponent({
               </div>
             )
           }
-          {props.hasMask && unref(isEditModel) && <div class={['mask']}></div>}
         </TagComponent>
       )
     }

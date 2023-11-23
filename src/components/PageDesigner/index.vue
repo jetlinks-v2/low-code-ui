@@ -41,7 +41,8 @@ const isShowConfig = ref<boolean>(false); // 是否展示配置
 const selected = ref<any[]>([]); // 被选择数据,需要多选
 const _ctrl = ref<boolean>(false);
 const focus = ref<boolean>(false);
-const focused = ref<boolean>(false);
+const focused = ref<boolean>(false); // 记录弹框的快捷键问题
+const copyData = ref<any[]>([]);
 
 provide("PageDesigner", {
   model,
@@ -50,7 +51,8 @@ provide("PageDesigner", {
   selected,
   _ctrl,
   focus,
-  focused
+  focused,
+  copyData
 });
 
 watch(
