@@ -346,6 +346,7 @@
       v-if="
         [
           'input',
+          'input-group',
           'textarea',
           'input-number',
           'input-password',
@@ -401,6 +402,28 @@
         />
       </j-form-item>
     </template>
+    <!-- <template v-if="['input-group'].includes(type)">
+      <j-form-item label="前组件">
+        <CheckButton
+          :options="[
+            { label: '启用', value: true },
+            { label: '禁用', value: false },
+          ]"
+          @change="onDataChange"
+          v-model:value="target.componentProps.preComponent.show"
+        />
+      </j-form-item>
+      <j-form-item label="后组件">
+        <CheckButton
+          :options="[
+            { label: '启用', value: true },
+            { label: '禁用', value: false },
+          ]"
+          @change="onDataChange"
+          v-model:value="target.componentProps.afterComponent.show"
+        />
+      </j-form-item>
+    </template> -->
     <!-- 规则校验 -->
     <template v-if="rulesVisible">
       <j-form-item

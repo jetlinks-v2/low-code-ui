@@ -4,7 +4,7 @@ import { Text,Org,Role,User,Product,Device,Upload, Geo, Form, CardSelect , Input
 const componentMap = {
     // 'input': Input,
     'input': Input,
-    'input-group': InputGroup,
+    // 'input-group': InputGroup,
     'text': Text,
     'org': Org,
     'role': Role,

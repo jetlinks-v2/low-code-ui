@@ -17,6 +17,7 @@ export const getConfigList = (_type: string, obj: any, type: 'workflow' | 'low-c
     if (
         [
             'input',
+            'input-group',
             'textarea',
             'input-number',
             'input-password',
