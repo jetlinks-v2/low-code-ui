@@ -1,6 +1,7 @@
 import { extractCssClass, insertCustomCssToHead } from "@LowCode/components/PageDesigner/utils/utils"
 import DraggableLayout from "../../Draggable/DraggableLayout"
 import './index.less'
+import {PageProvider} from "../../../core";
 import { useTool } from '../../../hooks'
 import { useMagicKeys, useElementHover } from '@vueuse/core'
 
@@ -95,28 +96,30 @@ const Canvas = defineComponent({
 
     return () => {
       return (
-        <div
-          onClick={() => {
-            if (unref(isEditModel)) {
-              handleClick()
-            }
-          }}
-          data-id="root"
-          class={['subject', ...unref(cssClassList)]}
-          ref={canvasRef}
-        >
-          <DraggableLayout
-            data-layout-type={'root'}
-            style={{
-              height: '100%',
-              width: '100%',
-              padding: `0 ${_padding.value}px`
-            }}
-            data={designer.pageData.value?.children || []}
-            parent={designer.pageData.value}
-            isRoot
-          ></DraggableLayout>
-        </div>
+          <PageProvider>
+            <div
+              onClick={() => {
+                if (unref(isEditModel)) {
+                  handleClick()
+                }
+              }}
+              data-id="root"
+              class={['subject', ...unref(cssClassList)]}
+              ref={canvasRef}
+            >
+              <DraggableLayout
+                data-layout-type={'root'}
+                style={{
+                  height: '100%',
+                  width: '100%',
+                  padding: `0 ${_padding.value}px`
+                }}
+                data={designer.pageData.value?.children || []}
+                parent={designer.pageData.value}
+                isRoot
+              ></DraggableLayout>
+            </div>
+          </PageProvider>
       )
     }
   }

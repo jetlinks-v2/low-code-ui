@@ -8,6 +8,7 @@ import StepsLayout from './StepsLayout';
 import InfoLayout from './InfoLayout';
 import TimelineLayout from './TimelineLayout';
 import { useTool } from '../../hooks';
+import ProTableLayout from './ProTableLayout'
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -45,6 +46,8 @@ const DraggableLayout = defineComponent({
                         return (<InfoLayout data={element} parent={props.data}></InfoLayout>)
                     case 'timeline':
                         return (<TimelineLayout data={element} parent={props.data}></TimelineLayout>)
+                    case 'proTable':
+                        return (<ProTableLayout data={element} parent={props.data} />)
                     default:
                         return <Selection data={element} parent={props.data} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                             <TypeComponent {...element.componentProps} />
