@@ -2,9 +2,6 @@ import { uid } from "./uid"
 
 const handleProps = (node: any) => {
     const result: any = { ...node.componentProps }
-    if (!result?.style) {
-        result.style = {}
-    }
     if (!result?.cssCode) {
         result.cssCode = ''
     }
