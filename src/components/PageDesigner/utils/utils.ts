@@ -1,5 +1,6 @@
 import { map } from "lodash-es"
 import { ISchema } from "../typings"
+import { uid } from "./uid"
 
 // 添加子组件
 export const appendChildItem = (arr: any[], newData: any, parent: any) => {
@@ -124,4 +125,29 @@ export const insertCustomCssToHead = (cssCode: string, formId: string, attrKey: 
     }
 
     head.appendChild(newStyle)
+}
+
+export const handleCopyData = (arr: any[]) => {
+    return arr.map(item => {
+        return {
+            ...item,
+            key: item.type + uid(6),
+            children: handleCopyData(item.children || [])
+        }
+    })
+}
+
+// 插入数据，主要是为了粘贴
+export const copyDataByKey = (arr: any[], newData: any[], _item: any) => {
+    const _index = arr.findIndex(item => item?.key === _item?.key)
+    if (_index === -1) {
+        return arr.map(item => {
+            return {
+                ...item,
+                children: item?.children?.length ? copyDataByKey(item.children, newData, _item) : []
+            }
+        })
+    } else {
+        return [...arr.slice(0, _index + 1), ...newData, ...arr.slice(_index + 1, arr?.length)]
+    }
 }
