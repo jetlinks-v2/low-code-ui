@@ -333,7 +333,7 @@
       <j-form-item
         label="分页器"
       >
-        <j-switch v-model:checked="target.componentProps.pagination.open" />
+        <j-switch v-model:checked="target.componentProps.paginationSetting.open" />
       </j-form-item>
       <j-form-item
         label="展示格式"

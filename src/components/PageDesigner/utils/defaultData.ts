@@ -147,14 +147,16 @@ export const _function: ISchema[] = [
                 {
                     title: 'Address',
                     dataIndex: 'address',
+                    scopedSlots: 'address',
+                    render: (slotProps) => {
+                        console.log(slotProps)
+                        return (slotProps['address'] + '123123123123123')
+                    }
                 },
                 {
                     title: 'Action',
                     dataIndex: 'action',
-                    render: (slotProps) => {
-                        console.log(slotProps)
-                        return slotProps['action']
-                    }
+
                 },
             ],
             dataSource: [
@@ -162,8 +164,11 @@ export const _function: ISchema[] = [
                 { name: 'Jim Green', age: 32, address: 'London No. 1 Lake Park'},
                 { name: 'Joe Black', age: 45, address: 'Sidney No. 1 Lake Park'},
             ],
-            pagination: {
-                open: true
+            paginationSetting: {
+                open: true,
+                pagination: {
+                    pageSizeOptions: [12, 24, 48, 96]
+                }
             },
         }
     }
