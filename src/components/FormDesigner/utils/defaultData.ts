@@ -5,12 +5,42 @@ export const basic: ISchema[] = [
     {
         type: 'input',
         name: '文本框',
+        componentProps:{
+            prefix:{
+                type:'',
+                text:''
+            },
+            suffix:{
+                type:'',
+                text:''
+            }
+        }
     },
+    // {
+    //     type:'input-group',
+    //     name:'输入框组合',
+    //     componentProps:{
+    //         preComponent:{
+    //             type:'select',
+    //             show:false,
+    //             col:8,
+    //             options:[],
+    //             preText:''
+    //         },
+    //         afterComponent:{
+    //             type:'select',
+    //             show:false,
+    //             col:8,
+    //             options:[],
+    //             preText:''
+    //         }
+    //     }
+    // },
     {
         type: 'text',
         name: '文本',
         componentProps: {
-            value: '文本'
+            value: '文本',
         },
     },
     {
@@ -225,6 +255,17 @@ export const layout: ISchema[] = [
             },
         ]
     },
+    {
+        type: 'inline',
+        name: '内联',
+        children: [],
+        componentProps: {
+
+        },
+        formItemProps: {
+            isLayout: false
+        },
+    },
 ]
 // 高级组件
 export const pro: ISchema[] = [
@@ -240,10 +281,10 @@ export const pro: ISchema[] = [
         type: 'role',
         name: '角色选择',
     },
-    // { // 需求未定
-    //     type: 'geo',
-    //     name: '地区',
-    // },
+    { // 需求未定
+        type: 'geo',
+        name: '地区',
+    },
 ]
 
 const iot: ISchema[] = [
@@ -271,7 +312,7 @@ export const filedData = [
         id: 'pro',
         name: '高级组件',
         children: [...pro]
-    },{
+    }, {
         id: 'iot',
         name: 'iot组件',
         children: [...iot]

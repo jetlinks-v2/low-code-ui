@@ -233,20 +233,19 @@
       </j-form-item>
     </template>
     <template v-if="['geo'].includes(type)">
-      <!-- <j-form-item label="存储层级" :name="['componentProps', 'level']">
-        <j-select
-          v-model:value="target.componentProps.level"
-          placeholder="请选择"
-          required
-          @change="onDataChange"
-        >
-          <j-select-option :value="'all'">全部层级</j-select-option>
-          <j-select-option :value="'min'">最小级</j-select-option>
-        </j-select>
-      </j-form-item> -->
+      <j-form-item label="组件形态" :name="['componentProps', 'type']">
+        <CheckButton
+          :options="[
+            { label: '树形下拉框', value: 'tree' },
+            { label: '分级下拉框', value: 'select' },
+          ]"
+          @change="onChange"
+          v-model:value="target.componentProps.type"
+        />
+      </j-form-item>
       <j-form-item
-        label="可选项"
-        :name="['componentProps', 'geoType']"
+        label="可选项格式"
+        :name="['componentProps', 'format']"
         :validateFirst="true"
         :rules="[
           {
@@ -256,11 +255,13 @@
         ]"
       >
         <j-select
-          v-model:value="target.componentProps.geoType"
+          v-model:value="target.componentProps.format"
           placeholder="请选择"
           @change="onDataChange"
         >
-          <!-- <j-select-option v-for="item in options" :value="item?.id">{{ item?.name }}</j-select-option> -->
+        <j-select-option :value="'name'">区域名称</j-select-option>
+          <j-select-option :value="'code'">行政区划代码</j-select-option>
+          <j-select-option :value="'nameCode'">区域名称｜行政区划代码</j-select-option>
         </j-select>
       </j-form-item>
     </template>
@@ -346,6 +347,7 @@
       v-if="
         [
           'input',
+          'input-group',
           'textarea',
           'input-number',
           'input-password',
@@ -369,6 +371,60 @@
         />
       </j-form-item>
     </template>
+    <template
+      v-if="
+        [
+          'input',
+        ].includes(type)
+      "
+    >
+      <j-form-item
+        :validateFirst="true"
+        label="前标签"
+        :name="['componentProps', 'addonBefore']"
+      >
+        <j-input
+          placeholder="请输入"
+          v-model:value="target.componentProps.addonBefore"
+          :maxlength="10"
+          @change="onDataChange"
+        />
+      </j-form-item>
+      <j-form-item
+        :validateFirst="true"
+        label="后标签"
+        :name="['componentProps', 'addonAfter']"
+      >
+        <j-input
+          placeholder="请输入"
+          v-model:value="target.componentProps.addonAfter"
+          :maxlength="10"
+          @change="onDataChange"
+        />
+      </j-form-item>
+    </template>
+    <!-- <template v-if="['input-group'].includes(type)">
+      <j-form-item label="前组件">
+        <CheckButton
+          :options="[
+            { label: '启用', value: true },
+            { label: '禁用', value: false },
+          ]"
+          @change="onDataChange"
+          v-model:value="target.componentProps.preComponent.show"
+        />
+      </j-form-item>
+      <j-form-item label="后组件">
+        <CheckButton
+          :options="[
+            { label: '启用', value: true },
+            { label: '禁用', value: false },
+          ]"
+          @change="onDataChange"
+          v-model:value="target.componentProps.afterComponent.show"
+        />
+      </j-form-item>
+    </template> -->
     <!-- 规则校验 -->
     <template v-if="rulesVisible">
       <j-form-item
@@ -415,9 +471,9 @@ const list = computed(() =>
   target.value.componentProps?.listType === 'text' ? textType : imgType,
 )
 
-const { data: options, run } = useRequest(getGeoType, {
-  immediate: false,
-})
+// const { data: options, run } = useRequest(getGeoType, {
+//   immediate: false,
+// })
 
 const rulesVisible = computed(() => {
   return [
@@ -519,9 +575,9 @@ const onDateChange = (e) => {
   emits('refresh', target.value)
 }
 
-watchEffect(() => {
-  if (target.value?.type === 'geo') {
-    run()
-  }
-})
+// watchEffect(() => {
+//   if (target.value?.type === 'geo') {
+//     run()
+//   }
+// })
 </script>

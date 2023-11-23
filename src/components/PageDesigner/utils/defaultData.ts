@@ -73,7 +73,8 @@ export const layout: ISchema[] = [
                         componentProps: {
                             label:'标题1',
                             value: '123',
-                            span:1
+                            span:1,
+                            labelWidth:200
                         },
                     },
                 ],
@@ -112,6 +113,15 @@ export const layout: ISchema[] = [
                 },
             },
         ]
+    },
+    {
+        type: 'inline',
+        name: '内联',
+        children: [],
+        componentProps: {},
+        formItemProps: {
+            isLayout: false
+        },
     },
 ]
 

@@ -31,10 +31,10 @@
 </template>
 
 <script lang="ts" setup>
-import Header from './components/Header/index.vue'
-import Canvas from './components/Panels/Canvas/index'
-import Config from './components/Panels/Config/index.vue'
-import Filed from './components/Panels/Filed/index.vue'
+import Header from "./components/Header/index.vue";
+import Canvas from "./components/Panels/Canvas/index";
+import Config from "./components/Panels/Config/index.vue";
+import Filed from "./components/Panels/Filed/index.vue";
 import {
   provide,
   ref,
@@ -43,10 +43,10 @@ import {
   unref,
   computed,
   reactive,
-} from 'vue'
-import { cloneDeep, debounce, map } from 'lodash-es'
-import { useProduct, useFormDesigner } from '@LowCode/store'
-import { Modal } from 'jetlinks-ui-components'
+} from "vue";
+import { cloneDeep, debounce, map } from "lodash-es";
+import { useProduct, useFormDesigner } from "@LowCode/store";
+import { Modal } from "jetlinks-ui-components";
 import {
   deleteDataByKey,
   copyDataByKey,
@@ -55,13 +55,13 @@ import {
   initData,
   appendChildItem,
   handleCopyData,
-} from './utils/utils'
-import { uid } from './utils/uid'
-import Check from './components/Check/index.vue'
-import { onlyMessage } from '@jetlinks-web/utils'
-import { providerEnum } from '@LowCode/components/ProJect'
-import { proAll } from '../QuickEditTable/util'
-import { CheckSpin } from '@LowCode/components/index'
+} from "./utils/utils";
+import { uid } from "./utils/uid";
+import Check from "./components/Check/index.vue";
+import { onlyMessage } from "@jetlinks-web/utils";
+import { providerEnum } from "@LowCode/components/ProJect";
+import { proAll } from "../QuickEditTable/util";
+import { CheckSpin } from "@LowCode/components/index";
 
 const props = defineProps({
   value: {
@@ -70,7 +70,7 @@ const props = defineProps({
   },
   mode: {
     // 是否为编辑
-    type: String as PropType<'add' | 'edit' | undefined>,
+    type: String as PropType<"add" | "edit" | undefined>,
     default: undefined,
   },
   data: {
@@ -78,134 +78,137 @@ const props = defineProps({
   },
   type: {
     // 判断是工作流还是低代码
-    type: String as PropType<'workflow' | 'low-code'>,
-    default: 'low-code',
+    type: String as PropType<"workflow" | "low-code">,
+    default: "low-code",
   },
-})
+});
 
-const emits = defineEmits(['saveData', 'back'])
-const model = ref<'preview' | 'edit'>(props.mode ? 'preview' : 'edit') // 预览；编辑
-const formData = ref<any>(initData) // 表单数据
-const isShowConfig = ref<boolean>(false) // 是否展示配置
-const selected = ref<any[]>([]) // 被选择数据,需要多选
-const errorKey = ref<any[]>([])
-const configRef = ref<any>()
-const refList = ref<any>({})
-const formRef = ref<any>()
-const formRefList = ref<any>({})
-const formState = reactive({})
-const collectVisible = ref<boolean>(false)
-const collectData = ref<any[]>([])
-const delVisible = ref<boolean>(false)
-const spinning = ref<boolean>(false)
-const _ctrl = ref<boolean>(false)
-const _other = ref<boolean>(false)
-const focus = ref<boolean>(false)
-const focused = ref<boolean>(false)
+const emits = defineEmits(["saveData", "back"]);
+const model = ref<"preview" | "edit">(props.mode ? "preview" : "edit"); // 预览；编辑
+const formData = ref<any>(initData); // 表单数据
+const isShowConfig = ref<boolean>(false); // 是否展示配置
+const selected = ref<any[]>([]); // 被选择数据,需要多选
+const errorKey = ref<any[]>([]);
+const configRef = ref<any>();
+const refList = ref<any>({});
+const formRef = ref<any>();
+const formRefList = ref<any>({});
+const formState = reactive({});
+const collectVisible = ref<boolean>(false);
+const collectData = ref<any[]>([]);
+const delVisible = ref<boolean>(false);
+const spinning = ref<boolean>(false);
+const _ctrl = ref<boolean>(false);
+const _other = ref<boolean>(false);
+const focus = ref<boolean>(false);
+const focused = ref<boolean>(false);
 
-const product = useProduct()
-const formDesigner = useFormDesigner()
+const product = useProduct();
+const formDesigner = useFormDesigner();
 
 const isSelectedRoot = computed(() => {
-  return !!selected.value.find((item) => item.key === 'root')
-})
+  return !!selected.value.find((item) => item.key === "root");
+});
 
 const _width = computed(() => {
-  return model.value === 'preview'
-    ? '100%'
+  return model.value === "preview"
+    ? "100%"
     : !unref(isShowConfig)
-    ? 'calc(100% - 200px)'
-    : 'calc(100% - 584px)'
-})
+    ? "calc(100% - 200px)"
+    : "calc(100% - 584px)";
+});
 
 // 设置数据被选中
 const setSelection = (node: any) => {
-  if (['card-item'].includes(node.type)) {
-    onSaveData()
-    return
+  if (["card-item"].includes(node.type)) {
+    onSaveData();
+    return;
   }
-  if (_ctrl.value && model.value === 'edit' && !_other.value) {
-    if (node === 'root') {
-      onSaveData()
-      return
+  if (_ctrl.value && model.value === "edit" && !_other.value) {
+    if (node === "root") {
+      onSaveData();
+      return;
     }
-    if (map(selected.value, 'key').includes('root')) {
-      selected.value = [node]
+    if (map(selected.value, "key").includes("root")) {
+      selected.value = [node];
     } else {
-      if (!map(selected.value, 'key').includes(node.key)) {
-        selected.value.push(node)
+      if (!map(selected.value, "key").includes(node.key)) {
+        selected.value.push(node);
       }
     }
   } else {
-    selected.value = []
-    if (node === 'root') {
-      selected.value.push(formData.value)
+    selected.value = [];
+    if (node === "root") {
+      selected.value.push(formData.value);
     } else {
-      selected.value.push(node)
+      selected.value.push(node);
     }
   }
   isShowConfig.value =
     !(selected.value?.length > 1) &&
-    !map(selected.value, 'type').includes('space-item')
-  onSaveData()
-}
+    !map(selected.value, "type").find((i) => {
+      return ["space-item", "inline", "inline-item"].includes(i);
+    });
+  onSaveData();
+};
 
 // 删除
 const onDelete = debounce(() => {
-  const arr = selected.value || []
-  if (unref(isSelectedRoot) || !arr?.length || focused.value) return
-  delVisible.value = true
+  const arr = selected.value || [];
+  if (unref(isSelectedRoot) || !arr?.length || focused.value) return;
+  delVisible.value = true;
   Modal.confirm({
-    title: '确定删除组件及其配置？',
-    okText: '确认',
-    cancelText: '取消',
+    title: "确定删除组件及其配置？",
+    okText: "确认",
+    cancelText: "取消",
     onOk() {
-      delVisible.value = false
+      delVisible.value = false;
       // 删除数据
-      const _data = deleteDataByKey(formData.value.children, selected.value)
+      const _data = deleteDataByKey(formData.value.children, selected.value);
       formData.value = {
         ...formData.value,
         children: _data?.arr || [],
-      }
-      setSelection(_data?.data || 'root')
+      };
+      setSelection(_data?.data || "root");
     },
     onCancel() {
-      delVisible.value = false
+      delVisible.value = false;
     },
-  })
-}, 200)
+  });
+}, 200);
 
 // 复制
 const onCopy = () => {
   const list = cloneDeep(selected.value).filter((item) => {
     return ![
-      'collapse-item',
-      'tabs-item',
-      'grid-item',
-      'table-item',
-      'space-item',
-    ].includes(item.type)
-  })
-  if (unref(isSelectedRoot) || focused.value) return
-  formDesigner.setCopyData(props.data?.id, list || [])
-}
+      "collapse-item",
+      "tabs-item",
+      "grid-item",
+      "table-item",
+      "space-item",
+      "inline-item"
+    ].includes(item.type);
+  });
+  if (unref(isSelectedRoot) || focused.value) return;
+  formDesigner.setCopyData(props.data?.id, list || []);
+};
 
 // 剪切
 const onShear = debounce(() => {
-  if (unref(isSelectedRoot) || focused.value) return
-  formDesigner.setCopyData(props.data?.id, selected.value || [])
-  const _data: any = deleteDataByKey(formData.value.children, selected.value)
+  if (unref(isSelectedRoot) || focused.value) return;
+  formDesigner.setCopyData(props.data?.id, selected.value || []);
+  const _data: any = deleteDataByKey(formData.value.children, selected.value);
   formData.value = {
     ...formData.value,
     children: _data?.arr || [],
-  }
-  setSelection(_data?.data || 'root')
-}, 200)
+  };
+  setSelection(_data?.data || "root");
+}, 200);
 
 // 粘贴
 const onPaste = () => {
-  if (!selected.value?.length || focused.value) return
-  const obj = formDesigner.getCopyData()
+  if (!selected.value?.length || focused.value) return;
+  const obj = formDesigner.getCopyData();
   const list = (obj?.list || []).map((item) => {
     return {
       ...item,
@@ -213,112 +216,117 @@ const onPaste = () => {
         ...item?.formItemProps,
         label:
           obj.key === props.data?.id
-            ? 'copy_' + item.formItemProps?.label
+            ? "copy_" + item.formItemProps?.label
             : item.formItemProps?.label,
         name:
           obj.key === props.data?.id
-            ? 'copy_' + item.formItemProps?.name
+            ? "copy_" + item.formItemProps?.name
             : item.formItemProps?.name,
       },
-      key: item.key + '_' + uid(),
+      key: item.key + "_" + uid(),
       children: handleCopyData(item?.children || []),
-    }
-  })
+    };
+  });
   if (list.length && selected.value?.length) {
-    const dt = selected.value?.[selected.value.length - 1]
-    if (dt?.key === 'root') {
+    const dt = selected.value?.[selected.value.length - 1];
+    if (dt?.key === "root") {
       formData.value = {
         ...formData.value,
         children: [...formData.value?.children, ...list],
-      }
+      };
     } else {
       formData.value = {
         ...formData.value,
         children: copyDataByKey(formData.value?.children, list, dt),
-      }
+      };
     }
-    setSelection(list?.[list.length - 1] || 'root')
-    formDesigner.deleteData()
+    setSelection(list?.[list.length - 1] || "root");
+    formDesigner.deleteData();
   }
-}
+};
 
 // 收藏为模板
 const onCollect = () => {
-  if (unref(isSelectedRoot)) return
-  collectData.value = selected.value || []
-  collectVisible.value = true
-}
+  if (unref(isSelectedRoot)) return;
+  collectData.value = selected.value || [];
+  collectVisible.value = true;
+};
 
 // 添加子组件
 const onAddChild = (
   newData: any,
   parent: any,
-  __flag?: 'start' | 'end' | undefined,
+  __flag?: "start" | "end" | undefined
 ) => {
-  const arr = appendChildItem(formData.value?.children, newData, parent, __flag)
+  const arr = appendChildItem(
+    formData.value?.children,
+    newData,
+    parent,
+    __flag
+  );
   formData.value = {
     ...formData.value,
     children: arr || [],
-  }
-  setSelection(newData || 'root')
-}
+  };
+  setSelection(newData || "root");
+};
 
 /**
  * 保存数据
  */
 const onSaveData = () => {
-  if (props.type === 'low-code') {
+  if (props.type === "low-code") {
     const obj = {
       ...props.data,
       configuration: {
-        type: 'form',
+        type: "form",
         code: JSON.stringify(unref(formData)),
       },
-    }
-    product.update(obj)
+    };
+    product.update(obj);
   }
-}
+};
 
-const setModel = (_type: 'preview' | 'edit') => {
-  model.value = _type
-}
+const setModel = (_type: "preview" | "edit") => {
+  model.value = _type;
+};
 
 const onSave = () => {
-  if (model.value === 'preview') {
+  if (model.value === "preview") {
     // 校验内嵌表单
     const _func = Object.keys(formRefList.value || {}).map((item) => {
-      return formRefList.value[item]?.onSave()
-    })
+      return formRefList.value[item]?.onSave();
+    });
     // 主表单
-    _func.push(formRef.value?.validate())
+    _func.push(formRef.value?.validate());
     return new Promise((resolve, reject) => {
       proAll(_func)
         .then(() => {
-          resolve(formState)
+          resolve(formState);
         })
         .catch((err) => {
-          reject(err)
-        })
-    })
+          reject(err);
+        });
+    });
   }
-}
+};
 
 const getFormList = computed(() => {
-  const list = product.getDataMapByType(providerEnum.FormPage)
+  const list = product.getDataMapByType(providerEnum.FormPage);
   //   过滤掉自身
-  const filterList = list.filter((item) => item.id !== props.data?.id)
+  const filterList = list.filter((item) => item.id !== props.data?.id);
   return filterList.map((item) => {
     return {
       label: item.title,
       value: item.id,
       code: item.configuration?.code,
-    }
-  })
-})
+    };
+  });
+});
 
-provide('FormDesigner', {
+provide("FormDesigner", {
   model,
-  type: props?.type || 'low-code',
+  type: props?.type || "low-code",
   formData,
   formState,
   formRef,
@@ -346,49 +354,49 @@ provide('FormDesigner', {
   onCollect,
   onAddChild,
   onSave,
-})
+});
 
 watch(
   () => model.value,
-  (newValue: 'preview' | 'edit') => {
-    if (newValue === 'preview') {
-      Object.assign(formState, {})
-      const obj: any = getFieldData(formData.value)
-      Object.assign(formState, obj)
+  (newValue: "preview" | "edit") => {
+    if (newValue === "preview") {
+      Object.assign(formState, {});
+      const obj: any = getFieldData(formData.value);
+      Object.assign(formState, obj);
     }
   },
   {
     deep: true,
     immediate: true,
-  },
-)
+  }
+);
 
 watch(
   () => props.data,
   (newVal) => {
-    if (props.type === 'workflow') {
+    if (props.type === "workflow") {
       formData.value =
         newVal && Object.keys(newVal)?.length
           ? cloneDeep(newVal)
-          : cloneDeep(initData)
+          : cloneDeep(initData);
     } else {
       try {
-        const obj = JSON.parse(newVal?.configuration?.code)
-        formData.value = Object.keys(obj).length ? obj : cloneDeep(initData)
+        const obj = JSON.parse(newVal?.configuration?.code);
+        formData.value = Object.keys(obj).length ? obj : cloneDeep(initData);
       } catch (error) {
-        formData.value = cloneDeep(initData)
+        formData.value = cloneDeep(initData);
       }
     }
   },
   {
     deep: true,
     immediate: true,
-  },
-)
+  }
+);
 
 onUnmounted(() => {
-  onSaveData()
-})
+  onSaveData();
+});
 
 // 校验
 const onValidate = async () => {
@@ -398,35 +406,35 @@ const onValidate = async () => {
       unref(formData),
       getFormList.value,
       props?.type
-    )
-    errorKey.value = resp
+    );
+    errorKey.value = resp;
     if (errorKey.value?.length) {
-      reject(errorKey.value)
+      reject(errorKey.value);
     } else {
-      resolve(true)
+      resolve(true);
     }
-  })
-}
+  });
+};
 
 const onWorkFlowSave = async () => {
-  const _val = await onValidate()
+  const _val = await onValidate();
   if (_val) {
-    emits('saveData', formData.value)
+    emits("saveData", formData.value);
   }
-}
+};
 
 const onValid = async () => {
-  spinning.value = true
+  spinning.value = true;
   const _val = await onValidate().catch(() => {
-    spinning.value = false
-  })
-  spinning.value = false
+    spinning.value = false;
+  });
+  spinning.value = false;
   if (_val) {
-    onlyMessage('校验通过')
+    onlyMessage("校验通过");
   }
-}
+};
 
-defineExpose({ onSave, validate: onValidate })
+defineExpose({ onSave, validate: onValidate });
 </script>
 
 <style lang="less" scoped>

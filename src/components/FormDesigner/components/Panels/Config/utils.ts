@@ -7,7 +7,7 @@ export const getConfigList = (_type: string, obj: any, type: 'workflow' | 'low-c
         })
     }
 
-    if (!['root', 'grid-item', 'grid'].includes(unref(_type))) {
+    if (!['root', 'grid-item', 'grid', 'inline', 'inline-item'].includes(unref(_type))) {
         arr.push({
             key: 'Base',
             header: '基础信息',
@@ -17,6 +17,7 @@ export const getConfigList = (_type: string, obj: any, type: 'workflow' | 'low-c
     if (
         [
             'input',
+            'input-group',
             'textarea',
             'input-number',
             'input-password',

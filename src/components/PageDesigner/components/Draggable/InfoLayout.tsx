@@ -49,6 +49,7 @@ export default defineComponent({
                 componentProps: {
                     label: '标题item_' + uid(4),
                     value: '123',
+                    labelWidth: 200,
                     span: 1
                 },
             })
@@ -85,11 +86,11 @@ export default defineComponent({
             }
         }
 
-        const borderStyle = () => {
+        const borderStyle = (width: number) => {
             return {
                 backgroundColor: '#fafafa',
                 padding: '16px 24px',
-                minWidth: '40%',
+                width: `${width}px`,
                 borderRight: '#e5e5e5 solid 1px'
             }
         }
@@ -123,18 +124,25 @@ export default defineComponent({
                                                 hasCopy={true}
                                                 hasDel={true}
                                                 parent={item.children}
-                                                style={item?.componentProps?.bordered ? handleBorder(item?.componentProps?.column, i?.componentProps?.span, index) : {
+                                            >
+                                                <div style={item?.componentProps?.bordered ? handleBorder(item?.componentProps?.column, i?.componentProps?.span, index) : {
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                }}
-                                            >
-                                                <div
-                                                    style={item?.componentProps?.bordered ? borderStyle() : { padding: '16px 24px', }}
-                                                    class={!item?.componentProps?.bordered && "info-label"}
-                                                >
-                                                    {i.componentProps?.label}
+                                                }}>
+                                                    <div
+                                                        style={item?.componentProps?.bordered ? borderStyle(i?.componentProps?.labelWidth) : { padding: '16px 24px', width: `${i?.componentProps?.labelWidth}px` }}
+                                                        class={!item?.componentProps?.bordered && "info-label"}
+                                                    >
+                                                        {i.componentProps?.label}
+                                                    </div>
+                                                    <div style={{ padding: '0 12px' }}>
+                                                        <DraggableLayout
+                                                            data-layout-type={'info-item-item'}
+                                                            data={i?.children || []}
+                                                            parent={i}
+                                                        />
+                                                    </div>
                                                 </div>
-                                                <div style={{ padding: '0 12px' }}>{i.componentProps?.value}</div>
                                             </Selection>
                                         </Col>
                                     })

@@ -1,14 +1,14 @@
 
 import { isEmpty } from 'lodash-es';
 import DraggableWrap from './DragGableWrap'
-import Selection from '../Selection'
 import './index.less';
-import componentMap from '../../utils/componentMap';
 import StepsLayout from './StepsLayout';
 import InfoLayout from './InfoLayout';
 import TimelineLayout from './TimelineLayout';
-import { useTool } from '../../hooks';
+import { useProps, useTool } from '../../hooks';
 import ProTableLayout from './ProTableLayout'
+import CommonLayout from './CommonLayout';
+import InlineLayout from './InlineLayout';
 import SearchLayout from './SearchLayout'
 
 const DraggableLayout = defineComponent({
@@ -39,7 +39,6 @@ const DraggableLayout = defineComponent({
 
         const slots = {
             item: ({ element }) => {
-                const TypeComponent = componentMap?.[element?.type] || 'div'
                 switch (element.type) {
                     case 'steps':
                         return (<StepsLayout data={element} parent={props.data}></StepsLayout>)
@@ -49,13 +48,12 @@ const DraggableLayout = defineComponent({
                         return (<TimelineLayout data={element} parent={props.data}></TimelineLayout>)
                     case 'proTable':
                         return (<ProTableLayout data={element} parent={props.data} />)
+                    case 'inline':
+                        return (<InlineLayout data={element} parent={props.data} />)
                     case 'search':
                         return (<SearchLayout data={element} parent={props.data} />)
                     default:
-                        return <Selection data={element} parent={props.data} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                            <TypeComponent {...element.componentProps} />
-                        </Selection>
-
+                        return <CommonLayout data={element} parent={props.data} />
                 }
             },
             footer() {

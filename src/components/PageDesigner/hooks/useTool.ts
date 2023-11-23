@@ -1,6 +1,7 @@
-import { debounce } from "lodash-es"
-import { appendChildItem, deleteDataByKey } from "../utils/utils"
+import { cloneDeep, debounce } from "lodash-es"
+import { appendChildItem, copyDataByKey, deleteDataByKey, handleCopyData } from "../utils/utils"
 import { Modal } from 'jetlinks-ui-components'
+import { uid } from "../utils/uid"
 
 const useTool = () => {
     const designer: any = inject('PageDesigner')
@@ -31,6 +32,10 @@ const useTool = () => {
     const setModel = (_type: 'preview' | 'edit') => {
         designer.model.value = _type
     }
+
+    const isSelectedRoot = computed(() => {
+        return !!designer.selected.value.find((item: any) => item.key === 'root')
+    })
 
     const onAddChild = (newData: any, parent: any) => {
         const arr = appendChildItem(designer.pageData.value?.children, newData, parent)
@@ -67,82 +72,60 @@ const useTool = () => {
 
     // 复制
     const onCopy = () => {
-        // const list = cloneDeep(designer.selected.value).filter((item: any) => {
-        //     return ![
-        //         'collapse-item',
-        //         'tabs-item',
-        //         'grid-item',
-        //         'table-item',
-        //         'space-item',
-        //     ].includes(item.type)
-        // })
-        // if (unref(isSelectedRoot) || focused.value) return
-        // formDesigner.setCopyData(props.data?.id, list || [])
+        if (unref(isSelectedRoot) || designer.focused.value) return
+        designer.copyData.value = cloneDeep(designer.selected.value) || []
     }
 
     // 剪切
     const onShear = debounce(() => {
-        // if (unref(isSelectedRoot) || focused.value) return
-        // formDesigner.setCopyData(props.data?.id, selected.value || [])
-        // const _data: any = deleteDataByKey(formData.value.children, selected.value)
-        // formData.value = {
-        //     ...formData.value,
-        //     children: _data?.arr || [],
-        // }
-        // setSelection(_data?.data || 'root')
+        if (unref(isSelectedRoot) || designer.focused.value) return
+        designer.copyData.value = cloneDeep(designer.selected.value) || []
+        const _data: any = deleteDataByKey(designer.pageData.value.children, designer.selected.value)
+        designer.pageData.value = {
+            ...designer.pageData.value,
+            children: _data?.arr || [],
+        }
+        setSelection(_data?.data || 'root')
     }, 200)
 
     // 粘贴
     const onPaste = () => {
-        // if (!selected.value?.length || focused.value) return
-        // const obj = formDesigner.getCopyData()
-        // const list = (obj?.list || []).map((item) => {
-        //     return {
-        //         ...item,
-        //         formItemProps: {
-        //             ...item?.formItemProps,
-        //             label:
-        //                 obj.key === props.data?.id
-        //                     ? 'copy_' + item.formItemProps?.label
-        //                     : item.formItemProps?.label,
-        //             name:
-        //                 obj.key === props.data?.id
-        //                     ? 'copy_' + item.formItemProps?.name
-        //                     : item.formItemProps?.name,
-        //         },
-        //         key: item.key + '_' + uid(),
-        //         children: handleCopyData(item?.children || []),
-        //     }
-        // })
-        // if (list.length && selected.value?.length) {
-        //     const dt = selected.value?.[selected.value.length - 1]
-        //     if (dt?.key === 'root') {
-        //         formData.value = {
-        //             ...formData.value,
-        //             children: [...formData.value?.children, ...list],
-        //         }
-        //     } else {
-        //         formData.value = {
-        //             ...formData.value,
-        //             children: copyDataByKey(formData.value?.children, list, dt),
-        //         }
-        //     }
-        //     setSelection(list?.[list.length - 1] || 'root')
-        //     formDesigner.deleteData()
-        // }
+        if (!designer.selected.value?.length || designer.focused.value) return
+        const list = (designer.copyData.value || []).map((item: any) => {
+            return {
+                ...item,
+                formItemProps: {
+                    ...item?.formItemProps,
+                    label: 'copy_' + item.formItemProps?.label,
+                    name: 'copy_' + item.formItemProps?.name
+                },
+                key: item.key + '_' + uid(),
+                children: handleCopyData(item?.children || []),
+            }
+        })
+        if (list.length && designer.selected.value?.length) {
+            const dt = designer.selected.value?.[designer.selected.value.length - 1]
+            designer.pageData.value = {
+                ...designer.pageData.value,
+                children: dt?.key === 'root' ? [...designer.pageData.value?.children, ...list] : copyDataByKey(designer.pageData.value?.children, list, dt),
+            }
+            setSelection(list?.[list.length - 1] || 'root')
+            designer.copyData.value = []
+        }
     }
 
     return {
         isEditModel,
         isDragArea,
         _model,
+        isSelectedRoot,
         setSelection,
         onDelete,
         onAddChild,
         onCopy,
         onShear,
         onPaste,
-        setModel
+        setModel,
     }
 }
 
