@@ -6,7 +6,8 @@ import './index.less';
 import componentMap from '../../utils/componentMap';
 import StepsLayout from './StepsLayout';
 import InfoLayout from './InfoLayout';
-import Info from './copy_InfoLayout'
+import TimelineLayout from './TimelineLayout';
+import { useTool } from '../../hooks';
 import ProTableLayout from './ProTableLayout'
 
 const DraggableLayout = defineComponent({
@@ -33,7 +34,7 @@ const DraggableLayout = defineComponent({
         },
     },
     setup(props) {
-        const designer: any = inject('FormDesigner')
+        const { _model } = useTool()
 
         const slots = {
             item: ({ element }) => {
@@ -42,11 +43,11 @@ const DraggableLayout = defineComponent({
                     case 'steps':
                         return (<StepsLayout data={element} parent={props.data}></StepsLayout>)
                     case 'info':
-                        return (<Info data={element} parent={props.data}></Info>)
+                        return (<InfoLayout data={element} parent={props.data}></InfoLayout>)
+                    case 'timeline':
+                        return (<TimelineLayout data={element} parent={props.data}></TimelineLayout>)
                     case 'proTable':
                         return (<ProTableLayout data={element} parent={props.data} />)
-                    // case 'info':
-                    //     return (<InfoLayout data={element} parent={props.data}></InfoLayout>)
                     default:
                         return <Selection data={element} parent={props.data} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                             <TypeComponent {...element.componentProps} />
@@ -88,7 +89,7 @@ const DraggableLayout = defineComponent({
                     tag={props.tag}
                     v-slots={slots}
                     componentData={useAttrs()} // tag的props和event
-                    model={unref(designer.model)}
+                    model={unref(_model)}
                     {...options}
                 />
             )

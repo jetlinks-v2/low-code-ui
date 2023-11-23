@@ -46,7 +46,7 @@ const formRef = ref<any>()
 const { target } = useTarget()
 const formState = reactive({ ...unref(target) })
 
-const designer: any = inject('FormDesigner')
+const designer: any = inject('PageDesigner')
 
 const _type = computed(() => {
   return target?.value?.type || 'root'
