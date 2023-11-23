@@ -1,167 +1,159 @@
 <template>
-    <div>
-        <a-select :options="geoList" :open="selectRef.open" showSearch allowClear v-model:value="_value" placeholder="请选择" :disabled="disabled"
-            @search="onSearch" @change="onChange" @dropdownVisibleChange="onDrop" @blur="onBlur">
-            <template #dropdownRender="{ menuNode: menu }">
-                <j-spin :spinning="selectRef.loading">
-                    <v-nodes :vnodes="menu" />
-                </j-spin>
-            </template>
-        </a-select>
+    <div v-if="type === 'tree'">
+        <j-tree-select :tree-data="geoList" :fieldNames="{ label: format, value: 'code' }" @select="handleSelect"
+            :disabled="disabled" placeholder='请选择' v-model:value="_value" v-model:treeExpandedKeys="treeExpandedKeys">
+        </j-tree-select>
     </div>
+    <j-space v-else class="select">
+        <div v-for="(item, index) in  selectRef.list " style="padding: 0 6px;">
+            <j-select :fieldNames="{ label: format, value: 'code' }" :options="item" v-model:value="selectRef.value[index]"
+                :disabled="disabled" placeholder='请选择' style="min-width: 100px;"
+                @change="(value, options) => handleChange(value, options, index)">
+            </j-select>
+        </div>
+    </j-space>
 </template>
 
 <script  setup>
-import { getGeoTree, GeoTreeByName } from '@LowCode/api/form'
-import { debounce } from "lodash-es";
+import { getGeoTree } from '@LowCode/api/form'
 
 
 const props = defineProps({
     value: {
-        type: String,
+        type: Object,
         default: undefined
     },
     disabled: {
         type: Boolean,
         default: false
     },
-    // level: {
-    //     type: String,
-    //     default: 'all'
-    // },
-    geoType: {
+    type: {
         type: String,
-        default: 'country'
+        default: 'tree'
+    },
+    format: {
+        type: String,
+        default: 'name'
     }
 })
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value', 'change'])
 
-const VNodes = (_, { attrs }) => {
-    return attrs.vnodes
-}
-const geoList = ref()
+const geoList = ref([])
 const _value = ref()
-const geoType = ref(props.geoType)
-
 const selectRef = reactive({
-    open: false,
-    loading: false,
+    list: [undefined],
+    value: [undefined]
 })
-
-const TreeMap = new Map()
+const treeExpandedKeys = ref([])
 
 //处理tree的name
-const handleTree = (tree, name) => {
+const handleTree = (tree) => {
     if (tree.length === 0) return []
     return tree.map(item => {
-        if (name) {
-            item.name = `${name}/${item.name}`
-        }
+        item.nameCode = `${item.name} | ${item.code}`
         if (item.children) {
-            item.children = handleTree(item.children, item.name)
+            item.children = handleTree(item.children)
         }
-        TreeMap.set(item.id, item)
         return item
     })
 }
 
-const getTree = async (option) => {
-    selectRef.loading = true
-    const res = await getGeoTree(geoType.value, {
-        paging: false,
-        "terms": [
-            {
-                "value": option ? option.key : 1,
-                "termType": "eq",
-                "column": option ? "parentId" : 'level'
-            }
-        ]
-    }).finally(() => selectRef.loading = false)
+
+const getTree = async () => {
+    const res = await getGeoTree({ "paging": false, "sorts": [{ "name": "sortIndex", "order": "asc" }] })
     if (res.status === 200) {
+        geoList.value = handleTree(res.result)
+        selectRef.list[0] = geoList.value
+    }
+}
 
-        if (res.result.length === 0) {
-            selectRef.open = false
+const findParent = (data, target, result) => {
+    for (let item of data) {
+        if (item.id === target?.id) {
+            //将查找到的目标数据加入结果数组中
+            result.unshift(item)
+            return true
+        }
+        if (item.children && item.children.length > 0) {
+            //根据查找到的结果往上找父级节点
+            let isFind = findParent(item.children, target, result)
+            if (isFind) {
+                result.unshift(item)
+                return true
+            }
+        }
+    }
+    //走到这说明没找到目标
+    return false
+}
+
+const handleProps = (value) => {
+    const arr = []
+    findParent(geoList.value, value, arr)
+    selectRef.value = arr.map((item, index) => {
+        selectRef.list[0] = geoList.value
+        if (item.children) {
+            selectRef.list[index + 1] = item.children
+        }
+
+        return item.code
+    })
+
+
+}
+
+const handleSelect = (_, node) => {
+    delete node.children
+    emit('update:value', node)
+    emit('change', node)
+}
+
+const handleChange = (_, options, index) => {
+    selectRef.value = selectRef.value.map((item, idx) => {
+        if (idx <= index) {
+            return item
         } else {
-            geoList.value = res.result?.map(item => ({
-                label: option ? `${option.label}/${item.name}` : item.name,
-                value: option ? `${option.value}/${item.name}` : item.name,
-                key: item.id
-            }))
+            return undefined
         }
-    }
-}
-
-
-const onSearch = debounce(async (inputValue) => {
-    // console.log('----e', inputValue)
-    if (inputValue) {
-        selectRef.loading = true
-        const res = await GeoTreeByName(geoType.value, {
-            "paging": false,
-            terms: [
-                {
-                    "value": `%${inputValue}%`,
-                    "termType": "like",
-                    "column": "name"
-                }
-            ]
-        }).finally(() => selectRef.loading = false)
-        if (res.status === 200) {
-            handleTree(res.result)
-            const arr = [...TreeMap.values()].filter(item => item.name.includes(inputValue))
-
-            // console.log(arr, [...TreeMap.values()])
-            geoList.value = arr.map(item => ({
-                key: item.id,
-                label: item.name,
-                value: item.name
-            }))
-        }
-    }
-}, 300)
-
-
-
-const onChange = (value, options) => {
-    // console.log('value', value, options)
-    if (value) {
-        getTree(options)
+    })
+    selectRef.list.length = index + 1
+    if (options.children) {
+        selectRef.list[index + 1] = options.children
     } else {
-        selectRef.open = false
-        getTree()
-    }
-    changeValue(value)
-}
-
-const onDrop = (value) => {
-    if (value) {
-        selectRef.open = value
-    }
-    if (!value && !_value.value) {
-        selectRef.open = value
+        emit('update:value', options)
+        emit('change', options)
     }
 }
 
-const onBlur = ()=>{
-    selectRef.open = false
-}
 
 
 onMounted(() => {
     getTree()
 })
 
-const changeValue = (value) => {
-    emit('update:value', value)
-}
 
 
 watch(
     () => props.value,
-    () => {
-        _value.value = props.value
+    (val) => {
+        if (val) {
+            // console.log('props.value', props.value)
+            if (props.type === 'tree') {
+                _value.value = props.value?.code
+                const arr = []
+                findParent(geoList.value, val, arr)
+                treeExpandedKeys.value = arr.map(item => item.code)
+            } else {
+                handleProps(val)
+            }
+        }
+
     },
-    { deep: true, immediate: true }
+    { deep: true }
 )
 </script>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.select {
+    display: flex;
+}
+</style>
