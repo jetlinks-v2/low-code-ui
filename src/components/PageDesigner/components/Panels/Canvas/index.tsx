@@ -1,88 +1,24 @@
 import { extractCssClass, insertCustomCssToHead } from "@LowCode/components/PageDesigner/utils/utils"
 import DraggableLayout from "../../Draggable/DraggableLayout"
 import './index.less'
-import {PageProvider} from "../../../core";
-import { useTool } from '../../../hooks'
-import { useMagicKeys, useElementHover } from '@vueuse/core'
+import { PageProvider } from "../../../core";
+import { useKeys, useTool } from '../../../hooks'
+import { Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 
 const Canvas = defineComponent({
   name: 'Canvas',
   inheritAttrs: false,
   customOptions: {},
   setup() {
-    const { isEditModel, setSelection, onCopy, onShear, onPaste, onDelete } = useTool()
+    const { isEditModel, setSelection, onPaste } = useTool()
     const designer: any = inject('PageDesigner')
     const cssClassList = ref<string[]>([])
     const canvasRef = ref<any>()
-    const keys = useMagicKeys()
-    const focused = useElementHover(canvasRef)
+    const { } = useKeys(canvasRef)
 
     const handleClick = () => {
       setSelection('root')
     }
-
-    watch(
-      () => [keys?.['Ctrl']?.value, keys?.['Meta']?.value],
-      ([v1, v2]) => {
-        // designer._ctrl.value = v1 || v2
-      },
-    )
-
-    watch(
-      () => [keys?.['Ctrl+C']?.value, keys?.['Meta+C']?.value],
-      ([v1, v2]) => {
-        // designer._other.value = v1 || v2
-        if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
-          onCopy?.()
-        }
-      },
-    )
-
-    watch(
-      () => [keys?.['Ctrl+X']?.value, keys?.['Meta+X']?.value],
-      ([v1, v2]) => {
-        // designer._other.value = v1 || v2
-        if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
-          onShear?.()
-        }
-      },
-    )
-
-    watch(
-      () => [keys?.['Ctrl+V']?.value, keys?.['Meta+V']?.value],
-      ([v1, v2]) => {
-        // designer._other.value = v1 || v2
-        if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
-          onPaste?.()
-        }
-      },
-    )
-
-    // 删除
-    watch(
-      () => [keys?.['Backspace']?.value, keys?.['Delete']?.value],
-      ([v1, v2]) => {
-        // designer._other.value = v1 || v2
-        if ((v1 || v2) && isEditModel.value && designer.focus?.value) {
-          if (!designer?.delVisible?.value) {
-            onDelete?.()
-          }
-        }
-      },
-    )
-
-    watch(
-      () => focused?.value,
-      (newValue) => {
-        if (designer.focus) {
-          designer.focus.value = newValue
-        }
-      },
-      {
-        immediate: true,
-        deep: true
-      }
-    )
 
     watchEffect(() => {
       const arr = extractCssClass(unref(designer.pageData)?.componentProps?.cssCode)
@@ -94,32 +30,59 @@ const Canvas = defineComponent({
       return unref(designer.pageData)?.componentProps?.padding || 0
     })
 
+    const renderContent = () => {
+      return <DraggableLayout
+        data-layout-type={'root'}
+        style={{
+          height: '100%',
+          width: '100%',
+          padding: `0 ${_padding.value}px`
+        }}
+        data={designer.pageData.value?.children || []}
+        parent={designer.pageData.value}
+        isRoot
+      ></DraggableLayout>
+    }
+
+    const renderChildren = () => {
+      return <Dropdown
+        trigger={['contextmenu']}
+        onContextmenu={() => {
+          const flag = designer.selected.value.find((item: any) => item.key === 'root')
+          if (!flag) {
+            setSelection('root')
+          }
+        }}
+        v-slots={{
+          overlay: () => {
+            return (
+              <Menu>
+                <MenuItem key="paste"><Button type="link" onClick={onPaste}>粘贴</Button></MenuItem>
+              </Menu>
+            )
+          }
+        }}
+      >
+        {renderContent()}
+      </Dropdown>
+    }
+
     return () => {
       return (
-          <PageProvider>
-            <div
-              onClick={() => {
-                if (unref(isEditModel)) {
-                  handleClick()
-                }
-              }}
-              data-id="root"
-              class={['subject', ...unref(cssClassList)]}
-              ref={canvasRef}
-            >
-              <DraggableLayout
-                data-layout-type={'root'}
-                style={{
-                  height: '100%',
-                  width: '100%',
-                  padding: `0 ${_padding.value}px`
-                }}
-                data={designer.pageData.value?.children || []}
-                parent={designer.pageData.value}
-                isRoot
-              ></DraggableLayout>
-            </div>
-          </PageProvider>
+        <PageProvider>
+          <div
+            onClick={() => {
+              if (unref(isEditModel)) {
+                handleClick()
+              }
+            }}
+            data-id="root"
+            class={['subject', ...unref(cssClassList)]}
+            ref={canvasRef}
+          >
+            {!!designer.copyData.value?.length ? renderChildren() : renderContent()}
+          </div>
+        </PageProvider>
       )
     }
   }
