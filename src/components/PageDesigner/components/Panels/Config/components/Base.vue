@@ -270,7 +270,7 @@
     </template>
     <template v-if="['info-item-item'].includes(target.type)">
       <j-form-item
-        label="内容的描述"
+        label="内容描述"
         :name="['componentProps', 'label']"
         required
         :validateFirst="true"
@@ -280,6 +280,22 @@
           @change="onDataChange"
           :maxlength="32"
           v-model:value="target.componentProps.label"
+        />
+      </j-form-item>
+      <j-form-item
+        label="内容描述宽度"
+        :name="['componentProps', 'labelWidth']"
+        required
+        :validateFirst="true"
+      >
+        <j-input-number
+          placeholder="请输入"
+          style="width: 100%"
+          :precision="0"
+          :min="100"
+          addon-after="px"
+          @change="onDataChange"
+          v-model:value="target.componentProps.labelWidth"
         />
       </j-form-item>
       <j-form-item
