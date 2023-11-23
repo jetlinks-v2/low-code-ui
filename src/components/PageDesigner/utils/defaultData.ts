@@ -80,26 +80,35 @@ export const layout: ISchema[] = [
                 componentProps: {
                     title:'标题1',
                     bordered: true,
-                    column:2
+                    column:3
+                },
+            },
+        ]
+    },
+    {
+        type: 'timeline',
+        name: '时间轴',
+        componentProps: {},
+        children: [
+            {
+                type: 'timeline-item',
+                children: [],
+                componentProps: {
+                    label:'时间轴1'
                 },
             },
             {
-                type: 'info-item',
-                children: [
-                    {
-                        type: 'info-item-item',
-                        children: [],
-                        componentProps: {
-                            label:'标题2',
-                            value: '哈哈哈哈哈哈',
-                            span:1
-                        },
-                    },
-                ],
+                type: 'timeline-item',
+                children: [],
                 componentProps: {
-                    title:'标题2',
-                    column:3,
-                    bordered:false
+                    label:'时间轴2'
+                },
+            },
+            {
+                type: 'timeline-item',
+                children: [],
+                componentProps: {
+                    label:'时间轴3'
                 },
             },
         ]
@@ -115,30 +124,10 @@ export const _function: ISchema[] = [
                 {
                     title: '搜索项1',
                     dataIndex: 'id1',
-                    key: 'id1',
                     search: {
                         type: 'string',
-                        defaultTermType: 'eq',
                     },
-                },
-                {
-                    title: '搜索项2',
-                    dataIndex: 'id2',
-                    key: 'id2',
-                    search: {
-                        type: 'string',
-                        defaultTermType: 'eq',
-                    },
-                },
-                {
-                    title: '搜索项3',
-                    dataIndex: 'id3',
-                    key: 'id3',
-                    search: {
-                        type: 'string',
-                        defaultTermType: 'eq',
-                    },
-                },
+                }
             ]
         },
     },

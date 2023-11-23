@@ -24,8 +24,6 @@
 import { ref, watchEffect, inject } from 'vue'
 import { onlyMessage } from '@jetlinks-web/utils'
 
-const designer: any = inject('FormDesigner')
-
 const props = defineProps({
   text: {
     type: String,
