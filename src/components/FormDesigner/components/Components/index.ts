@@ -9,6 +9,8 @@ import Geo from './Geo.vue'
 import Form from './Form.vue'
 import CardSelect from './CardSelect.vue'
 import Input from './Input.vue'
+import CostStructure from './CostStructure.vue'
+import InputGroup from './InputGroup.vue'
 
 export {
     Text,
@@ -21,5 +23,7 @@ export {
     Geo,
     Form,
     CardSelect,
-    Input
+    Input,
+    CostStructure,
+    InputGroup
 }

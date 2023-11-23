@@ -1,9 +1,10 @@
 import { InputNumber, Textarea, Select, InputPassword, Switch, TreeSelect, DatePicker, TimePicker } from 'jetlinks-ui-components'
-import { Text,Org,Role,User,Product,Device,Upload, Geo, Form, CardSelect , Input } from '../components/Components/index'
+import { Text,Org,Role,User,Product,Device,Upload, Geo, Form, CardSelect , Input ,CostStructure, InputGroup } from '../components/Components/index'
 
 const componentMap = {
     // 'input': Input,
     'input': Input,
+    'input-group': InputGroup,
     'text': Text,
     'org': Org,
     'role': Role,
@@ -21,7 +22,8 @@ const componentMap = {
     'date-picker': DatePicker,
     'time-picker': TimePicker,
     'geo': Geo,
-    'form': Form
+    'form': Form,
+    'cost-structure' : CostStructure
 }
 
 export default componentMap;

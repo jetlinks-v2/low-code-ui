@@ -15,6 +15,9 @@ export const basic: ISchema[] = [
                 text:''
             }
         }
+    },{
+        type:'input-group',
+        name:'输入框组合',
     },
     {
         type: 'text',
@@ -250,6 +253,10 @@ export const pro: ISchema[] = [
         type: 'role',
         name: '角色选择',
     },
+    {
+        type: 'cost-structure',
+        name: '费用构成'
+    }
     // { // 需求未定
     //     type: 'geo',
     //     name: '地区',
