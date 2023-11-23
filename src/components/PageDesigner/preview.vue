@@ -97,7 +97,7 @@ watch(
   },
 )
 
-provide('FormDesigner', {
+provide('PageDesigner', {
   model: 'preview',
   type: props?.type || 'low-code',
   refList,

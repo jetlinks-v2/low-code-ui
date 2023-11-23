@@ -1,8 +1,7 @@
 <template>
   <div>
-    page
-    <!-- <j-form-item :validateFirst="true" label="组件布局" name="layout">
-      <div class="layout-box">
+    <j-form-item :validateFirst="true" label="背景图片" name="layout">
+      <!-- <div class="layout-box">
         <div
           class="layout-item"
           @click="onClick(item.value)"
@@ -12,52 +11,42 @@
         >
           <img :src="item.img" />
         </div>
-      </div>
-    </j-form-item> -->
-    <!-- <j-form-item :validateFirst="true" label="组件尺寸" name="size">
+      </div> -->
+    </j-form-item>
+    <j-form-item :validateFirst="true" label="页面位置" name="position">
       <CheckButton
         :options="[
-          { label: '小', value: 'small' },
-          { label: '中', value: 'default' },
-          { label: '大', value: 'large' },
+          { label: '左', value: 'left' },
+          { label: '中', value: 'center' },
+          { label: '右', value: 'right' },
         ]"
         @change="onDataChange"
-        v-model:value="target.componentProps.size"
+        v-model:value="target.componentProps.position"
       />
-    </j-form-item> -->
+    </j-form-item>
+    <j-form-item :validateFirst="true" label="页面边距" name="padding">
+      <j-input-number
+        v-model:value="target.componentProps.padding"
+        :min="0"
+        style="width: 100%"
+        addon-after="px"
+        :precision="0"
+        @change="onDataChange"
+      />
+    </j-form-item>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { useTarget } from '../../../../hooks'
+import { useTarget } from "../../../../hooks";
 
-const { target } = useTarget()
+const { target } = useTarget();
 
-const emits = defineEmits(['refresh'])
+const emits = defineEmits(["refresh"]);
 
-// const list = [
-//   {
-//     value: 'horizontal',
-//     img: '/images/form-designer/horizontal.png',
-//   },
-//   {
-//     value: 'vertical',
-//     img: '/images/form-designer/vertical.png',
-//   },
-//   {
-//     value: 'inline',
-//     img: '/images/form-designer/inline.png',
-//   },
-// ]
-
-// const onDataChange = () => {
-//   emits('refresh', target.value)
-// }
-
-// const onClick = (key: string) => {
-//   target.value.componentProps.layout = key
-//   emits('refresh', target.value)
-// }
+const onDataChange = () => {
+  emits("refresh", target.value);
+};
 </script>
 
 <style lang="less" scoped>

@@ -1,8 +1,7 @@
 import DraggableLayout from '../Draggable/DraggableLayout'
 import Selection from '../Selection/index'
-import { Steps, Step, Button, Space } from 'jetlinks-ui-components'
+import { Steps, Step, Button, Space, AIcon } from 'jetlinks-ui-components'
 import './index.less'
-import { omit } from 'lodash-es'
 import { useTool } from '../../hooks'
 import { withModifiers } from 'vue'
 import generatorData from '../../utils/generatorData'
@@ -23,8 +22,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const { isDragArea, isEditModel } = useTool()
-        const designer: any = inject('FormDesigner')
+        const { isDragArea, isEditModel, onAddChild } = useTool()
 
         const _data = computed(() => {
             return props.data
@@ -43,12 +41,12 @@ export default defineComponent({
                     title: '标题' + uid(4)
                 },
             })
-            designer.onAddChild(_item, props.data)
+            onAddChild(_item, props.data)
         }
 
         const onPrev = () => {
             if (isEditModel.value) {
-                if(current.value > 0){
+                if (current.value > 0) {
                     current.value--;
                 }
             }
@@ -56,7 +54,7 @@ export default defineComponent({
 
         const onNext = () => {
             if (isEditModel.value) {
-                if(current.value < unref(list)?.length - 1){
+                if (current.value < unref(list)?.length - 1) {
                     current.value++;
                 }
             }
@@ -77,11 +75,11 @@ export default defineComponent({
         return () => {
             return (
                 <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
-                    <Steps current={current.value} data-layout-type={'steps'} {...omit(unref(_data).componentProps, 'description')} onChange={onChange}>
+                    <Steps current={current.value} data-layout-type={'steps'} {...unref(_data).componentProps} onChange={onChange}>
                         {
-                            unref(list).map(element => {
+                            unref(list).map((element: any) => {
                                 return (
-                                    <Step {...element.componentProps} />
+                                    <Step {...element.componentProps} icon={element.componentProps?.icon ? <AIcon type={element.componentProps?.icon} /> : undefined} />
                                 )
                             })
                         }
