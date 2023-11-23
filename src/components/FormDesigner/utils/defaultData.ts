@@ -255,6 +255,17 @@ export const layout: ISchema[] = [
             },
         ]
     },
+    {
+        type: 'inline',
+        name: '内联',
+        children: [],
+        componentProps: {
+
+        },
+        formItemProps: {
+            isLayout: false
+        },
+    },
 ]
 // 高级组件
 export const pro: ISchema[] = [
@@ -301,7 +312,7 @@ export const filedData = [
         id: 'pro',
         name: '高级组件',
         children: [...pro]
-    },{
+    }, {
         id: 'iot',
         name: 'iot组件',
         children: [...iot]

@@ -36,7 +36,7 @@ import { Scrollbar } from 'jetlinks-ui-components'
 import Page from './components/Page.vue'
 import Base from './components/Base.vue'
 import Status from './components/Status.vue'
-import { useTarget } from '../../../hooks'
+import { useTarget, useTool } from '../../../hooks'
 import { map } from 'lodash-es'
 import { getConfigList } from './utils'
 import { updateData } from '@LowCode/components/PageDesigner/utils/utils'
@@ -44,6 +44,7 @@ import { updateData } from '@LowCode/components/PageDesigner/utils/utils'
 const formRef = ref<any>()
 
 const { target } = useTarget()
+const { setSelection } = useTool()
 const formState = reactive({ ...unref(target) })
 
 const designer: any = inject('PageDesigner')
@@ -81,7 +82,7 @@ const onRefresh = (obj: any) => {
         ...designer.pageData.value,
         children: arr,
       }
-      designer.setSelection(obj)
+      setSelection(obj)
     }
   }
 }

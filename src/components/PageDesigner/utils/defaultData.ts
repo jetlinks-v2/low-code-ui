@@ -114,6 +114,15 @@ export const layout: ISchema[] = [
             },
         ]
     },
+    {
+        type: 'inline',
+        name: '内联',
+        children: [],
+        componentProps: {},
+        formItemProps: {
+            isLayout: false
+        },
+    },
 ]
 
 export const _function: ISchema[] = [

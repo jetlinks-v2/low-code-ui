@@ -13,7 +13,7 @@
         </div>
       </div> -->
     </j-form-item>
-    <j-form-item :validateFirst="true" label="页面位置" name="position">
+    <!-- <j-form-item :validateFirst="true" label="页面位置" name="position">
       <CheckButton
         :options="[
           { label: '左', value: 'left' },
@@ -24,16 +24,7 @@
         v-model:value="target.componentProps.position"
       />
     </j-form-item>
-    <j-form-item :validateFirst="true" label="页面边距" name="padding">
-      <j-input-number
-        v-model:value="target.componentProps.padding"
-        :min="0"
-        style="width: 100%"
-        addon-after="px"
-        :precision="0"
-        @change="onDataChange"
-      />
-    </j-form-item>
+     -->
   </div>
 </template>
 
