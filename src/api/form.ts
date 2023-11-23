@@ -65,9 +65,10 @@ export const getGeoType = () => request.post(`/district/category/_query/no-pagin
 
 /**
  * 获取地区
- * categoryId：类型id
  */
-export const getGeoTree = (categoryId: string, data: any) => request.post(`/district/byCategory/${categoryId}/_query`, data)
+export const getGeoTree = ( data: any) => request.post(`/area/_all/tree`, data)
+
+
 
 /**
  * 根据类别条件查询地区（树结构）

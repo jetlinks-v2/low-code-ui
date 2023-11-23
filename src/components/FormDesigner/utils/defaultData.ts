@@ -240,10 +240,10 @@ export const pro: ISchema[] = [
         type: 'role',
         name: '角色选择',
     },
-    // { // 需求未定
-    //     type: 'geo',
-    //     name: '地区',
-    // },
+    { // 需求未定
+        type: 'geo',
+        name: '地区',
+    },
 ]
 
 const iot: ISchema[] = [
