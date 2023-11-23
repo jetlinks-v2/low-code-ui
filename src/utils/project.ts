@@ -32,7 +32,7 @@ const handleModuleChildren = (data: any[], filter?: IntegrateFilterType) => {
     item.provider = item.others.type
     item.others.tree_index = index
 
-    if ([providerEnum.HtmlPage, providerEnum.ListPage, providerEnum.FormPage].includes(type)) {
+    if ([providerEnum.HtmlPage, providerEnum.ListPage, providerEnum.FormPage,providerEnum.PageDesign].includes(type)) {
       item.provider = 'page-code'
       resources.push(omit(item, ['fullId']))
     }

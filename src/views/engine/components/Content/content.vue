@@ -8,6 +8,7 @@
     <ListPage v-else-if="data.type === providerEnum.ListPage" :data="props.data"/>
     <SQLCode v-else-if="data.type === providerEnum.SQL"  v-bind="data"/>
     <FunctionCode v-else-if="data.type === providerEnum.Function"  v-bind="data"/>
+    <PageDesigner v-else-if="data.type === providerEnum.PageDesign"  v-bind="data"/>
   </div>
 </template>
 
@@ -15,6 +16,7 @@
 import { providerEnum } from '@LowCode/components/ProJect/index'
 import ProjectEmpty from '@LowCode/components/ProJect/Empty/index.vue'
 import { ListPage , CRUD , Project , SQLCode , FunctionCode} from '@LowCode/components/index'
+import { PageDesigner } from '@LowCode/components/index';
 
 const props = defineProps({
   data: {
