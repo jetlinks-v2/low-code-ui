@@ -5,7 +5,7 @@ import './index.less';
 import StepsLayout from './StepsLayout';
 import InfoLayout from './InfoLayout';
 import TimelineLayout from './TimelineLayout';
-import { useTool } from '../../hooks';
+import { useProps, useTool } from '../../hooks';
 import ProTableLayout from './ProTableLayout'
 import CommonLayout from './CommonLayout';
 

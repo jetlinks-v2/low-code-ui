@@ -79,8 +79,8 @@ const handleProps = (node: any) => {
             result.unit = 'M'
             break
         case 'geo':
-            result.level = 'all'
-            result.geoType = 'country'
+            result.type = 'tree'
+            result.format = 'name'
             break
         case 'grid':
             result.inlineMax = 4
