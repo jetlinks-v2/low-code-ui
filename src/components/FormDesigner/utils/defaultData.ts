@@ -5,12 +5,42 @@ export const basic: ISchema[] = [
     {
         type: 'input',
         name: '文本框',
+        componentProps:{
+            prefix:{
+                type:'',
+                text:''
+            },
+            suffix:{
+                type:'',
+                text:''
+            }
+        }
     },
+    // {
+    //     type:'input-group',
+    //     name:'输入框组合',
+    //     componentProps:{
+    //         preComponent:{
+    //             type:'select',
+    //             show:false,
+    //             col:8,
+    //             options:[],
+    //             preText:''
+    //         },
+    //         afterComponent:{
+    //             type:'select',
+    //             show:false,
+    //             col:8,
+    //             options:[],
+    //             preText:''
+    //         }
+    //     }
+    // },
     {
         type: 'text',
         name: '文本',
         componentProps: {
-            value: '文本'
+            value: '文本',
         },
     },
     {
