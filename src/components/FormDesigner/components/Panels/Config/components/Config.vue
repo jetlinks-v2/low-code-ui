@@ -233,20 +233,19 @@
       </j-form-item>
     </template>
     <template v-if="['geo'].includes(type)">
-      <!-- <j-form-item label="存储层级" :name="['componentProps', 'level']">
-        <j-select
-          v-model:value="target.componentProps.level"
-          placeholder="请选择"
-          required
-          @change="onDataChange"
-        >
-          <j-select-option :value="'all'">全部层级</j-select-option>
-          <j-select-option :value="'min'">最小级</j-select-option>
-        </j-select>
-      </j-form-item> -->
+      <j-form-item label="组件形态" :name="['componentProps', 'type']">
+        <CheckButton
+          :options="[
+            { label: '树形下拉框', value: 'tree' },
+            { label: '分级下拉框', value: 'select' },
+          ]"
+          @change="onChange"
+          v-model:value="target.componentProps.type"
+        />
+      </j-form-item>
       <j-form-item
-        label="可选项"
-        :name="['componentProps', 'geoType']"
+        label="可选项格式"
+        :name="['componentProps', 'format']"
         :validateFirst="true"
         :rules="[
           {
@@ -256,11 +255,13 @@
         ]"
       >
         <j-select
-          v-model:value="target.componentProps.geoType"
+          v-model:value="target.componentProps.format"
           placeholder="请选择"
           @change="onDataChange"
         >
-          <!-- <j-select-option v-for="item in options" :value="item?.id">{{ item?.name }}</j-select-option> -->
+        <j-select-option :value="'name'">区域名称</j-select-option>
+          <j-select-option :value="'code'">行政区划代码</j-select-option>
+          <j-select-option :value="'nameCode'">区域名称｜行政区划代码</j-select-option>
         </j-select>
       </j-form-item>
     </template>
@@ -470,9 +471,9 @@ const list = computed(() =>
   target.value.componentProps?.listType === 'text' ? textType : imgType,
 )
 
-const { data: options, run } = useRequest(getGeoType, {
-  immediate: false,
-})
+// const { data: options, run } = useRequest(getGeoType, {
+//   immediate: false,
+// })
 
 const rulesVisible = computed(() => {
   return [
@@ -574,9 +575,9 @@ const onDateChange = (e) => {
   emits('refresh', target.value)
 }
 
-watchEffect(() => {
-  if (target.value?.type === 'geo') {
-    run()
-  }
-})
+// watchEffect(() => {
+//   if (target.value?.type === 'geo') {
+//     run()
+//   }
+// })
 </script>

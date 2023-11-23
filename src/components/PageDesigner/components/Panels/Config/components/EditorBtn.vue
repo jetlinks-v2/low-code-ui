@@ -9,7 +9,7 @@
       @ok="handleOk"
       @cancel="handleCancel"
     >
-      <div ref="target" style="height: 300px;">
+      <div ref="target" style="height: 300px">
         <j-monaco-editor
           @errorChange="onErrorChange"
           v-model="_value"
@@ -21,53 +21,71 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect, inject } from 'vue'
-import { onlyMessage } from '@jetlinks-web/utils'
+import { ref, watchEffect, inject, watch } from "vue";
+import { onlyMessage } from "@jetlinks-web/utils";
+import { useFocusWithin } from "@vueuse/core";
+
+const designer: any = inject("PageDesigner");
 
 const props = defineProps({
   text: {
     type: String,
-    default: '',
+    default: "",
   },
   value: {
     type: String,
   },
   language: {
     type: String,
-    default: 'css',
+    default: "css",
   },
-})
+});
 
-const emits = defineEmits(['update:value', 'change'])
-const visible = ref<boolean>(false)
-const _value = ref<string>()
-const target = ref()
-const _error = ref<any[]>([])
+const emits = defineEmits(["update:value", "change"]);
+const visible = ref<boolean>(false);
+const _value = ref<string>();
+const target = ref();
+const _error = ref<any[]>([]);
+
+const { focused } = useFocusWithin(target);
 
 watchEffect(() => {
-  _value.value = props?.value //
-})
+  _value.value = props?.value; //
+});
 
 const onBtn = () => {
-  visible.value = true
-}
+  visible.value = true;
+};
 
 const onErrorChange = (error: any[]) => {
-  _error.value = error
-}
+  _error.value = error;
+};
 
 const handleOk = () => {
   if (!_error.value?.length) {
-    emits('update:value', _value.value)
-    emits('change', _value.value)
-    visible.value = false
+    emits("update:value", _value.value);
+    emits("change", _value.value);
+    visible.value = false;
   } else {
-    onlyMessage('代码有误，请检查','error')
+    onlyMessage("代码有误，请检查", "error");
   }
-}
+};
 
 const handleCancel = () => {
-  visible.value = false
-  _value.value = ''
-}
+  visible.value = false;
+  _value.value = "";
+};
+
+watch(
+  focused,
+  (v) => {
+    if (designer) {
+      designer.focused.value = v;
+    }
+  },
+  {
+    immediate: true,
+    deep: true,
+  }
+);
 </script>
