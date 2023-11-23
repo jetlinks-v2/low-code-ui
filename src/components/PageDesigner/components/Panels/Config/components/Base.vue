@@ -327,6 +327,48 @@
         />
       </j-form-item>
     </template>
+    <template v-if="['timeline'].includes(target.type)">
+      <j-form-item
+        label="位置"
+        :name="['componentProps', 'mode']"
+        :validateFirst="true"
+      >
+        <CheckButton
+          :options="[
+            { label: '左', value: 'left' },
+            { label: '交叉', value: 'alternate' },
+            { label: '右', value: 'right' },
+          ]"
+          @change="onDataChange"
+          v-model:value="target.componentProps.mode"
+        />
+      </j-form-item>
+    </template>
+    <template v-if="['timeline-item'].includes(target.type)">
+      <j-form-item
+        label="标题"
+        :name="['componentProps', 'label']"
+        required
+        :validateFirst="true"
+      >
+        <j-input
+          placeholder="请输入"
+          @change="onDataChange"
+          :maxlength="32"
+          v-model:value="target.componentProps.label"
+        />
+      </j-form-item>
+      <j-form-item
+        label="颜色"
+        :validateFirst="true"
+        :name="['componentProps', 'color']"
+      >
+        <ColorPicker
+          v-model:hex="target.componentProps.color"
+          @change="onDataChange"
+        />
+      </j-form-item>
+    </template>
   </div>
 </template>
 

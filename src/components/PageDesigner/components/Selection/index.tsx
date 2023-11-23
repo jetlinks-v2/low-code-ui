@@ -3,6 +3,7 @@ import { withModifiers } from 'vue'
 import './index.less'
 import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import { useTool } from '../../hooks'
+import { extractCssClass, insertCustomCssToHead } from '../../utils/utils'
 
 const Selection = defineComponent({
   name: 'Selection',
@@ -39,6 +40,7 @@ const Selection = defineComponent({
     },
   },
   setup(props, { slots }) {
+    const cssClassList = ref<string[]>([])
     const designer: any = inject('PageDesigner')
     const { isEditModel, onPaste, onDelete, setSelection, onCopy, onShear } = useTool()
 
@@ -56,6 +58,12 @@ const Selection = defineComponent({
     const TagComponent = isHTMLTag(props.tag as string) ? props.tag : resolveComponent(props.tag as string)
 
     const _hasDrag = computed(() => { return props.hasDrag })
+
+    watchEffect(() => {
+      const arr = extractCssClass(props.data.componentProps?.cssCode)
+      cssClassList.value = arr
+      insertCustomCssToHead(props.data.componentProps?.cssCode, props.data?.key)
+    })
 
     const editNode = () => {
       return <Dropdown
@@ -98,6 +106,7 @@ const Selection = defineComponent({
           ]}
           {...useAttrs()}
           onClick={withModifiers(handleClick, ['stop'])}
+          {...unref(cssClassList)}
         >
           {unref(isEditModel) ? editNode() : slots?.default()}
           {

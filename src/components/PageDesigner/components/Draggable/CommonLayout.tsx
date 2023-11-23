@@ -19,12 +19,12 @@ export default defineComponent({
     },
     setup(props) {
         const TypeComponent = componentMap?.[props?.data?.type] || 'div'
-        const _props = useProps(props.data)
-        const params = {
-            data: props.data,
-            parent: props.parent
-        }
         return () => {
+            const _props = useProps(props.data)
+            const params = {
+                data: props.data,
+                parent: props.parent
+            }
             return (
                 <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                     <TypeComponent {..._props.componentProps} />

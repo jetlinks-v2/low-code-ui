@@ -18,13 +18,7 @@ import Config from "./components/Panels/Config/index.vue";
 import Header from "./components/Header/index.vue";
 import { provide, ref, watch } from "vue";
 import { cloneDeep } from "lodash-es";
-
-const initData = {
-  type: "root",
-  key: "root",
-  componentProps: {},
-  children: [],
-};
+import { initData } from "./utils/utils";
 
 const props = defineProps({
   data: {
