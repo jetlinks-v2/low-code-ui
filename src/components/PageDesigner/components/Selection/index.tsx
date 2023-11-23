@@ -2,6 +2,7 @@ import { isHTMLTag } from '@vue/shared'
 import { withModifiers } from 'vue'
 import './index.less'
 import { AIcon } from 'jetlinks-ui-components'
+import { useTool } from '../../hooks'
 
 const Selection = defineComponent({
   name: 'Selection',
@@ -10,7 +11,7 @@ const Selection = defineComponent({
   props: {
     data: {
       type: Object,
-      default: () => {}
+      default: () => { }
     },
     tag: {
       type: String,
@@ -38,20 +39,17 @@ const Selection = defineComponent({
     },
   },
   setup(props, { slots }) {
-    const designer: any = inject('FormDesigner')
+    const designer: any = inject('PageDesigner')
+    const { isEditModel, onPaste, onDelete, setSelection } = useTool()
 
     const Selected = computed(() => {
       const flag = designer.selected.value.find(item => props?.data?.key === item.key)
       return props?.data?.key !== undefined && flag
     })
 
-    const isEditModel = computed(() => {
-      return unref(designer?.model) === 'edit'
-    })
-
     const handleClick = () => {
       if (unref(isEditModel)) {
-        designer.setSelection(props.data)
+        setSelection(props.data)
       }
     }
 
@@ -60,12 +58,12 @@ const Selection = defineComponent({
     const _hasDrag = computed(() => { return props.hasDrag })
 
     // 粘贴
-    const onPaste = () => {
-      designer?.onPaste()
+    const _onPaste = () => {
+      onPaste()
     }
     // 删除
-    const onDelete = () => {
-      designer?.onDelete()
+    const _onDelete = () => {
+      onDelete()
     }
     return () => {
       return (
@@ -89,7 +87,7 @@ const Selection = defineComponent({
                     <div
                       class="action"
                       onClick={withModifiers(() => {
-                        onPaste()
+                        _onPaste()
                       }, ['stop'])}
                     >
                       <AIcon type="CopyOutlined" />
@@ -100,7 +98,7 @@ const Selection = defineComponent({
                   props.hasDel && (
                     <div
                       class="action"
-                      onClick={withModifiers(() => { onDelete() }, ['stop'])}
+                      onClick={withModifiers(() => { _onDelete() }, ['stop'])}
                     >
                       <AIcon type="DeleteOutlined" />
                     </div>

@@ -1,11 +1,5 @@
-import useTool from './useTool'
-import useTarget from './useTarget'
-import useData from './useData'
-import useProps from './useProps'
+export { default as useTool } from './useTool'
+export { default as useTarget } from './useTarget'
+export { default as useProps } from './useProps'
 
-export {
-    useTool,
-    useTarget,
-    useData,
-    useProps
-}
+export * from './usePageProvider'
