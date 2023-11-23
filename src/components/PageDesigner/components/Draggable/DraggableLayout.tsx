@@ -7,6 +7,7 @@ import componentMap from '../../utils/componentMap';
 import StepsLayout from './StepsLayout';
 import InfoLayout from './InfoLayout';
 import Info from './copy_InfoLayout'
+import ProTableLayout from './ProTableLayout'
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -42,6 +43,8 @@ const DraggableLayout = defineComponent({
                         return (<StepsLayout data={element} parent={props.data}></StepsLayout>)
                     case 'info':
                         return (<Info data={element} parent={props.data}></Info>)
+                    case 'proTable':
+                        return (<ProTableLayout data={element} parent={props.data} />)
                     // case 'info':
                     //     return (<InfoLayout data={element} parent={props.data}></InfoLayout>)
                     default:
