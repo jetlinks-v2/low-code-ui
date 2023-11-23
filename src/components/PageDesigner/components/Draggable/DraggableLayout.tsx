@@ -8,6 +8,7 @@ import TimelineLayout from './TimelineLayout';
 import { useProps, useTool } from '../../hooks';
 import ProTableLayout from './ProTableLayout'
 import CommonLayout from './CommonLayout';
+import InlineLayout from './InlineLayout';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -46,6 +47,8 @@ const DraggableLayout = defineComponent({
                         return (<TimelineLayout data={element} parent={props.data}></TimelineLayout>)
                     case 'proTable':
                         return (<ProTableLayout data={element} parent={props.data} />)
+                    case 'inline':
+                        return (<InlineLayout data={element} parent={props.data} />)
                     default:
                         return <CommonLayout data={element} parent={props.data} />
                 }

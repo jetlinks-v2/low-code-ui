@@ -2,7 +2,7 @@ import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
 import './index.less'
 import { withModifiers } from 'vue'
-import { cloneDeep, omit } from 'lodash-es'
+import { cloneDeep } from 'lodash-es'
 import { useTool } from '../../hooks'
 import generatorData from '../../utils/generatorData'
 
@@ -48,9 +48,7 @@ export default defineComponent({
             const _item = generatorData({
                 type: props.data?.type + '-item',
                 children: [],
-                componentProps: {
-                    span: 1
-                },
+                componentProps: {},
                 formItemProps: {
                     isLayout: false
                 },
@@ -68,39 +66,41 @@ export default defineComponent({
 
             return (
                 <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
-                    <div
-                        data-layout-type={'inline'}
-                        {...props.data.componentProps}
-                        style={{ display: 'flex', alignItems: 'center' }}
-                    >
-                        {
-                            unref(list).map((element: any) => {
-                                return (
-                                    <div key={element.key} {...omit(element.componentProps, 'span')}>
-                                        <Selection
-                                            class={unref(isDragArea) && 'drag-area'}
-                                            hasDel={unref(list).length > 1}
-                                            data={element}
-                                            style={unref(layoutPadStyle)}
-                                            tag="div"
-                                            hasCopy={true}
-                                            parent={unref(list)}
-                                        >
-                                            <DraggableLayout
-                                                data={element?.children || []}
-                                                data-layout-type={'item'}
-                                                parent={element}
-                                                path={_path}
-                                                index={_index}
-                                                visible={props.visible}
-                                                editable={props.editable}
-                                            />
-                                        </Selection>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
+                    {
+                        unref(list)?.length ? <div
+                            data-layout-type={'inline'}
+                            {...props.data.componentProps}
+                            style={{ display: 'flex', alignItems: 'center' }}
+                        >
+                            {
+                                unref(list).map((element: any) => {
+                                    return (
+                                        <div key={element.key} {...element.componentProps}>
+                                            <Selection
+                                                class={unref(isDragArea) && 'drag-area'}
+                                                hasDel={unref(list).length > 1}
+                                                data={element}
+                                                style={unref(layoutPadStyle)}
+                                                tag="div"
+                                                hasCopy={true}
+                                                parent={unref(list)}
+                                            >
+                                                <DraggableLayout
+                                                    data={element?.children || []}
+                                                    data-layout-type={'inline-item'}
+                                                    parent={element}
+                                                    path={_path}
+                                                    index={_index}
+                                                    visible={props.visible}
+                                                    editable={props.editable}
+                                                />
+                                            </Selection>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div> : (unref(isEditModel) ? <div class="draggable-empty">内联</div> : <div></div>)
+                    }
                     {
                         unref(isEditModel) &&
                         <div class="draggable-add">
