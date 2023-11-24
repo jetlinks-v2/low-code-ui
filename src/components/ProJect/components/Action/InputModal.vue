@@ -127,6 +127,11 @@ const getConfiguration = (type) => {
         type: 'html',
         code: ''
       };
+    case providerEnum.PageDesign:
+      return {
+        type: 'page-design',
+        code: ''
+      };
   }
 }
 

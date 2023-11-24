@@ -47,18 +47,20 @@ const props = defineProps({
   },
 });
 
-const emits = defineEmits(["update:value"]);
+const emits = defineEmits(["update:value",'change']);
 
 const dialogVisible = ref<boolean>(false);
 const selected = ref<string>();
 
 const onSave = () => {
   emits("update:value", selected.value);
+  emits('change',selected.value)
   dialogVisible.value = false;
 };
 
 const onRemove = () => {
   emits("update:value", '');
+  emits("change", '');
 }
 
 const onOpen = () => {

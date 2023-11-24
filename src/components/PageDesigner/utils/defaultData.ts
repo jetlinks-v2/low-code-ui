@@ -147,7 +147,8 @@ export const _function: ISchema[] = [
         componentProps: {
             request: {
                 query: '',
-                handleResult: ''
+                handleResult: '',
+                defaultParams: ''
             },
             columns: [
                 {
@@ -161,12 +162,14 @@ export const _function: ISchema[] = [
                 {
                     title: 'Address',
                     dataIndex: 'address',
-                    scopedSlots: 'address',
                 },
                 {
                     title: 'Action',
                     dataIndex: 'action',
-
+                    render: (slotProps) => {
+                        console.log(slotProps)
+                        return slotProps['action']
+                    }
                 },
             ],
             dataSource: [
