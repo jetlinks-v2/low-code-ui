@@ -3,6 +3,7 @@ import Selection from '../../Selection/index'
 import { defineComponent, inject } from 'vue'
 import { useTool, usePageProvider } from '../../../hooks'
 import TableSkeleton from './Skeleton'
+import { request as axiosRequest } from '@jetlinks-web/core'
 
 export default defineComponent({
     name: 'ProTableLayout',
@@ -51,6 +52,28 @@ export default defineComponent({
             return !props.data.componentProps.paginationSetting?.open
         })
 
+        const hasRequest = computed(() => {
+            const { request } = props.data.componentProps
+            return !!request?.query && !isEditModel.value
+        })
+        const handleRequestFn = async (paramsData: any) => {
+            const { request, handleResult } = props.data.componentProps
+            const resp = await axiosRequest.post(request.query, paramsData)
+            if (handleResult) {
+                const handleResultFn = new Function('result', handleResult)
+                resp.result = handleResultFn.call(this, resp.result)
+            }
+            return resp
+        }
+
+        const defaultParams = computed(() => {
+            try {
+                return JSON.parse(props.data.componentProps?.request?.defaultParams)
+            } catch (e) {
+                return undefined
+            }
+        })
+
         const headerTitleRender = () => {
             return (
                 <Selection {...useAttrs()}>
@@ -66,16 +89,16 @@ export default defineComponent({
                         columns={columns.value}
                         dataSource={dataSource.value}
                         modelValue={'TABLE'}
-                        params={params}
+                        params={params.value}
                         noPagination={noPagination.value}
                         pagination={props.data.componentProps.paginationSetting?.pagination}
+                        request={hasRequest.value ? handleRequestFn : undefined}
+                        defaultParams={defaultParams.value}
                         v-slots={{
                             headerTitle: headerTitleRender,
                             ...columnsSlots.value
                         }}
                     >
-
-
                     </ProTable>
 
                 </Selection>

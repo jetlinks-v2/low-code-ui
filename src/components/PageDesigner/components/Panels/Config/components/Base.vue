@@ -327,41 +327,73 @@
         />
       </j-form-item>
     </template>
-    <template v-if="['proTable'].includes(target.type)">
+    <template v-if="['timeline'].includes(target.type)">
       <j-form-item
-          label="表格列"
-          :name="['componentProps', 'columns']"
-          required
-          :validateFirst="true"
+        label="位置"
+        :name="['componentProps', 'mode']"
+        :validateFirst="true"
       >
-        <Search
-            @change="onDataChange"
-            type="table"
-            v-model:value="target.componentProps.columns"
+        <CheckButton
+          :options="[
+            { label: '左', value: 'left' },
+            { label: '交叉', value: 'alternate' },
+            { label: '右', value: 'right' },
+          ]"
+          @change="onDataChange"
+          v-model:value="target.componentProps.mode"
+        />
+      </j-form-item>
+    </template>
+    <template v-if="['timeline-item'].includes(target.type)">
+      <j-form-item
+        label="标题"
+        :name="['componentProps', 'label']"
+        required
+        :validateFirst="true"
+      >
+        <j-input
+          placeholder="请输入"
+          @change="onDataChange"
+          :maxlength="32"
+          v-model:value="target.componentProps.label"
         />
       </j-form-item>
       <j-form-item
-          label="数据源"
-          :name="['componentProps', 'request']"
+        label="颜色"
+        :validateFirst="true"
+        :name="['componentProps', 'color']"
       >
+        <ColorPicker
+          v-model:hex="target.componentProps.color"
+          @change="onDataChange"
+        />
+      </j-form-item>
+    </template>
+    <template v-if="['proTable'].includes(target.type)">
+      <j-form-item
+        label="表格列"
+        :name="['componentProps', 'columns']"
+        required
+        :validateFirst="true"
+      >
+        <Search
+          @change="onDataChange"
+          type="table"
+          v-model:value="target.componentProps.columns"
+        />
+      </j-form-item>
+      <j-form-item label="数据源" :name="['componentProps', 'request']">
         <DataSource v-model:value="target.componentProps.request" />
       </j-form-item>
-      <j-form-item
-        label="分页器"
-      >
-        <j-switch v-model:checked="target.componentProps.paginationSetting.open" />
+      <j-form-item label="分页器">
+        <j-switch
+          v-model:checked="target.componentProps.paginationSetting.open"
+        />
       </j-form-item>
-      <j-form-item
-        label="展示格式"
-        :name="['componentProps', 'viewType']"
-      >
-
+      <j-form-item label="展示格式" :name="['componentProps', 'viewType']">
       </j-form-item>
-      <j-form-item
-          label="操作列"
-          :name="['componentProps', 'action']"
-      >
-
+      <j-form-item label="操作列" :name="['componentProps', 'action']">
+        <Action v-model:value="target.componentProps.action" />
       </j-form-item>
     </template>
   </div>
@@ -370,9 +402,10 @@
 <script lang="ts" setup>
 import Icon from "./Icon/index.vue";
 import Search from "./Search/index.vue";
+import Action from "./ProTable/Action/index.vue";
 import { ColorPicker } from "jetlinks-ui-components";
 import { useTarget } from "../../../../hooks";
-import { DataSource } from './ProTable'
+import { DataSource } from "./ProTable";
 
 const { target } = useTarget();
 
