@@ -40,6 +40,7 @@ export default defineComponent({
         const { isDragArea, layoutPadStyle } = useTool()
 
         const _data = computed(() => {
+            console.log('========',props.data)
             return props.data
         })
 
@@ -66,7 +67,7 @@ export default defineComponent({
             const renderContent = () => {
                 return (
                     <div data-layout-type={'title'}>
-                        <div style={{marginTop: '10px'}}><TitleComponent data={unref(_data)?.componentProps?.title} /></div>
+                        <div style={{marginTop: '10px'}}><TitleComponent data={unref(_data)?.componentProps?.title} icon={unref(_data)?.componentProps?.icon}/></div>
                         {
                             unref(list).map(element => {
                                 return (

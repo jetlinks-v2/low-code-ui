@@ -1,6 +1,10 @@
 <template>
     <div class="title" :style="style">
-        <div class="title-content">{{ data }}</div>
+        <div v-if="!icon" class="title-content">{{ data }}</div>
+        <div v-else class="title-content-icon">
+            <AIcon :type="icon" />
+            {{ data }}
+        </div>
         <slot name="extra"></slot>
     </div>
 </template>
@@ -13,11 +17,23 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    icon:{
+        type:String,
+        default:''
+    },
     style: {
         type: Object as PropType<CSSProperties>,
         default: () => ({}),
     },
 });
+
+watch(
+    ()=>props.icon,
+    ()=>{
+        console.log('props.icon',props.icon)
+    }
+)
+
 </script>
 
 <style lang="less" scoped>
@@ -44,6 +60,14 @@ const props = defineProps({
             border-radius: 0 3px 3px 0;
             content: ' ';
         }
+    }
+     .title-content-icon {
+        position: relative;
+        padding-left: 10px;
+        color: rgba(0, 0, 0, 0.8);
+        font-weight: 600;
+        line-height: 1;
+
     }
 }
 </style>
