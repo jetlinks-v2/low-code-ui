@@ -1,7 +1,7 @@
 <template>
   <div>
     <j-button @click="visible = true">配置</j-button>
-    <Modal v-if="visible" />
+    <Modal v-if="visible" @cancel="onClose" @save="onSave" />
   </div>
 </template>
 
