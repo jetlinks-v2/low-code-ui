@@ -5,11 +5,14 @@ import DraggableWrap from '../../Draggable/DraggableWrap'
 import { IconWidget } from '../../Icons';
 import './index.less';
 import { cloneDeep } from 'lodash-es';
+import { useTool } from '@LowCode/components/PageDesigner/hooks';
 
 const Library = defineComponent({
     name: 'Library',
     inheritAttrs: false,
     setup() {
+        const { setSelection } = useTool()
+        
         const handleClone = (element) => {
             const item = { ...generatorData(element) }
             return cloneDeep(item)
@@ -35,7 +38,12 @@ const Library = defineComponent({
             sort: false,
             group: { name: "j-canvas", pull: 'clone', put: false },
             ghostClass: 'ghost',
-            clone: handleClone
+            clone: handleClone,
+            onEnd: (e) => {
+                if (e.to?.dataset?.layoutType !== 'filed-item') {
+                    setSelection(e.item?._underlying_vm_ || 'root')
+                }
+            }
         }
 
         return () => {

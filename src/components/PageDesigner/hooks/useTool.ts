@@ -28,7 +28,7 @@ const useTool = () => {
         const obj = {
             ...unref(designer.data),
             configuration: {
-                type: "page",
+                type: "page-design",
                 code: JSON.stringify(unref(designer.pageData)),
             },
         };
