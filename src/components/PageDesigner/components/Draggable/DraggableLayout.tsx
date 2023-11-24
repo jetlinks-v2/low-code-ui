@@ -9,6 +9,7 @@ import { useProps, useTool } from '../../hooks';
 import ProTableLayout from './ProTableLayout'
 import CommonLayout from './CommonLayout';
 import InlineLayout from './InlineLayout';
+import SearchLayout from './SearchLayout'
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -49,6 +50,8 @@ const DraggableLayout = defineComponent({
                         return (<ProTableLayout data={element} parent={props.data} />)
                     case 'inline':
                         return (<InlineLayout data={element} parent={props.data} />)
+                    case 'search':
+                        return (<SearchLayout data={element} parent={props.data} />)
                     default:
                         return <CommonLayout data={element} parent={props.data} />
                 }

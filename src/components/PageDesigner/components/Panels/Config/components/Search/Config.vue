@@ -34,7 +34,7 @@
           "
         />
       </template>
-      <template #search="{ record, valueChange }">
+      <template v-if="type === 'search'" #search="{ record, valueChange }">
         <div style="display: flex; justify-content: space-between">
           <j-select
             placeholder="请选择"
@@ -84,6 +84,10 @@ const props = defineProps({
     type: Array as PropType<any[]>,
     default: () => [],
   },
+  type: {
+    type: String,
+    default: 'search'
+  }
 });
 
 const emits = defineEmits(["save", "close"]);
