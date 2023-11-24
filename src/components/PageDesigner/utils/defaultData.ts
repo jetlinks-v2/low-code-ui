@@ -147,7 +147,8 @@ export const _function: ISchema[] = [
         componentProps: {
             request: {
                 query: '',
-                handleResult: ''
+                handleResult: '',
+                defaultParams: ''
             },
             columns: [
                 {
