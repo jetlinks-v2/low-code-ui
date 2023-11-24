@@ -114,6 +114,15 @@ export const layout: ISchema[] = [
             },
         ]
     },
+    {
+        type: 'inline',
+        name: '内联',
+        children: [],
+        componentProps: {},
+        formItemProps: {
+            isLayout: false
+        },
+    },
 ]
 
 export const _function: ISchema[] = [
@@ -136,6 +145,10 @@ export const _function: ISchema[] = [
         type: 'proTable',
         name: '表格',
         componentProps: {
+            request: {
+                query: '',
+                handleResult: ''
+            },
             columns: [
                 {
                     title: 'Name',
@@ -148,21 +161,25 @@ export const _function: ISchema[] = [
                 {
                     title: 'Address',
                     dataIndex: 'address',
+                    scopedSlots: 'address',
                 },
                 {
                     title: 'Action',
                     dataIndex: 'action',
-                    render: (slotProps) => {
-                        console.log(slotProps)
-                        return slotProps['action']
-                    }
+
                 },
             ],
             dataSource: [
                 { name: 'John Brown', age: 14, address: 'New York No. 1 Lake Park'},
                 { name: 'Jim Green', age: 32, address: 'London No. 1 Lake Park'},
                 { name: 'Joe Black', age: 45, address: 'Sidney No. 1 Lake Park'},
-            ]
+            ],
+            paginationSetting: {
+                open: true,
+                pagination: {
+                    pageSizeOptions: [12, 24, 48, 96]
+                }
+            },
         }
     }
 ]

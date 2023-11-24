@@ -6,6 +6,6 @@ type PageProviderType = {
 
     remove?: (key: string) => void
 }
-export const UsePageProvider = (): PageProviderType => {
+export const usePageProvider = (): PageProviderType => {
     return inject(PageSymbol, { context: {} })
 }

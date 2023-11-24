@@ -14,6 +14,7 @@ import { PropType } from 'vue';
 import { onEnd } from './ControlInsertionPlugin';
 import './index.less';
 import TitleLayout from './TitleLayout';
+import InlineLayout from './InlineLayout';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -111,6 +112,8 @@ const DraggableLayout = defineComponent({
                         return (<CollapseLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></CollapseLayout>)
                     case 'table':
                         return (<TableLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></TableLayout>)
+                    case 'inline':
+                        return (<InlineLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.data}></InlineLayout>)
                     default:
                         return (<CommLayout editable={unref(_editable)} visible={unref(_visible)} index={_index} path={_path} key={element.key} data={element} parent={props.parent}></CommLayout>)
                 }

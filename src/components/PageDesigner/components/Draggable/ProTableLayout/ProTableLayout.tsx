@@ -1,7 +1,7 @@
 import { ProTable, Button } from 'jetlinks-ui-components'
 import Selection from '../../Selection/index'
 import { defineComponent, inject } from 'vue'
-import { useTool, UsePageProvider } from '../../../hooks'
+import { useTool, usePageProvider } from '../../../hooks'
 import TableSkeleton from './Skeleton'
 
 export default defineComponent({
@@ -20,7 +20,7 @@ export default defineComponent({
     },
     setup(props) {
         const { isDragArea, isEditModel } = useTool()
-        const PageProvider = UsePageProvider()
+        const PageProvider = usePageProvider()
 
         const _data = computed(() => {
             return props.data
@@ -35,27 +35,31 @@ export default defineComponent({
         })
 
         const params = computed(() => {
-            console.log('pro-table-layout:params', params)
             return PageProvider.context.params
         })
 
         const columnsSlots = computed(() => {
             return props.data.componentProps.columns?.reduce((prev: Record<string, Function>, next) => {
-                console.log(next.dataIndex, next.render)
                 if (next.render) {
-                    prev[next.dataIndex] = (...args: any) => next.render(args)
+                    prev[next.dataIndex] = next.render
                 }
                 return prev
             }, {}) || {}
         })
 
+        const noPagination = computed(() => {
+            return !props.data.componentProps.paginationSetting?.open
+        })
 
         const headerTitleRender = () => {
-            return (<Button type="dashed" style={{ width: '100px' }}>+</Button>)
+            return (
+                <Selection {...useAttrs()}>
+                    <Button type="dashed" style={{ width: '100px' }}>+</Button>
+                </Selection>
+            )
         }
 
         return () => {
-            console.log(columnsSlots.value)
             return (
                 <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <ProTable
@@ -63,6 +67,8 @@ export default defineComponent({
                         dataSource={dataSource.value}
                         modelValue={'TABLE'}
                         params={params}
+                        noPagination={noPagination.value}
+                        pagination={props.data.componentProps.paginationSetting?.pagination}
                         v-slots={{
                             headerTitle: headerTitleRender,
                             ...columnsSlots.value
@@ -71,6 +77,7 @@ export default defineComponent({
 
 
                     </ProTable>
+
                 </Selection>
             )
         }

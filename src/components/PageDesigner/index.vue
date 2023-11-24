@@ -22,9 +22,7 @@ import { cloneDeep } from "lodash-es";
 const initData = {
   type: "root",
   key: "root",
-  componentProps: {
-    padding: 0,
-  },
+  componentProps: {},
   children: [],
 };
 
