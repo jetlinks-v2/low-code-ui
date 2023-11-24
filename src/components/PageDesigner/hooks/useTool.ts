@@ -2,10 +2,12 @@ import { cloneDeep, debounce } from "lodash-es"
 import { appendChildItem, copyDataByKey, deleteDataByKey, handleCopyData } from "../utils/utils"
 import { Modal } from 'jetlinks-ui-components'
 import { uid } from "../utils/uid"
+import { useProduct } from "@LowCode/store";
 
 const useTool = () => {
     const designer: any = inject('PageDesigner')
     const delVisible = ref<boolean>(false)
+    const product = useProduct();
 
     const isEditModel = computed(() => {
         return unref(designer?.model) === 'edit'
@@ -19,6 +21,20 @@ const useTool = () => {
         return unref(designer?.model)
     })
 
+    /**
+ * 保存数据
+ */
+    const onSaveData = () => {
+        const obj = {
+            ...unref(designer.data),
+            configuration: {
+                type: "page",
+                code: JSON.stringify(unref(designer.pageData)),
+            },
+        };
+        product.update(obj);
+    };
+
     // 设置数据被选中
     const setSelection = (node: any) => {
         if (node === 'root') {
@@ -26,6 +42,7 @@ const useTool = () => {
         } else {
             designer.selected.value = [node]
         }
+        onSaveData()
         designer.isShowConfig.value = true
     }
 

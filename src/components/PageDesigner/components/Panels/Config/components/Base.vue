@@ -393,6 +393,7 @@
       <j-form-item label="展示格式" :name="['componentProps', 'viewType']">
       </j-form-item>
       <j-form-item label="操作列" :name="['componentProps', 'action']">
+        <Action v-model:value="target.componentProps.action" />
       </j-form-item>
     </template>
   </div>
@@ -401,6 +402,7 @@
 <script lang="ts" setup>
 import Icon from "./Icon/index.vue";
 import Search from "./Search/index.vue";
+import Action from "./ProTable/Action/index.vue";
 import { ColorPicker } from "jetlinks-ui-components";
 import { useTarget } from "../../../../hooks";
 import { DataSource } from "./ProTable";

@@ -60,9 +60,9 @@ const Selection = defineComponent({
     const _hasDrag = computed(() => { return props.hasDrag })
 
     watchEffect(() => {
-      const arr = extractCssClass(props.data.componentProps?.cssCode)
+      const arr = extractCssClass(props.data?.componentProps?.cssCode)
       cssClassList.value = arr
-      insertCustomCssToHead(props.data.componentProps?.cssCode, props.data?.key)
+      insertCustomCssToHead(props.data?.componentProps?.cssCode, props.data?.key)
     })
 
     const editNode = () => {
