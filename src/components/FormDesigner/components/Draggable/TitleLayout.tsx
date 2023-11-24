@@ -40,7 +40,6 @@ export default defineComponent({
         const { isDragArea, layoutPadStyle } = useTool()
 
         const _data = computed(() => {
-            console.log('========',props.data)
             return props.data
         })
 
