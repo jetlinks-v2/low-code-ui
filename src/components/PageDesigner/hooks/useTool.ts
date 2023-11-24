@@ -3,6 +3,7 @@ import { appendChildItem, copyDataByKey, deleteDataByKey, handleCopyData } from 
 import { Modal } from 'jetlinks-ui-components'
 import { uid } from "../utils/uid"
 import { useProduct } from "@LowCode/store";
+import { providerEnum } from "@LowCode/components/ProJect";
 
 const useTool = () => {
     const designer: any = inject('PageDesigner')
@@ -131,6 +132,19 @@ const useTool = () => {
         }
     }
 
+    const getFormList = computed(() => {
+        const list = product.getDataMapByType(providerEnum.FormPage);
+        //   过滤掉自身
+        const filterList = list.filter((item) => item.id !== designer?.data?.id);
+        return filterList.map((item) => {
+            return {
+                label: item.title,
+                value: item.id,
+                code: item.configuration?.code,
+            };
+        });
+    });
+
     return {
         isEditModel,
         isDragArea,
@@ -143,6 +157,7 @@ const useTool = () => {
         onShear,
         onPaste,
         setModel,
+        getFormList
     }
 }
 

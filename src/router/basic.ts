@@ -33,15 +33,6 @@ export const BASIC_ROUTER_DATA: any[] = [
       hasLayout: false
     }
   },
-  {
-    code: 'page',
-    name: '页面设计器',
-    url: '/page',
-    meta: {
-      hideInMenu: true,
-      hasLayout: false
-    }
-  },
   // {
   //   code: 'process',
   //   name: '流程引擎',
@@ -157,14 +148,6 @@ export const BASIC_ROUTERS: RouteRecordItem[] = [
     },
     component: () => import('@LowCode/views/preview/index.vue'),
   },
-  // {
-  //   path: '/pageDesigner',
-  //   name: 'PageDesigner',
-  //   meta: {
-  //     title: '页面设计器',
-  //   },
-  //   component: () => import('@LowCode/views/components/PageDesigner/index.vue'),
-  // },
 ]
 
 export const LOGIN_ROUTE: any = {

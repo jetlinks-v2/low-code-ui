@@ -26,6 +26,10 @@ export const basic: ISchema[] = [
             text: '标签'
         },
     },
+    {
+        type: 'form',
+        name: '表单',
+    },
 ]
 
 export const layout: ISchema[] = [
