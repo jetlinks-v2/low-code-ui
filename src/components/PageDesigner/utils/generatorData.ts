@@ -14,6 +14,11 @@ const handleProps = (node: any) => {
     if (!result?.onMounted) {
         result.onMounted = ''
     }
+    if(node.type === 'form'){
+        if (!result?.source) {
+            result.source = {}
+        }
+    }
     return result
 }
 
