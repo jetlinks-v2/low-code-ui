@@ -5,6 +5,7 @@ import Selection from '../Selection/index'
 import { withModifiers } from 'vue'
 import { Timeline, TimelineItem } from 'jetlinks-ui-components'
 import DraggableLayout from "./DraggableLayout"
+import { omit } from "lodash-es"
 
 export default defineComponent({
     name: 'TimelineLayout',
@@ -48,7 +49,7 @@ export default defineComponent({
                     <Timeline {...props.data.componentProps}>
                         {
                             unref(list).map((item: any) => {
-                                return <TimelineItem>
+                                return <TimelineItem {...omit(item.componentProps, 'label')}>
                                     <p>{...item.componentProps?.label}</p>
                                     <Selection
                                         class={unref(isDragArea) && 'drag-area'}

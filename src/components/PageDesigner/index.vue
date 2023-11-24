@@ -18,13 +18,7 @@ import Config from "./components/Panels/Config/index.vue";
 import Header from "./components/Header/index.vue";
 import { provide, ref, watch } from "vue";
 import { cloneDeep } from "lodash-es";
-
-const initData = {
-  type: "root",
-  key: "root",
-  componentProps: {},
-  children: [],
-};
+import { initData } from "./utils/utils";
 
 const props = defineProps({
   data: {
@@ -43,6 +37,7 @@ const focused = ref<boolean>(false); // 记录弹框的快捷键问题
 const copyData = ref<any[]>([]);
 
 provide("PageDesigner", {
+  data: props.data,
   model,
   pageData,
   isShowConfig,
@@ -50,16 +45,18 @@ provide("PageDesigner", {
   _ctrl,
   focus,
   focused,
-  copyData
+  copyData,
 });
 
 watch(
   () => props.data,
   (newVal) => {
-    pageData.value =
-      newVal && Object.keys(newVal)?.length
-        ? cloneDeep(newVal)
-        : cloneDeep(initData);
+    try {
+      const obj = JSON.parse(newVal?.configuration?.code);
+      pageData.value = Object.keys(obj).length ? obj : cloneDeep(initData);
+    } catch (error) {
+      pageData.value = cloneDeep(initData);
+    }
   },
   {
     deep: true,
