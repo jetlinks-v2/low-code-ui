@@ -162,14 +162,17 @@ export const _function: ISchema[] = [
                 {
                     title: 'Address',
                     dataIndex: 'address',
+                    render: (slotProps) => {
+                        console.log(slotProps)
+                        return h('div', {}, [
+                            h('div', { style: { borderBottom: '1px solid rgba(0,0,0,3)'}}, slotProps.name),
+                            h('div', null, slotProps.address)
+                        ])
+                    }
                 },
                 {
                     title: 'Action',
                     dataIndex: 'action',
-                    render: (slotProps) => {
-                        console.log(slotProps)
-                        return slotProps['action']
-                    }
                 },
             ],
             dataSource: [

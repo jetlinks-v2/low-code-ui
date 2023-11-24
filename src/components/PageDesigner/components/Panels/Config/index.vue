@@ -56,7 +56,7 @@ const _type = computed(() => {
 const Panels = {
   Page,
   Base,
-  Status
+  Status,
 }
 
 const panelsList = computed(() => {

@@ -28,7 +28,12 @@ export default defineComponent({
         })
 
         const columns = computed(() => {
-            return props.data.componentProps.columns
+            return props.data.componentProps.columns.map(item => {
+                if (item.render) {
+                    item.scopedSlots = true
+                }
+                return item
+            })
         })
 
         const dataSource = computed(() => {
@@ -40,7 +45,7 @@ export default defineComponent({
         })
 
         const columnsSlots = computed(() => {
-            return props.data.componentProps.columns?.reduce((prev: Record<string, Function>, next) => {
+            return props.data.componentProps.columns?.reduce((prev: Record<string, any>, next) => {
                 if (next.render) {
                     prev[next.dataIndex] = next.render
                 }
@@ -83,6 +88,7 @@ export default defineComponent({
         }
 
         return () => {
+            console.log(columnsSlots.value)
             return (
                 <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <ProTable
