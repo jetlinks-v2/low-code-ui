@@ -27,12 +27,6 @@ const props = defineProps({
     },
 });
 
-watch(
-    ()=>props.icon,
-    ()=>{
-        console.log('props.icon',props.icon)
-    }
-)
 
 </script>
 
