@@ -241,9 +241,10 @@ export const layout: ISchema[] = [
         name: '标题',
         componentProps: {
             title: 'Title',
+            icon:''
         },
         formItemProps: {
-            isLayout: false
+            isLayout: false,
         },
         children: [
             {

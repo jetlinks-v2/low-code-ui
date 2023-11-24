@@ -47,6 +47,12 @@
         </template>
         {{ providerMap[providerEnum.Function] }}
       </j-menu-item>
+      <j-menu-item :key="providerEnum.PageDesign">
+        <template #icon>
+          <img :src="getImage('/project/form.svg')" style="width: 24px; height: 24px;">
+        </template>
+        {{ providerMap[providerEnum.PageDesign] }}
+      </j-menu-item>
     </j-sub-menu>
     <j-menu-item :key="actionMap['Profile'].key">
       {{ actionMap['Profile'].value }}
@@ -130,6 +136,7 @@ const onContextMenuClick = (node, menuKey) => {
     case providerEnum.HtmlPage:
     case providerEnum.ListPage:
     case providerEnum.FormPage:
+    case providerEnum.PageDesign:
     case providerEnum.CRUD:
     case providerEnum.SQL:
     case providerEnum.Function:
