@@ -6,7 +6,9 @@
       />
     </div>
     <div class="code-tip">
-      <j-monaco-editor />
+      <j-monaco-editor
+        readOnly
+      />
     </div>
   </div>
 </template>
@@ -18,5 +20,7 @@ export default {
 </script>
 
 <style scoped>
+.responder-warp {
 
+}
 </style>

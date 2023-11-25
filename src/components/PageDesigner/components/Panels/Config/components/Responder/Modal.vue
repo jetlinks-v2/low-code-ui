@@ -18,7 +18,7 @@
         <j-input />
       </j-form-item>
       <j-form-item
-        label=""
+        label="响应器"
       >
         <Responder />
       </j-form-item>
