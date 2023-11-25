@@ -1,9 +1,9 @@
 <template>
-    <div>
-        <PageDesigner />
-    </div>
+    <div>123</div>
 </template>
 
 <script lang="ts" setup>
-
+const props = defineProps({
+    
+})
 </script>

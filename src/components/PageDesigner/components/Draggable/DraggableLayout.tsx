@@ -5,7 +5,7 @@ import './index.less';
 import StepsLayout from './StepsLayout';
 import InfoLayout from './InfoLayout';
 import TimelineLayout from './TimelineLayout';
-import { useProps, useTool } from '../../hooks';
+import { useTool } from '../../hooks';
 import ProTableLayout from './ProTableLayout'
 import CommonLayout from './CommonLayout';
 import InlineLayout from './InlineLayout';
@@ -35,7 +35,7 @@ const DraggableLayout = defineComponent({
         },
     },
     setup(props) {
-        const { _model } = useTool()
+        const { _model, setSelection } = useTool()
 
         const slots = {
             item: ({ element }) => {
@@ -80,7 +80,13 @@ const DraggableLayout = defineComponent({
             animation: 150,
             multiDrag: true,
             itemKey: 'key',
-            group: { name: "j-canvas" }
+            group: { name: "j-canvas" },
+            //拖动结束
+            onEnd: (e) => {
+                if (e.to?.dataset?.layoutType !== 'filed-item') {
+                    setSelection(e.item?._underlying_vm_ || 'root')
+                }
+            }
         }
 
         return () => {
