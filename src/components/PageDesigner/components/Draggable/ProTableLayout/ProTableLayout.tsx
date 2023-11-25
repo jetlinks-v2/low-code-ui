@@ -1,7 +1,7 @@
 import { ProTable } from 'jetlinks-ui-components'
 import Selection from '../../Selection/index'
 import { defineComponent, withModifiers } from 'vue'
-import { useTool, usePageProvider } from '../../../hooks'
+import { useTool, usePageDependencies } from '../../../hooks'
 import { request as axiosRequest } from '@jetlinks-web/core'
 import DraggableLayout from '../DraggableLayout'
 import generatorData from '@LowCode/components/PageDesigner/utils/generatorData'
@@ -23,7 +23,7 @@ export default defineComponent({
     },
     setup(props) {
         const { isDragArea, isEditModel, onAddChild } = useTool()
-        const PageProvider = usePageProvider()
+        const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
 
         const _data = computed(() => {
             return props.data
@@ -94,10 +94,6 @@ export default defineComponent({
 
         const dataSource = computed(() => {
             return props.data.componentProps.dataSource
-        })
-
-        const params = computed(() => {
-            return PageProvider.context.params
         })
 
         const columnsSlots = computed(() => {

@@ -25,6 +25,7 @@ export default defineComponent({
                 data: props.data,
                 parent: props.parent
             }
+            console.log('CommLayout', _props.componentProps)
             return (
                 <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                     <TypeComponent {..._props.componentProps} />
