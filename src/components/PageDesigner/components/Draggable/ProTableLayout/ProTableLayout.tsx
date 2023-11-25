@@ -1,8 +1,7 @@
 import { ProTable, Button } from 'jetlinks-ui-components'
 import Selection from '../../Selection/index'
-import { defineComponent, inject } from 'vue'
-import { useTool, usePageProvider } from '../../../hooks'
-import TableSkeleton from './Skeleton'
+import { defineComponent } from 'vue'
+import { useTool, usePageProvider, usePageDependencies } from '../../../hooks'
 import { request as axiosRequest } from '@jetlinks-web/core'
 
 export default defineComponent({
@@ -21,7 +20,7 @@ export default defineComponent({
     },
     setup(props) {
         const { isDragArea, isEditModel } = useTool()
-        const PageProvider = usePageProvider()
+        const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
 
         const _data = computed(() => {
             return props.data
@@ -38,10 +37,6 @@ export default defineComponent({
 
         const dataSource = computed(() => {
             return props.data.componentProps.dataSource
-        })
-
-        const params = computed(() => {
-            return PageProvider.context.params
         })
 
         const columnsSlots = computed(() => {
@@ -88,7 +83,6 @@ export default defineComponent({
         }
 
         return () => {
-            console.log(columnsSlots.value)
             return (
                 <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <ProTable

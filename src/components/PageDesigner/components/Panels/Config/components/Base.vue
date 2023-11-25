@@ -382,9 +382,9 @@
           v-model:value="target.componentProps.columns"
         />
       </j-form-item>
-      <j-form-item label="数据源" :name="['componentProps', 'request']">
-        <DataSource v-model:value="target.componentProps.request" />
-      </j-form-item>
+<!--      <j-form-item label="数据源" :name="['componentProps', 'request']">-->
+<!--        <DataSource v-model:value="target.componentProps.request" />-->
+<!--      </j-form-item>-->
       <j-form-item label="分页器">
         <j-switch
           v-model:checked="target.componentProps.paginationSetting.open"
