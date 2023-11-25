@@ -47,7 +47,7 @@ const DraggableLayout = defineComponent({
                     case 'timeline':
                         return (<TimelineLayout data={element} parent={props.data}></TimelineLayout>)
                     case 'proTable':
-                        return (<ProTableLayout data={element} parent={props.data} />)
+                        return <ProTableLayout data={element} parent={props.data} />
                     case 'inline':
                         return (<InlineLayout data={element} parent={props.data} />)
                     case 'search':

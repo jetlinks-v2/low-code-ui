@@ -30,6 +30,10 @@ export const BodyProps = () => ({
   validate: {
     type: Boolean,
     default: false
+  },
+  cellHeight: {
+    type: Number,
+    default: 66
   }
 })
 

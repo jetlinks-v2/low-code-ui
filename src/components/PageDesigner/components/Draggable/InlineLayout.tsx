@@ -4,6 +4,7 @@ import './index.less'
 import { withModifiers } from 'vue'
 import { useTool } from '../../hooks'
 import generatorData from '../../utils/generatorData'
+import { Space } from 'jetlinks-ui-components'
 
 export default defineComponent({
     name: 'InlineLayout',
@@ -43,10 +44,9 @@ export default defineComponent({
                 <Selection {...useAttrs()} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
                     {
                         unref(list)?.length ?
-                            <div
+                            <Space
                                 data-layout-type={'inline'}
                                 {...props.data.componentProps}
-                                style={{ display: 'flex', alignItems: 'center' }}
                             >
                                 {
                                     unref(list).map((element: any) => {
@@ -70,7 +70,7 @@ export default defineComponent({
                                         )
                                     })
                                 }
-                            </div> : (unref(isEditModel) ? <div class="draggable-empty">内联</div> : <div></div>)
+                            </Space> : (unref(isEditModel) ? <div class="draggable-empty">内联</div> : <div></div>)
                     }
                     {
                         unref(isEditModel) &&

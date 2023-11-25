@@ -20,6 +20,17 @@ export const basic: ISchema[] = [
         },
     },
     {
+        type: 'dropdown',
+        name: '下拉菜单',
+        componentProps: {
+            text: '下拉菜单',
+            shape: 'default',
+            size: 'middle',
+            type: 'primary',
+            menu: []
+        },
+    },
+    {
         type: 'tag',
         name: '标签',
         componentProps: {
@@ -167,16 +178,9 @@ export const _function: ISchema[] = [
                     title: 'Address',
                     dataIndex: 'address',
                 },
-                {
-                    title: 'Action',
-                    dataIndex: 'action',
-
-                },
             ],
             dataSource: [
                 { name: 'John Brown', age: 14, address: 'New York No. 1 Lake Park'},
-                { name: 'Jim Green', age: 32, address: 'London No. 1 Lake Park'},
-                { name: 'Joe Black', age: 45, address: 'Sidney No. 1 Lake Park'},
             ],
             paginationSetting: {
                 open: true,
@@ -184,6 +188,7 @@ export const _function: ISchema[] = [
                     pageSizeOptions: [12, 24, 48, 96]
                 }
             },
+            actionVisible: true,
             responder: {
                 dependencies: undefined,
                 responder: undefined
