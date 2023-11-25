@@ -51,8 +51,8 @@ dependencies:
     specifier: ^1.11.8
     version: 1.11.8
   jetlinks-ui-components:
-    specifier: 1.0.34-8
-    version: 1.0.34-8(vue-router@4.2.2)(vue@3.3.4)
+    specifier: 1.0.34-10
+    version: 1.0.34-10(vue-router@4.2.2)(vue@3.3.4)
   less:
     specifier: ^4.2.0
     version: 4.2.0
@@ -2854,8 +2854,8 @@ packages:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
     dev: true
 
-  /jetlinks-ui-components@1.0.34-8(vue-router@4.2.2)(vue@3.3.4):
-    resolution: {integrity: sha512-avIPjkHWOdaissyS/diDslrjyT4OyZFBaqwKramdlnRQvOhYm7JAuR57O6Hpy9/8up7EzHPsjSINZzSfsxS6WQ==}
+  /jetlinks-ui-components@1.0.34-10(vue-router@4.2.2)(vue@3.3.4):
+    resolution: {integrity: sha512-Qg47fiMfQ1abQXBBe22/36CzZmIbv0sfPxTVIlJjztAZR/dpzbcF+lHg8eFqy/6NJ+Khyd57q6kyxoeBDHyzdA==}
     engines: {node: '>=18.14.0'}
     dependencies:
       '@vueuse/core': 9.13.0(vue@3.3.4)
