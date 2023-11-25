@@ -83,7 +83,6 @@ export default defineComponent({
         }
 
         return () => {
-            console.log(columnsSlots.value)
             return (
                 <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <ProTable

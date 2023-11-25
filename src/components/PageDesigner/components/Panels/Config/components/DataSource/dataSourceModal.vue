@@ -16,7 +16,20 @@
         name="query"
         :rules="[{ required: true, message: '请输入数据源地址'}]"
       >
-        <j-input v-model:value="formModel.query" placeholder="请输入数据源地址" />
+        <j-input v-model:value="formModel.query" placeholder="请输入数据源地址" >
+          <template #addonBefore>
+            <j-select
+              v-model:value="formModel.methods"
+              :options="[
+                  { label: 'GET', value: 'get' },
+                  { label: 'POST', value: 'post' },
+                  { label: 'PUT', value: 'put' },
+                  { label: 'PATCH', value: 'patch' },
+                  { label: 'DELETE', value: 'remove' },
+              ]"
+            />
+          </template>
+        </j-input>
       </j-form-item>
       <j-form-item
         label="默认参数"
@@ -61,6 +74,7 @@ const formModel = reactive({
   query: props.data.query,
   handleResult: props.data.handleResult,
   defaultParams: props.data.defaultParams,
+  methods: props.data.methods || 'post'
 })
 
 const formRef = ref()
