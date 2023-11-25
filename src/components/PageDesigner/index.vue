@@ -35,6 +35,7 @@ const _ctrl = ref<boolean>(false);
 const focus = ref<boolean>(false);
 const focused = ref<boolean>(false); // 记录弹框的快捷键问题
 const copyData = ref<any[]>([]);
+const dependencies = ref({}) // 依赖项
 
 provide("PageDesigner", {
   data: props.data,
@@ -46,6 +47,7 @@ provide("PageDesigner", {
   focus,
   focused,
   copyData,
+  dependencies
 });
 
 watch(

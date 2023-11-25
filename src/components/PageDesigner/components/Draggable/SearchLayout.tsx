@@ -1,4 +1,3 @@
-import { ProTable, Button } from 'jetlinks-ui-components'
 import Selection from '../Selection/index'
 import { defineComponent, inject } from 'vue'
 import { useTool, usePageProvider } from '../../hooks'
@@ -21,6 +20,7 @@ export default defineComponent({
     setup(props) {
         const { isDragArea, isEditModel } = useTool()
         const PageProvider = usePageProvider()
+        const designer = inject<any>('PageDesigner')
 
         const _data = computed(() => {
             return props.data
@@ -31,8 +31,14 @@ export default defineComponent({
         })
 
         const onSearch = (params: any) => {
-            PageProvider.add?.('params', params)
+            PageProvider.add?.(props.data.key, params)
         }
+
+        onBeforeMount(() => {
+            if (isEditModel) {
+                designer.dependencies.value[props.data.key] = props.data.name || props.data.key
+            }
+        })
 
         return () => {
             return (
