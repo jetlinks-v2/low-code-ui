@@ -24,15 +24,28 @@
         language="javascript"
       />
     </j-form-item>
+    <j-form-item
+        label="响应器"
+        :name="['componentProps', 'responder']"
+    >
+      <Responder
+        v-model:value="target.componentProps.responder"
+      />
+    </j-form-item>
   </div>
 </template>
 <script lang="ts" setup>
 import EditorBtn from './EditorBtn.vue'
 import { useTarget } from '../../../../hooks'
+import Responder from './Responder'
 
 const { target } = useTarget()
 
 const emits = defineEmits(['refresh'])
+
+const showDataSource = computed(() => {
+
+})
 
 const onDataChange = () => {
   emits('refresh', target.value)

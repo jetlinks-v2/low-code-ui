@@ -170,10 +170,7 @@ export const _function: ISchema[] = [
                 {
                     title: 'Action',
                     dataIndex: 'action',
-                    render: (slotProps) => {
-                        console.log(slotProps)
-                        return slotProps['action']
-                    }
+
                 },
             ],
             dataSource: [
