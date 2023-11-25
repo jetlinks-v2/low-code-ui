@@ -15,7 +15,7 @@
         />
       </j-form-item>
     </template>
-    <template v-if="['button'].includes(target.type)">
+    <template v-if="['button', 'dropdown'].includes(target.type)">
       <j-form-item
         label="按钮文本"
         :name="['componentProps', 'text']"
@@ -118,6 +118,19 @@
         <Icon
           v-model:value="target.componentProps.icon"
           @change="onDataChange"
+        />
+      </j-form-item>
+    </template>
+    <template v-if="['dropdown'].includes(target.type)">
+      <j-form-item
+        label="配置下拉菜单"
+        :name="['componentProps', 'menu']"
+        required
+        :validateFirst="true"
+      >
+        <Dropdown
+          @change="onDataChange"
+          v-model:value="target.componentProps.menu"
         />
       </j-form-item>
     </template>
@@ -383,17 +396,47 @@
         />
       </j-form-item>
       <j-form-item label="数据源" :name="['componentProps', 'request']">
-        <DataSource v-model:value="target.componentProps.request" />
+        <DataSource
+          v-model:value="target.componentProps.request"
+          @change="onDataChange"
+        />
       </j-form-item>
       <j-form-item label="分页器">
         <j-switch
           v-model:checked="target.componentProps.paginationSetting.open"
+          @change="onDataChange"
         />
       </j-form-item>
       <j-form-item label="展示格式" :name="['componentProps', 'viewType']">
+        <ShowFormat
+          v-model:value="target.componentProps.viewType"
+          @change="onDataChange"
+        />
       </j-form-item>
-      <j-form-item label="操作列" :name="['componentProps', 'action']">
-        <Action v-model:value="target.componentProps.action" />
+      <j-form-item
+        label="是否展示操作列"
+        :name="['componentProps', 'actionVisible']"
+      >
+        <!-- <Action v-model:value="target.componentProps.action" /> -->
+        <j-switch
+          v-model:checked="target.componentProps.actionVisible"
+          @change="onDataChange"
+        />
+      </j-form-item>
+      <j-form-item
+        v-if="target.componentProps.actionVisible"
+        label="操作列宽度"
+        :name="['componentProps', 'actionWidth']"
+      >
+        <j-input-number
+          :precision="0"
+          :min="1"
+          addon-after="px"
+          placeholder="请输入"
+          style="width: 100%"
+          v-model:value="target.componentProps.actionWidth"
+          @change="onDataChange"
+        />
       </j-form-item>
     </template>
   </div>
@@ -402,7 +445,8 @@
 <script lang="ts" setup>
 import Icon from "./Icon/index.vue";
 import Search from "./Search/index.vue";
-import Action from "./ProTable/Action/index.vue";
+import Dropdown from "./Dropdown/index.vue";
+import ShowFormat from "./ProTable/ShowFormat/index.vue";
 import { ColorPicker } from "jetlinks-ui-components";
 import { useTarget } from "../../../../hooks";
 import { DataSource } from "./ProTable";

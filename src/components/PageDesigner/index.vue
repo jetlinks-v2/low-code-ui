@@ -67,7 +67,7 @@ watch(
 
 <style lang="less" scoped>
 .container {
-  height: 100vh;
+  height: 100%;
   .box {
     display: flex;
     width: 100%;
