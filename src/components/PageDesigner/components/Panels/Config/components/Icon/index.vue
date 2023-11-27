@@ -1,17 +1,23 @@
 <template>
   <div>
-    <div class="icon-upload has-icon" v-if="value">
-      <AIcon :type="value" style="font-size: 90px" />
+    <div
+      class="icon-upload has-icon"
+      :style="{ 'width': _width, 'height': _width }"
+      v-if="value"
+    >
+      <AIcon :type="value" :style="{'font-size': _size}" />
       <j-space class="mark">
         <span @click="onOpen"><AIcon type="EditOutlined" /></span>
-        <span @click="onRemove" style="color: red"><AIcon type="DeleteOutlined" /></span>
+        <span @click="onRemove" style="color: red"
+          ><AIcon type="DeleteOutlined"
+        /></span>
       </j-space>
     </div>
 
-    <div v-else @click="onOpen" class="icon-upload no-icon">
+    <div v-else @click="onOpen" :style="{ 'width': _width, 'height': _width }" class="icon-upload no-icon">
       <span>
         <AIcon type="PlusOutlined" style="font-size: 30px" />
-        <p>点击选择图标</p>
+        <p v-if="size !== 'small'">点击选择图标</p>
       </span>
     </div>
     <template v-if="dialogVisible">
@@ -38,28 +44,42 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import iconKeys from "./fields";
 
 const props = defineProps({
   value: {
     type: String,
   },
+  size: {
+    type: String as PropType<"default" | "small">,
+    default: "default",
+  },
 });
 
-const emits = defineEmits(["update:value"]);
+const emits = defineEmits(["update:value", "change"]);
 
 const dialogVisible = ref<boolean>(false);
 const selected = ref<string>();
 
+const _width = computed(() => {
+  return props.size === "small" ? "50px" : "100px";
+});
+
+const _size = computed(() => {
+  return props.size === "small" ? "40px" : "90px";
+});
+
 const onSave = () => {
   emits("update:value", selected.value);
+  emits("change", selected.value);
   dialogVisible.value = false;
 };
 
 const onRemove = () => {
-  emits("update:value", '');
-}
+  emits("update:value", "");
+  emits("change", "");
+};
 
 const onOpen = () => {
   dialogVisible.value = true;
@@ -73,8 +93,6 @@ const onCancel = () => {
 
 <style lang="less" scoped>
 .icon-upload {
-  width: 100px;
-  height: 100px;
   border: 1px dashed #d9d9d9;
   font-size: 14px;
   display: flex;

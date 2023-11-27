@@ -20,11 +20,26 @@ export const basic: ISchema[] = [
         },
     },
     {
+        type: 'dropdown',
+        name: '下拉菜单',
+        componentProps: {
+            text: '下拉菜单',
+            shape: 'default',
+            size: 'middle',
+            type: 'primary',
+            menu: []
+        },
+    },
+    {
         type: 'tag',
         name: '标签',
         componentProps: {
             text: '标签'
         },
+    },
+    {
+        type: 'form',
+        name: '表单',
     },
 ]
 
@@ -114,6 +129,15 @@ export const layout: ISchema[] = [
             },
         ]
     },
+    {
+        type: 'inline',
+        name: '内联',
+        children: [],
+        componentProps: {},
+        formItemProps: {
+            isLayout: false
+        },
+    },
 ]
 
 export const _function: ISchema[] = [
@@ -136,6 +160,11 @@ export const _function: ISchema[] = [
         type: 'proTable',
         name: '表格',
         componentProps: {
+            request: {
+                query: '',
+                handleResult: '',
+                defaultParams: ''
+            },
             columns: [
                 {
                     title: 'Name',
@@ -149,20 +178,21 @@ export const _function: ISchema[] = [
                     title: 'Address',
                     dataIndex: 'address',
                 },
-                {
-                    title: 'Action',
-                    dataIndex: 'action',
-                    render: (slotProps) => {
-                        console.log(slotProps)
-                        return slotProps['action']
-                    }
-                },
             ],
             dataSource: [
                 { name: 'John Brown', age: 14, address: 'New York No. 1 Lake Park'},
-                { name: 'Jim Green', age: 32, address: 'London No. 1 Lake Park'},
-                { name: 'Joe Black', age: 45, address: 'Sidney No. 1 Lake Park'},
-            ]
+            ],
+            paginationSetting: {
+                open: true,
+                pagination: {
+                    pageSizeOptions: [12, 24, 48, 96]
+                }
+            },
+            actionVisible: true,
+            responder: {
+                dependencies: undefined,
+                responder: undefined
+            }
         }
     }
 ]

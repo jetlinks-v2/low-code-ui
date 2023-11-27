@@ -34,7 +34,7 @@
           "
         />
       </template>
-      <template #search="{ record, valueChange }">
+      <template v-if="type === 'search'" #search="{ record, valueChange }">
         <div style="display: flex; justify-content: space-between">
           <j-select
             placeholder="请选择"
@@ -84,6 +84,10 @@ const props = defineProps({
     type: Array as PropType<any[]>,
     default: () => [],
   },
+  type: {
+    type: String,
+    default: "search",
+  },
 });
 
 const emits = defineEmits(["save", "close"]);
@@ -98,11 +102,11 @@ const options = Object.keys(componentType).map((i) => {
 
 const tableRef = ref<any>();
 
-const myColumns = [
+const myColumns: any[] = [
   {
     title: "下标",
     dataIndex: "dataIndex",
-    width: 200,
+    // width: 200,
     form: {
       rules: {
         asyncValidator: (rule, value, callback, source) => {
@@ -129,7 +133,7 @@ const myColumns = [
     title: "标题",
     dataIndex: "title",
     ellipsis: true,
-    width: 200,
+    // width: 200,
     form: {
       rules: {
         asyncValidator: (_, value) => {
@@ -141,30 +145,38 @@ const myColumns = [
       },
     },
   },
-  {
-    title: "类型",
-    dataIndex: "search",
-    width: 250,
-    form: {
-      rules: {
-        asyncValidator: (_, value) => {
-          if (!value?.type) {
-            return Promise.reject("请选择类型");
-          }
-          if(['select', 'treeSelect'].includes(value?.type) && !value?.options){
-            return Promise.reject("请配置options");
-          }
-          return Promise.resolve();
+];
+
+watchEffect(() => {
+  if (props.type === "search") {
+    myColumns.push({
+      title: "类型",
+      dataIndex: "search",
+      // width: 250,
+      form: {
+        rules: {
+          asyncValidator: (_, value) => {
+            if (!value?.type) {
+              return Promise.reject("请选择类型");
+            }
+            if (
+              ["select", "treeSelect"].includes(value?.type) &&
+              !value?.options
+            ) {
+              return Promise.reject("请配置options");
+            }
+            return Promise.resolve();
+          },
         },
       },
-    },
-  },
-  {
+    });
+  }
+  myColumns.push({
     title: "操作",
     dataIndex: "action",
     width: 100,
-  },
-];
+  });
+});
 
 watchEffect(() => {
   dataSource.value = cloneDeep(props.data || []);
@@ -178,7 +190,7 @@ const onRemove = (dt: any) => {
 };
 
 const onAdd = () => {
-  dataSource.value.push({ dataIndex: 'search' + uid(4), search: {} });
+  dataSource.value.push({ dataIndex: (props.type || "search") + uid(4), search: {} });
 };
 
 const onChange = (arr: any, _record: any) => {
@@ -191,8 +203,8 @@ const onChange = (arr: any, _record: any) => {
 
 const onSave = () => {
   tableRef.value?.validates().then((resp: any) => {
-    if(resp){
-        emits('save', dataSource.value)
+    if (resp) {
+      emits("save", dataSource.value);
     }
   });
 };

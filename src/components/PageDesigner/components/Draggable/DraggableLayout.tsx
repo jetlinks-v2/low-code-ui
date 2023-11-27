@@ -1,15 +1,15 @@
 
 import { isEmpty } from 'lodash-es';
 import DraggableWrap from './DragGableWrap'
-import Selection from '../Selection'
 import './index.less';
-import componentMap from '../../utils/componentMap';
 import StepsLayout from './StepsLayout';
 import InfoLayout from './InfoLayout';
 import TimelineLayout from './TimelineLayout';
-import { useProps, useTool } from '../../hooks';
+import { useTool } from '../../hooks';
 import ProTableLayout from './ProTableLayout'
 import CommonLayout from './CommonLayout';
+import InlineLayout from './InlineLayout';
+import SearchLayout from './SearchLayout'
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -35,7 +35,7 @@ const DraggableLayout = defineComponent({
         },
     },
     setup(props) {
-        const { _model } = useTool()
+        const { _model, setSelection } = useTool()
 
         const slots = {
             item: ({ element }) => {
@@ -47,7 +47,11 @@ const DraggableLayout = defineComponent({
                     case 'timeline':
                         return (<TimelineLayout data={element} parent={props.data}></TimelineLayout>)
                     case 'proTable':
-                        return (<ProTableLayout data={element} parent={props.data} />)
+                        return <ProTableLayout data={element} parent={props.data} />
+                    case 'inline':
+                        return (<InlineLayout data={element} parent={props.data} />)
+                    case 'search':
+                        return (<SearchLayout data={element} parent={props.data} />)
                     default:
                         return <CommonLayout data={element} parent={props.data} />
                 }
@@ -76,7 +80,13 @@ const DraggableLayout = defineComponent({
             animation: 150,
             multiDrag: true,
             itemKey: 'key',
-            group: { name: "j-canvas" }
+            group: { name: "j-canvas" },
+            //拖动结束
+            onEnd: (e) => {
+                if (e.to?.dataset?.layoutType !== 'filed-item') {
+                    setSelection(e.item?._underlying_vm_ || 'root')
+                }
+            }
         }
 
         return () => {

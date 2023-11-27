@@ -2,10 +2,13 @@ import { cloneDeep, debounce } from "lodash-es"
 import { appendChildItem, copyDataByKey, deleteDataByKey, handleCopyData } from "../utils/utils"
 import { Modal } from 'jetlinks-ui-components'
 import { uid } from "../utils/uid"
+import { useProduct } from "@LowCode/store";
+import { providerEnum } from "@LowCode/components/ProJect";
 
 const useTool = () => {
     const designer: any = inject('PageDesigner')
     const delVisible = ref<boolean>(false)
+    const product = useProduct();
 
     const isEditModel = computed(() => {
         return unref(designer?.model) === 'edit'
@@ -19,6 +22,20 @@ const useTool = () => {
         return unref(designer?.model)
     })
 
+    /**
+ * 保存数据
+ */
+    const onSaveData = () => {
+        const obj = {
+            ...unref(designer.data),
+            configuration: {
+                type: "page-design",
+                code: JSON.stringify(unref(designer.pageData)),
+            },
+        };
+        product.update(obj);
+    };
+
     // 设置数据被选中
     const setSelection = (node: any) => {
         if (node === 'root') {
@@ -26,6 +43,7 @@ const useTool = () => {
         } else {
             designer.selected.value = [node]
         }
+        onSaveData()
         designer.isShowConfig.value = true
     }
 
@@ -114,6 +132,19 @@ const useTool = () => {
         }
     }
 
+    const getFormList = computed(() => {
+        const list = product.getDataMapByType(providerEnum.FormPage);
+        //   过滤掉自身
+        const filterList = list.filter((item) => item.id !== designer?.data?.id);
+        return filterList.map((item) => {
+            return {
+                label: item.title,
+                value: item.id,
+                code: item.configuration?.code,
+            };
+        });
+    });
+
     return {
         isEditModel,
         isDragArea,
@@ -126,6 +157,7 @@ const useTool = () => {
         onShear,
         onPaste,
         setModel,
+        getFormList
     }
 }
 

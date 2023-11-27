@@ -15,6 +15,7 @@ export const providerEnum = {
   HtmlPage: 'page-html',
   ListPage: 'page-list',
   FormPage: 'page-form',
+  PageDesign:'page-design'
 }
 
 export const providerMap = {
@@ -26,6 +27,7 @@ export const providerMap = {
   [providerEnum.ListPage]: '标准列表页',
   [providerEnum.FormPage]: '表单页',
   [providerEnum.Function]: '函数',
+  [providerEnum.PageDesign]: '页面设计器',
   'project': '项目'
 }
 
@@ -43,6 +45,7 @@ export const providerImages = {
   [providerEnum.HtmlPage]: getImage('/tree/page.svg'),
   [providerEnum.FormPage]: getImage('/tree/page.svg'),
   [providerEnum.Function]: getImage('/tree/function.svg'),
+  [providerEnum.PageDesign]: getImage('/tree/page.svg'),
   'project': getImage('/tree/project.svg'),
 }
 
@@ -54,6 +57,7 @@ export const typeImages = {
   [providerEnum.HtmlPage]: getImage('/project/html.svg'),
   [providerEnum.FormPage]: getImage('/project/form.svg'),
   [providerEnum.Function]: getImage('/project/function.svg'),
+  [providerEnum.PageDesign]: getImage('/project/form.svg'),
   'project': getImage('/project/project.svg'),
 }
 
@@ -145,6 +149,11 @@ export const projectListMenu = [
     type: providerEnum.Function,
     img: getImage('/project/function.svg'),
     text: '使用脚本自定义业务逻辑'
+  },
+  {
+    type: providerEnum.PageDesign,
+    img: getImage('/project/form.svg'),
+    text: '页面设计器'
   }
 ]
 

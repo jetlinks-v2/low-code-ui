@@ -14,8 +14,10 @@
           'space-item',
           'grid',
           'tabs',
+          'inline',
           'collapse',
           'space',
+          'title',
           'org',
           'role',
           'user',
@@ -153,6 +155,18 @@
             @change="onDataChange"
             v-model:value="target.componentProps.title"
           />
+        </j-form-item>
+      </template>
+      <template v-if="type === 'title'">
+        <j-form-item
+          label="图标"
+          :validateFirst="true"
+          :name="['componentProps', 'icon']"
+        >
+        <Icon
+          v-model:value="target.componentProps.icon"
+          @change="onDataChange"
+        />
         </j-form-item>
       </template>
       <template v-if="['card', 'collapse', 'tabs', 'title'].includes(type)">
@@ -503,6 +517,7 @@ import Storage from './Storage/index.vue'
 import { uid } from '@LowCode/components/FormDesigner/utils/uid'
 import { cloneDeep, flatten, map } from 'lodash-es'
 import { CheckButton } from '@LowCode/components/index'
+import Icon from "@LowCode/components/PageDesigner/components/Panels/Config/components/Icon/index.vue";
 
 const designer: any = inject('FormDesigner')
 

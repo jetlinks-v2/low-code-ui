@@ -8,6 +8,7 @@
     <ListPage v-else-if="data.type === providerEnum.ListPage" :data="props.data"/>
     <SQLCode v-else-if="data.type === providerEnum.SQL"  v-bind="data"/>
     <FunctionCode v-else-if="data.type === providerEnum.Function"  v-bind="data"/>
+    <PageDesigner v-else-if="data.type === providerEnum.PageDesign"  :data="props.data"/>
   </div>
 </template>
 

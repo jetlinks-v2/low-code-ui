@@ -24,17 +24,40 @@
         language="javascript"
       />
     </j-form-item>
+    <j-form-item label="数据源" :name="['componentProps', 'request']">
+      <DataSource v-model:value="target.componentProps.request" @change="onDataChange" />
+    </j-form-item>
+    <j-form-item
+        v-if="showResponder"
+        label="响应器"
+        :name="['componentProps', 'responder']"
+    >
+      <Responder
+        v-model:value="target.componentProps.responder"
+        :id="target.key"
+        :type="target.type"
+        @change="onDataChange"
+      />
+    </j-form-item>
+
   </div>
 </template>
 <script lang="ts" setup>
 import EditorBtn from './EditorBtn.vue'
 import { useTarget } from '../../../../hooks'
+import Responder from './Responder'
+import DataSource from './DataSource'
 
 const { target } = useTarget()
 
 const emits = defineEmits(['refresh'])
 
+const showResponder = computed(() => {
+  return !['search'].includes(target.value.type)
+})
+
 const onDataChange = () => {
+  console.log('refresh', target.value)
   emits('refresh', target.value)
 }
 </script>
