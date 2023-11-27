@@ -18,7 +18,7 @@ import Config from "./components/Panels/Config/index.vue";
 import Header from "./components/Header/index.vue";
 import { provide, ref, watch } from "vue";
 import { cloneDeep } from "lodash-es";
-import { initData } from "./utils/utils";
+import { initData } from "./utils/defaultData";
 
 const props = defineProps({
   data: {

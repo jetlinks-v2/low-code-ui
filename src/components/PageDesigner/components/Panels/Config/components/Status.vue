@@ -13,15 +13,15 @@
       />
     </j-form-item>
     <j-form-item
-      :validateFirst="true"
-      label="JS代码"
-      :name="['componentProps', 'eventCode']"
+        :validateFirst="true"
+        label="mounted事件"
+        :name="['componentProps', 'mountedCode']"
     >
       <EditorBtn
-        @change="onDataChange"
-        v-model:value="target.componentProps.eventCode"
-        text="编写代码"
-        language="javascript"
+          @change="onDataChange"
+          v-model:value="target.componentProps.mountedCode"
+          text="编写代码"
+          language="javascript"
       />
     </j-form-item>
     <j-form-item label="数据源" :name="['componentProps', 'request']">

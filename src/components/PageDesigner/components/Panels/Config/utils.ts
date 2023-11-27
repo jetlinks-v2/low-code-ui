@@ -2,10 +2,11 @@ export const getConfigList = (_type: string) => {
     const arr: any[] = []
     if (['root'].includes(unref(_type))) {
         arr.push({
-            key: 'Page',
+            key: 'PageConfig',
             header: '页面样式',
         })
-    } else {
+    } 
+    if(!['root', 'form', 'info', 'inline-item'].includes(unref(_type))){
         arr.push({
             key: 'Base',
             header: '基础信息',

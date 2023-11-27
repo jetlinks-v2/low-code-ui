@@ -139,7 +139,7 @@ export default defineComponent({
                     <ProTable
                         columns={columns.value}
                         dataSource={dataSource.value}
-                        modelValue={'TABLE'}
+                        modelValue={props.data?.componentProps?.model || 'TABLE'}
                         params={params.value}
                         noPagination={noPagination.value}
                         pagination={props.data.componentProps.paginationSetting?.pagination}

@@ -33,7 +33,7 @@ import {
   reactive,
 } from "vue";
 import { Scrollbar } from "jetlinks-ui-components";
-import Page from "./components/Page.vue";
+import PageConfig from "./components/Page.vue";
 import Base from "./components/Base.vue";
 import Status from "./components/Status.vue";
 import { useTarget, useTool } from "../../../hooks";
@@ -55,7 +55,7 @@ const _type = computed(() => {
 });
 
 const Panels = {
-  Page,
+  PageConfig,
   Base,
   Status,
   SourceForm,
