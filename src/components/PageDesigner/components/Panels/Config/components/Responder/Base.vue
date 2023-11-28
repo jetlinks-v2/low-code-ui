@@ -1,6 +1,6 @@
 <template>
   <j-button @click="visible = true">配置响应器</j-button>
-  <Modal v-if="visible" :id="id" :type="type" @save="save" @cancel="cancel" />
+  <Modal v-if="visible" :id="id" :type="type" :data="value" @save="save" @cancel="cancel" />
 </template>
 
 <script setup name="ResponderBase">
