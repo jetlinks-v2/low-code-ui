@@ -12,15 +12,14 @@
         :model="formModel"
     >
       <j-form-item
-        label="数据源"
-        name="query"
-        :rules="[{ required: true, message: '请输入数据源地址'}]"
+          label="数据源"
+          name="query"
       >
-        <j-input v-model:value="formModel.query" placeholder="请输入数据源地址" />
+        <j-input v-model:value="formModel.query" placeholder="请输入数据源地址"/>
       </j-form-item>
       <j-form-item
-        label="默认查询参数"
-        name="defaultParams"
+          label="默认查询参数"
+          name="defaultParams"
       >
         <j-monaco-editor
             v-model="formModel.defaultParams"
@@ -29,8 +28,8 @@
         />
       </j-form-item>
       <j-form-item
-        label="数据处理"
-        name="handleResult"
+          label="数据处理"
+          name="handleResult"
       >
         <div>
           <span style="font-weight: 600;">function (result) {</span>

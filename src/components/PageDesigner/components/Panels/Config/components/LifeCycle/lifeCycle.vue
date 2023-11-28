@@ -1,15 +1,19 @@
 <template>
-  <j-button @click="visible = true">配置响应器</j-button>
+  <j-button @click="visible = true">{{title}}</j-button>
   <Modal v-if="visible" :id="id" :type="type" :data="value" @save="save" @cancel="cancel" />
 </template>
 
-<script setup name="ResponderBase">
+<script setup name="LifeCycle">
 import Modal from './Modal.vue'
 
 const props = defineProps({
+  title: {
+    type: String,
+    default: '配置onCreated'
+  },
   value: {
-    type: Object,
-    default: () => ({}),
+    type: String,
+    default: undefined,
   },
   type: {
     type: String,
@@ -19,7 +23,7 @@ const props = defineProps({
     type: String,
     default: undefined
   }
-});
+})
 
 const emits = defineEmits(["update:value", "change"]);
 
@@ -34,6 +38,7 @@ const save = (data) => {
 const cancel = () => {
   visible.value = false
 }
+
 </script>
 
 <style scoped>

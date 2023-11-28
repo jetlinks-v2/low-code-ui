@@ -1,8 +1,8 @@
 import {ProTable, Ellipsis, Row, Col} from 'jetlinks-ui-components'
 import Selection from '../../Selection/index'
-import {defineComponent, withModifiers} from 'vue'
-import {useTool, usePageDependencies} from '../../../hooks'
-import {request as axiosRequest} from '@jetlinks-web/core'
+import { defineComponent, withModifiers } from 'vue'
+import {useTool, usePageDependencies, usePageProvider} from '../../../hooks'
+import { request as axiosRequest } from '@jetlinks-web/core'
 import DraggableLayout from '../DraggableLayout'
 import generatorData from '@LowCode/components/PageDesigner/utils/generatorData'
 import '../index.less'
@@ -16,8 +16,7 @@ export default defineComponent({
     props: {
         data: {
             type: Object,
-            default: () => {
-            }
+            default: () => ({})
         },
         parent: {
             type: Array,
@@ -25,8 +24,11 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const {isDragArea, isEditModel, onAddChild} = useTool()
-        const {dependencies: params} = usePageDependencies(props.data.componentProps?.responder?.dependencies)
+        const { isDragArea, isEditModel, onAddChild } = useTool()
+        const pageProvider = usePageProvider()
+        const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
+        const route = useRoute()
+        const tableRef = ref()
 
         const _data = computed(() => {
             return props.data
@@ -113,16 +115,16 @@ export default defineComponent({
         })
 
         const hasRequest = computed(() => {
-            const {request} = props.data.componentProps
+            const { request } = props.data.componentProps
             return !!request?.query && !isEditModel.value
         })
 
         const handleRequestFn = async (paramsData: any) => {
-            const {request, handleResult} = props.data.componentProps
+            const { request, handleResult } = props.data.componentProps
             const resp = await axiosRequest.post(request.query, paramsData)
             if (handleResult) {
                 const handleResultFn = new Function('result', handleResult)
-                resp.result = handleResultFn.call(this, resp.result)
+                resp.result = handleResultFn(resp.result)
             }
             return resp
         }
@@ -231,11 +233,33 @@ export default defineComponent({
             </Card>
         }
 
+        const onCreatedFn = (code?: string) => {
+            if (code && !isEditModel.value) {
+                const context = {
+                    context: pageProvider.context,
+                    axios: axiosRequest,
+                    route: route,
+                    refs: {
+                        tableRef
+                    }
+                }
+                const fn = new Function('context', code)
+                fn(context)
+            }
+        }
+
+        onCreatedFn(props.data.componentProps?.onCreated)
+
+        onMounted(() => {
+            onCreatedFn(props.data.componentProps?.onCreated)
+        })
+
         return () => {
+
             return (
-                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)}
-                           parent={props.parent}>
+                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <ProTable
+                        ref={tableRef}
                         columns={columns.value}
                         dataSource={dataSource.value}
                         {..._model.value}

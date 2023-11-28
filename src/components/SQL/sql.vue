@@ -85,7 +85,6 @@ const getAllCrud = () => {
           kind: 18,
         })
       })
-
     }
   })
 
