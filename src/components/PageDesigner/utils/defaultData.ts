@@ -208,6 +208,9 @@ export const _function: ISchema[] = [
             responder: {
                 dependencies: undefined,
                 responder: undefined
+            },
+            viewType: {
+                model: ["TABLE"],
             }
         }
     }
