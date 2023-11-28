@@ -239,7 +239,6 @@
         />
       </j-form-item>
     </template>
-    <template v-if="['info'].includes(target.type)"> info </template>
     <template v-if="['info-item'].includes(target.type)">
       <j-form-item
         label="标题"
@@ -395,9 +394,9 @@
           v-model:value="target.componentProps.columns"
         />
       </j-form-item>
-<!--      <j-form-item label="数据源" :name="['componentProps', 'request']">-->
-<!--        <DataSource v-model:value="target.componentProps.request" />-->
-<!--      </j-form-item>-->
+      <!--      <j-form-item label="数据源" :name="['componentProps', 'request']">-->
+      <!--        <DataSource v-model:value="target.componentProps.request" />-->
+      <!--      </j-form-item>-->
       <j-form-item label="分页器">
         <j-switch
           v-model:checked="target.componentProps.paginationSetting.open"
@@ -434,6 +433,47 @@
           v-model:value="target.componentProps.actionWidth"
           @change="onDataChange"
         />
+      </j-form-item>
+    </template>
+    <template v-if="['inline'].includes(target.type)">
+      <j-form-item
+        label="对齐方式"
+        :name="['componentProps', 'align']"
+        required
+        :validateFirst="true"
+      >
+        <j-select
+          @change="onDataChange"
+          v-model:value="target.componentProps.align"
+        >
+          <j-select-option value="start">start</j-select-option>
+          <j-select-option value="end">end</j-select-option>
+          <j-select-option value="center">center</j-select-option>
+          <j-select-option value="baseline">baseline</j-select-option>
+        </j-select>
+      </j-form-item>
+      <j-form-item
+        label="间距方向"
+        :name="['componentProps', 'direction']"
+        required
+        :validateFirst="true"
+      >
+        <CheckButton
+          :options="[
+            { label: '垂直', value: 'vertical' },
+            { label: '水平', value: 'horizontal' },
+          ]"
+          @change="onDataChange"
+          v-model:value="target.componentProps.direction"
+        />
+      </j-form-item>
+      <j-form-item
+        label="间距大小"
+        :name="['componentProps', 'size']"
+        required
+        :validateFirst="true"
+      >
+        <j-slider v-model:value="target.componentProps.size" @change="onDataChange" />
       </j-form-item>
     </template>
   </div>

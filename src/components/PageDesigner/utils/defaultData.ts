@@ -1,5 +1,14 @@
 import { ISchema } from "../typings";
 
+export const initData = {
+    type: "root",
+    key: "root",
+    componentProps: {
+        mountedCode: '',
+    },
+    children: [],
+}
+
 // 基础组件
 export const basic: ISchema[] = [
     {
@@ -16,7 +25,10 @@ export const basic: ISchema[] = [
             text: '按钮',
             shape: 'default',
             size: 'middle',
-            type: 'default'
+            type: 'default',
+            buttonConfig: {
+                type:'Button'
+            },
         },
     },
     {
@@ -133,7 +145,11 @@ export const layout: ISchema[] = [
         type: 'inline',
         name: '内联',
         children: [],
-        componentProps: {},
+        componentProps: {
+            align: 'baseline',
+            direction: 'horizontal',
+            size: 8
+        },
         formItemProps: {
             isLayout: false
         },

@@ -33,9 +33,10 @@ import {
   reactive,
 } from "vue";
 import { Scrollbar } from "jetlinks-ui-components";
-import Page from "./components/Page.vue";
+import PageConfig from "./components/Page.vue";
 import Base from "./components/Base.vue";
 import Status from "./components/Status.vue";
+import Button from './components/Button/index.vue'
 import { useTarget, useTool } from "../../../hooks";
 import { map } from "lodash-es";
 import { getConfigList } from "./utils";
@@ -55,9 +56,10 @@ const _type = computed(() => {
 });
 
 const Panels = {
-  Page,
+  PageConfig,
   Base,
   Status,
+  Button,
   SourceForm,
 };
 
