@@ -135,8 +135,7 @@ export default defineComponent({
             }
         })
 
-        const onCreated = (code?: string) => {
-            console.log(code, props.data.componentProps)
+        const onCreatedFn = (code?: string) => {
             if (code && !isEditModel.value) {
                 const context = {
                     context: pageProvider.context,
@@ -151,7 +150,11 @@ export default defineComponent({
             }
         }
 
-        onCreated(props.data.componentProps?.onCreated)
+        onCreatedFn(props.data.componentProps?.onCreated)
+
+        onMounted(() => {
+            onCreatedFn(props.data.componentProps?.onCreated)
+        })
 
         return () => {
 

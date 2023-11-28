@@ -81,12 +81,27 @@ const defaultCode = `
 * @params route {Object} 路由信息
 * @params refs  {Object} 当前组件下的refs
 */
-(function({ context, axios, route, refs}){
+function onCreated({ context, axios, route, refs}){
 
-  // 接口请求
-  axios.post('')
+  /**
+  * 接口请求
+  * post、postParams、get、patch、remove、put
+  */
+  // axios.post(url, data)
+  // axios.postParams(url, data, params)
+  // axios.get(url, params)
+  // axios.patch(url, data)
+  // axios.remove(url, params)
+  // axios.put(url, data)
 
-})
+  /**
+  * 路由信息
+  * route.params
+  * route.query
+  */
+  const is = route.params.id
+
+}
 `
 
 const change = (v) => {
