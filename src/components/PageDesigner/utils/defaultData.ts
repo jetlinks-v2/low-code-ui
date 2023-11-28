@@ -25,7 +25,10 @@ export const basic: ISchema[] = [
             text: '按钮',
             shape: 'default',
             size: 'middle',
-            type: 'default'
+            type: 'default',
+            buttonConfig: {
+                type:'Button'
+            },
         },
     },
     {
