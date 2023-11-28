@@ -5,14 +5,13 @@ const handleProps = (node: any) => {
     if (!result?.cssCode) {
         result.cssCode = ''
     }
-    if (!result?.onChange) {
-        result.onChange = ''
+    if (!result?.mountedCode) {
+        result.mountedCode = ''
     }
-    if (!result?.onCreated) {
-        result.onCreated = ''
-    }
-    if (!result?.onMounted) {
-        result.onMounted = ''
+    if(node.type === 'form'){
+        if (!result?.source) {
+            result.source = {}
+        }
     }
     return result
 }
@@ -26,7 +25,7 @@ const generatorData = (node: any) => {
     result.componentProps = handleProps(node)
 
     if (Array.isArray(node?.children) && node?.children?.length > 0) {
-        result.children = (node?.children || [])?.map(i => {
+        result.children = (node?.children || [])?.map((i: any)=> {
             return generatorData(i)
         })
     }

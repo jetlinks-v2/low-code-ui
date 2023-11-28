@@ -74,7 +74,6 @@ const props = defineProps({
   ...BodyProps()
 })
 
-const cellHeight = 66
 const myData = ref([])
 const bodyRef = ref()
 const startIndex = ref(0)
@@ -95,7 +94,7 @@ const isValidate = computed(() => {
 
 const bodyHeight = computed(() => {
   const len = myData.value.length
-  return len ? len * cellHeight : 200
+  return len ? len * props.cellHeight : 200
 })
 
 const update = () => {
@@ -103,7 +102,7 @@ const update = () => {
 }
 
 const handlePosition = (height) => {
-  const start = Math.round(height / cellHeight) - 2
+  const start = Math.round(height / props.cellHeight) - 2
   const end = start + maxLen.value + 4
   startIndex.value = start >= 0 ? start : 0
   endIndex.value = end
@@ -124,7 +123,7 @@ const bodyStyle = computed(() => {
 
 const maxLength = () => {
   if ( props.scroll?.y) {
-    maxLen.value = Math.round( props.scroll.y / cellHeight)
+    maxLen.value = Math.round( props.scroll.y / props.cellHeight)
     endIndex.value = maxLen.value + 2
     update()
   }
@@ -150,12 +149,12 @@ const validateItem = (path) => {
 const inViewport = (keys) => {
   const inView = keys.find(key => {
     const _index = key.split(PathMark)[2]
-    return _index * cellHeight > (startIndex.value * cellHeight + props.scroll?.y)
+    return _index * props.cellHeight > (startIndex.value * props.cellHeight + props.scroll?.y)
   })
 
   if (inView) {
     const _index = inView.split(PathMark)[2]
-    scrollRef.value.setScrollTop(_index * cellHeight)
+    scrollRef.value.setScrollTop(_index * props.cellHeight)
   }
 }
 
@@ -166,7 +165,7 @@ watch(() => JSON.stringify(props.columns),  () => {
 }, { immediate: true })
 
 watch(() => JSON.stringify(props.data), (newValue, oldValue) => {
-  myData.value = dataAddID(props.data, cellHeight)
+  myData.value = dataAddID(props.data, props.cellHeight)
   updateDataSource(props.data)
   update()
 }, { immediate: true })

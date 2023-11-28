@@ -2,7 +2,6 @@
   <j-modal
     visible
     title="配置操作列"
-    :width="800"
     @ok="onSave"
     @cancel="emits('close')"
   >

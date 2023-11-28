@@ -18,7 +18,7 @@ import Config from "./components/Panels/Config/index.vue";
 import Header from "./components/Header/index.vue";
 import { provide, ref, watch } from "vue";
 import { cloneDeep } from "lodash-es";
-import { initData } from "./utils/utils";
+import { initData } from "./utils/defaultData";
 
 const props = defineProps({
   data: {
@@ -35,6 +35,7 @@ const _ctrl = ref<boolean>(false);
 const focus = ref<boolean>(false);
 const focused = ref<boolean>(false); // 记录弹框的快捷键问题
 const copyData = ref<any[]>([]);
+const dependencies = ref({}) // 依赖项
 
 provide("PageDesigner", {
   data: props.data,
@@ -46,6 +47,7 @@ provide("PageDesigner", {
   focus,
   focused,
   copyData,
+  dependencies
 });
 
 watch(
@@ -67,7 +69,7 @@ watch(
 
 <style lang="less" scoped>
 .container {
-  height: 100vh;
+  height: 100%;
   .box {
     display: flex;
     width: 100%;

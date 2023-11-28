@@ -2,11 +2,12 @@ import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
 import TitleComponent from '@LowCode/components/TitleComponent/index.vue'
 import './index.less'
-import { withModifiers } from 'vue'
-import { useTool } from '../../hooks'
+import {inject, withModifiers} from 'vue'
+import {usePageDependencies, usePageProvider, useTool} from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import { uid } from '../../utils/uid'
 import { Row, Col } from 'jetlinks-ui-components'
+import {request as axiosRequest} from "@jetlinks-web/core/src/request";
 
 export default defineComponent({
     name: 'InfoLayout',
@@ -24,6 +25,34 @@ export default defineComponent({
     },
     setup(props) {
         const { isEditModel, isDragArea, onAddChild } = useTool()
+        const designer = inject<any>('PageDesigner')
+        const PageProvider = usePageProvider()
+        const detailInfo = ref()
+
+        const defaultParams = () => {
+            try {
+                return JSON.parse(props.data.componentProps?.request?.defaultParams)
+            } catch (e) {
+                return undefined
+            }
+        }
+
+        const handleRequestFn = async () => {
+            const { request, handleResult } = props.data.componentProps
+            if (request) {
+                const paramsData = defaultParams()
+                const resp = await axiosRequest.get(request.query, paramsData)
+                if (handleResult) {
+                    const handleResultFn = new Function('result', handleResult)
+                    detailInfo.value = handleResultFn.call(this, resp.result)
+                } else {
+                    detailInfo.value = resp.result
+                }
+                PageProvider.add?.(props.data.key, detailInfo.value)
+            }
+        }
+
+        handleRequestFn()
 
         const list = computed(() => {
             return props.data?.children || []
@@ -162,6 +191,12 @@ export default defineComponent({
                 return emptyRender()
             }
         }
+
+        onBeforeMount(() => {
+            if (isEditModel) {
+                designer.dependencies.value[props.data.key] = props.data.name || props.data.key
+            }
+        })
 
         return () => {
             return (

@@ -25,7 +25,7 @@
     "@wangeditor/editor-for-vue": "^5.1.12",
     "async-validator": "^4.2.5",
     "dayjs": "^1.11.8",
-    "jetlinks-ui-components": "1.0.34-8",
+    "jetlinks-ui-components": "1.0.34-11",
     "less": "^4.2.0",
     "lodash-es": "^4.17.21",
     "md5": "^2.3.0",

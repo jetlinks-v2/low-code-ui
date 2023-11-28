@@ -2,13 +2,6 @@ import { map } from "lodash-es"
 import { ISchema } from "../typings"
 import { uid } from "./uid"
 
-export const initData = {
-    type: "root",
-    key: "root",
-    componentProps: {},
-    children: [],
-}
-
 // 添加子组件
 export const appendChildItem = (arr: any[], newData: any, parent: any) => {
     return arr.map(item => {

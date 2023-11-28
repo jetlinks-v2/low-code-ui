@@ -1,13 +1,7 @@
 <template>
   <div>
     <j-button @click="visible = true">配置</j-button>
-    <Config
-      :type="type"
-      v-if="visible"
-      :data="value"
-      @save="onSave"
-      @close="onClose"
-    />
+    <Config v-if="visible" :data="value" @save="onSave" @close="onClose" />
   </div>
 </template>
   
@@ -19,10 +13,6 @@ const props = defineProps({
   value: {
     type: Array as PropType<any[]>,
     default: () => [],
-  },
-  type: {
-    type: String,
-    default: "search",
   },
 });
 const emits = defineEmits(["update:value", "change"]);
