@@ -11,6 +11,12 @@ export const getConfigList = (_type: string) => {
             header: '基础信息',
         })
     }
+    if(['button'].includes(unref(_type))){
+        arr.push({
+            key: 'Button',
+            header: '按钮配置',
+        })
+    }
     arr.push({
         key: 'Status',
         header: '高级配置',
