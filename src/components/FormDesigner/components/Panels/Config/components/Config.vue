@@ -144,6 +144,26 @@
           </j-select>
         </j-input-group>
       </j-form-item>
+      <j-form-item
+          label="是否为按钮"
+          :validateFirst="true"
+          :name="['componentProps', 'isButton']"
+          :rules="[
+            {
+              required: true,
+              message: '请选择',
+            },
+          ]"
+      >
+        <CheckButton
+          :options="[
+            { label: '否', value: false },
+            { label: '是', value: true },
+          ]"
+          @change="onChange"
+          v-model:value="target.componentProps.isButton"
+        />
+      </j-form-item>
     </template>
     <template v-if="['tree-select', 'select-card'].includes(type)">
       <j-form-item

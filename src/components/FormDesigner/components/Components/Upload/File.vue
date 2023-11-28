@@ -17,7 +17,8 @@
         <p class="ant-upload-drag-icon">
           <AIcon type="CloudUploadOutlined" />
         </p>
-        <p class="ant-upload-hint">将文件拖动到此处，或点击上传</p>
+        <j-button>选择文件</j-button>
+        <p class="ant-upload-hint">{{ props.accept?.length ? `支持格式:${props?.accept?.join('、')}` : `支持所有格式` }}</p>
       </div>
       <template #itemRender="{ file }">
         <div class="render">
@@ -30,6 +31,7 @@
           ></j-input>
           <div class="render-left" @dblclick="onDbClick(file)" v-else>
             <j-ellipsis>{{ file.name }}</j-ellipsis>
+            <j-progress :percent="file.percent.toFixed(2)" size="small" trailColor="#eaf2fe" v-if="file.status === 'uploading'"></j-progress>
           </div>
           <j-space>
             <j-button
@@ -52,7 +54,7 @@
         </div>
       </template>
     </a-upload-dragger>
-    <div class="bottom">单个大小限制{{ fileSize }}{{ unit }}</div>
+    <!-- <div class="bottom">单个大小限制{{ fileSize }}{{ unit }}</div> -->
   </div>
 </template>
 
@@ -100,7 +102,6 @@ const fileList = ref<any[]>([])
 const dbRef = ref<boolean>(false)
 const dbId = ref<string>('')
 const nameRef = ref()
-
 const beforeUpload = (file: UploadProps['fileList'][number]) => {
   // console.log('props.accept----', props.accept, file)
   const maxSize =
@@ -189,11 +190,16 @@ watch(
 .content {
   & > span {
     display: flex;
-    flex-direction: column-reverse;
+    // flex-direction: column-reverse;
+    :deep(.ant-upload-list){
+      overflow: auto;
+      height: 160px;
+    }
   }
 
   :deep(.ant-upload.ant-upload-drag) {
     margin-top: 10px;
+    flex: 1;
   }
   .bottom {
     margin-top: 20px;
@@ -201,11 +207,14 @@ watch(
   }
 }
 
-:deep(.ant-upload-list-text-container) {
-  display: flex;
-  width: 100%;
-}
 
+:deep(.ant-upload-list){
+  flex:1;
+}
+:deep(.ant-upload-list-text-container) {
+        display: flex;
+        width: 100%;
+  }
 .render {
   display: flex;
   align-items: center;

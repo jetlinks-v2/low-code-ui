@@ -1,10 +1,13 @@
 <template>
   <div>
-    <template v-if="listType === 'text'">
+    <template v-if="listType === 'text' && !isButton">
       <File v-bind="_componentProps" :value="_value" @change="onChange" />
     </template>
-    <template v-else>
+    <template v-else-if="!isButton">
       <Picture v-bind="_componentProps" :value="_value" @change="onChange" />
+    </template>
+    <template v-if="isButton">
+      <ButtonUpload v-bind="_componentProps" :list-type="listType" :value="_value" @change="onChange" />
     </template>
   </div>
 </template>
@@ -14,6 +17,7 @@ import { omit } from 'lodash-es'
 import { computed, ref, watch } from 'vue'
 import File from './File.vue'
 import Picture from './Picture.vue'
+import ButtonUpload from './ButtonUpload.vue'
 
 const props = defineProps({
   fileSize: {
@@ -33,13 +37,17 @@ const props = defineProps({
   },
   listType: {
     type: String,
-    default: 'text',
+    default:'text',
   },
   value: {
     type: String,
     default: '',
   },
   disabled:{
+    type:Boolean,
+    default:false
+  },
+  isButton:{
     type:Boolean,
     default:false
   }
