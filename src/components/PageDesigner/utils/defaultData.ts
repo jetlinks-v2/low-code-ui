@@ -1,5 +1,14 @@
 import { ISchema } from "../typings";
 
+export const initData = {
+    type: "root",
+    key: "root",
+    componentProps: {
+        mountedCode: '',
+    },
+    children: [],
+}
+
 // 基础组件
 export const basic: ISchema[] = [
     {
@@ -17,6 +26,17 @@ export const basic: ISchema[] = [
             shape: 'default',
             size: 'middle',
             type: 'default'
+        },
+    },
+    {
+        type: 'dropdown',
+        name: '下拉菜单',
+        componentProps: {
+            text: '下拉菜单',
+            shape: 'default',
+            size: 'middle',
+            type: 'primary',
+            menu: []
         },
     },
     {
@@ -122,7 +142,11 @@ export const layout: ISchema[] = [
         type: 'inline',
         name: '内联',
         children: [],
-        componentProps: {},
+        componentProps: {
+            align: 'baseline',
+            direction: 'horizontal',
+            size: 8
+        },
         formItemProps: {
             isLayout: false
         },
@@ -167,16 +191,9 @@ export const _function: ISchema[] = [
                     title: 'Address',
                     dataIndex: 'address',
                 },
-                {
-                    title: 'Action',
-                    dataIndex: 'action',
-
-                },
             ],
             dataSource: [
                 { name: 'John Brown', age: 14, address: 'New York No. 1 Lake Park'},
-                { name: 'Jim Green', age: 32, address: 'London No. 1 Lake Park'},
-                { name: 'Joe Black', age: 45, address: 'Sidney No. 1 Lake Park'},
             ],
             paginationSetting: {
                 open: true,
@@ -184,6 +201,7 @@ export const _function: ISchema[] = [
                     pageSizeOptions: [12, 24, 48, 96]
                 }
             },
+            actionVisible: true,
             responder: {
                 dependencies: undefined,
                 responder: undefined

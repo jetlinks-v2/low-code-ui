@@ -83,7 +83,7 @@ defineExpose({ onSave })
 </script>
 <style scoped>
 .form-warp {
-  border: 1px solid #e6e6e6;
+  /* border: 1px solid #e6e6e6; */
   padding-bottom: 18px;
 }
 </style>
