@@ -1,7 +1,7 @@
 import Selection from '../Selection/index'
 import './index.less'
 import componentMap from '../../utils/componentMap'
-import { useProps } from '../../hooks'
+import {useProps} from '../../hooks'
 
 export default defineComponent({
     name: 'CommLayout',
@@ -19,13 +19,14 @@ export default defineComponent({
     },
     setup(props) {
         const TypeComponent = componentMap?.[props?.data?.type] || 'div'
+
         return () => {
             const _props = useProps(props.data)
             const params = {
                 data: props.data,
                 parent: props.parent
             }
-            console.log('CommLayout', _props.componentProps)
+            // console.log('CommLayout', _props.componentProps)
             return (
                 <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                     <TypeComponent {..._props.componentProps} />

@@ -96,7 +96,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value', 'change'])
 
 const cropper = reactive({
   visible: false,
@@ -140,6 +140,7 @@ const handleChange = (info: UploadChangeParam) => {
     imageUrl.value = info.file.response?.result?.accessUrl;
     loading.value = false;
     emit('update:value', info.file.response?.result?.accessUrl);
+    emit('change', info.file.response?.result?.accessUrl);
   }
   if (info.file.status === 'error') {
     loading.value = false;
@@ -151,6 +152,7 @@ const saveImage = (url: any) => {
   cropper.visible = false
   imageUrl.value = url?.accessUrl
   emit('update:value', url?.accessUrl);
+  emit('change', url?.accessUrl);
 }
 
 watch(() => props.value, (newValue) => {

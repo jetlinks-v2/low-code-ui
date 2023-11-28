@@ -15,7 +15,6 @@ const Canvas = defineComponent({
     const cssClassList = ref<string[]>([])
     const canvasRef = ref<any>()
     const { } = useKeys(canvasRef)
-
     const handleClick = () => {
       setSelection('root')
     }
@@ -26,23 +25,26 @@ const Canvas = defineComponent({
       insertCustomCssToHead(unref(designer.pageData)?.componentProps?.cssCode, 'root')
     })
 
-    const _padding = computed(() => {
-      return unref(designer.pageData)?.componentProps?.padding || 0
-    })
-
     const renderContent = () => {
       return <DraggableLayout
         data-layout-type={'root'}
         style={{
           height: '100%',
-          width: '100%',
-          padding: `0 ${_padding.value}px`
+          width: '100%'
         }}
         data={designer.pageData.value?.children || []}
         parent={designer.pageData.value}
         isRoot
       ></DraggableLayout>
     }
+
+    onMounted(() => {
+      if(!unref(isEditModel) && designer.pageData.value?.componentProps?.mountedCode){
+        // TODO: 参数问题需要解决
+        let customFn = new Function(designer.pageData.value?.componentProps?.mountedCode)
+        customFn.call()
+      }
+    })
 
     const renderChildren = () => {
       return <Dropdown
@@ -79,6 +81,10 @@ const Canvas = defineComponent({
             data-id="root"
             class={['subject', ...unref(cssClassList)]}
             ref={canvasRef}
+            style={{
+              backgroundImage: `url(${designer.pageData.value?.componentProps?.backgroundImage})`,
+              backgroundSize: 'cover'
+            }}
           >
             {!!designer.copyData.value?.length ? renderChildren() : renderContent()}
           </div>

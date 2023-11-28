@@ -65,6 +65,14 @@ const Selection = defineComponent({
       insertCustomCssToHead(props.data?.componentProps?.cssCode, props.data?.key)
     })
 
+    onMounted(() => {
+      if(!unref(isEditModel) && props.data?.componentProps?.mountedCode){
+        // TODO: 参数问题需要解决
+        let customFn = new Function(props.data?.componentProps?.mountedCode)
+        customFn.call()
+      }
+    })
+
     const editNode = () => {
       return <Dropdown
         trigger={['contextmenu']}
@@ -103,10 +111,11 @@ const Selection = defineComponent({
             unref(isEditModel) && unref(_hasDrag) && 'handle',
             unref(isEditModel) && Selected.value && 'Selected',
             unref(isEditModel) && 'edit-hover',
+            ...unref(cssClassList)
           ]}
           {...useAttrs()}
           onClick={withModifiers(handleClick, ['stop'])}
-          {...unref(cssClassList)}
+
         >
           {unref(isEditModel) ? editNode() : slots?.default()}
           {

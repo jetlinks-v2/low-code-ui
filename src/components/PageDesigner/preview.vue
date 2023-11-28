@@ -8,7 +8,7 @@
 import Canvas from "./components/Panels/Canvas/index";
 import { provide, ref, watch } from "vue";
 import { ISchema } from "./typings";
-import { initData } from "./utils/utils";
+import { initData } from "./utils/defaultData";
 import { cloneDeep } from "lodash-es";
 
 const props = defineProps({

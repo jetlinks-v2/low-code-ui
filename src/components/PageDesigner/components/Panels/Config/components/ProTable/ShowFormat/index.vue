@@ -6,7 +6,7 @@
 </template>
     
   <script lang="ts" setup>
-import { PropType, ref } from "vue";
+import { ref } from "vue";
 import Config from "./Config.vue";
 
 const props = defineProps({
