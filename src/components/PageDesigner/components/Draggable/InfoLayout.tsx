@@ -41,18 +41,25 @@ export default defineComponent({
             const { request, handleResult } = props.data.componentProps
             if (request) {
                 const paramsData = defaultParams()
-                const resp = await axiosRequest.get(request.query, paramsData)
-                if (handleResult) {
-                    const handleResultFn = new Function('result', handleResult)
-                    detailInfo.value = handleResultFn.call(this, resp.result)
-                } else {
-                    detailInfo.value = resp.result
+                console.log(request)
+                try {
+                    const resp = await axiosRequest[request.methods](request.query, paramsData)
+                    if (handleResult) {
+                        const handleResultFn = new Function('result', handleResult)
+                        detailInfo.value = handleResultFn.call(this, resp.result)
+                    } else {
+                        detailInfo.value = resp.result
+                    }
+                    PageProvider.add?.(props.data.key, detailInfo.value)
+                } catch (e) {
+                    console.error(e)
                 }
-                PageProvider.add?.(props.data.key, detailInfo.value)
             }
         }
 
-        handleRequestFn()
+        if (!isEditModel.value) {
+            handleRequestFn()
+        }
 
         const list = computed(() => {
             return props.data?.children || []

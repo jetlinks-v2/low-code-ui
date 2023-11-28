@@ -1,7 +1,7 @@
 <template>
   <div>
     <j-button @click="visible = true">配置数据源</j-button>
-    <Modal v-if="visible" @cancel="onClose" @save="onSave" />
+    <Modal v-if="visible" :data="value" @cancel="onClose" @save="onSave" />
   </div>
 </template>
 
