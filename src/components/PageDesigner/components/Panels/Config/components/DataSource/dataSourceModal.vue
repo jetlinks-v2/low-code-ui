@@ -14,7 +14,6 @@
       <j-form-item
         label="数据源"
         name="query"
-        :rules="[{ required: true, message: '请输入数据源地址'}]"
       >
         <j-input v-model:value="formModel.query" placeholder="请输入数据源地址" >
           <template #addonBefore>
