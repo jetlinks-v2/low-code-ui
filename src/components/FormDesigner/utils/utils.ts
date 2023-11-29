@@ -71,11 +71,11 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
     if (['root', 'table-item-index', 'table-item-actions'].includes(_type)) {
         return false
     } else {
-        if (arr.includes(_type)) {
-            if (!node?.formItemProps?.label) {
-                return obj
-            }
-        }
+        // if (arr.includes(_type)) {
+        //     if (!node?.formItemProps?.label) {
+        //         return obj
+        //     }
+        // }
         if (!['space-item', 'card-item', 'grid-item', 'table-item', 'grid', 'space', 'tabs', 'collapse', 'card', 'collapse-item', 'tabs-item'].includes(_type) || (['tabs', 'collapse', 'card'].includes(_type) && node?.formItemProps?.isLayout)) {
             if (!node?.formItemProps?.name) {
                 return obj
@@ -188,7 +188,8 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
                 }
             }
         }
-        if (['tabs', 'collapse', 'card'].includes(_type) && node?.formItemProps?.isLayout && !node.formItemProps?.label) {
+        //  && !node.formItemProps?.label
+        if (['tabs', 'collapse', 'card'].includes(_type) && node?.formItemProps?.isLayout) {
             return obj
         }
         if (['input', 'textarea', 'input-password', 'date-picker', 'time-picker'].includes(_type)) {
