@@ -18,7 +18,7 @@
       </div>
     </j-form-item>
     <j-form-item
-      label="是否为页面"
+      label="设置该页面为系统主菜单"
       :name="['componentProps', 'isPage']"
       :validateFirst="true"
     >
@@ -27,18 +27,34 @@
         @change="onDataChange"
       />
     </j-form-item>
+    <template v-if="target.componentProps.isPage">
+      <j-form-item
+          label="菜单名称"
+        :name="['componentProps', 'pageName']"
+      >
+        <j-input v-model:value="target.componentProps.pageName" placeholder="请输入菜单名称" @change="onDataChange" />
+      </j-form-item>
+      <j-form-item
+          label="菜单图标"
+          :name="['componentProps', 'pageIcon']"
+      >
+        <Icon v-model:value="target.componentProps.pageIcon" @change="onDataChange"/>
+      </j-form-item>
+    </template>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { useTarget } from "../../../../hooks";
 import { ImageUpload } from "@LowCode/components";
+import Icon from './Icon/index.vue'
 
 const { target } = useTarget();
 
 const emits = defineEmits(["refresh"]);
 
 const onDataChange = () => {
+  console.log(target.value)
   emits("refresh", target.value);
 };
 </script>
