@@ -135,7 +135,7 @@ export default defineComponent({
             }
             // else if (['form'].includes(props?.data.type)) {// 会被置空
             //     __value.value = get(designer.formState, _path)
-            // } 
+            // }
             else if (['switch'].includes(props?.data.type)) {// 会被置空
                 const val = get(designer.formState, _path)
                 __value.value = val === 'true' ? true : val
@@ -151,7 +151,7 @@ export default defineComponent({
         })
 
         const path_ = computed(() => {
-            if (props.data?.componentProps?.mode !== "multiple") {
+            if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && props.data?.componentProps?.mode !== "multiple") {
                 const _key = (props.data?.componentProps.keys || [])?.find(i => i?.flag)
                 const __path = _path.slice(0, _path.length - 1) || []
                 __path.push(_key?.config?.source)
