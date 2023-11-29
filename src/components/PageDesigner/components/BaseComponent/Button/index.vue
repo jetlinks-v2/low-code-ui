@@ -13,8 +13,8 @@
         </template>
         {{ text }}
     </j-button>
-    <Modal v-if="visible && buttonConfig?.type === 'Modal'" :button-config="buttonConfig" @close="setVisible(false)"/>
-    <Drawer  v-if="visible && buttonConfig?.type === 'Drawer'" :button-config="buttonConfig" @close="setVisible(false)"/>
+    <Modal v-if="visible && buttonConfig?.type === 'Modal'" :button-config="buttonConfig" @close="setVisible(false)" />
+    <Drawer v-if="visible && buttonConfig?.type === 'Drawer'" :button-config="buttonConfig" @close="setVisible(false)" />
 </template>
   
 <script lang="ts" setup name="Button">
@@ -22,6 +22,9 @@ import { omit } from "lodash-es";
 import { PropType, ref } from "vue";
 import Modal from './buttonModal.vue'
 import Drawer from './buttonDrawer.vue'
+import { request as axiosRequest } from "@jetlinks-web/core/src/request";
+import { onlyMessage } from "@LowCode/utils/comm";
+
 
 const props = defineProps({
     text: {
@@ -66,7 +69,7 @@ const props = defineProps({
         type: String,
     },
     buttonConfig: {
-        type: Object
+        type: Object,
     }
 });
 
@@ -79,21 +82,40 @@ const setVisible = (val: boolean) => {
 };
 
 
-const setFunc = (code: string) => {
-    const func = new Function(code);
-    func()
+const defaultParams = () => {
+    try {
+        return JSON.parse(props.buttonConfig?.config?.defaultParams)
+    } catch (e) {
+        return undefined
+    }
+}
+
+const handleRequestFn = async () => {
+    const config = props.buttonConfig?.config
+    if (props.buttonConfig?.config.query) {
+        const paramsData = defaultParams()
+        try {
+            const resp = await axiosRequest[config.methods](config.query, paramsData)
+            if (config.click) {
+                const handleResultFn = new Function('result','onlyMessage', config.click)
+                handleResultFn(resp.result,onlyMessage)
+            } 
+        } catch (e) {
+            console.error(e)
+        }
+    }
 }
 
 const onClick = () => {
     if (props.buttonConfig?.type === 'Button') {
-        setFunc(props.buttonConfig?.config.click)
+        handleRequestFn()
     } else {
         setVisible(true)
     }
 };
 
 const onConfirm = () => {
-    setFunc(props.buttonConfig?.config?.confirm)
+    handleRequestFn()
 };
 
 
