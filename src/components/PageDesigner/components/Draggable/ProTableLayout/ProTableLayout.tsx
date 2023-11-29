@@ -1,4 +1,4 @@
-import { ProTable } from 'jetlinks-ui-components'
+import {ProTable, Ellipsis, Row, Col} from 'jetlinks-ui-components'
 import Selection from '../../Selection/index'
 import { defineComponent, withModifiers } from 'vue'
 import {useTool, usePageDependencies, usePageProvider} from '../../../hooks'
@@ -6,6 +6,8 @@ import { request as axiosRequest } from '@jetlinks-web/core'
 import DraggableLayout from '../DraggableLayout'
 import generatorData from '@LowCode/components/PageDesigner/utils/generatorData'
 import '../index.less'
+import {Card} from '@LowCode/components'
+import {get} from "lodash-es";
 
 export default defineComponent({
     name: 'ProTableLayout',
@@ -14,7 +16,7 @@ export default defineComponent({
     props: {
         data: {
             type: Object,
-            default: () => { }
+            default: () => ({})
         },
         parent: {
             type: Array,
@@ -135,6 +137,102 @@ export default defineComponent({
             }
         })
 
+        const _model = computed(() => {
+            if (props.data.componentProps?.viewType?.model?.length === 2) {
+                return {
+                    model: '',
+                    modelValue: props.data.componentProps?.viewType?.modelValue || 'TABLE'
+                }
+            }
+            return {
+                model: props.data.componentProps?.viewType?.model?.[0] || 'TABLE'
+            }
+        })
+
+        const handleFn = (code: string, _record: any) => {
+            if(!code) return ''
+            const handleResultFn = new Function('record', code)
+            return handleResultFn.call(this, _record)
+        }
+
+        const statusConfig = (emphasisField: any, _record: any) => {
+            if(emphasisField?.showStatus){
+                return {
+                    showStatus: true,
+                    status: get(_record, (emphasisField?.status || '')?.split('.')),
+                    statusText: get(_record, (emphasisField?.statusText || '')?.split('.')),
+                    statusColor: JSON.parse(emphasisField?.statusColor || "{}")
+                }
+            }
+            return {
+                showStatus: false
+            }
+        }
+
+        const getButtonData = (arr: any[], _button: any[]) => {
+            arr.forEach(item => { // 'table-item-actions'
+                if(item.type === 'button'){
+                    _button.push(item)
+                }
+                if(item.children?.length) {
+                    getButtonData(item.children, _button)
+                }
+            })
+        }
+
+        const _actions = computed(() => {
+            if(props.data?.componentProps?.actionVisible){
+                // TODO: 卡片actions处理
+                return [
+                    {
+                        key: 'view',
+                        text: '按钮',
+                    },
+                    {
+                        key: 'view1',
+                        text: '按钮',
+                    },
+                    {
+                        key: 'view2',
+                        text: '按钮',
+                    }
+                ]
+            }
+            return []
+        })
+
+        const cardRender = (_record: any) => {
+            return <Card
+                actions={_actions.value}
+                record={_record}
+                {...statusConfig(props.data.componentProps?.viewType?.cardConfig?.emphasisField, _record)}
+                v-slots={{
+                    img: () => {
+                        return <img
+                            width={80}
+                            height={80}
+                            src={props.data.componentProps?.viewType?.cardConfig?.customIcon || '/images/list-page/table-card-default.png'}/>
+                    },
+                    content: () => {
+                        return <div>
+                            <Ellipsis><h3>{handleFn(props.data.componentProps?.viewType?.cardConfig?.titleCode, _record)}</h3></Ellipsis>
+                            <Row gutter={24}>
+                                <Col span={12}>
+                                    <div>{props.data.componentProps?.viewType?.cardConfig?.field1Title}</div>
+                                    <Ellipsis>{handleFn(props.data.componentProps?.viewType?.cardConfig?.field1Code, _record)}</Ellipsis>
+                                </Col>
+                                <Col span={12}>
+                                    <div>{props.data.componentProps?.viewType?.cardConfig?.field2Title}</div>
+                                    <Ellipsis>{handleFn(props.data.componentProps?.viewType?.cardConfig?.field2Code, _record)}</Ellipsis>
+                                </Col>
+                            </Row>
+                        </div>
+                    }
+                }}
+            >
+            </Card>
+        }
+
         const onCreatedFn = (code?: string) => {
             if (code && !isEditModel.value) {
                 const context = {
@@ -164,7 +262,7 @@ export default defineComponent({
                         ref={tableRef}
                         columns={columns.value}
                         dataSource={dataSource.value}
-                        modelValue={props.data?.componentProps?.model || 'TABLE'}
+                        {..._model.value}
                         params={params.value}
                         noPagination={noPagination.value}
                         pagination={props.data.componentProps.paginationSetting?.pagination}
@@ -172,6 +270,7 @@ export default defineComponent({
                         defaultParams={defaultParams.value}
                         v-slots={{
                             headerTitle: buttonRender('table-item-header'),
+                            card: cardRender,
                             ...columnsSlots.value
                         }}
                     >

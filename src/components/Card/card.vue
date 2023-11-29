@@ -30,12 +30,14 @@
           <!-- 状态 -->
           <div v-if="showStatus" class="item-state" :style="{ backgroundColor: `rgba(${stateColor}, .1)`}">
             <div class="item-state-content">
-              <BadgeStatus
-                :status="status"
-                :text="statusText"
-                :statusNames="statusNames"
-                :statusColor="statusColor"
-              />
+              <slot name="status">
+                  <BadgeStatus
+                      :status="status"
+                      :text="statusText"
+                      :statusNames="statusNames"
+                      :statusColor="statusColor"
+                  />
+              </slot>
             </div>
           </div>
         </div>

@@ -56,13 +56,6 @@
         :name="['formItemProps', 'label']"
         v-if="!['text'].includes(type)"
         :validateFirst="true"
-        :rules="[
-          {
-            required: true,
-            message: '请输入名称',
-            trigger: 'change',
-          },
-        ]"
       >
         <j-input
           placeholder="请输入"
@@ -208,13 +201,6 @@
           label="名称"
           :validateFirst="true"
           :name="['formItemProps', 'label']"
-          :rules="[
-            {
-              required: true,
-              message: '请输入名称',
-              trigger: 'change',
-            },
-          ]"
         >
           <j-input
             placeholder="请输入"

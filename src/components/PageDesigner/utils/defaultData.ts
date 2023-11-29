@@ -27,7 +27,7 @@ export const basic: ISchema[] = [
             size: 'middle',
             type: 'default',
             buttonConfig: {
-                type:'Button'
+                type:'Button',
             },
         },
     },
@@ -208,6 +208,9 @@ export const _function: ISchema[] = [
             responder: {
                 dependencies: undefined,
                 responder: undefined
+            },
+            viewType: {
+                model: ["TABLE"],
             }
         }
     }

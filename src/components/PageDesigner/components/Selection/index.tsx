@@ -46,7 +46,7 @@ const Selection = defineComponent({
 
     const Selected = computed(() => {
       const flag = designer.selected.value.find((item: any) => props?.data?.key === item.key)
-      return props?.data?.key !== undefined && flag
+      return props?.data?.key !== undefined && flag && unref(isEditModel)
     })
 
     const handleClick = () => {
@@ -57,7 +57,7 @@ const Selection = defineComponent({
 
     const TagComponent = isHTMLTag(props.tag as string) ? props.tag : resolveComponent(props.tag as string)
 
-    const _hasDrag = computed(() => { return props.hasDrag })
+    const _hasDrag = computed(() => { return props.hasDrag && unref(isEditModel) })
 
     watchEffect(() => {
       const arr = extractCssClass(props.data?.componentProps?.cssCode)
@@ -108,8 +108,8 @@ const Selection = defineComponent({
           data-id={props.data?.key}
           class={[
             'selectElement',
-            unref(isEditModel) && unref(_hasDrag) && 'handle',
-            unref(isEditModel) && Selected.value && 'Selected',
+            unref(_hasDrag) && 'handle',
+            unref(Selected) && 'Selected',
             unref(isEditModel) && 'edit-hover',
             ...unref(cssClassList)
           ]}

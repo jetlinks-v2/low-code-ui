@@ -1,12 +1,12 @@
 <template>
     <div>
       <j-button @click="visible = true">配置</j-button>
-      <Modal v-if="visible " @cancel="onClose" @save="onSave" :type="type" :data="value"/>
+      <Created v-if="visible " @cancel="onClose" @save="onSave" :type="type" :data="value"/>
     </div>
   </template>
   
   <script setup name="Config">
-  import Modal from './configModal.vue'
+  import Created from './createdModal.vue'
   
   const props = defineProps({ 
     value: {

@@ -65,6 +65,8 @@ export default defineComponent({
             return _path
         })
 
+        console.log(__path.value, props.data.type)
+
         const data = ref<any[]>([])
 
         watchEffect(() => {
