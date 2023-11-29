@@ -26,7 +26,7 @@
           v-if="modelRef.model?.length === 2"
         >
           <j-radio-group
-            v-model:value="modelRef.defaultModel"
+            v-model:value="modelRef.modelValue"
             button-style="solid"
           >
             <j-radio-button value="TABLE">数据列表</j-radio-button>
@@ -55,7 +55,7 @@ const formRef = ref();
 
 const modelRef = reactive({
   model: ["TABLE"],
-  defaultModel: "TABLE",
+  modelValue: "",
   cardConfig: {},
 });
 
@@ -63,7 +63,7 @@ watch(
   () => props.data,
   () => {
     modelRef.model = props.data?.model || ["TABLE"]
-    modelRef.defaultModel = props.data?.defaultModel || "TABLE"
+    modelRef.modelValue = props.data?.modelValue
     modelRef.cardConfig = props.data?.cardConfig
   },
   {
@@ -74,12 +74,22 @@ watch(
 
 const onChange = (checkedValue: any) => {
   modelRef.model = checkedValue?.length ? checkedValue : ["TABLE"];
+  if(modelRef.model?.length === 2){
+    modelRef.modelValue = "TABLE"
+    modelRef.cardConfig = {}
+  }
 };
 
 const onSave = () => {
   formRef.value.validate().then((res: any) => {
     if (res) {
-      emits('save', res)
+      if(modelRef.model?.length === 2) {
+        emits('save', modelRef)
+      } else {
+        emits('save', {
+          model: modelRef.model
+        })
+      }
     }
   })
 };

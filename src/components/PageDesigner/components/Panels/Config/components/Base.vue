@@ -409,31 +409,14 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <j-form-item
-        label="是否展示操作列"
-        :name="['componentProps', 'actionVisible']"
-      >
-        <!-- <Action v-model:value="target.componentProps.action" /> -->
-        <j-switch
-          v-model:checked="target.componentProps.actionVisible"
-          @change="onDataChange"
-        />
-      </j-form-item>
-      <j-form-item
-        v-if="target.componentProps.actionVisible"
-        label="操作列宽度"
-        :name="['componentProps', 'actionWidth']"
-      >
-        <j-input-number
-          :precision="0"
-          :min="1"
-          addon-after="px"
-          placeholder="请输入"
-          style="width: 100%"
-          v-model:value="target.componentProps.actionWidth"
-          @change="onDataChange"
-        />
-      </j-form-item>
+      <template v-if="target.componentProps.actionVisible">
+        <j-form-item
+            label="配置操作列"
+            :name="['componentProps', 'action']"
+        >
+          <Action v-model:value="target.componentProps.action" @change="onDataChange" />
+        </j-form-item>
+      </template>
     </template>
     <template v-if="['inline'].includes(target.type)">
       <j-form-item
@@ -484,6 +467,7 @@ import Icon from "./Icon/index.vue";
 import Search from "./Search/index.vue";
 import Dropdown from "./Dropdown/index.vue";
 import ShowFormat from "./ProTable/ShowFormat/index.vue";
+import Action from './ProTable/Action/index.vue';
 import { ColorPicker } from "jetlinks-ui-components";
 import { useTarget } from "../../../../hooks";
 import { DataSource } from "./ProTable";
