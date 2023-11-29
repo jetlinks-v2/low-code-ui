@@ -3,6 +3,7 @@ import type {Ref} from "vue";
 
 type PageProviderType = {
     context: Record<string, any>
+    slots?: Record<string, any>
     add?: (key: string, data: any) => void
 
     remove?: (key: string) => void
