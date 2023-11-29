@@ -80,6 +80,9 @@ const useTool = () => {
                     ...designer.pageData.value,
                     children: _data?.arr || [],
                 }
+
+                designer.dependencies.value = designer.dependencies.value.filters((key: string) => !designer.selected.value.includes(key))
+
                 setSelection(_data?.data || 'root')
             },
             onCancel() {
