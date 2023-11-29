@@ -70,7 +70,7 @@ const props = defineProps({
     },
     buttonConfig: {
         type: Object,
-    }
+    },
 });
 
 
