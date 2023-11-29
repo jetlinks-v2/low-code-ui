@@ -27,7 +27,7 @@ export const basic: ISchema[] = [
             size: 'middle',
             type: 'default',
             buttonConfig: {
-                type:'Button'
+                type:'Button',
             },
         },
     },
