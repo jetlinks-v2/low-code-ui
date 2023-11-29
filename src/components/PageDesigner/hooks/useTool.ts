@@ -1,4 +1,4 @@
-import { cloneDeep, debounce } from "lodash-es"
+import {cloneDeep, debounce, omit} from "lodash-es"
 import { appendChildItem, copyDataByKey, deleteDataByKey, handleCopyData } from "../utils/utils"
 import { Modal } from 'jetlinks-ui-components'
 import { uid } from "../utils/uid"
@@ -81,7 +81,7 @@ const useTool = () => {
                     children: _data?.arr || [],
                 }
 
-                designer.dependencies.value = designer.dependencies.value.filters((key: string) => !designer.selected.value.includes(key))
+                designer.dependencies.value = omit(designer.dependencies.value, designer.selected.value.map((item: any) => item.key))
 
                 setSelection(_data?.data || 'root')
             },
