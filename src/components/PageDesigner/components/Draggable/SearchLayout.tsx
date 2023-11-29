@@ -40,7 +40,7 @@ export default defineComponent({
         })
 
         onBeforeMount(() => {
-            if (isEditModel) {
+            if (isEditModel.value) {
                 designer.dependencies.value[props.data.key] = props.data.name || props.data.key
             }
         })
