@@ -1,7 +1,7 @@
 import {ProTable, Ellipsis, Row, Col, AIcon, Space, Tooltip, Button} from 'jetlinks-ui-components'
 import Selection from '../../Selection/index'
 import { defineComponent, withModifiers } from 'vue'
-import {useTool, usePageDependencies, usePageProvider} from '../../../hooks'
+import {useTool, usePageDependencies, usePageProvider,  useLifeCycle} from '../../../hooks'
 import { request as axiosRequest } from '@jetlinks-web/core'
 import DraggableLayout from '../DraggableLayout'
 import generatorData from '@LowCode/components/PageDesigner/utils/generatorData'
@@ -27,7 +27,6 @@ export default defineComponent({
         const { isDragArea, isEditModel, onAddChild } = useTool()
         const pageProvider = usePageProvider()
         const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
-        const route = useRoute()
         const tableRef = ref()
 
         const _data = computed(() => {
@@ -235,25 +234,13 @@ export default defineComponent({
             </Card>
         }
 
-        const onCreatedFn = (code?: string) => {
-            if (code && !isEditModel.value) {
-                const context = {
-                    context: pageProvider.context,
-                    axios: axiosRequest,
-                    route: route,
-                    refs: {
-                        tableRef
-                    }
-                }
-                const fn = new Function('context', code)
-                fn(context)
-            }
-        }
 
-        onCreatedFn(props.data.componentProps?.onCreated)
+        const { executionMounted } = useLifeCycle(props.data.componentProps, { tableRef: tableRef }, isEditModel)
+        const tableRefKey = props.data.key + 'ref'
 
         onMounted(() => {
-            onCreatedFn(props.data.componentProps?.onCreated)
+            executionMounted()
+            pageProvider.addSlot?.(tableRefKey, tableRef)
         })
 
         return () => {
