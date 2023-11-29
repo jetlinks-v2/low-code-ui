@@ -2,7 +2,7 @@ import { omit } from "lodash-es"
 
 const useProps = (element: any) => {
   const _componentProps: any = {
-    ...omit(element?.componentProps, ['onChange', 'cssCode', 'onCreated', 'onChange', 'onMounted']),
+    ...omit(element?.componentProps, ['cssCode',]),
   }
 
   if (element.type === 'search') {

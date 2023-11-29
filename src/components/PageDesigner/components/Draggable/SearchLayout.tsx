@@ -1,6 +1,6 @@
 import Selection from '../Selection/index'
 import { defineComponent, inject } from 'vue'
-import { useTool, usePageProvider } from '../../hooks'
+import { useTool, usePageProvider, useLifeCycle } from '../../hooks'
 import Search from '../../../Search/Search.vue'
 
 export default defineComponent({
@@ -19,6 +19,7 @@ export default defineComponent({
     },
     setup(props) {
         const { isDragArea, isEditModel } = useTool()
+        const { executionMounted } = useLifeCycle(props.data.componentProps, {}, isEditModel)
         const PageProvider = usePageProvider()
         const designer = inject<any>('PageDesigner')
 
@@ -33,6 +34,10 @@ export default defineComponent({
         const onSearch = (params: any) => {
             PageProvider.add?.(props.data.key, params)
         }
+
+        onMounted(() => {
+            executionMounted()
+        })
 
         onBeforeMount(() => {
             if (isEditModel) {
