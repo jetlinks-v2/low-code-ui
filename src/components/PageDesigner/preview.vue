@@ -20,7 +20,7 @@ const props = defineProps({
 
 const emit = defineEmits([]);
 const pageData = ref<ISchema>(initData); // 表单数据
-
+const dependencies = ref({}) // 依赖项
 watch(
   () => JSON.stringify(props.data),
   () => {
@@ -34,6 +34,7 @@ watch(
 provide("PageDesigner", {
   model: "preview",
   pageData,
+  dependencies
 });
 
 </script>

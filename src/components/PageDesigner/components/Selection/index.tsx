@@ -45,8 +45,11 @@ const Selection = defineComponent({
     const { isEditModel, onPaste, onDelete, setSelection, onCopy, onShear } = useTool()
 
     const Selected = computed(() => {
-      const flag = designer.selected.value.find((item: any) => props?.data?.key === item.key)
-      return props?.data?.key !== undefined && flag && unref(isEditModel)
+      if (unref(isEditModel)) {
+        const flag = designer.selected.value.find((item: any) => props?.data?.key === item.key)
+        return props?.data?.key !== undefined && flag
+      }
+      return false
     })
 
     const handleClick = () => {
