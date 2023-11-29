@@ -39,7 +39,29 @@
         @change="onDataChange"
       />
     </j-form-item>
-
+    <j-form-item
+      label="onCreated"
+      :name="['componentProps', 'onCreated']"
+    >
+      <LifeCycle
+          v-model:value="target.componentProps.onCreated"
+          :id="target.key"
+          :type="target.type"
+          @change="onDataChange"
+      />
+    </j-form-item>
+    <j-form-item
+        label="onMounted"
+        :name="['componentProps', 'onMounted']"
+    >
+      <LifeCycle
+          title="配置onMounted"
+          v-model:value="target.componentProps.onMounted"
+          :id="target.key"
+          :type="target.type"
+          @change="onDataChange"
+      />
+    </j-form-item>
   </div>
 </template>
 <script lang="ts" setup>
@@ -47,6 +69,7 @@ import EditorBtn from './EditorBtn.vue'
 import { useTarget } from '../../../../hooks'
 import Responder from './Responder'
 import DataSource from './DataSource'
+import LifeCycle from './LifeCycle'
 
 const { target } = useTarget()
 

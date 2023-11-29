@@ -1,5 +1,6 @@
 import { defineComponent, provide, reactive } from 'vue'
 import { PageSymbol } from './context'
+import { userRouterParams } from '@jetlinks-web/hooks'
 
 export default defineComponent({
     name: 'PageProvider',
@@ -8,6 +9,8 @@ export default defineComponent({
         const context = reactive({})
 
         const _slots = reactive({})
+
+        const designer: any = inject('PageDesigner')
 
         const pageEntity = {
             context,
@@ -24,8 +27,24 @@ export default defineComponent({
             remove(key: string) {
                 delete context[key]
             },
-
         }
+
+        const route = useRoute()
+
+        const { params } = userRouterParams()
+
+        watch(() => JSON.stringify(params || '{}'), () => {
+            context['page_route_params'] = params || {}
+        }, { immediate: true })
+
+        watch(() => JSON.stringify(route.query || '{}'), () => {
+            context['page_route_query'] = route.query || {}
+        }, { immediate: true })
+
+        onMounted(() => {
+            designer.dependencies.value['page_route_params'] = 'page_route_params'
+            designer.dependencies.value['page_route_query'] = 'page_route_query'
+        })
 
         provide(PageSymbol, pageEntity)
 

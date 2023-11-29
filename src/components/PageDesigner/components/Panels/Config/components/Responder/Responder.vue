@@ -6,13 +6,18 @@
     <div class="responder-content">
       <div class="code">
         <j-monaco-editor
-          v-model:value="_value"
+          v-model:modelValue="_value"
+          language="javascript"
+          :registrationTypescript="registrationTypescript"
           @change="onChange"
         />
       </div>
       <div class="code-tip">
         <j-monaco-editor
-
+            readOnly
+            :modelValue="defaultCode"
+            language="javascript"
+            :registrationTypescript="registrationTypescript"
         />
       </div>
     </div>
@@ -33,6 +38,22 @@ const emit = defineEmits('update:value')
 
 const _value = ref(props.value)
 
+const defaultCode = ` // return返回值作为显示值
+  (function (value) {
+    return value["属性值"]
+    // 可以自由组合值
+    // return value["属性值1"] + value["属性值2"]
+  })
+
+`
+
+const registrationTypescript = {
+  name: 'typescript',
+  typescript: `
+    const value: Record<string, any>
+  `
+}
+
 const onChange = (v) => {
   _value.value = v
   emit('update:value', v)
@@ -46,7 +67,7 @@ const onChange = (v) => {
 
   .responder-content {
     display: flex;
-    height: 300px;
+    height: 320px;
 
     .code {
       flex-grow: 1;
@@ -54,7 +75,7 @@ const onChange = (v) => {
     }
 
     .code-tip {
-      width: 250px;
+      width: 450px;
       padding: 0 8px;
     }
   }

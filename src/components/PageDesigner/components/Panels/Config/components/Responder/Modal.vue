@@ -2,7 +2,7 @@
   <j-modal
     visible
     title="配置响应器"
-    width="800px"
+    width="1000px"
     @ok="onSave"
     @cancel="onCancel"
   >
@@ -17,6 +17,7 @@
       >
         <j-select
             v-model:value="formModel.dependencies"
+            placeholder="请选择依赖项"
             :options="options"
         />
       </j-form-item>
