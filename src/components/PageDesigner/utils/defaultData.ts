@@ -204,7 +204,9 @@ export const _function: ISchema[] = [
                     pageSizeOptions: [12, 24, 48, 96]
                 }
             },
-            actionVisible: true,
+            action: {
+                visible: false,
+            },
             responder: {
                 dependencies: undefined,
                 responder: undefined

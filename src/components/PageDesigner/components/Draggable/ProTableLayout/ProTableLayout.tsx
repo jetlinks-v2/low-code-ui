@@ -1,8 +1,8 @@
-import {ProTable, Ellipsis, Row, Col} from 'jetlinks-ui-components'
+import {ProTable, Ellipsis, Row, Col, AIcon, Space, Tooltip, Button} from 'jetlinks-ui-components'
 import Selection from '../../Selection/index'
-import { defineComponent, withModifiers } from 'vue'
+import {defineComponent, withModifiers} from 'vue'
 import {useTool, usePageDependencies, usePageProvider} from '../../../hooks'
-import { request as axiosRequest } from '@jetlinks-web/core'
+import {request as axiosRequest} from '@jetlinks-web/core'
 import DraggableLayout from '../DraggableLayout'
 import generatorData from '@LowCode/components/PageDesigner/utils/generatorData'
 import '../index.less'
@@ -24,9 +24,9 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const { isDragArea, isEditModel, onAddChild } = useTool()
+        const {isDragArea, isEditModel, onAddChild} = useTool()
         const pageProvider = usePageProvider()
-        const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
+        const {dependencies: params} = usePageDependencies(props.data.componentProps?.responder?.dependencies)
         const route = useRoute()
         const tableRef = ref()
 
@@ -34,19 +34,17 @@ export default defineComponent({
             return props.data
         })
 
-        const handleAdd = (type: 'table-item-header' | 'table-item-actions') => {
+        const handleAdd = () => {
             const _item = generatorData({
-                type,
+                type: 'table-item',
                 children: [],
                 componentProps: {},
             })
             onAddChild(_item, props.data)
         }
 
-        const buttonRender = (_type: 'table-item-header' | 'table-item-actions') => {
-            const headerChildren = (unref(_data)?.children || []).filter((item: any) => {
-                return item?.type === _type
-            })?.[0]
+        const buttonRender = () => {
+            const headerChildren = (unref(_data)?.children || [])?.[0]
             if (headerChildren) {
                 return (
                     <Selection
@@ -58,7 +56,7 @@ export default defineComponent({
                         parent={unref(_data)}
                     >
                         <DraggableLayout
-                            data-layout-type={_type}
+                            data-layout-type={'table-item'}
                             data={headerChildren?.children || []}
                             parent={headerChildren}
                         />
@@ -68,12 +66,27 @@ export default defineComponent({
                 if (unref(isEditModel)) {
                     return <div class="draggable-add">
                         <div class="draggable-add-btn" onClick={withModifiers(() => {
-                            handleAdd(_type)
+                            handleAdd()
                         }, ['stop'])}><span>添加操作按钮</span>
                         </div>
                     </div>
                 }
             }
+        }
+
+        const actionRender = (_actions: any[]) => {
+            return <Space>
+                {
+                    _actions.map(item => {
+                        const _props = {
+                            danger: item.danger,
+                            key: item.key,
+                            icon: item.icon ? <AIcon type={item.icon}/> : ''
+                        }
+                        return <Tooltip title={item?.text}><Button type='link' {..._props} /></Tooltip>
+                    })
+                }
+            </Space>
         }
 
         const columns = computed(() => {
@@ -83,14 +96,14 @@ export default defineComponent({
                 }
                 return item
             })
-            if (props.data.componentProps?.actionVisible) {
+            if (props.data.componentProps?.action?.visible) {
                 arr.push({
                     title: '操作',
                     dataIndex: 'jetlinks_actions',
                     scopedSlots: true,
-                    width: props.data.componentProps?.actionWidth || 200,
+                    width: props.data.componentProps?.action?.width || 200,
                     render: () => {
-                        return buttonRender('table-item-actions')
+                        return actionRender(props.data.componentProps?.action?.actions || [])
                     }
                 })
             }
@@ -115,12 +128,12 @@ export default defineComponent({
         })
 
         const hasRequest = computed(() => {
-            const { request } = props.data.componentProps
+            const {request} = props.data.componentProps
             return !!request?.query && !isEditModel.value
         })
 
         const handleRequestFn = async (paramsData: any) => {
-            const { request, handleResult } = props.data.componentProps
+            const {request, handleResult} = props.data.componentProps
             const resp = await axiosRequest.post(request.query, paramsData)
             if (handleResult) {
                 const handleResultFn = new Function('result', handleResult)
@@ -150,13 +163,13 @@ export default defineComponent({
         })
 
         const handleFn = (code: string, _record: any) => {
-            if(!code) return ''
+            if (!code) return ''
             const handleResultFn = new Function('record', code)
             return handleResultFn.call(this, _record)
         }
 
         const statusConfig = (emphasisField: any, _record: any) => {
-            if(emphasisField?.showStatus){
+            if (emphasisField?.showStatus) {
                 return {
                     showStatus: true,
                     status: get(_record, (emphasisField?.status || '')?.split('.')),
@@ -171,32 +184,19 @@ export default defineComponent({
 
         const getButtonData = (arr: any[], _button: any[]) => {
             arr.forEach(item => { // 'table-item-actions'
-                if(item.type === 'button'){
+                if (item.type === 'button') {
                     _button.push(item)
                 }
-                if(item.children?.length) {
+                if (item.children?.length) {
                     getButtonData(item.children, _button)
                 }
             })
         }
 
         const _actions = computed(() => {
-            if(props.data?.componentProps?.actionVisible){
+            if (props.data?.componentProps?.action?.visible) {
                 // TODO: 卡片actions处理
-                return [
-                    {
-                        key: 'view',
-                        text: '按钮',
-                    },
-                    {
-                        key: 'view1',
-                        text: '按钮',
-                    },
-                    {
-                        key: 'view2',
-                        text: '按钮',
-                    }
-                ]
+                return props.data.componentProps?.action?.actions || []
             }
             return []
         })
@@ -215,7 +215,9 @@ export default defineComponent({
                     },
                     content: () => {
                         return <div>
-                            <Ellipsis><h3>{handleFn(props.data.componentProps?.viewType?.cardConfig?.titleCode, _record)}</h3></Ellipsis>
+                            <Ellipsis>
+                                <h3>{handleFn(props.data.componentProps?.viewType?.cardConfig?.titleCode, _record)}</h3>
+                            </Ellipsis>
                             <Row gutter={24}>
                                 <Col span={12}>
                                     <div>{props.data.componentProps?.viewType?.cardConfig?.field1Title}</div>
@@ -255,9 +257,9 @@ export default defineComponent({
         })
 
         return () => {
-
             return (
-                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
+                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)}
+                           parent={props.parent}>
                     <ProTable
                         ref={tableRef}
                         columns={columns.value}
@@ -269,7 +271,7 @@ export default defineComponent({
                         request={hasRequest.value ? handleRequestFn : undefined}
                         defaultParams={defaultParams.value}
                         v-slots={{
-                            headerTitle: buttonRender('table-item-header'),
+                            headerTitle: buttonRender,
                             card: cardRender,
                             ...columnsSlots.value
                         }}
