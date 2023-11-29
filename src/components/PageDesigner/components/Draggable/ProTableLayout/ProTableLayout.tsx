@@ -1,8 +1,8 @@
 import {ProTable, Ellipsis, Row, Col, AIcon, Space, Tooltip, Button} from 'jetlinks-ui-components'
 import Selection from '../../Selection/index'
-import {defineComponent, withModifiers} from 'vue'
+import { defineComponent, withModifiers } from 'vue'
 import {useTool, usePageDependencies, usePageProvider} from '../../../hooks'
-import {request as axiosRequest} from '@jetlinks-web/core'
+import { request as axiosRequest } from '@jetlinks-web/core'
 import DraggableLayout from '../DraggableLayout'
 import generatorData from '@LowCode/components/PageDesigner/utils/generatorData'
 import '../index.less'
@@ -24,9 +24,9 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const {isDragArea, isEditModel, onAddChild} = useTool()
+        const { isDragArea, isEditModel, onAddChild } = useTool()
         const pageProvider = usePageProvider()
-        const {dependencies: params} = usePageDependencies(props.data.componentProps?.responder?.dependencies)
+        const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
         const route = useRoute()
         const tableRef = ref()
 
@@ -133,7 +133,7 @@ export default defineComponent({
         })
 
         const handleRequestFn = async (paramsData: any) => {
-            const {request, handleResult} = props.data.componentProps
+            const { request, handleResult } = props.data.componentProps
             const resp = await axiosRequest.post(request.query, paramsData)
             if (handleResult) {
                 const handleResultFn = new Function('result', handleResult)
@@ -257,9 +257,9 @@ export default defineComponent({
         })
 
         return () => {
+
             return (
-                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)}
-                           parent={props.parent}>
+                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <ProTable
                         ref={tableRef}
                         columns={columns.value}
