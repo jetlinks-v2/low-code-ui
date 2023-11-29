@@ -27,7 +27,7 @@ export const basic: ISchema[] = [
             size: 'middle',
             type: 'default',
             buttonConfig: {
-                type:'Button'
+                type:'Button',
             },
         },
     },
@@ -204,10 +204,15 @@ export const _function: ISchema[] = [
                     pageSizeOptions: [12, 24, 48, 96]
                 }
             },
-            actionVisible: true,
+            action: {
+                visible: false,
+            },
             responder: {
                 dependencies: undefined,
                 responder: undefined
+            },
+            viewType: {
+                model: ["TABLE"],
             }
         }
     }

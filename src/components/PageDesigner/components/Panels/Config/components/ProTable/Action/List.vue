@@ -1,40 +1,133 @@
 <template>
-    <div>
-        <div v-for="item in value" :key="item.key" class="box-item">
-            <div>{{ item.name }}</div>
-            <j-space>
-                <j-button type="link"><AIcon type="EditOutlined" /></j-button>
-                <j-button type="link" danger><AIcon type="DeleteOutlined" /></j-button>
-            </j-space>
-        </div>
-        <j-button block @click="onAdd">新增</j-button>
-    </div>
+  <div>
+    <QuickEditTable
+        validate
+        ref="tableRef"
+        :data="dataSource"
+        :columns="myColumns"
+        :height="300"
+        :scroll="{ x: 1600, y: 300 }"
+        :cellHeight="60"
+    >
+      <template #text="{ record, valueChange }">
+        <j-input
+            v-model:value="record.text"
+            @change="
+            () => {
+              valueChange(record.text);
+              onChange()
+            }
+          "
+        />
+      </template>
+      <template #danger="{ record }">
+        <j-switch v-model:checked="record.danger" @change="onChange()" />
+      </template>
+      <template #icon="{ record }">
+        <Icon size="small" v-model:value="record.icon" @change="onChange()" />
+      </template>
+      <template #event="{ record }">
+        <j-button @click="console.log('配置')">配置</j-button>
+      </template>
+      <template #action="{ record }">
+        <j-button type="link" danger @click="onRemove(record)"
+        >
+          <AIcon type="DeleteOutlined"
+          />
+        </j-button>
+      </template>
+    </QuickEditTable>
+    <j-button block @click="onAdd">新增</j-button>
+  </div>
 </template>
 
 <script lang="ts" setup>
-const props = defineProps({
-    value: {
-        type: Array as PropType<any[]>,
-        default: () => [
-            {
-                key: 'view',
-                name: '查看'
-            }
-        ]
-    }
-})
+import {ref, watchEffect, PropType} from "vue";
+import {cloneDeep} from "lodash-es";
+import Icon from "../../Icon/index.vue";
+import {uid} from "@LowCode/components/PageDesigner/utils/uid";
 
-const emits = defineEmits(['update:value'])
+const props = defineProps({
+  value: {
+    type: Array as PropType<any[]>,
+    default: () => [],
+  },
+});
+const emits = defineEmits(['update:value']);
+const dataSource = ref(props.value || []);
+const tableRef = ref<any>();
+
+const myColumns: any[] = [
+  {
+    title: "文本",
+    dataIndex: "text",
+    ellipsis: true,
+    form: {
+      rules: {
+        asyncValidator: (_, value: any) => {
+          if (!value) {
+            return Promise.reject("请输入文本");
+          }
+          return Promise.resolve();
+        },
+      },
+    },
+  },
+  {
+    title: "危险按钮",
+    dataIndex: "danger",
+    ellipsis: true,
+  },
+  {
+    title: "图标",
+    dataIndex: "icon",
+    ellipsis: true,
+    width: 120,
+  },
+  {
+    title: "事件配置",
+    dataIndex: "event",
+  },
+  {
+    title: "操作",
+    dataIndex: "action",
+    width: 70,
+  },
+];
+
+watchEffect(() => {
+  dataSource.value = cloneDeep(props.value || []);
+});
+
+const onRemove = (dt: any) => {
+  const _index = dataSource.value.findIndex((i) => {
+    return i.key === dt?.key;
+  });
+  dataSource.value.splice(_index, 1);
+  onChange()
+};
+
 const onAdd = () => {
-    
+  dataSource.value.push({
+    key: "table-action" + uid(4),
+    text: "按钮",
+    danger: false,
+  });
+  onChange()
+};
+
+const onChange = () => {
+  emits('update:value', unref(dataSource))
 }
+
+const onSave = () => new Promise((resolve, reject) => {
+  tableRef.value?.validates().then((_data: any) => {
+    resolve(_data);
+  }).catch(() => {
+    reject(false)
+  })
+});
+
+defineExpose({ onSave });
 </script>
 
-<style lang="less" scoped>
-.box-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 20px;
-}
-</style>
