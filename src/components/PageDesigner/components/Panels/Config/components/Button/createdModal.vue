@@ -1,5 +1,5 @@
 <template>
-    <j-modal visible title="配置项" width="800px" @ok="onSave" @cancel="onCancel">
+    <j-modal visible title="created配置" width="800px" @ok="onSave" @cancel="onCancel">
         <j-form layout="vertical" ref="formRef" :model="formModel">
             <j-form-item label="标题" name="title" :rules="[{ required: true, message: '请输入数据源地址' }]">
                 <j-input v-model:value="formModel.title" placeholder="请输入弹框标题" />
@@ -21,7 +21,7 @@
                     placeholder='请选择' v-model:value="formModel.resource.id">
                 </j-tree-select>
             </j-form-item>
-            <j-form-item label="数据源" name="query">
+            <!-- <j-form-item label="数据源" name="query">
                 <j-input v-model:value="formModel.query" placeholder="请输入数据源地址">
                     <template #addonBefore>
                         <j-select v-model:value="formModel.methods" style="width: 100px;" :options="[
@@ -43,7 +43,7 @@
                     <j-monaco-editor v-model="formModel.cancel" language="javascript"
                         :registrationTypescript="registrationTypescript" style="height: 200px" />
                 </div>
-            </j-form-item>
+            </j-form-item> -->
         </j-form>
     </j-modal>
 </template>
@@ -78,8 +78,8 @@ const formModel = reactive({
     defaultParams: props.data.defaultParams,
     methods: props.data.methods || 'post',
     title: props.data.title,
-    footer: props.data.footer || true,
-    width: props.data.width,
+    footer: props.data.footer,
+    width: props.data.width || 500,
     okText: props.data.okText || '确定',
     handleData: props.data.handleData,
     resource: props.data.resource || {},
@@ -87,17 +87,6 @@ const formModel = reactive({
 
 
 const formRef = ref()
-
-const registrationTypescript = {
-    name: 'typescript',
-    typescript: `
-      type ResultDataType = {
-          data: Array<any>
-      }
-      type ResultType = Array<any> | ResultDataType
-      const result: ResultType
-    `
-}
 
 const onSave = () => {
     console.log(formRef.value)
@@ -123,8 +112,7 @@ const filterOptions = (arr) => {
 }
 
 const handleSelect = (_, node) => {
-    console.log('node====', node, info.value.id)
-
+    // console.log('node====', node, info.value.id)
     formModel.resource = {
         ...pick(node, ['id', 'parentId', 'type']),
         projectId: info.value.id,
@@ -143,7 +131,7 @@ const onCancel = () => {
 
 onMounted(() => {
     options.value = filterOptions(cloneDeep(data.value[0]?.children))
-    console.log(options.value)
+    // console.log(options.value)
 })
 
 </script>

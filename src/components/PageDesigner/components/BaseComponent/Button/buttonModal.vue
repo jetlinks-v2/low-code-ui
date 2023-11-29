@@ -2,11 +2,11 @@
 <template>
     <j-modal 
         :visible="true" 
-        :width="`${buttonConfig?.config?.width || 400}px`" 
-        :title="buttonConfig?.config?.title" 
+        :width="`${buttonConfig?.created?.width}px`" 
+        :title="buttonConfig?.created?.title" 
         :maskClosable="false" 
-        :okText="buttonConfig?.config?.okText"
-        :footer="buttonConfig?.config?.footer ? undefined : null" 
+        :okText="buttonConfig?.created?.okText"
+        :footer="buttonConfig?.created?.footer ? undefined : null" 
         :confirmLoading="confirmLoading" 
         @ok="onOk"
         @cancel="onCancel"
@@ -15,7 +15,7 @@
             <FormView :value="_value" :data="_configuration" ref="formRef" />
         </div>
         <div v-else>
-            PageView
+            <PageView  :data="_configuration" />
         </div>
     </j-modal>
 </template>
@@ -35,7 +35,7 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 const confirmLoading = ref(false)
 
-const type = computed(() => props.buttonConfig?.config?.resource?.type)
+const type = computed(() => props.buttonConfig?.created?.resource?.type)
 const _value = ref({})
 const _configuration = ref()
 const formRef = ref()
@@ -43,13 +43,13 @@ const formRef = ref()
 
 const defaultParams = () => {
     try {
-        return JSON.parse(props.buttonConfig?.config?.defaultParams)
+        return JSON.parse(props.buttonConfig?.created?.defaultParams)
     } catch (e) {
         return undefined
     }
 }
 
-const handleRequestFn = async () => {
+const handleRequestFn = async (data) => {
     const config = props.buttonConfig?.config
 
     if (props.buttonConfig?.config.query) {
@@ -57,8 +57,9 @@ const handleRequestFn = async () => {
         try {
             const resp = await axiosRequest[config.methods](config.query, {
                 paramsData,
+                ...data
             })
-            if (config.ok) {
+            if (created.ok) {
                 const handleResultFn = new Function('result', config.ok)
                 handleResultFn(resp)
             } 
@@ -66,31 +67,36 @@ const handleRequestFn = async () => {
             console.error(e)
         }
     }
+    
 }
 
 
 
 
 const onCancel = () => {
-    // eval(props.buttonConfig?.config.cancel)
+    if(props.buttonConfig?.config.cancel){
+        const func = Function( props.buttonConfig?.config.cancel)
+        func()
+    }
     emit('close')
 };
 
 const onOk =async () => {
     const res =await formRef.value?.onSave()
     if (res) {
-        // confirmLoading.value = true
-        // console.log(res)
-       await handleRequestFn(res)
-        // _value.value = res
-        // eval(props.buttonConfig?.config.ok)
+        confirmLoading.value = true
+        console.log(res)
+        await handleRequestFn(res).finally(()=>{
+            confirmLoading.value = false
+            emit('close')
+        })
     }
 };
 
-console.log('p==========', props)
+// console.log('p==========', props)
 
 watch(
-    () => props.buttonConfig?.config?.resource?.configuration,
+    () => props.buttonConfig?.created?.resource?.configuration,
     (val) => {
         _configuration.value = JSON.parse(val.code)
     },
