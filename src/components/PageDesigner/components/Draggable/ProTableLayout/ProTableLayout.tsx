@@ -5,6 +5,7 @@ import {useTool, usePageDependencies, usePageProvider} from '../../../hooks'
 import { request as axiosRequest } from '@jetlinks-web/core'
 import DraggableLayout from '../DraggableLayout'
 import generatorData from '@LowCode/components/PageDesigner/utils/generatorData'
+import { provide } from 'vue'
 import '../index.less'
 
 export default defineComponent({
@@ -27,7 +28,19 @@ export default defineComponent({
         const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
         const route = useRoute()
         const tableRef = ref()
-
+        const isSelect = ref(false)
+        const _selectedRowKeys = ref([])
+        const showSelect = () =>{
+            isSelect.value = true
+        }
+        const closeSelect = () =>{
+            isSelect.value = false
+            _selectedRowKeys.value =[]
+        }
+        const getSelectKeys = () =>{
+            return _selectedRowKeys.value
+        }
+        provide('selectConfig',{showSelect,closeSelect,getSelectKeys})
         const _data = computed(() => {
             return props.data
         })
@@ -150,6 +163,37 @@ export default defineComponent({
             }
         }
 
+        const onSelectChange = (item: any,state: boolean) => {
+            console.log(item,'item')
+            const arr = new Set(_selectedRowKeys.value);
+            // console.log(item, state);
+            if (state) {
+                arr.add(item.id);
+            } else {
+                arr.delete(item.id);
+            }
+            _selectedRowKeys.value = [...arr.values()];
+        };
+
+        const selectAll = (selected: Boolean, selectedRows: any,changeRows:any) => {
+            if (selected) {
+                    changeRows.map((i: any) => {
+                        if (!_selectedRowKeys.value.includes(i.id)) {
+                            _selectedRowKeys.value.push(i.id)
+                        }
+                    })
+                } else {
+                    const arr = changeRows.map((item: any) => item.id)
+                    const _ids: string[] = [];
+                    _selectedRowKeys.value.map((i: any) => {
+                        if (!arr.includes(i)) {
+                            _ids.push(i)
+                        }
+                    })
+                    _selectedRowKeys.value = _ids
+                }
+        }
+
         onCreatedFn(props.data.componentProps?.onCreated)
 
         onMounted(() => {
@@ -170,6 +214,16 @@ export default defineComponent({
                         pagination={props.data.componentProps.paginationSetting?.pagination}
                         request={hasRequest.value ? handleRequestFn : undefined}
                         defaultParams={defaultParams.value}
+                        rowSelection={
+                        isSelect.value
+                            ? {
+                                  selectedRowKeys: _selectedRowKeys.value,
+                                  onSelect: onSelectChange,
+                                  onSelectAll: selectAll,
+                                  onSelectNone: ()=>_selectedRowKeys.value = []
+                              }
+                            : false
+                        }
                         v-slots={{
                             headerTitle: buttonRender('table-item-header'),
                             ...columnsSlots.value

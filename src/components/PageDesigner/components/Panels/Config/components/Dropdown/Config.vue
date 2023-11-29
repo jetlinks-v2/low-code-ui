@@ -67,7 +67,7 @@
         <Icon size="small" v-model:value="record.icon" />
       </template>
       <template #event="{ record }">
-        <j-button @click="console.log('配置')">配置</j-button>
+        <j-button @click="visible=true">配置</j-button>
       </template>
       <template #action="{ record }">
         <j-button type="link" danger @click="onRemove(record)"
@@ -75,7 +75,9 @@
         /></j-button>
       </template>
     </QuickEditTable>
+
     <j-button block @click="onAdd">新增</j-button>
+    <EventConfig v-if="visible" @closeConfig="visible=false"/>
   </j-modal>
 </template>
 
@@ -84,6 +86,7 @@ import { ref, watchEffect, PropType } from "vue";
 import { uid } from "../../../../../utils/uid";
 import { cloneDeep } from "lodash-es";
 import Icon from "../Icon/index.vue";
+import EventConfig from './EventConfig.vue'
 
 const props = defineProps({
   data: {
@@ -94,7 +97,7 @@ const props = defineProps({
 
 const emits = defineEmits(["save", "close"]);
 const dataSource = ref(props.data);
-
+const visible = ref(false)
 const tableRef = ref<any>();
 
 const myColumns: any[] = [
