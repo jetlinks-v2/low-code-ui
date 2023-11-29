@@ -29,16 +29,8 @@ export default defineComponent({
         })
         const onMountedFn = (code?: string) => {
             if (code && !isEditModel.value) {
-                const context = {
-                    record: data,
-                    axios: axiosRequest,
-                    route: route,
-                    refs: {
-                        formRef
-                    }
-                }
-                const fn = new Function('context', code)
-                fn(context)
+                const fn = new Function('record', 'axios', 'route', 'refs', code)
+                fn(data || {}, axiosRequest, route, { formRef })
             }
         }
 
@@ -59,10 +51,14 @@ export default defineComponent({
             />
         }
 
+        const setValue = (val: any) => {
+            value.value = val
+        }
+
         const onSave = async () => {
             if (!okCode) return
             const handleResultFn = new Function('axios', 'route', 'refs', okCode)
-            const _refs = type === 'page' ? { pageRef } : { formRef }
+            const _refs = type === 'page' ? { pageRef, setValue } : { formRef, setValue }
             const resp = await handleResultFn(axiosRequest, route,  _refs)
             if (resp) {
                 emit('save', true)

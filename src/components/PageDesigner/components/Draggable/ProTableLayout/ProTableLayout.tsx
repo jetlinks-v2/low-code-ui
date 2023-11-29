@@ -88,7 +88,7 @@ export default defineComponent({
                         if (item.event) {
                             if (item.event?.type === 'confirm') {
                                 return <Tooltip title={item?.text}>
-                                    <Popconfirm onConfirm={() => {
+                                    <Popconfirm title={item.event?.confirmText || '确认吗？'} onConfirm={() => {
                                         if (item.event?.okCode && !unref(isEditModel)) {
                                             const handleResultFn = new Function('record', 'axios', 'refs', item.event?.okCode)
                                             handleResultFn(_record, axiosRequest, {
@@ -230,8 +230,62 @@ export default defineComponent({
 
         const _actions = computed(() => {
             if (props.data?.componentProps?.action?.visible) {
-                // TODO: 卡片actions处理
-                return props.data.componentProps?.action?.actions || []
+                return (props.data.componentProps?.action?.actions || []).map(item => {
+                    const _props = {
+                        danger: item.danger,
+                        key: item.key,
+                        icon: item.icon,
+                        text: item.text,
+                    }
+                    if (item.event) {
+                        if (item.event?.type === 'confirm') {
+                            return {
+                                ..._props,
+                                permissionProps: (_record: any) => ({
+                                    tooltip: {
+                                        title: item?.text,
+                                    },
+                                    popConfirm: {
+                                        title: item.event?.confirmText || '确认吗？',
+                                        onConfirm: async () => {
+                                            if (item.event?.okCode && !unref(isEditModel)) {
+                                                const handleResultFn = new Function('record', 'axios', 'refs', item.event?.okCode)
+                                                handleResultFn(_record, axiosRequest, {
+                                                    tableRef
+                                                })
+                                            }
+                                        },
+                                    },
+                                })
+                            }
+                        } else if (item.event?.type === 'modal' || item.event?.type === 'drawer') {
+                            return {
+                                ..._props,
+                                permissionProps: (_record: any) => ({
+                                    tooltip: {
+                                        title: item?.text,
+                                    },
+                                    icon: 'EditOutlined',
+                                    onClick: () => {
+                                        if (!unref(isEditModel)) {
+                                            dataModal.value = {
+                                                data: _record,
+                                                type: item.event?.pageType || 'form',
+                                                code: item.event?.pageData,
+                                                title: item?.text,
+                                                mountedCode: item.event?.mountedCode,
+                                                okCode: item.event?.okCode,
+                                                modalType: item.event?.type || 'modal',
+                                            }
+                                            modalVisible.value = true
+                                        }
+                                    },
+                                })
+                            }
+                        }
+                    }
+                    return _props
+                })
             }
             return []
         })

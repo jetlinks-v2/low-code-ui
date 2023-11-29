@@ -57,11 +57,7 @@
               </j-select>
             </j-form-item>
             <j-form-item label="页面onMounted" name="mountedCode" required>
-              <div>
-                {{
-                  formState.type === 'confirm' ? 'function (record)' : 'function onCreated({ context, axios, route, refs, record })'
-                }}}
-              </div>
+              <div>function onCreated(record, axios, route, refs)</div>
               <div style="height: 300px">
                 <j-monaco-editor
                     @errorChange="onErrorChange"
@@ -71,8 +67,13 @@
               </div>
             </j-form-item>
           </template>
+          <template v-else>
+            <j-form-item label="确认文本" name="confirmText" required>
+              <j-input placeholder="请输入" v-model:value="formState.confirmText" />
+            </j-form-item>
+          </template>
           <j-form-item label="确认事件" name="okCode" required>
-            <div>{{ formState.type === 'confirm' ? 'function (record, axios)' : 'function ({record, refs})' }}}</div>
+            <div>{{ formState.type === 'confirm' ? 'function (record, axios, refs)' : 'function (axios, route, refs)' }}}</div>
             <div style="height: 300px">
               <j-monaco-editor
                   @errorChange="onErrorChange"
@@ -115,7 +116,8 @@ const formState = reactive({
   pageType: 'form',
   mountedCode: '',
   pageData: undefined,
-  pageCode: undefined
+  pageCode: undefined,
+  confirmText: ""
 });
 const formRef = ref<any>();
 const _error = ref<any[]>([]);
