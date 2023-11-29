@@ -4,3 +4,5 @@ export { default as useProps } from './useProps'
 export { default as useKeys } from './useKeys'
 
 export * from './usePageProvider'
+
+export * from  './useLifeCycle'

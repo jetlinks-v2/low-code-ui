@@ -1,7 +1,7 @@
 <template>
-    <j-modal visible title="配置项" width="800px" @ok="onSave" @cancel="onCancel">
+    <j-modal visible title="before配置项" width="800px" @ok="onSave" @cancel="onCancel">
         <j-form layout="vertical" ref="formRef" :model="formModel">
-            <j-form-item label="数据源" name="query" :rules="[{ required: true, message: '请输入数据源地址' }]">
+            <j-form-item label="数据源" name="query" >
                 <j-input v-model:value="formModel.query" placeholder="请输入数据源地址">
                     <template #addonBefore>
                         <j-select v-model:value="formModel.methods" style="width: 100px;" :options="[
@@ -85,14 +85,7 @@ const formModel = reactive({
     confirm: props.data.confirm,
     cancel: props.data.cancel,
     title: props.data.title,
-    footer: props.data.footer || true,
-    width: props.data.width,
-    okText: props.data.okText || '确定',
-    relation: props.data.relation,
     ok: props.data.ok,
-    handleData: props.data.handleData,
-    close: props.data.close,
-    resource: props.data.resource || {},
 })
 
 
