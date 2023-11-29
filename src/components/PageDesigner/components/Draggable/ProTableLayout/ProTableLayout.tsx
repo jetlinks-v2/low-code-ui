@@ -1,13 +1,14 @@
-import {ProTable, Ellipsis, Row, Col, AIcon, Space, Tooltip, Button} from 'jetlinks-ui-components'
+import {ProTable, Ellipsis, Row, Col, AIcon, Space, Tooltip, Button, Popconfirm} from 'jetlinks-ui-components'
 import Selection from '../../Selection/index'
-import { defineComponent, withModifiers } from 'vue'
+import {defineComponent, withModifiers} from 'vue'
 import {useTool, usePageDependencies, usePageProvider} from '../../../hooks'
-import { request as axiosRequest } from '@jetlinks-web/core'
+import {request as axiosRequest} from '@jetlinks-web/core'
 import DraggableLayout from '../DraggableLayout'
 import generatorData from '@LowCode/components/PageDesigner/utils/generatorData'
 import '../index.less'
 import {Card} from '@LowCode/components'
 import {get} from "lodash-es";
+import ProTableModal from './Modal';
 
 export default defineComponent({
     name: 'ProTableLayout',
@@ -24,11 +25,13 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const { isDragArea, isEditModel, onAddChild } = useTool()
+        const {isDragArea, isEditModel, onAddChild} = useTool()
         const pageProvider = usePageProvider()
-        const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
+        const {dependencies: params} = usePageDependencies(props.data.componentProps?.responder?.dependencies)
         const route = useRoute()
         const tableRef = ref()
+        const modalVisible = ref<boolean>(false)
+        const dataModal = ref()
 
         const _data = computed(() => {
             return props.data
@@ -74,7 +77,7 @@ export default defineComponent({
             }
         }
 
-        const actionRender = (_actions: any[]) => {
+        const actionRender = (_actions: any[], _record: any) => {
             return <Space>
                 {
                     _actions.map(item => {
@@ -82,6 +85,39 @@ export default defineComponent({
                             danger: item.danger,
                             key: item.key,
                             icon: item.icon ? <AIcon type={item.icon}/> : ''
+                        }
+                        if (item.event) {
+                            if (item.event?.type === 'confirm') {
+                                return <Tooltip title={item?.text}>
+                                    <Popconfirm onConfirm={() => {
+                                        if (item.event?.okCode && !unref(isEditModel)) {
+                                            const handleResultFn = new Function('record', 'axios', 'refs', item.event?.okCode)
+                                            handleResultFn(_record, axiosRequest, {
+                                                tableRef
+                                            })
+                                        }
+                                    }}>
+                                        <Button type='link' {..._props} />
+                                    </Popconfirm>
+                                </Tooltip>
+                            } else if (item.event?.type === 'modal' || item.event?.type === 'drawer') {
+                                return <Tooltip title={item?.text}>
+                                    <Button type='link' {..._props} onClick={() => {
+                                        if (!unref(isEditModel)) {
+                                            dataModal.value = {
+                                                data: _record,
+                                                type: item.event?.pageType || 'form',
+                                                code: item.event?.pageData,
+                                                title: item?.text,
+                                                mountedCode: item.event?.mountedCode,
+                                                okCode: item.event?.okCode,
+                                                modalType: item.event?.type || 'modal',
+                                            }
+                                            modalVisible.value = true
+                                        }
+                                    }}/>
+                                </Tooltip>
+                            }
                         }
                         return <Tooltip title={item?.text}><Button type='link' {..._props} /></Tooltip>
                     })
@@ -102,8 +138,8 @@ export default defineComponent({
                     dataIndex: 'jetlinks_actions',
                     scopedSlots: true,
                     width: props.data.componentProps?.action?.width || 200,
-                    render: () => {
-                        return actionRender(props.data.componentProps?.action?.actions || [])
+                    render: (record: any) => {
+                        return actionRender(props.data.componentProps?.action?.actions || [], record)
                     }
                 })
             }
@@ -133,7 +169,7 @@ export default defineComponent({
         })
 
         const handleRequestFn = async (paramsData: any) => {
-            const { request, handleResult } = props.data.componentProps
+            const {request, handleResult} = props.data.componentProps
             const resp = await axiosRequest.post(request.query, paramsData)
             if (handleResult) {
                 const handleResultFn = new Function('result', handleResult)
@@ -259,7 +295,8 @@ export default defineComponent({
         return () => {
 
             return (
-                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
+                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)}
+                           parent={props.parent}>
                     <ProTable
                         ref={tableRef}
                         columns={columns.value}
@@ -277,9 +314,16 @@ export default defineComponent({
                         }}
                     >
                     </ProTable>
+                    {modalVisible.value && <ProTableModal data={dataModal.value} onSave={(flag: boolean) => {
+                        if(flag){
+                            tableRef.value?.reload()
+                            modalVisible.value = false
+                        }
+                    }} onClose={() => {
+                        modalVisible.value = false
+                    }}/>}
                 </Selection>
             )
         }
-
     }
 })
