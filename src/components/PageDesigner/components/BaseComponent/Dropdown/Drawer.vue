@@ -62,7 +62,7 @@ const handleRequestFn = async (data) => {
                 paramsData,
                 ...data
             })
-            if (created.ok) {
+            if (props.data?.ok) {
                 const handleResultFn = new Function('result', config.ok)
                 handleResultFn(resp)
             } 
@@ -84,10 +84,18 @@ const onCancel = () => {
 };
 
 const onOk =async () => {
-    const res =await formRef.value?.onSave()
-    if (res) {
+    if(type === providerEnum.FormPage){
+        const res =await formRef.value?.onSave()
+        if (res) {
         confirmLoading.value = true
         await handleRequestFn(res).finally(()=>{
+            confirmLoading.value = false
+            emit('close')
+        })
+    }
+    }else{
+        confirmLoading.value = true
+        await handleRequestFn({}).finally(()=>{
             confirmLoading.value = false
             emit('close')
         })

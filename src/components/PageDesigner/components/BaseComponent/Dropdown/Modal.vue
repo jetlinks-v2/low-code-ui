@@ -51,15 +51,15 @@ const defaultParams = () => {
 
 const handleRequestFn = async (data) => {
     const config = props.data
-
     if (props.data?.query) {
+
         const paramsData = defaultParams()
         try {
             const resp = await axiosRequest[config.methods](config.query, {
                 paramsData,
                 ...data
             })
-            if (created.ok) {
+            if (props.data?.ok) {
                 const handleResultFn = new Function('result', config.ok)
                 handleResultFn(resp)
             } 
@@ -74,20 +74,26 @@ const handleRequestFn = async (data) => {
 
 
 const onCancel = () => {
-    if(props.buttonConfig?.config.cancel){
-        const func = Function( props.buttonConfig?.config.cancel)
+    if(props.data?.cancel){
+        const func = Function( props.data?.cancel)
         func()
     }
     emit('close')
 };
 
 const onOk =async () => {
-    console.log(props.data)
-    const res =await formRef.value?.onSave()
-    if (res) {
+    if(type === providerEnum.FormPage){
+        const res =await formRef.value?.onSave()
+        if (res) {
         confirmLoading.value = true
-        console.log(res)
         await handleRequestFn(res).finally(()=>{
+            confirmLoading.value = false
+            emit('close')
+        })
+    }
+    }else{
+        confirmLoading.value = true
+        await handleRequestFn({}).finally(()=>{
             confirmLoading.value = false
             emit('close')
         })
