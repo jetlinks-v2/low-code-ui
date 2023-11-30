@@ -181,7 +181,6 @@ export default defineComponent({
         }
 
         const onSelectChange = (item: any,state: boolean) => {
-            console.log(item,'item')
             const arr = new Set(_selectedRowKeys.value);
             // console.log(item, state);
             if (state) {

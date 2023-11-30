@@ -34,6 +34,14 @@
           <j-select-option value="default">次按钮</j-select-option>
         </j-select>
       </template>
+      <template #buttonType="{ record }">
+        <j-select v-model:value="record.buttonType">
+          <j-select-option value="Button">默认按钮</j-select-option>
+          <j-select-option value="Popconfirm">确认框</j-select-option>
+          <j-select-option value="Modal">弹框</j-select-option>
+          <j-select-option value="Drawer">抽屉</j-select-option>
+        </j-select>
+      </template>
       <template #shape="{ record }">
         <j-select
           v-model:value="record.shape"
@@ -67,7 +75,7 @@
         <Icon size="small" v-model:value="record.icon" />
       </template>
       <template #event="{ record }">
-        <j-button @click="visible=true">配置</j-button>
+        <j-button @click="()=>showEventConfig(record)">配置</j-button>
       </template>
       <template #action="{ record }">
         <j-button type="link" danger @click="onRemove(record)"
@@ -77,7 +85,7 @@
     </QuickEditTable>
 
     <j-button block @click="onAdd">新增</j-button>
-    <EventConfig v-if="visible" @closeConfig="visible=false"/>
+    <EventConfig v-if="EventVisible" :type="buttonType" :data="EventData" @cancel="EventVisible=false" @save="saveEventConfig"/>
   </j-modal>
 </template>
 
@@ -97,9 +105,13 @@ const props = defineProps({
 
 const emits = defineEmits(["save", "close"]);
 const dataSource = ref(props.data);
-const visible = ref(false)
+const EventVisible = ref(false)
+const ModalVisible = ref(false)
 const tableRef = ref<any>();
-
+const buttonType = ref()
+const EventData = ref()
+const ModalData = ref()
+const EventKey = ref()
 const myColumns: any[] = [
   {
     title: "文本",
@@ -122,6 +134,11 @@ const myColumns: any[] = [
     dataIndex: "type",
     ellipsis: true,
     width: 120,
+  },{
+    title: '按钮类型',
+    dataIndex: 'buttonType',
+    ellipsis: true,
+    width: 120
   },
   {
     title: "形状",
@@ -193,6 +210,7 @@ const onAdd = () => {
     ghost: false,
     block: false,
     danger: false,
+    buttonType: 'Button'
   });
 };
 
@@ -203,5 +221,22 @@ const onSave = () => {
     }
   });
 };
+
+const showEventConfig = (data:any) =>{
+  console.log(data)
+  buttonType.value = data.buttonType
+  EventData.value = data.event
+  EventKey.value = data.key
+  EventVisible.value = true
+}
+
+const saveEventConfig  = (data:any) =>{
+  dataSource.value.find(i=>{
+    i.key = EventKey.value
+    i.event = data
+    return true
+  })
+  EventVisible.value = false
+}
 </script>
 
