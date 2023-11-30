@@ -1,4 +1,4 @@
-import {ProTable, Ellipsis, Row, Col, AIcon, Space, Tooltip, Button} from 'jetlinks-ui-components'
+import {ProTable, Ellipsis, Row, Col, AIcon, Space, Tooltip, Button, Popconfirm} from 'jetlinks-ui-components'
 import Selection from '../../Selection/index'
 import { defineComponent, withModifiers } from 'vue'
 import {useTool, usePageDependencies, usePageProvider,  useLifeCycle} from '../../../hooks'
@@ -9,6 +9,7 @@ import { provide } from 'vue'
 import '../index.less'
 import {Card} from '@LowCode/components'
 import {get} from "lodash-es";
+import ProTableModal from './Modal';
 
 export default defineComponent({
     name: 'ProTableLayout',
@@ -42,6 +43,9 @@ export default defineComponent({
             return _selectedRowKeys.value
         }
         provide('selectConfig',{showSelect,closeSelect,getSelectKeys})
+        const modalVisible = ref<boolean>(false)
+        const dataModal = ref()
+
         const _data = computed(() => {
             return props.data
         })
@@ -86,7 +90,7 @@ export default defineComponent({
             }
         }
 
-        const actionRender = (_actions: any[]) => {
+        const actionRender = (_actions: any[], _record: any) => {
             return <Space>
                 {
                     _actions.map(item => {
@@ -94,6 +98,39 @@ export default defineComponent({
                             danger: item.danger,
                             key: item.key,
                             icon: item.icon ? <AIcon type={item.icon}/> : ''
+                        }
+                        if (item.event) {
+                            if (item.event?.type === 'confirm') {
+                                return <Tooltip title={item?.text}>
+                                    <Popconfirm title={item.event?.confirmText || '确认吗？'} onConfirm={() => {
+                                        if (item.event?.okCode && !unref(isEditModel)) {
+                                            const handleResultFn = new Function('record', 'axios', 'refs', item.event?.okCode)
+                                            handleResultFn(_record, axiosRequest, {
+                                                tableRef
+                                            })
+                                        }
+                                    }}>
+                                        <Button type='link' {..._props} />
+                                    </Popconfirm>
+                                </Tooltip>
+                            } else if (item.event?.type === 'modal' || item.event?.type === 'drawer') {
+                                return <Tooltip title={item?.text}>
+                                    <Button type='link' {..._props} onClick={() => {
+                                        if (!unref(isEditModel)) {
+                                            dataModal.value = {
+                                                data: _record,
+                                                type: item.event?.pageType || 'form',
+                                                code: item.event?.pageData,
+                                                title: item?.text,
+                                                mountedCode: item.event?.mountedCode,
+                                                okCode: item.event?.okCode,
+                                                modalType: item.event?.type || 'modal',
+                                            }
+                                            modalVisible.value = true
+                                        }
+                                    }}/>
+                                </Tooltip>
+                            }
                         }
                         return <Tooltip title={item?.text}><Button type='link' {..._props} /></Tooltip>
                     })
@@ -114,8 +151,8 @@ export default defineComponent({
                     dataIndex: 'jetlinks_actions',
                     scopedSlots: true,
                     width: props.data.componentProps?.action?.width || 200,
-                    render: () => {
-                        return actionRender(props.data.componentProps?.action?.actions || [])
+                    render: (record: any) => {
+                        return actionRender(props.data.componentProps?.action?.actions || [], record)
                     }
                 })
             }
@@ -237,8 +274,62 @@ export default defineComponent({
 
         const _actions = computed(() => {
             if (props.data?.componentProps?.action?.visible) {
-                // TODO: 卡片actions处理
-                return props.data.componentProps?.action?.actions || []
+                return (props.data.componentProps?.action?.actions || []).map(item => {
+                    const _props = {
+                        danger: item.danger,
+                        key: item.key,
+                        icon: item.icon,
+                        text: item.text,
+                    }
+                    if (item.event) {
+                        if (item.event?.type === 'confirm') {
+                            return {
+                                ..._props,
+                                permissionProps: (_record: any) => ({
+                                    tooltip: {
+                                        title: item?.text,
+                                    },
+                                    popConfirm: {
+                                        title: item.event?.confirmText || '确认吗？',
+                                        onConfirm: async () => {
+                                            if (item.event?.okCode && !unref(isEditModel)) {
+                                                const handleResultFn = new Function('record', 'axios', 'refs', item.event?.okCode)
+                                                handleResultFn(_record, axiosRequest, {
+                                                    tableRef
+                                                })
+                                            }
+                                        },
+                                    },
+                                })
+                            }
+                        } else if (item.event?.type === 'modal' || item.event?.type === 'drawer') {
+                            return {
+                                ..._props,
+                                permissionProps: (_record: any) => ({
+                                    tooltip: {
+                                        title: item?.text,
+                                    },
+                                    icon: 'EditOutlined',
+                                    onClick: () => {
+                                        if (!unref(isEditModel)) {
+                                            dataModal.value = {
+                                                data: _record,
+                                                type: item.event?.pageType || 'form',
+                                                code: item.event?.pageData,
+                                                title: item?.text,
+                                                mountedCode: item.event?.mountedCode,
+                                                okCode: item.event?.okCode,
+                                                modalType: item.event?.type || 'modal',
+                                            }
+                                            modalVisible.value = true
+                                        }
+                                    },
+                                })
+                            }
+                        }
+                    }
+                    return _props
+                })
             }
             return []
         })
@@ -277,6 +368,20 @@ export default defineComponent({
             </Card>
         }
 
+        const onCreatedFn = (code?: string) => {
+            if (code && !isEditModel.value) {
+                const context = {
+                    context: pageProvider.context,
+                    axios: axiosRequest,
+                    route: route,
+                    refs: {
+                        tableRef
+                    }
+                }
+                const fn = new Function('context', code)
+                fn(context)
+            }
+        }
 
         const { executionMounted } = useLifeCycle(props.data.componentProps, { tableRef: tableRef }, isEditModel)
         const tableRefKey = props.data.key + 'ref'
@@ -317,9 +422,16 @@ export default defineComponent({
                         }}
                     >
                     </ProTable>
+                    {modalVisible.value && <ProTableModal data={dataModal.value} onSave={(flag: boolean) => {
+                        if(flag){
+                            tableRef.value?.reload()
+                            modalVisible.value = false
+                        }
+                    }} onClose={() => {
+                        modalVisible.value = false
+                    }}/>}
                 </Selection>
             )
         }
-
     }
 })

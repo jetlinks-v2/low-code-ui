@@ -2,7 +2,7 @@ import DraggableLayout from '../Draggable/DraggableLayout'
 import Selection from '../Selection/index'
 import { Steps, Step, Button, Space, AIcon } from 'jetlinks-ui-components'
 import './index.less'
-import { useTool } from '../../hooks'
+import { useLifeCycle, useTool } from '../../hooks'
 import { withModifiers } from 'vue'
 import generatorData from '../../utils/generatorData'
 import { uid } from '../../utils/uid'
@@ -23,6 +23,7 @@ export default defineComponent({
     },
     setup(props) {
         const { isDragArea, isEditModel, onAddChild } = useTool()
+        const { executionMounted } = useLifeCycle(props.data.componentProps, {}, isEditModel)
 
         const _data = computed(() => {
             return props.data
@@ -71,6 +72,9 @@ export default defineComponent({
                 current.value = cur || 0
             }
         }
+        onMounted(() => {
+            executionMounted()
+        })
 
         return () => {
             return (

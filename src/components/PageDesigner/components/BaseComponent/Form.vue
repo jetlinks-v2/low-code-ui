@@ -14,6 +14,9 @@
 <script lang="ts" setup>
 import FormPreview from '@LowCode/components/FormDesigner/preview.vue'
 import { watch, computed, ref, inject } from 'vue'
+import { useLifeCycle } from '../../hooks/useLifeCycle';
+import { useTool } from '../../hooks';
+
 
 const designer: any = inject('FormDesigner')
 const props = defineProps({
@@ -33,6 +36,14 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  onMounted:{
+    type: String,
+    default: ''
+  },
+  onCreated:{
+    type: String,
+    default: ''
+  }
 })
 
 const emit = defineEmits(['update:value', 'change'])
@@ -42,6 +53,10 @@ const formRef = ref<any>(null)
 const config = computed(() => {
   return JSON.parse(props.source?.code || '{}')
 })
+
+ const { isEditModel } = useTool()
+
+const { executionMounted } = useLifeCycle(props, {}, isEditModel)
 
 const onValueChange = (e) => {
   emit('update:value', e)
@@ -65,6 +80,10 @@ watch(
     immediate: true,
   },
 )
+
+onMounted(() => {
+  executionMounted()
+})
 
 const onSave = () => {
   return new Promise((resolve, reject) => {
