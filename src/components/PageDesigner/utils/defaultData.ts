@@ -196,7 +196,7 @@ export const _function: ISchema[] = [
                 },
             ],
             dataSource: [
-                { name: 'John Brown', age: 14, address: 'New York No. 1 Lake Park'},
+                { name: 'John Brown', age: 14, address: 'New York No. 1 Lake Park',id:'123'},
             ],
             paginationSetting: {
                 open: true,
