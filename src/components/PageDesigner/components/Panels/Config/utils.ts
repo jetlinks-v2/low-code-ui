@@ -6,7 +6,7 @@ export const getConfigList = (_type: string) => {
             header: '页面样式',
         })
     } 
-    if(!['root', 'form', 'info', 'inline-item', 'card', 'card-item'].includes(unref(_type))){
+    if(!['root', 'inline-item', 'card-item', 'timeline-item'].includes(unref(_type))){
         arr.push({
             key: 'Base',
             header: '基础信息',

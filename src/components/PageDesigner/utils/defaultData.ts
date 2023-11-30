@@ -90,18 +90,21 @@ export const layout: ISchema[] = [
     {
         type: 'info',
         name: '信息列表',
-        componentProps: {
-
-        },
+        componentProps: {},
         children: [
             {
                 type: 'info-item',
                 children: [
                     {
                         type: 'info-item-item',
-                        children: [],
+                        children: [
+                            {
+                                type: 'info-item-item-item',
+                                componentProps: {}
+                            }
+                        ],
                         componentProps: {
-                            label:'标题1',
+                            label:'文本',
                             value: '123',
                             span:1,
                             labelWidth:200
@@ -119,28 +122,14 @@ export const layout: ISchema[] = [
     {
         type: 'timeline',
         name: '时间轴',
-        componentProps: {},
+        componentProps: {
+            mode: "left"
+        },
         children: [
             {
                 type: 'timeline-item',
+                componentProps: {},
                 children: [],
-                componentProps: {
-                    label:'时间轴1'
-                },
-            },
-            {
-                type: 'timeline-item',
-                children: [],
-                componentProps: {
-                    label:'时间轴2'
-                },
-            },
-            {
-                type: 'timeline-item',
-                children: [],
-                componentProps: {
-                    label:'时间轴3'
-                },
             },
         ]
     },

@@ -22,7 +22,7 @@ export default defineComponent({
         const route = useRoute()
         const formRef = ref()
         const pageRef = ref()
-        const value = ref()
+        const myValue = ref()
 
         const config = computed(() => {
             return JSON.parse(code || '{}')
@@ -40,10 +40,10 @@ export default defineComponent({
 
         const renderChildren = () => {
             if (type === 'page') {
-                return <PagePreview ref={pageRef.value} data={config.value}/>
+                return <PagePreview ref={pageRef.value} data={config.value} pageValue={myValue.value}/>
             }
             return <FormPreview
-                value={value.value}
+                value={myValue.value}
                 mode={'edit'}
                 data={config.value}
                 type={'low-code'}
@@ -51,14 +51,10 @@ export default defineComponent({
             />
         }
 
-        const setValue = (val: any) => {
-            value.value = val
-        }
-
         const onSave = async () => {
             if (!okCode) return
             const handleResultFn = new Function('axios', 'route', 'refs', okCode)
-            const _refs = type === 'page' ? { pageRef, setValue } : { formRef, setValue }
+            const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
             const resp = await handleResultFn(axiosRequest, route,  _refs)
             if (resp) {
                 emit('save', true)

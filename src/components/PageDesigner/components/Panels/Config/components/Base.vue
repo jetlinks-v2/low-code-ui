@@ -1,5 +1,20 @@
 <template>
   <div>
+    <template v-if="!['steps-item', 'info-item', 'info-item-item', 'card-item', 'timeline-item'].includes(target.type)">
+      <j-form-item
+          label="名称"
+          name="name"
+          required
+          :validateFirst="true"
+      >
+        <j-input
+            placeholder="请输入"
+            @change="onDataChange"
+            :maxlength="32"
+            v-model:value="target.name"
+        />
+      </j-form-item>
+    </template>
     <template v-if="['text'].includes(target.type)">
       <j-form-item
         label="文本内容"
@@ -265,6 +280,22 @@
         />
       </j-form-item>
       <j-form-item
+          label="内容描述宽度"
+          :name="['componentProps', 'labelWidth']"
+          required
+          :validateFirst="true"
+      >
+        <j-input-number
+            placeholder="请输入"
+            style="width: 100%"
+            :precision="0"
+            :min="100"
+            addon-after="px"
+            @change="onDataChange"
+            v-model:value="target.componentProps.labelWidth"
+        />
+      </j-form-item>
+      <j-form-item
         label="一行的数量"
         :name="['componentProps', 'column']"
         required
@@ -292,22 +323,6 @@
           @change="onDataChange"
           :maxlength="32"
           v-model:value="target.componentProps.label"
-        />
-      </j-form-item>
-      <j-form-item
-        label="内容描述宽度"
-        :name="['componentProps', 'labelWidth']"
-        required
-        :validateFirst="true"
-      >
-        <j-input-number
-          placeholder="请输入"
-          style="width: 100%"
-          :precision="0"
-          :min="100"
-          addon-after="px"
-          @change="onDataChange"
-          v-model:value="target.componentProps.labelWidth"
         />
       </j-form-item>
       <j-form-item
@@ -353,31 +368,6 @@
           ]"
           @change="onDataChange"
           v-model:value="target.componentProps.mode"
-        />
-      </j-form-item>
-    </template>
-    <template v-if="['timeline-item'].includes(target.type)">
-      <j-form-item
-        label="标题"
-        :name="['componentProps', 'label']"
-        required
-        :validateFirst="true"
-      >
-        <j-input
-          placeholder="请输入"
-          @change="onDataChange"
-          :maxlength="32"
-          v-model:value="target.componentProps.label"
-        />
-      </j-form-item>
-      <j-form-item
-        label="颜色"
-        :validateFirst="true"
-        :name="['componentProps', 'color']"
-      >
-        <ColorPicker
-          v-model:hex="target.componentProps.color"
-          @change="onDataChange"
         />
       </j-form-item>
     </template>
