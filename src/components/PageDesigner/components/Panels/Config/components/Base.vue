@@ -204,6 +204,18 @@
           @change="onDataChange"
         />
       </j-form-item>
+      <j-form-item
+          label="步骤按钮配置"
+          :validateFirst="true"
+          :name="['componentProps', 'action']"
+          required
+      >
+        <Steps
+            v-model:value="target.componentProps.action"
+            @change="onDataChange"
+            :data="stepsList"
+        />
+      </j-form-item>
     </template>
     <template v-if="['steps-item'].includes(target.type)">
       <j-form-item
@@ -458,13 +470,25 @@ import Search from "./Search/index.vue";
 import Dropdown from "./Dropdown/index.vue";
 import ShowFormat from "./ProTable/ShowFormat/index.vue";
 import Action from './ProTable/Action/index.vue';
+import Steps from './Steps/index.vue'
 import { ColorPicker } from "jetlinks-ui-components";
 import { useTarget } from "../../../../hooks";
-import { DataSource } from "./ProTable";
 
 const { target } = useTarget();
 
 const emits = defineEmits(["refresh"]);
+
+const stepsList = computed(() => {
+  if(target.value?.type === 'steps'){
+    return (target.value?.children || []).map((item: any) => {
+      return {
+        label: item?.componentProps?.title || item?.key,
+        value: item?.key
+      }
+    })
+  }
+  return []
+})
 
 const onDataChange = () => {
   emits("refresh", target.value);

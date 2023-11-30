@@ -1,11 +1,13 @@
 import DraggableLayout from '../Draggable/DraggableLayout'
 import Selection from '../Selection/index'
-import { Steps, Step, Button, Space, AIcon } from 'jetlinks-ui-components'
+import {Steps, Step, Button, Space, AIcon} from 'jetlinks-ui-components'
 import './index.less'
-import { useLifeCycle, useTool } from '../../hooks'
-import { withModifiers } from 'vue'
+import {useLifeCycle, useTool} from '../../hooks'
+import {withModifiers} from 'vue'
 import generatorData from '../../utils/generatorData'
-import { uid } from '../../utils/uid'
+import {uid} from '../../utils/uid'
+import {request as axiosRequest} from "@jetlinks-web/core/src/request";
+import {useRoute} from "vue-router";
 
 export default defineComponent({
     name: 'StepsLayout',
@@ -14,7 +16,8 @@ export default defineComponent({
     props: {
         data: {
             type: Object,
-            default: () => { }
+            default: () => {
+            }
         },
         parent: {
             type: Array,
@@ -22,9 +25,9 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const { isDragArea, isEditModel, onAddChild } = useTool()
-        const { executionMounted } = useLifeCycle(props.data.componentProps, {}, isEditModel)
-
+        const {isDragArea, isEditModel, onAddChild} = useTool()
+        const {executionMounted} = useLifeCycle(props.data.componentProps, {}, isEditModel)
+        const route = useRoute()
         const _data = computed(() => {
             return props.data
         })
@@ -45,28 +48,6 @@ export default defineComponent({
             onAddChild(_item, props.data)
         }
 
-        const onPrev = () => {
-            if (isEditModel.value) {
-                if (current.value > 0) {
-                    current.value--;
-                }
-            }
-        }
-
-        const onNext = () => {
-            if (isEditModel.value) {
-                if (current.value < unref(list)?.length - 1) {
-                    current.value++;
-                }
-            }
-        }
-
-        const onFinish = () => {
-            if (isEditModel.value) {
-                console.log('finish')
-            }
-        }
-
         const onChange = (cur: number) => {
             if (isEditModel.value) {
                 current.value = cur || 0
@@ -76,14 +57,38 @@ export default defineComponent({
             executionMounted()
         })
 
+        const buttonRender = () => {
+            return (props.data.componentProps.action || []).filter((item: any) => {
+                return item.show.includes(unref(list)?.[current.value]?.key)
+            }).map((i: any) => {
+                const _props = {
+                    danger: i.danger,
+                    key: i.key,
+                    text: i.text,
+                    type: i.type,
+                    icon: i.icon ? <AIcon type={i.icon} /> : ''
+                }
+                return <Button {..._props} onClick={() => {
+                    if(!unref(isEditModel) && i.eventCode) {
+                        const handleResultFn = new Function('axios', 'route', 'refs', i?.eventCode)
+                        handleResultFn(axiosRequest, route, {
+                            current
+                        })
+                    }
+                }}>{i.text}</Button>
+            })
+        }
+
         return () => {
             return (
                 <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
-                    <Steps current={current.value} data-layout-type={'steps'} {...unref(_data).componentProps} onChange={onChange}>
+                    <Steps current={current.value} data-layout-type={'steps'} {...unref(_data).componentProps}
+                           onChange={onChange}>
                         {
                             unref(list).map((element: any) => {
                                 return (
-                                    <Step {...element.componentProps} icon={element.componentProps?.icon ? <AIcon type={element.componentProps?.icon} /> : undefined} />
+                                    <Step {...element.componentProps} icon={element.componentProps?.icon ?
+                                        <AIcon type={element.componentProps?.icon}/> : undefined}/>
                                 )
                             })
                         }
@@ -110,16 +115,13 @@ export default defineComponent({
                         justifyContent: 'flex-end',
                         margin: '10px'
                     }}>
-                        <Space>
-                            {current.value > 0 && <Button onClick={onPrev}>上一步</Button>}
-                            {current.value < unref(list)?.length - 1 && <Button onClick={onNext}>下一步</Button>}
-                            {current.value === unref(list)?.length - 1 && <Button onClick={onFinish} type='primary'>完成</Button>}
-                        </Space>
+                        <Space>{buttonRender()}</Space>
                     </div>
                     {
                         unref(isEditModel) &&
                         <div class="draggable-add">
-                            <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}><span>添加步骤</span></div>
+                            <div class="draggable-add-btn" onClick={withModifiers(handleAdd, ['stop'])}>
+                                <span>添加步骤</span></div>
                         </div>
                     }
                 </Selection>
