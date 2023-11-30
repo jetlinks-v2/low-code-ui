@@ -25,7 +25,7 @@ import PageView from '../../../preview.vue'
 import FormView from '@LowCode/components/FormDesigner/preview.vue'
 import { providerEnum } from "@LowCode/components/ProJect";
 import { request as axiosRequest } from "@jetlinks-web/core/src/request";
-
+import { inject } from 'vue';
 
 const props = defineProps({
     data: {
@@ -34,7 +34,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['close'])
 const confirmLoading = ref(false)
-
+const selectKeys = inject('selectConfig').getSelectKeys()
 const type = computed(() => props.data?.resource?.type)
 const _value = ref({})
 const _configuration = ref()
@@ -57,7 +57,8 @@ const handleRequestFn = async (data) => {
         try {
             const resp = await axiosRequest[config.methods](config.query, {
                 paramsData,
-                ...data
+                ...data,
+                ids:selectKeys
             })
             if (props.data?.ok) {
                 const handleResultFn = new Function('result', config.ok)
