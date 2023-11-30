@@ -138,6 +138,19 @@ const useTool = () => {
     const getFormList = computed(() => {
         const list = product.getDataMapByType(providerEnum.FormPage);
         //   过滤掉自身
+        // const filterList = list.filter((item) => item.id !== designer?.data?.id);
+        return list.map((item) => {
+            return {
+                label: item.title,
+                value: item.id,
+                code: item.configuration?.code,
+            };
+        });
+    });
+
+    const getPageList = computed(() => {
+        const list = product.getDataMapByType(providerEnum.PageDesign);
+        //   过滤掉自身
         const filterList = list.filter((item) => item.id !== designer?.data?.id);
         return filterList.map((item) => {
             return {
@@ -160,7 +173,8 @@ const useTool = () => {
         onShear,
         onPaste,
         setModel,
-        getFormList
+        getFormList,
+        getPageList
     }
 }
 
