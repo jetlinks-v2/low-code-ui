@@ -3,7 +3,7 @@ import Selection from '../Selection/index'
 import TitleComponent from '@LowCode/components/TitleComponent/index.vue'
 import './index.less'
 import {inject, withModifiers} from 'vue'
-import {usePageDependencies, usePageProvider, useTool} from '../../hooks'
+import {useLifeCycle, usePageDependencies, usePageProvider, useTool} from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import { uid } from '../../utils/uid'
 import { Row, Col } from 'jetlinks-ui-components'
@@ -28,6 +28,8 @@ export default defineComponent({
         const designer = inject<any>('PageDesigner')
         const PageProvider = usePageProvider()
         const detailInfo = ref()
+
+        const { executionMounted } = useLifeCycle(props.data.componentProps, {}, isEditModel)
 
         const defaultParams = () => {
             try {
@@ -198,6 +200,11 @@ export default defineComponent({
                 return emptyRender()
             }
         }
+
+        
+        onMounted(() => {
+            executionMounted()
+        })
 
         onBeforeMount(() => {
             if (isEditModel.value) {

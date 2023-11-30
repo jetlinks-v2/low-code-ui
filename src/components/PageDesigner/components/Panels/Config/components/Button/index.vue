@@ -9,10 +9,10 @@
                 <j-select-option value="Drawer">抽屉</j-select-option>
             </j-select>
         </j-form-item>
-        <j-form-item v-if="isCreated()" label="created" :name="['componentProps', 'buttonConfig', 'created']" :validateFirst="true" >
+        <j-form-item v-if="isCreated()" label="基础配置" :name="['componentProps', 'buttonConfig', 'created']" :validateFirst="true" >
             <Created v-model:value="target.componentProps.buttonConfig.created" @change="onDataChange" :type="target.componentProps.buttonConfig.type"/>
         </j-form-item>
-        <j-form-item label="before" :name="['componentProps', 'buttonConfig', 'config']" :validateFirst="true">
+        <j-form-item label="事件处理" :name="['componentProps', 'buttonConfig', 'config']" :validateFirst="true">
             <Config v-model:value="target.componentProps.buttonConfig.config" @change="onDataChange" :type="target.componentProps.buttonConfig.type"/>
         </j-form-item>
     </div>

@@ -52,6 +52,9 @@ export const basic: ISchema[] = [
     {
         type: 'form',
         name: '表单',
+        componentProps:{
+            
+        }
     },
 ]
 
