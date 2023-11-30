@@ -26,13 +26,25 @@ const useTool = () => {
  * 保存数据
  */
     const onSaveData = () => {
+        let menu = {}
+        if (unref(designer.pageData).componentProps.isPage) {
+            menu = {
+                name: unref(designer.pageData).componentProps?.pageName,
+                icon: unref(designer.pageData).componentProps?.pageIcon,
+            }
+        }
         const obj = {
             ...unref(designer.data),
             configuration: {
                 type: "page-design",
                 code: JSON.stringify(unref(designer.pageData)),
             },
+            others: {
+                ...designer.data.others,
+                ...menu
+            }
         };
+
         product.update(obj);
     };
 
