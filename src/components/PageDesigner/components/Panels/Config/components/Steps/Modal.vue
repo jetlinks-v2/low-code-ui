@@ -1,15 +1,15 @@
 <template>
-  <j-button @click="visible = true">配置{{title}}</j-button>
-  <Modal v-if="visible" :id="id" :type="type" :data="value" :title="title" @save="save" @cancel="cancel" />
+  <j-button @click="visible = true">{{title}}</j-button>
+  <Modal v-if="visible" :id="id" :type="type" :data="value" @save="save" @cancel="cancel" />
 </template>
 
-<script setup name="LifeCycle">
+<script setup name="">
 import Modal from './Modal.vue'
 
 const props = defineProps({
   title: {
     type: String,
-    default: 'onCreated'
+    default: '配置onCreated'
   },
   value: {
     type: String,
