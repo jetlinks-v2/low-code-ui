@@ -26,13 +26,25 @@ const useTool = () => {
  * 保存数据
  */
     const onSaveData = () => {
+        let menu = {}
+        if (unref(designer.pageData).componentProps.isPage) {
+            menu = {
+                name: unref(designer.pageData).componentProps?.pageName,
+                icon: unref(designer.pageData).componentProps?.pageIcon,
+            }
+        }
         const obj = {
             ...unref(designer.data),
             configuration: {
                 type: "page-design",
                 code: JSON.stringify(unref(designer.pageData)),
             },
+            others: {
+                ...designer.data.others,
+                ...menu
+            }
         };
+
         product.update(obj);
     };
 
@@ -138,6 +150,19 @@ const useTool = () => {
     const getFormList = computed(() => {
         const list = product.getDataMapByType(providerEnum.FormPage);
         //   过滤掉自身
+        // const filterList = list.filter((item) => item.id !== designer?.data?.id);
+        return list.map((item) => {
+            return {
+                label: item.title,
+                value: item.id,
+                code: item.configuration?.code,
+            };
+        });
+    });
+
+    const getPageList = computed(() => {
+        const list = product.getDataMapByType(providerEnum.PageDesign);
+        //   过滤掉自身
         const filterList = list.filter((item) => item.id !== designer?.data?.id);
         return filterList.map((item) => {
             return {
@@ -160,7 +185,8 @@ const useTool = () => {
         onShear,
         onPaste,
         setModel,
-        getFormList
+        getFormList,
+        getPageList
     }
 }
 

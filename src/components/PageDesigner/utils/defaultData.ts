@@ -153,9 +153,17 @@ export const layout: ISchema[] = [
             direction: 'horizontal',
             size: 8
         },
-        formItemProps: {
-            isLayout: false
-        },
+    },
+    {
+        type: 'card',
+        name: '卡片',
+        children: [
+            {
+                type: 'card-item',
+                children: []
+            },
+        ],
+        componentProps: {},
     },
 ]
 

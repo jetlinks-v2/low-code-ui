@@ -10,6 +10,7 @@ import ProTableLayout from './ProTableLayout'
 import CommonLayout from './CommonLayout';
 import InlineLayout from './InlineLayout';
 import SearchLayout from './SearchLayout'
+import CardLayout from './CardLayout';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -52,6 +53,8 @@ const DraggableLayout = defineComponent({
                         return (<InlineLayout data={element} parent={props.data} />)
                     case 'search':
                         return (<SearchLayout data={element} parent={props.data} />)
+                    case 'card':
+                        return (<CardLayout data={element} parent={props.data} />)
                     default:
                         return <CommonLayout data={element} parent={props.data} />
                 }

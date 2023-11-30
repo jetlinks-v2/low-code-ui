@@ -74,7 +74,8 @@
               {{ item.text }}
             </span>
           </PermissionButton>
-          <j-button v-else :icon="item.icon" @click="item.click" >
+          <j-button v-else @click="item.click" >
+            <template #icon><AIcon :type="item.icon ? item.icon : 'DeleteOutlined'" /></template>
             {{ item.text }}
           </j-button>
         </div>

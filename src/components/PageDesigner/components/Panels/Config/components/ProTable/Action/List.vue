@@ -23,11 +23,17 @@
       <template #danger="{ record }">
         <j-switch v-model:checked="record.danger" @change="onChange()" />
       </template>
-      <template #icon="{ record }">
-        <Icon size="small" v-model:value="record.icon" @change="onChange()" />
+      <template #icon="{ record, valueChange }">
+        <Icon size="small" v-model:value="record.icon" @change="() => {
+          valueChange(record.icon);
+          onChange()
+        }" />
       </template>
-      <template #event="{ record }">
-        <j-button @click="console.log('配置')">配置</j-button>
+      <template #event="{ record, valueChange }">
+        <Event v-model:value="record.event" @change="() => {
+          valueChange(record.event);
+          onChange()
+        }" />
       </template>
       <template #action="{ record }">
         <j-button type="link" danger @click="onRemove(record)"
@@ -46,6 +52,7 @@ import {ref, watchEffect, PropType} from "vue";
 import {cloneDeep} from "lodash-es";
 import Icon from "../../Icon/index.vue";
 import {uid} from "@LowCode/components/PageDesigner/utils/uid";
+import Event from './Event.vue';
 
 const props = defineProps({
   value: {
@@ -112,6 +119,7 @@ const onAdd = () => {
     key: "table-action" + uid(4),
     text: "按钮",
     danger: false,
+    event: undefined
   });
   onChange()
 };
