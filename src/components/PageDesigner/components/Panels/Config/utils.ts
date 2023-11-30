@@ -18,6 +18,13 @@ export const getConfigList = (_type: string) => {
             header: '按钮配置'
         })     
     }
+    if(['steps'].includes(unref(_type))) {
+        arr.push({
+            key: 'Steps',
+            header: '步骤配置'
+        })
+    }
+
     if (['form'].includes(unref(_type))) {
         arr.push({
             key: 'SourceForm',

@@ -44,7 +44,7 @@
         :name="['componentProps', 'onMounted']"
     >
       <LifeCycle
-          title="配置onMounted"
+          title="onMounted"
           v-model:value="target.componentProps.onMounted"
           :id="target.key"
           :type="target.type"

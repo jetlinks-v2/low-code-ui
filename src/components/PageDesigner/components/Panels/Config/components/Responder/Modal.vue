@@ -77,7 +77,7 @@ const options = computed(() => {
   // 过滤自己
   return Object.keys(designer.dependencies.value).filter(key => key !== props.id).map((key) => {
     return {
-      label: designer.dependencies[key],
+      label: designer.dependencies.value[key],
       value: key
     }
   })
