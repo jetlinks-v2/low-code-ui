@@ -27,7 +27,8 @@
         @change="onDataChange"
       />
     </j-form-item>
-    <j-form-item
+    <template v-if="!types.includes(target.type)">
+      <j-form-item
       label="onCreated"
       :name="['componentProps', 'onCreated']"
     >
@@ -50,6 +51,7 @@
           @change="onDataChange"
       />
     </j-form-item>
+    </template>
   </div>
 </template>
 <script lang="ts" setup>
@@ -62,6 +64,8 @@ import LifeCycle from './LifeCycle'
 const { target } = useTarget()
 
 const emits = defineEmits(['refresh'])
+
+const types = ['text','button','dropdown','tag']
 
 const showResponder = computed(() => {
   return !['search'].includes(target.value.type)

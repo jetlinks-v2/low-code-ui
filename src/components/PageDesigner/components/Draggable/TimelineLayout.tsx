@@ -1,4 +1,4 @@
-import { useTool } from "../../hooks"
+import { useLifeCycle, useTool } from "../../hooks"
 import generatorData from "../../utils/generatorData"
 import { uid } from "../../utils/uid"
 import Selection from '../Selection/index'
@@ -23,6 +23,13 @@ export default defineComponent({
     },
     setup(props) {
         const { isDragArea, isEditModel, onAddChild } = useTool()
+        const { executionMounted } = useLifeCycle(props.data.componentProps, {}, isEditModel)
+
+        
+        onMounted(() => {
+            executionMounted()
+        })
+       
 
         const _data = computed(() => {
             return props.data
