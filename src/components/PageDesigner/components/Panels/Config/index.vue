@@ -37,6 +37,7 @@ import PageConfig from "./components/Page.vue";
 import Base from "./components/Base.vue";
 import Status from "./components/Status.vue";
 import Button from './components/Button/index.vue'
+import Steps from './components/Steps/index.vue'
 import { useTarget, useTool } from "../../../hooks";
 import { map } from "lodash-es";
 import { getConfigList } from "./utils";
@@ -61,6 +62,7 @@ const Panels = {
   Status,
   Button,
   SourceForm,
+  Steps
 };
 
 const panelsList = computed(() => {

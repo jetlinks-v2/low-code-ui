@@ -1,13 +1,13 @@
 <template>
   <j-modal
       visible
-      title="配置响应器"
+      :title="`配置${title}`"
       width="1000px"
       @ok="onSave"
       @cancel="onCancel"
   >
     <div class="editor-warp">
-      <div>function onCreated({ context, axios, route, refs})</div>
+      <div>function {{title}}({ context, axios, route, refs})</div>
       <div class="editor-code">
         <div class="code">
           <j-monaco-editor
@@ -49,9 +49,13 @@ const props = defineProps({
   id: {
     type: String,
     default: undefined
+  },
+  title: {
+    type: String,
+    default: undefined
   }
 })
-console.log(props.data)
+
 const emit = defineEmits('save', 'cancel')
 
 const _value = ref(props.data)
@@ -87,7 +91,8 @@ function onCreated({ context, axios, route, refs}){
   * 接口请求
   * post、postParams、get、patch、remove、put
   */
-  // axios.post(url, data)
+
+  axios.post('/instance/_query', { sorts: [{ name: 'createTime', order: 'desc' }] })
   // axios.postParams(url, data, params)
   // axios.get(url, params)
   // axios.patch(url, data)
