@@ -165,7 +165,7 @@
         />
       </j-form-item>
       <j-form-item
-          v-if="!target.componentProps.isButton && target.componentProps.listType !== 'text' && target.componentProps.maxCount ===1 "
+          v-if="!target.componentProps.isButton && target.componentProps.listType !== 'text' && target.componentProps.maxCount === 1"
           label="组件宽度"
           :validateFirst="true"
           :name="['componentProps', 'width']"
