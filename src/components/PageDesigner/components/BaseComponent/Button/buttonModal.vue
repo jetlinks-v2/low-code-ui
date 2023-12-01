@@ -1,21 +1,14 @@
 
 <template>
-    <j-modal 
-        :visible="true" 
-        :width="`${buttonConfig?.created?.width}px`" 
-        :title="buttonConfig?.created?.title" 
-        :maskClosable="false" 
-        :okText="buttonConfig?.created?.okText"
-        :footer="buttonConfig?.created?.footer ? undefined : null" 
-        :confirmLoading="confirmLoading" 
-        @ok="onOk"
-        @cancel="onCancel"
-    >
+    <j-modal :visible="true" :width="`${buttonConfig?.created?.width}px`" :title="buttonConfig?.created?.title"
+        :maskClosable="false" :okText="buttonConfig?.created?.okText"
+        :footer="buttonConfig?.created?.footer ? undefined : null" :confirmLoading="confirmLoading" @ok="onOk"
+        @cancel="onCancel">
         <div v-if="type === providerEnum.FormPage">
             <FormView :value="_value" :data="_configuration" ref="formRef" />
         </div>
         <div v-else>
-            <PageView  :data="_configuration" />
+            <PageView :data="_configuration" />
         </div>
     </j-modal>
 </template>
@@ -59,38 +52,50 @@ const handleRequestFn = async (data) => {
                 paramsData,
                 ...data
             })
-            if (created.ok) {
+            if (config.ok) {
                 const handleResultFn = new Function('result', config.ok)
                 handleResultFn(resp)
-            } 
+            }
         } catch (e) {
             console.error(e)
         }
+    } else {
+        if (config.ok) {
+            const handleResultFn = new Function(config.ok)
+            handleResultFn()
+        }
     }
-    
 }
 
 
 
 
 const onCancel = () => {
-    if(props.buttonConfig?.config.cancel){
-        const func = Function( props.buttonConfig?.config.cancel)
+    if (props.buttonConfig?.config?.cancel) {
+        const func = Function(props.buttonConfig?.config.cancel)
         func()
     }
     emit('close')
 };
 
-const onOk =async () => {
-    const res =await formRef.value?.onSave()
-    if (res) {
-        confirmLoading.value = true
-        console.log(res)
-        await handleRequestFn(res).finally(()=>{
-            confirmLoading.value = false
-            emit('close')
-        })
+const onOk = async () => {
+    if (type.value === providerEnum.FormPage) {
+        const res = await formRef.value?.onSave()
+        if (res) {
+            confirmLoading.value = true
+            console.log(res)
+            await handleRequestFn(res).finally(() => {
+                confirmLoading.value = false
+                emit('close')
+            })
+        }
+    } else {
+        await handleRequestFn().finally(() => {
+                confirmLoading.value = false
+                emit('close')
+            })
     }
+
 };
 
 // console.log('p==========', props)

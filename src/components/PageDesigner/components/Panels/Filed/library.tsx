@@ -13,7 +13,7 @@ const Library = defineComponent({
     setup() {
         const { setSelection } = useTool()
         
-        const handleClone = (element) => {
+        const handleClone = (element: any) => {
             const item = { ...generatorData(element) }
             return cloneDeep(item)
         }

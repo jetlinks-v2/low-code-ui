@@ -62,15 +62,19 @@ const handleRequestFn = async (data) => {
                 paramsData,
                 ...data
             })
-            if (created.ok) {
+            if (config.ok) {
                 const handleResultFn = new Function('result', config.ok)
                 handleResultFn(resp)
-            } 
+            }
         } catch (e) {
             console.error(e)
         }
+    } else {
+        if (config.ok) {
+            const handleResultFn = new Function(config.ok)
+            handleResultFn()
+        }
     }
-    
 }
 
 
@@ -83,15 +87,24 @@ const onCancel = () => {
     emit('close')
 };
 
-const onOk =async () => {
-    const res =await formRef.value?.onSave()
-    if (res) {
-        confirmLoading.value = true
-        await handleRequestFn(res).finally(()=>{
-            confirmLoading.value = false
-            emit('close')
-        })
+const onOk = async () => {
+    if (type.value === providerEnum.FormPage) {
+        const res = await formRef.value?.onSave()
+        if (res) {
+            confirmLoading.value = true
+            console.log(res)
+            await handleRequestFn(res).finally(() => {
+                confirmLoading.value = false
+                emit('close')
+            })
+        }
+    } else {
+        await handleRequestFn().finally(() => {
+                confirmLoading.value = false
+                emit('close')
+            })
     }
+
 };
 
 watch(
