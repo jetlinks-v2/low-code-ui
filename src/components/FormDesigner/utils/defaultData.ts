@@ -75,6 +75,9 @@ export const basic: ISchema[] = [
     {
         type: 'upload',
         name: '上传',
+        componentProps:{
+            isButton:false,
+        }
     },
     {
         type: 'switch',
