@@ -164,6 +164,23 @@
           v-model:value="target.componentProps.isButton"
         />
       </j-form-item>
+      <j-form-item
+          v-if="!target.componentProps.isButton && target.componentProps.listType !== 'text' && target.componentProps.maxCount ===1 "
+          label="组件宽度"
+          :validateFirst="true"
+          :name="['componentProps', 'width']"
+          :rules="[
+            {
+              required: true,
+              message: '请输入',
+            },
+          ]"
+      >
+        <j-input
+          @change="onChange"
+          v-model:value="target.componentProps.width"
+        />
+      </j-form-item>
     </template>
     <template v-if="['tree-select', 'select-card'].includes(type)">
       <j-form-item

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height: 100%;">
     <template v-if="listType === 'text' && !isButton">
       <File v-bind="_componentProps" :value="_value" @change="onChange" />
     </template>
@@ -50,6 +50,9 @@ const props = defineProps({
   isButton:{
     type:Boolean,
     default:false
+  },
+  width:{
+    type:Number,
   }
 })
 const _value: any = ref([])
