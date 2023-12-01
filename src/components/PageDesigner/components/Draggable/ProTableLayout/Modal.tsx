@@ -29,25 +29,24 @@ export default defineComponent({
         })
         const onMountedFn = (code?: string) => {
             if (code && !isEditModel.value) {
+                const _refs = type === 'page' ? { pageRef, setValue } : { formRef, setValue }
                 const fn = new Function('record', 'axios', 'route', 'refs', code)
-                fn(data || {}, axiosRequest, route, { formRef })
+                fn(data || {}, axiosRequest, route, _refs)
             }
         }
 
-        onMounted(() => {
-            onMountedFn(mountedCode)
-        })
+       
 
         const renderChildren = () => {
             if (type === 'page') {
-                return <PagePreview ref={pageRef.value} data={config.value}/>
+                return <PagePreview ref={pageRef} data={config.value}/>
             }
             return <FormPreview
                 value={value.value}
                 mode={'edit'}
                 data={config.value}
                 type={'low-code'}
-                ref={formRef.value}
+                ref={formRef}
             />
         }
 
@@ -58,6 +57,7 @@ export default defineComponent({
         const onSave = async () => {
             if (!okCode) return
             const handleResultFn = new Function('axios', 'route', 'refs', okCode)
+            console.log('=1=====',formRef)
             const _refs = type === 'page' ? { pageRef, setValue } : { formRef, setValue }
             const resp = await handleResultFn(axiosRequest, route,  _refs)
             if (resp) {
@@ -98,6 +98,9 @@ export default defineComponent({
             }
         }
 
+        onMounted(() => {
+            onMountedFn(mountedCode)
+        })
 
         return () => {
             return renderContent()

@@ -90,6 +90,16 @@ const myColumns: any[] = [
     dataIndex: "icon",
     ellipsis: true,
     width: 120,
+    form: {
+      rules: {
+        asyncValidator: (_, value: any) => {
+          if (!value) {
+            return Promise.reject("请选择图标");
+          }
+          return Promise.resolve();
+        },
+      },
+    },
   },
   {
     title: "事件配置",

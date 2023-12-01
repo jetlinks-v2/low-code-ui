@@ -107,8 +107,8 @@ const getQueryPrams = (str)=>{
 }
 
 const getQuery = async () => {
-  
-  const res = await queryEndCommands('property', [])
+  const res =await queryEndCommands(info.id, [])
+  // const res = await queryEndCommands('property', [])
   if (res.status === 200) {
     const arr = handleQuery(res.result)
     options.value = arr
