@@ -1,17 +1,19 @@
 <template>
   <div class="container">
     <Header
-      @save="onWorkFlowSave"
-      :type="type"
-      :data="data"
-      @validate="onValid"
-      @back="emits('back')"
+        @save="onWorkFlowSave"
+        :type="type"
+        :data="data"
+        @validate="onValid"
+        @back="emits('back')"
     />
     <div class="box">
-      <div class="left" v-if="model !== 'preview'"><Filed /></div>
+      <div class="left" v-if="model !== 'preview'">
+        <Filed/>
+      </div>
       <div
-        class="right"
-        :style="{
+          class="right"
+          :style="{
           width: _width,
         }"
       >
@@ -22,11 +24,11 @@
         </div>
       </div>
       <div class="config" v-if="isShowConfig && model !== 'preview'">
-        <Config ref="configRef" />
+        <Config ref="configRef"/>
       </div>
     </div>
-    <Check v-if="model === 'preview' && !mode" />
-    <CheckSpin :spinning="spinning" />
+    <Check v-if="model === 'preview' && !mode"/>
+    <CheckSpin :spinning="spinning"/>
   </div>
 </template>
 
@@ -44,9 +46,9 @@ import {
   computed,
   reactive,
 } from "vue";
-import { cloneDeep, debounce, map } from "lodash-es";
-import { useProduct, useFormDesigner } from "@LowCode/store";
-import { Modal } from "jetlinks-ui-components";
+import {cloneDeep, debounce, map} from "lodash-es";
+import {useProduct, useFormDesigner} from "@LowCode/store";
+import {Modal} from "jetlinks-ui-components";
 import {
   deleteDataByKey,
   copyDataByKey,
@@ -56,17 +58,18 @@ import {
   appendChildItem,
   handleCopyData,
 } from "./utils/utils";
-import { uid } from "./utils/uid";
+import {uid} from "./utils/uid";
 import Check from "./components/Check/index.vue";
-import { onlyMessage } from "@jetlinks-web/utils";
-import { providerEnum } from "@LowCode/components/ProJect";
-import { proAll } from "../QuickEditTable/util";
-import { CheckSpin } from "@LowCode/components/index";
+import {onlyMessage} from "@jetlinks-web/utils";
+import {providerEnum} from "@LowCode/components/ProJect";
+import {proAll} from "../QuickEditTable/util";
+import {CheckSpin} from "@LowCode/components/index";
 
 const props = defineProps({
   value: {
     type: Object,
-    default: () => {},
+    default: () => {
+    },
   },
   mode: {
     // 是否为编辑
@@ -112,10 +115,10 @@ const isSelectedRoot = computed(() => {
 
 const _width = computed(() => {
   return model.value === "preview"
-    ? "100%"
-    : !unref(isShowConfig)
-    ? "calc(100% - 200px)"
-    : "calc(100% - 584px)";
+      ? "100%"
+      : !unref(isShowConfig)
+          ? "calc(100% - 200px)"
+          : "calc(100% - 584px)";
 });
 
 // 设置数据被选中
@@ -145,10 +148,10 @@ const setSelection = (node: any) => {
     }
   }
   isShowConfig.value =
-    !(selected.value?.length > 1) &&
-    !map(selected.value, "type").find((i) => {
-      return ["space-item", "inline", "inline-item"].includes(i);
-    });
+      !(selected.value?.length > 1) &&
+      !map(selected.value, "type").find((i) => {
+        return ["space-item", "inline", "inline-item"].includes(i);
+      });
   onSaveData();
 };
 
@@ -215,13 +218,13 @@ const onPaste = () => {
       formItemProps: {
         ...item?.formItemProps,
         label:
-          obj.key === props.data?.id
-            ? "copy_" + item.formItemProps?.label
-            : item.formItemProps?.label,
+            obj.key === props.data?.id
+                ? "copy_" + item.formItemProps?.label
+                : item.formItemProps?.label,
         name:
-          obj.key === props.data?.id
-            ? "copy_" + item.formItemProps?.name
-            : item.formItemProps?.name,
+            obj.key === props.data?.id
+                ? "copy_" + item.formItemProps?.name
+                : item.formItemProps?.name,
       },
       key: item.key + "_" + uid(),
       children: handleCopyData(item?.children || []),
@@ -254,15 +257,15 @@ const onCollect = () => {
 
 // 添加子组件
 const onAddChild = (
-  newData: any,
-  parent: any,
-  __flag?: "start" | "end" | undefined
+    newData: any,
+    parent: any,
+    __flag?: "start" | "end" | undefined
 ) => {
   const arr = appendChildItem(
-    formData.value?.children,
-    newData,
-    parent,
-    __flag
+      formData.value?.children,
+      newData,
+      parent,
+      __flag
   );
   formData.value = {
     ...formData.value,
@@ -301,12 +304,12 @@ const onSave = () => {
     _func.push(formRef.value?.validate());
     return new Promise((resolve, reject) => {
       proAll(_func)
-        .then(() => {
-          resolve(formState);
-        })
-        .catch((err) => {
-          reject(err);
-        });
+          .then(() => {
+            resolve(formState);
+          })
+          .catch((err) => {
+            reject(err);
+          });
     });
   }
 };
@@ -357,42 +360,58 @@ provide("FormDesigner", {
 });
 
 watch(
-  () => model.value,
-  (newValue: "preview" | "edit") => {
-    if (newValue === "preview") {
-      Object.assign(formState, {});
-      const obj: any = getFieldData(formData.value);
-      Object.assign(formState, obj);
+    () => model.value,
+    (newValue: "preview" | "edit") => {
+      if (newValue === "preview") {
+        Object.assign(formState, {});
+        const obj: any = getFieldData(formData.value);
+        Object.assign(formState, obj);
+      }
+    },
+    {
+      deep: true,
+      immediate: true,
     }
-  },
-  {
-    deep: true,
-    immediate: true,
-  }
 );
 
 watch(
-  () => props.data,
-  (newVal) => {
-    if (props.type === "workflow") {
-      formData.value =
-        newVal && Object.keys(newVal)?.length
-          ? cloneDeep(newVal)
-          : cloneDeep(initData);
-    } else {
-      try {
-        const obj = JSON.parse(newVal?.configuration?.code);
-        formData.value = Object.keys(obj).length ? obj : cloneDeep(initData);
-      } catch (error) {
-        formData.value = cloneDeep(initData);
+    () => props.data,
+    (newVal) => {
+      if (props.type === "workflow") {
+        formData.value =
+            newVal && Object.keys(newVal)?.length
+                ? cloneDeep(newVal)
+                : cloneDeep(initData);
+      } else {
+        try {
+          const obj = JSON.parse(newVal?.configuration?.code);
+          formData.value = Object.keys(obj).length ? obj : cloneDeep(initData);
+        } catch (error) {
+          formData.value = cloneDeep(initData);
+        }
       }
+    },
+    {
+      deep: true,
+      immediate: true,
     }
-  },
-  {
-    deep: true,
-    immediate: true,
-  }
 );
+
+// const onMountedFn = () => {
+//   const customFn = new Function('refs', formData.value?.componentProps?.mountedCode)
+//   const obj = {
+//     request,
+//     refList,
+//     formState
+//   }
+//   customFn(obj)
+// }
+//
+// onMounted(() => {
+//   // if (model.value !== 'edit' && formData.value?.componentProps?.mountedCode) {
+//     onMountedFn()
+//   // }
+// })
 
 onUnmounted(() => {
   onSaveData();
@@ -402,10 +421,10 @@ onUnmounted(() => {
 const onValidate = async () => {
   return new Promise(async (resolve, reject) => {
     const resp: any = await checkedConfig(
-      product.info,
-      unref(formData),
-      getFormList.value,
-      props?.type
+        product.info,
+        unref(formData),
+        getFormList.value,
+        props?.type
     );
     errorKey.value = resp;
     if (errorKey.value?.length) {
@@ -434,7 +453,7 @@ const onValid = async () => {
   }
 };
 
-defineExpose({ onSave, validate: onValidate });
+defineExpose({onSave, validate: onValidate});
 </script>
 
 <style lang="less" scoped>
@@ -451,6 +470,7 @@ defineExpose({ onSave, validate: onValidate });
     width: 100%;
     overflow: hidden;
     flex: 1;
+
     .left {
       width: 200px;
       height: 100%;
@@ -458,6 +478,7 @@ defineExpose({ onSave, validate: onValidate });
 
     .right {
       width: 100%;
+
       .canvas-box {
         width: 100%;
         height: 100%;

@@ -1,11 +1,11 @@
 import Selection from '../Selection/index'
 import './index.less'
-import { FormItem, Ellipsis } from 'jetlinks-ui-components'
-import { cloneDeep, get, isNumber, omit, set } from 'lodash-es'
+import {FormItem, Ellipsis} from 'jetlinks-ui-components'
+import {cloneDeep, get, isNumber, omit, set} from 'lodash-es'
 import componentMap from '../../utils/componentMap'
-import { useProps, useTool } from '../../hooks'
-import { request } from '@jetlinks-web/core'
-import { queryOptions } from '../../utils/utils'
+import {useProps, useTool} from '../../hooks'
+import {request} from '@jetlinks-web/core'
+import {queryOptions} from '../../utils/utils'
 import dayjs from 'dayjs'
 
 export default defineComponent({
@@ -15,7 +15,8 @@ export default defineComponent({
     props: {
         data: {
             type: Object,
-            default: () => { }
+            default: () => {
+            }
         },
         parent: {
             type: [Array, Object],
@@ -39,7 +40,7 @@ export default defineComponent({
         }
     },
     setup(props) {
-        const { isEditModel } = useTool()
+        const {isEditModel} = useTool()
         const designer: any = inject('FormDesigner')
         const TypeComponent = componentMap?.[props?.data?.type] || 'div'
         const _path: string[] = cloneDeep(props?.path || []);
@@ -62,33 +63,32 @@ export default defineComponent({
             if (isEditModel.value) {
                 return
             }
-            const _this = {
-                getWidgetRef: (path: any) => {
-                    return unref(designer.refList)?.[path]
-                },
+            const _refs = {
+                // getWidgetRef: (path: any) => {
+                //     return unref(designer.refList)?.[path]
+                // },
+                refList: designer.refList,
                 request: request
             }
             if (!props.data?.componentProps?.eventCode && !unref(isEditModel)) return
+            let obj: any = undefined
             if (['input', 'textarea', 'input-password'].includes(props.data?.type)) {
-                let customFn = new Function('e', props.data?.componentProps?.eventCode)
-                customFn.call(_this, arg?.[0])
+                obj = arg?.[0]
             }
             if (['input-number'].includes(props.data?.type)) {
-                let customFn = new Function('value', props.data?.componentProps?.eventCode)
-                customFn.call(_this, arg?.[0])
+                obj = arg?.[0]
             }
             if (['select', 'switch', 'select-card', 'tree-select'].includes(props.data.type)) {
-                let customFn = new Function('value', 'option', props.data?.componentProps?.eventCode)
-                customFn.call(_this, arg?.[0], arg?.[1])
+                obj = {value: arg?.[0], option: arg?.[1]}
             }
             if (['time-picker'].includes(props.data?.type)) {
-                let customFn = new Function('time', 'timeString', props.data?.componentProps?.eventCode)
-                customFn.call(_this, arg?.[0], arg?.[1])
+                obj = {time: arg?.[0], timeString: arg?.[1]}
             }
             if (['date-picker'].includes(props.data?.type)) {
-                let customFn = new Function('date', 'timeString', props.data?.componentProps?.eventCode)
-                customFn.call(_this, arg?.[0], arg?.[1])
+                obj = {date: arg?.[0], timeString: arg?.[1]}
             }
+            const customFn = new Function('value', 'refs', props.data?.componentProps?.eventCode)
+            customFn(obj, _refs)
         }
 
         const registerToRefList = (path: string[], _ref: any) => {
@@ -97,6 +97,8 @@ export default defineComponent({
                 designer.refList.value[__path] = _ref
             }
         }
+
+        registerToRefList(_path, selectRef.value)
 
         watchEffect(() => {
             registerToRefList(_path, selectRef.value)
@@ -132,8 +134,8 @@ export default defineComponent({
                 })
                 __value.value = obj
             }
-            // else if (['form'].includes(props?.data.type)) {// 会被置空
-            //     __value.value = get(designer.formState, _path)
+                // else if (['form'].includes(props?.data.type)) {// 会被置空
+                //     __value.value = get(designer.formState, _path)
             // }
             else if (['switch'].includes(props?.data.type)) {// 会被置空
                 const val = get(designer.formState, _path)
@@ -157,6 +159,21 @@ export default defineComponent({
                 return __path
             }
             return _path
+        })
+
+        const onMountedFn = () => {
+            const customFn = new Function('refs', props.data?.componentProps?.mountedCode)
+            const obj = {
+                request,
+                myRef: selectRef
+            }
+            customFn(obj)
+        }
+
+        onMounted(() => {
+            if (props.data?.componentProps?.mountedCode && !unref(isEditModel)) {
+                onMountedFn()
+            }
         })
 
         return () => {
