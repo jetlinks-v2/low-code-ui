@@ -1,5 +1,3 @@
-import {includes} from "lodash-es";
-
 export const getConfigList = (_type: string) => {
     const arr: any[] = []
     if (['root'].includes(unref(_type))) {
@@ -7,8 +5,8 @@ export const getConfigList = (_type: string) => {
             key: 'PageConfig',
             header: '页面样式',
         })
-    }
-    if(!['root', 'form', 'info', 'inline-item', 'card', 'card-item'].includes(unref(_type))){
+    } 
+    if(!['root', 'inline-item', 'card-item', 'timeline-item'].includes(unref(_type))){
         arr.push({
             key: 'Base',
             header: '基础信息',
@@ -18,14 +16,14 @@ export const getConfigList = (_type: string) => {
         arr.push({
             key: 'Button',
             header: '按钮配置'
-        })
+        })     
     }
-    if(['steps'].includes(unref(_type))) {
-        arr.push({
-            key: 'Steps',
-            header: '步骤配置'
-        })
-    }
+    // if(['steps'].includes(unref(_type))) {
+    //     arr.push({
+    //         key: 'Steps',
+    //         header: '步骤配置'
+    //     })
+    // }
 
     if (['form'].includes(unref(_type))) {
         arr.push({

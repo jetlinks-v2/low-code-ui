@@ -16,9 +16,12 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  pageValue: {
+    type: Object,
+  }
 });
 
-const emit = defineEmits([]);
+// const emit = defineEmits([]);
 const pageData = ref<ISchema>(initData); // 表单数据
 const dependencies = ref({}) // 依赖项
 watch(
@@ -34,7 +37,8 @@ watch(
 provide("PageDesigner", {
   model: "preview",
   pageData,
-  dependencies
+  dependencies,
+  pageValue: props.pageValue
 });
 
 </script>
