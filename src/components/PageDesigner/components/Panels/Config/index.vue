@@ -5,15 +5,15 @@
       <div class="config-container">
         <j-form ref="formRef" :model="formState" layout="vertical">
           <j-collapse
-            v-model:activeKey="activeKey"
-            :expand-icon-position="'right'"
-            :bordered="false"
+              v-model:activeKey="activeKey"
+              :expand-icon-position="'right'"
+              :bordered="false"
           >
             <j-collapse-panel v-for="item in panelsList" :key="item.key">
               <template #header>
-                <TitleComponent :data="item.header" />
+                <TitleComponent :data="item.header"/>
               </template>
-              <component :is="Panels[item.key]" @refresh="onRefresh" />
+              <component :is="Panels[item.key]" @refresh="onRefresh"/>
             </j-collapse-panel>
           </j-collapse>
         </j-form>
@@ -32,22 +32,22 @@ import {
   unref,
   reactive,
 } from "vue";
-import { Scrollbar } from "jetlinks-ui-components";
+import {Scrollbar} from "jetlinks-ui-components";
 import PageConfig from "./components/Page.vue";
 import Base from "./components/Base.vue";
 import Status from "./components/Status.vue";
 import Button from './components/Button/index.vue'
-import { useTarget, useTool } from "../../../hooks";
-import { map } from "lodash-es";
-import { getConfigList } from "./utils";
-import { updateData } from "@LowCode/components/PageDesigner/utils/utils";
+import {useTarget, useTool} from "../../../hooks";
+import {map} from "lodash-es";
+import {getConfigList} from "./utils";
+import {updateData} from "@LowCode/components/PageDesigner/utils/utils";
 import SourceForm from "./components/SourceForm.vue";
 
 const formRef = ref<any>();
 
-const { target } = useTarget();
-const { setSelection } = useTool();
-const formState = reactive({ ...unref(target) });
+const {target} = useTarget();
+const {setSelection} = useTool();
+const formState = reactive({...unref(target)});
 
 const designer: any = inject("PageDesigner");
 
@@ -92,15 +92,29 @@ const onRefresh = (obj: any) => {
 };
 
 watch(
-  () => target.value,
-  (newVal) => {
-    Object.assign(formState, newVal);
-  },
-  {
-    immediate: true,
-    deep: true,
-  }
+    () => target.value,
+    (newVal) => {
+      Object.assign(formState, newVal);
+    },
+    {
+      immediate: true,
+      deep: true,
+    }
 );
+
+watch(
+    () => designer.errorKey?.value,
+    (newValue) => {
+      if (unref(newValue)?.length) {
+        formRef.value?.validateFields()
+      }
+    },
+    {
+      immediate: true,
+      deep: true,
+    },
+)
+
 </script>
 
 <style lang="less" scoped>
@@ -113,6 +127,7 @@ watch(
   align-items: center;
   padding-left: 16px;
 }
+
 .config-container {
   height: 100%;
   padding: 16px;
@@ -120,15 +135,19 @@ watch(
 
   :deep(.ant-collapse) {
     background-color: #fff;
+
     .ant-collapse-item {
       border: none !important;
       margin-bottom: 2px;
+
       .ant-collapse-header {
         background-color: #fafafa !important;
         padding: 13px;
+
         .title {
           margin: 0;
         }
+
         span {
           color: #333333;
         }

@@ -7,7 +7,6 @@
       ref="formRef"
       :disabled="disabled"
       @stateChange="onValueChange"
-      :formStyle="formStyle"
     />
   </div>
 </template>
@@ -15,11 +14,14 @@
 import FormPreview from '@LowCode/components/FormDesigner/preview.vue'
 import { watch, computed, ref, inject } from 'vue'
 import { useLifeCycle } from '../../hooks/useLifeCycle';
-import { useTool } from '../../hooks';
+import {usePageProvider, useTool} from '../../hooks';
 
-
-const designer: any = inject('FormDesigner')
+const designer: any = inject('PageDesigner')
 const props = defineProps({
+  _key: {
+    type: String,
+    default: ''
+  },
   value: {
     type: Array,
     default: [],
@@ -54,21 +56,16 @@ const config = computed(() => {
   return JSON.parse(props.source?.code || '{}')
 })
 
- const { isEditModel } = useTool()
+const { isEditModel } = useTool()
 
 const { executionMounted } = useLifeCycle(props, {}, isEditModel)
+
+const pageProvider = usePageProvider()
 
 const onValueChange = (e) => {
   emit('update:value', e)
   emit('change', e)
 }
-
-const formStyle = computed(() => {
-  return {
-    layout: designer?.formData.value?.componentProps?.layout,
-    size: designer?.formData.value?.componentProps?.size,
-  }
-})
 
 watch(
   () => props.value,
@@ -83,16 +80,17 @@ watch(
 
 onMounted(() => {
   executionMounted()
+  pageProvider.addSlot?.(props._key, formRef)
 })
 
 const onSave = () => {
   return new Promise((resolve, reject) => {
     formRef.value
       ?.onSave()
-      .then((_data) => {
+      .then((_data: any) => {
         resolve(_data)
       })
-      .catch((err) => {
+      .catch((err: any) => {
         reject(err)
       })
   })

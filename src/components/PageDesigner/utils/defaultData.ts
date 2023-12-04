@@ -107,14 +107,14 @@ export const layout: ISchema[] = [
                             label:'文本',
                             value: '123',
                             span:1,
-                            labelWidth:200
                         },
                     },
                 ],
                 componentProps: {
                     title:'标题1',
                     bordered: true,
-                    column:3
+                    column:3,
+                    labelWidth:200
                 },
             },
         ]
@@ -166,7 +166,7 @@ export const _function: ISchema[] = [
                     title: '搜索项1',
                     dataIndex: 'id1',
                     search: {
-                        type: 'string',
+                        type: 'input',
                     },
                 }
             ]

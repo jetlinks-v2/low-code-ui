@@ -2,13 +2,15 @@
   <div class="header">
     <div class="right">
       <j-space>
-        <j-button
-          type="primary"
-          v-if="isEditModel"
-          @click="onPreview('preview')"
-          style="padding-left: 4px; padding-right: 4px"
+        <template v-if="isEditModel">
+          <j-button type="primary" @click="onValid">验证</j-button>
+          <j-button
+              type="primary"
+              @click="onPreview('preview')"
+              style="padding-left: 4px; padding-right: 4px"
           ><AIcon style="font-size: 20px" type="CaretRightOutlined"
-        /></j-button>
+          /></j-button>
+        </template>
         <template v-else>
           <j-button type="link" @click="onPreview('edit')"
             ><AIcon type="LeftOutlined" />结束预览</j-button
@@ -21,7 +23,8 @@
 </template>
   
 <script lang="ts" setup>
-import { useTool } from "../../hooks";
+import {useCheck, useTool} from "../../hooks";
+import {onlyMessage} from "@jetlinks-web/utils";
 
 const props = defineProps({
   data: {
@@ -29,11 +32,20 @@ const props = defineProps({
     default: () => {},
   },
 });
-
+const designer: any = inject('PageDesigner')
 const { isEditModel, setSelection, setModel } = useTool();
+const { onValidate } = useCheck()
 
-const emits = defineEmits(["back"]);
-
+const onValid = async () => {
+  designer.spinning.value = true;
+  const _val = await onValidate().catch(() => {
+    designer.spinning.value = false;
+  });
+  designer.spinning.value = false;
+  if (_val) {
+    onlyMessage("校验通过");
+  }
+};
 const onPreview = (_type: "preview" | "edit") => {
   setModel(_type);
   setSelection("root");

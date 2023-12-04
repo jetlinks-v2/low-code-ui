@@ -4,6 +4,7 @@ import './index.less'
 import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import { useTool } from '../../hooks'
 import { extractCssClass, insertCustomCssToHead } from '../../utils/utils'
+import {map} from "lodash-es";
 
 const Selection = defineComponent({
   name: 'Selection',
@@ -50,6 +51,11 @@ const Selection = defineComponent({
         return props?.data?.key !== undefined && flag
       }
       return false
+    })
+
+    const _error = computed(() => {
+      const arr = map(designer.errorKey?.value, 'key')
+      return unref(isEditModel) && arr.includes(props.data?.key)
     })
 
     const handleClick = () => {
@@ -114,6 +120,7 @@ const Selection = defineComponent({
             unref(_hasDrag) && 'handle',
             unref(Selected) && 'Selected',
             unref(isEditModel) && 'edit-hover',
+            unref(_error) && 'Warning',
             ...unref(cssClassList)
           ]}
           {...useAttrs()}
