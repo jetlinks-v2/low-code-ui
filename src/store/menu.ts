@@ -3,7 +3,7 @@ import {router} from '@jetlinks-web/router'
 import {cloneDeep} from 'lodash-es'
 import {setParamsValue} from '@jetlinks-web/hooks'
 import {onlyMessage} from '@jetlinks-web/utils'
-import {handleMenus, handleMenusMap, handleSiderMenu} from '@LowCode/utils'
+import {handleMenus, handleMenusMap, handleSiderMenu, handleMenuInit} from '@LowCode/utils'
 import {getOwnMenuThree} from '@LowCode/api/menu'
 import {getGlobModules} from '@LowCode/router/globModules'
 import {extraMenu} from '@LowCode/router/extraMenu'
@@ -77,28 +77,7 @@ export const useMenuStore = defineStore('menu', () => {
 
     if (resp.success) {
       const result = resp.result
-      const filterMenu = result.filter(item => ['process', 'web_ide'].includes(item.code)).map(item => {
-        if (item.code === 'process') {
-          item.redirect = `${item.url}/home`
-          item.children =  [
-            {
-              code: 'process/home',
-              name: '',
-              url: item.redirect,
-            },
-            ...(item.children || [])
-          ]
-
-          item.meta = {
-            hideChildrenInMenu: true
-          }
-        }
-        if (item.code === 'web_ide') {
-          item.code = 'center'
-        }
-
-        return item
-      })
+      const filterMenu = handleMenuInit(result.filter(item => ['process', 'web_ide'].includes(item.code)))
 
       const systemMenu = result.find(item => item.code === 'system')
 

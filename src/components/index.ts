@@ -1,4 +1,3 @@
-import type { App } from 'vue'
 import TitleComponent from './TitleComponent/index.vue'
 import ImageUpload from "./Upload/Image/ImageUpload.vue";
 import ListPage from './ListPage/index.vue';
