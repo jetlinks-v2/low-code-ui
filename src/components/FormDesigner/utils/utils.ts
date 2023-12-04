@@ -608,6 +608,7 @@ export const initData = {
         size: 'default',
         cssCode: '',
         eventCode: '',
+        mountedCode: ''
     },
     children: [],
 }

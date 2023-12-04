@@ -9,6 +9,9 @@ const handleProps = (node: any) => {
     if (!result?.cssCode) {
         result.cssCode = ''
     }
+    if (!result?.mountedCode) {
+        result.mountedCode = ''
+    }
     if (!result?.onChange) {
         result.onChange = ''
     }

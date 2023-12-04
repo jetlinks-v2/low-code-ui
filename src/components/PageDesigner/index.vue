@@ -8,6 +8,7 @@
         <Config></Config>
       </div>
     </div>
+    <CheckSpin :spinning="spinning"/>
   </div>
 </template>
 
@@ -19,6 +20,9 @@ import Header from "./components/Header/index.vue";
 import { provide, ref, watch } from "vue";
 import { cloneDeep } from "lodash-es";
 import { initData } from "./utils/defaultData";
+import { useCheck } from './hooks'
+import {CheckSpin} from "@LowCode/components/index";
+
 
 const props = defineProps({
   data: {
@@ -33,7 +37,6 @@ const props = defineProps({
   }
 });
 
-// const emits = defineEmits(["saveData", "back"]);
 const model = ref<"preview" | "edit">("edit"); // 预览；编辑
 const pageData = ref<any>(initData); // 表单数据
 const isShowConfig = ref<boolean>(false); // 是否展示配置
@@ -43,6 +46,9 @@ const focus = ref<boolean>(false);
 const focused = ref<boolean>(false); // 记录弹框的快捷键问题
 const copyData = ref<any[]>([]);
 const dependencies = ref({}) // 依赖项
+const errorKey = ref<any[]>([]);
+const spinning = ref<boolean>(false);
+const { onValidate } = useCheck()
 
 provide("PageDesigner", {
   data: props.data,
@@ -55,7 +61,9 @@ provide("PageDesigner", {
   focused,
   copyData,
   dependencies,
-  pageValue: props.pageValue
+  pageValue: props.pageValue,
+  errorKey,
+  spinning
 });
 
 watch(
@@ -73,6 +81,8 @@ watch(
     immediate: true,
   }
 );
+
+defineExpose({validate: onValidate});
 </script>
 
 <style lang="less" scoped>
