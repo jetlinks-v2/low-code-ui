@@ -112,7 +112,7 @@ import { useEngine, useProduct } from '@LowCode/store'
 import { providerEnum } from '@LowCode/components/ProJect/index'
 import { validateDraft } from "@LowCode/api/project";
 import { regular } from '@jetlinks-web/utils'
-import { TitleComponent , ListPage , CRUD , SQLCode , FunctionCode} from '@LowCode/components/index'
+import { TitleComponent , ListPage , CRUD , SQLCode , FunctionCode , FormDesigner , CustomHTML} from '@LowCode/components/index'
 
 const props = defineProps({
   status: {

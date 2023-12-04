@@ -2,8 +2,8 @@ import type { App } from 'vue'
 import TitleComponent from './TitleComponent/index.vue'
 import ImageUpload from "./Upload/Image/ImageUpload.vue";
 import ListPage from './ListPage/index.vue';
-import { FormPreview } from './FormDesigner/index';
-
+import { FormPreview ,FormDesigner } from './FormDesigner/index';
+import CustomHTML from './CustomHTML/index.vue'
 import QuickEditTable from './QuickEditTable/index.vue'
 import Search from './Search'
 import Menu from './Menu/index.vue'
@@ -46,5 +46,7 @@ export {
     CardBox,
     CheckSpin,
     CheckButton,
-    PageDesigner
+    PageDesigner,
+    FormDesigner,
+    CustomHTML
 }
