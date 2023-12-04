@@ -14,6 +14,7 @@
           @errorChange="onErrorChange"
           v-model="_value"
           :language="language"
+          :key="uid(4)"
         />
       </div>
     </j-modal>
@@ -24,6 +25,7 @@
 import { ref, watchEffect, inject, watch } from "vue";
 import { onlyMessage } from "@jetlinks-web/utils";
 import { useFocusWithin } from "@vueuse/core";
+import {uid} from "@LowCode/components/PageDesigner/utils/uid";
 
 const designer: any = inject("PageDesigner");
 

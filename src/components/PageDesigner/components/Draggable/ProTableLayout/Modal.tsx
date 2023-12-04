@@ -22,43 +22,38 @@ export default defineComponent({
         const route = useRoute()
         const formRef = ref()
         const pageRef = ref()
-        const value = ref()
+        const myValue = ref()
 
         const config = computed(() => {
             return JSON.parse(code || '{}')
         })
         const onMountedFn = (code?: string) => {
             if (code && !isEditModel.value) {
+                const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
                 const fn = new Function('record', 'axios', 'route', 'refs', code)
-                fn(data || {}, axiosRequest, route, { formRef })
+                fn(data || {}, axiosRequest, route, _refs)
             }
         }
 
-        onMounted(() => {
-            onMountedFn(mountedCode)
-        })
+       
 
         const renderChildren = () => {
             if (type === 'page') {
-                return <PagePreview ref={pageRef.value} data={config.value}/>
+                return <PagePreview ref={pageRef.value} data={config.value} pageValue={myValue.value}/>
             }
             return <FormPreview
-                value={value.value}
+                value={myValue.value}
                 mode={'edit'}
                 data={config.value}
                 type={'low-code'}
-                ref={formRef.value}
+                ref={formRef}
             />
-        }
-
-        const setValue = (val: any) => {
-            value.value = val
         }
 
         const onSave = async () => {
             if (!okCode) return
             const handleResultFn = new Function('axios', 'route', 'refs', okCode)
-            const _refs = type === 'page' ? { pageRef, setValue } : { formRef, setValue }
+            const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
             const resp = await handleResultFn(axiosRequest, route,  _refs)
             if (resp) {
                 emit('save', true)
@@ -98,6 +93,9 @@ export default defineComponent({
             }
         }
 
+        onMounted(() => {
+            onMountedFn(mountedCode)
+        })
 
         return () => {
             return renderContent()

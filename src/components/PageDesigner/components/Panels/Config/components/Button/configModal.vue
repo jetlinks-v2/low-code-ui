@@ -1,5 +1,5 @@
 <template>
-    <j-modal visible title="before配置项" width="800px" @ok="onSave" @cancel="onCancel">
+    <j-modal visible title="事件处理" width="800px" @ok="onSave" @cancel="onCancel">
         <j-form layout="vertical" ref="formRef" :model="formModel">
             <j-form-item label="数据源" name="query" >
                 <j-input v-model:value="formModel.query" placeholder="请输入数据源地址">

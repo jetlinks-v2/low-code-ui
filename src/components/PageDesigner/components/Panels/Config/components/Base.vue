@@ -1,5 +1,20 @@
 <template>
   <div>
+    <template v-if="!['steps-item', 'info-item', 'info-item-item', 'card-item', 'timeline-item'].includes(target.type)">
+      <j-form-item
+          label="名称"
+          name="name"
+          required
+          :validateFirst="true"
+      >
+        <j-input
+            placeholder="请输入"
+            @change="onDataChange"
+            :maxlength="32"
+            v-model:value="target.name"
+        />
+      </j-form-item>
+    </template>
     <template v-if="['text'].includes(target.type)">
       <j-form-item
         label="文本内容"
@@ -189,6 +204,18 @@
           @change="onDataChange"
         />
       </j-form-item>
+      <j-form-item
+          label="步骤按钮配置"
+          :validateFirst="true"
+          :name="['componentProps', 'action']"
+          required
+      >
+        <Steps
+            v-model:value="target.componentProps.action"
+            @change="onDataChange"
+            :data="stepsList"
+        />
+      </j-form-item>
     </template>
     <template v-if="['steps-item'].includes(target.type)">
       <j-form-item
@@ -265,6 +292,22 @@
         />
       </j-form-item>
       <j-form-item
+          label="内容描述宽度"
+          :name="['componentProps', 'labelWidth']"
+          required
+          :validateFirst="true"
+      >
+        <j-input-number
+            placeholder="请输入"
+            style="width: 100%"
+            :precision="0"
+            :min="100"
+            addon-after="px"
+            @change="onDataChange"
+            v-model:value="target.componentProps.labelWidth"
+        />
+      </j-form-item>
+      <j-form-item
         label="一行的数量"
         :name="['componentProps', 'column']"
         required
@@ -292,22 +335,6 @@
           @change="onDataChange"
           :maxlength="32"
           v-model:value="target.componentProps.label"
-        />
-      </j-form-item>
-      <j-form-item
-        label="内容描述宽度"
-        :name="['componentProps', 'labelWidth']"
-        required
-        :validateFirst="true"
-      >
-        <j-input-number
-          placeholder="请输入"
-          style="width: 100%"
-          :precision="0"
-          :min="100"
-          addon-after="px"
-          @change="onDataChange"
-          v-model:value="target.componentProps.labelWidth"
         />
       </j-form-item>
       <j-form-item
@@ -356,31 +383,6 @@
         />
       </j-form-item>
     </template>
-    <template v-if="['timeline-item'].includes(target.type)">
-      <j-form-item
-        label="标题"
-        :name="['componentProps', 'label']"
-        required
-        :validateFirst="true"
-      >
-        <j-input
-          placeholder="请输入"
-          @change="onDataChange"
-          :maxlength="32"
-          v-model:value="target.componentProps.label"
-        />
-      </j-form-item>
-      <j-form-item
-        label="颜色"
-        :validateFirst="true"
-        :name="['componentProps', 'color']"
-      >
-        <ColorPicker
-          v-model:hex="target.componentProps.color"
-          @change="onDataChange"
-        />
-      </j-form-item>
-    </template>
     <template v-if="['proTable'].includes(target.type)">
       <j-form-item
         label="表格列"
@@ -409,14 +411,12 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <template v-if="target.componentProps.actionVisible">
-        <j-form-item
+      <j-form-item
             label="配置操作列"
             :name="['componentProps', 'action']"
         >
           <Action v-model:value="target.componentProps.action" @change="onDataChange" />
-        </j-form-item>
-      </template>
+      </j-form-item>
     </template>
     <template v-if="['inline'].includes(target.type)">
       <j-form-item
@@ -468,13 +468,25 @@ import Search from "./Search/index.vue";
 import Dropdown from "./Dropdown/index.vue";
 import ShowFormat from "./ProTable/ShowFormat/index.vue";
 import Action from './ProTable/Action/index.vue';
+import Steps from './Steps/index.vue'
 import { ColorPicker } from "jetlinks-ui-components";
 import { useTarget } from "../../../../hooks";
-import { DataSource } from "./ProTable";
 
 const { target } = useTarget();
 
 const emits = defineEmits(["refresh"]);
+
+const stepsList = computed(() => {
+  if(target.value?.type === 'steps'){
+    return (target.value?.children || []).map((item: any) => {
+      return {
+        label: item?.componentProps?.title || item?.key,
+        value: item?.key
+      }
+    })
+  }
+  return []
+})
 
 const onDataChange = () => {
   emits("refresh", target.value);

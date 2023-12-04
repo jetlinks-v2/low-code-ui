@@ -66,8 +66,10 @@ const onSave = async () => {
   if(_table && _table?.length){
     formRef.value?.validate().then((res: any) => {
       if (res) {
-        console.log(formState)
-        emits('save', formState)
+        emits('save', {
+          ...formState,
+          actions: _table
+        })
       }
     })
   } else {

@@ -5,6 +5,7 @@ import {useTool, usePageDependencies, usePageProvider,  useLifeCycle} from '../.
 import { request as axiosRequest } from '@jetlinks-web/core'
 import DraggableLayout from '../DraggableLayout'
 import generatorData from '@LowCode/components/PageDesigner/utils/generatorData'
+import { provide } from 'vue'
 import '../index.less'
 import {Card} from '@LowCode/components'
 import {get} from "lodash-es";
@@ -29,6 +30,19 @@ export default defineComponent({
         const pageProvider = usePageProvider()
         const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
         const tableRef = ref()
+        const isSelect = ref(false)
+        const _selectedRowKeys = ref([])
+        const showSelect = () =>{
+            isSelect.value = true
+        }
+        const closeSelect = () =>{
+            isSelect.value = false
+            _selectedRowKeys.value =[]
+        }
+        const getSelectKeys = () =>{
+            return _selectedRowKeys.value
+        }
+        provide('selectConfig',{showSelect,closeSelect,getSelectKeys})
         const modalVisible = ref<boolean>(false)
         const dataModal = ref()
 
@@ -203,6 +217,36 @@ export default defineComponent({
             return handleResultFn.call(this, _record)
         }
 
+        const onSelectChange = (item: any,state: boolean) => {
+            const arr = new Set(_selectedRowKeys.value);
+            // console.log(item, state);
+            if (state) {
+                arr.add(item.id);
+            } else {
+                arr.delete(item.id);
+            }
+            _selectedRowKeys.value = [...arr.values()];
+        };
+
+        const selectAll = (selected: Boolean, selectedRows: any,changeRows:any) => {
+            if (selected) {
+                    changeRows.map((i: any) => {
+                        if (!_selectedRowKeys.value.includes(i.id)) {
+                            _selectedRowKeys.value.push(i.id)
+                        }
+                    })
+                } else {
+                    const arr = changeRows.map((item: any) => item.id)
+                    const _ids: string[] = [];
+                    _selectedRowKeys.value.map((i: any) => {
+                        if (!arr.includes(i)) {
+                            _ids.push(i)
+                        }
+                    })
+                    _selectedRowKeys.value = _ids
+                }
+        }
+
         const statusConfig = (emphasisField: any, _record: any) => {
             if (emphasisField?.showStatus) {
                 return {
@@ -361,6 +405,16 @@ export default defineComponent({
                         pagination={props.data.componentProps.paginationSetting?.pagination}
                         request={hasRequest.value ? handleRequestFn : undefined}
                         defaultParams={defaultParams.value}
+                        rowSelection={
+                        isSelect.value
+                            ? {
+                                  selectedRowKeys: _selectedRowKeys.value,
+                                  onSelect: onSelectChange,
+                                  onSelectAll: selectAll,
+                                  onSelectNone: ()=>_selectedRowKeys.value = []
+                              }
+                            : false
+                        }
                         v-slots={{
                             headerTitle: buttonRender,
                             card: cardRender,
