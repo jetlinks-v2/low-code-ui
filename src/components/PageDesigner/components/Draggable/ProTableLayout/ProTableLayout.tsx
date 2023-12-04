@@ -30,6 +30,7 @@ export default defineComponent({
         const pageProvider = usePageProvider()
         const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
         const tableRef = ref()
+        const route = useRoute()
         const isSelect = ref(false)
         const _selectedRowKeys = ref([])
         const showSelect = () =>{
@@ -393,20 +394,20 @@ export default defineComponent({
             </Card>
         }
 
-        const onCreatedFn = (code?: string) => {
-            if (code && !isEditModel.value) {
-                const context = {
-                    context: pageProvider.context,
-                    axios: axiosRequest,
-                    route: route,
-                    refs: {
-                        tableRef
-                    }
-                }
-                const fn = new Function('context', code)
-                fn(context)
-            }
-        }
+        // const onCreatedFn = (code?: string) => {
+        //     if (code && !isEditModel.value) {
+        //         const context = {
+        //             context: pageProvider.context,
+        //             axios: axiosRequest,
+        //             route: route,
+        //             refs: {
+        //                 tableRef
+        //             }
+        //         }
+        //         const fn = new Function('context', code)
+        //         fn(context)
+        //     }
+        // }
 
         const { executionMounted } = useLifeCycle(props.data.componentProps, { tableRef: tableRef }, isEditModel)
         const tableRefKey = props.data.key + 'ref'

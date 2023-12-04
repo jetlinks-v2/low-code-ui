@@ -31,6 +31,7 @@ const useTool = () => {
             menu = {
                 name: unref(designer.pageData).componentProps?.pageName,
                 icon: unref(designer.pageData).componentProps?.pageIcon,
+                code: unref(designer.pageData).componentProps?.pageCode,
             }
         }
         const obj = {
