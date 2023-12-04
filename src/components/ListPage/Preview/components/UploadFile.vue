@@ -41,7 +41,6 @@ import { _import } from '@LowCode/api/list'
 import { PropType } from 'vue'
 import { downloadFileByUrl } from '@jetlinks-web/utils'
 
-const emit = defineEmits<Emits>()
 
 const props = defineProps({
   product: {

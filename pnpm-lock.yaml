@@ -71,6 +71,9 @@ dependencies:
   splitpanes:
     specifier: ^3.1.5
     version: 3.1.5
+  sql-parser:
+    specifier: ^0.5.0
+    version: 0.5.0
   vite-plugin-progress:
     specifier: ^0.0.7
     version: 0.0.7(vite@4.3.9)
@@ -3664,6 +3667,11 @@ packages:
 
   /splitpanes@3.1.5:
     resolution: {integrity: sha512-r3Mq2ITFQ5a2VXLOy4/Sb2Ptp7OfEO8YIbhVJqJXoFc9hc5nTXXkCvtVDjIGbvC0vdE7tse+xTM9BMjsszP6bw==}
+    dev: false
+
+  /sql-parser@0.5.0:
+    resolution: {integrity: sha512-0Lw6wAUF4MGJ5pRKY6W8emkhWB7WmQ/5bioEzVVk0oI7kIvACJxJCdHD/K8EKQb+kniRPOuxhSnmd/kU+gn/9Q==}
+    engines: {'0': node}
     dev: false
 
   /ssr-window@3.0.0:
