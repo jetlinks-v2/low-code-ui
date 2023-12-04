@@ -4,12 +4,12 @@
       <j-form :layout="'vertical'" ref="formRef" :model="modelRef">
         <j-form-item label="数据展示方式" name="model" required>
           <j-checkbox-group
-              :value="modelRef.model"
-              :options="[
+            :value="modelRef.model"
+            :options="[
               { label: '数据列表', value: 'TABLE' },
               { label: '卡片列表', value: 'CARD' },
             ]"
-              @change="onChange"
+            @change="onChange"
           />
         </j-form-item>
         <j-form-item
@@ -19,16 +19,16 @@
             v-if="modelRef.model?.includes('CARD')"
             :rules="_rules"
         >
-          <CardConfig v-model:value="modelRef.cardConfig"/>
+          <CardConfig v-model:value="modelRef.cardConfig" />
         </j-form-item>
         <j-form-item
-            label="默认形态"
-            name="defaultModel"
-            v-if="modelRef.model?.length === 2"
+          label="默认形态"
+          name="defaultModel"
+          v-if="modelRef.model?.length === 2"
         >
           <j-radio-group
-              v-model:value="modelRef.modelValue"
-              button-style="solid"
+            v-model:value="modelRef.modelValue"
+            button-style="solid"
           >
             <j-radio-button value="TABLE">数据列表</j-radio-button>
             <j-radio-button value="CARD">卡片列表</j-radio-button>
@@ -40,14 +40,13 @@
 </template>
 
 <script lang="ts" setup>
-import {reactive, ref} from "vue";
+import { reactive, ref } from "vue";
 import CardConfig from "./CardConfig.vue";
 
 const props = defineProps({
   data: {
     type: Object,
-    default: () => {
-    },
+    default: () => {},
   },
 });
 
@@ -62,21 +61,21 @@ const modelRef = reactive({
 });
 
 watch(
-    () => props.data,
-    () => {
-      modelRef.model = props.data?.model || ["TABLE"]
-      modelRef.modelValue = props.data?.modelValue
-      modelRef.cardConfig = props.data?.cardConfig
-    },
-    {
-      deep: true,
-      immediate: true
-    }
+  () => props.data,
+  () => {
+    modelRef.model = props.data?.model || ["TABLE"]
+    modelRef.modelValue = props.data?.modelValue
+    modelRef.cardConfig = props.data?.cardConfig
+  },
+  {
+    deep: true,
+    immediate: true
+  }
 );
 
 const onChange = (checkedValue: any) => {
   modelRef.model = checkedValue?.length ? checkedValue : ["TABLE"];
-  if (modelRef.model?.length === 2) {
+  if(modelRef.model?.length === 2){
     modelRef.modelValue = "TABLE"
     modelRef.cardConfig = {}
   }
@@ -85,7 +84,6 @@ const onChange = (checkedValue: any) => {
 const _rules = [
   {
     validator(_rule: any, value: any) {
-      console.log(value)
       if (!Object.keys(value)?.length) {
         return Promise.reject('请配置卡片');
       }
@@ -102,7 +100,7 @@ const _rules = [
 const onSave = () => {
   formRef.value.validate().then((res: any) => {
     if (res) {
-      if (modelRef.model?.length === 2) {
+      if(modelRef.model?.length === 2) {
         emits('save', modelRef)
       } else {
         emits('save', {

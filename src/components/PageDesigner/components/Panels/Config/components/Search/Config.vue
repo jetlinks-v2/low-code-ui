@@ -52,10 +52,8 @@
           <template
             v-if="['select', 'treeSelect'].includes(record.search?.type)"
           >
-            <EditorBtn
-              :value="JSON.stringify(record.search?.options || [])"
-              text="配置"
-              language="json"
+            <Modal
+              :value="record.search?.options"
               @change="(val) => onChange(record, val)"
             />
           </template>
@@ -76,7 +74,7 @@ import { ref, watchEffect } from "vue";
 import { componentType } from "jetlinks-ui-components/es/Search/setting";
 import { uid } from "../../../../../utils/uid";
 import { cloneDeep } from "lodash-es";
-import EditorBtn from "../EditorBtn.vue";
+import Modal from "./Modal.vue";
 import { regular } from "@jetlinks-web/utils";
 
 const props = defineProps({
@@ -104,14 +102,14 @@ const tableRef = ref<any>();
 
 const myColumns: any[] = [
   {
-    title: "下标",
+    title: "key",
     dataIndex: "dataIndex",
     // width: 200,
     form: {
       rules: {
         asyncValidator: (rule, value, callback, source) => {
           if (!value) {
-            return Promise.reject("请输入下标");
+            return Promise.reject("请输入key");
           }
           if (!regular.isModalReg(value)) {
             return Promise.reject(
@@ -156,6 +154,7 @@ watchEffect(() => {
       form: {
         rules: {
           asyncValidator: (_, value) => {
+            console.log(value)
             if (!value?.type) {
               return Promise.reject("请选择类型");
             }
@@ -193,10 +192,10 @@ const onAdd = () => {
   dataSource.value.push({ dataIndex: (props.type || "search") + uid(4), search: {} });
 };
 
-const onChange = (arr: any, _record: any) => {
+const onChange = (_record: any, obj: any) => {
   dataSource.value.forEach((item) => {
     if (item.dataIndex === _record.dataIndex) {
-      item.search.options = JSON.parse(arr || "[]");
+      item.search.options = obj
     }
   });
 };

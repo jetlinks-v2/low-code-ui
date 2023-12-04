@@ -20,7 +20,7 @@
             <template v-if="type === 'Button'">
                 <j-form-item label="点击事件" name="click">
                     <div>
-                        <span style="font-weight: 600;">function (result) {</span>
+                        <span style="font-weight: 600;">function (context, route, result) </span>
                         <j-monaco-editor v-model="formModel.click" language="javascript"
                             :registrationTypescript="registrationTypescript" style="height: 200px" />
                     </div>
