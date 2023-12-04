@@ -41,7 +41,6 @@ const onValid = async () => {
   const _val = await onValidate().catch(() => {
     designer.spinning.value = false;
   });
-  console.log(_val, 'ddddd')
   designer.spinning.value = false;
   if (_val) {
     onlyMessage("校验通过");

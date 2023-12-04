@@ -1,16 +1,24 @@
 <template>
   <div style="margin: 5px 0">
     <j-button @click="onClick" type="link">配置</j-button>
-    <j-modal visible title="配置" v-if="visible" @ok="handleOk" @cancel="handleCancel">
-      <div>function (record) {</div>
-      <div style="height: 300px">
-        <j-monaco-editor
-            @errorChange="onErrorChange"
-            v-model="_value"
-            language="javascript"
-        />
+    <j-modal :width="800" visible title="配置" v-if="visible" @ok="handleOk" @cancel="handleCancel">
+      <div>function (record)</div>
+      <div style="display: flex; gap: 12px">
+        <div style="height: 300px; flex: 1">
+          <j-monaco-editor
+              @errorChange="onErrorChange"
+              v-model="_value"
+              language="javascript"
+          />
+        </div>
+        <div style="height: 300px; width: 300px">
+          <j-monaco-editor
+              :modelValue="defaultCode"
+              language="javascript"
+              :readOnly="true"
+          />
+        </div>
       </div>
-      <div>}</div>
     </j-modal>
   </div>
 </template>
@@ -30,6 +38,14 @@ const emits = defineEmits(['update:value', 'change'])
 const visible = ref<boolean>(false)
 const _value = ref<string>(props.value);
 const _error = ref<any[]>([]);
+
+const defaultCode = `
+/**
+* @params context {record} 表格横排的数据
+*/
+// key为需要显示的数据的key
+return record?.key
+`
 
 const onClick = () => {
   visible.value = true

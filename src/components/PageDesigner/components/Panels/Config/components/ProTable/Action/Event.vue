@@ -12,12 +12,13 @@
         <j-form layout="vertical" ref="formRef" :model="formState">
           <j-form-item label="类型" name="type" required>
             <j-radio-group v-model:value="formState.type" button-style="solid">
+              <j-radio-button value="common">普通按钮</j-radio-button>
               <j-radio-button value="confirm">确认框</j-radio-button>
               <j-radio-button value="modal">弹窗</j-radio-button>
               <j-radio-button value="drawer">抽屉</j-radio-button>
             </j-radio-group>
           </j-form-item>
-          <template v-if="formState.type !== 'confirm'">
+          <template v-if="!['confirm', 'common'].includes(formState.type)">
             <j-form-item label="页面类型" name="pageType" required>
               <j-radio-group v-model:value="formState.pageType" @change="onTypeChange">
                 <j-radio value="page">页面</j-radio>
@@ -56,30 +57,49 @@
               >
               </j-select>
             </j-form-item>
-            <j-form-item label="页面onMounted" name="mountedCode" required>
-              <div>function onCreated(record, axios, route, refs)</div>
-              <div style="height: 300px">
-                <j-monaco-editor
-                    @errorChange="onErrorChange"
-                    v-model="formState.mountedCode"
-                    language="javascript"
-                />
+            <j-form-item label="页面onMounted" name="mountedCode">
+              <div>function onMounted(record, axios, route, refs)</div>
+              <div style="display: flex; gap: 12px">
+                <div style="height: 300px; flex: 1">
+                  <j-monaco-editor
+                      @errorChange="onErrorChange"
+                      v-model="formState.mountedCode"
+                      language="javascript"
+                  />
+                </div>
+                <div style="height: 300px; width: 300px">
+                  <j-monaco-editor
+                      :modelValue="defaultMountedCode"
+                      language="javascript"
+                  />
+                </div>
               </div>
             </j-form-item>
           </template>
           <template v-else>
-            <j-form-item label="确认文本" name="confirmText" required>
-              <j-input placeholder="请输入" v-model:value="formState.confirmText" />
+            <j-form-item label="确认文本" name="confirmText" required v-if="['confirm'].includes(formState.type)">
+              <j-input placeholder="请输入" v-model:value="formState.confirmText"/>
             </j-form-item>
           </template>
-          <j-form-item label="确认事件" name="okCode" required>
-            <div>{{ formState.type === 'confirm' ? 'function (record, axios, refs)' : 'function (axios, route, refs)' }}}</div>
-            <div style="height: 300px">
-              <j-monaco-editor
-                  @errorChange="onErrorChange"
-                  v-model="formState.okCode"
-                  language="javascript"
-              />
+          <j-form-item label="确认事件" name="okCode">
+            <div>{{
+                formState.type === 'confirm' ? 'function (record, axios, refs)' : 'function (axios, route, refs)'
+              }}
+            </div>
+            <div style="display: flex; gap: 12px">
+              <div style="height: 300px; flex: 1">
+                <j-monaco-editor
+                    @errorChange="onErrorChange"
+                    v-model="formState.okCode"
+                    language="javascript"
+                />
+              </div>
+              <div style="height: 300px; width: 300px">
+                <j-monaco-editor
+                    :modelValue="defaultCode"
+                    language="javascript"
+                />
+              </div>
             </div>
           </j-form-item>
         </j-form>
@@ -122,6 +142,67 @@ const formState = reactive({
 const formRef = ref<any>();
 const _error = ref<any[]>([]);
 
+const defaultCode = `
+/**
+* @params axios {Axios} 请求实例
+* @params route {Object} 路由信息
+* @params refs  {Object} 当前组件下的refs
+*/
+function _fun({ axios, route, refs}){
+
+  /**
+  * 接口请求
+  * post、postParams、get、patch、remove、put
+  */
+
+  axios.post('/instance/_query', { sorts: [{ name: 'createTime', order: 'desc' }] })
+  // axios.postParams(url, data, params)
+  // axios.get(url, params)
+  // axios.patch(url, data)
+  // axios.remove(url, params)
+  // axios.put(url, data)
+
+  /**
+  * 路由信息
+  * route.params
+  * route.query
+  */
+  const is = route.params.id
+
+}
+`
+
+const defaultMountedCode = `
+/**
+* @params record {Object} 表格横排数据
+* @params axios {Axios} 请求实例
+* @params route {Object} 路由信息
+* @params refs  {Object} 当前组件下的refs
+*/
+function onMounted({record, axios, route, refs}){
+
+  /**
+  * 接口请求
+  * post、postParams、get、patch、remove、put
+  */
+
+  axios.post('/instance/_query', { sorts: [{ name: 'createTime', order: 'desc' }] })
+  // axios.postParams(url, data, params)
+  // axios.get(url, params)
+  // axios.patch(url, data)
+  // axios.remove(url, params)
+  // axios.put(url, data)
+
+  /**
+  * 路由信息
+  * route.params
+  * route.query
+  */
+  const is = route.params.id
+
+}
+`
+
 const _rules = [
   {
     required: true,
@@ -154,7 +235,7 @@ watchEffect(() => {
 const onSave = async () => {
   formRef.value?.validate().then((res: any) => {
     if (res) {
-      console.log('======',_error.value)
+      console.log('======', _error.value)
       if (!_error.value?.length) {
         emits("update:value", formState);
         emits("change", formState);

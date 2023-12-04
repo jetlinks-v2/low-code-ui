@@ -130,9 +130,18 @@ export default defineComponent({
                                         }
                                     }}/>
                                 </Tooltip>
+                            } else {
+                                return <Tooltip title={item?.text}><Button type='link' {..._props} onClick={() => {
+                                    if (item.event?.okCode && !unref(isEditModel)) {
+                                        const handleResultFn = new Function('record', 'axios', 'refs', item.event?.okCode)
+                                        handleResultFn(_record, axiosRequest, {
+                                            tableRef
+                                        })
+                                    }
+                                }} /></Tooltip>
                             }
                         }
-                        return <Tooltip title={item?.text}><Button type='link' {..._props} /></Tooltip>
+                        return <Tooltip title={item?.text}><Button type='link' {..._props}/></Tooltip>
                     })
                 }
             </Space>
@@ -309,7 +318,6 @@ export default defineComponent({
                                     tooltip: {
                                         title: item?.text,
                                     },
-                                    icon: 'EditOutlined',
                                     onClick: () => {
                                         if (!unref(isEditModel)) {
                                             dataModal.value = {
@@ -322,6 +330,23 @@ export default defineComponent({
                                                 modalType: item.event?.type || 'modal',
                                             }
                                             modalVisible.value = true
+                                        }
+                                    },
+                                })
+                            }
+                        } else {
+                            return {
+                                ..._props,
+                                permissionProps: (_record: any) => ({
+                                    tooltip: {
+                                        title: item?.text,
+                                    },
+                                    onClick: () => {
+                                        if (item.event?.okCode && !unref(isEditModel)) {
+                                            const handleResultFn = new Function('record', 'axios', 'refs', item.event?.okCode)
+                                            handleResultFn(_record, axiosRequest, {
+                                                tableRef
+                                            })
                                         }
                                     },
                                 })
