@@ -20,8 +20,6 @@ import CardBox from './CardBox/index.vue'
 import CheckSpin from './CheckSpin/index.vue'
 import CheckButton from './CheckButton/index.vue'
 import PageDesigner from './PageDesigner/index.vue'
-import CustomHTML from './CustomHTML/index.vue'
-import FormDesigner from './FormDesigner/index.vue'
 
 export {
     TitleComponent,
