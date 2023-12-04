@@ -1,5 +1,5 @@
 <template>
-    <j-modal visible title="created配置" width="800px" @ok="onSave" @cancel="onCancel">
+    <j-modal visible title="基础配置" width="800px" @ok="onSave" @cancel="onCancel">
         <j-form layout="vertical" ref="formRef" :model="formModel">
             <j-form-item label="标题" name="title" :rules="[{ required: true, message: '请输入数据源地址' }]">
                 <j-input v-model:value="formModel.title" placeholder="请输入弹框标题" />

@@ -10,16 +10,16 @@
           <j-form-item
               required
               label="状态文本"
-              name="status"
+              name="statusText"
           >
-            <j-input prefix="record." v-model:value="modelRef.status"/>
+            <j-input prefix="record." v-model:value="modelRef.statusText"/>
           </j-form-item>
           <j-form-item
               required
               label="状态值"
-              name="statusText"
+              name="status"
           >
-            <j-input prefix="record." v-model:value="modelRef.statusText"/>
+            <j-input prefix="record." v-model:value="modelRef.status"/>
           </j-form-item>
           <j-form-item
               required
