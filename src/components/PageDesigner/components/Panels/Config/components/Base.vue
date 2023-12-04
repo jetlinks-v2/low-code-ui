@@ -46,7 +46,6 @@
       <j-form-item
         label="按钮类型"
         :name="['componentProps', 'type']"
-        required
         :validateFirst="true"
       >
         <j-select
@@ -63,13 +62,12 @@
       <j-form-item
         label="按钮形状"
         :name="['componentProps', 'shape']"
-        required
         :validateFirst="true"
       >
         <CheckButton
           :options="[
-            { label: 'round', value: 'round' },
-            { label: 'circle', value: 'circle' },
+            { label: '半圆', value: 'round' },
+            { label: '圆形', value: 'circle' },
             { label: '默认', value: 'default' },
           ]"
           @change="onDataChange"
@@ -79,7 +77,6 @@
       <j-form-item
         label="按钮大小"
         :name="['componentProps', 'size']"
-        required
         :validateFirst="true"
       >
         <CheckButton
@@ -96,7 +93,6 @@
         label="幽灵属性"
         :validateFirst="true"
         :name="['componentProps', 'ghost']"
-        required
       >
         <j-switch
           v-model:checked="target.componentProps.ghost"
@@ -107,7 +103,6 @@
         label="危险按钮"
         :validateFirst="true"
         :name="['componentProps', 'danger']"
-        required
       >
         <j-switch
           v-model:checked="target.componentProps.danger"
@@ -118,7 +113,6 @@
         label="Block 按钮"
         :validateFirst="true"
         :name="['componentProps', 'block']"
-        required
       >
         <j-switch
           v-model:checked="target.componentProps.block"
@@ -154,7 +148,6 @@
         label="标签是否可以关闭"
         :validateFirst="true"
         :name="['componentProps', 'closable']"
-        required
       >
         <j-switch
           v-model:checked="target.componentProps.closable"
@@ -197,7 +190,6 @@
         label="是否为点状步骤条"
         :validateFirst="true"
         :name="['componentProps', 'progressDot']"
-        required
       >
         <j-switch
           v-model:checked="target.componentProps.progressDot"
@@ -284,7 +276,6 @@
         label="是否展示边框"
         :validateFirst="true"
         :name="['componentProps', 'bordered']"
-        required
       >
         <j-switch
           v-model:checked="target.componentProps.bordered"
@@ -313,14 +304,15 @@
         required
         :validateFirst="true"
       >
-        <j-input-number
-          placeholder="请输入"
-          @change="onDataChange"
-          style="width: 100%"
-          :precision="0"
-          :min="1"
-          v-model:value="target.componentProps.column"
-        />
+        <j-select @change="onDataChange" placeholder="请输入" v-model:value="target.componentProps.column" :options="columnsOptions" />
+<!--        <j-input-number-->
+<!--          placeholder="请输入"-->
+<!--          @change="onDataChange"-->
+<!--          style="width: 100%"-->
+<!--          :precision="0"-->
+<!--          :min="1"-->
+<!--          v-model:value="target.componentProps.column"-->
+<!--        />-->
       </j-form-item>
     </template>
     <template v-if="['info-item-item'].includes(target.type)">
@@ -411,20 +403,17 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <template v-if="target.componentProps.actionVisible">
-        <j-form-item
+      <j-form-item
             label="配置操作列"
             :name="['componentProps', 'action']"
         >
           <Action v-model:value="target.componentProps.action" @change="onDataChange" />
-        </j-form-item>
-      </template>
+      </j-form-item>
     </template>
     <template v-if="['inline'].includes(target.type)">
       <j-form-item
         label="对齐方式"
         :name="['componentProps', 'align']"
-        required
         :validateFirst="true"
       >
         <j-select
@@ -440,7 +429,6 @@
       <j-form-item
         label="间距方向"
         :name="['componentProps', 'direction']"
-        required
         :validateFirst="true"
       >
         <CheckButton
@@ -455,7 +443,6 @@
       <j-form-item
         label="间距大小"
         :name="['componentProps', 'size']"
-        required
         :validateFirst="true"
       >
         <j-slider v-model:value="target.componentProps.size" @change="onDataChange" />
@@ -488,6 +475,12 @@ const stepsList = computed(() => {
     })
   }
   return []
+})
+
+const columnsOptions = computed(() => {
+  return [1, 2, 3, 4, 6, 8, 12, 24].map(item => {
+    return {label: item, value: item}
+  })
 })
 
 const onDataChange = () => {
