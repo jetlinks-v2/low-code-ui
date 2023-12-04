@@ -85,7 +85,6 @@ const onChange = (checkedValue: any) => {
 const _rules = [
   {
     validator(_rule: any, value: any) {
-      console.log(value)
       if (!Object.keys(value)?.length) {
         return Promise.reject('请配置卡片');
       }

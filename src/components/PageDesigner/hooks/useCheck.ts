@@ -5,7 +5,7 @@ const useCheck = () => {
     const { getFormList } = useTool()
     const errorMap = new Map()
 
-    const noCheckArr = ['root']
+    // const noCheckArr = ['root']
     const nameCheckArr = ['text', 'button', 'dropdown', 'tag', 'form', 'steps', 'info', 'timeline', 'card', 'inline']
 
     const checkedConfigItem = (node: ISchema) => {
@@ -14,8 +14,10 @@ const useCheck = () => {
             message: (node.formItemProps?.label || node.name) + '配置错误'
         }
         const _type = node.type || 'root'
-        if (noCheckArr.includes(_type)) {
-            return false
+        if (_type === 'root' && node.componentProps?.isPage) {
+            if(node.componentProps?.pageCode || node.componentProps?.pageName){
+                return obj
+            }
         } else {
             if(nameCheckArr.includes(_type) && !node.name) {
                 // 校验名称

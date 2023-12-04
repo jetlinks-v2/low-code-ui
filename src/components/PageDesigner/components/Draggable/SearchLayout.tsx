@@ -1,7 +1,8 @@
 import Selection from '../Selection/index'
-import { defineComponent, inject } from 'vue'
-import { useTool, usePageProvider, useLifeCycle } from '../../hooks'
+import {defineComponent, inject} from 'vue'
+import {useTool, usePageProvider, useLifeCycle} from '../../hooks'
 import Search from '../../../Search/Search.vue'
+import {request as axiosRequest} from "@jetlinks-web/core/src/request";
 
 export default defineComponent({
     name: 'ProTableLayout',
@@ -10,7 +11,8 @@ export default defineComponent({
     props: {
         data: {
             type: Object,
-            default: () => { }
+            default: () => {
+            }
         },
         parent: {
             type: Array,
@@ -18,8 +20,8 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const { isDragArea, isEditModel } = useTool()
-        const { executionMounted } = useLifeCycle(props.data.componentProps, {}, isEditModel)
+        const {isEditModel} = useTool()
+        const {executionMounted} = useLifeCycle(props.data.componentProps, {}, isEditModel)
         const PageProvider = usePageProvider()
         const designer = inject<any>('PageDesigner')
 
@@ -28,7 +30,37 @@ export default defineComponent({
         })
 
         const columns = computed(() => {
-            return props.data.componentProps.columns
+            console.log(props.data.componentProps.columns)
+            return (props.data.componentProps.columns || [])?.map((item: any) => {
+                const obj = {
+                    dataIndex: item.dataIndex,
+                    title: item.title,
+                }
+                let _options: any = undefined
+                if (['select', 'treeSelect'].includes(item.search?.type)) {
+                    if (item.search?.options?.type === 'dynamic') {
+                        _options = () =>
+                            new Promise(async (resolve) => {
+                                const {query, handleResult, defaultParams, methods} = item.search?.options?.optionsData || {}
+                                const resp = await axiosRequest?.[methods || 'post'](query, JSON.parse(defaultParams || '{}'))
+                                if (handleResult) {
+                                    const handleResultFn = new Function('result', handleResult)
+                                    resolve(handleResultFn(resp))
+                                }
+                                resolve(resp)
+                            })
+                    } else {
+                        _options = JSON.parse(item.search?.options?.optionsJson || '[]')
+                    }
+                }
+                return {
+                    ...obj,
+                    search: {
+                        type: item?.search?.type || 'input',
+                        options: _options
+                    }
+                }
+            })
         })
 
         const onSearch = (params: any) => {
@@ -47,12 +79,13 @@ export default defineComponent({
 
         return () => {
             return (
-                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
+                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)}
+                           parent={props.parent}>
                     <Search
                         columns={columns.value}
                         onSearch={onSearch}
+                        target={props.data?.key}
                     />
-
                 </Selection>
             )
         }

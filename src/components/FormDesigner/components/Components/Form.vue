@@ -7,15 +7,14 @@
       ref="formRef"
       :disabled="disabled"
       @stateChange="onValueChange"
-      :formStyle="formStyle"
     />
   </div>
 </template>
 <script lang="ts" setup>
 import FormPreview from '@LowCode/components/FormDesigner/preview.vue'
-import { watch, computed, ref, inject } from 'vue'
+import { watch, computed, ref } from 'vue'
 
-const designer: any = inject('FormDesigner')
+// const designer: any = inject('FormDesigner')
 const props = defineProps({
   value: {
     type: Array,
@@ -48,12 +47,12 @@ const onValueChange = (e) => {
   emit('change', e)
 }
 
-const formStyle = computed(() => {
-  return {
-    layout: designer?.formData.value?.componentProps?.layout,
-    size: designer?.formData.value?.componentProps?.size,
-  }
-})
+// const formStyle = computed(() => {
+//   return {
+//     layout: designer?.formData.value?.componentProps?.layout,
+//     size: designer?.formData.value?.componentProps?.size,
+//   }
+// })
 
 watch(
   () => props.value,
