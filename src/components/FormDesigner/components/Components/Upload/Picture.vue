@@ -1,5 +1,6 @@
 <template>
-  <a-upload
+  <div :class="{content:maxCount ===1}" :style="{width: maxCount ===1 ?  width + 'px' : '100%', height:  maxCount ===1 ?  width + 'px' : '100%'}">
+    <a-upload
     dragger
     name="file"
     v-model:file-list="fileList"
@@ -12,21 +13,21 @@
     :accept="accept"
     :disabled="fileList.length >= maxCount || disabled"
   >
-    <div v-if="(maxCount > 1 || fileList.length < maxCount) && !uploading ">
-      <p class="icon">
-        <AIcon type="CloudUploadOutlined" />
-      </p>
-      <p>将图片拖动到此处，或点击上传</p>
-    </div>
-    <div class="uploading" v-if="uploading">
-        <div class="loadingContainer">
-          <AIcon type="LoadingOutlined" class="loading"/>
-          <span>{{ `上传中${percent}%` }}</span>
-        </div>
-    </div>
+      <div v-if="(maxCount > 1 || fileList.length < maxCount) && !uploading ">
+        <p class="icon">
+          <AIcon type="CloudUploadOutlined" />
+        </p>
+        <p>将图片拖动到此处，或点击上传</p>
+      </div>
+      <div class="uploading" v-if="uploading" >
+          <div class="loadingContainer">
+            <AIcon type="LoadingOutlined" class="loading"/>
+            <span>{{ `上传中${percent}%` }}</span>
+          </div>
+      </div>
     <template #itemRender="{ file }">
       <div class="render">
-        <a-image :src="file.url"> 
+        <a-image :src="file.url" class="image"> 
           <template #previewMask>
             <AIcon type="EyeOutlined" />
             <AIcon
@@ -50,12 +51,12 @@
         </div> -->
       </div>
     </template>
-  </a-upload>
+    </a-upload>
+  </div>
   <!-- <div class="bottom">单个大小限制{{ fileSize }}{{ unit }}</div> -->
   <!-- <a-modal :visible="previewRef.previewVisible" :title="previewRef.previewTitle" :footer="null"  :width="400" @cancel="handleCancel">
     <img alt="example" style="width: 100%" :src="previewRef.previewImage" />
   </a-modal> -->
-
   <CropperModal
     v-if="cropper.visible"
     :img="cropper.img"
@@ -99,6 +100,9 @@ const props = defineProps({
   disabled:{
     type:Boolean,
     default:false
+  },
+  width:{
+    type:Number,
   }
 })
 
@@ -212,6 +216,24 @@ watch(
 </script>
 
 <style scoped lang='less'>
+.content{
+  :deep(.ant-upload-picture-card-wrapper){
+    height: 100%;
+    width: 100%;
+  }
+  :deep(.ant-upload-list){
+    height: 100%;
+    width: 100%;
+  }
+  :deep(.ant-upload){
+    height:100%;
+    width:100%
+  }
+  :deep(.ant-upload-list-picture-card-container){
+    height:100%;
+    width:100%
+  }
+}
 .uploading{
   height: 100%;
 }
