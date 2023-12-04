@@ -24,9 +24,12 @@ const props = defineProps({
   data: {
     type: Object,
   },
+  pageValue: {
+    type: Object,
+  }
 });
 
-const emits = defineEmits(["saveData", "back"]);
+// const emits = defineEmits(["saveData", "back"]);
 const model = ref<"preview" | "edit">("edit"); // 预览；编辑
 const pageData = ref<any>(initData); // 表单数据
 const isShowConfig = ref<boolean>(false); // 是否展示配置
@@ -47,7 +50,8 @@ provide("PageDesigner", {
   focus,
   focused,
   copyData,
-  dependencies
+  dependencies,
+  pageValue: props.pageValue
 });
 
 watch(
