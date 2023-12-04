@@ -1,4 +1,3 @@
-import type { App } from 'vue'
 import TitleComponent from './TitleComponent/index.vue'
 import ImageUpload from "./Upload/Image/ImageUpload.vue";
 import ListPage from './ListPage/index.vue';
@@ -21,6 +20,8 @@ import CardBox from './CardBox/index.vue'
 import CheckSpin from './CheckSpin/index.vue'
 import CheckButton from './CheckButton/index.vue'
 import PageDesigner from './PageDesigner/index.vue'
+import CustomHTML from './CustomHTML/index.vue'
+import FormDesigner from './FormDesigner/index.vue'
 
 export {
     TitleComponent,
@@ -46,5 +47,7 @@ export {
     CardBox,
     CheckSpin,
     CheckButton,
-    PageDesigner
+    PageDesigner,
+    FormDesigner,
+    CustomHTML
 }
