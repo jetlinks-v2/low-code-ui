@@ -114,7 +114,7 @@ import { useEngine, useProduct } from '@LowCode/store'
 import { providerEnum } from '@LowCode/components/ProJect/index'
 import { validateDraft } from "@LowCode/api/project";
 import { TitleComponent , ListPage , CRUD , SQLCode , FunctionCode, PageDesigner, CustomHTML, FormDesigner } from '@LowCode/components/index'
-import SqlParser from 'sql-parser'
+import { regular } from '@jetlinks-web/utils'
 
 const props = defineProps({
   status: {
@@ -258,7 +258,7 @@ const validateAll = async (id, cb) => {
     if (!hasSql) {
       handleStatusItem(item.id, hasSql ? 1 : 2, hasSql ? ['请输入sql'] : [] )
     } else {
-      const _sql = !SqlParser.parser(item.configuration.sql)
+      const _sql = !regular.isSql(item.configuration.sql)
       handleStatusItem(item.id, _sql ? 1 : 2, _sql ? ['请输入正确的sql'] : [] )
     }
     cb?.()
