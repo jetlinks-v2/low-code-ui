@@ -77,6 +77,7 @@ export const basic: ISchema[] = [
         name: '上传',
         componentProps:{
             isButton:false,
+            width:100
         }
     },
     {

@@ -15,7 +15,7 @@
 <script setup name="ContentWarp">
 import { providerEnum } from '@LowCode/components/ProJect/index'
 import ProjectEmpty from '@LowCode/components/ProJect/Empty/index.vue'
-import { ListPage , CRUD , Project , SQLCode , FunctionCode} from '@LowCode/components/index'
+import { ListPage , CRUD , Project , SQLCode , FunctionCode , PageDesigner , FormDesigner , CustomHTML} from '@LowCode/components/index'
 
 const props = defineProps({
   data: {

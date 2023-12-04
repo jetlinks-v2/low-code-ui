@@ -182,3 +182,27 @@ export const handleAuthMenu = (menuData: any, cb: (code, buttons) => void) => {
     })
   }
 }
+
+export const handleMenuInit = (menus: any[]) => {
+    return menus?.map(item => {
+        if (item.code === 'process') {
+            item.redirect = `${item.url}/home`
+            item.children =  [
+                {
+                    code: 'process/home',
+                    name: '',
+                    url: item.redirect,
+                },
+                ...(item.children || [])
+            ]
+
+            item.meta = {
+                hideChildrenInMenu: true
+            }
+        }
+        if (item.code === 'web_ide') {
+            item.code = 'center'
+        }
+        return item
+    }) || []
+}

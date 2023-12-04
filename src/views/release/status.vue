@@ -96,6 +96,7 @@
         <ListPage v-else-if="modelData.type === providerEnum.ListPage" :data="modelData.data" :key="modelData.data.id" ref="modelRef"/>
         <SQLCode v-else-if="modelData.type === providerEnum.SQL"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
         <FunctionCode v-else-if="modelData.type === providerEnum.Function"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
+        <PageDesigner v-else-if="modelData.type === providerEnum.PageDesign"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
       </div>
     </div>
     <div class="release-validate-box">
@@ -103,6 +104,7 @@
       <CustomHTML v-else-if="validateContent.type === providerEnum.HtmlPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef" :showTip="false"/>
       <CRUD v-else-if="validateContent.type === providerEnum.CRUD" :key="validateContent.key" v-bind="validateContent.data" ref="validateRef" :showTip="false"/>
       <ListPage v-else-if="validateContent.type === providerEnum.ListPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef" :showTip="false"/>
+      <PageDesigner v-else-if="validateContent.type === providerEnum.PageDesign" :key="validateContent.key" :data="validateContent.data" ref="validateRef" :showTip="false"/>
     </div>
   </div>
 </template>
@@ -111,8 +113,8 @@
 import { useEngine, useProduct } from '@LowCode/store'
 import { providerEnum } from '@LowCode/components/ProJect/index'
 import { validateDraft } from "@LowCode/api/project";
-import { regular } from '@jetlinks-web/utils'
-import { TitleComponent , ListPage , CRUD , SQLCode , FunctionCode} from '@LowCode/components/index'
+import { TitleComponent , ListPage , CRUD , SQLCode , FunctionCode, PageDesigner, CustomHTML, FormDesigner } from '@LowCode/components/index'
+import SqlParser from 'sql-parser'
 
 const props = defineProps({
   status: {
@@ -256,7 +258,7 @@ const validateAll = async (id, cb) => {
     if (!hasSql) {
       handleStatusItem(item.id, hasSql ? 1 : 2, hasSql ? ['请输入sql'] : [] )
     } else {
-      const _sql = !regular.isSql(item.configuration.sql)
+      const _sql = !SqlParser.parser(item.configuration.sql)
       handleStatusItem(item.id, _sql ? 1 : 2, _sql ? ['请输入正确的sql'] : [] )
     }
     cb?.()

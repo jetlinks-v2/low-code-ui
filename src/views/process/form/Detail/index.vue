@@ -13,6 +13,7 @@ import { onMounted, ref } from 'vue'
 import { omit } from 'lodash-es'
 import { useMenuStore } from '@LowCode/store'
 import { useRoute } from 'vue-router'
+import { FormDesigner } from '@LowCode/components/index'
 
 const menu = useMenuStore()
 const route = useRoute()

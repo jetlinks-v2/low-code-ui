@@ -68,7 +68,38 @@ export default defineComponent({
         const list = computed(() => {
             return props.data?.children || []
         })
-
+        // 计算列表组件行自动铺满
+        // const dealCol = () =>{
+        //     list.value?.map(((item:any)=>{
+        //         let preTotal = 0
+        //         let total = 0
+        //         let changeMap = new Map()
+        //         if(item?.children?.length){
+        //             item.children.map((i:any,index:number)=>{
+        //                 if(total + 24 / item?.componentProps?.column * i?.componentProps?.span >24){
+        //                     changeMap.set(index-1,(24 - preTotal)/24 * item?.componentProps?.column)
+        //                     preTotal = 0
+        //                     total = 24 / item?.componentProps?.column * i?.componentProps?.span
+        //                 }else if(index == item.children.length-1){
+        //                     console.log(123)
+        //                     changeMap.set(index,(24 - preTotal)/24 * item?.componentProps?.column)
+        //                 }else{
+        //                     preTotal = total
+        //                     total += 24 / item?.componentProps?.column * i?.componentProps?.span
+        //                     if(total == 24){
+        //                         preTotal = 0
+        //                         total = 0
+        //                     }
+        //                 }
+        //             })
+        //         }
+        //         console.log(changeMap,'map')
+        //         changeMap.forEach((value:any,key:number)=>{
+        //             item.children[key].componentProps.span = value
+        //         })
+        //     }))
+        // }
+        // dealCol()
         const handleAdd = () => {
             const _item = generatorData({
                 type: props.data?.type + '-item',

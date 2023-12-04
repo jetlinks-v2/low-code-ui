@@ -30,6 +30,10 @@ const props = defineProps({
   },
   pageValue: {
     type: Object,
+  },
+  showTip: {
+    type: Boolean,
+    default: true
   }
 });
 
