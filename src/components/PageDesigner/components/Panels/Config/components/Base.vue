@@ -411,14 +411,12 @@
           @change="onDataChange"
         />
       </j-form-item>
-      <template v-if="target.componentProps.actionVisible">
-        <j-form-item
+      <j-form-item
             label="配置操作列"
             :name="['componentProps', 'action']"
         >
           <Action v-model:value="target.componentProps.action" @change="onDataChange" />
-        </j-form-item>
-      </template>
+      </j-form-item>
     </template>
     <template v-if="['inline'].includes(target.type)">
       <j-form-item

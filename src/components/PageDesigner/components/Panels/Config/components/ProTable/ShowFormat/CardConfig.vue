@@ -45,6 +45,7 @@
               <j-input
                   v-model:value="formState.field1Title"
                   placeholder="请输入"
+                  @change="onChange"
               />
             </div>
             <CardField key="field1Code" v-model:value="formState.field1Code" @change="onChange" />
@@ -54,6 +55,7 @@
               <j-input
                   v-model:value="formState.field2Title"
                   placeholder="请输入"
+                  @change="onChange"
               />
             </div>
             <CardField key="field2Code" v-model:value="formState.field2Code" @change="onChange" />

@@ -154,6 +154,7 @@ watchEffect(() => {
 const onSave = async () => {
   formRef.value?.validate().then((res: any) => {
     if (res) {
+      console.log('======',_error.value)
       if (!_error.value?.length) {
         emits("update:value", formState);
         emits("change", formState);

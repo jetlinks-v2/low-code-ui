@@ -29,14 +29,13 @@ export default defineComponent({
         })
         const onMountedFn = (code?: string) => {
             if (code && !isEditModel.value) {
+                const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
                 const fn = new Function('record', 'axios', 'route', 'refs', code)
-                fn(data || {}, axiosRequest, route, { formRef })
+                fn(data || {}, axiosRequest, route, _refs)
             }
         }
 
-        onMounted(() => {
-            onMountedFn(mountedCode)
-        })
+       
 
         const renderChildren = () => {
             if (type === 'page') {
@@ -47,7 +46,7 @@ export default defineComponent({
                 mode={'edit'}
                 data={config.value}
                 type={'low-code'}
-                ref={formRef.value}
+                ref={formRef}
             />
         }
 
@@ -94,6 +93,9 @@ export default defineComponent({
             }
         }
 
+        onMounted(() => {
+            onMountedFn(mountedCode)
+        })
 
         return () => {
             return renderContent()
