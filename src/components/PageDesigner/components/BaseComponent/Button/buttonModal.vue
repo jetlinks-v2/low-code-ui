@@ -35,7 +35,6 @@ const _value = ref({})
 const _configuration = ref()
 const formRef = ref()
 
-
 const defaultParams = () => {
     try {
         return JSON.parse(props.buttonConfig?.created?.defaultParams)
@@ -69,9 +68,6 @@ const handleRequestFn = async (data) => {
     }
 }
 
-
-
-
 const onCancel = () => {
     if (props.buttonConfig?.config?.cancel) {
         const func = Function(props.buttonConfig?.config.cancel)
@@ -98,8 +94,6 @@ const onOk = async () => {
     }
 
 };
-
-// console.log('p==========', props)
 
 watch(
     () => props.buttonConfig?.created?.resource?.configuration,

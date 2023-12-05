@@ -8,7 +8,10 @@ import {
     DropdownSource,
     TimelineSource,
     InfoSource,
-    SearchSource, TagSource, StepsSource
+    SearchSource,
+    TagSource,
+    StepsSource,
+    TabSource
 } from './source';
 
 const getIcon = (type: string) => {
@@ -37,6 +40,8 @@ const getIcon = (type: string) => {
             return SearchSource
         case 'proTable':
             return ArrayTableSource
+        case 'tabs':
+            return TabSource
         default:
             return TextSource
     }

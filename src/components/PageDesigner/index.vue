@@ -44,7 +44,6 @@ const selected = ref<any[]>([]); // 被选择数据,需要多选
 const _ctrl = ref<boolean>(false);
 const focus = ref<boolean>(false);
 const focused = ref<boolean>(false); // 记录弹框的快捷键问题
-const copyData = ref<any[]>([]);
 const dependencies = ref({}) // 依赖项
 const errorKey = ref<any[]>([]);
 const spinning = ref<boolean>(false);
@@ -58,7 +57,6 @@ const designerData = {
   _ctrl,
   focus,
   focused,
-  copyData,
   dependencies,
   pageValue: props.pageValue,
   errorKey,

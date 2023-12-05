@@ -3,12 +3,11 @@ import Selection from '../Selection/index'
 import TitleComponent from '@LowCode/components/TitleComponent/index.vue'
 import './index.less'
 import {inject, withModifiers} from 'vue'
-import {useLifeCycle, usePageDependencies, usePageProvider, useTool} from '../../hooks'
+import {useLifeCycle, usePageProvider, useTool} from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import {uid} from '../../utils/uid'
 import {Row, Col} from 'jetlinks-ui-components'
 import {request as axiosRequest} from "@jetlinks-web/core/src/request";
-import {map, sum, ceil, cloneDeep} from "lodash-es";
 
 export default defineComponent({
     name: 'InfoLayout',
@@ -140,23 +139,6 @@ export default defineComponent({
             }
         }
 
-        // const getChildren = (arr: any[], column: number) => {
-        //     const list = cloneDeep(arr)
-        //     list.forEach((item, index) => {
-        //         if (item.componentProps.span > column) {
-        //             item.componentProps.span = column
-        //         } else {
-        //             const _sum = sum(map(arr.slice(0, index + 1), 'componentProps.span'))
-        //             const _ceil = ceil(_sum / column)
-        //             const _nextSpan = arr?.[index + 1]?.componentProps?.span
-        //             if((_ceil*column - _sum < _nextSpan && _ceil*column - _sum !== 0) || !_nextSpan) {
-        //                 item.componentProps.span = _ceil*column - _sum + item.componentProps.span
-        //             }
-        //         }
-        //     })
-        //     return list
-        // }
-
         const infoItemRender = (item: any) => {
             const isBordered = item?.componentProps?.bordered
             if (item.children?.length) {
@@ -168,7 +150,7 @@ export default defineComponent({
                                     class={unref(isDragArea) && 'drag-area'}
                                     data={i}
                                     tag="div"
-                                    hasCopy={true}
+                                    hasCopy={false}
                                     hasDel={true}
                                     parent={item.children}
                                 >
@@ -198,7 +180,7 @@ export default defineComponent({
                                                         class={unref(isDragArea) && 'drag-area'}
                                                         data={_item}
                                                         tag="div"
-                                                        hasCopy={true}
+                                                        hasCopy={false}
                                                         hasDel={true}
                                                         parent={_item.children}
                                                     >
@@ -228,7 +210,7 @@ export default defineComponent({
                         class={unref(isDragArea) && 'drag-area'}
                         data={item}
                         tag="div"
-                        hasCopy={true}
+                        hasCopy={false}
                         hasDel={true}
                         parent={unref(list)}
                         style={{
@@ -259,14 +241,13 @@ export default defineComponent({
 
         onBeforeMount(() => {
             if (isEditModel.value) {
-                designer.dependencies.value[props.data.key] = props.data.name || props.data.key
+                designer.dependencies.value[props.data.key] = props.data?.name || props.data?.key
             }
         })
 
         return () => {
             return (
-                <Selection {...useAttrs()} hasDel={true} hasCopy={true} hasDrag={true} data={props.data}
-                           parent={props.parent}>
+                <Selection {...useAttrs()} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
                     {infoRender()}
                     {
                         unref(isEditModel) &&
@@ -280,85 +261,3 @@ export default defineComponent({
         }
     }
 })
-
-
-{/*{*/
-}
-{/*    item.children?.length ? <Row style={{*/
-}
-{/*        borderLeft: item?.componentProps?.bordered ? '#e5e5e5 solid 1px' : 'none'*/
-}
-{/*    }}>*/
-}
-{/*        {*/
-}
-{/*            item.children.map((i: any, index: number) => {*/
-}
-{/*                return <Col span={24 / item?.componentProps?.column * i?.componentProps?.span} >*/
-}
-{/*                    <Selection*/
-}
-{/*                        class={unref(isDragArea) && 'drag-area'}*/
-}
-{/*                        data={i}*/
-}
-{/*                        tag="div"*/
-}
-{/*                        hasCopy={true}*/
-}
-{/*                        hasDel={true}*/
-}
-{/*                        parent={item.children}*/
-}
-{/*                    >*/
-}
-{/*                        <div style={item?.componentProps?.bordered ? handleBorder(item?.componentProps?.column, i?.componentProps?.span, index) : {*/
-}
-{/*                            display: 'flex',*/
-}
-{/*                            alignItems: 'center',*/
-}
-{/*                        }}>*/
-}
-{/*                            <div*/
-}
-{/*                                style={item?.componentProps?.bordered ? borderStyle(i?.componentProps?.labelWidth) : { padding: '16px 24px', width: `${i?.componentProps?.labelWidth}px` }}*/
-}
-{/*                                class={!item?.componentProps?.bordered && "info-label"}*/
-}
-{/*                            >*/
-}
-{/*                                {i.componentProps?.label}*/
-}
-{/*                            </div>*/
-}
-{/*                            <Selection data={i} tag="div" class={unref(isDragArea) && 'drag-area'}>*/
-}
-{/*                                <DraggableLayout*/
-}
-{/*                                    data-layout-type={'info-item-item-item'}*/
-}
-{/*                                    data={i?.children || []}*/
-}
-{/*                                    parent={i}*/
-}
-{/*                                />*/
-}
-{/*                            </Selection>*/
-}
-{/*                        </div>*/
-}
-{/*                    </Selection>*/
-}
-{/*                </Col>*/
-}
-{/*            })*/
-}
-{/*        }*/
-}
-{/*    </Row>*/
-}
-{/*        : emptyRender()*/
-}
-{/*}*/
-}

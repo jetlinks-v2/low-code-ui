@@ -6,12 +6,12 @@ const useCheck = (validateData: any) => {
     const errorMap = new Map()
 
     // const noCheckArr = ['root']
-    const nameCheckArr = ['text', 'button', 'dropdown', 'tag', 'form', 'steps', 'info', 'timeline', 'card', 'inline']
+    const nameCheckArr = ['text', 'button', 'dropdown', 'tag', 'form', 'steps', 'info', 'timeline', 'card', 'inline', 'tabs']
 
     const checkedConfigItem = (node: ISchema) => {
         const obj = {
             key: node?.key,
-            message: (node.formItemProps?.label || node.name) + '配置错误'
+            message: node.name + '配置错误'
         }
         const _type = node.type || 'root'
         if (_type === 'root' && node.componentProps?.isPage) {
@@ -62,6 +62,10 @@ const useCheck = (validateData: any) => {
             }
             // 表格
             if(_type === 'proTable' && !node.componentProps?.columns?.length){
+                return obj
+            }
+            // tabs
+            if(_type === 'tabs-item' && !node.componentProps?.name){
                 return obj
             }
         }
