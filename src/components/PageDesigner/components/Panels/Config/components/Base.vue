@@ -1,6 +1,6 @@
 <template>
   <div>
-    <template v-if="!['steps-item', 'info-item', 'info-item-item', 'card-item', 'timeline-item'].includes(target.type)">
+    <template v-if="!['steps-item', 'info-item', 'info-item-item', 'card-item', 'timeline-item', 'tabs-item'].includes(target.type)">
       <j-form-item
           label="名称"
           name="name"
@@ -448,6 +448,37 @@
         <j-slider v-model:value="target.componentProps.size" @change="onDataChange" />
       </j-form-item>
     </template>
+    <template v-if="['tabs'].includes(target.type)">
+      <j-form-item
+          :validateFirst="true"
+          :name="['componentProps', 'type']"
+          label="切卡样式"
+      >
+        <CheckButton
+            :options="[
+              { label: '线框', value: 'line' },
+              { label: '卡片', value: 'card' },
+            ]"
+            @change="onDataChange"
+            v-model:value="target.componentProps.type"
+        />
+      </j-form-item>
+    </template>
+    <template v-if="['tabs-item'].includes(target.type)">
+      <j-form-item
+          label="标题"
+          name="name"
+          required
+          :validateFirst="true"
+      >
+        <j-input
+            placeholder="请输入"
+            @change="onDataChange"
+            :maxlength="32"
+            v-model:value="target.componentProps.name"
+        />
+      </j-form-item>
+    </template>
   </div>
 </template>
 
@@ -460,6 +491,7 @@ import Action from './ProTable/Action/index.vue';
 import Steps from './Steps/index.vue'
 import { ColorPicker } from "jetlinks-ui-components";
 import { useTarget } from "../../../../hooks";
+import {CheckButton} from "@LowCode/components/index";
 
 const { target } = useTarget();
 

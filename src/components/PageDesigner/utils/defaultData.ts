@@ -154,6 +154,17 @@ export const layout: ISchema[] = [
         ],
         componentProps: {},
     },
+    {
+        type: 'tabs',
+        name: '选项卡',
+        children: [],
+        componentProps: {
+            type: 'line',
+            tabPosition: 'top',
+            align: 'top',
+            hidden: false
+        }
+    },
 ]
 
 export const _function: ISchema[] = [

@@ -1,8 +1,5 @@
 import {useLifeCycle, useTool} from "../../hooks"
-import generatorData from "../../utils/generatorData"
-import {uid} from "../../utils/uid"
 import Selection from '../Selection/index'
-import {withModifiers} from 'vue'
 import {Timeline, TimelineItem} from 'jetlinks-ui-components'
 import DraggableLayout from "./DraggableLayout"
 import {omit} from "lodash-es"
