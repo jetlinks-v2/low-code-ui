@@ -1,6 +1,6 @@
 import {ISchema} from "../typings";
 import useTool from './useTool'
-const useCheck = () => {
+const useCheck = (validateData: any) => {
     const designer: any = inject('PageDesigner')
     const { getFormList } = useTool()
     const errorMap = new Map()
@@ -96,8 +96,10 @@ const useCheck = () => {
     // 校验
     const onValidate = async () => {
         return new Promise(async (resolve, reject) => {
-            const resp: any = await checkedConfig(designer.pageData.value);
-            designer.errorKey.value = resp;
+            const resp: any = await checkedConfig(validateData || designer.pageData.value);
+            if (designer?.errorKey) {
+              designer.errorKey.value = resp;
+            }
             if (resp?.length) {
                 reject(resp);
             } else {

@@ -7,6 +7,7 @@
 <script setup name="projectTree">
 import { useProduct } from '@LowCode/store'
 import { Menu } from '@LowCode/components/index'
+import { getMenus } from '@LowCode/utils/project'
 
 const emit = defineEmits(['change'])
 const product = useProduct()
@@ -15,14 +16,8 @@ const list = ref([])
 
 const getTree = () => {
   const maps = product.getDataMap()
-  const copyData = JSON.parse(JSON.stringify([...maps.values()]))
 
-  list.value = copyData.filter(item => {
-    return item.others && item.others?.menu && item.others?.menu.main
-  }).map(item => {
-    item.parentFullId = maps.get(item.parentId).fullId || item.parentId
-    return item
-  })
+  list.value = getMenus(maps)
 }
 
 const change = (data) => {
