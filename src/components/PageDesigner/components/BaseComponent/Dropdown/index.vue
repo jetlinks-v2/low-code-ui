@@ -2,37 +2,36 @@
   <div>
     <j-space v-if="visible && _item.key">
       <j-popconfirm v-if="_item?.buttonType === 'Popconfirm'" :title="_item.event?.title" @confirm="onConfirm">
-        <j-button  v-bind="omit(_item,['key','text','icon'])">
+        <j-button v-bind="omit(_item, ['key', 'text', 'icon'])">
           <template #icon v-if="_item?.icon">
             <AIcon :type="_item?.icon"></AIcon>
           </template>
           {{ _item?.text }}
         </j-button>
       </j-popconfirm>
-      <j-button  v-else v-bind="omit(_item,['key','text','icon'])" @click="onClick">
-          <template #icon v-if="_item?.icon">
-            <AIcon :type="_item?.icon"></AIcon>
-          </template>
-          {{ _item?.text  }}
-        </j-button>
-      <j-button type="link" @click="reload"
-                >
-                <AIcon type="RedoOutlined" />
-                重选</j-button
-            >
+      <j-button v-else v-bind="omit(_item, ['key', 'text', 'icon'])" @click="onClick">
+        <template #icon v-if="_item?.icon">
+          <AIcon :type="_item?.icon"></AIcon>
+        </template>
+        {{ _item?.text }}
+      </j-button>
+      <j-button type="link" @click="reload">
+        <AIcon type="RedoOutlined" />
+        重选
+      </j-button>
     </j-space>
     <j-dropdown v-else>
       <j-button v-bind="omit(props, ['icon', 'text'])">{{ text }}</j-button>
       <template #overlay>
         <j-menu @click="handleMenuClick">
           <j-menu-item v-for="item in menu" :key="item?.key">
-            <j-button v-bind="omit(item, ['key', 'text','icon'])">
+            <j-button v-bind="omit(item, ['key', 'text', 'icon'])">
               <template #icon v-if="item?.icon">
                 <AIcon :type="item?.icon"></AIcon>
               </template>
-            {{
-              item?.text
-            }}</j-button>
+              {{
+                item?.text
+              }}</j-button>
           </j-menu-item>
         </j-menu>
       </template>
@@ -93,67 +92,74 @@ const props = defineProps({
   },
 });
 
-const selectConfig:any = inject('selectConfig')
+const selectConfig: any = inject('selectConfig')
 const visible = ref(false)
 const _item = ref()
 
 const comVisible = ref(false)
 
 const setVisible = (val: boolean) => {
-    comVisible.value = val;
+  comVisible.value = val;
 };
 
-const handleMenuClick = (e :any) =>{
-  const val = props.menu.find(i=>i.key === e.key);
+const handleMenuClick = (e: any) => {
+  const val = props.menu.find(i => i.key === e.key);
   visible.value = true
   _item.value = val
   selectConfig.showSelect()
 }
-const reload = () =>{
+const reload = () => {
   visible.value = false
   selectConfig.closeSelect()
 }
 
 const defaultParams = () => {
-    try {
-        return JSON.parse(_item.value?.event?.defaultParams)
-    } catch (e) {
-        return undefined
-    }
+  try {
+    return JSON.parse(_item.value?.event?.defaultParams)
+  } catch (e) {
+    return undefined
+  }
 }
 
 const handleRequestFn = async () => {
-    const config = _item.value?.event
-    if (_item.value?.event?.query) {
-      const  selectKeys = selectConfig.getSelectKeys()
-        const paramsData = {
-          selectKeys,
-          ...defaultParams(),
-        }
-        try {
-            const resp = await axiosRequest[config.methods](config.query, paramsData)
-            if (config.click) {
-                const handleResultFn = new Function('result','onlyMessage', config.click)
-                handleResultFn(resp.result,onlyMessage)
-            } 
-        } catch (e) {
-            console.error(e)
-        }
+  const config = _item.value?.event
+  if (_item.value?.event?.query) {
+    const selectKeys = selectConfig.getSelectKeys()
+    const paramsData = {
+      // selectKeys,
+      ...defaultParams(),
+      terms: [
+            {
+              "type": "or",
+              "value": selectKeys,
+              "termType": "in",
+              "column": "id"
+            }
+          ]
     }
+    try {
+      const resp = await axiosRequest[config.methods](config.query, paramsData)
+      if (config.click) {
+        const handleResultFn = new Function('result', 'onlyMessage', config.click)
+        handleResultFn(resp.result, onlyMessage)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
 }
 
 const onClick = () => {
-    if (_item?.value.buttonType === 'Button') {
-        handleRequestFn()
-    } else {
-        setVisible(true)
-    }
+  if (_item?.value.buttonType === 'Button') {
+    handleRequestFn()
+  } else {
+    setVisible(true)
+  }
 };
 
 const onConfirm = () => {
-    handleRequestFn()
+  handleRequestFn()
 };
 </script>
 
-<style lang="less" scoped>
-</style>
+<style lang="less" scoped></style>

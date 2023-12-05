@@ -15,7 +15,7 @@
         label="依赖项"
         name="dependencies"
       >
-        <j-select
+        <a-auto-complete
             v-model:value="formModel.dependencies"
             placeholder="请选择依赖项"
             :options="options"
