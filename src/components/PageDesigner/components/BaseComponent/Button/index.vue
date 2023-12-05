@@ -16,7 +16,7 @@
     <Modal v-if="visible && buttonConfig?.type === 'Modal'" :button-config="buttonConfig" @close="setVisible(false)" />
     <Drawer v-if="visible && buttonConfig?.type === 'Drawer'" :button-config="buttonConfig" @close="setVisible(false)" />
 </template>
-  
+
 <script lang="ts" setup name="Button">
 import { omit } from "lodash-es";
 import { PropType, ref } from "vue";
@@ -25,6 +25,7 @@ import Drawer from './buttonDrawer.vue'
 import { request as axiosRequest } from "@jetlinks-web/core/src/request";
 import {usePageProvider} from "@LowCode/components/PageDesigner/hooks";
 import {useRouter} from 'vue-router'
+import { useMenuStore } from '@LowCode/store'
 
 const props = defineProps({
     text: {
@@ -76,6 +77,7 @@ const props = defineProps({
 const pageProvider = usePageProvider()
 const route = useRoute()
 const router = useRouter()
+const menu = useMenuStore()
 
 const visible = ref(false)
 
@@ -101,14 +103,15 @@ const handleRequestFn = async () => {
             if (config.click) {
                 const handleResultFn = new Function('context', 'route', 'router', 'result', config.click)
                 handleResultFn(pageProvider.context, route, router, resp)
-            } 
+            }
         } catch (e) {
             console.error(e)
         }
     } else {
       if (config.click) {
-        const handleResultFn = new Function('context', 'route', 'router', config.click)
-        handleResultFn(pageProvider.context, route, router)
+        const handleResultFn = new Function('context', 'route', 'jumpPageByCode', config.click)
+        console.log(menu)
+        handleResultFn(pageProvider.context, route, menu.jumpPageByCode)
       }
     }
 }
