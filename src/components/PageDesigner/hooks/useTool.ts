@@ -29,10 +29,15 @@ const useTool = () => {
         let menu = {}
         if (unref(designer.pageData).componentProps.isPage) {
             menu = {
+                main: true,
                 name: unref(designer.pageData).componentProps?.pageName,
                 icon: unref(designer.pageData).componentProps?.pageIcon,
                 code: unref(designer.pageData).componentProps?.pageCode,
             }
+        } else {
+          menu = {
+            main: false
+          }
         }
         const obj = {
             ...unref(designer.data),
@@ -42,7 +47,7 @@ const useTool = () => {
             },
             others: {
                 ...designer.data.others,
-                ...menu
+                menu
             }
         };
 

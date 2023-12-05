@@ -285,6 +285,7 @@ const validateAll = async (id, cb) => {
     validateContent.key = item.id + '_' + new Date().getTime()
     nextTick(async () => {
       setTimeout(() => {
+        console.log(validateRef.value)
         validateRef.value.validate().then(ref => {
           status[item.id] = 2
           handleStatusItem(item.id, 2, [] )

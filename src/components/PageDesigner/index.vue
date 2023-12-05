@@ -48,9 +48,8 @@ const copyData = ref<any[]>([]);
 const dependencies = ref({}) // 依赖项
 const errorKey = ref<any[]>([]);
 const spinning = ref<boolean>(false);
-const { onValidate } = useCheck()
 
-provide("PageDesigner", {
+const designerData = {
   data: props.data,
   model,
   pageData,
@@ -64,7 +63,11 @@ provide("PageDesigner", {
   pageValue: props.pageValue,
   errorKey,
   spinning
-});
+}
+
+provide("PageDesigner", designerData);
+
+const { onValidate } = useCheck(designerData)
 
 watch(
   () => props.data,
