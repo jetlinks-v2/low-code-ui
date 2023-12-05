@@ -2,7 +2,7 @@
   <template v-if="!isEmpty">
     <ListPage v-if="showList" :data="data" :show="true" :projectId="route.params.project" :pageId="route.params.id" />
     <HtmlPage v-if="showHtml" :code="data" />
-    <PageView v-if="showPage" :data="data ? JSON.parse(data) : {}" />
+    <PageView v-if="showPage" :key="route.params.id + '_' +route.params.sid" :data="data ? JSON.parse(data) : {}" />
   </template>
   <template v-else>
     <Result status="404" title="404"></Result>
@@ -58,9 +58,13 @@ const getInfo = async () => {
   })
 }
 
-if (route.name === 'preview') {
-  getInfo()
-}
+
+
+watch(() => route.params.sid, () => {
+  if (route.name === 'preview') {
+    getInfo()
+  }
+}, { immediate: true })
 
 </script>
 
