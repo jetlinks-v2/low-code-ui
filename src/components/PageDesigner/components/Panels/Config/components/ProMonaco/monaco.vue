@@ -51,7 +51,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value', 'change'])
 
 const myValue = ref(props.value)
 const myTipCode = ref(props.tipCode)
@@ -65,6 +65,7 @@ const registrationTypescript = computed(() => {
 
 const change = () => {
   emit('update:value', myValue.value)
+  emit('change', myValue.value)
 }
 
 </script>
