@@ -65,6 +65,7 @@
                       @errorChange="onErrorChange"
                       v-model="formState.mountedCode"
                       language="javascript"
+                      key="mounted"
                   />
                 </div>
                 <div style="height: 300px; width: 300px">
@@ -92,6 +93,7 @@
                     @errorChange="onErrorChange"
                     v-model="formState.okCode"
                     language="javascript"
+                    key="ok"
                 />
               </div>
               <div style="height: 300px; width: 300px">
@@ -235,7 +237,7 @@ watchEffect(() => {
 const onSave = async () => {
   formRef.value?.validate().then((res: any) => {
     if (res) {
-      console.log('======', _error.value)
+      // console.log('======', _error.value)
       if (!_error.value?.length) {
         emits("update:value", formState);
         emits("change", formState);

@@ -11,6 +11,7 @@ import CommonLayout from './CommonLayout';
 import InlineLayout from './InlineLayout';
 import SearchLayout from './SearchLayout'
 import CardLayout from './CardLayout';
+import TabsLayout from './TabsLayout';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -55,6 +56,8 @@ const DraggableLayout = defineComponent({
                         return (<SearchLayout data={element} parent={props.data} />)
                     case 'card':
                         return (<CardLayout data={element} parent={props.data} />)
+                    case 'tabs':
+                        return (<TabsLayout data={element} parent={props.data} />)
                     default:
                         return <CommonLayout data={element} parent={props.data} />
                 }
