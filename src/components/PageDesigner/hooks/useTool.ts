@@ -10,7 +10,7 @@ const useTool = () => {
     const delVisible = ref<boolean>(false)
     const product = useProduct();
     const pageDesigner = usePageDesigner();
-    const _noCopyData = ['steps-item', 'info-item', 'info-item-item', 'timeline-item', 'inline-item', 'card-item', 'tabs-item']
+    const _noCopyData = ['steps-item', 'info-item', 'info-item-item', 'info-item-item-item', 'timeline-item', 'inline-item', 'card-item', 'tabs-item']
 
     const isEditModel = computed(() => {
         return unref(designer?.model) === 'edit'
