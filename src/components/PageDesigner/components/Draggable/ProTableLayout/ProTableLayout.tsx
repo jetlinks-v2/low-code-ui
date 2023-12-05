@@ -126,7 +126,7 @@ export default defineComponent({
                                                 type: item.event?.pageType || 'form',
                                                 code: item.event?.pageData,
                                                 title:  item.event?.title || item?.text,
-                                                mountedCode: item.event?.mountedCode,
+                                                createdCode: item.event?.createdCode,
                                                 okCode: item.event?.okCode,
                                                 modalType: item.event?.type || 'modal',
                                             }
@@ -137,8 +137,8 @@ export default defineComponent({
                             } else {
                                 return <Tooltip title={item?.text}><Button type='link' {..._props} onClick={() => {
                                     if (item.event?.okCode && !unref(isEditModel)) {
-                                        const handleResultFn = new Function('record', 'axios', 'refs', item.event?.okCode)
-                                        handleResultFn(_record, axiosRequest, {
+                                        const handleResultFn = new Function('record', 'route', 'axios', 'refs', item.event?.okCode)
+                                        handleResultFn(_record, axiosRequest, route, {
                                             tableRef
                                         })
                                     }
@@ -328,7 +328,7 @@ export default defineComponent({
                                                 type: item.event?.pageType || 'form',
                                                 code: item.event?.pageData,
                                                 title: item?.text,
-                                                mountedCode: item.event?.mountedCode,
+                                                createdCode: item.event?.createdCode,
                                                 okCode: item.event?.okCode,
                                                 modalType: item.event?.type || 'modal',
                                             }
@@ -346,8 +346,8 @@ export default defineComponent({
                                     },
                                     onClick: () => {
                                         if (item.event?.okCode && !unref(isEditModel)) {
-                                            const handleResultFn = new Function('record', 'axios', 'refs', item.event?.okCode)
-                                            handleResultFn(_record, axiosRequest, {
+                                            const handleResultFn = new Function('record', 'route', 'axios', 'refs', item.event?.okCode)
+                                            handleResultFn(_record, axiosRequest, route, {
                                                 tableRef
                                             })
                                         }
