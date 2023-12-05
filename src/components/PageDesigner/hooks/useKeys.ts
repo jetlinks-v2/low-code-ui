@@ -30,7 +30,7 @@ const useKeys = (canvasRef: any) => {
         () => [keys?.['Ctrl+C']?.value, keys?.['Meta+C']?.value],
         ([v1, v2]) => {
             if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
-                onCopy?.()
+                onCopy?.(designer?.data?.id)
             }
         },
     )
@@ -39,7 +39,7 @@ const useKeys = (canvasRef: any) => {
         () => [keys?.['Ctrl+X']?.value, keys?.['Meta+X']?.value],
         ([v1, v2]) => {
             if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
-                onShear?.()
+                onShear?.(designer?.data?.id)
             }
         },
     )
@@ -48,7 +48,7 @@ const useKeys = (canvasRef: any) => {
         () => [keys?.['Ctrl+V']?.value, keys?.['Meta+V']?.value],
         ([v1, v2]) => {
             if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
-                onPaste?.()
+                onPaste?.(designer?.data?.id)
             }
         },
     )

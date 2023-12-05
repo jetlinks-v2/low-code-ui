@@ -86,7 +86,7 @@ const Canvas = defineComponent({
               backgroundSize: 'cover'
             }}
           >
-            { isEditModel.value && !!designer.copyData.value.length ? renderChildren() : renderContent()}
+            { isEditModel.value ? renderChildren() : renderContent()}
           </div>
         </PageProvider>
       )

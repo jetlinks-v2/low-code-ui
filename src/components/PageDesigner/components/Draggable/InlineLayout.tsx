@@ -62,7 +62,7 @@ export default defineComponent({
                                                     hasDel={unref(list).length > 1}
                                                     data={element}
                                                     tag="div"
-                                                    hasCopy={true}
+                                                    hasCopy={false}
                                                     parent={unref(list)}
                                                 >
                                                     <DraggableLayout

@@ -10,6 +10,7 @@ import '../index.less'
 import {Card} from '@LowCode/components'
 import {get} from "lodash-es";
 import ProTableModal from './Modal';
+import dayjs from 'dayjs'
 
 export default defineComponent({
     name: 'ProTableLayout',
@@ -223,13 +224,12 @@ export default defineComponent({
 
         const handleFn = (code: string, _record: any) => {
             if (!code) return ''
-            const handleResultFn = new Function('record', code)
-            return handleResultFn.call(this, _record)
+            const handleResultFn = new Function('record', 'util', code)
+            return handleResultFn(_record, { dayjs })
         }
 
         const onSelectChange = (item: any,state: boolean) => {
             const arr = new Set(_selectedRowKeys.value);
-            // console.log(item, state);
             if (state) {
                 arr.add(item.id);
             } else {
