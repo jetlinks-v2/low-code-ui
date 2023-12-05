@@ -30,7 +30,7 @@ import PageView from '../../../preview.vue'
 import FormView from '@LowCode/components/FormDesigner/preview.vue'
 import { providerEnum } from "@LowCode/components/ProJect";
 import {usePageProvider} from "@LowCode/components/PageDesigner/hooks";
-
+import { useRouter } from 'vue-router';
 
 const props = defineProps({
     buttonConfig: {
@@ -41,6 +41,7 @@ const emit = defineEmits(['close'])
 const confirmLoading = ref(false)
 const pageProvider = usePageProvider()
 const route = useRoute()
+const router = useRouter()
 
 const type = computed(() => props.buttonConfig?.created?.resource?.type)
 const _value = ref({})
@@ -66,8 +67,8 @@ const handleRequestFn = async (data) => {
                 ...data
             })
             if (config.ok) {
-              const handleResultFn = new Function('context', 'route', 'result', config.ok)
-              handleResultFn(pageProvider.context, route, resp)
+              const handleResultFn = new Function('context',  'route','router', 'result', config.ok)
+              handleResultFn(pageProvider.context, route, router, resp)
             }
         } catch (e) {
             console.error(e)

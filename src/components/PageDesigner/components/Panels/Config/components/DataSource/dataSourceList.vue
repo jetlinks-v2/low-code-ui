@@ -36,7 +36,7 @@ const handleQuery = (arr) => {
   arr.forEach((item) => {
     if (item.command) {
       item.command.forEach((i) => {
-        const url = `low-code/runtime/${item.moduleId}.${item.id}/${i.id}`
+        const url = `low-code/runtime/${info.id}/${info.id}.${item.moduleId}.${item.id}/${i.id}`
         const label = `${item.moduleName}-${item.name}-${i.name}`
         commandMap.set(url, {
           label: label,

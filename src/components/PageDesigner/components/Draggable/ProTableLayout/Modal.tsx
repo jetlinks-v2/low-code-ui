@@ -4,6 +4,7 @@ import {request as axiosRequest} from '@jetlinks-web/core'
 import PagePreview from "@LowCode/components/PageDesigner/preview.vue";
 import FormPreview from "@LowCode/components/FormDesigner/preview.vue";
 import {useTool} from "@LowCode/components/PageDesigner/hooks";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
     name: 'ProTableModal',
@@ -17,9 +18,10 @@ export default defineComponent({
     },
     emits: ['save', 'close'],
     setup(props, {emit}) {
-        const {modalType, type, code, title, data, mountedCode, okCode} = props?.data
+        const {modalType, type, code, title, data, createdCode, okCode, width, footerVisible} = props?.data
         const {isEditModel} = useTool()
         const route = useRoute()
+        const router = useRouter()
         const formRef = ref()
         const pageRef = ref()
         const myValue = ref()
@@ -27,15 +29,18 @@ export default defineComponent({
         const config = computed(() => {
             return JSON.parse(code || '{}')
         })
-        const onMountedFn = (code?: string) => {
+
+        const onCreatedFn = (code?: string) => {
             if (code && !isEditModel.value) {
                 const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
-                const fn = new Function('record', 'axios', 'route', 'refs', code)
-                fn(data || {}, axiosRequest, route, _refs)
+                const fn = new Function('record', 'axios', 'route', 'router', 'refs', code)
+                fn(data || {}, axiosRequest, route, router, _refs)
             }
         }
 
-       
+        // onMounted(() => {
+            onCreatedFn(createdCode)
+        // })
 
         const renderChildren = () => {
             if (type === 'page') {
@@ -52,9 +57,9 @@ export default defineComponent({
 
         const onSave = async () => {
             if (!okCode) return
-            const handleResultFn = new Function('axios', 'route', 'refs', okCode)
+            const handleResultFn = new Function('axios', 'route', 'router', 'refs', okCode)
             const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
-            const resp = await handleResultFn(axiosRequest, route,  _refs)
+            const resp = await handleResultFn(axiosRequest, route, router,  _refs)
             if (resp) {
                 emit('save', true)
             }
@@ -75,7 +80,7 @@ export default defineComponent({
                 return <Modal
                     visible
                     title={title}
-                    width={700}
+                    width={width}
                     onOk={onSave}
                     onCancel={onCancel}
                 >
@@ -85,17 +90,14 @@ export default defineComponent({
                 return <Drawer
                     visible
                     title={title}
-                    footer={footerContent()}
+                    width={width}
+                    footer={footerVisible && footerContent()}
                     onClose={onCancel}
                 >
                     {renderChildren()}
                 </Drawer>
             }
         }
-
-        onMounted(() => {
-            onMountedFn(mountedCode)
-        })
 
         return () => {
             return renderContent()

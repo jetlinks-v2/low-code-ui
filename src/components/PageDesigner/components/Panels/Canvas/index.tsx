@@ -42,7 +42,7 @@ const Canvas = defineComponent({
       if(!unref(isEditModel) && designer.pageData.value?.componentProps?.mountedCode){
         // TODO: 参数问题需要解决
         let customFn = new Function(designer.pageData.value?.componentProps?.mountedCode)
-        customFn.call()
+        customFn()
       }
     })
 

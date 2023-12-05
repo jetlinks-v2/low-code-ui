@@ -74,7 +74,6 @@
 
 <script lang="ts" setup name="SearchConfig">
 import { ref, watchEffect } from "vue";
-import { componentType } from "jetlinks-ui-components/es/Search/setting";
 import { uid } from "../../../../../utils/uid";
 import { cloneDeep } from "lodash-es";
 import Modal from "./Modal.vue";
@@ -95,12 +94,40 @@ const props = defineProps({
 const emits = defineEmits(["save", "close"]);
 const dataSource = ref(props.data);
 
-const options = Object.keys(componentType).map((i) => {
-  return {
-    label: i,
-    value: i,
-  };
-});
+const options = [
+  {
+    label: '输入框',
+    value: 'input',
+  },
+  {
+    label: '选择框',
+    value: 'select',
+  },
+  {
+    label: '数字输入框',
+    value: 'inputNumber',
+  },
+  {
+    label: '时间选择',
+    value: 'time',
+  },
+  {
+    label: '日期选择',
+    value: 'date',
+  },
+  {
+    label: '时间范围选择',
+    value: 'timeRange',
+  },
+  {
+    label: '日期范围选择',
+    value: 'rangePicker',
+  },
+  {
+    label: '树选择',
+    value: 'treeSelect',
+  },
+]
 
 const tableRef = ref<any>();
 
