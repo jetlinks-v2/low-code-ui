@@ -11,6 +11,7 @@ import {Card} from '@LowCode/components'
 import {get} from "lodash-es";
 import ProTableModal from './Modal';
 import dayjs from 'dayjs'
+import { useRouter } from "vue-router";
 
 export default defineComponent({
     name: 'ProTableLayout',
@@ -32,6 +33,7 @@ export default defineComponent({
         const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
         const tableRef = ref()
         const route = useRoute()
+        const router = useRouter()
         const isSelect = ref(false)
         const _selectedRowKeys = ref([])
         const showSelect = () =>{
@@ -137,8 +139,8 @@ export default defineComponent({
                             } else {
                                 return <Tooltip title={item?.text}><Button type='link' {..._props} onClick={() => {
                                     if (item.event?.okCode && !unref(isEditModel)) {
-                                        const handleResultFn = new Function('record', 'route', 'axios', 'refs', item.event?.okCode)
-                                        handleResultFn(_record, axiosRequest, route, {
+                                        const handleResultFn = new Function('record', 'axios', 'route', 'router', 'refs', item.event?.okCode)
+                                        handleResultFn(_record, axiosRequest, route, router, {
                                             tableRef
                                         })
                                     }
@@ -346,8 +348,8 @@ export default defineComponent({
                                     },
                                     onClick: () => {
                                         if (item.event?.okCode && !unref(isEditModel)) {
-                                            const handleResultFn = new Function('record', 'route', 'axios', 'refs', item.event?.okCode)
-                                            handleResultFn(_record, axiosRequest, route, {
+                                            const handleResultFn = new Function('record', 'axios', 'route', 'router', 'refs', item.event?.okCode)
+                                            handleResultFn(_record, axiosRequest, route, router, {
                                                 tableRef
                                             })
                                         }
