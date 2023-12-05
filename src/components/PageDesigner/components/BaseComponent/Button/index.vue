@@ -109,9 +109,10 @@ const handleRequestFn = async () => {
         }
     } else {
       if (config.click) {
-        const handleResultFn = new Function('context', 'route', 'jumpPageByCode', config.click)
-        console.log(menu)
-        handleResultFn(pageProvider.context, route, menu.jumpPageByCode)
+        const handleResultFn = new Function('context', 'route', 'jumpPageByCode','axios','refs', config.click)
+        handleResultFn(pageProvider.context, route, menu.jumpPageByCode, axiosRequest,{
+            slots: pageProvider.slots,
+        })
       }
     }
 }

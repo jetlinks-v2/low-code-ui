@@ -1,21 +1,23 @@
 <template>
     <j-modal visible title="事件处理" width="800px" @ok="onSave" @cancel="onCancel">
         <j-form layout="vertical" ref="formRef" :model="formModel">
-            <j-form-item label="数据源" name="query" >
-                <j-input v-model:value="formModel.query" placeholder="请输入数据源地址">
-                    <template #addonBefore>
-                        <j-select v-model:value="formModel.methods" style="width: 100px;" :options="[
-                            { label: 'GET', value: 'get' },
-                            { label: 'POST', value: 'post' },
-                            { label: 'PUT', value: 'put' },
-                            { label: 'PATCH', value: 'patch' },
-                            { label: 'DELETE', value: 'remove' },
-                        ]" />
-                    </template>
-                </j-input>
+            <j-form-item label="数据源" name="query">
+                <div class="query">
+                    <j-select v-model:value="formModel.methods" :options="[
+                        { label: 'GET', value: 'get' },
+                        { label: 'POST', value: 'post' },
+                        { label: 'PUT', value: 'put' },
+                        { label: 'PATCH', value: 'patch' },
+                        { label: 'DELETE', value: 'remove' },
+                    ]" style="width: 100px;" />
+                    <DataSourceList v-model:value="formModel.query" />
+                </div>
+            </j-form-item>
+            <j-form-item v-if="formModel.queryParams && formModel.queryParams?.length !== 0" label="路由参数" name="queryParams">
+                <Params v-model:queryParams="formModel.queryParams" />
             </j-form-item>
             <j-form-item label="默认参数" name="defaultParams">
-                <j-monaco-editor v-model="formModel.defaultParams" language="json" style="height: 160px" />
+                <ProMonaco v-model="formModel.defaultParams" language="json" style="height: 160px" :tipCode="tipCode_1" />
             </j-form-item>
             <template v-if="type === 'Button'">
                 <j-form-item label="点击事件" name="click">
@@ -60,6 +62,9 @@
 </template>
   
 <script setup name="ConfigModal">
+import DataSourceList from '../DataSource/dataSourceList.vue'
+import Params from '../DataSource/params.vue'
+import { ProMonaco } from '../ProMonaco'
 
 const props = defineProps({
     data: {
@@ -75,11 +80,12 @@ const props = defineProps({
 const emit = defineEmits(['save', 'cancel'])
 
 
-
+const tipCode_1 = `{"sorts": [{ "name": "createTime", "order": "desc" }], "terms": [] }`
 
 const formModel = reactive({
     query: props.data.query,
     defaultParams: props.data.defaultParams,
+    queryParams: props.data.queryParams,
     methods: props.data.methods || 'post',
     click: props.data.click,
     confirm: props.data.confirm,
@@ -118,5 +124,9 @@ const onCancel = () => {
 
 </script>
   
-<style scoped></style>
+<style scoped>
+.query {
+    display: flex;
+}
+</style>
   
