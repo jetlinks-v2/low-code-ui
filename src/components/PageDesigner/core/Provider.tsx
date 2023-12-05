@@ -41,9 +41,14 @@ export default defineComponent({
             context['page_route_query'] = route.query || {}
         }, { immediate: true })
 
+        watch(() => JSON.stringify(designer.pageValue || '{}'), () => {
+            context['page_value'] = designer.pageValue || {}
+        }, { immediate: true })
+
         onMounted(() => {
             designer.dependencies.value['page_route_params'] = 'page_route_params'
             designer.dependencies.value['page_route_query'] = 'page_route_query'
+            designer.dependencies.value['page_value'] = 'page_value'
         })
 
         provide(PageSymbol, pageEntity)

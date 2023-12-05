@@ -17,7 +17,7 @@ export default defineComponent({
     },
     emits: ['save', 'close'],
     setup(props, {emit}) {
-        const {modalType, type, code, title, data, mountedCode, okCode, width, footerVisible} = props?.data
+        const {modalType, type, code, title, data, createdCode, okCode, width, footerVisible} = props?.data
         const {isEditModel} = useTool()
         const route = useRoute()
         const formRef = ref()
@@ -27,13 +27,18 @@ export default defineComponent({
         const config = computed(() => {
             return JSON.parse(code || '{}')
         })
-        const onMountedFn = (code?: string) => {
+
+        const onCreatedFn = (code?: string) => {
             if (code && !isEditModel.value) {
                 const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
                 const fn = new Function('record', 'axios', 'route', 'refs', code)
                 fn(data || {}, axiosRequest, route, _refs)
             }
         }
+
+        // onMounted(() => {
+            onCreatedFn(createdCode)
+        // })
 
         const renderChildren = () => {
             if (type === 'page') {
@@ -91,10 +96,6 @@ export default defineComponent({
                 </Drawer>
             }
         }
-
-        onMounted(() => {
-            onMountedFn(mountedCode)
-        })
 
         return () => {
             return renderContent()

@@ -81,9 +81,9 @@
               >
               </j-select>
             </j-form-item>
-            <j-form-item label="页面onMounted" name="mountedCode">
-              <div>function onMounted(record, axios, route, refs)</div>
-              <ProMonaco :tipCode="defaultMountedCode" v-model:value="formState.mountedCode" language="javascript" style="height: 300px"/>
+            <j-form-item label="页面onCreated" name="createdCode">
+              <div>function onCreated(record, axios, route, refs)</div>
+              <ProMonaco :tipCode="defaultMountedCode" v-model:value="formState.createdCode" language="javascript" style="height: 300px"/>
             </j-form-item>
           </template>
           <template v-else>
@@ -93,10 +93,10 @@
           </template>
           <j-form-item label="确认事件" name="okCode">
             <div>{{
-                formState.type === 'confirm' ? 'function (record, axios, refs)' : 'function (axios, route, refs)'
+                formState.type === 'confirm' ? 'function (record, axios, refs)' : (formState.type !== 'common' ? 'function (axios, route, refs)' : 'function (record, route, axios, refs)')
               }}
             </div>
-            <ProMonaco :tipCode="defaultCode" v-model:value="formState.okCode" language="javascript" style="height: 300px"/>
+            <ProMonaco :tipCode="defaultCode" v-model:value="formState.okCode" language="javascript" style="height: 300px" />
           </j-form-item>
         </j-form>
       </div>
@@ -132,7 +132,7 @@ const formState = reactive({
   okCode: '', // 确认代码,
   pageType: '',
   width: 520,
-  mountedCode: '',
+  createdCode: '',
   pageData: undefined,
   pageCode: undefined,
   confirmText: "",
