@@ -6,13 +6,20 @@ export const useLifeCycle = (componentProps: any, refs: Record<string, Ref<any>>
 
     const pageProvider = usePageProvider()
     const route = useRoute()
+    const designer: any = inject('PageDesigner')
+
+    const setContext = (code: string,name:string,value:any) => {
+        pageProvider.context[code] = value
+        designer.dependencies[code] = name
+    }
     const onCreatedFn = (code?: string) => {
         if (code && !isEditModel.value) {
             const context = {
                 context: pageProvider.context,
                 axios: request,
                 route: route,
-                refs
+                refs,
+                setContext
             }
             const fn = new Function('context', code)
             fn(context)
