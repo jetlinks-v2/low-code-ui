@@ -2,13 +2,15 @@ import {cloneDeep, debounce, omit} from "lodash-es"
 import {appendChildItem, copyDataByKey, deleteDataByKey, handleCopyData} from "../utils/utils"
 import {Modal} from 'jetlinks-ui-components'
 import {uid} from "../utils/uid"
-import {useProduct} from "@LowCode/store";
+import {usePageDesigner, useProduct} from "@LowCode/store";
 import {providerEnum} from "@LowCode/components/ProJect";
 
 const useTool = () => {
     const designer: any = inject('PageDesigner')
     const delVisible = ref<boolean>(false)
     const product = useProduct();
+    const pageDesigner = usePageDesigner();
+    const _noCopyData = ['steps-item', 'info-item', 'info-item-item', 'timeline-item', 'inline-item', 'card-item', 'tabs-item']
 
     const isEditModel = computed(() => {
         return unref(designer?.model) === 'edit'
@@ -35,9 +37,9 @@ const useTool = () => {
                 code: unref(designer.pageData).componentProps?.pageCode,
             }
         } else {
-          menu = {
-            main: false
-          }
+            menu = {
+                main: false
+            }
         }
         const obj = {
             ...unref(designer.data),
@@ -110,16 +112,22 @@ const useTool = () => {
     }, 200)
 
     // 复制
-    const onCopy = () => {
+    const onCopy = (id: string) => {
         if (unref(isSelectedRoot) || designer.focused.value) return
-        designer.copyData.value = cloneDeep(designer.selected.value) || []
+        const arr = (cloneDeep(designer.selected.value) || []).filter((item: any) => {
+            return !_noCopyData.includes(item.type)
+        })
+        pageDesigner.setCopyData(id, arr);
     }
 
     // 剪切
-    const onShear = debounce(() => {
+    const onShear = debounce((id: string) => {
         if (unref(isSelectedRoot) || designer.focused.value) return
-        designer.copyData.value = cloneDeep(designer.selected.value) || []
-        const _data: any = deleteDataByKey(designer.pageData.value.children, designer.selected.value)
+        const arr = (cloneDeep(designer.selected.value) || []).filter((item: any) => {
+            return !_noCopyData.includes(item.type)
+        })
+        pageDesigner.setCopyData(id, arr);
+        const _data: any = deleteDataByKey(designer.pageData.value.children, arr)
         designer.pageData.value = {
             ...designer.pageData.value,
             children: _data?.arr || [],
@@ -128,18 +136,17 @@ const useTool = () => {
     }, 200)
 
     // 粘贴
-    const onPaste = () => {
+    const onPaste = (id: string) => {
         if (!designer.selected.value?.length || designer.focused.value) return
-        const list = (designer.copyData.value || []).map((item: any) => {
+        const obj = pageDesigner.getCopyData();
+        const list = (obj?.list || []).map((item: any) => {
             return {
                 ...item,
-                formItemProps: {
-                    ...item?.formItemProps,
-                    label: 'copy_' + item.formItemProps?.label,
-                    name: 'copy_' + item.formItemProps?.name
-                },
                 key: item.key + '_' + uid(),
                 children: handleCopyData(item?.children || []),
+                name: obj.key === id
+                    ? "copy_" + item?.name
+                    : item?.name,
             }
         })
         if (list.length && designer.selected.value?.length) {
@@ -149,7 +156,7 @@ const useTool = () => {
                 children: dt?.key === 'root' ? [...designer.pageData.value?.children, ...list] : copyDataByKey(designer.pageData.value?.children, list, dt),
             }
             setSelection(list?.[list.length - 1] || 'root')
-            designer.copyData.value = []
+            pageDesigner.deleteData();
         }
     }
 

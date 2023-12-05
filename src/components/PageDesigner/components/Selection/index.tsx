@@ -78,7 +78,7 @@ const Selection = defineComponent({
       if(!unref(isEditModel) && props.data?.componentProps?.mountedCode){
         // TODO: 参数问题需要解决
         let customFn = new Function(props.data?.componentProps?.mountedCode)
-        customFn.call()
+        customFn()
       }
     })
 
@@ -95,10 +95,18 @@ const Selection = defineComponent({
           overlay: () => {
             return (
               <Menu>
-                <MenuItem key="copy"><Button type="link" onClick={() => { onCopy() }}>复制</Button></MenuItem>
-                {!!designer.copyData.value?.length && <MenuItem key="paste"><Button type="link" onClick={onPaste}>粘贴</Button></MenuItem>}
-                <MenuItem key="shear"><Button type="link" onClick={onShear}>剪切</Button></MenuItem>
-                <MenuItem key="delete"><Button danger type="link" onClick={onDelete}>删除</Button></MenuItem>
+                <MenuItem key="copy"><Button type="link" onClick={() => {
+                  onCopy(designer.data?.id)
+                }}>复制</Button></MenuItem>
+                <MenuItem key="paste"><Button type="link" onClick={() => {
+                  onPaste(designer.data?.id)
+                }}>粘贴</Button></MenuItem>
+                <MenuItem key="shear"><Button type="link" onClick={() => {
+                  onShear(designer.data?.id)
+                }}>剪切</Button></MenuItem>
+                <MenuItem key="delete"><Button danger type="link" onClick={() => {
+                  onDelete()
+                }}>删除</Button></MenuItem>
               </Menu>
             )
           }
@@ -136,7 +144,7 @@ const Selection = defineComponent({
                     <div
                       class="action"
                       onClick={withModifiers(() => {
-                        onPaste()
+                        onPaste(designer.data?.id)
                       }, ['stop'])}
                     >
                       <AIcon type="CopyOutlined" />

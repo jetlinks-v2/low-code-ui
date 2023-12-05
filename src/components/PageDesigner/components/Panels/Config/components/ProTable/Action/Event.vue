@@ -6,11 +6,11 @@
         title="配置按钮事件"
         @ok="onSave"
         :width="800"
-        @cancel="emits('close')"
+        @cancel="visible = false"
     >
       <div style="overflow-y: auto; max-height: 550px">
         <j-form layout="vertical" ref="formRef" :model="formState">
-          <j-form-item label="类型" name="type" required>
+          <j-form-item label="类型" name="type">
             <j-radio-group v-model:value="formState.type" button-style="solid">
               <j-radio-button value="common">普通按钮</j-radio-button>
               <j-radio-button value="confirm">确认框</j-radio-button>
@@ -19,6 +19,30 @@
             </j-radio-group>
           </j-form-item>
           <template v-if="!['confirm', 'common'].includes(formState.type)">
+            <j-form-item required :label="formState?.type === 'modal' ? '弹窗宽度' : '抽屉宽度'" name="width">
+              <j-input-number
+                  placeholder="请输入"
+                  style="width: 100%"
+                  :precision="0"
+                  :min="520"
+                  addon-after="px"
+                  @change="onDataChange"
+                  v-model:value="formState.width"
+              />
+            </j-form-item>
+            <j-form-item :label="formState?.type === 'modal' ? '弹窗标题' : '抽屉标题'" name="title">
+              <j-input
+                  placeholder="请输入"
+                  @change="onDataChange"
+                  v-model:value="formState.title"
+              />
+            </j-form-item>
+            <j-form-item label="是否展示footer" name="footerVisible">
+              <j-switch
+                  @change="onDataChange"
+                  v-model:checked="formState.footerVisible"
+              />
+            </j-form-item>
             <j-form-item label="页面类型" name="pageType" required>
               <j-radio-group v-model:value="formState.pageType" @change="onTypeChange">
                 <j-radio value="page">页面</j-radio>
@@ -124,7 +148,7 @@ const props = defineProps({
   value: {
     type: Object,
     default: () => ({
-      type: 'confirm',
+      type: 'common',
       okCode: '', // 确认代码
     })
   },
@@ -133,13 +157,16 @@ const props = defineProps({
 const emits = defineEmits(["update:value", "change"]);
 const visible = ref<boolean>(false)
 const formState = reactive({
-  type: 'confirm',
+  type: 'common',
   okCode: '', // 确认代码,
-  pageType: 'form',
+  pageType: '',
+  width: 520,
   mountedCode: '',
   pageData: undefined,
   pageCode: undefined,
-  confirmText: ""
+  confirmText: "",
+  title: "",
+  footerVisible: true
 });
 const formRef = ref<any>();
 const _error = ref<any[]>([]);
