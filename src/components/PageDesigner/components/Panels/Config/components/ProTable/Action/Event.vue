@@ -83,22 +83,7 @@
             </j-form-item>
             <j-form-item label="页面onMounted" name="mountedCode">
               <div>function onMounted(record, axios, route, refs)</div>
-              <div style="display: flex; gap: 12px">
-                <div style="height: 300px; flex: 1">
-                  <j-monaco-editor
-                      @errorChange="onErrorChange"
-                      v-model="formState.mountedCode"
-                      language="javascript"
-                      key="mounted"
-                  />
-                </div>
-                <div style="height: 300px; width: 300px">
-                  <j-monaco-editor
-                      :modelValue="defaultMountedCode"
-                      language="javascript"
-                  />
-                </div>
-              </div>
+              <ProMonaco :tipCode="defaultMountedCode" v-model:value="formState.mountedCode" language="javascript" style="height: 300px"/>
             </j-form-item>
           </template>
           <template v-else>
@@ -111,22 +96,7 @@
                 formState.type === 'confirm' ? 'function (record, axios, refs)' : 'function (axios, route, refs)'
               }}
             </div>
-            <div style="display: flex; gap: 12px">
-              <div style="height: 300px; flex: 1">
-                <j-monaco-editor
-                    @errorChange="onErrorChange"
-                    v-model="formState.okCode"
-                    language="javascript"
-                    key="ok"
-                />
-              </div>
-              <div style="height: 300px; width: 300px">
-                <j-monaco-editor
-                    :modelValue="defaultCode"
-                    language="javascript"
-                />
-              </div>
-            </div>
+            <ProMonaco :tipCode="defaultCode" v-model:value="formState.okCode" language="javascript" style="height: 300px"/>
           </j-form-item>
         </j-form>
       </div>
@@ -139,6 +109,7 @@ import {reactive, ref, watchEffect} from "vue";
 import {cloneDeep} from "lodash-es";
 import {onlyMessage} from "@jetlinks-web/utils";
 import {useTool} from "@LowCode/components/PageDesigner/hooks";
+import {ProMonaco} from "../../ProMonaco";
 
 const {getFormList, getPageList} = useTool();
 const options = ref<any[]>(getFormList.value || [])
@@ -169,7 +140,6 @@ const formState = reactive({
   footerVisible: true
 });
 const formRef = ref<any>();
-const _error = ref<any[]>([]);
 
 const defaultCode = `
 /**
@@ -253,10 +223,6 @@ const _rules = [
   },
 ];
 
-const onErrorChange = (error: any[]) => {
-  _error.value = error;
-};
-
 watchEffect(() => {
   Object.assign(formState, cloneDeep(props.value));
 });
@@ -264,14 +230,9 @@ watchEffect(() => {
 const onSave = async () => {
   formRef.value?.validate().then((res: any) => {
     if (res) {
-      // console.log('======', _error.value)
-      if (!_error.value?.length) {
-        emits("update:value", formState);
-        emits("change", formState);
-        visible.value = false;
-      } else {
-        onlyMessage("代码有误，请检查", "error");
-      }
+      emits("update:value", formState);
+      emits("change", formState);
+      visible.value = false;
     }
   })
 }

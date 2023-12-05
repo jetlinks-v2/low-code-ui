@@ -18,23 +18,7 @@
           </j-radio-group>
         </j-form-item>
         <j-form-item label="静态数据" name="optionsJson" required v-if="formState.type === 'static'">
-          <div style="display: flex; gap: 12px">
-            <div ref="target" style="height: 300px; flex: 1">
-              <j-monaco-editor
-                  @errorChange="onErrorChange"
-                  v-model="formState.optionsJson"
-                  language="json"
-                  key="static"
-              />
-            </div>
-            <div ref="target" style="height: 300px; width: 300px">
-              <j-monaco-editor
-                  :modelValue="defaultJson"
-                  language="json"
-                  :readOnly="true"
-              />
-            </div>
-          </div>
+          <ProMonaco :tipCode="defaultJson" v-model:value="formState.optionsJson" language="json" style="height: 300px"/>
         </j-form-item>
         <template v-if="formState.type === 'dynamic'">
           <dataSourceConfig ref="dataRef" :value="formState.optionsData"/>
@@ -49,6 +33,7 @@ import {ref, reactive} from "vue";
 import dataSourceConfig from '../DataSource/dataSourceConfig.vue'
 import {onlyMessage} from "@jetlinks-web/utils";
 import {cloneDeep} from "lodash-es";
+import {ProMonaco} from "../ProMonaco";
 
 const props = defineProps({
   value: {
@@ -59,7 +44,6 @@ const props = defineProps({
 
 const emits = defineEmits(["update:value", "change"]);
 const visible = ref<boolean>(false);
-const _error = ref<any[]>([]);
 
 const defaultJson = `
 [
@@ -91,10 +75,6 @@ const formState = reactive({
 const formRef = ref<any>();
 const dataRef = ref<any>();
 
-const onErrorChange = (error: any[]) => {
-  _error.value = error;
-};
-
 const onChange = () => {
   formState.optionsJson = ''
   formState.optionsData = {}
@@ -102,19 +82,15 @@ const onChange = () => {
 
 const handleOk = async () => {
   if (formState.type === 'static') {
-    if (!_error.value?.length) {
-      const resp = await formRef.value?.validateFields()
-      if (resp) {
-        emits("update:value", formState);
-        emits("change", formState);
-        visible.value = false;
-      }
-    } else {
-      onlyMessage("代码有误，请检查", "error");
+    const resp = await formRef.value?.validate()
+    if (resp) {
+      emits("update:value", formState);
+      emits("change", formState);
+      visible.value = false;
     }
   } else {
     const res = await dataRef.value?.onSave()
-    const resp = await formRef.value?.validateFields()
+    const resp = await formRef.value?.validate()
     if (resp && res.query) {
       const obj = {
         ...formState,

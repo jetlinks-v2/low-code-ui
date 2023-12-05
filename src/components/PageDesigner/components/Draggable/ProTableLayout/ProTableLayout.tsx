@@ -120,10 +120,12 @@ export default defineComponent({
                                     <Button type='link' {..._props} onClick={() => {
                                         if (!unref(isEditModel)) {
                                             dataModal.value = {
+                                                width: item.event?.width || 520,
+                                                footerVisible: item.event?.footerVisible,
                                                 data: _record,
                                                 type: item.event?.pageType || 'form',
                                                 code: item.event?.pageData,
-                                                title: item?.text,
+                                                title:  item.event?.title || item?.text,
                                                 mountedCode: item.event?.mountedCode,
                                                 okCode: item.event?.okCode,
                                                 modalType: item.event?.type || 'modal',

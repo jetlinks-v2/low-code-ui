@@ -118,7 +118,8 @@ export default defineComponent({
                 children: [
                     {
                         type: item?.type + '-item-item',
-                        componentProps: {}
+                        componentProps: {},
+                        children: []
                     }
                 ],
                 componentProps: {
