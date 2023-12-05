@@ -2,7 +2,7 @@
   <div style="margin: 5px 0">
     <j-button @click="onClick" type="link">配置</j-button>
     <j-modal :width="800" visible title="配置" v-if="visible" @ok="handleOk" @cancel="handleCancel">
-      <div>function (record)</div>
+      <div>function (record, util)</div>
       <div style="display: flex; gap: 12px">
         <div style="height: 300px; flex: 1">
           <j-monaco-editor

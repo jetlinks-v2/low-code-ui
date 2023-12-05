@@ -88,7 +88,7 @@ const DraggableLayout = defineComponent({
             itemKey: 'key',
             group: { name: "j-canvas" },
             //拖动结束
-            onEnd: (e) => {
+            onEnd: (e: any) => {
                 if (e.to?.dataset?.layoutType !== 'filed-item') {
                     setSelection(e.item?._underlying_vm_ || 'root')
                 }

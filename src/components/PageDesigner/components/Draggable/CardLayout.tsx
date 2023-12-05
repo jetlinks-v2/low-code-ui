@@ -1,7 +1,6 @@
 import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
 import './index.less'
-import { cloneDeep, omit } from 'lodash-es'
 import { useTool } from '../../hooks'
 
 export default defineComponent({
@@ -19,7 +18,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const { isDragArea, layoutPadStyle } = useTool()
+        const { isDragArea } = useTool()
 
         const _data = computed(() => {
             return props.data
@@ -33,19 +32,19 @@ export default defineComponent({
         return () => {
 
             return (
-                <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
+                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <div
                         data-layout-type={'card'}
                         {...unref(_data).componentProps}
                     >
                         {
-                            unref(list).map(element => {
+                            unref(list).map((element: any) => {
                                 return (
                                     <Selection
                                         class={unref(isDragArea) && 'drag-area'}
                                         data={element}
                                         tag="div"
-                                        hasCopy={true}
+                                        hasCopy={false}
                                         hasDel={unref(list).length > 1}
                                         parent={unref(list)}
                                     >

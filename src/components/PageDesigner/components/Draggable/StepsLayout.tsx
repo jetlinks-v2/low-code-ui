@@ -99,7 +99,7 @@ export default defineComponent({
                         class={unref(isDragArea) && 'drag-area'}
                         data={unref(list)?.[current.value]}
                         tag="div"
-                        hasCopy={true}
+                        hasCopy={false}
                         hasDel={unref(list).length > 1}
                         parent={unref(list)}
                         style={{
