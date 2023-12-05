@@ -17,7 +17,7 @@ export default defineComponent({
     },
     emits: ['save', 'close'],
     setup(props, {emit}) {
-        const {modalType, type, code, title, data, mountedCode, okCode} = props?.data
+        const {modalType, type, code, title, data, mountedCode, okCode, width, footerVisible} = props?.data
         const {isEditModel} = useTool()
         const route = useRoute()
         const formRef = ref()
@@ -34,8 +34,6 @@ export default defineComponent({
                 fn(data || {}, axiosRequest, route, _refs)
             }
         }
-
-       
 
         const renderChildren = () => {
             if (type === 'page') {
@@ -75,7 +73,7 @@ export default defineComponent({
                 return <Modal
                     visible
                     title={title}
-                    width={700}
+                    width={width}
                     onOk={onSave}
                     onCancel={onCancel}
                 >
@@ -85,7 +83,8 @@ export default defineComponent({
                 return <Drawer
                     visible
                     title={title}
-                    footer={footerContent()}
+                    width={width}
+                    footer={footerVisible && footerContent()}
                     onClose={onCancel}
                 >
                     {renderChildren()}

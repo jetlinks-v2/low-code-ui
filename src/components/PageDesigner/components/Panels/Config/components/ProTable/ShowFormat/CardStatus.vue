@@ -26,28 +26,7 @@
               label="状态的颜色值"
               name="statusColor"
           >
-            <j-row :gutter="24">
-              <j-col :span="14">
-                <div style="height: 300px">
-                  <j-monaco-editor
-                      @errorChange="onErrorChange"
-                      v-model="modelRef.statusColor"
-                      key="card-status-1"
-                      language="json"
-                  />
-                </div>
-              </j-col>
-              <j-col :span="10">
-                <div style="height: 300px">
-                  <j-monaco-editor
-                      :modelValue="statusJson"
-                      key="card-status-2"
-                      language="json"
-                      readOnly
-                  />
-                </div>
-              </j-col>
-            </j-row>
+            <ProMonaco :tipCode="statusJson" v-model:value="modelRef.statusColor" language="json" style="height: 300px"/>
           </j-form-item>
         </template>
       </j-form>
@@ -57,8 +36,8 @@
 
 <script lang="ts" setup>
 import {reactive, ref} from "vue";
-import {onlyMessage} from "@jetlinks-web/utils";
 import {cloneDeep} from "lodash-es";
+import {ProMonaco} from "../../ProMonaco";
 
 const props = defineProps({
   value: {
@@ -71,7 +50,6 @@ const props = defineProps({
 const emits = defineEmits(['update:value', 'change'])
 
 const visible = ref<boolean>(false)
-const _error = ref<any[]>([]);
 const statusJson = `
 {
   "default": "102, 102, 102",
@@ -97,20 +75,12 @@ const onClick = () => {
   visible.value = true
 }
 
-const onErrorChange = (error: any[]) => {
-  _error.value = error;
-};
-
 const handleOk = () => {
   formRef.value.validate().then((res: any) => {
     if (res) {
-      if (!_error.value?.length) {
-        emits("update:value", modelRef);
-        emits("change", modelRef);
-        visible.value = false;
-      } else {
-        onlyMessage("代码有误，请检查", "error");
-      }
+      emits("update:value", modelRef);
+      emits("change", modelRef);
+      visible.value = false;
     }
   })
 };

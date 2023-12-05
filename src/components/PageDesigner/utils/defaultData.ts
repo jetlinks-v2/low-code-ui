@@ -100,7 +100,8 @@ export const layout: ISchema[] = [
                         children: [
                             {
                                 type: 'info-item-item-item',
-                                componentProps: {}
+                                componentProps: {},
+                                children: []
                             }
                         ],
                         componentProps: {
