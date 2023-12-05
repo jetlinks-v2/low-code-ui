@@ -1,9 +1,9 @@
 import {cloneDeep, debounce, omit} from "lodash-es"
-import { appendChildItem, copyDataByKey, deleteDataByKey, handleCopyData } from "../utils/utils"
-import { Modal } from 'jetlinks-ui-components'
-import { uid } from "../utils/uid"
-import { useProduct } from "@LowCode/store";
-import { providerEnum } from "@LowCode/components/ProJect";
+import {appendChildItem, copyDataByKey, deleteDataByKey, handleCopyData} from "../utils/utils"
+import {Modal} from 'jetlinks-ui-components'
+import {uid} from "../utils/uid"
+import {useProduct} from "@LowCode/store";
+import {providerEnum} from "@LowCode/components/ProJect";
 
 const useTool = () => {
     const designer: any = inject('PageDesigner')
@@ -23,14 +23,15 @@ const useTool = () => {
     })
 
     /**
- * 保存数据
- */
+     * 保存数据
+     */
     const onSaveData = () => {
         let menu = {}
         if (unref(designer.pageData).componentProps.isPage) {
             menu = {
                 name: unref(designer.pageData).componentProps?.pageName,
                 icon: unref(designer.pageData).componentProps?.pageIcon,
+                code: unref(designer.pageData).componentProps?.pageCode,
             }
         }
         const obj = {
@@ -186,7 +187,7 @@ const useTool = () => {
         onPaste,
         setModel,
         getFormList,
-        getPageList
+        getPageList,
     }
 }
 

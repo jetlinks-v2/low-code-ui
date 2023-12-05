@@ -5,7 +5,7 @@ export const getConfigList = (_type: string) => {
             key: 'PageConfig',
             header: '页面样式',
         })
-    } 
+    }
     if(!['root', 'inline-item', 'card-item', 'timeline-item'].includes(unref(_type))){
         arr.push({
             key: 'Base',
@@ -16,7 +16,7 @@ export const getConfigList = (_type: string) => {
         arr.push({
             key: 'Button',
             header: '按钮配置'
-        })     
+        })
     }
     // if(['steps'].includes(unref(_type))) {
     //     arr.push({

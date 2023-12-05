@@ -178,8 +178,6 @@ const Selection = defineComponent({
       designer.onCollect()
     }
 
-    expose({ setVisible, setOptions, setValue, setDisabled })
-
     const editNode = () => {
       return <Dropdown
         trigger={['contextmenu']}
@@ -230,7 +228,7 @@ const Selection = defineComponent({
         {...useAttrs()}
         onClick={withModifiers(handleClick, ['stop'])}
       >
-        {unref(isEditModel) ? editNode() : slots?.default()}
+        {unref(isEditModel) ? editNode() : (visible.value ? slots?.default() : '')}
         {
           unref(isEditModel) && Selected.value && !isMultiple.value && (
             <div class="bottomRight">
@@ -259,8 +257,9 @@ const Selection = defineComponent({
         }
       </TagComponent>
     }
+    expose({ setVisible, setOptions, setValue, setDisabled })
 
-    return () => renderSelected()
+    return () =>  renderSelected()
   }
 })
 

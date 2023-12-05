@@ -9,6 +9,7 @@
       @ok="handleOk"
       @cancel="handleCancel"
     >
+      <div>{{tip}}</div>
       <div ref="target" style="height: 300px;">
         <j-monaco-editor
           @errorChange="onErrorChange"
@@ -39,6 +40,9 @@ const props = defineProps({
     type: String,
     default: 'css',
   },
+  tip: {
+    type: String,
+  }
 })
 
 const emits = defineEmits(['update:value', 'change'])

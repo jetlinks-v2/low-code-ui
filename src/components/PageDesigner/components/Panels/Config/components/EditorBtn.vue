@@ -14,7 +14,7 @@
           @errorChange="onErrorChange"
           v-model="_value"
           :language="language"
-          :key="uid(4)"
+          :key="key"
         />
       </div>
     </j-modal>
@@ -48,6 +48,7 @@ const visible = ref<boolean>(false);
 const _value = ref<string>();
 const target = ref();
 const _error = ref<any[]>([]);
+const key = uid(4)
 
 const { focused } = useFocusWithin(target);
 

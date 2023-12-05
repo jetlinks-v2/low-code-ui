@@ -35,9 +35,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  formStyle: {
-    type: Object,
-  },
+  // formStyle: {
+  //   type: Object,
+  // },
 })
 
 const emit = defineEmits(['valueChange', 'stateChange'])
@@ -57,15 +57,15 @@ watch(
   () => {
     if (props.data) {
       let obj = cloneDeep(props.data)
-      if (props.formStyle) {
-        obj = {
-          ...obj,
-          componentProps: {
-            ...obj.componentProps,
-            ...props.formStyle,
-          },
-        }
-      }
+      // if (props.formStyle) {
+      //   obj = {
+      //     ...obj,
+      //     componentProps: {
+      //       ...obj.componentProps,
+      //       ...props.formStyle,
+      //     },
+      //   }
+      // }
       formData.value = obj as ISchema
       if(!props?.value || !Object.keys(props?.value)?.length){
         Object.assign(formState, getFieldData(formData.value) || {})
@@ -78,24 +78,24 @@ watch(
   },
 )
 
-watch(
-  () => props.formStyle,
-  (val: any) => {
-    if (val) {
-      const obj = {
-        ...formData.value,
-        componentProps: {
-          ...formData.value.componentProps,
-          ...val,
-        },
-      }
-      formData.value = cloneDeep(obj)
-    }
-  },
-  {
-    immediate: true,
-  },
-)
+// watch(
+//   () => props.formStyle,
+//   (val: any) => {
+//     if (val) {
+//       const obj = {
+//         ...formData.value,
+//         componentProps: {
+//           ...formData.value.componentProps,
+//           ...val,
+//         },
+//       }
+//       formData.value = cloneDeep(obj)
+//     }
+//   },
+//   {
+//     immediate: true,
+//   },
+// )
 
 provide('FormDesigner', {
   model: 'preview',

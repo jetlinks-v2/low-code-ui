@@ -1,7 +1,7 @@
 <template>
   <div>
     <j-button @click="onClick" type="link" size="small">配置</j-button>
-    <j-modal :width="700" visible title="配置" v-if="visible" @ok="handleOk" @cancel="handleCancel">
+    <j-modal :width="800" visible title="配置" v-if="visible" @ok="handleOk" @cancel="handleCancel">
       <j-form :layout="'vertical'" ref="formRef" :model="modelRef">
         <j-form-item label="数据展示方式" name="showStatus" required>
           <j-switch v-model:checked="modelRef.showStatus"/>
@@ -27,7 +27,7 @@
               name="statusColor"
           >
             <j-row :gutter="24">
-              <j-col :span="16">
+              <j-col :span="14">
                 <div style="height: 300px">
                   <j-monaco-editor
                       @errorChange="onErrorChange"
@@ -37,11 +37,10 @@
                   />
                 </div>
               </j-col>
-              <j-col :span="8">
+              <j-col :span="10">
                 <div style="height: 300px">
                   <j-monaco-editor
-                      @errorChange="onErrorChange"
-                      :value="statusJson"
+                      :modelValue="statusJson"
                       key="card-status-2"
                       language="json"
                       readOnly
@@ -59,6 +58,7 @@
 <script lang="ts" setup>
 import {reactive, ref} from "vue";
 import {onlyMessage} from "@jetlinks-web/utils";
+import {cloneDeep} from "lodash-es";
 
 const props = defineProps({
   value: {
@@ -72,7 +72,15 @@ const emits = defineEmits(['update:value', 'change'])
 
 const visible = ref<boolean>(false)
 const _error = ref<any[]>([]);
-const statusJson = '{ // 123 }'
+const statusJson = `
+{
+  "default": "102, 102, 102",
+  "processing": "9, 46, 231",
+  "error": "229, 0, 18",
+  "success": "36, 178, 118",
+  "warning": "255, 144, 0"
+}
+`
 const formRef = ref();
 
 const modelRef = reactive({
@@ -83,7 +91,7 @@ const modelRef = reactive({
 });
 
 watchEffect(() => {
-  Object.assign(modelRef, props?.value)
+  Object.assign(modelRef, cloneDeep(props?.value))
 });
 const onClick = () => {
   visible.value = true

@@ -2,7 +2,7 @@ import DraggableLayout from '../Draggable/DraggableLayout'
 import Selection from '../Selection/index'
 import {Steps, Step, Button, Space, AIcon} from 'jetlinks-ui-components'
 import './index.less'
-import {useLifeCycle, useTool} from '../../hooks'
+import {useLifeCycle, usePageProvider, useTool} from '../../hooks'
 import {withModifiers} from 'vue'
 import generatorData from '../../utils/generatorData'
 import {uid} from '../../utils/uid'
@@ -28,6 +28,7 @@ export default defineComponent({
         const {isDragArea, isEditModel, onAddChild} = useTool()
         const {executionMounted} = useLifeCycle(props.data.componentProps, {}, isEditModel)
         const route = useRoute()
+        const pageProvider = usePageProvider()
         const _data = computed(() => {
             return props.data
         })
@@ -58,7 +59,7 @@ export default defineComponent({
         })
 
         const buttonRender = () => {
-            return (props.data.componentProps.action || []).filter((item: any) => {
+            return (props.data.componentProps?.action || []).filter((item: any) => {
                 return item.show.includes(unref(list)?.[current.value]?.key)
             }).map((i: any) => {
                 const _props = {
@@ -72,6 +73,7 @@ export default defineComponent({
                     if(!unref(isEditModel) && i.eventCode) {
                         const handleResultFn = new Function('axios', 'route', 'refs', i?.eventCode)
                         handleResultFn(axiosRequest, route, {
+                            slots: pageProvider.slots,
                             current
                         })
                     }

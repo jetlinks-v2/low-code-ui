@@ -30,6 +30,7 @@ export default defineComponent({
         const pageProvider = usePageProvider()
         const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
         const tableRef = ref()
+        const route = useRoute()
         const isSelect = ref(false)
         const _selectedRowKeys = ref([])
         const showSelect = () =>{
@@ -130,9 +131,18 @@ export default defineComponent({
                                         }
                                     }}/>
                                 </Tooltip>
+                            } else {
+                                return <Tooltip title={item?.text}><Button type='link' {..._props} onClick={() => {
+                                    if (item.event?.okCode && !unref(isEditModel)) {
+                                        const handleResultFn = new Function('record', 'axios', 'refs', item.event?.okCode)
+                                        handleResultFn(_record, axiosRequest, {
+                                            tableRef
+                                        })
+                                    }
+                                }} /></Tooltip>
                             }
                         }
-                        return <Tooltip title={item?.text}><Button type='link' {..._props} /></Tooltip>
+                        return <Tooltip title={item?.text}><Button type='link' {..._props}/></Tooltip>
                     })
                 }
             </Space>
@@ -309,7 +319,6 @@ export default defineComponent({
                                     tooltip: {
                                         title: item?.text,
                                     },
-                                    icon: 'EditOutlined',
                                     onClick: () => {
                                         if (!unref(isEditModel)) {
                                             dataModal.value = {
@@ -322,6 +331,23 @@ export default defineComponent({
                                                 modalType: item.event?.type || 'modal',
                                             }
                                             modalVisible.value = true
+                                        }
+                                    },
+                                })
+                            }
+                        } else {
+                            return {
+                                ..._props,
+                                permissionProps: (_record: any) => ({
+                                    tooltip: {
+                                        title: item?.text,
+                                    },
+                                    onClick: () => {
+                                        if (item.event?.okCode && !unref(isEditModel)) {
+                                            const handleResultFn = new Function('record', 'axios', 'refs', item.event?.okCode)
+                                            handleResultFn(_record, axiosRequest, {
+                                                tableRef
+                                            })
                                         }
                                     },
                                 })
@@ -368,20 +394,20 @@ export default defineComponent({
             </Card>
         }
 
-        const onCreatedFn = (code?: string) => {
-            if (code && !isEditModel.value) {
-                const context = {
-                    context: pageProvider.context,
-                    axios: axiosRequest,
-                    route: route,
-                    refs: {
-                        tableRef
-                    }
-                }
-                const fn = new Function('context', code)
-                fn(context)
-            }
-        }
+        // const onCreatedFn = (code?: string) => {
+        //     if (code && !isEditModel.value) {
+        //         const context = {
+        //             context: pageProvider.context,
+        //             axios: axiosRequest,
+        //             route: route,
+        //             refs: {
+        //                 tableRef
+        //             }
+        //         }
+        //         const fn = new Function('context', code)
+        //         fn(context)
+        //     }
+        // }
 
         const { executionMounted } = useLifeCycle(props.data.componentProps, { tableRef: tableRef }, isEditModel)
         const tableRefKey = props.data.key + 'ref'

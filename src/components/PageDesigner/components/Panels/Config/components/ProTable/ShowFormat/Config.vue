@@ -13,10 +13,11 @@
           />
         </j-form-item>
         <j-form-item
-          required
-          label="卡片配置"
-          name="cardConfig"
-          v-if="modelRef.model?.includes('CARD')"
+            required
+            label="卡片配置"
+            name="cardConfig"
+            v-if="modelRef.model?.includes('CARD')"
+            :rules="_rules"
         >
           <CardConfig v-model:value="modelRef.cardConfig" />
         </j-form-item>
@@ -79,6 +80,22 @@ const onChange = (checkedValue: any) => {
     modelRef.cardConfig = {}
   }
 };
+
+const _rules = [
+  {
+    validator(_rule: any, value: any) {
+      if (!Object.keys(value)?.length) {
+        return Promise.reject('请配置卡片');
+      }
+      const {field1Code, titleCode, field2Title, field2Code, field1Title} = value || {}
+      if (!field1Code || !titleCode || !field2Title || !field2Code || !field1Title) {
+        return Promise.reject('请配置卡片');
+      }
+      return Promise.resolve();
+    },
+    trigger: "change",
+  },
+];
 
 const onSave = () => {
   formRef.value.validate().then((res: any) => {

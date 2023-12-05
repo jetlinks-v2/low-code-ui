@@ -1,59 +1,44 @@
-import { ArrayTableSource, CardSource, CollapseSource, DatePickerSource, DeviceSource, GridSource, InputSource, NumberPickerSource, ObjectSource, PasswordSource, RadioGroupSource, SelectSource, SpaceSource, SwitchSource, TabSource, TextAreaSource, TextSource, TimePickerSource, TreeSelectSource, UploadSource } from './source';
+import {
+    ArrayTableSource,
+    ButtonSource,
+    CardSource,
+    ObjectSource,
+    SpaceSource,
+    TextSource,
+    DropdownSource,
+    TimelineSource,
+    InfoSource,
+    SearchSource, TagSource, StepsSource
+} from './source';
 
 const getIcon = (type: string) => {
     switch (type) {
-        case 'input':
-            return InputSource
         case 'text':
             return TextSource
-        case 'textarea':
-            return TextAreaSource
-        case 'input-number':
-            return NumberPickerSource
-        case 'select-card':
-            return RadioGroupSource
-        case 'input-password':
-            return PasswordSource
-        case 'upload':
-            return UploadSource
-        case 'switch':
-            return SwitchSource
+        case 'button':
+            return ButtonSource
+        case 'dropdown':
+            return DropdownSource
+        case 'tag':
+            return TagSource
         case 'form':
             return ObjectSource
-        case 'select':
-            return SelectSource
-        case 'tree-select':
-            return TreeSelectSource
-        case 'date-picker':
-            return DatePickerSource
-        case 'time-picker':
-            return TimePickerSource
-        case 'table':
-            return ArrayTableSource
+        case 'steps':
+            return StepsSource
+        case 'info':
+            return InfoSource
+        case 'timeline':
+            return TimelineSource
+        case 'inline':
+            return SpaceSource
         case 'card':
             return CardSource
-        case 'grid':
-            return GridSource
-        case 'tabs':
-            return TabSource
-        case 'collapse':
-            return CollapseSource
-        case 'space':
-            return SpaceSource
-        case 'org':
-            return SelectSource
-        case 'user':
-            return SelectSource
-        case 'role':
-            return SelectSource
-        case 'geo':
-            return SelectSource
-        case 'product':
-            return DeviceSource
-        case 'device':
-            return DeviceSource
+        case 'search':
+            return SearchSource
+        case 'proTable':
+            return ArrayTableSource
         default:
-            return InputSource
+            return TextSource
     }
 }
 
