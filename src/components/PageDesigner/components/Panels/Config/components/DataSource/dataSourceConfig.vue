@@ -17,7 +17,12 @@
         <Params v-model:queryParams="formModel.queryParams"/>
       </j-form-item>
       <j-form-item label="默认参数" name="defaultParams">
-        <ProMonaco v-model="formModel.defaultParams" language="json" style="height: 160px"/>
+        <ProMonaco
+          v-model="formModel.defaultParams"
+          language="json"
+          style="height: 160px"
+          :tipCode="tipCode_1"
+        />
       </j-form-item>
       <j-form-item label="数据处理" name="handleResult">
         <div>
@@ -33,7 +38,7 @@
 <script setup lang="ts">
 import Params from './params.vue'
 import DataSourceList from './dataSourceList.vue'
-import { ProMonaco } from '../../../../ProMonaco'
+import { ProMonaco } from '../ProMonaco'
 
 const props = defineProps({
   value: {
@@ -42,6 +47,8 @@ const props = defineProps({
   }
 })
 const options = ref<any[]>([])
+
+const tipCode_1 = `{"sorts": [{ "name": "createTime", "order": "desc" }], "terms": [] }`
 
 const formModel = reactive({
   query: props.value.query,

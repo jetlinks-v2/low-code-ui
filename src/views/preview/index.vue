@@ -1,7 +1,8 @@
 <template>
   <template v-if="!isEmpty">
     <ListPage v-if="showList" :data="data" :show="true" :projectId="route.params.project" :pageId="route.params.id" />
-    <HtmlPage v-else-if="showHtml" :code="data" />
+    <HtmlPage v-if="showHtml" :code="data" />
+    <PageView v-if="showPage" :data="data ? JSON.parse(data) : {}" />
   </template>
   <template v-else>
     <Result status="404" title="404"></Result>
@@ -13,6 +14,7 @@ import {  ConfigProvider } from "ant-design-vue";
 import { getResource } from '@LowCode/api/basis'
 import ListPage from '@LowCode/components/ListPage/Output/index.vue'
 import HtmlPage from '@LowCode/components/CustomHTML/output/Preview.vue'
+import PageView from '@LowCode/components/PageDesigner/preview.vue'
 import { queryProject } from "@LowCode/api/project";
 import { Result } from 'jetlinks-ui-components'
 
@@ -21,11 +23,15 @@ const data = ref()
 const isEmpty = ref(false)
 
 const showList = computed(() => {
-  return route.params?.type === 'list' && data.value
+  return route.params?.type === 'list' && !!data.value
 })
 
 const showHtml = computed(() => {
-  return route.params?.type === 'html' && data.value
+  return route.params?.type === 'html' && !!data.value
+})
+
+const showPage = computed(() => {
+  return route.params?.type === 'page' && !!data.value
 })
 
 const getInfo = async () => {
