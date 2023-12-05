@@ -10,7 +10,12 @@
             { label: 'PATCH', value: 'patch' },
             { label: 'DELETE', value: 'remove' },
           ]" style="width: 100px;"/>
-          <j-auto-complete v-model:value="formModel.query" :options="options" placeholder="请输入数据源地址"/>
+          <a-auto-complete
+            v-model:value="formModel.query"
+            :options="options"
+            placeholder="请输入数据源地址"
+            @search="handleSearch"
+          />
         </div>
       </j-form-item>
       <j-form-item v-if="formModel.queryParams &&formModel.queryParams?.length!==0" label="路由参数" name="queryParams">
@@ -34,6 +39,7 @@
 import Params from './params.vue'
 import {queryEndCommands} from '@LowCode/api/form'
 import {useProduct} from "@LowCode/store";
+import {cloneDeep} from "lodash-es";
 
 const props = defineProps({
   value: {
@@ -42,6 +48,7 @@ const props = defineProps({
   }
 })
 const options = ref<any[]>([])
+let optionsCache: any[] = []
 
 const formModel = reactive({
   query: props.value.query,
@@ -50,6 +57,19 @@ const formModel = reactive({
   queryParams: props.value.queryParams,
   methods: props.value.methods || 'post'
 })
+
+/**
+ * 根据关键词提示
+ * @param searchText 关键词
+ */
+const handleSearch = (searchText: string) => {
+  options.value = optionsCache.filter(
+    (item) => !!item.label?.includes(searchText),
+  );
+  if (!options.value.length) {
+    options.value.unshift({ label: searchText, value: searchText });
+  }
+};
 
 const formRef = ref()
 
@@ -97,6 +117,7 @@ const getQuery = async () => {
   if (res.status === 200) {
     const arr = handleQuery(res.result)
     options.value = arr
+    optionsCache = cloneDeep(arr)
   }
 }
 
