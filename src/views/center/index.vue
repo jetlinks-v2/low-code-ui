@@ -53,11 +53,11 @@ import Save from './Save/index.vue'
 import dayjs from 'dayjs';
 import { queryProject, delProject, enableProject, disabledProject } from '@LowCode/api/project'
 import { onlyMessage } from '@LowCode/utils/comm';
-import { router } from '@jetlinks-web/router';
 import Menu from './Menu/index.vue'
 import { delMenu } from '@LowCode/api/menu';
 import { Search as ProSearch} from '@LowCode/components/index'
 import { Card } from '@LowCode/components/index'
+import { useRouter } from 'vue-router'
 
 const params = ref<any>({})
 const tableRef = ref<Record<string, any>>({});
@@ -65,6 +65,8 @@ const current = ref({})
 const modelType = ref<string>('add')
 const visible = ref<boolean>(false)
 const visibleMenu = ref<boolean>(false)
+
+const router = useRouter()
 
 const columns = [
   {

@@ -34,6 +34,9 @@
           "
         />
       </template>
+      <templaye #renderFn="{ record, valueChange }">
+        <RenderConfig v-model="record.renderFn" />
+      </templaye>
       <template v-if="type === 'search'" #search="{ record, valueChange }">
         <div style="display: flex; justify-content: space-between">
           <j-select
@@ -69,13 +72,14 @@
   </j-modal>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="SearchConfig">
 import { ref, watchEffect } from "vue";
 import { componentType } from "jetlinks-ui-components/es/Search/setting";
 import { uid } from "../../../../../utils/uid";
 import { cloneDeep } from "lodash-es";
 import Modal from "./Modal.vue";
 import { regular } from "@jetlinks-web/utils";
+import RenderConfig from './renderConfig.vue'
 
 const props = defineProps({
   data: {
@@ -169,6 +173,11 @@ watchEffect(() => {
         },
       },
     });
+  } else {
+    myColumns.push({
+      title: 'render',
+      dataIndex: 'renderFn',
+    })
   }
   myColumns.push({
     title: "操作",
