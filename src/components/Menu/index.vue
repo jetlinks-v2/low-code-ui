@@ -98,13 +98,26 @@ const onCheck = (e) => {
     menuState.count = menuState.checkedKey.length
 }
 
+const getType = (type) => {
+  if (type === providerEnum.HtmlPage) {
+    return 'html'
+  }
+  if (type === providerEnum.ListPage) {
+    return 'list'
+  }
+  if (type === providerEnum.PageDesign) {
+    return 'page'
+  }
+}
+
 const toRight = () => {
     // const arr = menuState.checkedKey
     const arr = leftList.value.filter(item => menuState.checkedKey.includes(item.id)).map(it => {
         // console.log('-----it', it)
         const id = randomString(16)
-        const code = it.code || randomString(8)
-        const type = it.others.type === providerEnum.HtmlPage ? 'html' : 'list'
+        const code = it.others?.menu?.code || randomString(8)
+        const type = getType(it.others.type)
+
         const url = `/preview/${props.projectId}/${it.parentFullId}/${it.id}/${type}/${code}`
         return {
             ...it,

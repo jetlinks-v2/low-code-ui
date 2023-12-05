@@ -1,5 +1,5 @@
 <template>
-  <j-modal visible title="数据源配置" width="800px" @ok="onSave" @cancel="onCancel">
+  <j-modal visible title="数据源配置" width="1000px" @ok="onSave" @cancel="onCancel">
     <dataSourceConfig ref="formRef" :value="data" />
   </j-modal>
 </template>
