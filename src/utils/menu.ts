@@ -13,10 +13,22 @@ type MenuItem = {
     meta?: any
 }
 
-const hasAppID = (item: { appId?: string, url?: string }): { isApp: boolean, appUrl: string } => {
+const hasAppID = (item: { appId?: string, url: string, options: any, code: string }): { isApp: boolean, appUrl: string, code: string } => {
+    const isApp = !!item.appId || item.options?.owner
+    const isLowCode = !!item.options?.LowCode
+
+    let _code = item.url
+
+    if (isLowCode) {
+      _code = item.code
+    } else if (isApp) {
+      _code = `/${item.appId || item.options?.owner}${item.url}`
+    }
+
     return {
         isApp: !!item.appId,
-        appUrl: `/${item.appId}${item.url}`
+        appUrl: `/${item.appId}${item.url}`,
+        code: _code
     }
 }
 
@@ -75,11 +87,11 @@ const hasExtraChildren = (item: MenuItem, extraMenus: any ) => {
 export const handleMenus = (menuData: any, extraMenus: any, components: any, level: number = 1) => {
     if (menuData && menuData.length) {
         return menuData.map(item => {
-            const { isApp, appUrl } = hasAppID(item) // 是否为第三方程序
+            const { isApp, appUrl, code } = hasAppID(item) // 是否为第三方程序
             const meta = handleMeta(item, isApp)
             const route: any = {
                 path: isApp ? appUrl : `${item.url}`,
-                name: isApp ? appUrl : item.code,
+                name: isApp ? code : item.code,
                 // url: isApp ? appUrl : item.url,
                 meta: meta,
                 children: item.children
@@ -144,11 +156,11 @@ export const handleSiderMenu = (menuData: any) => {
       }
       return true
     }).map(item => {
-      const { isApp, appUrl } = hasAppID(item) // 是否为第三方程序
+      const { isApp, appUrl, code } = hasAppID(item) // 是否为第三方程序
       const meta = handleMeta(item, isApp)
       const route: any = {
         path: isApp ? appUrl : `${item.url}`,
-        name: isApp ? appUrl : item.code,
+        name: isApp ? code : item.code,
         url: isApp ? appUrl : item.url,
         meta: meta,
         children: item.children
