@@ -76,7 +76,7 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
         //         return obj
         //     }
         // }
-        if (!['space-item', 'card-item', 'grid-item', 'table-item', 'grid', 'space', 'tabs', 'collapse', 'card', 'collapse-item', 'tabs-item'].includes(_type) || (['tabs', 'collapse', 'card'].includes(_type) && node?.formItemProps?.isLayout)) {
+        if (!['space-item', 'card-item', 'grid-item', 'table-item', 'grid', 'space', 'tabs', 'collapse', 'card', 'collapse-item', 'tabs-item', 'title-item', 'title'].includes(_type) || (['tabs', 'collapse', 'card'].includes(_type) && node?.formItemProps?.isLayout)) {
             if (!node?.formItemProps?.name) {
                 return obj
             } else if (!(/^[a-zA-Z0-9_\-]+$/.test(node?.formItemProps?.name))) {
@@ -175,7 +175,7 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
         if ('space' === _type && (node?.componentProps?.size !== 0 && !node?.componentProps?.size)) {
             return obj
         }
-        if (['card'].includes(_type) && !(node?.componentProps?.title)) {
+        if (['card', 'title'].includes(_type) && !(node?.componentProps?.title)) {
             return obj
         }
         if (['form'].includes(_type)) {
@@ -189,7 +189,7 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
             }
         }
         //  && !node.formItemProps?.label
-        if (['tabs', 'collapse', 'card'].includes(_type) && node?.formItemProps?.isLayout) {
+        if (['tabs', 'collapse', 'card', 'title'].includes(_type) && node?.formItemProps?.isLayout) {
             return obj
         }
         if (['input', 'textarea', 'input-password', 'date-picker', 'time-picker'].includes(_type)) {

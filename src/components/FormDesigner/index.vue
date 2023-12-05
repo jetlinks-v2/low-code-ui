@@ -123,7 +123,7 @@ const _width = computed(() => {
 
 // 设置数据被选中
 const setSelection = (node: any) => {
-  if (["card-item"].includes(node.type)) {
+  if (["card-item", "title-item"].includes(node.type)) {
     onSaveData();
     return;
   }
