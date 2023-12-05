@@ -64,7 +64,6 @@ export const useMenuStore = defineStore('menu', () => {
   }
 
   const jumpPageByCode = (code: string, options: { params?: Record<string, any>, query?: Record<string, any> } = {}) => {
-    console.log(code, hasMenu(code))
     if (hasMenu(code)) {
       const { params = {}, query = {} } = options
       const _menuItem = menusMap.value.get(code)
