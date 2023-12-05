@@ -103,7 +103,7 @@ const toRight = () => {
     const arr = leftList.value.filter(item => menuState.checkedKey.includes(item.id)).map(it => {
         // console.log('-----it', it)
         const id = randomString(16)
-        const code = randomString(8)
+        const code = it.code || randomString(8)
         const type = it.others.type === providerEnum.HtmlPage ? 'html' : 'list'
         const url = `/preview/${props.projectId}/${it.parentFullId}/${it.id}/${type}/${code}`
         return {
