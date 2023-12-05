@@ -10,19 +10,19 @@
             { label: 'PATCH', value: 'patch' },
             { label: 'DELETE', value: 'remove' },
           ]" style="width: 100px;"/>
-          <j-auto-complete v-model:value="formModel.query" :options="options" placeholder="请输入数据源地址"/>
+          <DataSourceList v-model:value="formModel.query" />
         </div>
       </j-form-item>
       <j-form-item v-if="formModel.queryParams &&formModel.queryParams?.length!==0" label="路由参数" name="queryParams">
         <Params v-model:queryParams="formModel.queryParams"/>
       </j-form-item>
       <j-form-item label="默认参数" name="defaultParams">
-        <j-monaco-editor v-model="formModel.defaultParams" language="json" style="height: 160px"/>
+        <ProMonaco v-model="formModel.defaultParams" language="json" style="height: 160px"/>
       </j-form-item>
       <j-form-item label="数据处理" name="handleResult">
         <div>
           <span style="font-weight: 600;">function (result) {</span>
-          <j-monaco-editor v-model="formModel.handleResult" language="javascript"
+          <ProMonaco v-model="formModel.handleResult" language="javascript"
                            :registrationTypescript="registrationTypescript" style="height: 200px"/>
         </div>
       </j-form-item>
@@ -32,8 +32,8 @@
 
 <script setup lang="ts">
 import Params from './params.vue'
-import {queryEndCommands} from '@LowCode/api/form'
-import {useProduct} from "@LowCode/store";
+import DataSourceList from './dataSourceList.vue'
+import { ProMonaco } from '../../../../ProMonaco'
 
 const props = defineProps({
   value: {
@@ -53,8 +53,6 @@ const formModel = reactive({
 
 const formRef = ref()
 
-const {info} = useProduct()
-
 const registrationTypescript = {
   name: 'typescript',
   typescript: `
@@ -66,23 +64,6 @@ const registrationTypescript = {
   `
 }
 
-const handleQuery = (arr: any[]) => {
-  const commandMap = new Map()
-  arr.forEach((item: any) => {
-    if (item.command) {
-      item.command.forEach((i: any) => {
-        const url = `low-code/runtime/${item.moduleId}.${item.id}/${i.id}`
-        const label = `${item.moduleName}-${item.name}-${i.name}`
-        commandMap.set(url, {
-          label: label,
-          value: url
-        })
-      })
-    }
-  })
-  return [...commandMap.values()]
-}
-
 const getQueryPrams = (str: any) => {
   const arr = str.match(/\{([^}]+)\}/g)?.map((item: any) => ({
     name: item.slice(1, -1),
@@ -91,16 +72,6 @@ const getQueryPrams = (str: any) => {
   }))
   return arr
 }
-
-const getQuery = async () => {
-  const res = await queryEndCommands(info.id, [])
-  if (res.status === 200) {
-    const arr = handleQuery(res.result)
-    options.value = arr
-  }
-}
-
-getQuery()
 
 watch(
     () => formModel.query,
