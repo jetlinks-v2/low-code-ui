@@ -11,12 +11,12 @@
     </div>
     <div class="code-tips">
       <j-monaco-editor
-        readOnly
-        :modelValue="tipCode"
+        :modelValue="myTipCode"
         :language="language"
-        :registrationTypescript="{
-          name: 'typescript',
-          typescript: tipCode
+        :options="{
+          minimap: {
+            enabled: false
+          }
         }"
       />
     </div>
@@ -41,8 +41,12 @@ const props = defineProps({
       suggestions: []
     })
   },
+  tsTip: {
+    type: String,
+    default: undefined
+  },
   tipCode: {
-    type: '',
+    type: String,
     default: undefined
   }
 })
@@ -50,11 +54,12 @@ const props = defineProps({
 const emit = defineEmits(['update:value'])
 
 const myValue = ref(props.value)
+const myTipCode = ref(props.tipCode)
 
 const registrationTypescript = computed(() => {
   return ['javascript', 'typescript'].includes(props.language)? {
     name: 'typescript',
-    typescript: props.tipCode
+    typescript: props.tsTip
   } : undefined
 })
 
