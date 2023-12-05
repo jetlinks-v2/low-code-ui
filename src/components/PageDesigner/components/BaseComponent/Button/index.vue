@@ -107,8 +107,10 @@ const handleRequestFn = async () => {
         }
     } else {
       if (config.click) {
-        const handleResultFn = new Function('context', 'route', 'router', config.click)
-        handleResultFn(pageProvider.context, route, router)
+        const handleResultFn = new Function('context', 'route', 'router','axios','refs', config.click)
+        handleResultFn(pageProvider.context, route, router,axiosRequest,{
+            slots: pageProvider.slots,
+        })
       }
     }
 }
