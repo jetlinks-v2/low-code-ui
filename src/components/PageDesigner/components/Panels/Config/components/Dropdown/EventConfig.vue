@@ -24,17 +24,16 @@
             </j-form-item>
         </div>
           <j-form-item label="数据源" name="query" >
-              <j-input v-model:value="formModel.query" placeholder="请输入数据源地址">
-                  <template #addonBefore>
-                      <j-select v-model:value="formModel.methods" style="width: 100px;" :options="[
-                          { label: 'GET', value: 'get' },
-                          { label: 'POST', value: 'post' },
-                          { label: 'PUT', value: 'put' },
-                          { label: 'PATCH', value: 'patch' },
-                          { label: 'DELETE', value: 'remove' },
-                      ]" />
-                  </template>
-              </j-input>
+            <div class="query">
+              <j-select v-model:value="formModel.methods" :options="[
+                  { label: 'GET', value: 'get' },
+                  { label: 'POST', value: 'post' },
+                  { label: 'PUT', value: 'put' },
+                  { label: 'PATCH', value: 'patch' },
+                  { label: 'DELETE', value: 'remove' },
+                ]" style="width: 100px;"/>
+              <DataSourceList v-model:value="formModel.query" />
+            </div>
           </j-form-item>
           <j-form-item label="默认参数" name="defaultParams">
               <j-monaco-editor v-model="formModel.defaultParams" language="json" style="height: 160px" />
@@ -86,6 +85,8 @@ import { useProduct } from "@LowCode/store";
 import { storeToRefs } from "pinia";
 import { providerEnum } from "@LowCode/components/ProJect";
 import { cloneDeep, pick } from "lodash-es";
+import { DataSourceList } from '../DataSource'
+
 const props = defineProps({
   data: {
       type: Object,
@@ -181,4 +182,8 @@ onMounted(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.query {
+  display: flex;
+}
+</style>
