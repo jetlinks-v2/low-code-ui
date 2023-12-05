@@ -4,6 +4,7 @@ import {request as axiosRequest} from '@jetlinks-web/core'
 import PagePreview from "@LowCode/components/PageDesigner/preview.vue";
 import FormPreview from "@LowCode/components/FormDesigner/preview.vue";
 import {useTool} from "@LowCode/components/PageDesigner/hooks";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
     name: 'ProTableModal',
@@ -20,6 +21,7 @@ export default defineComponent({
         const {modalType, type, code, title, data, createdCode, okCode, width, footerVisible} = props?.data
         const {isEditModel} = useTool()
         const route = useRoute()
+        const router = useRouter()
         const formRef = ref()
         const pageRef = ref()
         const myValue = ref()
@@ -31,8 +33,8 @@ export default defineComponent({
         const onCreatedFn = (code?: string) => {
             if (code && !isEditModel.value) {
                 const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
-                const fn = new Function('record', 'axios', 'route', 'refs', code)
-                fn(data || {}, axiosRequest, route, _refs)
+                const fn = new Function('record', 'axios', 'route', 'router', 'refs', code)
+                fn(data || {}, axiosRequest, route, router, _refs)
             }
         }
 
@@ -55,9 +57,9 @@ export default defineComponent({
 
         const onSave = async () => {
             if (!okCode) return
-            const handleResultFn = new Function('axios', 'route', 'refs', okCode)
+            const handleResultFn = new Function('axios', 'route', 'router', 'refs', okCode)
             const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
-            const resp = await handleResultFn(axiosRequest, route,  _refs)
+            const resp = await handleResultFn(axiosRequest, route, router,  _refs)
             if (resp) {
                 emit('save', true)
             }

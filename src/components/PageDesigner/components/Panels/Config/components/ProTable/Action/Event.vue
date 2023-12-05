@@ -93,7 +93,7 @@
           </template>
           <j-form-item label="确认事件" name="okCode">
             <div>{{
-                formState.type === 'confirm' ? 'function (record, axios, refs)' : (formState.type !== 'common' ? 'function (axios, route, refs)' : 'function (record, route, axios, refs)')
+                formState.type === 'confirm' ? 'function (record, axios, refs)' : (formState.type !== 'common' ? 'function (axios, route, router, refs)' : 'function (record, route, router, axios, refs)')
               }}
             </div>
             <ProMonaco :tipCode="defaultCode" v-model:value="formState.okCode" language="javascript" style="height: 300px" />
