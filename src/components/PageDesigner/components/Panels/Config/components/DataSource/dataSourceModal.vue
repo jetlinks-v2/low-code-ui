@@ -18,7 +18,7 @@ const formRef = ref()
 const onSave = () => {
   formRef.value?.onSave().then(res => {
     if (res) {
-      emit('save', formModel)
+      emit('save', res)
     }
   })
 }

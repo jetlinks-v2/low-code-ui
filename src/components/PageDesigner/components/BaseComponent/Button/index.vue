@@ -103,6 +103,9 @@ const handleRequestFn = async () => {
         } catch (e) {
             console.error(e)
         }
+    }else{
+        const handleResultFn = new Function(config.click)
+        handleResultFn()
     }
 }
 
