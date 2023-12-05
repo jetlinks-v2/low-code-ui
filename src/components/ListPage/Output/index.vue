@@ -513,8 +513,8 @@ const handleRowActions = () => {
 const query = (_params: Record<string, any>) => {
   return queryRuntime(
     props.projectId,
-    allData.value?.dataBind.data.function,
-    allData.value?.dataBind.data.command,
+    allData.value?.dataBind?.data?.function,
+    allData.value?.dataBind?.data?.command,
     _params,
   )
 }
