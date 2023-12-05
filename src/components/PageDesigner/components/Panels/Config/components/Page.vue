@@ -50,6 +50,7 @@
           label="菜单code"
           :name="['componentProps', 'pageCode']"
           required
+          :rules="codeRules"
       >
         <j-input v-model:value="target.componentProps.pageCode" placeholder="请输入菜单code" @change="onDataChange"/>
       </j-form-item>
@@ -61,10 +62,20 @@
 import {useTarget} from "../../../../hooks";
 import {ImageUpload} from "@LowCode/components";
 import Icon from './Icon/index.vue'
+import { useProduct } from '@LowCode/store'
+import { getMenus } from '@LowCode/utils/project'
 
 const {target} = useTarget();
+const project = useProduct()
 
 const emits = defineEmits(["refresh"]);
+
+const codeRules = [{
+  validator: (_: any, value: string) => {
+    const maps = project.getDataMap()
+    //
+  }
+}]
 
 const onDataChange = () => {
   emits("refresh", target.value);

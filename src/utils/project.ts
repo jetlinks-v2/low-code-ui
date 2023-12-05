@@ -4,6 +4,7 @@ import { cloneDeep, omit } from "lodash-es";
 export type IntegrateFilterType = { key: string, value: Array<any>}
 export const Integrate = (data: any[], filter?: IntegrateFilterType) => {
   const cloneData = cloneDeep(data)
+
   const { children, others, ...project } = cloneData[0]
 
   const arr = handleChildren([{
@@ -65,4 +66,15 @@ const handleChildren = (data: any[], filter?: IntegrateFilterType) => {
     }
   })
   return modules
+}
+
+export const getMenus = (dataMap: Map<string, any>) => {
+  const data = cloneDeep([...dataMap.values()])
+
+  return data?.filter(item => {
+    return item.others && item.others?.menu && item.others?.menu.main
+  }).map(item => {
+    item.parentFullId = dataMap.get(item.parentId).fullId || item.parentId
+    return item
+  })
 }
