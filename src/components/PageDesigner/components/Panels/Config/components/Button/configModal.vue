@@ -23,8 +23,9 @@
                 <j-form-item label="点击事件" name="click">
                     <div>
                         <span style="font-weight: 600;">function (result, util, global) </span>
-                        <j-monaco-editor v-model="formModel.click" language="javascript"
-                            :registrationTypescript="registrationTypescript" style="height: 200px" />
+                        <!-- <j-monaco-editor v-model="formModel.click" language="javascript"
+                            :registrationTypescript="registrationTypescript" style="height: 200px" /> -->
+                            <ProMonaco :tipCode="defaultCode" v-model:value="formModel.click" language="javascript" style="height: 300px" />
                     </div>
                 </j-form-item>
             </template>
@@ -35,8 +36,9 @@
                 <j-form-item label="确认事件" name="confirm">
                     <div>
                         <span style="font-weight: 600;">function (result, util, global)</span>
-                        <j-monaco-editor v-model="formModel.confirm" language="javascript"
-                            :registrationTypescript="registrationTypescript" style="height: 200px" />
+                        <ProMonaco :tipCode="defaultCode" v-model:value="_value" language="javascript" style="height: 300px" />
+                        <!-- <j-monaco-editor v-model="formModel.confirm" language="javascript"
+                            :registrationTypescript="registrationTypescript" style="height: 200px" /> -->
                     </div>
                 </j-form-item>
             </template>
@@ -44,16 +46,17 @@
                 <j-form-item label="确认事件" name="ok">
                     <div>
                         <span style="font-weight: 600;">function (result, util, global)</span>
-                        <div>//调用数据源的回调</div>
-                        <j-monaco-editor v-model="formModel.ok" language="javascript"
-                            :registrationTypescript="registrationTypescript" style="height: 200px" />
+                        <!-- <j-monaco-editor v-model="formModel.ok" language="javascript"
+                            :registrationTypescript="registrationTypescript" style="height: 200px" /> -->
+                            <ProMonaco :tipCode="defaultCode" v-model:value="formModel.ok" language="javascript" style="height: 300px" />
                     </div>
                 </j-form-item>
                 <j-form-item label="取消事件" name="cancel">
                     <div>
                         <span style="font-weight: 600;">function (util, global)</span>
-                        <j-monaco-editor v-model="formModel.cancel" language="javascript"
-                            :registrationTypescript="registrationTypescript" style="height: 200px" />
+                        <!-- <j-monaco-editor v-model="formModel.cancel" language="javascript"
+                            :registrationTypescript="registrationTypescript" style="height: 200px" /> -->
+                            <ProMonaco :tipCode="defaultCode" v-model:value="formModel.cancel" language="javascript" style="height: 300px" />
                     </div>
                 </j-form-item>
             </template>
@@ -97,16 +100,35 @@ const formModel = reactive({
 
 const formRef = ref()
 
-const registrationTypescript = {
-    name: 'typescript',
-    typescript: `
-      type ResultDataType = {
-          data: Array<any>
-      }
-      type ResultType = Array<any> | ResultDataType
-      const result: ResultType
-    `
+const defaultCode = `
+/**
+* @params result {Axios} 请求实例
+* @params route {Object} 路由信息
+* @params refs  {Object} 当前组件下的refs
+*/
+function _fun({ axios, route, refs}){
+
+  /**
+  * 接口请求
+  * post、postParams、get、patch、remove、put
+  */
+
+  axios.post('/instance/_query', { sorts: [{ name: 'createTime', order: 'desc' }] })
+  // axios.postParams(url, data, params)
+  // axios.get(url, params)
+  // axios.patch(url, data)
+  // axios.remove(url, params)
+  // axios.put(url, data)
+
+  /**
+  * 路由信息
+  * route.params
+  * route.query
+  */
+  const is = route.params.id
+
 }
+`
 
 const onSave = () => {
     formRef.value?.validateFields().then(res => {

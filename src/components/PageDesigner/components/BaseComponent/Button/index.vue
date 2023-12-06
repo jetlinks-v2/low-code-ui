@@ -24,6 +24,7 @@ import Modal from './buttonModal.vue'
 import Drawer from './buttonDrawer.vue'
 import { request as axiosRequest } from "@jetlinks-web/core/src/request";
 import {usePageProvider, useTool} from "@LowCode/components/PageDesigner/hooks";
+import { useMenuStore } from "@LowCode/store/menu";
 
 const props = defineProps({
     text: {
@@ -73,6 +74,7 @@ const props = defineProps({
 });
 
 const { paramsUtil, _global } = useTool()
+// const { jumpPageByCode } = useMenuStore()
 
 const visible = ref(false)
 
