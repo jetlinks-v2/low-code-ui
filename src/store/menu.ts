@@ -63,6 +63,18 @@ export const useMenuStore = defineStore('menu', () => {
     }
   }
 
+  const jumpPageByCode = (code: string, options: { params?: Record<string, any>, query?: Record<string, any> } = {}) => {
+    if (hasMenu(code)) {
+      const { params = {}, query = {} } = options
+      const _menuItem = menusMap.value.get(code)
+      router.push({path: _menuItem.path, params, query})
+      setParamsValue(code, params)
+    } else {
+      onlyMessage('暂无权限，请联系管理员', 'error')
+      console.warn(`没有找到对应的页面: ${code}`)
+    }
+  }
+
   const handleMenusMapById = (item: { name: string, path: string }) => {
     const {name, path} = item
     if (name) {
@@ -77,6 +89,7 @@ export const useMenuStore = defineStore('menu', () => {
 
     if (resp.success) {
       const result = resp.result
+      const allMenus = handleMenuInit(cloneDeep(result))
       const filterMenu = handleMenuInit(result.filter(item => ['process', 'web_ide'].includes(item.code)))
 
       const systemMenu = result.find(item => item.code === 'system')
@@ -86,24 +99,27 @@ export const useMenuStore = defineStore('menu', () => {
           hideInMenu: true
         }
 
+        allMenus.push(systemMenu)
         filterMenu.push(systemMenu)
       }
       const workFlowMenu = [ ...filterMenu, ...BASIC_ROUTER_DATA]
-      const routes = handleMenus(cloneDeep(workFlowMenu), extraMenu, asyncRoutes) // 处理路由
 
-      if (routes.length) {
-        routes.push({
+      const routes = handleMenus(cloneDeep([ ...allMenus, ...BASIC_ROUTER_DATA]), extraMenu, asyncRoutes) // 处理路由
+      const base_routers = handleMenus(cloneDeep(workFlowMenu), extraMenu, asyncRoutes) // 处理路由
+      if (base_routers.length) {
+        base_routers.push({
           path: '/',
-          redirect: routes[0].path
+          redirect: base_routers[0].path
         })
       }
 
       authStore.handlePermission(resp.result) // 处理按钮权限
-      menu.value = routes
+      menu.value = base_routers
 
+      console.log(routes)
       handleMenusMap(routes, handleMenusMapById)
       siderMenus.value = handleSiderMenu(cloneDeep(filterMenu)) // 处理菜单
-
+      console.log(siderMenus.value)
     }
   }
 
@@ -114,6 +130,7 @@ export const useMenuStore = defineStore('menu', () => {
     hasRouteMenu,
     hasMenu,
     jumpPage,
-    queryMenus
+    queryMenus,
+    jumpPageByCode
   }
 })
