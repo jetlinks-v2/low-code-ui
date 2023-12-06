@@ -1,6 +1,5 @@
 <template>
-    <!-- <span :style="style">{{ _value }}</span> -->
-    <j-image :width="width" :src="_value" fallback=""></j-image>
+    <j-image :width="width" :src="_value" ></j-image>
 </template>
 
 <script lang="ts" setup>
@@ -10,11 +9,11 @@ import {usePageDependencies, useTool} from "../../hooks";
 const props = defineProps({
     value: {
         type: String,
-        default: ''
+        default: 'https://aliyuncdn.antdv.com/vue.png'
     },
     width: {
-        type: Object,
-        default: () => {}
+        type: Number,
+        default: 200
     },
     responder: {
       type: Object,

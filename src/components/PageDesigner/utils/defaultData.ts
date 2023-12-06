@@ -60,6 +60,13 @@ export const basic: ISchema[] = [
         name: '内嵌页面',
         componentProps:{}
     },
+    {
+        type:'image',
+        name: '图片预览',
+        componentProps:{
+            width:200
+        }
+    }
 ]
 
 export const layout: ISchema[] = [

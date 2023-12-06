@@ -1,4 +1,4 @@
-import { Button, Tag, Text, Form, Dropdown, Page } from '../components/BaseComponent/index'
+import { Button, Tag, Text, Form, Dropdown, Page ,Image} from '../components/BaseComponent/index'
 
 const componentMap = {
     'text': Text,
@@ -6,7 +6,8 @@ const componentMap = {
     'tag': Tag,
     'form': Form,
     'dropdown': Dropdown,
-    'page': Page
+    'page': Page,
+    'image':Image
 }
 
 export default componentMap;
