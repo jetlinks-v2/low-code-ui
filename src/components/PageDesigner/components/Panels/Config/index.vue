@@ -42,6 +42,7 @@ import {map} from "lodash-es";
 import {getConfigList} from "./utils";
 import {updateData} from "@LowCode/components/PageDesigner/utils/utils";
 import SourceForm from "./components/SourceForm.vue";
+import SourcePage from "./components/SourcePage.vue";
 
 const formRef = ref<any>();
 
@@ -60,7 +61,8 @@ const Panels = {
   Base,
   Status,
   Button,
-  SourceForm
+  SourceForm,
+  SourcePage
 };
 
 const panelsList = computed(() => {

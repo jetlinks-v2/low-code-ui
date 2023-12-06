@@ -151,3 +151,14 @@ export const copyDataByKey = (arr: any[], newData: any[], _item: any) => {
         return [...arr.slice(0, _index + 1), ...newData, ...arr.slice(_index + 1, arr?.length)]
     }
 }
+
+export const _getData = (arr: any[]) => {
+    return arr.map(item => {
+        return {
+            ordinal: item?.ordinal,
+            label: item.text,
+            value: item.value,
+            children: _getData(item?.children || [])
+        }
+    })
+}
