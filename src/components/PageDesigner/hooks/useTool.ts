@@ -7,6 +7,7 @@ import {providerEnum} from "@LowCode/components/ProJect";
 import { useRoute, useRouter } from 'vue-router';
 import {request as axiosRequest} from '@jetlinks-web/core'
 import {usePageProvider} from "./usePageProvider";
+import { useMenuStore } from '@LowCode/store'
 
 const useTool = () => {
     const designer: any = inject('PageDesigner')
@@ -15,11 +16,13 @@ const useTool = () => {
     const pageDesigner = usePageDesigner();
     const pageProvider = usePageProvider()
     const _noCopyData = ['steps-item', 'info-item', 'info-item-item', 'info-item-item-item', 'timeline-item', 'inline-item', 'card-item', 'tabs-item']
+    const { jumpPageByCode } = useMenuStore()
 
     const paramsUtil = {
         route: useRoute(),
         router: useRouter(),
         axios: axiosRequest,
+        jumpPageByCode: jumpPageByCode,
     }
 
     const _global = {
