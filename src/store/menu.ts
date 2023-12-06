@@ -89,7 +89,7 @@ export const useMenuStore = defineStore('menu', () => {
 
     if (resp.success) {
       const result = resp.result
-      const allMenus = handleMenuInit(result)
+      const allMenus = handleMenuInit(cloneDeep(result))
       const filterMenu = handleMenuInit(result.filter(item => ['process', 'web_ide'].includes(item.code)))
 
       const systemMenu = result.find(item => item.code === 'system')
@@ -119,7 +119,7 @@ export const useMenuStore = defineStore('menu', () => {
       console.log(routes)
       handleMenusMap(routes, handleMenusMapById)
       siderMenus.value = handleSiderMenu(cloneDeep(filterMenu)) // 处理菜单
-
+      console.log(siderMenus.value)
     }
   }
 
