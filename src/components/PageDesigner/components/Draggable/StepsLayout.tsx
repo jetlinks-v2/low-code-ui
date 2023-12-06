@@ -2,12 +2,10 @@ import DraggableLayout from '../Draggable/DraggableLayout'
 import Selection from '../Selection/index'
 import {Steps, Step, Button, Space, AIcon} from 'jetlinks-ui-components'
 import './index.less'
-import {useLifeCycle, usePageProvider, useTool} from '../../hooks'
+import {useLifeCycle, useTool} from '../../hooks'
 import {withModifiers} from 'vue'
 import generatorData from '../../utils/generatorData'
 import {uid} from '../../utils/uid'
-import {request as axiosRequest} from "@jetlinks-web/core/src/request";
-import {useRoute} from "vue-router";
 
 export default defineComponent({
     name: 'StepsLayout',
@@ -25,10 +23,8 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const {isDragArea, isEditModel, onAddChild} = useTool()
+        const {isDragArea, isEditModel, onAddChild, paramsUtil} = useTool()
         const {executionMounted} = useLifeCycle(props.data.componentProps, {}, isEditModel)
-        const route = useRoute()
-        const pageProvider = usePageProvider()
         const _data = computed(() => {
             return props.data
         })
@@ -54,6 +50,7 @@ export default defineComponent({
                 current.value = cur || 0
             }
         }
+
         onMounted(() => {
             executionMounted()
         })
@@ -71,11 +68,10 @@ export default defineComponent({
                 }
                 return <Button {..._props} onClick={() => {
                     if(!unref(isEditModel) && i.eventCode) {
-                        const handleResultFn = new Function('axios', 'route', 'refs', i?.eventCode)
-                        handleResultFn(axiosRequest, route, {
-                            slots: pageProvider.slots,
+                        const handleResultFn = new Function('refs', 'util', i?.eventCode)
+                        handleResultFn({
                             current
-                        })
+                        }, paramsUtil)
                     }
                 }}>{i.text}</Button>
             })

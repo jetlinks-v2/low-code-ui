@@ -26,6 +26,7 @@ import FormView from '@LowCode/components/FormDesigner/preview.vue'
 import { providerEnum } from "@LowCode/components/ProJect";
 import { request as axiosRequest } from "@jetlinks-web/core/src/request";
 import { inject } from 'vue';
+import {useTool} from "@LowCode/components/PageDesigner/hooks";
 
 const props = defineProps({
     data: {
@@ -39,7 +40,7 @@ const type = computed(() => props.data?.resource?.type)
 const _value = ref({})
 const _configuration = ref()
 const formRef = ref()
-
+const { paramsUtil } = useTool()
 
 const defaultParams = () => {
     try {
@@ -61,8 +62,8 @@ const handleRequestFn = async (data) => {
                 ids:selectKeys
             })
             if (props.data?.ok) {
-                const handleResultFn = new Function('result', config.ok)
-                handleResultFn(resp)
+              const handleResultFn = new Function('result', 'util', config.ok)
+              handleResultFn(resp, paramsUtil)
             } 
         } catch (e) {
             console.error(e)

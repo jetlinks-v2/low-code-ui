@@ -29,8 +29,7 @@ import { request as axiosRequest } from "@jetlinks-web/core/src/request";
 import PageView from '../../../preview.vue'
 import FormView from '@LowCode/components/FormDesigner/preview.vue'
 import { providerEnum } from "@LowCode/components/ProJect";
-import {usePageProvider} from "@LowCode/components/PageDesigner/hooks";
-import { useRouter } from 'vue-router';
+import {useTool} from "@LowCode/components/PageDesigner/hooks";
 
 const props = defineProps({
     buttonConfig: {
@@ -39,14 +38,13 @@ const props = defineProps({
 })
 const emit = defineEmits(['close'])
 const confirmLoading = ref(false)
-const pageProvider = usePageProvider()
-const route = useRoute()
-const router = useRouter()
 
 const type = computed(() => props.buttonConfig?.created?.resource?.type)
 const _value = ref({})
 const _configuration = ref()
 const formRef = ref()
+
+const { paramsUtil } = useTool()
 
 const defaultParams = () => {
     try {
@@ -67,16 +65,16 @@ const handleRequestFn = async (data) => {
                 ...data
             })
             if (config.ok) {
-              const handleResultFn = new Function('context',  'route','router', 'result', config.ok)
-              handleResultFn(pageProvider.context, route, router, resp)
+              const handleResultFn = new Function('result', 'util', config.ok)
+              handleResultFn(resp, paramsUtil)
             }
         } catch (e) {
             console.error(e)
         }
     } else {
         if (config.ok) {
-            const handleResultFn = new Function(config.ok)
-            handleResultFn()
+            const handleResultFn = new Function('util', config.ok)
+            handleResultFn(paramsUtil)
         }
     }
 }
@@ -85,8 +83,8 @@ const handleRequestFn = async (data) => {
 
 const onCancel = () => {
     if(props.buttonConfig?.config?.cancel){
-        const func = Function( props.buttonConfig?.config.cancel)
-        func()
+        const func = Function('util', props.buttonConfig?.config.cancel)
+        func(paramsUtil)
     }
     emit('close')
 };
@@ -96,7 +94,6 @@ const onOk = async () => {
         const res = await formRef.value?.onSave()
         if (res) {
             confirmLoading.value = true
-            console.log(res)
             await handleRequestFn(res).finally(() => {
                 confirmLoading.value = false
                 emit('close')

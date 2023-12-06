@@ -23,8 +23,7 @@ import { PropType, ref } from "vue";
 import Modal from './buttonModal.vue'
 import Drawer from './buttonDrawer.vue'
 import { request as axiosRequest } from "@jetlinks-web/core/src/request";
-import {usePageProvider} from "@LowCode/components/PageDesigner/hooks";
-import {useRouter} from 'vue-router'
+import {usePageProvider, useTool} from "@LowCode/components/PageDesigner/hooks";
 
 const props = defineProps({
     text: {
@@ -73,9 +72,9 @@ const props = defineProps({
     },
 });
 
+const { paramsUtil } = useTool()
+
 const pageProvider = usePageProvider()
-const route = useRoute()
-const router = useRouter()
 
 const visible = ref(false)
 
@@ -99,16 +98,16 @@ const handleRequestFn = async () => {
         try {
             const resp = await axiosRequest[config.methods](config.query, paramsData)
             if (config.click) {
-                const handleResultFn = new Function('context', 'route', 'router', 'result', config.click)
-                handleResultFn(pageProvider.context, route, router, resp)
+                const handleResultFn = new Function('result', 'util', config.click)
+                handleResultFn(resp, paramsUtil)
             } 
         } catch (e) {
             console.error(e)
         }
     } else {
       if (config.click) {
-        const handleResultFn = new Function('context', 'route', 'router', config.click)
-        handleResultFn(pageProvider.context, route, router)
+        const handleResultFn = new Function('result', 'util', config.click)
+        handleResultFn({}, paramsUtil)
       }
     }
 }
