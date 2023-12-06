@@ -3,6 +3,8 @@ import {defineComponent, inject} from 'vue'
 import {useTool, usePageProvider, useLifeCycle} from '../../hooks'
 import Search from '../../../Search/Search.vue'
 import {request as axiosRequest} from "@jetlinks-web/core/src/request";
+import {queryDictionaryData} from "@LowCode/api/form";
+import {_getData} from "@LowCode/components/PageDesigner/utils/utils";
 
 export default defineComponent({
     name: 'ProTableLayout',
@@ -30,7 +32,6 @@ export default defineComponent({
         })
 
         const columns = computed(() => {
-            console.log(props.data.componentProps.columns)
             return (props.data.componentProps.columns || [])?.map((item: any) => {
                 const obj = {
                     dataIndex: item.dataIndex,
@@ -48,6 +49,12 @@ export default defineComponent({
                                     resolve(handleResultFn(resp))
                                 }
                                 resolve(resp)
+                            })
+                    } else if(item.search?.options?.type === 'dic'){
+                        _options = () =>
+                            new Promise(async (resolve) => {
+                                const resp = await queryDictionaryData(item.search?.options?.dictionary)
+                                resolve(_getData(resp?.result || []))
                             })
                     } else {
                         _options = JSON.parse(item.search?.options?.optionsJson || '[]')

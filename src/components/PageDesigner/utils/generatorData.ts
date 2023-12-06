@@ -8,7 +8,7 @@ const handleProps = (node: any) => {
     if (!result?.mountedCode) {
         result.mountedCode = ''
     }
-    if(node.type === 'form'){
+    if(['form', 'page'].includes(node.type)){
         if (!result?.source) {
             result.source = {}
         }

@@ -53,9 +53,12 @@ export const basic: ISchema[] = [
     {
         type: 'form',
         name: '表单',
-        componentProps:{
-            
-        }
+        componentProps:{}
+    },
+    {
+        type: 'page',
+        name: '内嵌页面',
+        componentProps:{}
     },
 ]
 
@@ -166,6 +169,18 @@ export const layout: ISchema[] = [
             align: 'top',
             hidden: false
         }
+    },
+    {
+        type: 'list',
+        name: '列表',
+        componentProps: {},
+        children: [
+            {
+                type: 'list-item',
+                componentProps: {},
+                children: [],
+            },
+        ]
     },
 ]
 
