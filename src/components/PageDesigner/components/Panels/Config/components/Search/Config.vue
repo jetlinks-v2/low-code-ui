@@ -79,6 +79,7 @@ import { cloneDeep } from "lodash-es";
 import Modal from "./Modal.vue";
 import { regular } from "@jetlinks-web/utils";
 import RenderConfig from './renderConfig.vue'
+import {QuickEditTable} from '@LowCode/components/index'
 
 const props = defineProps({
   data: {
