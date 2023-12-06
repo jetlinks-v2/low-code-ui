@@ -35,6 +35,7 @@
 
 <script setup >
 import { useTarget } from '../../../../../hooks'
+import {QuickEditTable} from '@LowCode/components/index'
 
 const { target } = useTarget()
 const props = defineProps({

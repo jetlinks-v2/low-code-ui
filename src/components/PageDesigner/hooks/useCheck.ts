@@ -1,7 +1,9 @@
 import {ISchema} from "../typings";
 import useTool from './useTool'
-const useCheck = (validateData: any) => {
+import { useProduct } from '@LowCode/store'
+const useCheck = (validateData?: any) => {
     const designer: any = inject('PageDesigner')
+    const project = useProduct()
     const { getFormList } = useTool()
     const errorMap = new Map()
 
@@ -11,11 +13,21 @@ const useCheck = (validateData: any) => {
     const checkedConfigItem = (node: ISchema) => {
         const obj = {
             key: node?.key,
-            message: node.name + '配置错误'
+            message: (node?.name || node?.key) + '配置错误'
         }
         const _type = node.type || 'root'
         if (_type === 'root' && node.componentProps?.isPage) {
-            if(node.componentProps?.pageCode || node.componentProps?.pageName){
+            if(!node.componentProps?.pageCode || !node.componentProps?.pageName){
+                return obj
+            }
+            const maps = project.getDataMap()
+            const arr: any[] = []
+            maps.forEach(_value => {
+                if(_value?.others?.menu?.main && _value?.id !== designer.data?.id && _value?.others?.menu?.code){
+                    arr.push(_value?.others?.menu?.code)
+                }
+            })
+            if(arr.includes(node.componentProps?.pageCode)){
                 return obj
             }
         } else {

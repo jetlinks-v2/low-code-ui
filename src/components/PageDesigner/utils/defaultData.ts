@@ -5,6 +5,7 @@ export const initData = {
     key: "root",
     componentProps: {
         mountedCode: '',
+        isPage: false
     },
     children: [],
 }

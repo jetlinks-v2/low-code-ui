@@ -53,6 +53,7 @@ import {cloneDeep} from "lodash-es";
 import Icon from "../../Icon/index.vue";
 import {uid} from "@LowCode/components/PageDesigner/utils/uid";
 import Event from './Event.vue';
+import {QuickEditTable} from '@LowCode/components/index'
 
 const props = defineProps({
   value: {
@@ -113,7 +114,6 @@ const myColumns: any[] = [
 ];
 
 watchEffect(() => {
-  console.log(props.value, 'props.value')
   dataSource.value = cloneDeep(props.value || []);
 });
 
