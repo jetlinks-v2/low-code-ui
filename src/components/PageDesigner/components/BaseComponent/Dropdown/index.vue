@@ -96,7 +96,7 @@ const props = defineProps({
 const selectConfig: any = inject('selectConfig')
 const visible = ref(false)
 const _item = ref()
-const { paramsUtil } = useTool()
+const { paramsUtil, _global } = useTool()
 
 
 const comVisible = ref(false)
@@ -143,8 +143,8 @@ const handleRequestFn = async () => {
     try {
       const resp = await axiosRequest[config.methods](config.query, paramsData)
       if (config.click) {
-        const handleResultFn = new Function('result', 'util', config.click)
-        handleResultFn(resp.result, paramsUtil)
+        const handleResultFn = new Function('result', 'util', 'global', config.click)
+        handleResultFn(resp.result, paramsUtil, _global)
       }
     } catch (e) {
       console.error(e)

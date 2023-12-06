@@ -20,6 +20,9 @@ const useTool = () => {
         route: useRoute(),
         router: useRouter(),
         axios: axiosRequest,
+    }
+
+    const _global = {
         context: pageProvider.context,
         slots: pageProvider.slots,
     }
@@ -200,6 +203,7 @@ const useTool = () => {
 
     return {
         paramsUtil,
+        _global,
         isEditModel,
         isDragArea,
         _model,

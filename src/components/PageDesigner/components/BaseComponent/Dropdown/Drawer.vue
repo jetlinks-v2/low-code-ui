@@ -39,7 +39,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['close'])
 const confirmLoading = ref(false)
-const { paramsUtil } = useTool()
+const { paramsUtil, _global } = useTool()
 
 const selectKeys = inject('selectConfig').getSelectKeys()
 const type = computed(() => props.data?.resource?.type)
@@ -67,8 +67,8 @@ const handleRequestFn = async (data) => {
                 ids:selectKeys
             })
             if (props.data?.ok) {
-                const handleResultFn = new Function('result', 'util', config.ok)
-                handleResultFn(resp, paramsUtil)
+                const handleResultFn = new Function('result', 'util', 'global', config.ok)
+                handleResultFn(resp, paramsUtil, _global)
             } 
         } catch (e) {
             console.error(e)

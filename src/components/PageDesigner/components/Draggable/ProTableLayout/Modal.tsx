@@ -19,22 +19,21 @@ export default defineComponent({
     emits: ['save', 'close'],
     setup(props, {emit}) {
         const {modalType, type, code, title, data, createdCode, okCode, width, footerVisible} = props?.data
-        const {isEditModel, paramsUtil} = useTool()
-        const route = useRoute()
-        const router = useRouter()
+        const {isEditModel, paramsUtil, _global} = useTool()
         const formRef = ref()
         const pageRef = ref()
         const myValue = ref()
 
         const config = computed(() => {
+            console.log(code)
             return JSON.parse(code || '{}')
         })
 
         const onCreatedFn = (code?: string) => {
             if (code && !isEditModel.value) {
                 const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
-                const fn = new Function('record', 'refs', 'util', code)
-                fn(data || {}, _refs, paramsUtil)
+                const fn = new Function('record', 'refs', 'util', 'global', code)
+                fn(data || {}, _refs, paramsUtil, _global)
             }
         }
 
@@ -55,9 +54,9 @@ export default defineComponent({
 
         const onSave = async () => {
             if (!okCode) return
-            const handleResultFn = new Function('refs', 'util', okCode)
+            const handleResultFn = new Function('refs', 'util', 'global', okCode)
             const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
-            const resp = await handleResultFn(_refs, paramsUtil)
+            const resp = await handleResultFn(_refs, paramsUtil, _global)
             if (resp) {
                 emit('save', true)
             }

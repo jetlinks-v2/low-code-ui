@@ -8,21 +8,15 @@
         :width="800"
         @cancel="visible = false"
     >
-      <div>function (axios, route, refs)</div>
-      <div style="height: 300px">
-        <j-monaco-editor
-            @errorChange="onErrorChange"
-            v-model="_value"
-            language="javascript"
-        />
-      </div>
+      <div>function (refs, util, global)</div>
+      <ProMonaco :tipCode="defaultCode" v-model:value="_value" language="javascript" style="height: 300px" />
     </j-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {ref, watchEffect} from "vue";
-import {onlyMessage} from "@jetlinks-web/utils";
+import {ProMonaco} from "../ProMonaco";
 
 const props = defineProps({
   value: {
@@ -35,23 +29,43 @@ const emits = defineEmits(["update:value"]);
 const visible = ref<boolean>(false)
 
 const _value = ref<any>(props.value || '');
-const _error = ref<any[]>([]);
-
-const onErrorChange = (error: any[]) => {
-  _error.value = error;
-};
 
 watchEffect(() => {
   _value.value = props.value
 });
 
+const defaultCode = `
+/**
+* @params axios {Axios} 请求实例
+* @params route {Object} 路由信息
+* @params refs  {Object} 当前组件下的refs
+*/
+function _fun({ axios, route, refs}){
+
+  /**
+  * 接口请求
+  * post、postParams、get、patch、remove、put
+  */
+
+  axios.post('/instance/_query', { sorts: [{ name: 'createTime', order: 'desc' }] })
+  // axios.postParams(url, data, params)
+  // axios.get(url, params)
+  // axios.patch(url, data)
+  // axios.remove(url, params)
+  // axios.put(url, data)
+
+  /**
+  * 路由信息
+  * route.params
+  * route.query
+  */
+  const is = route.params.id
+
+}
+`
 const onSave = async () => {
-  if (!_error.value?.length) {
-    emits("update:value", _value.value);
-    visible.value = false;
-  } else {
-    onlyMessage("代码有误，请检查", "error");
-  }
+  emits("update:value", _value.value);
+  visible.value = false;
 }
 </script>
 

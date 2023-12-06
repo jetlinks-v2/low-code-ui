@@ -33,7 +33,7 @@ const _value = ref({})
 const _configuration = ref()
 const formRef = ref()
 
-const { paramsUtil } = useTool()
+const { paramsUtil, _global } = useTool()
 
 const defaultParams = () => {
     try {
@@ -54,8 +54,8 @@ const handleRequestFn = async (data) => {
                 ...data
             })
             if (config.ok) {
-              const handleResultFn = new Function('result', 'util', config.ok)
-              handleResultFn(resp, paramsUtil)
+              const handleResultFn = new Function('result', 'util', 'global', config.ok)
+              handleResultFn(resp, paramsUtil, _global)
             }
         } catch (e) {
             console.error(e)

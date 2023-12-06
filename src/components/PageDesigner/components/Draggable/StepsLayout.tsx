@@ -23,7 +23,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const {isDragArea, isEditModel, onAddChild, paramsUtil} = useTool()
+        const {isDragArea, isEditModel, onAddChild, paramsUtil, _global} = useTool()
         const {executionMounted} = useLifeCycle(props.data.componentProps, {}, isEditModel)
         const _data = computed(() => {
             return props.data
@@ -68,10 +68,10 @@ export default defineComponent({
                 }
                 return <Button {..._props} onClick={() => {
                     if(!unref(isEditModel) && i.eventCode) {
-                        const handleResultFn = new Function('refs', 'util', i?.eventCode)
+                        const handleResultFn = new Function('refs', 'util', 'global', i?.eventCode)
                         handleResultFn({
                             current
-                        }, paramsUtil)
+                        }, paramsUtil, _global)
                     }
                 }}>{i.text}</Button>
             })

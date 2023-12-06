@@ -40,7 +40,7 @@ const type = computed(() => props.data?.resource?.type)
 const _value = ref({})
 const _configuration = ref()
 const formRef = ref()
-const { paramsUtil } = useTool()
+const { paramsUtil, _global } = useTool()
 
 const defaultParams = () => {
     try {
@@ -62,8 +62,8 @@ const handleRequestFn = async (data) => {
                 ids:selectKeys
             })
             if (props.data?.ok) {
-              const handleResultFn = new Function('result', 'util', config.ok)
-              handleResultFn(resp, paramsUtil)
+              const handleResultFn = new Function('result', 'util', 'global', config.ok)
+              handleResultFn(resp, paramsUtil, _global)
             } 
         } catch (e) {
             console.error(e)

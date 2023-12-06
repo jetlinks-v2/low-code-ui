@@ -72,9 +72,7 @@ const props = defineProps({
     },
 });
 
-const { paramsUtil } = useTool()
-
-const pageProvider = usePageProvider()
+const { paramsUtil, _global } = useTool()
 
 const visible = ref(false)
 
@@ -98,16 +96,16 @@ const handleRequestFn = async () => {
         try {
             const resp = await axiosRequest[config.methods](config.query, paramsData)
             if (config.click) {
-                const handleResultFn = new Function('result', 'util', config.click)
-                handleResultFn(resp, paramsUtil)
+                const handleResultFn = new Function('result', 'util', 'global', config.click)
+                handleResultFn(resp, paramsUtil, _global)
             } 
         } catch (e) {
             console.error(e)
         }
     } else {
       if (config.click) {
-        const handleResultFn = new Function('result', 'util', config.click)
-        handleResultFn({}, paramsUtil)
+        const handleResultFn = new Function('result', 'util', 'global', config.click)
+        handleResultFn({}, paramsUtil, _global)
       }
     }
 }

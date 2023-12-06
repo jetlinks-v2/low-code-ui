@@ -44,7 +44,7 @@ const _value = ref({})
 const _configuration = ref()
 const formRef = ref()
 
-const { paramsUtil } = useTool()
+const { paramsUtil, _global } = useTool()
 
 const defaultParams = () => {
     try {
@@ -65,16 +65,16 @@ const handleRequestFn = async (data) => {
                 ...data
             })
             if (config.ok) {
-              const handleResultFn = new Function('result', 'util', config.ok)
-              handleResultFn(resp, paramsUtil)
+              const handleResultFn = new Function('result', 'util', 'global', config.ok)
+              handleResultFn(resp, paramsUtil, _global)
             }
         } catch (e) {
             console.error(e)
         }
     } else {
         if (config.ok) {
-            const handleResultFn = new Function('util', config.ok)
-            handleResultFn(paramsUtil)
+            const handleResultFn = new Function('util', 'global', config.ok)
+            handleResultFn(paramsUtil, _global)
         }
     }
 }
@@ -83,8 +83,8 @@ const handleRequestFn = async (data) => {
 
 const onCancel = () => {
     if(props.buttonConfig?.config?.cancel){
-        const func = Function('util', props.buttonConfig?.config.cancel)
-        func(paramsUtil)
+        const func = Function('util', 'global', props.buttonConfig?.config.cancel)
+        func(paramsUtil, _global)
     }
     emit('close')
 };
