@@ -22,7 +22,7 @@
             <template v-if="type === 'Button'">
                 <j-form-item label="点击事件" name="click">
                     <div>
-                        <span style="font-weight: 600;">function (context, route, router, result) </span>
+                        <span style="font-weight: 600;">function (result, util, global) </span>
                         <j-monaco-editor v-model="formModel.click" language="javascript"
                             :registrationTypescript="registrationTypescript" style="height: 200px" />
                     </div>
@@ -34,7 +34,7 @@
                 </j-form-item>
                 <j-form-item label="确认事件" name="confirm">
                     <div>
-                        <span style="font-weight: 600;">function (result) {</span>
+                        <span style="font-weight: 600;">function (result, util, global)</span>
                         <j-monaco-editor v-model="formModel.confirm" language="javascript"
                             :registrationTypescript="registrationTypescript" style="height: 200px" />
                     </div>
@@ -43,7 +43,7 @@
             <template v-if="type === 'Modal' || type === 'Drawer'">
                 <j-form-item label="确认事件" name="ok">
                     <div>
-                        <span style="font-weight: 600;">function (result) {</span>
+                        <span style="font-weight: 600;">function (result, util, global)</span>
                         <div>//调用数据源的回调</div>
                         <j-monaco-editor v-model="formModel.ok" language="javascript"
                             :registrationTypescript="registrationTypescript" style="height: 200px" />
@@ -51,7 +51,7 @@
                 </j-form-item>
                 <j-form-item label="取消事件" name="cancel">
                     <div>
-                        <span style="font-weight: 600;">function () {</span>
+                        <span style="font-weight: 600;">function (util, global)</span>
                         <j-monaco-editor v-model="formModel.cancel" language="javascript"
                             :registrationTypescript="registrationTypescript" style="height: 200px" />
                     </div>
@@ -109,7 +109,6 @@ const registrationTypescript = {
 }
 
 const onSave = () => {
-    console.log(formRef.value)
     formRef.value?.validateFields().then(res => {
         if (res) {
             emit('save', formModel)

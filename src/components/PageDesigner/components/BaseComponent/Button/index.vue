@@ -16,16 +16,14 @@
     <Modal v-if="visible && buttonConfig?.type === 'Modal'" :button-config="buttonConfig" @close="setVisible(false)" />
     <Drawer v-if="visible && buttonConfig?.type === 'Drawer'" :button-config="buttonConfig" @close="setVisible(false)" />
 </template>
-
+  
 <script lang="ts" setup name="Button">
 import { omit } from "lodash-es";
 import { PropType, ref } from "vue";
 import Modal from './buttonModal.vue'
 import Drawer from './buttonDrawer.vue'
 import { request as axiosRequest } from "@jetlinks-web/core/src/request";
-import {usePageProvider} from "@LowCode/components/PageDesigner/hooks";
-import {useRouter} from 'vue-router'
-import { useMenuStore } from '@LowCode/store'
+import {usePageProvider, useTool} from "@LowCode/components/PageDesigner/hooks";
 
 const props = defineProps({
     text: {
@@ -74,10 +72,7 @@ const props = defineProps({
     },
 });
 
-const pageProvider = usePageProvider()
-const route = useRoute()
-const router = useRouter()
-const menu = useMenuStore()
+const { paramsUtil, _global } = useTool()
 
 const visible = ref(false)
 
@@ -101,18 +96,16 @@ const handleRequestFn = async () => {
         try {
             const resp = await axiosRequest[config.methods](config.query, paramsData)
             if (config.click) {
-                const handleResultFn = new Function('context', 'route', 'router', 'result', config.click)
-                handleResultFn(pageProvider.context, route, router, resp)
-            }
+                const handleResultFn = new Function('result', 'util', 'global', config.click)
+                handleResultFn(resp, paramsUtil, _global)
+            } 
         } catch (e) {
             console.error(e)
         }
     } else {
       if (config.click) {
-        const handleResultFn = new Function('context', 'route', 'jumpPageByCode','axios','refs', config.click)
-        handleResultFn(pageProvider.context, route, menu.jumpPageByCode, axiosRequest,{
-            slots: pageProvider.slots,
-        })
+        const handleResultFn = new Function('result', 'util', 'global', config.click)
+        handleResultFn({}, paramsUtil, _global)
       }
     }
 }
