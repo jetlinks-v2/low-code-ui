@@ -30,6 +30,7 @@ import PageView from '../../../preview.vue'
 import FormView from '@LowCode/components/FormDesigner/preview.vue'
 import { providerEnum } from "@LowCode/components/ProJect";
 import { inject } from 'vue';
+import {useTool} from "@LowCode/components/PageDesigner/hooks";
 
 const props = defineProps({
     data: {
@@ -38,6 +39,7 @@ const props = defineProps({
 })
 const emit = defineEmits(['close'])
 const confirmLoading = ref(false)
+const { paramsUtil, _global } = useTool()
 
 const selectKeys = inject('selectConfig').getSelectKeys()
 const type = computed(() => props.data?.resource?.type)
@@ -65,8 +67,8 @@ const handleRequestFn = async (data) => {
                 ids:selectKeys
             })
             if (props.data?.ok) {
-                const handleResultFn = new Function('result', config.ok)
-                handleResultFn(resp)
+                const handleResultFn = new Function('result', 'util', 'global', config.ok)
+                handleResultFn(resp, paramsUtil, _global)
             } 
         } catch (e) {
             console.error(e)
@@ -85,7 +87,7 @@ const onCancel = () => {
     emit('close')
 };
 
-const onOk =async () => {
+const onOk = async () => {
     if(type === providerEnum.FormPage){
         const res =await formRef.value?.onSave()
         if (res) {

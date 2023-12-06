@@ -113,6 +113,7 @@ const myColumns: any[] = [
 ];
 
 watchEffect(() => {
+  console.log(props.value, 'props.value')
   dataSource.value = cloneDeep(props.value || []);
 });
 

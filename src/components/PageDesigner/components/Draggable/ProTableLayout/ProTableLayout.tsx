@@ -28,12 +28,10 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const { isDragArea, isEditModel, onAddChild } = useTool()
+        const { isDragArea, isEditModel, onAddChild, paramsUtil, _global } = useTool()
         const pageProvider = usePageProvider()
         const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
         const tableRef = ref()
-        const route = useRoute()
-        const router = useRouter()
         const isSelect = ref(false)
         const _selectedRowKeys = ref([])
         const showSelect = () =>{
@@ -108,10 +106,10 @@ export default defineComponent({
                                 return <Tooltip title={item?.text}>
                                     <Popconfirm title={item.event?.confirmText || '确认吗？'} onConfirm={() => {
                                         if (item.event?.okCode && !unref(isEditModel)) {
-                                            const handleResultFn = new Function('record', 'axios', 'refs', item.event?.okCode)
-                                            handleResultFn(_record, axiosRequest, {
+                                            const handleResultFn = new Function('record', 'refs', 'util', 'global', item.event?.okCode)
+                                            handleResultFn(_record, {
                                                 tableRef
-                                            })
+                                            }, paramsUtil, _global)
                                         }
                                     }}>
                                         <Button type='link' {..._props} />
@@ -139,10 +137,10 @@ export default defineComponent({
                             } else {
                                 return <Tooltip title={item?.text}><Button type='link' {..._props} onClick={() => {
                                     if (item.event?.okCode && !unref(isEditModel)) {
-                                        const handleResultFn = new Function('record', 'axios', 'route', 'router', 'refs', item.event?.okCode)
-                                        handleResultFn(_record, axiosRequest, route, router, {
+                                        const handleResultFn = new Function('record', 'refs', 'util', 'global', item.event?.okCode)
+                                        handleResultFn(_record, {
                                             tableRef
-                                        })
+                                        }, paramsUtil, _global)
                                     }
                                 }} /></Tooltip>
                             }
@@ -307,10 +305,10 @@ export default defineComponent({
                                         title: item.event?.confirmText || '确认吗？',
                                         onConfirm: async () => {
                                             if (item.event?.okCode && !unref(isEditModel)) {
-                                                const handleResultFn = new Function('record', 'axios', 'refs', item.event?.okCode)
-                                                handleResultFn(_record, axiosRequest, {
+                                                const handleResultFn = new Function('record', 'refs', 'util', 'global', item.event?.okCode)
+                                                handleResultFn(_record, {
                                                     tableRef
-                                                })
+                                                }, paramsUtil, _global)
                                             }
                                         },
                                     },
@@ -348,10 +346,10 @@ export default defineComponent({
                                     },
                                     onClick: () => {
                                         if (item.event?.okCode && !unref(isEditModel)) {
-                                            const handleResultFn = new Function('record', 'axios', 'route', 'router', 'refs', item.event?.okCode)
-                                            handleResultFn(_record, axiosRequest, route, router, {
+                                            const handleResultFn = new Function('record', 'refs', 'util', 'global', item.event?.okCode)
+                                            handleResultFn(_record, {
                                                 tableRef
-                                            })
+                                            }, paramsUtil, _global)
                                         }
                                     },
                                 })
@@ -397,21 +395,6 @@ export default defineComponent({
             >
             </Card>
         }
-
-        // const onCreatedFn = (code?: string) => {
-        //     if (code && !isEditModel.value) {
-        //         const context = {
-        //             context: pageProvider.context,
-        //             axios: axiosRequest,
-        //             route: route,
-        //             refs: {
-        //                 tableRef
-        //             }
-        //         }
-        //         const fn = new Function('context', code)
-        //         fn(context)
-        //     }
-        // }
 
         const { executionMounted } = useLifeCycle(props.data.componentProps, { tableRef: tableRef }, isEditModel)
         const tableRefKey = props.data.key + 'ref'

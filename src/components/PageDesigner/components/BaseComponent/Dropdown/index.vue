@@ -45,9 +45,10 @@
 import { omit } from "lodash-es";
 import { inject } from 'vue'
 import { request as axiosRequest } from "@jetlinks-web/core/src/request";
-import { onlyMessage } from "@LowCode/utils/comm";
 import Modal from './Modal.vue'
 import Drawer from './Drawer.vue'
+import {useTool} from "@LowCode/components/PageDesigner/hooks";
+
 const props = defineProps({
   text: {
     type: String,
@@ -95,6 +96,8 @@ const props = defineProps({
 const selectConfig: any = inject('selectConfig')
 const visible = ref(false)
 const _item = ref()
+const { paramsUtil, _global } = useTool()
+
 
 const comVisible = ref(false)
 
@@ -140,8 +143,8 @@ const handleRequestFn = async () => {
     try {
       const resp = await axiosRequest[config.methods](config.query, paramsData)
       if (config.click) {
-        const handleResultFn = new Function('result', 'onlyMessage', config.click)
-        handleResultFn(resp.result, onlyMessage)
+        const handleResultFn = new Function('result', 'util', 'global', config.click)
+        handleResultFn(resp.result, paramsUtil, _global)
       }
     } catch (e) {
       console.error(e)
