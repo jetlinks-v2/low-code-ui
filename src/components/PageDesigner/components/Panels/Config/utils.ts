@@ -31,6 +31,14 @@ export const getConfigList = (_type: string) => {
             header: '表单设置',
         })
     }
+
+    if (['page'].includes(unref(_type))) {
+        arr.push({
+            key: 'SourcePage',
+            header: '页面设置',
+        })
+    }
+    
     arr.push({
         key: 'Status',
         header: '高级配置',

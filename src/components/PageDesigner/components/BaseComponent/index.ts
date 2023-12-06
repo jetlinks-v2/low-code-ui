@@ -4,6 +4,7 @@ import Text from './Text.vue'
 import Form from './Form.vue'
 import Dropdown from './Dropdown/index.vue'
 import Image from './Image.vue'
+import Page from './Page.vue'
 
 export {
     Button,
@@ -11,5 +12,6 @@ export {
     Text,
     Form,
     Dropdown,
-    Image
+    Image,
+    Page
 }
