@@ -27,6 +27,7 @@ import { typeImages } from '@LowCode/components/ProJect/index'
 import { useEngine, useProduct } from '@LowCode/store'
 import {storeToRefs} from "pinia";
 import { DragContent } from '@LowCode/components/index'
+import { omit} from 'lodash-es'
 
 const engine = useEngine()
 const product = useProduct()
@@ -42,6 +43,22 @@ const onClick = (data) => {
 watch(() => activeFile.value, () => {
   path.value = product.getParent({ id: activeFile.value })
 }, { immediate: true })
+
+// onBeforeRouteLeave((to, form, next) => {
+//   console.log('to===', to)
+//    const item =  omit(product.data[0], ['children'])
+//    console.log('item===',item,product.data[0])
+//   // product.update({
+//   //   ...item,
+//   //   others: {
+//   //     ...item?.others,
+//   //     activeFile: activeFile.value,
+//   //     files: files.value
+//   //   }
+//   // },()=>{
+//     // next()
+//   // })    
+// })
 
 </script>
 

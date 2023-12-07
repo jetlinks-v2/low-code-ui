@@ -10,7 +10,7 @@
         <div style="margin-right: 10px;">
           <img :src="getImage('/tree/project.svg')">
         </div>
-        {{ product.info?.draftName }}
+        {{ product.info?.draftName || product.info?.name }}
       </div>
     </div>
     <div class="release">

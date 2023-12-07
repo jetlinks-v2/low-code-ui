@@ -57,6 +57,14 @@ export const updateDraft = (id: string, type: string, updateId: string, data: an
 export const deleteDraft = (id: string, type: string, deleteId: string) => request.post(`/low-code/editor/draft/${id}/${type}/${deleteId}/_delete`)
 
 /**
+ * 拖动草稿
+ * @param id 草稿id
+ * @param type 删除标识(extensions,modules,functions,resources)
+ * @param  需要移动的功能或资源id
+ */
+export const moveDraft = (id: string, type: string, moveId:string, params: any) => request.postParams(`/low-code/editor/draft/${id}/${type}/${moveId}/_move`,{},params)
+
+/**
  * 发布草稿
  * @param id
  */
