@@ -119,26 +119,26 @@ export const useEngine = defineStore('engine', () => {
       if (type === 'project') {
         delete cloneRecord.children
       }
-      const item = product.data[0]
+      // const item = product.data[0]
       if (type !== 'module' && type !== 'project') {
         files.value.unshift(cloneRecord)
-        product.update({
-          ...item,
-          others: {
-            ...item?.others,
-            activeFile: activeFile.value,
-            files: files.value
-          }
-        })
+        // product.update({
+        //   ...item,
+        //   others: {
+        //     ...item?.others,
+        //     activeFile: activeFile.value,
+        //     files: files.value
+        //   }
+        // })
       }else{
-        product.update({
-          ...item,
-          others: {
-            ...item?.others,
-            activeFile: activeFile.value,
-            files: []
-          }
-        })
+        // product.update({
+        //   ...item,
+        //   others: {
+        //     ...item?.others,
+        //     activeFile: activeFile.value,
+        //     files: []
+        //   }
+        // })
       }
       // files.value.push(cloneRecord)
     }
@@ -209,15 +209,15 @@ export const useEngine = defineStore('engine', () => {
         } else {
           activeFile.value = files.value[index]?.id
         }
-        const item = product.data[0]
-        product.update({
-          ...item,
-          others: {
-            ...item?.others,
-            activeFile: activeFile.value,
-            files: files.value
-          }
-        })
+        // const item = product.data[0]
+        // product.update({
+        //   ...item,
+        //   others: {
+        //     ...item?.others,
+        //     activeFile: activeFile.value,
+        //     files: files.value
+        //   }
+        // })
       } else {
         console.log('record========',record)
         files.value[index] = record
