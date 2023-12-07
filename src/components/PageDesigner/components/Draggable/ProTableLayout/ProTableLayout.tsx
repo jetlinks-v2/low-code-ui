@@ -5,13 +5,13 @@ import {useTool, usePageDependencies, usePageProvider,  useLifeCycle} from '../.
 import { request as axiosRequest } from '@jetlinks-web/core'
 import DraggableLayout from '../DraggableLayout'
 import generatorData from '@LowCode/components/PageDesigner/utils/generatorData'
-import { provide } from 'vue'
+import { provide, h } from 'vue'
 import '../index.less'
-import {Card} from '@LowCode/components'
+import {Card, BadgeStatus} from '@LowCode/components'
+import { Tag } from 'jetlinks-ui-components'
 import {get} from "lodash-es";
 import ProTableModal from './Modal';
 import dayjs from 'dayjs'
-import { useRouter } from "vue-router";
 
 export default defineComponent({
     name: 'ProTableLayout',
@@ -178,8 +178,14 @@ export default defineComponent({
 
         const columnsSlots = computed(() => {
             return columns.value?.reduce((prev: Record<string, any>, next) => {
+                console.log('render',next)
                 if (next.render) {
-                    prev[next.dataIndex] = next.render
+                    const components = {
+                        BadgeStatus,
+                        Tag
+                    }
+                    const render = new Function('record', 'h', 'components', 'utils', next.render)
+                    prev[next.dataIndex] = (record: any) => render(record, h, components, {})
                 }
                 return prev
             }, {}) || {}
