@@ -45,8 +45,8 @@ export const addDraft = (id: string, type: string, data: any, params?: any) => r
  * @param updateId 需要更新的功能或资源id
  * @param data 更新本体
  */
-export const updateDraft = (id: string, data: any) => request.post(`/low-code/editor/draft/${id}/_update`, data)
-// export const updateDraft = (id: string, type: string, updateId: string, data: any) => request.post(`/low-code/editor/draft/${id}/${type}/${updateId}/_update`, data)
+// export const updateDraft = (id: string, data: any) => request.post(`/low-code/editor/draft/${id}/_update`, data)
+export const updateDraft = (id: string, type: string, updateId: string, data: any) => request.post(`/low-code/editor/draft/${id}/${type}/${updateId}/_update`, data)
 
 /**
  * 删除草稿
