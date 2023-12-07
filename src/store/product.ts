@@ -96,7 +96,7 @@ export const useProduct = defineStore('product', () => {
       }
     })
   }, 100)
-  
+
 
   const handleDataMap = (data?: TreeData[]) => {
     data?.forEach?.(item => {
@@ -173,7 +173,7 @@ export const useProduct = defineStore('product', () => {
             ...record.others,
             modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss')
           }
-         }
+        }
       } else if (item.children) {
         item.children = updateProduct(item.children, record)
       }
@@ -223,7 +223,8 @@ export const useProduct = defineStore('product', () => {
     const children: TreeData[] = modules?.[0] ? handleChildren(modules[0], extra.id) : []
     treeData.push({
       ...extra,
-      title: extra.name,
+      id: modules?.[0]?.id || extra.id,
+      title: modules?.[0]?.name || extra.name,
       type: 'project',
       children: children,
       others: modules ? modules[0]?.others : {}
@@ -236,6 +237,8 @@ export const useProduct = defineStore('product', () => {
     }
     info.value = {
       ...extra,
+      id: modules?.[0]?.id || extra.id,
+      title: modules?.[0]?.name || extra.name,
       others: modules ? modules[0]?.others : {}
     }
     published.value = extra.state?.value === 'published'
@@ -264,7 +267,7 @@ export const useProduct = defineStore('product', () => {
     updateDataCache()
     engine.updateFile(record,'add',open)
     // updateProductReq(record, (result) => {
-    //   handleProjectData(result) 
+    //   handleProjectData(result)
     // })
   }
 
@@ -275,11 +278,7 @@ export const useProduct = defineStore('product', () => {
     data.value = updateProduct(data.value, record)
     updateDataCache()
     engine.updateFile(record, 'edit')
-<<<<<<< HEAD
     updateProductReq(omit(record, ['children']), (result) => {
-=======
-    updateProductReq(record, (result) => {
->>>>>>> 635fb864249b9bf9df3c5ef36f1569a102babf34
       handleProjectData(result,false)
       cb?.()
     })
@@ -363,3 +362,4 @@ export const useProduct = defineStore('product', () => {
     filterTree
   }
 })
+
