@@ -4,8 +4,8 @@
     <Config v-if="visible" :data="value" @save="onSave" @close="onClose" />
   </div>
 </template>
-    
-  <script lang="ts" setup>
+  
+<script lang="ts" setup>
 import { PropType, ref } from "vue";
 import Config from "./Config.vue";
 
@@ -14,16 +14,13 @@ const props = defineProps({
     type: Array as PropType<any[]>,
     default: () => [],
   },
-  type: {
-    type: String,
-    default: "search",
-  },
 });
-const emits = defineEmits(["update:value", 'change']);
+const emits = defineEmits(["update:value", "change"]);
 
 const visible = ref<boolean>(false);
 
-const onSave = (_dt: any) => {
+const onSave = (_dt: any[]) => {
+  console.log('111111')
   emits("update:value", _dt);
   emits("change", _dt);
   visible.value = false;

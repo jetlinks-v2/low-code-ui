@@ -1,6 +1,6 @@
 import Selection from '../Selection/index'
-import {defineComponent, inject} from 'vue'
-import {useTool, usePageProvider, useLifeCycle} from '../../hooks'
+import {defineComponent} from 'vue'
+import {useTool, useLifeCycle, usePubsub} from '../../hooks'
 import Search from '../../../Search/Search.vue'
 import {request as axiosRequest} from "@jetlinks-web/core/src/request";
 import {queryDictionaryData} from "@LowCode/api/form";
@@ -23,13 +23,13 @@ export default defineComponent({
     },
     setup(props) {
         const {isEditModel} = useTool()
-        const {executionMounted} = useLifeCycle(props.data.componentProps, {}, isEditModel)
-        const PageProvider = usePageProvider()
-        const designer = inject<any>('PageDesigner')
 
-        const _data = computed(() => {
-            return props.data
+        const $self = reactive({
+            visible: true,
+            params: {}
         })
+
+        const {executionMounted} = useLifeCycle(props.data.componentProps, {}, isEditModel)
 
         const columns = computed(() => {
             return (props.data.componentProps.columns || [])?.map((item: any) => {
@@ -70,24 +70,26 @@ export default defineComponent({
             })
         })
 
-        const onSearch = (params: any) => {
-            PageProvider.add?.(props.data.key, params)
+        const handleResponderFn = ($dep?: string, $depValue?: any) => {
+            if (props.data?.componentProps?.responder?.responder) {
+                const handleResultFn = new Function('$self', '$dep', '$depValue', props.data?.componentProps?.responder?.responder)
+                handleResultFn($self, $dep, $depValue)
+            }
+        }
+
+        usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
+
+        const onSearch = (_params: any) => {
+            $self.params = _params
         }
 
         onMounted(() => {
             executionMounted()
         })
 
-        onBeforeMount(() => {
-            if (isEditModel.value) {
-                designer.dependencies.value[props.data.key] = props.data.name || props.data.key
-            }
-        })
-
         return () => {
-            return (
-                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)}
-                           parent={props.parent}>
+            return $self.visible && (
+                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={props.data} parent={props.parent}>
                     <Search
                         columns={columns.value}
                         onSearch={onSearch}
@@ -96,6 +98,5 @@ export default defineComponent({
                 </Selection>
             )
         }
-
     }
 })

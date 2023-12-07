@@ -15,22 +15,7 @@
         />
       </j-form-item>
     </template>
-    <template v-if="['text'].includes(target.type)">
-      <j-form-item
-        label="文本内容"
-        :name="['componentProps', 'value']"
-        required
-        :validateFirst="true"
-      >
-        <j-input
-          placeholder="请输入"
-          @change="onDataChange"
-          :maxlength="32"
-          v-model:value="target.componentProps.value"
-        />
-      </j-form-item>
-    </template>
-    <template v-if="['tag'].includes(target.type)">
+    <template v-if="['tag', 'button', 'dropdown', 'text'].includes(target.type)">
       <j-form-item
           label="标签内容"
           :name="['componentProps', 'text']"
@@ -46,18 +31,6 @@
       </j-form-item>
     </template>
     <template v-if="['button', 'dropdown'].includes(target.type)">
-      <j-form-item
-        label="按钮文本"
-        :name="['componentProps', 'text']"
-        :validateFirst="true"
-      >
-        <j-input
-          placeholder="请输入"
-          @change="onDataChange"
-          :maxlength="32"
-          v-model:value="target.componentProps.text"
-        />
-      </j-form-item>
       <j-form-item
         label="按钮类型"
         :name="['componentProps', 'type']"
@@ -142,19 +115,6 @@
         <Icon
           v-model:value="target.componentProps.icon"
           @change="onDataChange"
-        />
-      </j-form-item>
-    </template>
-    <template v-if="['dropdown'].includes(target.type)">
-      <j-form-item
-        label="配置下拉菜单"
-        :name="['componentProps', 'menu']"
-        required
-        :validateFirst="true"
-      >
-        <Dropdown
-          @change="onDataChange"
-          v-model:value="target.componentProps.menu"
         />
       </j-form-item>
     </template>
