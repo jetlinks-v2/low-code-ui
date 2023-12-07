@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import {addDraft, queryProjectDraft, updateDraft} from "@LowCode/api/project";
+import {addDraft, queryProjectDraft, updateDraft,deleteDraft} from "@LowCode/api/project";
 import { useEngine } from './engine'
 import dayjs from 'dayjs';
 import {throttle, cloneDeep, omit, debounce} from 'lodash-es'
@@ -18,7 +18,6 @@ type TreeData = {
 
 const handleChildren = (children: any, parentId: string): TreeData[] => {
   const treeData: TreeData[] = []
-
   if (children.children) {
     children.children.forEach(item => {
       const hasChildren = item.children?.length || item.functions?.length || item.resources?.length
@@ -67,20 +66,19 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
 /**
  * 保存草稿
  */
-const updateProductReq = debounce((draftData: any[], cb) => {
-  const integrateData = Integrate(draftData)
-  console.log('updateProductReq', new Date().getTime(),draftData)
-  updateDraft(integrateData.draftId, integrateData).then(resp => {
-    if (resp.success) {
-      const { children, ...oldProject } = draftData[0]
-      cb?.({
-        ...resp.result,
-        ...oldProject
-      })
-    }
-  })
-}, 100)
-
+// const updateProductReq = debounce((draftData: any[], cb) => {
+//   const integrateData = Integrate(draftData)
+//   console.log('updateProductReq', new Date().getTime(),draftData)
+//   updateDraft(integrateData.draftId, integrateData).then(resp => {
+//     if (resp.success) {
+//       const { children, ...oldProject } = draftData[0]
+//       cb?.({
+//         ...resp.result,
+//         ...oldProject
+//       })
+//     }
+//   })
+// }, 100)
 export const useProduct = defineStore('product', () => {
   const data = ref<TreeData[]>([]) // 项目
   const dataMap: Map<string, any> = new Map()
@@ -90,6 +88,15 @@ export const useProduct = defineStore('product', () => {
   let dataCache = '[]'
 
   const engine = useEngine()
+
+  const updateProductReq = debounce((record, cb) => {
+    updateDraft(info.value.draftId,getType(record.type) , record.id, record).then(resp=>{
+      if(resp.success){
+        cb?.(resp.result)
+      }
+    })
+  }, 100)
+  
 
   const handleDataMap = (data?: TreeData[]) => {
     data?.forEach?.(item => {
@@ -234,29 +241,42 @@ export const useProduct = defineStore('product', () => {
     published.value = extra.state?.value === 'published'
 
   }
+//获取后端type
+  const getType = (type:string)=>{
+    const modules = [providerEnum.Module]
+    const functions = [providerEnum.CRUD,providerEnum.Function,providerEnum.SQL]
+    const resources = [providerEnum.FormPage,providerEnum.HtmlPage,providerEnum.Page,providerEnum.PageDesign]
+    if(modules.includes(type)){
+      return 'modules'
+    }else if(functions.includes(type)){
+      return 'functions'
+    }else if(resources.includes(type)){
+      return 'resources'
+    }else{
+      return 'extensions'
+    }
+  }
 
   const add = (record: any, parentId: string,open?:any) => {
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
-    console.log('add',cloneDeep(data.value), record)
-
-    addDraft(info.value.draftId, record.others.type, record, parentId ? { moduleId: parentId } : {})
-    // updateDataCache()
-    // engine.updateFile(record,'add',open)
-    // updateProductReq(data.value, (result) => {
-    //   handleProjectData(result)
-    // })
+    addDraft(info.value.draftId,getType(record.others.type) , record, parentId ? { moduleId: parentId } : {})
+    updateDataCache()
+    engine.updateFile(record,'add',open)
+    updateProductReq(record, (result) => {
+      handleProjectData(result) 
+    })
   }
 
   const update = async (record: any, cb?: Function) => {
-    console.log('item---',record)
+    // debugger;
+    console.log('update=====',record)
     dataMap.set(record.id, omit(record, ['children']))
     data.value = updateProduct(data.value, record)
-    console.log('update',cloneDeep(data.value))
     updateDataCache()
     engine.updateFile(record, 'edit')
-    updateProductReq(data.value, (result) => {
-      handleProjectData(result)
+    updateProductReq(record, (result) => {
+      handleProjectData(result,false)
       cb?.()
     })
   }
@@ -267,9 +287,10 @@ export const useProduct = defineStore('product', () => {
     dataMap.delete(record.id)
     updateDataCache()
     engine.updateFile(record, 'del')
-    updateProductReq(data.value, (result) => {
-      handleProjectData(result)
-    })
+    deleteDraft(info.value.draftId,getType(record.type),record.id)
+    // updateProductReq(record, (result) => {
+    //   handleProjectData(result)
+    // })
   }
   //通过id查找对应节点
   const getById = (id: string) => {

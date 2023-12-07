@@ -55,15 +55,15 @@ const activeData = ref()
 
 const onEdit = (targetKey) => {
   engine.removeFile(targetKey)
-  const item = product.data[0]
-  product.update({
-    ...item,
-    others: {
-      ...item?.others,
-      activeFile: activeFile.value,
-      files: files.value
-    }
-  })
+  // const item = product.data[0]
+  // product.update({
+  //   ...item,
+  //   others: {
+  //     ...item?.others,
+  //     activeFile: activeFile.value,
+  //     files: files.value
+  //   }
+  // })
 }
 
 const select = (key) => {

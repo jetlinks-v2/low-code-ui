@@ -209,8 +209,8 @@ const onDrop = (info) => {
       ar.splice(i + 1, 0, dragObj);
     }
   }
-  // console.log('data---', restParentId(data))
-  product.update(restParentId(data)?.[0])
+  console.log('data---', restParentId(data))
+  // product.update(restParentId(data)?.[0])
   list.value = data
 }
 
