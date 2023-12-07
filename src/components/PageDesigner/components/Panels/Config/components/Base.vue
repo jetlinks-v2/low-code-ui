@@ -30,6 +30,39 @@
         />
       </j-form-item>
     </template>
+    <template v-if="['image'].includes(target.type)">
+      <j-form-item
+          label="图片宽度"
+          :name="['componentProps', 'width']"
+          required
+          :validateFirst="true"
+      >
+      <j-input-number
+            placeholder="请输入"
+            style="width: 100%"
+            :precision="0"
+            :min="100"
+            addon-after="px"
+            @change="onDataChange"
+            v-model:value="target.componentProps.width"
+        />
+      </j-form-item>
+    </template>
+    <template v-if="['tag'].includes(target.type)">
+      <j-form-item
+          label="标签内容"
+          :name="['componentProps', 'text']"
+          required
+          :validateFirst="true"
+      >
+        <j-input
+            placeholder="请输入"
+            @change="onDataChange"
+            :maxlength="32"
+            v-model:value="target.componentProps.text"
+        />
+      </j-form-item>
+    </template>
     <template v-if="['button', 'dropdown'].includes(target.type)">
       <j-form-item
         label="按钮文本"

@@ -4,6 +4,7 @@ import './index.less'
 import { PageProvider } from "../../../core";
 import { useKeys, useTool } from '../../../hooks'
 import { Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
+import {map} from "lodash-es";
 
 const Canvas = defineComponent({
   name: 'Canvas',
@@ -69,6 +70,13 @@ const Canvas = defineComponent({
       </Dropdown>
     }
 
+    const _error = computed(() => {
+      if(unref(isEditModel) && map(designer.errorKey.value, 'key').includes('root')) {
+        return '1px solid red'
+      }
+      return 'none'
+    })
+
     return () => {
       return (
         <PageProvider>
@@ -82,8 +90,9 @@ const Canvas = defineComponent({
             class={['subject', ...unref(cssClassList)]}
             ref={canvasRef}
             style={{
+              border: _error.value,
               backgroundImage: `url(${designer.pageData.value?.componentProps?.backgroundImage})`,
-              backgroundSize: 'cover'
+              backgroundSize: 'cover',
             }}
           >
             { isEditModel.value ? renderChildren() : renderContent()}

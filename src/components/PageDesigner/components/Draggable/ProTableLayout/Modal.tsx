@@ -19,28 +19,25 @@ export default defineComponent({
     emits: ['save', 'close'],
     setup(props, {emit}) {
         const {modalType, type, code, title, data, createdCode, okCode, width, footerVisible} = props?.data
-        const {isEditModel} = useTool()
-        const route = useRoute()
-        const router = useRouter()
+        const {isEditModel, paramsUtil, _global} = useTool()
         const formRef = ref()
         const pageRef = ref()
         const myValue = ref()
 
         const config = computed(() => {
+            console.log(code)
             return JSON.parse(code || '{}')
         })
 
         const onCreatedFn = (code?: string) => {
             if (code && !isEditModel.value) {
                 const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
-                const fn = new Function('record', 'axios', 'route', 'router', 'refs', code)
-                fn(data || {}, axiosRequest, route, router, _refs)
+                const fn = new Function('record', 'refs', 'util', 'global', code)
+                fn(data || {}, _refs, paramsUtil, _global)
             }
         }
 
-        // onMounted(() => {
-            onCreatedFn(createdCode)
-        // })
+        onCreatedFn(createdCode)
 
         const renderChildren = () => {
             if (type === 'page') {
@@ -57,9 +54,9 @@ export default defineComponent({
 
         const onSave = async () => {
             if (!okCode) return
-            const handleResultFn = new Function('axios', 'route', 'router', 'refs', okCode)
+            const handleResultFn = new Function('refs', 'util', 'global', okCode)
             const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
-            const resp = await handleResultFn(axiosRequest, route, router,  _refs)
+            const resp = await handleResultFn(_refs, paramsUtil, _global)
             if (resp) {
                 emit('save', true)
             }

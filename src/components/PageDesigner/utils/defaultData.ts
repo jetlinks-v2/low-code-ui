@@ -5,6 +5,7 @@ export const initData = {
     key: "root",
     componentProps: {
         mountedCode: '',
+        isPage: false
     },
     children: [],
 }
@@ -52,10 +53,20 @@ export const basic: ISchema[] = [
     {
         type: 'form',
         name: '表单',
-        componentProps:{
-            
-        }
+        componentProps:{}
     },
+    {
+        type: 'page',
+        name: '内嵌页面',
+        componentProps:{}
+    },
+    {
+        type:'image',
+        name: '图片预览',
+        componentProps:{
+            width:200
+        }
+    }
 ]
 
 export const layout: ISchema[] = [
@@ -165,6 +176,18 @@ export const layout: ISchema[] = [
             align: 'top',
             hidden: false
         }
+    },
+    {
+        type: 'list',
+        name: '列表',
+        componentProps: {},
+        children: [
+            {
+                type: 'list-item',
+                componentProps: {},
+                children: [],
+            },
+        ]
     },
 ]
 

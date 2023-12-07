@@ -34,6 +34,16 @@
     </j-form-item>
     <template v-if="target.componentProps.isPage">
       <j-form-item
+          label="是否只为路由"
+          :name="['componentProps', 'onlyRouter']"
+          :validateFirst="true"
+      >
+        <j-switch
+            v-model:checked="target.componentProps.onlyRouter"
+            @change="onDataChange"
+        />
+      </j-form-item>
+      <j-form-item
           label="菜单名称"
           :name="['componentProps', 'pageName']"
           required
@@ -63,17 +73,27 @@ import {useTarget} from "../../../../hooks";
 import {ImageUpload} from "@LowCode/components";
 import Icon from './Icon/index.vue'
 import { useProduct } from '@LowCode/store'
-import { getMenus } from '@LowCode/utils/project'
+import {inject} from "vue";
 
 const {target} = useTarget();
 const project = useProduct()
+const designer: any = inject("PageDesigner");
 
 const emits = defineEmits(["refresh"]);
 
 const codeRules = [{
   validator: (_: any, value: string) => {
     const maps = project.getDataMap()
-    //
+    const arr: any[] = []
+    maps.forEach(_value => {
+      if(_value?.others?.menu?.main && _value?.id !== designer.data?.id && _value?.others?.menu?.code){
+        arr.push(_value?.others?.menu?.code)
+      }
+    })
+    if(arr.includes(value)){
+      return Promise.reject(`菜单编码不能重复`);
+    }
+    return Promise.resolve();
   }
 }]
 
