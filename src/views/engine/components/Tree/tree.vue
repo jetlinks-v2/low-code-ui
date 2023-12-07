@@ -37,7 +37,7 @@ import { randomString } from '@jetlinks-web/utils'
 import { defaultSetting as CrudBaseData } from '@LowCode/components/Database/setting'
 import { onlyMessage } from '@jetlinks-web/utils';
 import { typeImages } from '@LowCode/components/ProJect/index'
-import { restParentId } from './tree'
+import { restParentId,findById } from './tree'
 import { cloneDeep } from 'lodash-es';
 import { delMenu } from '@LowCode/api/menu'
 import { Modal } from 'jetlinks-ui-components'
@@ -209,8 +209,16 @@ const onDrop = (info) => {
       ar.splice(i + 1, 0, dragObj);
     }
   }
+<<<<<<< HEAD
+  // console.log('data---',info.dropToGap, restParentId(data))
+  // product.update(restParentId(data)?.[0])
+  // const record = product.getById(dragKey)
+  const record = findById(restParentId(data),dragKey)
+  product.move(record,record.parentId)
+=======
   console.log('data---', restParentId(data))
   // product.update(restParentId(data)?.[0])
+>>>>>>> 635fb864249b9bf9df3c5ef36f1569a102babf34
   list.value = data
 }
 
