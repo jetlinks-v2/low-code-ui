@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import {addDraft, queryProjectDraft, updateDraft,deleteDraft} from "@LowCode/api/project";
+import {addDraft, queryProjectDraft, updateDraft,deleteDraft,moveDraft} from "@LowCode/api/project";
 import { useEngine } from './engine'
 import dayjs from 'dayjs';
 import {throttle, cloneDeep, omit, debounce} from 'lodash-es'
@@ -243,7 +243,7 @@ export const useProduct = defineStore('product', () => {
   }
 //获取后端type
   const getType = (type:string)=>{
-    const modules = [providerEnum.Module]
+    const modules = [providerEnum.Module,'project']
     const functions = [providerEnum.CRUD,providerEnum.Function,providerEnum.SQL]
     const resources = [providerEnum.FormPage,providerEnum.HtmlPage,providerEnum.Page,providerEnum.PageDesign]
     if(modules.includes(type)){
@@ -263,9 +263,9 @@ export const useProduct = defineStore('product', () => {
     addDraft(info.value.draftId,getType(record.others.type) , record, parentId ? { moduleId: parentId } : {})
     updateDataCache()
     engine.updateFile(record,'add',open)
-    updateProductReq(record, (result) => {
-      handleProjectData(result) 
-    })
+    // updateProductReq(record, (result) => {
+    //   handleProjectData(result) 
+    // })
   }
 
   const update = async (record: any, cb?: Function) => {
@@ -275,7 +275,7 @@ export const useProduct = defineStore('product', () => {
     data.value = updateProduct(data.value, record)
     updateDataCache()
     engine.updateFile(record, 'edit')
-    updateProductReq(record, (result) => {
+    updateProductReq(omit(record, ['children']), (result) => {
       handleProjectData(result,false)
       cb?.()
     })
@@ -292,6 +292,13 @@ export const useProduct = defineStore('product', () => {
     //   handleProjectData(result)
     // })
   }
+
+  const move = (record:any,parentId:string)=>{
+    updateDataCache()
+    console.log('parentId',parentId)
+    moveDraft(info.value.draftId,getType(record.type), record.id, { moduleId: parentId })
+  }
+
   //通过id查找对应节点
   const getById = (id: string) => {
     return getProduct(data.value, id)
@@ -343,6 +350,7 @@ export const useProduct = defineStore('product', () => {
     add,
     update,
     remove,
+    move,
     getById,
     getParent,
     initProjectState,
