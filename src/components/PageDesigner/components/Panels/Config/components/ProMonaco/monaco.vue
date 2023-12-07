@@ -11,6 +11,7 @@
     </div>
     <div class="code-tips">
       <j-monaco-editor
+          readOnly
         :modelValue="myTipCode"
         :language="language"
         :options="{

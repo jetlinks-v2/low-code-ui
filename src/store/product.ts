@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import {addDraft, queryProjectDraft, updateDraft} from "@LowCode/api/project";
+import { queryProjectDraft, updateDraft} from "@LowCode/api/project";
 import { useEngine } from './engine'
 import dayjs from 'dayjs';
 import {throttle, cloneDeep, omit, debounce} from 'lodash-es'
@@ -166,7 +166,7 @@ export const useProduct = defineStore('product', () => {
             ...record.others,
             modifyTime:dayjs().format('YYYY-MM-DD HH:mm:ss')
           }
-         }
+        }
       } else if (item.children) {
         item.children = updateProduct(item.children, record)
       }
@@ -239,13 +239,11 @@ export const useProduct = defineStore('product', () => {
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
     console.log('add',cloneDeep(data.value), record)
-
-    addDraft(info.value.draftId, record.others.type, record, parentId ? { moduleId: parentId } : {})
-    // updateDataCache()
-    // engine.updateFile(record,'add',open)
-    // updateProductReq(data.value, (result) => {
-    //   handleProjectData(result)
-    // })
+    updateDataCache()
+    engine.updateFile(record,'add',open)
+    updateProductReq(data.value, (result) => {
+      handleProjectData(result)
+    })
   }
 
   const update = async (record: any, cb?: Function) => {
@@ -330,3 +328,4 @@ export const useProduct = defineStore('product', () => {
     filterTree
   }
 })
+

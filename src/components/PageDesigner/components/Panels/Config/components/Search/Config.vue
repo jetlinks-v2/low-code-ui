@@ -1,7 +1,7 @@
 <template>
   <j-modal
     visible
-    title="配置搜索项"
+    :title="type === 'search' ? '配置搜索项' : '配置表格列'"
     :width="800"
     @ok="onSave"
     @cancel="emits('close')"
@@ -34,9 +34,9 @@
           "
         />
       </template>
-      <templaye #renderFn="{ record, valueChange }">
-        <RenderConfig v-model="record.renderFn" />
-      </templaye>
+      <template v-if="type === 'table'" #render="{ record, valueChange }">
+        <RenderConfig v-model:value="record.render" />
+      </template>
       <template v-if="type === 'search'" #search="{ record, valueChange }">
         <div style="display: flex; justify-content: space-between">
           <j-select
@@ -204,7 +204,7 @@ watchEffect(() => {
   } else {
     myColumns.push({
       title: 'render',
-      dataIndex: 'renderFn',
+      dataIndex: 'render',
     })
   }
   myColumns.push({
