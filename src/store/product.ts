@@ -275,7 +275,11 @@ export const useProduct = defineStore('product', () => {
     data.value = updateProduct(data.value, record)
     updateDataCache()
     engine.updateFile(record, 'edit')
+<<<<<<< HEAD
     updateProductReq(omit(record, ['children']), (result) => {
+=======
+    updateProductReq(record, (result) => {
+>>>>>>> 635fb864249b9bf9df3c5ef36f1569a102babf34
       handleProjectData(result,false)
       cb?.()
     })

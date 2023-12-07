@@ -209,11 +209,16 @@ const onDrop = (info) => {
       ar.splice(i + 1, 0, dragObj);
     }
   }
+<<<<<<< HEAD
   // console.log('data---',info.dropToGap, restParentId(data))
   // product.update(restParentId(data)?.[0])
   // const record = product.getById(dragKey)
   const record = findById(restParentId(data),dragKey)
   product.move(record,record.parentId)
+=======
+  console.log('data---', restParentId(data))
+  // product.update(restParentId(data)?.[0])
+>>>>>>> 635fb864249b9bf9df3c5ef36f1569a102babf34
   list.value = data
 }
 
