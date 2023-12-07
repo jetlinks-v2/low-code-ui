@@ -1,4 +1,8 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 dependencies:
   '@jetlinks-web/components':
@@ -47,8 +51,8 @@ dependencies:
     specifier: ^1.11.8
     version: 1.11.10
   jetlinks-ui-components:
-    specifier: 1.0.34-11
-    version: 1.0.34-11(typescript@5.3.2)(vue-router@4.2.5)(vue@3.3.9)
+    specifier: 1.0.34-16
+    version: 1.0.34-16(typescript@5.3.2)(vue-router@4.2.5)(vue@3.3.9)
   less:
     specifier: ^4.2.0
     version: 4.2.0
@@ -2764,8 +2768,8 @@ packages:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
     dev: true
 
-  /jetlinks-ui-components@1.0.34-11(typescript@5.3.2)(vue-router@4.2.5)(vue@3.3.9):
-    resolution: {integrity: sha512-HL7azRBBrpMu75iv0+/jfNlvejf9ggiwiH/HTYS4S2X6gA59/j1BaPa7EiL+18+mR1JLkHY0KZ/+rCcqS37WCw==}
+  /jetlinks-ui-components@1.0.34-16(typescript@5.3.2)(vue-router@4.2.5)(vue@3.3.9):
+    resolution: {integrity: sha512-+/ul5PAWHf6pnSDZBaLfwqa6te6oR3hnPP83O4D48X48NesEHsljWSSksu14nkpybrnYsUMCaweHiMXLnSASBg==}
     engines: {node: '>=18.14.0'}
     dependencies:
       '@vueuse/core': 9.13.0(vue@3.3.9)
@@ -4302,7 +4306,3 @@ packages:
     dependencies:
       tslib: 2.3.0
     dev: false
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false

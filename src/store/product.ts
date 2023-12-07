@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { queryProjectDraft, updateDraft} from "@LowCode/api/project";
+import {addDraft, queryProjectDraft, updateDraft} from "@LowCode/api/project";
 import { useEngine } from './engine'
 import dayjs from 'dayjs';
 import {throttle, cloneDeep, omit, debounce} from 'lodash-es'
@@ -239,11 +239,13 @@ export const useProduct = defineStore('product', () => {
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
     console.log('add',cloneDeep(data.value), record)
-    updateDataCache()
-    engine.updateFile(record,'add',open)
-    updateProductReq(data.value, (result) => {
-      handleProjectData(result)
-    })
+
+    addDraft(info.value.draftId, record.others.type, record, parentId ? { moduleId: parentId } : {})
+    // updateDataCache()
+    // engine.updateFile(record,'add',open)
+    // updateProductReq(data.value, (result) => {
+    //   handleProjectData(result)
+    // })
   }
 
   const update = async (record: any, cb?: Function) => {
