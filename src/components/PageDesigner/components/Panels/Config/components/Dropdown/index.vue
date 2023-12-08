@@ -1,31 +1,52 @@
 <template>
   <div>
-    <j-button @click="visible = true">配置</j-button>
-    <Config v-if="visible" :data="value" @save="onSave" @close="onClose" />
+    <j-form-item
+        :validateFirst="true"
+        label="菜单点击事件"
+        :name="['componentProps', 'clickCode']"
+    >
+      <EditorBtn
+          v-model:value="target.componentProps.clickCode"
+          language="javascript"
+          @change="onDataChange"
+          text="配置"
+      />
+    </j-form-item>
+    <j-form-item
+        :validateFirst="true"
+        label="重选事件"
+        :name="['componentProps', 'reloadCode']"
+    >
+      <EditorBtn
+          v-model:value="target.componentProps.reloadCode"
+          language="javascript"
+          @change="onDataChange"
+          text="配置"
+      />
+    </j-form-item>
+    <j-form-item
+        label="下拉菜单"
+        :name="['componentProps', 'menu']"
+        required
+        :validateFirst="true"
+    >
+      <Menu
+          @change="onDataChange"
+          v-model:value="target.componentProps.menu"
+      />
+    </j-form-item>
   </div>
 </template>
-  
+
 <script lang="ts" setup>
-import { PropType, ref } from "vue";
-import Config from "./Config.vue";
+import {useTarget} from '@LowCode/components/PageDesigner/hooks'
+import Menu from './Menu/index.vue'
+import EditorBtn from "../EditorBtn.vue";
 
-const props = defineProps({
-  value: {
-    type: Array as PropType<any[]>,
-    default: () => [],
-  },
-});
-const emits = defineEmits(["update:value", "change"]);
+const {target} = useTarget()
 
-const visible = ref<boolean>(false);
-
-const onSave = (_dt: any[]) => {
-  emits("update:value", _dt);
-  emits("change", _dt);
-  visible.value = false;
-};
-
-const onClose = () => {
-  visible.value = false;
-};
+const emits = defineEmits(['refresh'])
+const onDataChange = () => {
+  emits('refresh', target.value)
+}
 </script>

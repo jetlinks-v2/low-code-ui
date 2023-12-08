@@ -4,7 +4,7 @@ import {Tabs, TabPane, Badge} from 'jetlinks-ui-components'
 import './index.less'
 import {withModifiers} from 'vue'
 import { map, omit} from 'lodash-es'
-import {useTool} from '../../hooks'
+import {usePubsub, useTool} from '../../hooks'
 import generatorData from '../../utils/generatorData'
 
 export default defineComponent({
@@ -41,6 +41,19 @@ export default defineComponent({
             onAddChild(_item, props.data)
         }
 
+        const $self = reactive({
+            visible: true,
+        })
+
+        const handleResponderFn = ($dep?: string, $depValue?: any) => {
+            if (props.data?.componentProps?.responder?.responder) {
+                const handleResultFn = new Function('$self', '$dep', '$depValue', props.data?.componentProps?.responder?.responder)
+                handleResultFn($self, $dep, $depValue)
+            }
+        }
+
+        usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
+
         const _tabContent = (_element: any) => {
             if (unref(isEditModel)) {
                 const _arr = map(_element?.children || [], 'key').filter(i => map(designer.errorKey.value, 'key').includes(i))
@@ -53,8 +66,7 @@ export default defineComponent({
         }
 
         return () => {
-
-            return (
+            return $self.visible && (
                 <Selection {...useAttrs()} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
                     {
                         unref(list).length ? <Tabs data-layout-type={'tabs'} {...props.data.componentProps}>

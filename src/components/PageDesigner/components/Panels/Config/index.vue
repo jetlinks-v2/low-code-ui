@@ -43,6 +43,7 @@ import {getConfigList} from "./utils";
 import {updateData} from "@LowCode/components/PageDesigner/utils/utils";
 import SourceForm from "./components/SourceForm.vue";
 import SourcePage from "./components/SourcePage.vue";
+import Dropdown from './components/Dropdown/index.vue';
 
 const formRef = ref<any>();
 
@@ -62,7 +63,8 @@ const Panels = {
   Status,
   Button,
   SourceForm,
-  SourcePage
+  SourcePage,
+  Dropdown
 };
 
 const panelsList = computed(() => {

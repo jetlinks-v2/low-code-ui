@@ -72,7 +72,6 @@ const showResponder = computed(() => {
 })
 
 const onDataChange = () => {
-  console.log('refresh', target.value)
   emits('refresh', target.value)
 }
 </script>

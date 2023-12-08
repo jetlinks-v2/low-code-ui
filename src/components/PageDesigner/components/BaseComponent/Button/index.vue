@@ -1,126 +1,157 @@
 <template>
-    <j-popconfirm v-if="buttonConfig?.type === 'Popconfirm'" :title="buttonConfig.config?.title" @confirm="onConfirm">
-        <j-button v-bind="omit(props, 'icon')">
-            <template v-if="icon" #icon>
-                <AIcon :type="icon" />
-            </template>
-            {{ text }}</j-button>
-    </j-popconfirm>
-
-    <j-button v-else v-bind="omit(props, 'icon')" @click="onClick">
-        <template v-if="icon" #icon>
-            <AIcon :type="icon" />
+  <template v-if="$self.visible">
+    <j-popconfirm v-if="evetn?.type === 'confirm'" :title="event?.title" @confirm="onConfirm">
+      <j-button v-bind="_props" :loading="_loading" :disabled="disabled">
+        <template v-if="_icon" #icon>
+          <AIcon :type="_icon"/>
         </template>
-        {{ text }}
+        {{ _value }}
+      </j-button>
+    </j-popconfirm>
+    <j-button v-else v-bind="_props" @click="onClick" :loading="_loading" :disabled="disabled">
+      <template v-if="_icon" #icon>
+        <AIcon :type="_icon"/>
+      </template>
+      {{ _value }}
     </j-button>
-    <Modal v-if="visible && buttonConfig?.type === 'Modal'" :button-config="buttonConfig" @close="setVisible(false)" />
-    <Drawer v-if="visible && buttonConfig?.type === 'Drawer'" :button-config="buttonConfig" @close="setVisible(false)" />
+    <Modal v-if="visible" :data="dataModal" @save="onClose" @close="onClose" />
+  </template>
 </template>
-  
-<script lang="ts" setup name="Button">
-import { omit } from "lodash-es";
-import { PropType, ref } from "vue";
-import Modal from './buttonModal.vue'
-import Drawer from './buttonDrawer.vue'
-import { request as axiosRequest } from "@jetlinks-web/core/src/request";
-import {usePageProvider, useTool} from "@LowCode/components/PageDesigner/hooks";
-import { useMenuStore } from "@LowCode/store/menu";
+
+<script lang="ts" setup>
+import {omit} from "lodash-es";
+import {computed, PropType, ref} from "vue";
+import {usePubsub, useTool} from "@LowCode/components/PageDesigner/hooks";
+import Modal from '../MyModal';
 
 const props = defineProps({
-    text: {
-        type: String,
-        default: "",
-    },
-    type: {
-        type: String as PropType<
-            "primary" | "dashed" | "link" | "text" | "default"
-        >,
-        default: "default",
-    },
-    shape: {
-        type: String as PropType<"circle" | "round" | "default">,
-        default: "default",
-    },
-    size: {
-        type: String as PropType<"large" | "middle" | "small">,
-        default: "middle",
-    },
-    // loading: {
-    //   type: String as PropType<"large" | "middle" | "small">,
-    //   default: "middle",
-    // },
-    disabled: {
-        type: Boolean,
-        default: false,
-    },
-    ghost: {
-        type: Boolean,
-        default: false,
-    },
-    danger: {
-        type: Boolean,
-        default: false,
-    },
-    block: {
-        type: Boolean,
-        default: false,
-    },
-    icon: {
-        type: String,
-    },
-    buttonConfig: {
-        type: Object,
-    },
+  _key: {
+    type: String,
+    default: ''
+  },
+  text: {
+    type: String,
+    default: "",
+  },
+  type: {
+    type: String as PropType<
+        "primary" | "dashed" | "link" | "text" | "default"
+    >,
+    default: "default",
+  },
+  shape: {
+    type: String as PropType<"circle" | "round" | "default">,
+    default: "default",
+  },
+  size: {
+    type: String as PropType<"large" | "middle" | "small">,
+    default: "middle",
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  ghost: {
+    type: Boolean,
+    default: false,
+  },
+  danger: {
+    type: Boolean,
+    default: false,
+  },
+  block: {
+    type: Boolean,
+    default: false,
+  },
+  icon: {
+    type: String,
+  },
+  event: {
+    type: Object,
+  },
+  responder: {
+    type: Object,
+    default: () => ({})
+  }
 });
 
-const { paramsUtil, _global } = useTool()
-// const { jumpPageByCode } = useMenuStore()
+const {paramsUtil, _global} = useTool()
 
 const visible = ref(false)
 
-const setVisible = (val: boolean) => {
-    visible.value = val;
-};
+const $self = reactive({
+  visible: true,
+  text: props.text,
+  loading: props.loading,
+  disabled: props.disabled,
+  icon: props.icon
+})
 
-
-const defaultParams = () => {
-    try {
-        return JSON.parse(props.buttonConfig?.config?.defaultParams)
-    } catch (e) {
-        return undefined
-    }
+const handleResponderFn = ($dep?: string, $depValue?: any) => {
+  if (props.responder?.responder) {
+    const _handleResultFn = new Function('$self', '$dep', '$depValue', props.responder?.responder)
+    _handleResultFn($self, $dep, $depValue)
+  }
 }
 
-const handleRequestFn = async () => {
-    const config = props.buttonConfig?.config
-    if (props.buttonConfig?.config.query) {
-        const paramsData = defaultParams()
-        try {
-            const resp = await axiosRequest[config.methods](config.query, paramsData)
-            if (config.click) {
-                const handleResultFn = new Function('result', 'util', 'global', config.click)
-                handleResultFn(resp, paramsUtil, _global)
-            } 
-        } catch (e) {
-            console.error(e)
-        }
-    } else {
-      if (config.click) {
-        const handleResultFn = new Function('result', 'util', 'global', config.click)
-        handleResultFn({}, paramsUtil, _global)
-      }
-    }
+usePubsub(props._key, $self, props.responder?.dependencies, handleResponderFn)
+
+const _value = computed(() => {
+  return $self?.text || props.text
+})
+
+const _loading = computed(() => {
+  return $self?.loading || props.loading
+})
+
+const _disabled = computed(() => {
+  return $self?.disabled || props.disabled
+})
+
+const _icon = computed(() => {
+  return $self?._icon || props._icon
+})
+
+const _props = computed(() => {
+  return omit(props, ['icon', 'loading', 'disabled', 'event', 'responder'])
+})
+
+const dataModal = computed(() => {
+  return {
+    pageType: props.event?.pageType || 'form',
+    code: props.event?.pageData,
+    title: props.event?.title,
+    createdCode: props.event?.createdCode,
+    okCode: props.event?.okCode,
+    cancelCode: props.event?.cancelCode,
+    modalType: props.event?.type || 'modal',
+  }
+})
+
+const handleRequestFn = () => {
+  if (props.event?.okCode) {
+    const handleResultFn = new Function('util', 'global', props.event?.okCode)
+    handleResultFn(paramsUtil, _global)
+  }
 }
 
 const onClick = () => {
-    if (props.buttonConfig?.type === 'Button') {
-        handleRequestFn()
-    } else {
-        setVisible(true)
-    }
+  if(props.event?.type === 'common'){
+    handleRequestFn()
+  } else {
+    visible.value = true
+  }
 };
 
 const onConfirm = () => {
-    handleRequestFn()
+  handleRequestFn()
 };
+
+const onClose = () => {
+  visible.value = false
+}
 </script>

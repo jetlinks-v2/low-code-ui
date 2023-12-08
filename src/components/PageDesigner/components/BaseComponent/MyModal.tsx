@@ -1,11 +1,8 @@
 import {computed, defineComponent} from 'vue'
 import {Modal, Drawer, Button, Space} from 'jetlinks-ui-components'
-import {request as axiosRequest} from '@jetlinks-web/core'
 import PagePreview from "@LowCode/components/PageDesigner/preview.vue";
 import FormPreview from "@LowCode/components/FormDesigner/preview.vue";
 import {useTool} from "@LowCode/components/PageDesigner/hooks";
-import {useRouter} from "vue-router";
-
 export default defineComponent({
     name: 'ProTableModal',
     inheritAttrs: false,
@@ -15,32 +12,40 @@ export default defineComponent({
             type: Object,
             default: () => ({})
         },
+        type: {
+            type: String,
+            default: ''
+        }
     },
     emits: ['save', 'close'],
     setup(props, {emit}) {
-        const {modalType, type, code, title, data, createdCode, okCode, width, footerVisible} = props?.data
+        const {modalType, pageType, code, title, data, createdCode, okCode, width, footerVisible, cancelCode} = props?.data
         const {isEditModel, paramsUtil, _global} = useTool()
         const formRef = ref()
         const pageRef = ref()
         const myValue = ref()
 
         const config = computed(() => {
-            console.log(code)
             return JSON.parse(code || '{}')
         })
 
         const onCreatedFn = (code?: string) => {
             if (code && !isEditModel.value) {
-                const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
-                const fn = new Function('record', 'refs', 'util', 'global', code)
-                fn(data || {}, _refs, paramsUtil, _global)
+                const _refs = pageType === 'page' ? {pageRef, myValue} : {formRef, myValue}
+                if(props.type === 'table'){
+                    const fn = new Function('record', 'refs', 'util', 'global', code)
+                    fn(data || {}, _refs, paramsUtil, _global)
+                } else {
+                    const fn = new Function('refs', 'util', 'global', code)
+                    fn(_refs, paramsUtil, _global)
+                }
             }
         }
 
         onCreatedFn(createdCode)
 
         const renderChildren = () => {
-            if (type === 'page') {
+            if (pageType === 'page') {
                 return <PagePreview ref={pageRef.value} data={config.value} pageValue={myValue.value}/>
             }
             return <FormPreview
@@ -55,15 +60,21 @@ export default defineComponent({
         const onSave = async () => {
             if (!okCode) return
             const handleResultFn = new Function('refs', 'util', 'global', okCode)
-            const _refs = type === 'page' ? { pageRef, myValue } : { formRef, myValue }
+            const _refs = pageType === 'page' ? {pageRef, myValue} : {formRef, myValue}
             const resp = await handleResultFn(_refs, paramsUtil, _global)
             if (resp) {
-                emit('save', true)
+                props.type === 'table' ? emit('save', true) : emit('save')
             }
         }
 
-        const onCancel = () => {
-            emit('close')
+        const onCancel = async () => {
+            if (!cancelCode) return
+            const handleResultFn = new Function('refs', 'util', 'global', okCode)
+            const _refs = pageType === 'page' ? {pageRef, myValue} : {formRef, myValue}
+            const resp = await handleResultFn(_refs, paramsUtil, _global)
+            if (resp) {
+                emit('close')
+            }
         }
 
         const footerContent = () => {

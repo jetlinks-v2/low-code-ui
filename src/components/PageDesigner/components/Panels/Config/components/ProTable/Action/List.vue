@@ -30,7 +30,7 @@
         }" />
       </template>
       <template #event="{ record, valueChange }">
-        <Event v-model:value="record.event" @change="() => {
+        <ButtonConfig :type="'table'" v-model:value="record.event" @change="() => {
           valueChange(record.event);
           onChange()
         }" />
@@ -52,7 +52,7 @@ import {ref, watchEffect, PropType} from "vue";
 import {cloneDeep} from "lodash-es";
 import Icon from "../../Icon/index.vue";
 import {uid} from "@LowCode/components/PageDesigner/utils/uid";
-import Event from './Event.vue';
+import ButtonConfig from '../../ButtonConfig/index.vue';
 import {QuickEditTable} from '@LowCode/components/index'
 
 const props = defineProps({

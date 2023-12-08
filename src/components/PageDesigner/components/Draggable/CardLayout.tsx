@@ -1,8 +1,7 @@
 import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
 import './index.less'
-import { useTool } from '../../hooks'
-
+import {usePubsub, useTool} from '../../hooks'
 export default defineComponent({
     name: 'CardLayout',
     inheritAttrs: false,
@@ -28,10 +27,21 @@ export default defineComponent({
             return unref(_data)?.children || []
         })
 
+        const $self = reactive({
+            visible: true
+        })
+
+        const handleResponderFn = ($dep?: string, $depValue?: any) => {
+            if (props.data?.componentProps?.responder?.responder) {
+                const handleResultFn = new Function('$self', '$dep', '$depValue', props.data?.componentProps?.responder?.responder)
+                handleResultFn($self, $dep, $depValue)
+            }
+        }
+
+        usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
 
         return () => {
-
-            return (
+            return $self.visible && (
                 <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <div
                         data-layout-type={'card'}

@@ -7,3 +7,4 @@ export { default as useCheck } from './useCheck'
 export * from './usePageProvider'
 
 export * from  './useLifeCycle'
+export * from './usePubsub'

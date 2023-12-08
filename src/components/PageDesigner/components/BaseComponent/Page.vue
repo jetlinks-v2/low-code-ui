@@ -1,17 +1,17 @@
 <template>
-  <div class="form-warp">
+  <div class="form-warp" v-if="$self.visible">
     <PagePreview
       :pageValue="myValue"
       :data="config"
-      ref="formRef"
+      ref="pageRef"
     />
   </div>
 </template>
 <script lang="ts" setup>
 import PagePreview from '@LowCode/components/PageDesigner/preview.vue'
-import { watch, computed, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useLifeCycle } from '../../hooks/useLifeCycle';
-import {usePageProvider, useTool} from '../../hooks';
+import {usePageProvider, usePubsub, useTool} from '../../hooks';
 
 const props = defineProps({
   _key: {
@@ -33,13 +33,14 @@ const props = defineProps({
   onCreated:{
     type: String,
     default: ''
-  }
+  },
+  responder: {
+    type: Object,
+    default: () => ({})
+  },
 })
 
-const emit = defineEmits(['update:value', 'change'])
-
-const myValue = ref(props.value)
-const formRef = ref<any>(null)
+const pageRef = ref<any>(null)
 const config = computed(() => {
   return JSON.parse(props.source?.code || '{}')
 })
@@ -50,26 +51,31 @@ const { executionMounted } = useLifeCycle(props, {}, isEditModel)
 
 const pageProvider = usePageProvider()
 
-watch(
-  () => props.value,
-  (newVal) => {
-    myValue.value = newVal
-  },
-  {
-    deep: true,
-    immediate: true,
-  },
-)
+const $self = reactive({
+  visible: true,
+  value: props.value
+})
 
 onMounted(() => {
   executionMounted()
-  pageProvider.addSlot?.(props._key, formRef)
+  pageProvider.addRef?.(props._key, pageRef)
 })
 
+const handleResponderFn = ($dep?: string, $depValue?: any) => {
+  if (props?.responder?.responder) {
+    const handleResultFn = new Function('$self', '$dep', '$depValue', props?.responder?.responder)
+    handleResultFn($self, $dep, $depValue)
+  }
+}
+
+usePubsub(props._key, $self, props.responder?.dependencies, handleResponderFn)
+
+const myValue = computed(() => {
+  return $self.value || props.value
+})
 </script>
 <style scoped>
 .form-warp {
-  /* border: 1px solid #e6e6e6; */
   padding-bottom: 18px;
 }
 </style>

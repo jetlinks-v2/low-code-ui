@@ -2,12 +2,11 @@ import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
 import TitleComponent from '@LowCode/components/TitleComponent/index.vue'
 import './index.less'
-import {inject, withModifiers} from 'vue'
-import {useLifeCycle, usePageProvider, useTool} from '../../hooks'
+import {withModifiers} from 'vue'
+import {useLifeCycle, usePubsub, useTool} from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import {uid} from '../../utils/uid'
 import {Row, Col} from 'jetlinks-ui-components'
-import {request as axiosRequest} from "@jetlinks-web/core/src/request";
 
 export default defineComponent({
     name: 'InfoLayout',
@@ -26,47 +25,26 @@ export default defineComponent({
     },
     setup(props) {
         const {isEditModel, isDragArea, onAddChild} = useTool()
-        const designer = inject<any>('PageDesigner')
-        const PageProvider = usePageProvider()
-        const detailInfo = ref()
+
+        const $self = reactive({
+            visible: true
+        })
 
         const {executionMounted} = useLifeCycle(props.data.componentProps, {}, isEditModel)
-
-        const defaultParams = () => {
-            try {
-                return JSON.parse(props.data.componentProps?.request?.defaultParams)
-            } catch (e) {
-                return undefined
-            }
-        }
-
-        const handleRequestFn = async () => {
-            const {request, handleResult} = props.data.componentProps
-            if (request) {
-                const paramsData = defaultParams()
-                console.log(request)
-                try {
-                    const resp = await axiosRequest[request.methods](request.query, paramsData)
-                    if (handleResult) {
-                        const handleResultFn = new Function('result', handleResult)
-                        detailInfo.value = handleResultFn.call(this, resp.result)
-                    } else {
-                        detailInfo.value = resp.result
-                    }
-                    PageProvider.add?.(props.data.key, detailInfo.value)
-                } catch (e) {
-                    console.error(e)
-                }
-            }
-        }
-
-        if (!isEditModel.value) {
-            handleRequestFn()
-        }
 
         const list = computed(() => {
             return props.data?.children || []
         })
+
+        const handleResponderFn = ($dep?: string, $depValue?: any) => {
+            if (props.data?.componentProps?.responder?.responder) {
+                const handleResultFn = new Function('$self', '$dep', '$depValue', props.data?.componentProps?.responder?.responder)
+                handleResultFn($self, $dep, $depValue)
+            }
+        }
+
+        usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
+
         // 计算列表组件行自动铺满
         // const dealCol = () =>{
         //     list.value?.map(((item:any)=>{
@@ -235,19 +213,12 @@ export default defineComponent({
             }
         }
 
-
         onMounted(() => {
             executionMounted()
         })
 
-        onBeforeMount(() => {
-            if (isEditModel.value) {
-                designer.dependencies.value[props.data.key] = props.data?.name || props.data?.key
-            }
-        })
-
         return () => {
-            return (
+            return $self.visible && (
                 <Selection {...useAttrs()} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
                     {infoRender()}
                     {
