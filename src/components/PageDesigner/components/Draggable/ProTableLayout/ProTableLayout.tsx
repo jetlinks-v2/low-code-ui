@@ -12,6 +12,7 @@ import { Tag } from 'jetlinks-ui-components'
 import {get} from "lodash-es";
 import ProTableModal from '../../BaseComponent/MyModal';
 import dayjs from 'dayjs'
+
 export default defineComponent({
     name: 'ProTableLayout',
     inheritAttrs: false,
