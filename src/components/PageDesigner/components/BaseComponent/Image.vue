@@ -1,38 +1,45 @@
 <template>
-    <j-image :width="width" :src="_value" ></j-image>
+  <ErrorImage :width="width" :src="_value"></ErrorImage>
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue"
-import {usePageDependencies, useTool} from "../../hooks";
+import {computed} from "vue"
+import {usePubsub} from "../../hooks";
+import ErrorImage from '@LowCode/components/Image/index.vue'
 
 const props = defineProps({
-    value: {
-        type: String,
-        default: 'https://aliyuncdn.antdv.com/vue.png'
-    },
-    width: {
-        type: Number,
-        default: 200
-    },
-    responder: {
-      type: Object,
-      default: () => ({})
-    }
+  _key: {
+    type: String,
+    default: ''
+  },
+  src: {
+    type: String,
+  },
+  width: {
+    type: Number,
+    default: 80
+  },
+  responder: {
+    type: Object,
+    default: () => ({})
+  },
 })
 
-const { dependencies } = usePageDependencies(props.responder?.dependencies)
-const { isEditModel } = useTool()
-const handleResponderFn = (value: any = {}) => {
-  const handleResultFn = new Function('value', props.responder?.responder)
-  return handleResultFn.call(this, value)
+const $self = reactive({
+  visible: true,
+  src: props.src
+})
+
+const handleResponderFn = ($dep?: string, $depValue?: any) => {
+  if (props.responder?.responder) {
+    const handleResultFn = new Function('$self', '$dep', '$depValue', props?.responder?.responder)
+    handleResultFn($self, $dep, $depValue)
+  }
 }
 
-const _value = computed(() => {
+usePubsub(props._key, $self, props.responder?.dependencies, handleResponderFn)
 
-  if (props.responder?.responder && !isEditModel.value) {
-    return handleResponderFn(dependencies.value)
-  }
-    return props.value
+const _value = computed(() => {
+  return $self?.src || props.src
 })
 </script>
