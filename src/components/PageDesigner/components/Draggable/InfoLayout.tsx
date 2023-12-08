@@ -7,6 +7,7 @@ import {useLifeCycle, usePubsub, useTool} from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import {uid} from '../../utils/uid'
 import {Row, Col} from 'jetlinks-ui-components'
+import {handleDataSourceFn} from "../../utils/utils";
 
 export default defineComponent({
     name: 'InfoLayout',
@@ -27,10 +28,18 @@ export default defineComponent({
         const {isEditModel, isDragArea, onAddChild} = useTool()
 
         const $self = reactive({
-            visible: true
+            visible: true,
+            value: {}
         })
 
-        const {executionMounted} = useLifeCycle(props.data.componentProps, {}, isEditModel)
+        const setVisible = (flag: boolean) => {
+            $self.visible = flag
+        }
+        const setValue = (_val: any) => {
+            $self.value = _val
+        }
+
+        const {executionMounted} = useLifeCycle(props.data.componentProps, {setVisible, setValue}, isEditModel)
 
         const list = computed(() => {
             return props.data?.children || []
@@ -44,6 +53,16 @@ export default defineComponent({
         }
 
         usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
+
+        handleDataSourceFn(props.data?.componentProps?.request || {}, unref(isEditModel)).then((_val: any) => {
+            if (_val) {
+                $self.value = _val
+            }
+        })
+
+        onMounted(() => {
+            executionMounted()
+        })
 
         // 计算列表组件行自动铺满
         // const dealCol = () =>{
@@ -212,10 +231,6 @@ export default defineComponent({
                 return emptyRender()
             }
         }
-
-        onMounted(() => {
-            executionMounted()
-        })
 
         return () => {
             return $self.visible && (

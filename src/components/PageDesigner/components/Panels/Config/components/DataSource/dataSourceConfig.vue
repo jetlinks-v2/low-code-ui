@@ -18,7 +18,7 @@
       </j-form-item>
       <j-form-item label="默认参数" name="defaultParams">
         <ProMonaco
-          v-model="formModel.defaultParams"
+          v-model:value="formModel.defaultParams"
           language="json"
           style="height: 160px"
           :tipCode="tipCode_1"
@@ -27,7 +27,7 @@
       <j-form-item label="数据处理" name="handleResult">
         <div>
           <span style="font-weight: 600;">function (result) {</span>
-          <ProMonaco v-model="formModel.handleResult" language="javascript"
+          <ProMonaco v-model:value="formModel.handleResult" language="javascript"
                            :registrationTypescript="registrationTypescript" style="height: 200px"/>
         </div>
       </j-form-item>
@@ -89,12 +89,16 @@ watch(
     }
 )
 const onSave = () => new Promise((resolve, reject) => {
-  formRef.value?.validateFields().then((res: any) => {
+  formRef.value?.validate().then((res: any) => {
     if (res) {
       resolve(formModel)
     }
     reject(false)
   })
+})
+
+watchEffect(() => {
+  Object.assign(formModel, props.value)
 })
 
 defineExpose({onSave})

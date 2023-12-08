@@ -4,8 +4,9 @@ import {Tabs, TabPane, Badge} from 'jetlinks-ui-components'
 import './index.less'
 import {withModifiers} from 'vue'
 import { map, omit} from 'lodash-es'
-import {usePubsub, useTool} from '../../hooks'
+import {useLifeCycle, usePubsub, useTool} from '../../hooks'
 import generatorData from '../../utils/generatorData'
+import {handleDataSourceFn} from "../../utils/utils";
 
 export default defineComponent({
     name: 'TabsLayout',
@@ -25,7 +26,6 @@ export default defineComponent({
     setup(props) {
         const designer: any = inject('PageDesigner')
         const {isEditModel, isDragArea, onAddChild} = useTool()
-
         const list = computed(() => {
             return props.data?.children || []
         })
@@ -43,7 +43,17 @@ export default defineComponent({
 
         const $self = reactive({
             visible: true,
+            value: {}
         })
+
+        const setVisible = (flag: boolean) => {
+            $self.visible = flag
+        }
+        const setValue = (_val: any) => {
+            $self.value = _val
+        }
+
+        const { executionMounted } = useLifeCycle(props.data.componentProps, {setVisible, setValue}, isEditModel)
 
         const handleResponderFn = ($dep?: string, $depValue?: any) => {
             if (props.data?.componentProps?.responder?.responder) {
@@ -53,6 +63,16 @@ export default defineComponent({
         }
 
         usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
+
+        handleDataSourceFn(props.data?.componentProps?.request || {}, unref(isEditModel)).then((_val: any) => {
+            if (_val) {
+                $self.value = _val
+            }
+        })
+
+        onMounted(() => {
+            executionMounted()
+        })
 
         const _tabContent = (_element: any) => {
             if (unref(isEditModel)) {

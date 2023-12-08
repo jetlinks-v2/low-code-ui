@@ -12,6 +12,7 @@ import PagePreview from '@LowCode/components/PageDesigner/preview.vue'
 import { computed, ref } from 'vue'
 import { useLifeCycle } from '../../hooks/useLifeCycle';
 import {usePageProvider, usePubsub, useTool} from '../../hooks';
+import {handleDataSourceFn} from "../../utils/utils";
 
 const props = defineProps({
   _key: {
@@ -26,11 +27,11 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
-  onMounted:{
+  mountedCode:{
     type: String,
     default: ''
   },
-  onCreated:{
+  createdCode:{
     type: String,
     default: ''
   },
@@ -38,6 +39,10 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
+  request: {
+    type: Object,
+    default: () => ({})
+  }
 })
 
 const pageRef = ref<any>(null)
@@ -47,19 +52,20 @@ const config = computed(() => {
 
 const { isEditModel } = useTool()
 
-const { executionMounted } = useLifeCycle(props, {}, isEditModel)
-
-const pageProvider = usePageProvider()
-
 const $self = reactive({
   visible: true,
   value: props.value
 })
+const setVisible = (flag: boolean) => {
+  $self.visible = flag
+}
+const setValue = (_val: any) => {
+  $self.value = _val
+}
 
-onMounted(() => {
-  executionMounted()
-  pageProvider.addRef?.(props._key, pageRef)
-})
+const { executionMounted } = useLifeCycle(props, {setVisible, setValue}, isEditModel)
+
+const pageProvider = usePageProvider()
 
 const handleResponderFn = ($dep?: string, $depValue?: any) => {
   if (props?.responder?.responder) {
@@ -69,6 +75,17 @@ const handleResponderFn = ($dep?: string, $depValue?: any) => {
 }
 
 usePubsub(props._key, $self, props.responder?.dependencies, handleResponderFn)
+
+handleDataSourceFn(props?.request || {}, unref(isEditModel)).then((_val: any) => {
+  if (_val) {
+    $self.value = _val
+  }
+})
+
+onMounted(() => {
+  executionMounted()
+  pageProvider.addRef?.(props._key, pageRef)
+})
 
 const myValue = computed(() => {
   return $self.value || props.value
