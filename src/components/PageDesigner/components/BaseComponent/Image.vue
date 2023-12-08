@@ -1,5 +1,7 @@
 <template>
-  <ErrorImage :width="width" :src="_value"></ErrorImage>
+  <div v-if="$self.visible">
+    <ErrorImage :width="width" :src="_value"></ErrorImage>
+  </div>
 </template>
 
 <script lang="ts" setup>
