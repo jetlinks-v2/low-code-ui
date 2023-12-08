@@ -22,11 +22,12 @@
 <script setup name="EngineTree">
 import Search from './search.vue'
 import Tree from './tree.vue'
-import { useProduct } from "@LowCode/store";
+import { useProduct ,useEngine} from "@LowCode/store";
 import { storeToRefs } from 'pinia'
 import { DragBox } from '@LowCode/components/index'
 
 const product = useProduct()
+const engine = useEngine()
 
 const { data } = storeToRefs(product)
 
@@ -63,7 +64,17 @@ const productClass = computed(() => {
 watch(() => route.params.id, () => {
   if (route.params.id !== undefined ) {
     product.initProjectState()
-    product.queryProduct(route.params.id)
+    product.queryProduct(route.params.id,()=>{
+      const data = product.data[0]
+      if (data?.state?.value !== 'published') {
+        engine.selectFiles(data?.others?.files || [])
+        engine.setActiveFile(data?.others?.activeFile || data?.id)
+        engine.selectFile(data?.others?.activeFile)
+      } else {
+        engine.setActiveFile(data?.id)
+        engine.selectFile(data.id)
+      }
+    })
   }
 }, { immediate: true })
 

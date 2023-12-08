@@ -234,20 +234,17 @@ export const useProduct = defineStore('product', () => {
   const handleProjectData = (result, isActive?: boolean) => {
     const {modules, ...extra } = result
     const treeData: TreeData[] = []
-
     const children: TreeData[] = modules?.[0] ? handleChildren(modules[0], extra.id) : []
-
     treeData.push({
       ...extra,
       id: modules?.[0]?.id || extra.id,
       title: modules?.[0]?.name || extra.name,
       type: 'project',
       children: children,
-      others: modules ? modules[0]?.others : {}
+      // others: extra.others
     })
     handleDataMap(treeData);
     data.value = treeData
-
     updateDataCache()
     if (isActive) {
       engine.setActiveFile(treeData[0]?.id)
@@ -296,6 +293,7 @@ export const useProduct = defineStore('product', () => {
     data.value = updateProduct(data.value, record)
     updateDataCache()
     engine.updateFile(record, 'edit')
+
     updateProductReq(omit(record, ['children']), (result) => {
       handleProjectData(result,false)
       cb?.()
