@@ -20,8 +20,8 @@ const props = defineProps({
     default: ''
   },
   value: {
-    type: Array,
-    default: [],
+    type: Object,
+    default: () => ({}),
   },
   source: {
     type: Object,
@@ -54,7 +54,7 @@ const { isEditModel } = useTool()
 
 const $self = reactive({
   visible: true,
-  value: props.value
+  value: undefined
 })
 const setVisible = (flag: boolean) => {
   $self.visible = flag

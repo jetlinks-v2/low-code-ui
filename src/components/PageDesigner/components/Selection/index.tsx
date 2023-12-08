@@ -13,7 +13,7 @@ const Selection = defineComponent({
   props: {
     data: {
       type: Object,
-      default: () => { }
+      default: () => ({ })
     },
     tag: {
       type: String,
@@ -43,7 +43,7 @@ const Selection = defineComponent({
   setup(props, { slots }) {
     const cssClassList = ref<string[]>([])
     const designer: any = inject('PageDesigner')
-    const { isEditModel, onPaste, onDelete, setSelection, onCopy, onShear } = useTool()
+    const { _noCopyData, isEditModel, onPaste, onDelete, setSelection, onCopy, onShear } = useTool()
 
     const Selected = computed(() => {
       if (unref(isEditModel)) {
@@ -93,17 +93,22 @@ const Selection = defineComponent({
         }, ['stop'])}
         v-slots={{
           overlay: () => {
+            const flag = !_noCopyData.includes(props.data.type)
             return (
               <Menu>
-                <MenuItem key="copy"><Button type="link" onClick={() => {
-                  onCopy(designer.data?.id)
-                }}>复制</Button></MenuItem>
-                <MenuItem key="paste"><Button type="link" onClick={() => {
-                  onPaste(designer.data?.id)
-                }}>粘贴</Button></MenuItem>
-                <MenuItem key="shear"><Button type="link" onClick={() => {
-                  onShear(designer.data?.id)
-                }}>剪切</Button></MenuItem>
+                {
+                  flag && <>
+                      <MenuItem key="copy"><Button type="link" onClick={() => {
+                        onCopy(designer.data?.id)
+                      }}>复制</Button></MenuItem>
+                      <MenuItem key="paste"><Button type="link" onClick={() => {
+                        onPaste(designer.data?.id)
+                      }}>粘贴</Button></MenuItem>
+                      <MenuItem key="shear"><Button type="link" onClick={() => {
+                        onShear(designer.data?.id)
+                      }}>剪切</Button></MenuItem>
+                    </>
+                }
                 <MenuItem key="delete"><Button danger type="link" onClick={() => {
                   onDelete()
                 }}>删除</Button></MenuItem>
