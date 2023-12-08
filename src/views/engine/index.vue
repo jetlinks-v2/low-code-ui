@@ -28,6 +28,7 @@ import { useEngine, useProduct } from '@LowCode/store'
 import {storeToRefs} from "pinia";
 import { DragContent } from '@LowCode/components/index'
 import { omit} from 'lodash-es'
+import {updateProjectDraft} from "@LowCode/api/project";
 
 const engine = useEngine()
 const product = useProduct()
@@ -40,25 +41,26 @@ const onClick = (data) => {
   engine.addFile(data)
 }
 
+
 watch(() => activeFile.value, () => {
   path.value = product.getParent({ id: activeFile.value })
 }, { immediate: true })
 
-// onBeforeRouteLeave((to, form, next) => {
-//   console.log('to===', to)
-//    const item =  omit(product.data[0], ['children'])
-//    console.log('item===',item,product.data[0])
-//   // product.update({
-//   //   ...item,
-//   //   others: {
-//   //     ...item?.others,
-//   //     activeFile: activeFile.value,
-//   //     files: files.value
-//   //   }
-//   // },()=>{
-//     // next()
-//   // })    
-// })
+onBeforeRouteLeave((to, form, next) => {
+   const item =  omit(product.data[0], ['children'])
+   console.log('item===',item,product.data,product.info)
+   updateProjectDraft(product.info.draftId,{
+      // ...item,
+      name:item.name,
+      others: {
+        ...item?.others,
+        activeFile: activeFile.value,
+        files: files.value
+      }
+   }).finally(()=>{
+    next()
+   })   
+})
 
 </script>
 
