@@ -77,7 +77,7 @@
               </j-select>
             </j-form-item>
             <j-form-item label="页面onCreated" name="createdCode">
-              <div>function onCreated(record, refs, util, global)</div>
+              <div>function onCreated({{ okCodeTip }})</div>
               <ProMonaco :tipCode="defaultMountedCode" v-model:value="formState.createdCode" language="javascript" style="height: 300px"/>
             </j-form-item>
           </template>
@@ -88,11 +88,17 @@
           </template>
           <j-form-item label="确认事件" name="okCode">
             <div>{{
-                ['confirm', 'common'].includes(formState.type) ? 'function (record, refs, util, global)' : 'function (refs, util, global)'
+                ['confirm', 'common'].includes(formState.type) ? `function (${okCodeTip})` : 'function (refs, util, global)'
               }}
             </div>
             <ProMonaco :tipCode="defaultCode" v-model:value="formState.okCode" language="javascript" style="height: 300px" />
           </j-form-item>
+          <template v-if="!['confirm', 'common'].includes(formState.type)">
+            <j-form-item label="取消事件" name="cancelCode">
+              <div>function (refs, util, global)</div>
+              <ProMonaco :tipCode="defaultCode" v-model:value="formState.cancelCode" language="javascript" style="height: 300px" />
+            </j-form-item>
+          </template>
         </j-form>
       </div>
     </j-modal>
@@ -103,7 +109,7 @@
 import {reactive, ref, watchEffect} from "vue";
 import {cloneDeep} from "lodash-es";
 import {useTool} from "@LowCode/components/PageDesigner/hooks";
-import {ProMonaco} from "../../ProMonaco";
+import {ProMonaco} from "../ProMonaco";
 
 const {getFormList, getPageList} = useTool();
 const options = ref<any[]>(getFormList.value || [])
@@ -114,6 +120,9 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
+  type: {
+    type: String
+  }
 });
 
 const emits = defineEmits(["cancel", "save"]);
@@ -218,7 +227,11 @@ watchEffect(() => {
   Object.assign(formState, cloneDeep(props.value));
 });
 
-const onSave = async () => {
+const okCodeTip = computed(() => {
+  return props?.type === 'table' ? 'record, refs, util, global' : 'refs, util, global'
+})
+
+const onSave = () => {
   formRef.value?.validate().then((res: any) => {
     if (res) {
       emits("save", formState);

@@ -45,6 +45,7 @@ const _ctrl = ref<boolean>(false);
 const focus = ref<boolean>(false);
 const focused = ref<boolean>(false); // 记录弹框的快捷键问题
 const dependencies = ref({}) // 依赖项
+const pubsub = ref([]) // 发布订阅依赖项
 const errorKey = ref<any[]>([]);
 const spinning = ref<boolean>(false);
 
@@ -58,6 +59,7 @@ const designerData = {
   focus,
   focused,
   dependencies,
+  pubsub,
   pageValue: props.pageValue,
   errorKey,
   spinning

@@ -1,8 +1,8 @@
 import {ProTable, Ellipsis, Row, Col, AIcon, Space, Tooltip, Button, Popconfirm} from 'jetlinks-ui-components'
 import Selection from '../../Selection/index'
-import { defineComponent, withModifiers } from 'vue'
-import {useTool, usePageDependencies, usePageProvider,  useLifeCycle} from '../../../hooks'
-import { request as axiosRequest } from '@jetlinks-web/core'
+import {defineComponent, withModifiers} from 'vue'
+import {useTool, usePubsub, usePageProvider, useLifeCycle} from '../../../hooks'
+import {request as axiosRequest} from '@jetlinks-web/core'
 import DraggableLayout from '../DraggableLayout'
 import generatorData from '@LowCode/components/PageDesigner/utils/generatorData'
 import { provide, h } from 'vue'
@@ -10,7 +10,7 @@ import '../index.less'
 import {Card, BadgeStatus} from '@LowCode/components'
 import { Tag } from 'jetlinks-ui-components'
 import {get} from "lodash-es";
-import ProTableModal from './Modal';
+import ProTableModal from '../../BaseComponent/MyModal';
 import dayjs from 'dayjs'
 
 export default defineComponent({
@@ -28,23 +28,12 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const { isDragArea, isEditModel, onAddChild, paramsUtil, _global } = useTool()
+        const {isDragArea, isEditModel, onAddChild, paramsUtil, _global} = useTool()
         const pageProvider = usePageProvider()
-        const { dependencies: params } = usePageDependencies(props.data.componentProps?.responder?.dependencies)
         const tableRef = ref()
-        const isSelect = ref(false)
-        const _selectedRowKeys = ref([])
-        const showSelect = () =>{
-            isSelect.value = true
-        }
-        const closeSelect = () =>{
-            isSelect.value = false
-            _selectedRowKeys.value =[]
-        }
-        const getSelectKeys = () =>{
-            return _selectedRowKeys.value
-        }
-        provide('selectConfig',{showSelect,closeSelect,getSelectKeys})
+        const isSelected = ref(false)
+        const selectedRowKeys = ref([])
+
         const modalVisible = ref<boolean>(false)
         const dataModal = ref()
 
@@ -52,6 +41,20 @@ export default defineComponent({
             return props.data
         })
 
+        const $self = reactive({
+            visible: true,
+            params: {},
+            dataSource: []
+        })
+        const handleResponderFn = ($dep?: string, $depValue?: any) => {
+            const _responder = props.data?.componentProps?.responder?.responder
+            if (_responder) {
+                const handleResultFn = new Function('$self', '$dep', '$depValue', _responder)
+                handleResultFn($self, $dep, $depValue)
+            }
+        }
+
+        usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
         const handleAdd = () => {
             const _item = generatorData({
                 type: 'table-item',
@@ -123,11 +126,12 @@ export default defineComponent({
                                                 width: item.event?.width || 520,
                                                 footerVisible: item.event?.footerVisible,
                                                 data: _record,
-                                                type: item.event?.pageType || 'form',
+                                                pageType: item.event?.pageType || 'form',
                                                 code: item.event?.pageData,
-                                                title:  item.event?.title || item?.text,
+                                                title: item.event?.title || item?.text,
                                                 createdCode: item.event?.createdCode,
                                                 okCode: item.event?.okCode,
+                                                cancelCode: item.event?.cancelCode,
                                                 modalType: item.event?.type || 'modal',
                                             }
                                             modalVisible.value = true
@@ -142,7 +146,7 @@ export default defineComponent({
                                             tableRef
                                         }, paramsUtil, _global)
                                     }
-                                }} /></Tooltip>
+                                }}/></Tooltip>
                             }
                         }
                         return <Tooltip title={item?.text}><Button type='link' {..._props}/></Tooltip>
@@ -172,13 +176,12 @@ export default defineComponent({
             return arr
         })
 
-        const dataSource = computed(() => {
-            return props.data.componentProps.dataSource
+        const _dataSource = computed(() => {
+            return $self.dataSource || props.data.componentProps.dataSource
         })
 
         const columnsSlots = computed(() => {
             return columns.value?.reduce((prev: Record<string, any>, next) => {
-                console.log('render',next)
                 if (next.render) {
                     const components = {
                         BadgeStatus,
@@ -236,33 +239,33 @@ export default defineComponent({
             return handleResultFn(_record, { dayjs })
         }
 
-        const onSelectChange = (item: any,state: boolean) => {
-            const arr = new Set(_selectedRowKeys.value);
+        const onSelectChange = (item: any, state: boolean) => {
+            const arr = new Set(selectedRowKeys.value);
             if (state) {
-                arr.add(item.id);
+                arr.add(item?.id);
             } else {
-                arr.delete(item.id);
+                arr.delete(item?.id);
             }
-            _selectedRowKeys.value = [...arr.values()];
+            selectedRowKeys.value = [...arr.values()];
         };
 
         const selectAll = (selected: Boolean, selectedRows: any,changeRows:any) => {
             if (selected) {
-                    changeRows.map((i: any) => {
-                        if (!_selectedRowKeys.value.includes(i.id)) {
-                            _selectedRowKeys.value.push(i.id)
-                        }
-                    })
-                } else {
-                    const arr = changeRows.map((item: any) => item.id)
-                    const _ids: string[] = [];
-                    _selectedRowKeys.value.map((i: any) => {
-                        if (!arr.includes(i)) {
-                            _ids.push(i)
-                        }
-                    })
-                    _selectedRowKeys.value = _ids
-                }
+                changeRows.map((i: any) => {
+                    if (!selectedRowKeys.value.includes(i.id)) {
+                        selectedRowKeys.value.push(i.id)
+                    }
+                })
+            } else {
+                const arr = changeRows.map((item: any) => item.id)
+                const _ids: string[] = [];
+                selectedRowKeys.value.forEach((i: any) => {
+                    if (!arr.includes(i)) {
+                        _ids.push(i)
+                    }
+                })
+                selectedRowKeys.value = _ids
+            }
         }
 
         const statusConfig = (emphasisField: any, _record: any) => {
@@ -331,11 +334,12 @@ export default defineComponent({
                                         if (!unref(isEditModel)) {
                                             dataModal.value = {
                                                 data: _record,
-                                                type: item.event?.pageType || 'form',
+                                                pageType: item.event?.pageType || 'form',
                                                 code: item.event?.pageData,
-                                                title: item?.text,
+                                                title: item.event?.title || item?.text,
                                                 createdCode: item.event?.createdCode,
                                                 okCode: item.event?.okCode,
+                                                cancelCode: item.event?.cancelCode,
                                                 modalType: item.event?.type || 'modal',
                                             }
                                             modalVisible.value = true
@@ -402,12 +406,20 @@ export default defineComponent({
             </Card>
         }
 
-        const { executionMounted } = useLifeCycle(props.data.componentProps, { tableRef: tableRef }, isEditModel)
-        const tableRefKey = props.data.key + 'ref'
+        const {executionMounted} = useLifeCycle(props.data.componentProps, {tableRef: tableRef}, isEditModel)
 
         onMounted(() => {
             executionMounted()
-            pageProvider.addSlot?.(tableRefKey, tableRef)
+            pageProvider.addRef?.(props.data.key, {
+                selectedRowKeys,
+                onReload: () => {
+                    tableRef.value?.reload()
+                },
+                onShowSelected: (flag: boolean) => {
+                    isSelected.value = flag
+                    selectedRowKeys.value =[]
+                }
+            })
         })
 
         return () => {
@@ -417,22 +429,22 @@ export default defineComponent({
                     <ProTable
                         ref={tableRef}
                         columns={columns.value}
-                        dataSource={dataSource.value}
+                        dataSource={_dataSource.value}
                         {..._model.value}
-                        params={params.value}
+                        params={$self.params}
                         noPagination={noPagination.value}
                         pagination={props.data.componentProps.paginationSetting?.pagination}
                         request={hasRequest.value ? handleRequestFn : undefined}
                         defaultParams={defaultParams.value}
                         rowSelection={
-                        isSelect.value
-                            ? {
-                                  selectedRowKeys: _selectedRowKeys.value,
-                                  onSelect: onSelectChange,
-                                  onSelectAll: selectAll,
-                                  onSelectNone: ()=>_selectedRowKeys.value = []
-                              }
-                            : false
+                            isSelected.value
+                                ? {
+                                    selectedRowKeys: selectedRowKeys.value,
+                                    onSelect: onSelectChange,
+                                    onSelectAll: selectAll,
+                                    onSelectNone: () => selectedRowKeys.value = []
+                                }
+                                : false
                         }
                         v-slots={{
                             headerTitle: buttonRender,
@@ -441,8 +453,8 @@ export default defineComponent({
                         }}
                     >
                     </ProTable>
-                    {modalVisible.value && <ProTableModal data={dataModal.value} onSave={(flag: boolean) => {
-                        if(flag){
+                    {modalVisible.value && <ProTableModal type={'table'} data={dataModal.value} onSave={(flag: boolean) => {
+                        if (flag) {
                             tableRef.value?.reload()
                             modalVisible.value = false
                         }

@@ -1,4 +1,4 @@
-import {useLifeCycle, useTool} from "../../hooks"
+import {useLifeCycle, usePubsub, useTool} from "../../hooks"
 import Selection from '../Selection/index'
 import {Timeline, TimelineItem} from 'jetlinks-ui-components'
 import DraggableLayout from "./DraggableLayout"
@@ -20,9 +20,15 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const {isDragArea, isEditModel, onAddChild} = useTool()
-        const myValue = ref<any[]>([{label: '2015-09-01', color: 'red'}])
-        const {executionMounted} = useLifeCycle(props.data.componentProps, {myValue}, isEditModel)
+        const {isDragArea, isEditModel} = useTool()
+        const $self = reactive({
+            visible: true,
+            dataSource: [{label: '2023-12-06', value: ''}]
+        })
+        const setDataSource = (arr: any[]) => {
+            $self.dataSource = arr
+        }
+        const {executionMounted} = useLifeCycle(props.data.componentProps, {setDataSource}, isEditModel)
 
         onMounted(() => {
             executionMounted()
@@ -36,13 +42,22 @@ export default defineComponent({
             return unref(_data)?.children || []
         })
 
+        const handleResponderFn = ($dep?: string, $depValue?: any) => {
+            if (props.data?.componentProps?.responder?.responder) {
+                const handleResultFn = new Function('$self', '$dep', '$depValue', props.data?.componentProps?.responder?.responder)
+                handleResultFn($self, $dep, $depValue)
+            }
+        }
+
+        usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
+
         return () => {
-            return (
+            return $self.visible && (
                 <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)}
                            parent={props.parent}>
                     <Timeline {...props.data.componentProps}>
                         {
-                            unref(myValue).map((val: any) => {
+                            $self.dataSource.map((val: any) => {
                                 return <TimelineItem {...omit(val, 'label')}>
                                     <p>{val.label}</p>
                                     {

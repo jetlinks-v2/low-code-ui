@@ -1,4 +1,4 @@
-import {useLifeCycle, useTool} from "../../hooks"
+import {useLifeCycle, usePubsub, useTool} from "../../hooks"
 import Selection from '../Selection/index'
 import DraggableLayout from "./DraggableLayout"
 
@@ -18,9 +18,15 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const {isDragArea, isEditModel, onAddChild} = useTool()
-        const dataSource = ref<any[]>([1])
-        const {executionMounted} = useLifeCycle(props.data.componentProps, {dataSource}, isEditModel)
+        const {isDragArea, isEditModel} = useTool()
+        const $self = reactive({
+            visible: true,
+            dataSource: [1]
+        })
+        const setDataSource = (arr: any[]) => {
+            $self.dataSource = arr
+        }
+        const {executionMounted} = useLifeCycle(props.data.componentProps, {setDataSource}, isEditModel)
 
         onMounted(() => {
             executionMounted()
@@ -34,13 +40,21 @@ export default defineComponent({
             return unref(_data)?.children || []
         })
 
+        const handleResponderFn = ($dep?: string, $depValue?: any) => {
+            if (props.data?.componentProps?.responder?.responder) {
+                const handleResultFn = new Function('$self', '$dep', '$depValue', props.data?.componentProps?.responder?.responder)
+                handleResultFn($self, $dep, $depValue)
+            }
+        }
+
+        usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
+
         return () => {
-            return (
-                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)}
-                           parent={props.parent}>
+            return $self.visible && (
+                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <div>
                         {
-                            unref(dataSource).map(() => {
+                            $self.dataSource.map(() => {
                                 return <div>
                                     {
                                         unref(list).map((item: any) => {
