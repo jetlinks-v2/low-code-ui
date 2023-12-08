@@ -264,7 +264,7 @@ export const useProduct = defineStore('product', () => {
   const add = (record: any, parentId: string,open?:any) => {
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
-    addDraft(info.value.draftId,getType(record.others.type) , record, parentId ? { moduleId: parentId } : {})
+    addDraft(info.value.draftId,getType(record.others.type || record.type) , record, parentId ? { moduleId: parentId } : {})
     updateDataCache()
     engine.updateFile(record,'add',open)
     // updateProductReq(record, (result) => {
