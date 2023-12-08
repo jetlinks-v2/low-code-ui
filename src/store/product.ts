@@ -90,7 +90,7 @@ export const useProduct = defineStore('product', () => {
   const engine = useEngine()
 
   const updateProductReq = debounce((record, cb) => {
-    updateDraft(info.value.draftId,getType(record.type) , record.id, record).then(resp=>{
+    updateDraft(info.value.draftId || info.value.id,getType(record.type) , record.id, record).then(resp=>{
       if(resp.success){
         cb?.(resp.result)
       }
@@ -237,6 +237,7 @@ export const useProduct = defineStore('product', () => {
     }
     info.value = {
       ...extra,
+      draftId: extra.draftId || extra.id,
       id: modules?.[0]?.id || extra.id,
       title: modules?.[0]?.name || extra.name,
       others: modules ? modules[0]?.others : {}
@@ -263,7 +264,7 @@ export const useProduct = defineStore('product', () => {
   const add = (record: any, parentId: string,open?:any) => {
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
-    addDraft(info.value.draftId,getType(record.others.type) , record, parentId ? { moduleId: parentId } : {})
+    addDraft(info.value.draftId,getType(record.others.type || record.type) , record, parentId ? { moduleId: parentId } : {})
     updateDataCache()
     engine.updateFile(record,'add',open)
     // updateProductReq(record, (result) => {
