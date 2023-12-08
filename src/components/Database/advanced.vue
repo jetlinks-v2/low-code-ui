@@ -201,6 +201,9 @@
             :dataSource="apiDataSource"
             size="small"
             :pagination="false"
+            :scroll="{
+              y: 300
+            }"
           >
             <template #bodyCell="{ column, text }">
               <template v-if="column.dataIndex === 'api'">
@@ -229,7 +232,7 @@ import {getAssetType} from '@LowCode/api/basis'
 import {useRequest} from '@jetlinks-web/hooks'
 import {regular} from '@jetlinks-web/utils'
 import {CRUD_COLUMNS, formErrorFieldsToObj, proAll} from "@LowCode/components/Database/util";
-import {queryEndCommands} from '@LowCode/api/form'
+import {queryDraftCommands, queryEndCommands} from '@LowCode/api/form'
 import {useProduct} from '@LowCode/store'
 import {AdvancedApiColumns} from './util'
 import { CardBox } from '@LowCode/components/index'
@@ -260,7 +263,6 @@ const props = defineProps({
 const emit = defineEmits(['update:tree', 'update:asset', 'update:relation', 'update'])
 
 const CrudColumns = inject(CRUD_COLUMNS)
-const route = useRoute()
 const project = useProduct()
 const relationRef = ref()
 const assetRef = ref()
@@ -270,7 +272,7 @@ const {data: options} = useRequest(getAssetType, {
     return resp.result?.map(item => ({ ...item, label: item.name, value: item.id})) || []
   }
 })
-const {data: apiDataSource, run: apiRun} = useRequest(queryEndCommands,
+const {data: apiDataSource, run: apiRun} = useRequest(queryDraftCommands,
   {
     immediate: false,
     onSuccess(res) {
@@ -343,7 +345,7 @@ const treeChange = () => {
 
 const getApi = (v) => {
   if (v) {
-    apiRun(route.params.id, [])
+    apiRun(project.info.draftId, ['rdb-crud'])
   }
 }
 

@@ -46,6 +46,7 @@ export const queryDictionaryData = (id: string) => request.post(`/dictionary-ite
  * 获取功能预支持的指令
  */
 export const queryEndCommands = (id: string, data?: any) => request.post(`/low-code/editor/project/${id}/support/commands`, data)
+export const queryDraftCommands = (id: string, data?: any) => request.post(`/low-code/editor/${id}/support/commands`, data)
 
 /**
  * 获取功能预支持的指令
