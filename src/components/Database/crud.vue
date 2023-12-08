@@ -85,6 +85,10 @@ const props = defineProps({
     type: String,
     default: undefined
   },
+  name:{
+    type: String,
+    default: undefined
+  },
   type: {
     type: String,
     default: undefined

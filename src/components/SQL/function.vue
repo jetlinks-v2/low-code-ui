@@ -42,6 +42,10 @@ const props = defineProps({
     type: String,
     default: undefined
   },
+  name:{
+    type: String,
+    default: undefined
+  },
   others: {
     type: Object,
     default: () => ({})
@@ -92,6 +96,7 @@ const getTSTips = async () => {
 }
 
 const onChange = debounce((v) => {
+  console.log('data===',props)
   code.value = v
   const { configuration, ...extra} = props
   project.update({
