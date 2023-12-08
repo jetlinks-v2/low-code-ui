@@ -16,7 +16,7 @@ export const basic: ISchema[] = [
         type: 'text',
         name: '文本',
         componentProps: {
-            value: '文本'
+            text: '文本'
         },
     },
     {
@@ -27,8 +27,8 @@ export const basic: ISchema[] = [
             shape: 'default',
             size: 'middle',
             type: 'default',
-            buttonConfig: {
-                type:'Button',
+            event: {
+                type: 'common'
             },
         },
     },
@@ -40,7 +40,9 @@ export const basic: ISchema[] = [
             shape: 'default',
             size: 'middle',
             type: 'primary',
-            menu: []
+            menu: [],
+            clickCode: '',
+            reloadCode: ''
         },
     },
     {

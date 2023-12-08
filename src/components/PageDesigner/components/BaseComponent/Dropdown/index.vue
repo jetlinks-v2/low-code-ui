@@ -1,27 +1,32 @@
 <template>
-  <div>
+  <div v-if="$self.visible">
     <j-space v-if="visible && _item.key">
-      <j-popconfirm v-if="_item?.buttonType === 'Popconfirm'" :title="_item.event?.title" @confirm="onConfirm">
-        <j-button v-bind="omit(_item, ['key', 'text', 'icon'])">
+      <j-popconfirm v-if="_item?.event?.type === 'confirm'" :title="_item?.event?.title" @confirm="onConfirm">
+        <j-button v-bind="getProps(_item)">
           <template #icon v-if="_item?.icon">
             <AIcon :type="_item?.icon"></AIcon>
           </template>
           {{ _item?.text }}
         </j-button>
       </j-popconfirm>
-      <j-button v-else v-bind="omit(_item, ['key', 'text', 'icon'])" @click="onClick">
+      <j-button v-else v-bind="getProps(_item)" @click="onClick(_item)">
         <template #icon v-if="_item?.icon">
           <AIcon :type="_item?.icon"></AIcon>
         </template>
         {{ _item?.text }}
       </j-button>
       <j-button type="link" @click="reload">
-        <AIcon type="RedoOutlined" />
+        <AIcon type="RedoOutlined"/>
         重选
       </j-button>
     </j-space>
     <j-dropdown v-else>
-      <j-button v-bind="omit(props, ['icon', 'text'])">{{ text }}</j-button>
+      <j-button v-bind="getProps(props)" :disabled="_disabled" :loading="_loading">
+        <template #icon v-if="_icon">
+          <AIcon :type="_icon"></AIcon>
+        </template>
+        {{ _value }}
+      </j-button>
       <template #overlay>
         <j-menu @click="handleMenuClick">
           <j-menu-item v-for="item in menu" :key="item?.key">
@@ -31,32 +36,35 @@
               </template>
               {{
                 item?.text
-              }}</j-button>
+              }}
+            </j-button>
           </j-menu-item>
         </j-menu>
       </template>
     </j-dropdown>
-    <Modal v-if="comVisible && _item?.buttonType === 'Modal'" :data="_item?.event" @close="setVisible(false)" />
-    <Drawer v-if="comVisible && _item?.buttonType === 'Drawer'" :data="_item?.event" @close="setVisible(false)" />
+    <Modal v-if="comVisible" :data="dataModal" @save="onClose" @close="onClose" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { omit } from "lodash-es";
-import { inject } from 'vue'
-import { request as axiosRequest } from "@jetlinks-web/core/src/request";
-import Modal from './Modal.vue'
-import Drawer from './Drawer.vue'
-import {useTool} from "@LowCode/components/PageDesigner/hooks";
+import {omit} from "lodash-es";
+import {usePubsub, useTool} from "@LowCode/components/PageDesigner/hooks";
+import {computed} from "vue";
+import Modal from "../MyModal";
+import Console from "components/CustomHTML/Console.vue";
 
 const props = defineProps({
+  _key: {
+    type: String,
+    default: ''
+  },
   text: {
     type: String,
     default: "批量操作",
   },
   type: {
     type: String as PropType<
-      "primary" | "dashed" | "link" | "text" | "default"
+        "primary" | "dashed" | "link" | "text" | "default"
     >,
     default: "default",
   },
@@ -69,10 +77,6 @@ const props = defineProps({
     default: "middle",
   },
   disabled: {
-    type: Boolean,
-    default: false,
-  },
-  ghost: {
     type: Boolean,
     default: false,
   },
@@ -91,78 +95,109 @@ const props = defineProps({
     type: Array as PropType<any[]>,
     default: () => [],
   },
+  clickCode: {
+    type: String,
+  },
+  reloadCode: {
+    type: String,
+  },
+  responder: {
+    type: Object,
+    default: () => ({})
+  }
 });
 
-const selectConfig: any = inject('selectConfig')
 const visible = ref(false)
 const _item = ref()
-const { paramsUtil, _global } = useTool()
-
-
+const {paramsUtil, _global} = useTool()
+const dataModal = ref({})
 const comVisible = ref(false)
 
-const setVisible = (val: boolean) => {
-  comVisible.value = val;
-};
 
 const handleMenuClick = (e: any) => {
   const val = props.menu.find(i => i.key === e.key);
-  visible.value = true
   _item.value = val
-  selectConfig.showSelect()
+  visible.value = true
+  if (props.clickCode) {
+    const handleResultFn = new Function('util', 'global', props.clickCode)
+    handleResultFn(paramsUtil, _global)
+  }
 }
 const reload = () => {
+  if (props.reloadCode) {
+    const handleResultFn = new Function('util', 'global', props.reloadCode)
+    handleResultFn(paramsUtil, _global)
+  }
   visible.value = false
-  selectConfig.closeSelect()
 }
 
-const defaultParams = () => {
-  try {
-    return JSON.parse(_item.value?.event?.defaultParams)
-  } catch (e) {
-    return undefined
+const $self = reactive({
+  visible: true,
+  text: props.text,
+  loading: props.loading,
+  disabled: props.disabled,
+  icon: props.icon
+})
+
+const handleResponderFn = ($dep?: string, $depValue?: any) => {
+  if (props.responder?.responder) {
+    const _handleResultFn = new Function('$self', '$dep', '$depValue', props.responder?.responder)
+    _handleResultFn($self, $dep, $depValue)
+  }
+}
+usePubsub(props._key, $self, props.responder?.dependencies, handleResponderFn)
+
+const _value = computed(() => {
+  return $self?.text || props.text
+})
+
+const _loading = computed(() => {
+  return $self?.loading || props.loading
+})
+
+const _disabled = computed(() => {
+  return $self?.disabled || props.disabled
+})
+
+const _icon = computed(() => {
+  return $self?._icon || props._icon
+})
+
+const getProps = (item: any) => {
+  return omit(item, ['_key', 'icon', 'loading', 'disabled', 'event', 'responder'])
+}
+
+const handleRequestFn = (_okCode: string) => {
+  if (_okCode) {
+    const handleResultFn = new Function('util', 'global', _okCode)
+    handleResultFn(paramsUtil, _global)
   }
 }
 
-const handleRequestFn = async () => {
-  const config = _item.value?.event
-  if (_item.value?.event?.query) {
-    const selectKeys = selectConfig.getSelectKeys()
-    const paramsData = {
-      // selectKeys,
-      ...defaultParams(),
-      terms: [
-            {
-              "type": "or",
-              "value": selectKeys,
-              "termType": "in",
-              "column": "id"
-            }
-          ]
-    }
-    try {
-      const resp = await axiosRequest[config.methods](config.query, paramsData)
-      if (config.click) {
-        const handleResultFn = new Function('result', 'util', 'global', config.click)
-        handleResultFn(resp.result, paramsUtil, _global)
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }
-}
-
-const onClick = () => {
-  if (_item?.value.buttonType === 'Button') {
-    handleRequestFn()
+const onClick = (item: any) => {
+  if(item?.event?.type === 'common'){
+    handleRequestFn(item?.event?.okCode)
   } else {
-    setVisible(true)
+    dataModal.value = {
+      pageType: item.event?.pageType || 'form',
+      code: item.event?.pageData,
+      title: item.event?.title,
+      createdCode: item.event?.createdCode,
+      okCode: item.event?.okCode,
+      cancelCode: item.event?.cancelCode,
+      modalType: item.event?.type || 'modal',
+    }
+    comVisible.value = true
   }
 };
 
-const onConfirm = () => {
-  handleRequestFn()
+const onConfirm = (item: any) => {
+  handleRequestFn(item?.event?.okCode)
 };
+
+const onClose = () => {
+  comVisible.value = false
+}
 </script>
 
 <style lang="less" scoped></style>

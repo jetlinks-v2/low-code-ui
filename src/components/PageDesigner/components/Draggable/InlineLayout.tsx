@@ -2,7 +2,7 @@ import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
 import './index.less'
 import { withModifiers } from 'vue'
-import { useLifeCycle, useTool } from '../../hooks'
+import {useLifeCycle, usePubsub, useTool} from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import { Space } from 'jetlinks-ui-components'
 
@@ -27,6 +27,20 @@ export default defineComponent({
         const list = computed(() => {
             return props.data?.children || []
         })
+
+        const $self = reactive({
+            visible: true
+        })
+
+        const handleResponderFn = ($dep?: string, $depValue?: any) => {
+            if (props.data?.componentProps?.responder?.responder) {
+                const handleResultFn = new Function('$self', '$dep', '$depValue', props.data?.componentProps?.responder?.responder)
+                handleResultFn($self, $dep, $depValue)
+            }
+        }
+
+        usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
+
         const handleAdd = () => {
             const _item = generatorData({
                 type: props.data?.type + '-item',
@@ -43,9 +57,8 @@ export default defineComponent({
             executionMounted()
         })
 
-
         return () => {
-            return (
+            return $self.visible && (
                 <Selection {...useAttrs()} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
                     {
                         unref(list)?.length ?

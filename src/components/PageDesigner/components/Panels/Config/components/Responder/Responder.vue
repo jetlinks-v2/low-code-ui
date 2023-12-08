@@ -1,8 +1,8 @@
 <template>
   <div class="responder-warp">
-    <span>
-      function (value){ // value依赖项值
-    </span>
+    <div>
+      function (self, dep, depValue)
+    </div>
     <div class="responder-content">
       <div class="code">
         <j-monaco-editor
@@ -21,7 +21,6 @@
         />
       </div>
     </div>
-    <span>}</span>
   </div>
 </template>
 

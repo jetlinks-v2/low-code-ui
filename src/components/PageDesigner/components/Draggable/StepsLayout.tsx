@@ -2,7 +2,7 @@ import DraggableLayout from '../Draggable/DraggableLayout'
 import Selection from '../Selection/index'
 import {Steps, Step, Button, Space, AIcon} from 'jetlinks-ui-components'
 import './index.less'
-import {useLifeCycle, useTool} from '../../hooks'
+import {useLifeCycle, usePubsub, useTool} from '../../hooks'
 import {withModifiers} from 'vue'
 import generatorData from '../../utils/generatorData'
 import {uid} from '../../utils/uid'
@@ -51,6 +51,19 @@ export default defineComponent({
             }
         }
 
+        const $self = reactive({
+            visible: true,
+        })
+
+        const handleResponderFn = ($dep?: string, $depValue?: any) => {
+            if (props.data?.componentProps?.responder?.responder) {
+                const handleResultFn = new Function('$self', '$dep', '$depValue', props.data?.componentProps?.responder?.responder)
+                handleResultFn($self, $dep, $depValue)
+            }
+        }
+
+        usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
+
         onMounted(() => {
             executionMounted()
         })
@@ -78,7 +91,7 @@ export default defineComponent({
         }
 
         return () => {
-            return (
+            return $self.visible && (
                 <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <Steps current={current.value} data-layout-type={'steps'} {...unref(_data).componentProps}
                            onChange={onChange}>
