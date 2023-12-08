@@ -45,7 +45,7 @@ export const providerImages = {
   [providerEnum.HtmlPage]: getImage('/tree/page.svg'),
   [providerEnum.FormPage]: getImage('/tree/page.svg'),
   [providerEnum.Function]: getImage('/tree/function.svg'),
-  [providerEnum.PageDesign]: getImage('/tree/page.svg'),
+  [providerEnum.PageDesign]: getImage('/project/page_designer.svg'),
   'project': getImage('/tree/project.svg'),
 }
 
@@ -57,7 +57,7 @@ export const typeImages = {
   [providerEnum.HtmlPage]: getImage('/project/html.svg'),
   [providerEnum.FormPage]: getImage('/project/form.svg'),
   [providerEnum.Function]: getImage('/project/function.svg'),
-  [providerEnum.PageDesign]: getImage('/project/form.svg'),
+  [providerEnum.PageDesign]: getImage('/project/page_designer.svg'),
   'project': getImage('/project/project.svg'),
 }
 
