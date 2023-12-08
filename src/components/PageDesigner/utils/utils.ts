@@ -166,8 +166,8 @@ export const _getData = (arr: any[]) => {
 
 export const handleDataSourceFn = (_request: any, isEditModel: boolean) =>
     new Promise(async (resolve) => {
-        if (!isEditModel) {
-            const {query, handleResult, defaultParams, methods} = _request || {}
+        const {query, handleResult, defaultParams, methods} = _request || {}
+        if (!isEditModel && query && methods) {
             const resp = await axiosRequest?.[methods || 'post'](query, JSON.parse(defaultParams || '{}'))
             if (handleResult) {
                 const handleResultFn = new Function('result', handleResult)
