@@ -5,8 +5,10 @@ import {useTool, usePubsub, usePageProvider, useLifeCycle} from '../../../hooks'
 import {request as axiosRequest} from '@jetlinks-web/core'
 import DraggableLayout from '../DraggableLayout'
 import generatorData from '@LowCode/components/PageDesigner/utils/generatorData'
+import { provide, h } from 'vue'
 import '../index.less'
-import {Card} from '@LowCode/components'
+import {Card, BadgeStatus} from '@LowCode/components'
+import { Tag } from 'jetlinks-ui-components'
 import {get} from "lodash-es";
 import ProTableModal from '../../BaseComponent/MyModal';
 import dayjs from 'dayjs'
@@ -180,7 +182,12 @@ export default defineComponent({
         const columnsSlots = computed(() => {
             return columns.value?.reduce((prev: Record<string, any>, next) => {
                 if (next.render) {
-                    prev[next.dataIndex] = next.render
+                    const components = {
+                        BadgeStatus,
+                        Tag
+                    }
+                    const render = new Function('record', 'h', 'components', 'utils', next.render)
+                    prev[next.dataIndex] = (record: any) => render(record, h, components, {})
                 }
                 return prev
             }, {}) || {}
@@ -196,7 +203,7 @@ export default defineComponent({
         })
 
         const handleRequestFn = async (paramsData: any) => {
-            const {request, handleResult} = props.data.componentProps
+            const { request, handleResult } = props.data.componentProps
             const resp = await axiosRequest.post(request.query, paramsData)
             if (handleResult) {
                 const handleResultFn = new Function('result', handleResult)
@@ -228,7 +235,7 @@ export default defineComponent({
         const handleFn = (code: string, _record: any) => {
             if (!code) return ''
             const handleResultFn = new Function('record', 'util', code)
-            return handleResultFn(_record, {dayjs})
+            return handleResultFn(_record, { dayjs })
         }
 
         const onSelectChange = (item: any, state: boolean) => {
@@ -241,7 +248,7 @@ export default defineComponent({
             selectedRowKeys.value = [...arr.values()];
         };
 
-        const selectAll = (selected: Boolean, selectedRows: any, changeRows: any) => {
+        const selectAll = (selected: Boolean, selectedRows: any,changeRows:any) => {
             if (selected) {
                 changeRows.map((i: any) => {
                     if (!selectedRowKeys.value.includes(i.id)) {

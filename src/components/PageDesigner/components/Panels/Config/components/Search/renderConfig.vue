@@ -22,12 +22,14 @@ const emit = defineEmits(['update:value'])
 
 const visible = ref(false)
 
-const save = (v) => {
-  emit('update:value', v)
+const cancel = () => {
+  visible.value = false
 }
 
-const cancel = () => {
-
+const save = (v) => {
+  console.log(v)
+  emit('update:value', v)
+  cancel()
 }
 
 </script>

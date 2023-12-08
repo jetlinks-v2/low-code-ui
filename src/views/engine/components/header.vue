@@ -42,34 +42,35 @@ const onRelease = () => {
 }
 
 const quit = async () => {
+  menu.jumpPage('center')
   // router.push('/delivery/center')
-  const item = product.data[0]
-  product.update({
-    ...item,
-    others: {
-      ...item?.others,
-      activeFile: activeFile.value,
-      files: files.value
-    }
-  },()=>{
-    menu.jumpPage('center')
-  })
+  // const item = product.data[0]
+  // product.update({
+  //   ...item,
+  //   others: {
+  //     ...item?.others,
+  //     activeFile: activeFile.value,
+  //     files: files.value
+  //   }
+  // },()=>{
+  //   menu.jumpPage('center')
+  // })
 }
 
-onMounted(() => {
-  setTimeout(() => {
-    const data = product.data[0]
-    // console.log('data',data)
-    if (data?.state?.value !== 'published') {
-      engine.selectFiles(data?.others?.files || [])
-      engine.setActiveFile(data?.others?.activeFile || data?.id)
-      engine.selectFile(data?.others?.activeFile)
-    } else {
-      engine.setActiveFile(data?.id)
-      engine.selectFile(data.id)
-    }
-  }, 300)
-})
+// onMounted(() => {
+//   setTimeout(() => {
+//     const data = product.data[0]
+//     // console.log('data',data)
+//     if (data?.state?.value !== 'published') {
+//       engine.selectFiles(data?.others?.files || [])
+//       engine.setActiveFile(data?.others?.activeFile || data?.id)
+//       engine.selectFile(data?.others?.activeFile)
+//     } else {
+//       engine.setActiveFile(data?.id)
+//       engine.selectFile(data.id)
+//     }
+//   }, 300)
+// })
 
 </script>
 

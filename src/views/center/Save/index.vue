@@ -28,7 +28,7 @@
 
 <script setup lang='ts' name="Save">
 import { regular } from '@jetlinks-web/utils';
-import { queryProject, addProject, editProject } from '@LowCode/api/project'
+import { queryProject, addProject, editProject,addDraft } from '@LowCode/api/project'
 import { onlyMessage } from '@LowCode/utils/comm';
 import { useRequest } from '@jetlinks-web/hooks'
 
@@ -60,11 +60,20 @@ const title = computed(() => {
     }
 })
 
+
+
 const { loading, run } = useRequest(props.data.id ? editProject : addProject, {
     immediate: false,
     onSuccess: (res) => {
         if (res.success) {
             onlyMessage('操作成功')
+            if(!props.data.id){
+                addDraft(res.result,'modules',{
+                    id:modelRef.id,
+                    name:modelRef.name,
+                    fullId:modelRef.id,
+                })
+            }
             emit('close')
         }
     }

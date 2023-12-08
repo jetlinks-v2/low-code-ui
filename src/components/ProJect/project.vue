@@ -44,7 +44,6 @@ const handleSort = (value) => {
 
 watchEffect(() => {
     if (props.data) {
-        console.log('list', props.data)
         const arr = cloneDeep(props.data)
         list.value = handleSort(arr)
     }
