@@ -66,7 +66,7 @@ export const basic: ISchema[] = [
         type:'image',
         name: '图片预览',
         componentProps:{
-            width:200
+            width: 80
         }
     }
 ]
