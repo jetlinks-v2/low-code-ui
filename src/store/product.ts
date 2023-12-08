@@ -227,7 +227,7 @@ export const useProduct = defineStore('product', () => {
       title: modules?.[0]?.name || extra.name,
       type: 'project',
       children: children,
-      others: modules ? modules[0]?.others : {}
+      // others: extra.others
     })
     handleDataMap(treeData);
     data.value = treeData
@@ -279,6 +279,7 @@ export const useProduct = defineStore('product', () => {
     data.value = updateProduct(data.value, record)
     updateDataCache()
     engine.updateFile(record, 'edit')
+
     updateProductReq(omit(record, ['children']), (result) => {
       handleProjectData(result,false)
       cb?.()
