@@ -5,8 +5,16 @@ const handleProps = (node: any) => {
     if (!result?.cssCode) {
         result.cssCode = ''
     }
+    if (!result?.createdCode) {
+        result.createdCode = ''
+    }
     if (!result?.mountedCode) {
         result.mountedCode = ''
+    }
+    if (!result?.request) {
+        result.request = {
+            methods: 'post'
+        }
     }
     if(['form', 'page'].includes(node.type)){
         if (!result?.source) {

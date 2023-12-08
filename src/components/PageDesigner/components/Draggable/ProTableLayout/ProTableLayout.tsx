@@ -1,17 +1,17 @@
-import {ProTable, Ellipsis, Row, Col, AIcon, Space, Tooltip, Button, Popconfirm} from 'jetlinks-ui-components'
+import {ProTable, Ellipsis, Row, Col, AIcon, Space, Tooltip, Button, Popconfirm, Tag} from 'jetlinks-ui-components'
 import Selection from '../../Selection/index'
 import {defineComponent, withModifiers} from 'vue'
-import {useTool, usePubsub, usePageProvider, useLifeCycle} from '../../../hooks'
+import {useTool, usePubsub, useLifeCycle, usePageProvider} from '../../../hooks'
 import {request as axiosRequest} from '@jetlinks-web/core'
 import DraggableLayout from '../DraggableLayout'
 import generatorData from '@LowCode/components/PageDesigner/utils/generatorData'
-import { provide, h } from 'vue'
+import { h } from 'vue'
 import '../index.less'
 import {Card, BadgeStatus} from '@LowCode/components'
-import { Tag } from 'jetlinks-ui-components'
 import {get} from "lodash-es";
 import ProTableModal from '../../BaseComponent/MyModal';
 import dayjs from 'dayjs'
+import {handleDataSourceFn} from "../../../utils/utils";
 export default defineComponent({
     name: 'ProTableLayout',
     inheritAttrs: false,
@@ -45,6 +45,25 @@ export default defineComponent({
             params: {},
             dataSource: []
         })
+
+        const _refFn = {
+            selectedRowKeys,
+            onReload: () => {
+                tableRef.value?.reload()
+            },
+            setIsSelected: (flag: boolean) => {
+                isSelected.value = flag
+            },
+            setVisible: (flag: boolean) => {
+                $self.visible = flag
+            },
+            setDataSource: (arr: any) => {
+                $self.dataSource = arr
+            },
+            setParams: (_obj: any) => {
+                $self.params = _obj
+            }
+        }
         const handleResponderFn = ($dep?: string, $depValue?: any) => {
             const _responder = props.data?.componentProps?.responder?.responder
             if (_responder) {
@@ -405,20 +424,17 @@ export default defineComponent({
             </Card>
         }
 
-        const {executionMounted} = useLifeCycle(props.data.componentProps, {tableRef: tableRef}, isEditModel)
+        const {executionMounted} = useLifeCycle(props.data.componentProps, {..._refFn}, isEditModel)
+
+        handleDataSourceFn(props.data?.componentProps?.request || {}, unref(isEditModel)).then((_val: any) => {
+            if (_val && Array.isArray(_val)) {
+                $self.dataSource = _val
+            }
+        })
 
         onMounted(() => {
             executionMounted()
-            pageProvider.addRef?.(props.data.key, {
-                selectedRowKeys,
-                onReload: () => {
-                    tableRef.value?.reload()
-                },
-                onShowSelected: (flag: boolean) => {
-                    isSelected.value = flag
-                    selectedRowKeys.value =[]
-                }
-            })
+            pageProvider.addRef?.(props.data.key, {..._refFn})
         })
 
         return () => {

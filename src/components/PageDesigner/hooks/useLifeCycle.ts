@@ -26,10 +26,10 @@ export const useLifeCycle = (componentProps: any, refs: Record<string, Ref<any>>
         }
     }
 
-    onCreatedFn(componentProps?.onCreated)
+    onCreatedFn(componentProps?.createdCode)
 
     const executionMounted = () => {
-        onCreatedFn(componentProps?.onMounted)
+        onCreatedFn(componentProps?.mountedCode)
     }
 
     return {

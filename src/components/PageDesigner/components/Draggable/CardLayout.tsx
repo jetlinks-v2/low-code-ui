@@ -1,7 +1,9 @@
 import DraggableLayout from './DraggableLayout'
 import Selection from '../Selection/index'
 import './index.less'
-import {usePubsub, useTool} from '../../hooks'
+import {useLifeCycle, usePubsub, useTool} from '../../hooks'
+import {handleDataSourceFn} from '../../utils/utils'
+
 export default defineComponent({
     name: 'CardLayout',
     inheritAttrs: false,
@@ -9,7 +11,8 @@ export default defineComponent({
     props: {
         data: {
             type: Object,
-            default: () => { }
+            default: () => {
+            }
         },
         parent: {
             type: Array,
@@ -17,7 +20,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const { isDragArea } = useTool()
+        const {isDragArea, isEditModel} = useTool()
 
         const _data = computed(() => {
             return props.data
@@ -28,8 +31,18 @@ export default defineComponent({
         })
 
         const $self = reactive({
-            visible: true
+            visible: true,
+            value: {}
         })
+
+        const setVisible = (flag: boolean) => {
+            $self.visible = flag
+        }
+        const setValue = (_val: any) => {
+            $self.value = _val
+        }
+
+        const {executionMounted} = useLifeCycle(props.data.componentProps, {setVisible, setValue}, isEditModel)
 
         const handleResponderFn = ($dep?: string, $depValue?: any) => {
             if (props.data?.componentProps?.responder?.responder) {
@@ -40,9 +53,20 @@ export default defineComponent({
 
         usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
 
+        handleDataSourceFn(props.data?.componentProps?.request || {}, unref(isEditModel)).then((_val: any) => {
+            if (_val) {
+                $self.value = _val
+            }
+        })
+
+        onMounted(() => {
+            executionMounted()
+        })
+
         return () => {
             return $self.visible && (
-                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
+                <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)}
+                           parent={props.parent}>
                     <div
                         data-layout-type={'card'}
                         {...unref(_data).componentProps}
