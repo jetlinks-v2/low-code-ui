@@ -4,7 +4,8 @@
 
 <script lang="ts" setup>
 import {computed} from "vue"
-import {usePubsub} from "../../hooks";
+import {useLifeCycle, usePubsub, useTool} from "../../hooks";
+import {handleDataSourceFn} from "../../utils/utils";
 
 const props = defineProps({
   _key: {
@@ -19,16 +20,39 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
+  mountedCode:{
+    type: String,
+    default: ''
+  },
+  createdCode:{
+    type: String,
+    default: ''
+  },
   responder: {
+    type: Object,
+    default: () => ({})
+  },
+  request: {
     type: Object,
     default: () => ({})
   }
 })
 
+const { isEditModel } = useTool()
+
 const $self = reactive({
   visible: true,
   text: props.text
 })
+
+const setVisible = (flag: boolean) => {
+  $self.visible = flag
+}
+const setText = (_val: any) => {
+  $self.text = _val
+}
+
+const { executionMounted } = useLifeCycle(props, {setVisible, setText}, isEditModel)
 
 const handleResponderFn = ($dep?: string, $depValue?: any) => {
   if (props.responder?.responder) {
@@ -38,6 +62,16 @@ const handleResponderFn = ($dep?: string, $depValue?: any) => {
 }
 
 usePubsub(props._key, $self, props.responder?.dependencies, handleResponderFn)
+
+handleDataSourceFn(props?.request || {}, unref(isEditModel)).then((_val: any) => {
+  if (_val) {
+    $self.text = _val
+  }
+})
+
+onMounted(() => {
+  executionMounted()
+})
 
 const _value = computed(() => {
   return $self?.text || props.text

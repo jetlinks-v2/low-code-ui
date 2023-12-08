@@ -1,6 +1,7 @@
-import { map } from "lodash-es"
-import { ISchema } from "../typings"
-import { uid } from "./uid"
+import {map, reject} from "lodash-es"
+import {ISchema} from "../typings"
+import {uid} from "./uid"
+import {request as axiosRequest} from "@jetlinks-web/core/src/request";
 
 // 添加子组件
 export const appendChildItem = (arr: any[], newData: any, parent: any) => {
@@ -162,3 +163,17 @@ export const _getData = (arr: any[]) => {
         }
     })
 }
+
+export const handleDataSourceFn = (_request: any, isEditModel: boolean) =>
+    new Promise(async (resolve) => {
+        if (!isEditModel) {
+            const {query, handleResult, defaultParams, methods} = _request || {}
+            const resp = await axiosRequest?.[methods || 'post'](query, JSON.parse(defaultParams || '{}'))
+            if (handleResult) {
+                const handleResultFn = new Function('result', handleResult)
+                resolve(handleResultFn(resp))
+            }
+            resolve(resp)
+        }
+        reject(false)
+    })

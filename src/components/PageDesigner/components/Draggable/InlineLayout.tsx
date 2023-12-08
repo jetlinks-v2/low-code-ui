@@ -5,6 +5,7 @@ import { withModifiers } from 'vue'
 import {useLifeCycle, usePubsub, useTool} from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import { Space } from 'jetlinks-ui-components'
+import {handleDataSourceFn} from "../../utils/utils";
 
 export default defineComponent({
     name: 'InlineLayout',
@@ -22,15 +23,24 @@ export default defineComponent({
     },
     setup(props) {
         const { isEditModel, isDragArea, onAddChild } = useTool()
-        const { executionMounted } = useLifeCycle(props.data.componentProps, {}, isEditModel)
 
         const list = computed(() => {
             return props.data?.children || []
         })
 
         const $self = reactive({
-            visible: true
+            visible: true,
+            value: {}
         })
+
+        const setVisible = (flag: boolean) => {
+            $self.visible = flag
+        }
+        const setValue = (_val: any) => {
+            $self.value = _val
+        }
+
+        const { executionMounted } = useLifeCycle(props.data.componentProps, {setVisible, setValue}, isEditModel)
 
         const handleResponderFn = ($dep?: string, $depValue?: any) => {
             if (props.data?.componentProps?.responder?.responder) {
@@ -40,6 +50,16 @@ export default defineComponent({
         }
 
         usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
+
+        handleDataSourceFn(props.data?.componentProps?.request || {}, unref(isEditModel)).then((_val: any) => {
+            if (_val) {
+                $self.value = _val
+            }
+        })
+
+        onMounted(() => {
+            executionMounted()
+        })
 
         const handleAdd = () => {
             const _item = generatorData({
@@ -52,10 +72,6 @@ export default defineComponent({
             })
             onAddChild(_item, props.data)
         }
-
-        onMounted(() => {
-            executionMounted()
-        })
 
         return () => {
             return $self.visible && (

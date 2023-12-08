@@ -1,6 +1,7 @@
 import {useLifeCycle, usePubsub, useTool} from "../../hooks"
 import Selection from '../Selection/index'
 import DraggableLayout from "./DraggableLayout"
+import {handleDataSourceFn} from "../../utils/utils";
 
 export default defineComponent({
     name: 'ListLayout',
@@ -19,18 +20,6 @@ export default defineComponent({
     },
     setup(props) {
         const {isDragArea, isEditModel} = useTool()
-        const $self = reactive({
-            visible: true,
-            dataSource: [1]
-        })
-        const setDataSource = (arr: any[]) => {
-            $self.dataSource = arr
-        }
-        const {executionMounted} = useLifeCycle(props.data.componentProps, {setDataSource}, isEditModel)
-
-        onMounted(() => {
-            executionMounted()
-        })
 
         const _data = computed(() => {
             return props.data
@@ -40,6 +29,19 @@ export default defineComponent({
             return unref(_data)?.children || []
         })
 
+        const $self = reactive({
+            visible: true,
+            dataSource: [1]
+        })
+        const setDataSource = (arr: any[]) => {
+            $self.dataSource = arr
+        }
+        const setVisible = (flag: boolean) => {
+            $self.visible = flag
+        }
+
+        const {executionMounted} = useLifeCycle(props.data.componentProps, {setDataSource, setVisible}, isEditModel)
+
         const handleResponderFn = ($dep?: string, $depValue?: any) => {
             if (props.data?.componentProps?.responder?.responder) {
                 const handleResultFn = new Function('$self', '$dep', '$depValue', props.data?.componentProps?.responder?.responder)
@@ -48,6 +50,16 @@ export default defineComponent({
         }
 
         usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
+
+        handleDataSourceFn(props.data?.componentProps?.request || {}, unref(isEditModel)).then((_val: any) => {
+            if (_val && Array.isArray(_val)) {
+                $self.dataSource = _val
+            }
+        })
+
+        onMounted(() => {
+            executionMounted()
+        })
 
         return () => {
             return $self.visible && (

@@ -21,8 +21,9 @@
 <script lang="ts" setup>
 import {omit} from "lodash-es";
 import {computed, PropType, ref} from "vue";
-import {usePubsub, useTool} from "@LowCode/components/PageDesigner/hooks";
+import {useLifeCycle, usePubsub, useTool} from "@LowCode/components/PageDesigner/hooks";
 import Modal from '../MyModal';
+import {handleDataSourceFn} from "../../../utils/utils";
 
 const props = defineProps({
   _key: {
@@ -73,13 +74,25 @@ const props = defineProps({
   event: {
     type: Object,
   },
+  mountedCode:{
+    type: String,
+    default: ''
+  },
+  createdCode:{
+    type: String,
+    default: ''
+  },
   responder: {
+    type: Object,
+    default: () => ({})
+  },
+  request: {
     type: Object,
     default: () => ({})
   }
 });
 
-const {paramsUtil, _global} = useTool()
+const {paramsUtil, _global, isEditModel} = useTool()
 
 const visible = ref(false)
 
@@ -91,6 +104,25 @@ const $self = reactive({
   icon: props.icon
 })
 
+const setVisible = (flag: boolean) => {
+  $self.visible = flag
+}
+const setText = (_val: any) => {
+  $self.text = _val
+}
+const setLoading = (flag: boolean) => {
+  $self.loading = flag
+}
+
+const setIcon = (_val: any) => {
+  $self.icon = _val
+}
+const setDisabled = (flag: boolean) => {
+  $self.disabled = flag
+}
+
+const { executionMounted } = useLifeCycle(props, {setVisible, setVisible, setDisabled, setText, setLoading, setIcon}, isEditModel)
+
 const handleResponderFn = ($dep?: string, $depValue?: any) => {
   if (props.responder?.responder) {
     const _handleResultFn = new Function('$self', '$dep', '$depValue', props.responder?.responder)
@@ -99,6 +131,16 @@ const handleResponderFn = ($dep?: string, $depValue?: any) => {
 }
 
 usePubsub(props._key, $self, props.responder?.dependencies, handleResponderFn)
+
+handleDataSourceFn(props?.request || {}, unref(isEditModel)).then((_val: any) => {
+  if (_val) {
+    $self.text = _val
+  }
+})
+
+onMounted(() => {
+  executionMounted()
+})
 
 const _value = computed(() => {
   return $self?.text || props.text

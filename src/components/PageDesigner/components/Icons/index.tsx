@@ -11,7 +11,9 @@ import {
     SearchSource,
     TagSource,
     StepsSource,
-    TabSource
+    TabSource,
+    ImageSource,
+    ListSource
 } from './source';
 
 const getIcon = (type: string) => {
@@ -42,6 +44,10 @@ const getIcon = (type: string) => {
             return ArrayTableSource
         case 'tabs':
             return TabSource
+        case 'image':
+            return ImageSource
+        case 'list':
+            return ListSource
         default:
             return TextSource
     }
