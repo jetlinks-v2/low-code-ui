@@ -38,7 +38,6 @@ export const getConfigList = (_type: string) => {
             header: '页面设置',
         })
     }
-    
     arr.push({
         key: 'Status',
         header: '高级配置',

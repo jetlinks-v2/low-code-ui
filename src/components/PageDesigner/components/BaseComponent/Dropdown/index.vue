@@ -144,10 +144,10 @@ const reload = () => {
 
 const $self = reactive({
   visible: true,
-  text: props.text,
-  loading: props.loading,
-  disabled: props.disabled,
-  icon: props.icon
+  text: '',
+  loading: false,
+  disabled: false,
+  icon: ''
 })
 
 const setVisible = (flag: boolean) => {

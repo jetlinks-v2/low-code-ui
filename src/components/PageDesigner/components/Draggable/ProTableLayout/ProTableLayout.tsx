@@ -11,7 +11,7 @@ import {Card, BadgeStatus} from '@LowCode/components'
 import {get} from "lodash-es";
 import ProTableModal from '../../BaseComponent/MyModal';
 import dayjs from 'dayjs'
-import {handleDataSourceFn} from "../../../utils/utils";
+// import {handleDataSourceFn} from "../../../utils/utils";
 export default defineComponent({
     name: 'ProTableLayout',
     inheritAttrs: false,
@@ -430,11 +430,11 @@ export default defineComponent({
 
         const {executionMounted} = useLifeCycle(props.data.componentProps, {..._refFn}, isEditModel)
 
-        handleDataSourceFn(props.data?.componentProps?.request || {}, unref(isEditModel)).then((_val: any) => {
-            if (_val && Array.isArray(_val)) {
-                $self.dataSource = _val
-            }
-        })
+        // handleDataSourceFn(props.data?.componentProps?.request || {}, unref(isEditModel)).then((_val: any) => {
+        //     if (_val && Array.isArray(_val)) {
+        //         $self.dataSource = _val
+        //     }
+        // })
 
         onMounted(() => {
             executionMounted()
