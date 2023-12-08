@@ -121,7 +121,7 @@ const props = defineProps({
 
 const visible = ref(false)
 const _item = ref()
-const {paramsUtil, _global} = useTool()
+const {paramsUtil, _global, isEditModel} = useTool()
 const dataModal = ref({})
 const comVisible = ref(false)
 

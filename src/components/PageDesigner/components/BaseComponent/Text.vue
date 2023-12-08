@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 import {computed} from "vue"
-import {useLifeCycle, usePubsub} from "../../hooks";
+import {useLifeCycle, usePubsub, useTool} from "../../hooks";
 import {handleDataSourceFn} from "../../utils/utils";
 
 const props = defineProps({
@@ -37,6 +37,8 @@ const props = defineProps({
     default: () => ({})
   }
 })
+
+const { isEditModel } = useTool()
 
 const $self = reactive({
   visible: true,

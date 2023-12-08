@@ -10,7 +10,7 @@
 
 <script lang="ts" setup>
 import { omit } from "lodash-es";
-import {useLifeCycle, usePubsub} from "@LowCode/components/PageDesigner/hooks";
+import {useLifeCycle, usePubsub, useTool} from "@LowCode/components/PageDesigner/hooks";
 import {computed} from "vue";
 import {handleDataSourceFn} from "../../utils/utils";
 
@@ -56,6 +56,8 @@ const props = defineProps({
     default: () => ({})
   }
 });
+
+const { isEditModel } = useTool()
 
 const $self = reactive({
   visible: true,

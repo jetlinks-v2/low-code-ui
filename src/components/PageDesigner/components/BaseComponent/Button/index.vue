@@ -92,7 +92,7 @@ const props = defineProps({
   }
 });
 
-const {paramsUtil, _global} = useTool()
+const {paramsUtil, _global, isEditModel} = useTool()
 
 const visible = ref(false)
 
