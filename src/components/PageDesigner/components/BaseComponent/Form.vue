@@ -15,6 +15,7 @@ import FormPreview from '@LowCode/components/FormDesigner/preview.vue'
 import { computed, ref } from 'vue'
 import { useLifeCycle } from '../../hooks/useLifeCycle';
 import {usePageProvider, useTool, usePubsub} from '../../hooks';
+import {handleDataSourceFn} from "../../utils/utils";
 
 const props = defineProps({
   _key: {
@@ -37,11 +38,11 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
-  onMounted:{
+  mountedCode:{
     type: String,
     default: ''
   },
-  onCreated:{
+  createdCode:{
     type: String,
     default: ''
   },
@@ -49,6 +50,10 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
+  request: {
+    type: Object,
+    default: () => ({})
+  }
 })
 
 const formRef = ref<any>(null)
@@ -58,19 +63,34 @@ const config = computed(() => {
 
 const { isEditModel } = useTool()
 
-const { executionMounted } = useLifeCycle(props, {}, isEditModel)
-
 const pageProvider = usePageProvider()
-
-onMounted(() => {
-  executionMounted()
-  pageProvider.addRef?.(props._key, formRef)
-})
 
 const $self = reactive({
   visible: true,
   value: props.value
 })
+
+const setVisible = (flag: boolean) => {
+  $self.visible = flag
+}
+const setValue = (_val: any) => {
+  $self.value = _val
+}
+
+const onSave = () => {
+  return new Promise((resolve, reject) => {
+    formRef.value
+        ?.onSave()
+        .then((_data: any) => {
+          resolve(_data)
+        })
+        .catch((err: any) => {
+          reject(err)
+        })
+  })
+}
+
+const { executionMounted } = useLifeCycle(props, {setVisible, setVisible, onSave}, isEditModel)
 
 const onValueChange = (e: any) => {
   $self.value = e
@@ -85,24 +105,20 @@ const handleResponderFn = ($dep?: string, $depValue?: any) => {
 
 usePubsub(props._key, $self, props.responder?.dependencies, handleResponderFn)
 
+handleDataSourceFn(props?.request || {}, unref(isEditModel)).then((_val: any) => {
+  if (_val) {
+    $self.value = _val
+  }
+})
+
+onMounted(() => {
+  executionMounted()
+  pageProvider.addRef?.(props._key, formRef)
+})
+
 const myValue = computed(() => {
   return $self?.value || props.value
 })
-
-const onSave = () => {
-  return new Promise((resolve, reject) => {
-    formRef.value
-      ?.onSave()
-      .then((_data: any) => {
-        resolve(_data)
-      })
-      .catch((err: any) => {
-        reject(err)
-      })
-  })
-}
-
-defineExpose({ onSave })
 </script>
 <style scoped>
 .form-warp {

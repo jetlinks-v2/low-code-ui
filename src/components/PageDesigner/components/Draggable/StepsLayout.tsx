@@ -6,6 +6,7 @@ import {useLifeCycle, usePubsub, useTool} from '../../hooks'
 import {withModifiers} from 'vue'
 import generatorData from '../../utils/generatorData'
 import {uid} from '../../utils/uid'
+import {handleDataSourceFn} from "../../utils/utils";
 
 export default defineComponent({
     name: 'StepsLayout',
@@ -24,7 +25,6 @@ export default defineComponent({
     },
     setup(props) {
         const {isDragArea, isEditModel, onAddChild, paramsUtil, _global} = useTool()
-        const {executionMounted} = useLifeCycle(props.data.componentProps, {}, isEditModel)
         const _data = computed(() => {
             return props.data
         })
@@ -53,7 +53,17 @@ export default defineComponent({
 
         const $self = reactive({
             visible: true,
+            value: {}
         })
+
+        const setVisible = (flag: boolean) => {
+            $self.visible = flag
+        }
+        const setValue = (_val: any) => {
+            $self.value = _val
+        }
+
+        const {executionMounted} = useLifeCycle(props.data.componentProps, {setVisible, setValue}, isEditModel)
 
         const handleResponderFn = ($dep?: string, $depValue?: any) => {
             if (props.data?.componentProps?.responder?.responder) {
@@ -63,6 +73,12 @@ export default defineComponent({
         }
 
         usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
+
+        handleDataSourceFn(props.data?.componentProps?.request || {}, unref(isEditModel)).then((_val: any) => {
+            if (_val) {
+                $self.value = _val
+            }
+        })
 
         onMounted(() => {
             executionMounted()

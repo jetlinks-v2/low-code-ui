@@ -210,12 +210,16 @@ const onDrop = (info) => {
     }
   }
 
-  // console.log('data---',info.dropToGap, restParentId(data))
-  // product.update(restParentId(data)?.[0])
-  // const record = product.getById(dragKey)
   const record = findById(restParentId(data),dragKey)
-  product.move(record,record.parentId)
-  console.log('data---', restParentId(data))
+  const parentRecord = findById(restParentId(data),record.parentId)
+  // product.move(record,record.parentId)
+  parentRecord.children?.forEach((item,index)=>{
+    if(item.id === record.id){
+      product.move(record,record.parentId,index)
+      return;
+    }
+  })
+  // console.log('data---', restParentId(data),record,)
   list.value = data
 }
 

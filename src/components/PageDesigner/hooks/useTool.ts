@@ -25,10 +25,6 @@ const useTool = () => {
         jumpPageByCode: jumpPageByCode,
     }
 
-    watchEffect(() => {
-        console.log(pageProvider)
-    })
-
     const _global = {
         // context: pageProvider.context,
         $refs: pageProvider.$refs,

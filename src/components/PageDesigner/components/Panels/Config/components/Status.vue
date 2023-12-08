@@ -12,11 +12,10 @@
         language="css"
       />
     </j-form-item>
-    <j-form-item label="数据源" :name="['componentProps', 'request']">
+    <j-form-item v-if="!['search'].includes(target.type)" label="数据源" :name="['componentProps', 'request']">
       <DataSource v-model:value="target.componentProps.request" @change="onDataChange" />
     </j-form-item>
     <j-form-item
-        v-if="showResponder"
         label="响应器"
         :name="['componentProps', 'responder']"
     >
@@ -27,13 +26,12 @@
         @change="onDataChange"
       />
     </j-form-item>
-    <template v-if="!types.includes(target.type)">
       <j-form-item
       label="onCreated"
-      :name="['componentProps', 'onCreated']"
+      :name="['componentProps', 'createdCode']"
     >
       <LifeCycle
-          v-model:value="target.componentProps.onCreated"
+          v-model:value="target.componentProps.createdCode"
           :id="target.key"
           :type="target.type"
           @change="onDataChange"
@@ -41,17 +39,16 @@
     </j-form-item>
     <j-form-item
         label="onMounted"
-        :name="['componentProps', 'onMounted']"
+        :name="['componentProps', 'mountedCode']"
     >
       <LifeCycle
           title="onMounted"
-          v-model:value="target.componentProps.onMounted"
+          v-model:value="target.componentProps.mountedCode"
           :id="target.key"
           :type="target.type"
           @change="onDataChange"
       />
     </j-form-item>
-    </template>
   </div>
 </template>
 <script lang="ts" setup>
@@ -64,12 +61,6 @@ import LifeCycle from './LifeCycle'
 const { target } = useTarget()
 
 const emits = defineEmits(['refresh'])
-
-const types = ['text','button','dropdown','tag']
-
-const showResponder = computed(() => {
-  return !['search'].includes(target.value.type)
-})
 
 const onDataChange = () => {
   emits('refresh', target.value)
