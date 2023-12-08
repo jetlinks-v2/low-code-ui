@@ -201,12 +201,16 @@ export default defineComponent({
         const columnsSlots = computed(() => {
             return columns.value?.reduce((prev: Record<string, any>, next) => {
                 if (next.render) {
-                    const components = {
-                        BadgeStatus,
-                        Tag
+                    if(next.dataIndex === 'jetlinks_actions'){
+                        prev[next.dataIndex] = next.render
+                    } else {
+                        const components = {
+                            BadgeStatus,
+                            Tag
+                        }
+                        const render = new Function('record', 'h', 'components', 'utils', next.render)
+                        prev[next.dataIndex] = (record: any) => render(record, h, components, {})
                     }
-                    const render = new Function('record', 'h', 'components', 'utils', next.render)
-                    prev[next.dataIndex] = (record: any) => render(record, h, components, {})
                 }
                 return prev
             }, {}) || {}
