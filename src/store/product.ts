@@ -312,9 +312,9 @@ export const useProduct = defineStore('product', () => {
     // })
   }
 
-  const move = (record:any,parentId:string)=>{
+  const move = (record:any,parentId:string,index:number)=>{
     updateDataCache()
-    moveDraft(info.value.draftId,getType(record.type), record.id, { moduleId: parentId })
+    moveDraft(info.value.draftId,getType(record.type), record.id, { moduleId: parentId,index: index})
   }
 
   //通过id查找对应节点
