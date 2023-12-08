@@ -89,8 +89,22 @@ export const useProduct = defineStore('product', () => {
 
   const engine = useEngine()
 
+  const handleDataProvider = (item: any) => {
+    const type = item.others.type
+    item.provider = item.others.type
+    // item.others.tree_index = index
+
+    if ([providerEnum.HtmlPage, providerEnum.ListPage, providerEnum.FormPage,providerEnum.PageDesign].includes(type)) {
+      item.provider = 'page-code'
+    }
+
+    return item
+  }
+
+
   const updateProductReq = debounce((record, cb) => {
-    updateDraft(info.value.draftId || info.value.id,getType(record.type) , record.id, record).then(resp=>{
+    const _record = handleDataProvider(record)
+    updateDraft(info.value.draftId || info.value.id,getType(record.type) , record.id, _record).then(resp=>{
       if(resp.success){
         cb?.(resp.result)
       }
@@ -220,7 +234,9 @@ export const useProduct = defineStore('product', () => {
   const handleProjectData = (result, isActive?: boolean) => {
     const {modules, ...extra } = result
     const treeData: TreeData[] = []
+
     const children: TreeData[] = modules?.[0] ? handleChildren(modules[0], extra.id) : []
+
     treeData.push({
       ...extra,
       id: modules?.[0]?.id || extra.id,
@@ -231,6 +247,7 @@ export const useProduct = defineStore('product', () => {
     })
     handleDataMap(treeData);
     data.value = treeData
+
     updateDataCache()
     if (isActive) {
       engine.setActiveFile(treeData[0]?.id)
@@ -264,7 +281,8 @@ export const useProduct = defineStore('product', () => {
   const add = (record: any, parentId: string,open?:any) => {
     dataMap.set(record.id, record)
     data.value = addProduct(data.value, record, parentId)
-    addDraft(info.value.draftId,getType(record.others.type || record.type) , record, parentId ? { moduleId: parentId } : {})
+    const _record = handleDataProvider(record)
+    addDraft(info.value.draftId,getType(record.others.type || record.type) , _record, parentId ? { moduleId: parentId } : {})
     updateDataCache()
     engine.updateFile(record,'add',open)
     // updateProductReq(record, (result) => {
@@ -274,7 +292,6 @@ export const useProduct = defineStore('product', () => {
 
   const update = async (record: any, cb?: Function) => {
     // debugger;
-    console.log('update=====',record)
     dataMap.set(record.id, omit(record, ['children']))
     data.value = updateProduct(data.value, record)
     updateDataCache()
@@ -299,7 +316,6 @@ export const useProduct = defineStore('product', () => {
 
   const move = (record:any,parentId:string)=>{
     updateDataCache()
-    console.log('parentId',parentId)
     moveDraft(info.value.draftId,getType(record.type), record.id, { moduleId: parentId })
   }
 
