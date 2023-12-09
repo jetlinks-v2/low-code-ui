@@ -48,14 +48,28 @@ watch(() => activeFile.value, () => {
 
 onBeforeRouteLeave((to, form, next) => {
    const item =  omit(product.data[0], ['children'])
-   console.log('item===',item,product.data,product.info)
    updateProjectDraft(product.info.draftId,{
       // ...item,
       name:item.name,
       others: {
         ...item?.others,
         activeFile: activeFile.value,
-        files: files.value
+        files: files.value.map(item=>item.id)
+      }
+   }).finally(()=>{
+    next()
+   })   
+})
+
+onBeforeRouteUpdate((to, form, next) => {
+   const item =  omit(product.data[0], ['children'])
+   updateProjectDraft(product.info.draftId,{
+      // ...item,
+      name:item.name,
+      others: {
+        ...item?.others,
+        activeFile: activeFile.value,
+        files: files.value.map(item=>item.id)
       }
    }).finally(()=>{
     next()

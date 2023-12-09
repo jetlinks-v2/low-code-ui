@@ -66,8 +66,10 @@ watch(() => route.params.id, () => {
     product.initProjectState()
     product.queryProduct(route.params.id,()=>{
       const data = product.data[0]
+      
+      const files = data?.others?.files.map(item=>product.getById(item))
       if (data?.state?.value !== 'published') {
-        engine.selectFiles(data?.others?.files || [])
+        engine.selectFiles(files)
         engine.setActiveFile(data?.others?.activeFile || data?.id)
         engine.selectFile(data?.others?.activeFile)
       } else {
