@@ -5,7 +5,6 @@ import { withModifiers } from 'vue'
 import { cloneDeep } from 'lodash-es'
 import { useTool } from '../../hooks'
 import generatorData from '../../utils/generatorData'
-import { Space } from 'jetlinks-ui-components'
 
 export default defineComponent({
     name: 'InlineLayout',
@@ -68,9 +67,15 @@ export default defineComponent({
             return (
                 <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDel={true} hasCopy={true} hasDrag={true} data={props.data} parent={props.parent}>
                     {
-                        unref(list)?.length ? <Space
+                        unref(list)?.length ? <div
                             data-layout-type={'inline'}
                             {...props.data.componentProps}
+                            style={{
+                                display: "flex",
+                                gap: (props.data.componentProps?.gap || 24) + 'px',
+                                justifyContent: props.data.componentProps?.justifyContent || 'flex-start',
+                                alignItems: props.data.componentProps?.alignItems || 'center'
+                            }}
                         >
                             {
                                 unref(list).map((element: any) => {
@@ -99,7 +104,7 @@ export default defineComponent({
                                     )
                                 })
                             }
-                        </Space> : (unref(isEditModel) ? <div class="draggable-empty">内联</div> : <div></div>)
+                        </div> : (unref(isEditModel) ? <div class="draggable-empty">内联</div> : <div></div>)
                     }
                     {
                         unref(isEditModel) &&

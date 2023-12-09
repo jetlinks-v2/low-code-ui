@@ -265,7 +265,9 @@ export const layout: ISchema[] = [
         name: '内联',
         children: [],
         componentProps: {
-
+            gap: 24,
+            justifyContent: 'flex-start',
+            alignItems: 'center'
         },
         formItemProps: {
             isLayout: false
