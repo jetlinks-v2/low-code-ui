@@ -17,7 +17,7 @@
     </template>
     <template v-if="['tag', 'button', 'dropdown', 'text'].includes(target.type)">
       <j-form-item
-          label="标签内容"
+          label="文本内容"
           :name="['componentProps', 'text']"
           required
           :validateFirst="true"
