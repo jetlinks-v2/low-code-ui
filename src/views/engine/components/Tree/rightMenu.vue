@@ -145,7 +145,6 @@ const onContextMenuClick = (node, menuKey) => {
       if (!isModule) {
         _arr = product.getById(node.parentId)?.children || []
       }
-      console.log('2=============',node.data)
       emit('click', {
         data: undefined,
         cacheData: node.data,

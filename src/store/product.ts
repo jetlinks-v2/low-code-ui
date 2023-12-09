@@ -234,7 +234,7 @@ export const useProduct = defineStore('product', () => {
   const handleProjectData = (result, isActive?: boolean) => {
     const {modules, ...extra } = result
     const treeData: TreeData[] = []
-    const children: TreeData[] = modules?.[0] ? handleChildren(modules[0], extra.id) : []
+    const children: TreeData[] = modules?.[0] ? handleChildren(modules[0],isActive? extra.id:extra.projectId) : []
     treeData.push({
       ...extra,
       id: modules?.[0]?.id || extra.id,
