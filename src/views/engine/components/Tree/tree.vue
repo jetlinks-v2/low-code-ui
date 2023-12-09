@@ -125,6 +125,7 @@ const onDel =async (data) => {
 }
 
 const menuClick = (record) => {
+  console.log('record====1',record,product.data)
   if (record.menuKey === 'Copy') {
     engine.setCopyFile(record.data)
     onlyMessage('复制成功')

@@ -152,7 +152,7 @@ export const projectListMenu = [
   },
   {
     type: providerEnum.PageDesign,
-    img: getImage('/project/form.svg'),
+    img: getImage('/project/page_designer.svg'),
     text: '页面设计器'
   }
 ]
