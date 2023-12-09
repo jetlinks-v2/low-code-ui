@@ -1,47 +1,65 @@
 <template>
   <div class="advanced">
     <div class="content">
-      <CardBox>
-        <j-form :model="myRelation" ref="relationRef">
-          <div class="title">
-            开启关系
-            <j-tooltip title="开启关系后，平台被关联方和关联方同时增加一条数据">
-              <AIcon type="QuestionCircleOutlined" style="margin-left: 12px;color: #333;"/>
-            </j-tooltip>
-          </div>
-          <div>
-            <j-switch v-model:checked="myRelation.enabled" @change="updateRelation"/>
-            <div class="descriptions-warp" style="margin-top: 16px;width: 500px;"
-                 v-if="myRelation.enabled">
-              <div class="descriptions-item">
-                <div class="descriptions-title">
-                  关系对象标识
-                </div>
-                <div class="descriptions-content">
-                  <j-form-item name="relationType"
-                               :rules="[{ required: true, message: '请输入关系标识'}, { max: 64, message: '最多可输入64位字符'}]">
-                    <j-input :options="columnOptions" placeholder="请输入关系标识"
-                             v-model:value="myRelation.relationType" style="width: 100%"
-                             @change="updateRelation"/>
-                  </j-form-item>
+      <j-row>
+        <j-col :span="12">
+          <CardBox style="margin-right: 12px">
+            <j-form :model="myRelation" ref="relationRef">
+              <div class="title">
+                开启关系
+                <j-tooltip title="开启关系后，平台被关联方和关联方同时增加一条数据">
+                  <AIcon type="QuestionCircleOutlined" style="margin-left: 12px;color: #333;"/>
+                </j-tooltip>
+              </div>
+              <div>
+                <j-switch v-model:checked="myRelation.enabled" @change="updateRelation"/>
+                <div class="descriptions-warp" style="margin-top: 16px;width: 500px;"
+                     v-if="myRelation.enabled">
+                  <div class="descriptions-item">
+                    <div class="descriptions-title">
+                      关系对象标识
+                    </div>
+                    <div class="descriptions-content">
+                      <j-form-item name="relationType"
+                                   :rules="[{ required: true, message: '请输入关系标识'}, { max: 64, message: '最多可输入64位字符'}]">
+                        <j-input :options="columnOptions" placeholder="请输入关系标识"
+                                 v-model:value="myRelation.relationType" style="width: 100%"
+                                 @change="updateRelation"/>
+                      </j-form-item>
+                    </div>
+                  </div>
+                  <div class="descriptions-item">
+                    <div class="descriptions-title">
+                      关系对象名称
+                    </div>
+                    <div class="descriptions-content">
+                      <j-form-item name="relationTypeName"
+                                   :rules="[{ required: true, message: '请输入关系名称'},{ max: 16, message: '最多可输入16位字符'}]">
+                        <j-input v-model:value="myRelation.relationTypeName" placeholder="请为关系命名"
+                                 @change="updateRelation"/>
+                      </j-form-item>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="descriptions-item">
-                <div class="descriptions-title">
-                  关系对象名称
-                </div>
-                <div class="descriptions-content">
-                  <j-form-item name="relationTypeName"
-                               :rules="[{ required: true, message: '请输入关系名称'},{ max: 16, message: '最多可输入16位字符'}]">
-                    <j-input v-model:value="myRelation.relationTypeName" placeholder="请为关系命名"
-                             @change="updateRelation"/>
-                  </j-form-item>
-                </div>
-              </div>
+            </j-form>
+          </CardBox>
+        </j-col>
+        <j-col :span="12">
+          <CardBox style="height: 100%">
+            <div class="title">
+              记录数据变更
+              <j-tooltip title="开启关系后，平台被关联方和关联方同时增加一条数据">
+                <AIcon type="QuestionCircleOutlined" style="margin-left: 12px;color: #333;"/>
+              </j-tooltip>
             </div>
-          </div>
-        </j-form>
-      </CardBox>
+            <div>
+              <j-switch v-model:checked="myAudit" @change="auditChange"/>
+            </div>
+          </CardBox>
+        </j-col>
+      </j-row>
+
       <CardBox>
         <div class="tree-content">
           <div class="tree-left">
@@ -246,6 +264,10 @@ const props = defineProps({
     type: Object,
     default: () => ({})
   },
+  audit: {
+    type: Boolean,
+    default: false
+  },
   relation: {
     type: Object,
     default: () => ({})
@@ -266,6 +288,7 @@ const CrudColumns = inject(CRUD_COLUMNS)
 const project = useProduct()
 const relationRef = ref()
 const assetRef = ref()
+const myAudit = ref(props.audit)
 
 const {data: options} = useRequest(getAssetType, {
   onSuccess(resp) {
@@ -340,6 +363,11 @@ const assetEnableChange = (v) => {
 
 const treeChange = () => {
   emit('update:tree', myTree.value)
+  emit('update')
+}
+
+const auditChange = () => {
+  emit('update:audit', myAudit.value)
   emit('update')
 }
 

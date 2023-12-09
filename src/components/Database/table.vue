@@ -52,7 +52,9 @@
           <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" :disabled="index <= maxLen" />
         </template>
         <template #setting="{ record, index }">
-          <span v-if="index <= maxLen"></span>
+          <template v-if="index <= maxLen">
+            <j-button @click="() => settingClick(record, index)">配置</j-button>
+          </template>
           <template v-else>
             <j-tooltip
               v-if="!record.javaType || ['Boolean', 'DateTime'].includes(record.javaType)"
@@ -111,7 +113,15 @@
     </div>
   </div>
   <SettingModal
-    v-if="setting.visible"
+    v-if="setting.visible && setting.data?.index !== 1"
+    :data="setting.data"
+    :warp="WarpRef"
+    :publish="setting.data ? publishColumns.includes(setting.data.name) : false"
+    @cancel="settingCancel"
+    @save="settingSave"
+  />
+  <IDConfigModal
+    v-if="setting.visible && setting.data?.index === 1"
     :data="setting.data"
     :warp="WarpRef"
     :publish="setting.data ? publishColumns.includes(setting.data.name) : false"
@@ -132,7 +142,7 @@ import {
   formErrorFieldsToObj,
   settingValidate
 } from "@LowCode/components/Database/util";
-import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly } from './components'
+import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly, IDConfigModal } from './components'
 import { provide } from 'vue'
 import { defaultSetting, defaultTreeSetting } from './setting'
 import { regular } from '@jetlinks-web/utils'

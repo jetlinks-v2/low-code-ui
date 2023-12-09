@@ -60,7 +60,7 @@ const componentName = computed(() => {
     canImport: false,
     canExport: false
   }
-  console.log(javaType)
+
   switch(javaType) {
     case 'Enum':
       formModel.value = {
