@@ -44,7 +44,7 @@ const { isEditModel } = useTool()
 
 const $self = reactive({
   visible: true,
-  src: props.src
+  src: ''
 })
 
 const setVisible = (flag: boolean) => {

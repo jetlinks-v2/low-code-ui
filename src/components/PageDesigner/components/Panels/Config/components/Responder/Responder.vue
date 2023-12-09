@@ -1,7 +1,7 @@
 <template>
   <div class="responder-warp">
     <div>
-      function (self, dep, depValue)
+      function ($self, $dep, $depValue)
     </div>
     <div class="responder-content">
       <div class="code">

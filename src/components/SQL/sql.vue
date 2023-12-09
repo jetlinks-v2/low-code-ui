@@ -41,6 +41,10 @@ const props = defineProps({
     type: String,
     default: undefined
   },
+  name:{
+    type: String,
+    default: undefined
+  },
   others: {
     type: Object,
     default: () => ({})

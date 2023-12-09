@@ -23,8 +23,8 @@ const props = defineProps({
     default: ''
   },
   value: {
-    type: Array,
-    default: [],
+    type: Object,
+    default: () => ({}),
   },
   mode: {
     type: String,
@@ -67,7 +67,7 @@ const pageProvider = usePageProvider()
 
 const $self = reactive({
   visible: true,
-  value: props.value
+  value: undefined
 })
 
 const setVisible = (flag: boolean) => {

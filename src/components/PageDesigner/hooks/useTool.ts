@@ -82,7 +82,8 @@ const useTool = () => {
             designer.selected.value = [node]
         }
         onSaveData()
-        designer.isShowConfig.value = true
+        const arr= ['inline-item', 'card-item', 'timeline-item', 'table-item', 'list-item', 'info-item-item-item']
+        designer.isShowConfig.value = !arr.includes(node?.type)
     }
 
     const setModel = (_type: 'preview' | 'edit') => {
@@ -205,6 +206,7 @@ const useTool = () => {
     });
 
     return {
+        _noCopyData,
         paramsUtil,
         _global,
         isEditModel,

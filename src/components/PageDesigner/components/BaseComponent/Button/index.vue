@@ -98,10 +98,10 @@ const visible = ref(false)
 
 const $self = reactive({
   visible: true,
-  text: props.text,
-  loading: props.loading,
-  disabled: props.disabled,
-  icon: props.icon
+  text: '',
+  loading: false,
+  disabled: false,
+  icon: ''
 })
 
 const setVisible = (flag: boolean) => {
@@ -155,7 +155,7 @@ const _disabled = computed(() => {
 })
 
 const _icon = computed(() => {
-  return $self?._icon || props._icon
+  return $self?.icon || props.icon
 })
 
 const _props = computed(() => {

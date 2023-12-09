@@ -23,7 +23,6 @@ import { initData } from "./utils/defaultData";
 import { useCheck } from './hooks'
 import {CheckSpin} from "@LowCode/components/index";
 
-
 const props = defineProps({
   data: {
     type: Object,
