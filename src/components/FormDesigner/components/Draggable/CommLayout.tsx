@@ -184,6 +184,8 @@ export default defineComponent({
                 parent: props.parent
             }
 
+            console.log(_props.componentProps)
+
             return (
                 <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
                     <FormItem {...unref(_props.formItemProps)} name={path_.value} validateFirst={true}>
