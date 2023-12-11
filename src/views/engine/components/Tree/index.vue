@@ -68,19 +68,21 @@ watch(() => route.params.id, () => {
     product.queryProduct(route.params.id,()=>{
       const data = product.data[0]
       
-      const files = data?.others?.files.map(item=>{
+      const files = data?.others?.files?.map(item=>{
         if(isString(item)){
           return product.getById(item)
         }
         return item
       })
-      if (data?.state?.value !== 'published') {
+      if(files && files.length!==0){
+        if (data?.state?.value !== 'published') {
         engine.selectFiles(files)
         engine.setActiveFile(data?.others?.activeFile || data?.id)
         engine.selectFile(data?.others?.activeFile)
-      } else {
-        engine.setActiveFile(data?.id)
-        engine.selectFile(data.id)
+        } else {
+          engine.setActiveFile(data?.id)
+          engine.selectFile(data.id)
+        }
       }
     })
   }
