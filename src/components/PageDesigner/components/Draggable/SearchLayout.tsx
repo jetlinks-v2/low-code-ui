@@ -80,6 +80,7 @@ export default defineComponent({
         usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
 
         const onSearch = (_params: any) => {
+            if(unref(isEditModel)) return
             $self.params = _params
         }
 

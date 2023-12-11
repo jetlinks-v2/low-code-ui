@@ -36,9 +36,11 @@ export default defineComponent({
             dataSource: [{label: '2023-12-06', value: ''}]
         })
         const setDataSource = (arr: any[]) => {
+            if(unref(isEditModel)) return
             $self.dataSource = arr
         }
         const setVisible = (flag: boolean) => {
+            if(unref(isEditModel)) return
             $self.visible = flag
         }
 

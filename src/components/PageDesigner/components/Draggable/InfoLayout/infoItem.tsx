@@ -34,9 +34,11 @@ export default defineComponent({
         })
 
         const setVisible = (flag: boolean) => {
+            if(unref(isEditModel)) return
             $self.visible = flag
         }
         const setValue = (_val: any) => {
+            if(unref(isEditModel)) return
             $self.value = _val
         }
 
@@ -98,7 +100,7 @@ export default defineComponent({
                                         data={_item}
                                         tag="div"
                                         hasCopy={false}
-                                        hasDel={true}
+                                        hasDel={false}
                                         parent={_item.children}
                                     >
                                         <DraggableLayout

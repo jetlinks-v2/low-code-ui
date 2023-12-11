@@ -31,11 +31,12 @@ export default defineComponent({
             visible: true,
             value: {}
         })
-
         const setVisible = (flag: boolean) => {
+            if(unref(isEditModel)) return
             $self.visible = flag
         }
         const setValue = (_val: any) => {
+            if(unref(isEditModel)) return
             $self.value = _val
         }
 
@@ -103,30 +104,11 @@ export default defineComponent({
                 componentProps: {
                     title: '标题' + uid(4),
                     bordered: true,
-                    column: 3
+                    column: 3,
+                    titleVisible: true
                 },
             })
             onAddChild(_item, props.data)
-        }
-
-        const handleAddItem = (item: any) => {
-            const _item = generatorData({
-                type: item?.type + '-item',
-                children: [
-                    {
-                        type: item?.type + '-item-item',
-                        componentProps: {},
-                        children: []
-                    }
-                ],
-                componentProps: {
-                    label: '标题item_' + uid(4),
-                    value: '123',
-                    labelWidth: 200,
-                    span: 1
-                },
-            })
-            onAddChild(_item, item)
         }
 
         const emptyRender = () => {
