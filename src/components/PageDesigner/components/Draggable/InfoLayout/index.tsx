@@ -1,13 +1,13 @@
-import DraggableLayout from './DraggableLayout'
-import Selection from '../Selection/index'
-import TitleComponent from '@LowCode/components/TitleComponent/index.vue'
-import './index.less'
+import DraggableLayout from '../DraggableLayout'
+import Selection from '../../Selection'
+import '../index.less'
 import {withModifiers} from 'vue'
-import {useLifeCycle, usePubsub, useTool} from '../../hooks'
-import generatorData from '../../utils/generatorData'
-import {uid} from '../../utils/uid'
+import {useLifeCycle, usePubsub, useTool} from '../../../hooks'
+import generatorData from '../../../utils/generatorData'
+import {uid} from '../../../utils/uid'
 import {Row, Col} from 'jetlinks-ui-components'
-import {handleDataSourceFn} from "../../utils/utils";
+import {handleDataSourceFn} from "../../../utils/utils";
+import Info from './info'
 
 export default defineComponent({
     name: 'InfoLayout',
@@ -137,95 +137,10 @@ export default defineComponent({
             }
         }
 
-        const infoItemRender = (item: any) => {
-            const isBordered = item?.componentProps?.bordered
-            if (item.children?.length) {
-                return <Row>
-                    {
-                        (item.children || []).map((i: any) => {
-                            return <Col span={24 / item?.componentProps?.column * i?.componentProps?.span}>
-                                <Selection
-                                    class={unref(isDragArea) && 'drag-area'}
-                                    data={i}
-                                    tag="div"
-                                    hasCopy={false}
-                                    hasDel={true}
-                                    parent={item.children}
-                                >
-                                    <div style={{
-                                        display: 'flex',
-                                        minHeight: '40px',
-                                        border: isBordered ? '#e5e5e5 solid 1px' : 'none',
-                                        marginTop: '-1px',
-                                        marginRight: '-1px'
-                                    }}>
-                                        <div
-                                            style={{
-                                                width: (item?.componentProps?.labelWidth || 200) + 'px',
-                                                backgroundColor: isBordered ? '#fafafa' : '#fff',
-                                                borderRight: isBordered ? '#e5e5e5 solid 1px' : 'none',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                padding: '16px 24px'
-                                            }}
-                                            class={!isBordered && "info-label"}>
-                                            <span>{i.componentProps?.label}</span>
-                                        </div>
-                                        <div style={{flex: 1, padding: '16px 24px'}}>
-                                            {
-                                                (i.children || []).map((_item: any) => {
-                                                    return <Selection
-                                                        class={unref(isDragArea) && 'drag-area'}
-                                                        data={_item}
-                                                        tag="div"
-                                                        hasCopy={false}
-                                                        hasDel={true}
-                                                        parent={_item.children}
-                                                    >
-                                                        <DraggableLayout
-                                                            data-layout-type={'info-item-item-item'}
-                                                            data={_item?.children || []}
-                                                            parent={_item}
-                                                        />
-                                                    </Selection>
-                                                })
-                                            }
-                                        </div>
-                                    </div>
-                                </Selection>
-                            </Col>
-                        })
-                    }
-                </Row>
-            }
-            return emptyRender()
-        }
-
         const infoRender = () => {
             if (unref(list).length) {
                 return unref(list).map((item: any) => {
-                    return <Selection
-                        class={unref(isDragArea) && 'drag-area'}
-                        data={item}
-                        tag="div"
-                        hasCopy={false}
-                        hasDel={true}
-                        parent={unref(list)}
-                        style={{
-                            padding: '20px 10px'
-                        }}
-                    >
-                        {item?.componentProps?.titleVisible && <div><TitleComponent data={item?.componentProps?.title} icon={item?.componentProps?.icon}/></div>}
-                        {infoItemRender(item)}
-                        {
-                            unref(isEditModel) &&
-                            <div class="draggable-add">
-                                <div class="draggable-add-btn" onClick={withModifiers(() => {
-                                    handleAddItem(item)
-                                }, ['stop'])}><span>添加子项</span></div>
-                            </div>
-                        }
-                    </Selection>
+                    return <Info data={item} parent={unref(list)} />
                 })
             } else {
                 return emptyRender()

@@ -12,11 +12,13 @@
           'table-item',
           'grid-item',
           'space-item',
+          'inline-item',
           'grid',
           'tabs',
           'inline',
           'collapse',
           'space',
+          'inline',
           'title',
           'org',
           'role',
@@ -43,11 +45,13 @@
           'tabs',
           'collapse',
           'space',
+          'inline',
           'collapse-item',
           'tabs-item',
           'table-item',
           'grid-item',
           'space-item',
+          'inline-item'
         ].includes(type)
       "
     >
@@ -374,36 +378,12 @@
           </j-form-item>
         </template>
       </template>
-      <!-- <template v-if="['grid', 'space'].includes(type)">
-        <j-form-item
-          label="标识"
-          :name="['formItemProps', 'name']"
-          required
-          :validateFirst="true"
-          :rules="rules"
-        >
-          <j-input
-            placeholder="请输入"
-            :maxlength="64"
-            @change="onDataChange"
-            v-model:value="target.formItemProps.name"
-          />
-        </j-form-item>
-      </template> -->
       <template v-if="['tabs'].includes(type)">
         <j-form-item
             :validateFirst="true"
             :name="['componentProps', 'type']"
             label="切卡样式"
         >
-          <!-- <j-radio-group
-            v-model:value="target.componentProps.type"
-            button-style="solid"
-            @change="onDataChange"
-          >
-            <j-radio-button :value="'line'">线框</j-radio-button>
-            <j-radio-button :value="'card'">卡片</j-radio-button>
-          </j-radio-group> -->
           <CheckButton
               :options="[
               { label: '线框', value: 'line' },
@@ -415,6 +395,61 @@
         </j-form-item>
       </template>
       <template v-if="['space'].includes(type)">
+        <j-form-item
+            :validateFirst="true"
+            :name="['componentProps', 'align']"
+            label="对齐"
+        >
+          <j-select
+              v-model:value="target.componentProps.align"
+              placeholder="请选择"
+              @change="onDataChange"
+          >
+            <j-select-option value="start">头部</j-select-option>
+            <j-select-option value="end">尾部</j-select-option>
+            <j-select-option value="center">居中</j-select-option>
+            <j-select-option value="baseline">基准线</j-select-option>
+          </j-select>
+        </j-form-item>
+        <j-form-item
+            :name="['componentProps', 'direction']"
+            label="类型"
+            required
+            :validateFirst="true"
+        >
+          <!-- <j-radio-group
+            v-model:value="target.componentProps.direction"
+            button-style="solid"
+            @change="onDataChange"
+          >
+            <j-radio-button :value="'vertical'">垂直</j-radio-button>
+            <j-radio-button :value="'horizontal'">水平</j-radio-button>
+          </j-radio-group> -->
+          <CheckButton
+              :options="[
+              { label: '垂直', value: 'vertical' },
+              { label: '水平', value: 'horizontal' },
+            ]"
+              @change="onDataChange"
+              v-model:value="target.componentProps.direction"
+          />
+        </j-form-item>
+        <j-form-item
+            :name="['componentProps', 'size']"
+            label="间隔尺寸"
+            :validateFirst="true"
+            required
+        >
+          <j-input-number
+              v-model:value="target.componentProps.size"
+              style="width: 100%"
+              :precision="0"
+              :min="0"
+              @change="onDataChange"
+          />
+        </j-form-item>
+      </template>
+      <template v-if="['inline'].includes(type)">
         <j-form-item
             label="对齐方式"
             :name="['componentProps', 'alignItems']"
