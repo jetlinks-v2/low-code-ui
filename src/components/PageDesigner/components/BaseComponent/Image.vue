@@ -48,9 +48,11 @@ const $self = reactive({
 })
 
 const setVisible = (flag: boolean) => {
+  if(unref(isEditModel)) return
   $self.visible = flag
 }
 const setSrc = (_val: any) => {
+  if(unref(isEditModel)) return
   $self.src = _val
 }
 

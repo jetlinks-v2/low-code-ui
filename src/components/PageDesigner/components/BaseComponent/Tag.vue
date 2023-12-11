@@ -65,9 +65,11 @@ const $self = reactive({
 })
 
 const setVisible = (flag: boolean) => {
+  if(unref(isEditModel)) return
   $self.visible = flag
 }
 const setText = (_val: any) => {
+  if(unref(isEditModel)) return
   $self.text = _val
 }
 
