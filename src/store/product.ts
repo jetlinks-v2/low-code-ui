@@ -263,7 +263,7 @@ export const useProduct = defineStore('product', () => {
   const getType = (type:string)=>{
     const modules = [providerEnum.Module,'project']
     const functions = [providerEnum.CRUD,providerEnum.Function,providerEnum.SQL]
-    const resources = [providerEnum.FormPage,providerEnum.HtmlPage,providerEnum.Page,providerEnum.PageDesign]
+    const resources = [providerEnum.FormPage,providerEnum.HtmlPage,providerEnum.Page,providerEnum.PageDesign,providerEnum.ListPage]
     if(modules.includes(type)){
       return 'modules'
     }else if(functions.includes(type)){
