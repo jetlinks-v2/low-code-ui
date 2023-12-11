@@ -100,7 +100,7 @@ export default defineComponent({
                                         data={_item}
                                         tag="div"
                                         hasCopy={false}
-                                        hasDel={true}
+                                        hasDel={false}
                                         parent={_item.children}
                                     >
                                         <DraggableLayout

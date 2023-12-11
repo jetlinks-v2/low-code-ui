@@ -85,6 +85,14 @@ export default defineComponent({
             })
             onAddChild(_item, item)
         }
+
+        const emptyRender = () => {
+            if (unref(isEditModel)) {
+                return <div class="draggable-empty">描述列表</div>
+            } else {
+                return <div></div>
+            }
+        }
         const infoItemRender = (item: any) => {
             const isBordered = item?.componentProps?.bordered
             if (item.children?.length) {
