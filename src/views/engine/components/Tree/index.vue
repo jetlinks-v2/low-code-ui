@@ -25,6 +25,7 @@ import Tree from './tree.vue'
 import { useProduct ,useEngine} from "@LowCode/store";
 import { storeToRefs } from 'pinia'
 import { DragBox } from '@LowCode/components/index'
+import { isString } from 'lodash-es';
 
 const product = useProduct()
 const engine = useEngine()
@@ -67,7 +68,12 @@ watch(() => route.params.id, () => {
     product.queryProduct(route.params.id,()=>{
       const data = product.data[0]
       
-      const files = data?.others?.files.map(item=>product.getById(item))
+      const files = data?.others?.files.map(item=>{
+        if(isString(item)){
+          return product.getById(item)
+        }
+        return item
+      })
       if (data?.state?.value !== 'published') {
         engine.selectFiles(files)
         engine.setActiveFile(data?.others?.activeFile || data?.id)
