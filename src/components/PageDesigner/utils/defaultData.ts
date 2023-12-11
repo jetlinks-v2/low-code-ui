@@ -125,10 +125,11 @@ export const layout: ISchema[] = [
                     },
                 ],
                 componentProps: {
-                    title:'标题1',
+                    title: '标题1',
                     bordered: true,
-                    column:3,
-                    labelWidth:200
+                    column: 3,
+                    labelWidth: 200,
+                    titleVisible: true
                 },
             },
         ]
