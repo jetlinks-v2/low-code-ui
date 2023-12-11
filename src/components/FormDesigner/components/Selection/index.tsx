@@ -160,23 +160,6 @@ const Selection = defineComponent({
       }
       designer.setSelection(_data || 'root')
     }
-    // 粘贴
-    const onPaste = () => {
-      designer.onPaste()
-    }
-    // 剪切
-    const onShear = () => {
-      designer.onShear()
-    }
-    // 删除
-    const onDelete = () => {
-      designer.onDelete()
-    }
-
-    // 收藏为模板
-    const onCollect = () => {
-      designer.onCollect()
-    }
 
     const editNode = () => {
       return <Dropdown
@@ -192,10 +175,10 @@ const Selection = defineComponent({
             return (
               <Menu>
                 <MenuItem key="copy"><Button type="link" onClick={() => { designer.onCopy() }}>复制</Button></MenuItem>
-                <MenuItem key="paste"><Button type="link" onClick={onPaste}>粘贴</Button></MenuItem>
-                <MenuItem key="shear"><Button type="link" onClick={onShear}>剪切</Button></MenuItem>
-                <MenuItem key="delete"><Button danger type="link" onClick={onDelete}>删除</Button></MenuItem>
-                {designer?.type === 'low-code' && <MenuItem key="collect"><Button type="link" onClick={onCollect}>收藏为模版</Button></MenuItem>}
+                <MenuItem key="paste"><Button type="link" onClick={() => { designer.onPaste() }}>粘贴</Button></MenuItem>
+                <MenuItem key="shear"><Button type="link" onClick={() => { designer.onShear() }}>剪切</Button></MenuItem>
+                <MenuItem key="delete"><Button danger type="link" onClick={() => { designer.onDelete() }}>删除</Button></MenuItem>
+                {designer?.type === 'low-code' && <MenuItem key="collect"><Button type="link" onClick={() => { designer.onCollect() }}>收藏为模版</Button></MenuItem>}
               </Menu>
             )
           }
@@ -236,7 +219,7 @@ const Selection = defineComponent({
                 props.hasCopy && (
                   <div
                     class="action"
-                    onClick={withModifiers(() => onCopy(), ['stop'])}
+                    onClick={withModifiers(() => { onCopy() }, ['stop'])}
                   >
                     <AIcon type="CopyOutlined" />
                   </div>
@@ -246,7 +229,7 @@ const Selection = defineComponent({
                 props.hasDel && (
                   <div
                     class="action"
-                    onClick={withModifiers(() => onDelete(), ['stop'])}
+                    onClick={withModifiers(() => { designer.onDelete() }, ['stop'])}
                   >
                     <AIcon type="DeleteOutlined" />
                   </div>
@@ -257,6 +240,7 @@ const Selection = defineComponent({
         }
       </TagComponent>
     }
+
     expose({ setVisible, setOptions, setValue, setDisabled })
 
     return () =>  renderSelected()
