@@ -200,7 +200,7 @@ const _disabled = computed(() => {
 })
 
 const _icon = computed(() => {
-  return $self?._icon || props._icon
+  return $self?.icon || props.icon
 })
 
 const getProps = (item: any) => {

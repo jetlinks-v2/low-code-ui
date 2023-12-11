@@ -152,9 +152,9 @@ export const layout: ISchema[] = [
         name: '内联',
         children: [],
         componentProps: {
-            align: 'baseline',
-            direction: 'horizontal',
-            size: 8
+            gap: 24,
+            justifyContent: 'flex-start',
+            alignItems: 'center'
         },
     },
     {

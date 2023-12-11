@@ -15,7 +15,7 @@
         />
       </j-form-item>
     </template>
-    <template v-if="['tag', 'button', 'dropdown', 'text'].includes(target.type)">
+    <template v-if="['tag', 'text'].includes(target.type)">
       <j-form-item
           label="文本内容"
           :name="['componentProps', 'text']"
@@ -31,6 +31,18 @@
       </j-form-item>
     </template>
     <template v-if="['button', 'dropdown'].includes(target.type)">
+      <j-form-item
+          label="文本内容"
+          :name="['componentProps', 'text']"
+          :validateFirst="true"
+      >
+        <j-input
+            placeholder="请输入"
+            @change="onDataChange"
+            :maxlength="32"
+            v-model:value="target.componentProps.text"
+        />
+      </j-form-item>
       <j-form-item
         label="按钮类型"
         :name="['componentProps', 'type']"
@@ -388,39 +400,42 @@
     <template v-if="['inline'].includes(target.type)">
       <j-form-item
         label="对齐方式"
-        :name="['componentProps', 'align']"
+        :name="['componentProps', 'alignItems']"
         :validateFirst="true"
       >
         <j-select
           @change="onDataChange"
-          v-model:value="target.componentProps.align"
+          v-model:value="target.componentProps.alignItems"
         >
-          <j-select-option value="start">start</j-select-option>
-          <j-select-option value="end">end</j-select-option>
+          <j-select-option value="flex-start">flex-start</j-select-option>
+          <j-select-option value="flex-end">flex-end</j-select-option>
           <j-select-option value="center">center</j-select-option>
           <j-select-option value="baseline">baseline</j-select-option>
+          <j-select-option value="stretch">stretch</j-select-option>
         </j-select>
       </j-form-item>
       <j-form-item
         label="间距方向"
-        :name="['componentProps', 'direction']"
+        :name="['componentProps', 'justifyContent']"
         :validateFirst="true"
       >
-        <CheckButton
-          :options="[
-            { label: '垂直', value: 'vertical' },
-            { label: '水平', value: 'horizontal' },
-          ]"
-          @change="onDataChange"
-          v-model:value="target.componentProps.direction"
-        />
+        <j-select
+            @change="onDataChange"
+            v-model:value="target.componentProps.justifyContent"
+        >
+          <j-select-option value="flex-start">flex-start</j-select-option>
+          <j-select-option value="flex-end">flex-end</j-select-option>
+          <j-select-option value="center">center</j-select-option>
+          <j-select-option value="space-between">space-between</j-select-option>
+          <j-select-option value="space-around">space-around</j-select-option>
+        </j-select>
       </j-form-item>
       <j-form-item
         label="间距大小"
-        :name="['componentProps', 'size']"
+        :name="['componentProps', 'gap']"
         :validateFirst="true"
       >
-        <j-slider v-model:value="target.componentProps.size" @change="onDataChange" />
+        <j-slider v-model:value="target.componentProps.gap" @change="onDataChange" />
       </j-form-item>
     </template>
     <template v-if="['tabs'].includes(target.type)">
@@ -460,7 +475,6 @@
 <script lang="ts" setup>
 import Icon from "./Icon/index.vue";
 import Search from "./Search/index.vue";
-import Dropdown from "./Dropdown/index.vue";
 import ShowFormat from "./ProTable/ShowFormat/index.vue";
 import Action from './ProTable/Action/index.vue';
 import Steps from './Steps/index.vue'
