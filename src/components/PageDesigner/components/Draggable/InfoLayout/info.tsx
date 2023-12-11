@@ -33,9 +33,11 @@ export default defineComponent({
         })
 
         const setVisible = (flag: boolean) => {
+            if(unref(isEditModel)) return
             $self.visible = flag
         }
         const setValue = (_val: any) => {
+            if(unref(isEditModel)) return
             $self.value = _val
         }
 

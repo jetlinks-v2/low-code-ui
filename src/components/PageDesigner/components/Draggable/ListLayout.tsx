@@ -34,9 +34,11 @@ export default defineComponent({
             dataSource: [1]
         })
         const setDataSource = (arr: any[]) => {
+            if(unref(isEditModel)) return
             $self.dataSource = arr
         }
         const setVisible = (flag: boolean) => {
+            if(unref(isEditModel)) return
             $self.visible = flag
         }
 
