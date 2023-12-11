@@ -74,6 +74,7 @@ watch(() => route.params.id, () => {
         }
         return item
       })
+      console.log('====',data?.others?.files)
       if(files && files.length!==0){
         if (data?.state?.value !== 'published') {
         engine.selectFiles(files)
