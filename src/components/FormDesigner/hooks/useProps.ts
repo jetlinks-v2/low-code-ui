@@ -131,7 +131,7 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
   const _disabled = element?.componentProps?.disabled || __disabled || !editable || (mode === 'edit' && !element?.componentProps?.editable)
   // componentProps
   const _componentProps: any = {
-    ...omit(element?.componentProps, ['description', 'cssCode', 'editable', 'onChange', 'visible', 'source']),
+    ...omit(element?.componentProps, ['description', 'cssCode', 'editable', 'onChange', 'visible', 'source', 'mountedCode']),
     size: _data?.componentProps.size,
     disabled: _disabled
   }

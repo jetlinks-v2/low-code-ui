@@ -1,6 +1,6 @@
 import useTool from "./useTool";
 import type { Ref } from "vue";
-export const useLifeCycle = (componentProps: any, refs: Record<string, Ref<any>>, isEditModel: Ref<boolean>) => {
+export const useLifeCycle = (componentProps: any, refs: Record<string, any>, isEditModel: Ref<boolean>) => {
     const { paramsUtil, _global } = useTool()
     const onCreatedFn = (code?: string) => {
         if (code && !isEditModel.value) {

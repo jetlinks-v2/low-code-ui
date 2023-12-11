@@ -215,7 +215,7 @@ export default defineComponent({
                             padding: '20px 10px'
                         }}
                     >
-                        <div><TitleComponent data={item?.componentProps?.title}/></div>
+                        {item?.componentProps?.titleVisible && <div><TitleComponent data={item?.componentProps?.title} icon={item?.componentProps?.icon}/></div>}
                         {infoItemRender(item)}
                         {
                             unref(isEditModel) &&

@@ -247,18 +247,40 @@
     </template>
     <template v-if="['info-item'].includes(target.type)">
       <j-form-item
-        label="标题"
-        :name="['componentProps', 'title']"
-        required
-        :validateFirst="true"
+          label="是否展示标题"
+          :validateFirst="true"
+          :name="['componentProps', 'titleVisible']"
       >
-        <j-input
-          placeholder="请输入"
-          @change="onDataChange"
-          :maxlength="32"
-          v-model:value="target.componentProps.title"
+        <j-switch
+            v-model:checked="target.componentProps.titleVisible"
+            @change="onDataChange"
         />
       </j-form-item>
+      <template v-if="target.componentProps.titleVisible">
+        <j-form-item
+            label="标题"
+            :name="['componentProps', 'title']"
+            required
+            :validateFirst="true"
+        >
+          <j-input
+              placeholder="请输入"
+              @change="onDataChange"
+              :maxlength="32"
+              v-model:value="target.componentProps.title"
+          />
+        </j-form-item>
+        <j-form-item
+            label="图标"
+            :validateFirst="true"
+            :name="['componentProps', 'icon']"
+        >
+          <Icon
+              v-model:value="target.componentProps.icon"
+              @change="onDataChange"
+          />
+        </j-form-item>
+      </template>
       <j-form-item
         label="是否展示边框"
         :validateFirst="true"
