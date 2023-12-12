@@ -150,7 +150,7 @@ const setSelection = (node: any) => {
   isShowConfig.value =
       !(selected.value?.length > 1) &&
       !map(selected.value, "type").find((i) => {
-        return ["space-item", "inline", "inline-item"].includes(i);
+        return ["space-item", "inline-item"].includes(i);
       });
   onSaveData();
 };

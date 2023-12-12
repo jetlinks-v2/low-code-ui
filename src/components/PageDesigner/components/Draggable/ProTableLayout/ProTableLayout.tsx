@@ -49,18 +49,23 @@ export default defineComponent({
         const _refFn = {
             selectedRowKeys,
             onReload: () => {
+                if(unref(isEditModel)) return
                 tableRef.value?.reload()
             },
             setIsSelected: (flag: boolean) => {
+                if(unref(isEditModel)) return
                 isSelected.value = flag
             },
             setVisible: (flag: boolean) => {
+                if(unref(isEditModel)) return
                 $self.visible = flag
             },
             setDataSource: (arr: any) => {
+                if(unref(isEditModel)) return
                 $self.dataSource = arr
             },
             setParams: (_obj: any) => {
+                if(unref(isEditModel)) return
                 $self.params = _obj
             }
         }

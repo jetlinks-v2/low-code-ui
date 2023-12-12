@@ -16,7 +16,7 @@
     <j-form-item
         :validateFirst="true"
         v-if="!['geo', 'device', 'product', 'org', 'user', 'role'].includes(type)"
-        label="JS代码"
+        label="onChange事件"
         :name="['componentProps', 'eventCode']"
     >
       <EditorBtn
@@ -27,21 +27,19 @@
           tip="function (value, refs)"
       />
     </j-form-item>
-    <template v-if="!['root'].includes(type)">
-      <j-form-item
-          label="onMounted事件"
-          :validateFirst="true"
-          :name="['componentProps', 'mountedCode']"
-      >
-        <EditorBtn
-            @change="onDataChange"
-            v-model:value="target.componentProps.mountedCode"
-            text="编写代码"
-            language="javascript"
-            tip="function (refs)"
-        />
-      </j-form-item>
-    </template>
+    <j-form-item
+        label="onMounted事件"
+        :validateFirst="true"
+        :name="['componentProps', 'mountedCode']"
+    >
+      <EditorBtn
+          @change="onDataChange"
+          v-model:value="target.componentProps.mountedCode"
+          text="编写代码"
+          language="javascript"
+          tip="function (refs)"
+      />
+    </j-form-item>
     <j-form-item
         label="新增状态是否展示"
         :validateFirst="true"

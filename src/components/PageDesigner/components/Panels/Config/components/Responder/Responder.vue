@@ -6,10 +6,10 @@
     <div class="responder-content">
       <div class="code">
         <j-monaco-editor
-          v-model:modelValue="_value"
-          language="javascript"
-          :registrationTypescript="registrationTypescript"
-          @change="onChange"
+            v-model:modelValue="_value"
+            language="javascript"
+            :registrationTypescript="registrationTypescript"
+            @change="onChange"
         />
       </div>
       <div class="code-tip">
@@ -37,13 +37,14 @@ const emit = defineEmits('update:value')
 
 const _value = ref(props.value)
 
-const defaultCode = ` // return返回值作为显示值
-  (function (value) {
-    return value["属性值"]
-    // 可以自由组合值
-    // return value["属性值1"] + value["属性值2"]
-  })
+const defaultCode = `
+  /**
+  *$self 组件本身的数据，可以获取值和设值
+  *$dep 被依赖的组件的key
+  *$depValue 被依赖的组件的值
+  */
 
+  $self.visible = true // 控制组件的显示和隐藏
 `
 
 const registrationTypescript = {

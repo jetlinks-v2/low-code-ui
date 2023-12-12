@@ -4,7 +4,7 @@ import {FormItem, Ellipsis} from 'jetlinks-ui-components'
 import {cloneDeep, get, isNumber, omit, set} from 'lodash-es'
 import componentMap from '../../utils/componentMap'
 import {useProps, useTool} from '../../hooks'
-import {request} from '@jetlinks-web/core'
+import {request as axiosRequest} from "@jetlinks-web/core/src/request";
 import {queryOptions} from '../../utils/utils'
 import dayjs from 'dayjs'
 
@@ -164,7 +164,7 @@ export default defineComponent({
         const onMountedFn = () => {
             const customFn = new Function('refs', props.data?.componentProps?.mountedCode)
             const obj = {
-                request,
+                axios: axiosRequest,
                 myRef: selectRef
             }
             customFn(obj)
@@ -197,7 +197,7 @@ export default defineComponent({
                                 props.data?.type === 'switch' ? <TypeComponent
                                     {..._props.componentProps}
                                     checked={__value.value}
-                                    onUpdate:checked={(newValue) => {
+                                    onUpdate:checked={(newValue: any) => {
                                         set(designer.formState, _path, newValue || false)
                                     }}
                                     onChange={onChange}
@@ -207,7 +207,7 @@ export default defineComponent({
                                     value={__value.value}
                                     onUpdate:value={(newValue: any) => {
                                         if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && !Array.isArray(newValue)) {
-                                            props.data?.componentProps.keys.forEach(i => {
+                                            props.data?.componentProps.keys.forEach((i: any) => {
                                                 const __path = _path.slice(0, _path.length - 1) || []
                                                 __path.push(i.config?.source)
                                                 set(designer.formState, __path, newValue?.[i?.key] || null)

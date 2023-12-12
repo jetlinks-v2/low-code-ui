@@ -1,9 +1,8 @@
-
 import { isEmpty } from 'lodash-es';
 import DraggableWrap from './DragGableWrap'
 import './index.less';
 import StepsLayout from './StepsLayout';
-import InfoLayout from './InfoLayout';
+import InfoLayout from './InfoLayout/index';
 import TimelineLayout from './TimelineLayout';
 import { useTool } from '../../hooks';
 import ProTableLayout from './ProTableLayout'

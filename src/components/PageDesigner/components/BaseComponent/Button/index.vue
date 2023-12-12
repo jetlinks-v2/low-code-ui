@@ -105,19 +105,24 @@ const $self = reactive({
 })
 
 const setVisible = (flag: boolean) => {
+  if(unref(isEditModel)) return
   $self.visible = flag
 }
 const setText = (_val: any) => {
+  if(unref(isEditModel)) return
   $self.text = _val
 }
 const setLoading = (flag: boolean) => {
+  if(unref(isEditModel)) return
   $self.loading = flag
 }
 
 const setIcon = (_val: any) => {
+  if(unref(isEditModel)) return
   $self.icon = _val
 }
 const setDisabled = (flag: boolean) => {
+  if(unref(isEditModel)) return
   $self.disabled = flag
 }
 

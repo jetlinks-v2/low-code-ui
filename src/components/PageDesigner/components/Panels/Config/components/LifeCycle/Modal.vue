@@ -7,7 +7,7 @@
       @cancel="onCancel"
   >
     <div class="editor-warp">
-      <div>function {{title}}({ context, axios, route, refs})</div>
+      <div>function {{title}}(refs, util, global)</div>
       <div class="editor-code">
         <div class="code">
           <j-monaco-editor
@@ -80,33 +80,10 @@ const registrationTips = computed(() => {
 
 const defaultCode = `
 /**
-* @params context {Object} 页面全局依赖项
-* @params axios {Axios} 请求实例
-* @params route {Object} 路由信息
 * @params refs  {Object} 当前组件下的refs
+* @params util {Axios} 包含工具方法
+* @params global {Object} 页面全局依赖项
 */
-function onCreated({ context, axios, route, refs}){
-
-  /**
-  * 接口请求
-  * post、postParams、get、patch、remove、put
-  */
-
-  axios.post('/instance/_query', { sorts: [{ name: 'createTime', order: 'desc' }] })
-  // axios.postParams(url, data, params)
-  // axios.get(url, params)
-  // axios.patch(url, data)
-  // axios.remove(url, params)
-  // axios.put(url, data)
-
-  /**
-  * 路由信息
-  * route.params
-  * route.query
-  */
-  const is = route.params.id
-
-}
 `
 
 const change = (v) => {

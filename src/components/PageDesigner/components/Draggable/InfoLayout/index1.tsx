@@ -1,13 +1,13 @@
-import DraggableLayout from './DraggableLayout'
-import Selection from '../Selection/index'
-import TitleComponent from '@LowCode/components/TitleComponent/index.vue'
-import './index.less'
+import DraggableLayout from '../DraggableLayout'
+import Selection from '../../Selection'
+import TitleComponent from 'components/TitleComponent/index.vue'
+import '../index.less'
 import {withModifiers} from 'vue'
-import {useLifeCycle, usePubsub, useTool} from '../../hooks'
-import generatorData from '../../utils/generatorData'
-import {uid} from '../../utils/uid'
+import {useLifeCycle, usePubsub, useTool} from '../../../hooks'
+import generatorData from '../../../utils/generatorData'
+import {uid} from '../../../utils/uid'
 import {Row, Col} from 'jetlinks-ui-components'
-import {handleDataSourceFn} from "../../utils/utils";
+import {handleDataSourceFn} from "../../../utils/utils";
 
 export default defineComponent({
     name: 'InfoLayout',
@@ -215,7 +215,7 @@ export default defineComponent({
                             padding: '20px 10px'
                         }}
                     >
-                        <div><TitleComponent data={item?.componentProps?.title}/></div>
+                        {item?.componentProps?.titleVisible && <div><TitleComponent data={item?.componentProps?.title} icon={item?.componentProps?.icon}/></div>}
                         {infoItemRender(item)}
                         {
                             unref(isEditModel) &&
