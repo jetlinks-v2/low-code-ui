@@ -491,6 +491,37 @@
         />
       </j-form-item>
     </template>
+    <template v-if="['title'].includes(target.type)">
+      <j-form-item
+          label="名称"
+          :validateFirst="true"
+          :name="['componentProps', 'title']"
+          :rules="[
+            {
+              required: true,
+              message: '请输入名称',
+              trigger: 'change',
+            },
+          ]"
+      >
+        <j-input
+            placeholder="请输入"
+            :maxlength="64"
+            @change="onDataChange"
+            v-model:value="target.componentProps.title"
+        />
+      </j-form-item>
+      <j-form-item
+          label="图标"
+          :validateFirst="true"
+          :name="['componentProps', 'icon']"
+      >
+        <Icon
+            v-model:value="target.componentProps.icon"
+            @change="onDataChange"
+        />
+      </j-form-item>
+    </template>
   </div>
 </template>
 

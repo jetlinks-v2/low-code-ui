@@ -1,10 +1,10 @@
 import { isEmpty } from 'lodash-es';
 import DraggableWrap from './DragGableWrap'
 import './index.less';
+import { useTool } from '../../hooks';
 import StepsLayout from './StepsLayout';
 import InfoLayout from './InfoLayout/index';
 import TimelineLayout from './TimelineLayout';
-import { useTool } from '../../hooks';
 import ProTableLayout from './ProTableLayout'
 import CommonLayout from './CommonLayout';
 import InlineLayout from './InlineLayout';
@@ -12,6 +12,7 @@ import SearchLayout from './SearchLayout'
 import CardLayout from './CardLayout';
 import TabsLayout from './TabsLayout';
 import ListLayout from './ListLayout';
+import TitleLayout from './TitleLayout';
 
 const DraggableLayout = defineComponent({
     name: 'DraggableLayout',
@@ -60,6 +61,8 @@ const DraggableLayout = defineComponent({
                         return (<TabsLayout data={element} parent={props.data} />)
                     case 'list':
                         return (<ListLayout data={element} parent={props.data} />)
+                    case 'title':
+                        return (<TitleLayout data={element} parent={props.data} />)
                     default:
                         return <CommonLayout data={element} parent={props.data} />
                 }
