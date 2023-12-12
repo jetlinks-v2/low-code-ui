@@ -48,7 +48,6 @@ const Selection = defineComponent({
     const designer: any = inject('FormDesigner')
     const isField = checkIsField(props.data)
     const cssClassList = ref<string[]>([])
-    const visible = ref<boolean>(true)
 
     const Selected = computed(() => {
       const flag = designer.selected.value.find(item => props?.data?.key === item.key)
@@ -87,50 +86,6 @@ const Selection = defineComponent({
       cssClassList.value = arr
       insertCustomCssToHead(props.data.componentProps?.cssCode, props.data?.key)
     })
-
-    const setVisible = (bool: boolean) => {
-      visible.value = bool
-    }
-
-    const setOptions = (arr: any[]) => {
-      const obj = {
-        ...props.data,
-        componentProps: props.data.type === 'tree-select' ? {
-          ...props.data.componentProps,
-          options: arr
-        } : {
-          ...props.data.componentProps,
-          treeData: arr
-        }
-      }
-      const _list = updateData(unref(designer.formData)?.children, obj)
-      designer.formData.value = {
-        ...designer.formData.value,
-        children: _list || [],
-      }
-      designer.setSelection(props.data || 'root')
-    }
-
-    const setValue = (_val: any) => {
-      if (Array.isArray(props.path) && props.path?.length) {
-        set(designer.formState, props.path, _val)
-      }
-    }
-
-    const setDisabled = (bool: boolean) => {
-      const _list = updateData(unref(designer.formData)?.children, {
-        ...props.data,
-        componentProps: {
-          ...props.data.componentProps,
-          disabled: bool
-        }
-      })
-      designer.formData.value = {
-        ...designer.formData.value,
-        children: _list || [],
-      }
-      designer.setSelection(props.data || 'root')
-    }
 
     // 复制
     const onCopy = () => {
@@ -211,7 +166,7 @@ const Selection = defineComponent({
         {...useAttrs()}
         onClick={withModifiers(handleClick, ['stop'])}
       >
-        {unref(isEditModel) ? editNode() : (visible.value ? slots?.default() : '')}
+        {unref(isEditModel) ? editNode() : slots?.default()}
         {
           unref(isEditModel) && Selected.value && !isMultiple.value && (
             <div class="bottomRight">
@@ -241,7 +196,7 @@ const Selection = defineComponent({
       </TagComponent>
     }
 
-    expose({ setVisible, setOptions, setValue, setDisabled })
+    // expose({ setVisible, setOptions, setValue, setDisabled })
 
     return () =>  renderSelected()
   }

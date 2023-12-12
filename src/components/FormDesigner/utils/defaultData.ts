@@ -85,6 +85,19 @@ export const basic: ISchema[] = [
         name: '开关',
     },
     {
+        type: 'checkbox',
+        name: '多选框',
+    },
+    {
+        type: 'radio',
+        name: '单选框',
+        componentProps: {
+            size: 'default',
+            optionType: 'default',
+            buttonStyle: 'outline'
+        }
+    },
+    {
         type: 'form',
         name: '内嵌表单',
     },
@@ -116,6 +129,14 @@ export const basic: ISchema[] = [
     //     type: 'time-range-picker',
     //     name: '时间范围',
     // },
+    {
+        type: 'editor',
+        name: '富文本',
+        componentProps: {
+            height: 200,
+            placeholder: '请输入'
+        },
+    },
     {
         type: 'table',
         name: '表格',

@@ -1,11 +1,9 @@
-import DraggableLayout from '../DraggableLayout'
 import Selection from '../../Selection'
 import '../index.less'
 import {withModifiers} from 'vue'
 import {useLifeCycle, usePubsub, useTool} from '../../../hooks'
 import generatorData from '../../../utils/generatorData'
 import {uid} from '../../../utils/uid'
-import {Row, Col} from 'jetlinks-ui-components'
 import {handleDataSourceFn} from "../../../utils/utils";
 import Info from './info'
 
@@ -25,7 +23,7 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const {isEditModel, isDragArea, onAddChild} = useTool()
+        const {isEditModel, onAddChild} = useTool()
 
         const $self = reactive({
             visible: true,
