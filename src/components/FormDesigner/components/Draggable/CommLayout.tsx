@@ -86,10 +86,8 @@ export default defineComponent({
         }
 
         const onChange = (...arg) => {
+            if (unref(isEditModel)) return
             designer?.onChange?.()
-            if (isEditModel.value) {
-                return
-            }
             const _refs = {
                 refList: designer.refList,
                 axios: axiosRequest

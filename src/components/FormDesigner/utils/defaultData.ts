@@ -52,6 +52,10 @@ export const basic: ISchema[] = [
         name: '数字输入',
     },
     {
+        type: 'number-step',
+        name: '数字输入Pro',
+    },
+    {
         type: 'select-card',
         name: '选项',
         componentProps: {

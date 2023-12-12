@@ -3,7 +3,7 @@ import { withModifiers } from 'vue'
 import './index.less'
 import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import { checkIsField, copyDataByKey, extractCssClass, findParentById, handleCopyData, insertCustomCssToHead, updateData } from '../../utils/utils'
-import { map, set, cloneDeep } from 'lodash-es'
+import { map, cloneDeep } from 'lodash-es'
 import { uid } from '../../utils/uid'
 
 const Selection = defineComponent({
@@ -195,9 +195,6 @@ const Selection = defineComponent({
         }
       </TagComponent>
     }
-
-    // expose({ setVisible, setOptions, setValue, setDisabled })
-
     return () =>  renderSelected()
   }
 })
