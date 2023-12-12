@@ -25,7 +25,7 @@ const handleProps = (node: any) => {
             width: '100%'
         }
     }
-    if (/^(select|select-card|tree-select)$/.test(node.type)) {
+    if (/^(select|select-card|tree-select｜radio|checkbox)$/.test(node.type)) {
         result.placeholder = '请选择'
         result.source = {
             dictionary: undefined,
@@ -56,6 +56,12 @@ const handleProps = (node: any) => {
         case 'select-card':
             result.options = generateOptions(3)
             result.multiple = false
+            break
+        case 'radio':
+            result.options = generateOptions(3)
+            break
+        case 'checkbox':
+            result.options = generateOptions(3)
             break
         case 'select':
             result.options = generateOptions(3)

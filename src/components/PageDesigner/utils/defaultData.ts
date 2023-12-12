@@ -192,6 +192,19 @@ export const layout: ISchema[] = [
             },
         ]
     },
+    {
+        type: 'title',
+        name: '标题',
+        children: [
+            {
+                type: 'title-item',
+                children: []
+            },
+        ],
+        componentProps: {
+            title: '标题组件'
+        },
+    },
 ]
 
 export const _function: ISchema[] = [

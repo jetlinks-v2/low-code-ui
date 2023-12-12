@@ -340,7 +340,7 @@
           'select',
           'date-picker',
           'time-picker',
-          // 'table',
+          'editor',
           'org',
           'role',
           'user',
@@ -392,6 +392,7 @@
           'select',
           'date-picker',
           'time-picker',
+          'editor'
         ].includes(type)
       "
     >
@@ -437,6 +438,22 @@
           v-model:value="target.componentProps.addonAfter"
           :maxlength="10"
           @change="onDataChange"
+        />
+      </j-form-item>
+    </template>
+    <template v-if="['editor'].includes(type)">
+      <j-form-item
+          label="高度"
+          :name="['componentProps', 'height']"
+          :validateFirst="true"
+      >
+        <j-input-number
+            placeholder="请输入"
+            @change="onDataChange"
+            style="width: 100%"
+            :precision="0"
+            :min="0"
+            v-model:value="target.componentProps.height"
         />
       </j-form-item>
     </template>
@@ -519,6 +536,7 @@ const rulesVisible = computed(() => {
     'input-password',
     'date-picker',
     'time-picker',
+    'editor'
   ].includes(unref(type))
 })
 
