@@ -68,13 +68,18 @@ export default defineComponent({
         }
 
         const onCancel = async () => {
-            if (!cancelCode) return
-            const handleResultFn = new Function('refs', 'util', 'global', okCode)
-            const _refs = pageType === 'page' ? {pageRef, myValue} : {formRef, myValue}
-            const resp = await handleResultFn(_refs, paramsUtil, _global)
-            if (resp) {
+            if (!cancelCode) {
                 emit('close')
+                return
             }
+            const handleResultFn = new Function('refs', 'util', 'global', cancelCode)
+            const _refs = pageType === 'page' ? {pageRef, myValue} : {formRef, myValue}
+            await handleResultFn(_refs, paramsUtil, _global)
+            emit('close')
+            // const resp = await handleResultFn(_refs, paramsUtil, _global)
+            // if (resp) {
+            //     emit('close')
+            // }
         }
 
         const footerContent = () => {

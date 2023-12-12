@@ -126,7 +126,7 @@ const setDisabled = (flag: boolean) => {
   $self.disabled = flag
 }
 
-const { executionMounted } = useLifeCycle(props, {setVisible, setVisible, setDisabled, setText, setLoading, setIcon}, isEditModel)
+const { executionMounted } = useLifeCycle(props, {setVisible, setDisabled, setText, setLoading, setIcon}, isEditModel)
 
 const handleResponderFn = ($dep?: string, $depValue?: any) => {
   if (props.responder?.responder) {
@@ -181,8 +181,8 @@ const dataModal = computed(() => {
 
 const handleRequestFn = () => {
   if (props.event?.okCode) {
-    const handleResultFn = new Function('util', 'global', props.event?.okCode)
-    handleResultFn(paramsUtil, _global)
+    const handleResultFn = new Function('refs','util', 'global', props.event?.okCode)
+    handleResultFn({setVisible, setDisabled, setText, setLoading, setIcon},paramsUtil, _global)
   }
 }
 
