@@ -28,6 +28,7 @@ const useTool = () => {
     const _global = {
         // context: pageProvider.context,
         $refs: pageProvider.$refs,
+        pageValue: designer?.pageValue
     }
 
     const isEditModel = computed(() => {

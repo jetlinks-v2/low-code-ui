@@ -74,13 +74,13 @@ const Selection = defineComponent({
       insertCustomCssToHead(props.data?.componentProps?.cssCode, props.data?.key)
     })
 
-    onMounted(() => {
-      if(!unref(isEditModel) && props.data?.componentProps?.mountedCode){
-        // TODO: 参数问题需要解决
-        let customFn = new Function(props.data?.componentProps?.mountedCode)
-        customFn()
-      }
-    })
+    // onMounted(() => {
+    //   if(!unref(isEditModel) && props.data?.componentProps?.mountedCode){
+    //     // TODO: 参数问题需要解决
+    //     let customFn = new Function(props.data?.componentProps?.mountedCode)
+    //     customFn()
+    //   }
+    // })
 
     const editNode = () => {
       return <Dropdown
