@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+import { defineStore } from "@jetlinks-web/stores";
 import { useProduct } from './product'
 import dayjs from "dayjs";
 import { cloneDeep } from "lodash-es";
@@ -14,7 +14,7 @@ type FileItemType = {
   [key: string]: any
 }
 
-export const useEngine = defineStore('engine', () => {
+export const useEngine = defineStore('lowcode_engine', () => {
   const files = ref<FileItemType[]>([])
   const activeFile = ref()
   const content = ref()
@@ -195,7 +195,7 @@ export const useEngine = defineStore('engine', () => {
    */
   const updateFile = (record: any, type: string, open?: any) => {
     const index = files.value?.findIndex(item => item.id === record.id)
-    
+
 
     files.value = files.value.map(item => {
       return product.getById(item.id)
@@ -232,7 +232,7 @@ export const useEngine = defineStore('engine', () => {
         // })
       }
     } else if (type === 'add') {
-      addFile(record, open) 
+      addFile(record, open)
     }
   }
 

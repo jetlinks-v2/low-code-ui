@@ -17,6 +17,7 @@ import HtmlPage from '@LowCode/components/CustomHTML/output/Preview.vue'
 import PageView from '@LowCode/components/PageDesigner/preview.vue'
 import { queryProject } from "@LowCode/api/project";
 import { Result } from 'jetlinks-ui-components'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const data = ref()
