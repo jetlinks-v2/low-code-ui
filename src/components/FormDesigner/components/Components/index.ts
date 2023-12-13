@@ -12,6 +12,7 @@ import Input from './Input.vue'
 import CostStructure from './CostStructure.vue'
 import InputGroup from './InputGroup.vue'
 import Editor from './Editor.vue'
+import NumberStep from './NumberStep.vue'
 
 export {
     Text,
@@ -27,5 +28,6 @@ export {
     Input,
     CostStructure,
     InputGroup,
-    Editor
+    Editor,
+    NumberStep
 }
