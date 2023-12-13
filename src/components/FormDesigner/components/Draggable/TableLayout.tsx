@@ -8,6 +8,7 @@ import generatorData from '../../utils/generatorData'
 import { uid } from '../../utils/uid'
 import componentMap from '../../utils/componentMap'
 import { queryOptions } from '../../utils/utils'
+import boolean from "async-validator/dist-types/validator/boolean";
 
 export default defineComponent({
     name: 'TableLayout',
@@ -41,7 +42,9 @@ export default defineComponent({
     },
     setup(props) {
         const designer: any = inject('FormDesigner')
-
+        const visible = ref<boolean>(true)
+        const disabled = ref<boolean>(!!props.data.componentProps?.disabled)
+        const data = ref<any[]>([])
         const { isEditModel, isDragArea, layoutPadStyle } = useTool()
 
         const _data = computed(() => {
@@ -65,9 +68,33 @@ export default defineComponent({
             return _path
         })
 
-        console.log(__path.value, props.data.type)
+        const setVisible = (bool: boolean) => {
+            if (unref(isEditModel)) return
+            visible.value = bool
+        }
 
-        const data = ref<any[]>([])
+        const setValue = (_val: any) => {
+            if (unref(isEditModel)) return
+            if (Array.isArray(_val)) {
+                set(designer.formState, __path.value, [_val])
+            }
+        }
+
+        const setDisabled = (bool: boolean) => {
+            if (unref(isEditModel)) return
+            disabled.value = bool
+        }
+
+        const registerToRefList = (path: string[]) => {
+            if (!unref(isEditModel) && Array.isArray(path) && path?.length && props.data?.formItemProps?.name && designer.refList) {
+                const path_ = path.join('.')
+                designer.refList.value[path_] = {setVisible, setValue, setDisabled}
+            }
+        }
+
+        watchEffect(() => {
+            registerToRefList(__path.value)
+        })
 
         watchEffect(() => {
             data.value = get(designer.formState, __path.value) || []
@@ -193,7 +220,7 @@ export default defineComponent({
             if (element.children?.[0]?.type === 'table-item-index') {
                 return (dt?.index || 0) + 1
             } else if (element.children?.[0]?.type === 'table-item-actions') {
-                return <Button disabled={props.data.componentProps?.disabled} onClick={() => {
+                return <Button disabled={disabled.value} onClick={() => {
                     const arr = cloneDeep(get(designer.formState, __path.value) || [])
                     arr.splice(dt?.index, 1)
                     set(designer.formState, __path.value, arr)
@@ -221,7 +248,7 @@ export default defineComponent({
 
         return () => {
             return (
-                <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
+                visible.value && <Selection {...useAttrs()} style={unref(layoutPadStyle)} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <div class={'table'}>
                         <FormItem {...unref(_formItemProps)} validateFirst={true}>
                             <Table
@@ -230,7 +257,7 @@ export default defineComponent({
                                 scroll={{ y: props.data.componentProps?.height, x: 'max-content' }}
                             >
                                 {
-                                    unref(list).map(element => {
+                                    unref(list).map((element: any) => {
                                         return <TableColumn
                                             key={element.key}
                                             {...omit(element.componentProps, ['name', 'align'])}
@@ -252,7 +279,7 @@ export default defineComponent({
                                     const arr = get(designer.formState, __path.value) || []
                                     // 这里有个问题：当有列的key为id会出现问题，但是流程表单不会，因为不能为内置key
                                     set(designer.formState, __path.value, [...arr, {id: uid(16)}])
-                                }} style={{ width: '100%', marginTop: '10px' }} disabled={props.data.componentProps?.disabled}><AIcon type="PlusOutlined" />新增</Button>
+                                }} style={{ width: '100%', marginTop: '10px' }} disabled={disabled.value}><AIcon type="PlusOutlined" />新增</Button>
                             }
                             {
                                 unref(isEditModel) &&

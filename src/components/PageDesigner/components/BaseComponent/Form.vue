@@ -92,7 +92,7 @@ const onSave = () => {
   })
 }
 
-const { executionMounted } = useLifeCycle(props, {setVisible, setVisible, onSave}, isEditModel)
+const { executionMounted } = useLifeCycle(props, {setVisible, onSave}, isEditModel)
 
 const onValueChange = (e: any) => {
   $self.value = e

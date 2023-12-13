@@ -76,7 +76,7 @@ export default defineComponent({
         const setValue = (_val: any) => {
             if (unref(isEditModel)) return
             if (Array.isArray(_path) && _path?.length) {
-              set(designer.formState, _path, _val)
+                set(designer.formState, _path, _val)
             }
         }
 
@@ -94,20 +94,14 @@ export default defineComponent({
             }
             if (!props.data?.componentProps?.eventCode && !unref(isEditModel)) return
             let obj: any = undefined
-            if (['input', 'textarea', 'input-password', 'radio', 'checkbox'].includes(props.data?.type)) {
-                obj = arg?.[0]
-            }
-            if (['input-number'].includes(props.data?.type)) {
-                obj = arg?.[0]
-            }
             if (['select', 'switch', 'select-card', 'tree-select'].includes(props.data.type)) {
                 obj = {value: arg?.[0], option: arg?.[1]}
-            }
-            if (['time-picker'].includes(props.data?.type)) {
+            } else if (['time-picker'].includes(props.data?.type)) {
                 obj = {time: arg?.[0], timeString: arg?.[1]}
-            }
-            if (['date-picker'].includes(props.data?.type)) {
+            } else if (['date-picker'].includes(props.data?.type)) {
                 obj = {date: arg?.[0], timeString: arg?.[1]}
+            } else {
+                obj = arg?.[0]
             }
             const customFn = new Function('value', 'refs', props.data?.componentProps?.eventCode)
             customFn(obj, _refs)
@@ -116,9 +110,9 @@ export default defineComponent({
         const registerToRefList = (path: string[]) => {
             if (!unref(isEditModel) && Array.isArray(path) && path?.length && props.data?.formItemProps?.name && designer.refList) {
                 const __path = path.join('.')
-                if(['select', 'select-card', 'radio', 'checkbox'].includes(props.data?.type)){
+                if (['select', 'select-card', 'radio', 'checkbox'].includes(props.data?.type)) {
                     designer.refList.value[__path] = {setVisible, setValue, setDisabled, setOptions}
-                }else {
+                } else {
                     designer.refList.value[__path] = {setVisible, setValue, setDisabled}
                 }
             }
@@ -209,7 +203,7 @@ export default defineComponent({
             }
 
             const _description = () => {
-                if(props.data?.componentProps?.description){
+                if (props.data?.componentProps?.description) {
                     return <div class="form-designer-description">
                         <div>
                             <Ellipsis>{props.data?.componentProps?.description}</Ellipsis>
@@ -219,8 +213,9 @@ export default defineComponent({
             }
 
             const renderContent = () => {
-                if(unref(isEditModel)){
-                    return <Selection path={_path} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
+                if (unref(isEditModel)) {
+                    return <Selection path={_path} {...params} hasCopy={true} hasDel={true} hasDrag={true}
+                                      hasMask={true}>
                         <FormItem {...unref(_props.formItemProps)} name={path_.value} validateFirst={true}>
                             <TypeComponent
                                 model={unref(designer.model)}
@@ -232,8 +227,9 @@ export default defineComponent({
                         {_description()}
                     </Selection>
                 } else {
-                    if(visible.value){
-                        return <Selection path={_path} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
+                    if (visible.value) {
+                        return <Selection path={_path} {...params} hasCopy={true} hasDel={true} hasDrag={true}
+                                          hasMask={true}>
                             <FormItem {...unref(_props.formItemProps)} name={path_.value} validateFirst={true}>
                                 {
                                     ['switch'].includes(props.data?.type) ? <TypeComponent
