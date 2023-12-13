@@ -31,7 +31,7 @@ export default defineComponent({
         const pageProvider = usePageProvider()
         const tableRef = ref()
         const isSelected = ref(false)
-        const selectedRowKeys = ref([])
+        const selectedRowKeys = ref<any[]>([])
 
         const modalVisible = ref<boolean>(false)
         const dataModal = ref()
@@ -47,7 +47,6 @@ export default defineComponent({
         })
 
         const _refFn = {
-            selectedRowKeys,
             onReload: () => {
                 if(unref(isEditModel)) return
                 tableRef.value?.reload()
@@ -67,7 +66,11 @@ export default defineComponent({
             setParams: (_obj: any) => {
                 if(unref(isEditModel)) return
                 $self.params = _obj
-            }
+            },
+            setSelectedRowKeys: (arr: any[]) => {
+                if(unref(isEditModel)) return
+                selectedRowKeys.value = arr
+            },
         }
         const handleResponderFn = ($dep?: string, $depValue?: any) => {
             const _responder = props.data?.componentProps?.responder?.responder
