@@ -1,4 +1,4 @@
-import {defineStore} from "pinia";
+import {defineStore} from "@jetlinks-web/stores";
 import { getImage } from '@jetlinks-web/utils'
 import { settingDetail } from '@LowCode/api/system'
 
@@ -10,7 +10,7 @@ interface LayoutType {
   logo: string
   layout: 'mix' | 'side' | 'top'
 }
-export const useSystemStore = defineStore('system', () => {
+export const useSystemStore = defineStore('lowcode_system', () => {
   const theme = ref<string>('light') // 主题色
   const title = ref<string>('Jetlinks Code') // 浏览器标签页title
   const ico = ref<string>('/favicon.ico') // 浏览器标签页logo

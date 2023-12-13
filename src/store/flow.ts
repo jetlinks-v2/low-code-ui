@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore } from '@jetlinks-web/stores'
 import { cloneDeep } from 'lodash-es'
 import type { INode, IConfig, IModelBaseInfo } from '@LowCode/views/process/model/Detail/typings.d.ts'
 interface IModel {
@@ -20,7 +20,7 @@ export const defaultModel = {
     },
 }
 
-export const useFlowStore = defineStore('flow', () => {
+export const useFlowStore = defineStore('lowcode_flow', () => {
     const nodeMap = new Map()
     const selectedNode = ref<any>({})
     // 流程模型数据
@@ -42,14 +42,14 @@ export const useFlowStore = defineStore('flow', () => {
 
     /**
      * 设置模型数据
-     * @param data 
+     * @param data
      */
     const setModel = (data: any) => {
         model.value = !Object.keys(data).length ? cloneDeep(defaultModel) : data
     }
     /**
      * 设置模型基础信息
-     * @param data 
+     * @param data
      */
     const setModelBaseInfo = (data: any) => {
         modelBaseInfo.value = data
