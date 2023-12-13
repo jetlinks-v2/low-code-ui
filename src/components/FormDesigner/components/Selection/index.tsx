@@ -3,7 +3,7 @@ import { withModifiers } from 'vue'
 import './index.less'
 import { AIcon, Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import { checkIsField, copyDataByKey, extractCssClass, findParentById, handleCopyData, insertCustomCssToHead, updateData } from '../../utils/utils'
-import { map, set, cloneDeep } from 'lodash-es'
+import { map, cloneDeep } from 'lodash-es'
 import { uid } from '../../utils/uid'
 
 const Selection = defineComponent({
@@ -48,7 +48,6 @@ const Selection = defineComponent({
     const designer: any = inject('FormDesigner')
     const isField = checkIsField(props.data)
     const cssClassList = ref<string[]>([])
-    const visible = ref<boolean>(true)
 
     const Selected = computed(() => {
       const flag = designer.selected.value.find(item => props?.data?.key === item.key)
@@ -87,50 +86,6 @@ const Selection = defineComponent({
       cssClassList.value = arr
       insertCustomCssToHead(props.data.componentProps?.cssCode, props.data?.key)
     })
-
-    const setVisible = (bool: boolean) => {
-      visible.value = bool
-    }
-
-    const setOptions = (arr: any[]) => {
-      const obj = {
-        ...props.data,
-        componentProps: props.data.type === 'tree-select' ? {
-          ...props.data.componentProps,
-          options: arr
-        } : {
-          ...props.data.componentProps,
-          treeData: arr
-        }
-      }
-      const _list = updateData(unref(designer.formData)?.children, obj)
-      designer.formData.value = {
-        ...designer.formData.value,
-        children: _list || [],
-      }
-      designer.setSelection(props.data || 'root')
-    }
-
-    const setValue = (_val: any) => {
-      if (Array.isArray(props.path) && props.path?.length) {
-        set(designer.formState, props.path, _val)
-      }
-    }
-
-    const setDisabled = (bool: boolean) => {
-      const _list = updateData(unref(designer.formData)?.children, {
-        ...props.data,
-        componentProps: {
-          ...props.data.componentProps,
-          disabled: bool
-        }
-      })
-      designer.formData.value = {
-        ...designer.formData.value,
-        children: _list || [],
-      }
-      designer.setSelection(props.data || 'root')
-    }
 
     // 复制
     const onCopy = () => {
@@ -211,7 +166,7 @@ const Selection = defineComponent({
         {...useAttrs()}
         onClick={withModifiers(handleClick, ['stop'])}
       >
-        {unref(isEditModel) ? editNode() : (visible.value ? slots?.default() : '')}
+        {unref(isEditModel) ? editNode() : slots?.default()}
         {
           unref(isEditModel) && Selected.value && !isMultiple.value && (
             <div class="bottomRight">
@@ -240,9 +195,6 @@ const Selection = defineComponent({
         }
       </TagComponent>
     }
-
-    expose({ setVisible, setOptions, setValue, setDisabled })
-
     return () =>  renderSelected()
   }
 })

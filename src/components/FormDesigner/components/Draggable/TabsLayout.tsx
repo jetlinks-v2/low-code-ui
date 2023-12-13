@@ -105,9 +105,9 @@ export default defineComponent({
                                                 hasCopy={true}
                                                 hasDel={true}
                                                 parent={unref(list)}
-                                                style={{
-                                                    padding: '20px 10px'
-                                                }}
+                                                // style={{
+                                                //     padding: '20px 10px'
+                                                // }}
                                             >
                                                 <DraggableLayout
                                                     data-layout-type={'tabs-item'}

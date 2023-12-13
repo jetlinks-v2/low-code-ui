@@ -44,7 +44,8 @@ export default defineComponent({
         const designer: any = inject('FormDesigner')
         const TypeComponent = componentMap?.[props?.data?.type] || 'div'
         const _path: string[] = cloneDeep(props?.path || []);
-        const selectRef = ref<any>(null)
+        const visible = ref<boolean>(true)
+        const disabled = ref<boolean>(false)
         const _formRef = ref<any>(null)
         const options = ref<any[]>(props.data?.componentProps.options || [])
         const treeData = ref<any[]>(props.data?.componentProps.treeData || [])
@@ -58,55 +59,74 @@ export default defineComponent({
             _path[_index.value] = props.data?.formItemProps?.name
         }
 
-        const onChange = (...arg) => {
-            designer?.onChange?.()
-            if (isEditModel.value) {
-                return
+        const setVisible = (bool: boolean) => {
+            if (unref(isEditModel)) return
+            visible.value = bool
+        }
+
+        const setOptions = (arr: any[]) => {
+            if (unref(isEditModel)) return
+            if (['select', 'select-card', 'radio', 'checkbox'].includes(props.data?.type)) {
+                options.value = arr
+            } else {
+                treeData.value = arr
             }
+        }
+
+        const setValue = (_val: any) => {
+            if (unref(isEditModel)) return
+            if (Array.isArray(_path) && _path?.length) {
+                set(designer.formState, _path, _val)
+            }
+        }
+
+        const setDisabled = (bool: boolean) => {
+            if (unref(isEditModel)) return
+            disabled.value = bool
+        }
+
+        const onChange = (...arg) => {
+            if (unref(isEditModel)) return
+            designer?.onChange?.()
             const _refs = {
-                // getWidgetRef: (path: any) => {
-                //     return unref(designer.refList)?.[path]
-                // },
                 refList: designer.refList,
-                request: request
+                axios: axiosRequest
             }
             if (!props.data?.componentProps?.eventCode && !unref(isEditModel)) return
             let obj: any = undefined
-            if (['input', 'textarea', 'input-password'].includes(props.data?.type)) {
-                obj = arg?.[0]
-            }
-            if (['input-number'].includes(props.data?.type)) {
-                obj = arg?.[0]
-            }
             if (['select', 'switch', 'select-card', 'tree-select'].includes(props.data.type)) {
                 obj = {value: arg?.[0], option: arg?.[1]}
-            }
-            if (['time-picker'].includes(props.data?.type)) {
+            } else if (['time-picker'].includes(props.data?.type)) {
                 obj = {time: arg?.[0], timeString: arg?.[1]}
-            }
-            if (['date-picker'].includes(props.data?.type)) {
+            } else if (['date-picker'].includes(props.data?.type)) {
                 obj = {date: arg?.[0], timeString: arg?.[1]}
+            } else {
+                obj = arg?.[0]
             }
             const customFn = new Function('value', 'refs', props.data?.componentProps?.eventCode)
             customFn(obj, _refs)
         }
 
-        const registerToRefList = (path: string[], _ref: any) => {
+        const registerToRefList = (path: string[]) => {
             if (!unref(isEditModel) && Array.isArray(path) && path?.length && props.data?.formItemProps?.name && designer.refList) {
                 const __path = path.join('.')
-                designer.refList.value[__path] = _ref
+                if (['select', 'select-card', 'radio', 'checkbox'].includes(props.data?.type)) {
+                    designer.refList.value[__path] = {setVisible, setValue, setDisabled, setOptions}
+                } else {
+                    designer.refList.value[__path] = {setVisible, setValue, setDisabled}
+                }
             }
         }
 
-        registerToRefList(_path, selectRef.value)
+        registerToRefList(_path)
 
         watchEffect(() => {
-            registerToRefList(_path, selectRef.value)
+            registerToRefList(_path)
         })
 
-        if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select'].includes(props.data?.type)) {
+        if (!isEditModel.value && unref(designer.mode) && ['select', 'select-card', 'tree-select', 'radio', 'checkbox'].includes(props.data?.type)) {
             queryOptions(props.data?.componentProps.source).then(resp => {
-                if (['select', 'select-card'].includes(props.data?.type)) {
+                if (['select', 'select-card', 'radio', 'checkbox'].includes(props.data?.type)) {
                     options.value = resp
                 } else {
                     treeData.value = resp
@@ -133,11 +153,7 @@ export default defineComponent({
                     }
                 })
                 __value.value = obj
-            }
-                // else if (['form'].includes(props?.data.type)) {// 会被置空
-                //     __value.value = get(designer.formState, _path)
-            // }
-            else if (['switch'].includes(props?.data.type)) {// 会被置空
+            } else if (['switch'].includes(props?.data.type)) {// 会被置空
                 const val = get(designer.formState, _path)
                 __value.value = val === 'true' ? true : val
             } else {
@@ -165,7 +181,7 @@ export default defineComponent({
             const customFn = new Function('refs', props.data?.componentProps?.mountedCode)
             const obj = {
                 axios: axiosRequest,
-                myRef: selectRef
+                myRef: designer.refList
             }
             customFn(obj)
         }
@@ -179,62 +195,85 @@ export default defineComponent({
         return () => {
             const _props = useProps(props.data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
 
+            disabled.value = _props.componentProps?.disabled
+
             const params = {
                 data: props.data,
                 parent: props.parent
             }
 
-            return (
-                <Selection path={_path} ref={selectRef} {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                    <FormItem {...unref(_props.formItemProps)} name={path_.value} validateFirst={true}>
-                        {
-                            unref(isEditModel) ? <TypeComponent
+            const _description = () => {
+                if (props.data?.componentProps?.description) {
+                    return <div class="form-designer-description">
+                        <div>
+                            <Ellipsis>{props.data?.componentProps?.description}</Ellipsis>
+                        </div>
+                    </div>
+                }
+            }
+
+            const renderContent = () => {
+                if (unref(isEditModel)) {
+                    return <Selection path={_path} {...params} hasCopy={true} hasDel={true} hasDrag={true}
+                                      hasMask={true}>
+                        <FormItem {...unref(_props.formItemProps)} name={path_.value} validateFirst={true}>
+                            <TypeComponent
                                 model={unref(designer.model)}
                                 {...omit(_props.componentProps, ['disabled'])}
                                 source={props.data?.type === 'form' ? props.data?.componentProps?.source : undefined}
                                 onChange={onChange}
-                            ></TypeComponent> : (
-                                props.data?.type === 'switch' ? <TypeComponent
-                                    {..._props.componentProps}
-                                    checked={__value.value}
-                                    onUpdate:checked={(newValue: any) => {
-                                        set(designer.formState, _path, newValue || false)
-                                    }}
-                                    onChange={onChange}
-                                    ref={_formRef}
-                                ></TypeComponent> : <TypeComponent
-                                    {..._props.componentProps}
-                                    value={__value.value}
-                                    onUpdate:value={(newValue: any) => {
-                                        if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && !Array.isArray(newValue)) {
-                                            props.data?.componentProps.keys.forEach((i: any) => {
-                                                const __path = _path.slice(0, _path.length - 1) || []
-                                                __path.push(i.config?.source)
-                                                set(designer.formState, __path, newValue?.[i?.key] || null)
-                                            })
-                                        } else {
-                                            set(designer.formState, _path, newValue || null)
-                                        }
-                                    }}
-                                    options={unref(options)}
-                                    treeData={unref(treeData)}
-                                    source={props.data?.type === 'form' ? props.data?.componentProps?.source : undefined}
-                                    mode={props.data?.type === 'form' ? unref(designer.mode) : _props.componentProps?.mode}
-                                    onChange={onChange}
-                                    ref={_formRef}
-                                ></TypeComponent>
-                            )
-                        }
-                    </FormItem>
-                    {props.data?.componentProps?.description &&
-                        <div class="form-designer-description">
-                            <div>
-                                <Ellipsis>{props.data?.componentProps?.description}</Ellipsis>
-                            </div>
-                        </div>
+                            ></TypeComponent>
+                        </FormItem>
+                        {_description()}
+                    </Selection>
+                } else {
+                    if (visible.value) {
+                        return <Selection path={_path} {...params} hasCopy={true} hasDel={true} hasDrag={true}
+                                          hasMask={true}>
+                            <FormItem {...unref(_props.formItemProps)} name={path_.value} validateFirst={true}>
+                                {
+                                    ['switch'].includes(props.data?.type) ? <TypeComponent
+                                        {..._props.componentProps}
+                                        checked={__value.value}
+                                        onUpdate:checked={(newValue: any) => {
+                                            set(designer.formState, _path, newValue || false)
+                                        }}
+                                        onChange={onChange}
+                                        ref={_formRef}
+                                        disabled={unref(disabled)}
+                                    ></TypeComponent> : <TypeComponent
+                                        {..._props.componentProps}
+                                        value={__value.value}
+                                        onUpdate:value={(newValue: any) => {
+                                            if (['org', 'role', 'user', 'product', 'device'].includes(props.data?.type) && !Array.isArray(newValue)) {
+                                                props.data?.componentProps.keys.forEach((i: any) => {
+                                                    const __path = _path.slice(0, _path.length - 1) || []
+                                                    __path.push(i.config?.source)
+                                                    set(designer.formState, __path, newValue?.[i?.key] || null)
+                                                })
+                                            } else {
+                                                set(designer.formState, _path, newValue || null)
+                                            }
+                                        }}
+                                        treeData={unref(treeData)}
+                                        source={props.data?.type === 'form' ? props.data?.componentProps?.source : undefined}
+                                        mode={props.data?.type === 'form' ? unref(designer.mode) : _props.componentProps?.mode}
+                                        onChange={onChange}
+                                        ref={_formRef}
+                                        options={unref(options)}
+                                        disabled={unref(disabled)}
+                                    ></TypeComponent>
+                                }
+                            </FormItem>
+                            {_description()}
+                        </Selection>
+                    } else {
+                        return ''
                     }
-                </Selection>
-            )
+                }
+            }
+
+            return renderContent()
         }
     }
 })

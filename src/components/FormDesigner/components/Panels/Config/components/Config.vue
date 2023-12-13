@@ -1,7 +1,7 @@
 <!-- 组件属性 -->
 <template>
   <div>
-    <template v-if="['input-number'].includes(type)">
+    <template v-if="['input-number', 'number-step'].includes(type)">
       <j-form-item
         :validateFirst="true"
         :rules="maxRules"
@@ -44,6 +44,50 @@
           :min="0"
           :max="99999999999999"
           @change="onDataChange"
+        />
+      </j-form-item>
+    </template>
+    <template v-if="['number-step'].includes(type)">
+      <j-form-item
+          label="步数"
+          :name="['componentProps', 'step']"
+          required
+          :validateFirst="true"
+      >
+        <j-input-number
+            style="width: 100%"
+            v-model:value="target.componentProps.step"
+            placeholder="请输入"
+            :precision="0"
+            :min="1"
+            :max="99999999999999"
+            @change="onDataChange"
+        />
+      </j-form-item>
+      <j-form-item
+          :validateFirst="true"
+          label="输入框展示值的格式"
+          :name="['componentProps', 'formatter']"
+      >
+        <EditorBtn
+            @change="onDataChange"
+            v-model:value="target.componentProps.formatter"
+            text="编写代码"
+            language="javascript"
+            tip="function(value: number | string, info: { userTyping: boolean, input: string }): string"
+        />
+      </j-form-item>
+      <j-form-item
+          :validateFirst="true"
+          label="指定从 formatter 里转换回数字的方式"
+          :name="['componentProps', 'parser']"
+      >
+        <EditorBtn
+            @change="onDataChange"
+            v-model:value="target.componentProps.parser"
+            text="编写代码"
+            language="javascript"
+            tip="function(value: string): number"
         />
       </j-form-item>
     </template>
@@ -340,7 +384,7 @@
           'select',
           'date-picker',
           'time-picker',
-          // 'table',
+          'editor',
           'org',
           'role',
           'user',
@@ -392,6 +436,8 @@
           'select',
           'date-picker',
           'time-picker',
+          'editor',
+          'number-step'
         ].includes(type)
       "
     >
@@ -440,28 +486,22 @@
         />
       </j-form-item>
     </template>
-    <!-- <template v-if="['input-group'].includes(type)">
-      <j-form-item label="前组件">
-        <CheckButton
-          :options="[
-            { label: '启用', value: true },
-            { label: '禁用', value: false },
-          ]"
-          @change="onDataChange"
-          v-model:value="target.componentProps.preComponent.show"
+    <template v-if="['editor'].includes(type)">
+      <j-form-item
+          label="高度"
+          :name="['componentProps', 'height']"
+          :validateFirst="true"
+      >
+        <j-input-number
+            placeholder="请输入"
+            @change="onDataChange"
+            style="width: 100%"
+            :precision="0"
+            :min="0"
+            v-model:value="target.componentProps.height"
         />
       </j-form-item>
-      <j-form-item label="后组件">
-        <CheckButton
-          :options="[
-            { label: '启用', value: true },
-            { label: '禁用', value: false },
-          ]"
-          @change="onDataChange"
-          v-model:value="target.componentProps.afterComponent.show"
-        />
-      </j-form-item>
-    </template> -->
+    </template>
     <!-- 规则校验 -->
     <template v-if="rulesVisible">
       <j-form-item
@@ -481,12 +521,11 @@
 
 <script lang="ts" setup>
 import { useTarget } from '../../../../hooks'
-import { computed, unref, watchEffect } from 'vue'
-import { useRequest } from '@jetlinks-web/hooks'
-import { getGeoType } from '@LowCode/api/form'
+import { computed, unref } from 'vue'
 import Rule from './Rules/Rule.vue'
 import { uid } from '@LowCode/components/FormDesigner/utils/uid'
 import { CheckButton } from '@LowCode/components/index'
+import EditorBtn from "./EditorBtn.vue";
 
 const { target } = useTarget()
 
@@ -519,6 +558,8 @@ const rulesVisible = computed(() => {
     'input-password',
     'date-picker',
     'time-picker',
+    'editor',
+    'number-step'
   ].includes(unref(type))
 })
 

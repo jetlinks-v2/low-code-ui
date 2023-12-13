@@ -1,5 +1,5 @@
 <template>
-  <span :style="style" v-if="$self.visible">{{ _value }}</span>
+  <j-ellipsis :style="style" v-if="$self.visible">{{ _value }}</j-ellipsis>
 </template>
 
 <script lang="ts" setup>

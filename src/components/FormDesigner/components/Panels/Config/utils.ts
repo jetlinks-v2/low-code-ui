@@ -35,7 +35,9 @@ export const getConfigList = (_type: string, obj: any, type: 'workflow' | 'low-c
             'product',
             'device',
             'geo',
-            'form'
+            'form',
+            'editor',
+            'number-step'
         ].includes(unref(_type))) {
         arr.push({
             key: 'Config',
@@ -43,7 +45,7 @@ export const getConfigList = (_type: string, obj: any, type: 'workflow' | 'low-c
         })
     }
 
-    if (['select-card', 'tree-select', 'select'].includes(unref(_type))) {
+    if (['select-card', 'tree-select', 'select', 'radio', 'checkbox'].includes(unref(_type))) {
         arr.push({
             key: 'Source',
             header: '数据来源',
@@ -76,6 +78,8 @@ export const getConfigList = (_type: string, obj: any, type: 'workflow' | 'low-c
         'switch',
         'tree-select',
         'select',
+        'radio',
+        'checkbox',
         'date-picker',
         'time-picker',
         'table',
@@ -83,7 +87,9 @@ export const getConfigList = (_type: string, obj: any, type: 'workflow' | 'low-c
         'title',
         'tabs',
         'collapse',
-        'form'
+        'form',
+        'editor',
+        'number-step'
     ]
     const _list = ['geo', 'device', 'product', 'org', 'user', 'role']
 
@@ -98,7 +104,7 @@ export const getConfigList = (_type: string, obj: any, type: 'workflow' | 'low-c
             key: 'Table',
             header: '组件属性',
         })
-        if (['select', 'select-card', 'tree-select'].includes(obj?.children?.[0]?.type)) {
+        if (['select', 'select-card', 'tree-select', 'radio', 'checkbox'].includes(obj?.children?.[0]?.type)) {
             arr.push({
                 key: 'TableSource',
                 header: '数据来源',

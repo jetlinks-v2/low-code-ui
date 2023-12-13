@@ -11,6 +11,8 @@ import CardSelect from './CardSelect.vue'
 import Input from './Input.vue'
 import CostStructure from './CostStructure.vue'
 import InputGroup from './InputGroup.vue'
+import Editor from './Editor.vue'
+import NumberStep from './NumberStep.vue'
 
 export {
     Text,
@@ -25,5 +27,7 @@ export {
     CardSelect,
     Input,
     CostStructure,
-    InputGroup
+    InputGroup,
+    Editor,
+    NumberStep
 }

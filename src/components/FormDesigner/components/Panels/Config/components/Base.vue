@@ -131,6 +131,36 @@
           />
         </j-form-item>
       </template>
+      <template v-if="['radio'].includes(type)">
+        <j-form-item
+            :validateFirst="true"
+            :name="['componentProps', 'optionType']"
+            label="选项类型"
+        >
+          <CheckButton
+              :options="[
+              { label: '按钮', value: 'button' },
+              { label: '默认', value: 'default' },
+            ]"
+              @change="onDataChange"
+              v-model:value="target.componentProps.optionType"
+          />
+        </j-form-item>
+        <j-form-item
+            :validateFirst="true"
+            :name="['componentProps', 'buttonStyle']"
+            label="选项样式"
+        >
+          <CheckButton
+              :options="[
+              { label: '描边', value: 'outline' },
+              { label: '填色', value: 'solid' },
+            ]"
+              @change="onDataChange"
+              v-model:value="target.componentProps.buttonStyle"
+          />
+        </j-form-item>
+      </template>
     </template>
     <template v-else>
       <template v-if="type === 'card' || type === 'title'">
@@ -566,6 +596,8 @@ const descVisible = computed(() => {
     'product',
     'device',
     'geo',
+    'editor',
+    'number-step'
   ].includes(unref(type))
 })
 
@@ -581,6 +613,10 @@ const typeList = [
   {
     label: '数字输入',
     value: 'input-number',
+  },
+  {
+    label: '数字Pro',
+    value: 'number-step',
   },
   {
     label: '密码框',
@@ -606,6 +642,10 @@ const typeList = [
     label: '时间选择',
     value: 'time-picker',
   },
+  {
+    label: '富文本',
+    value: 'editor',
+  }
 ]
 
 const rules = [
