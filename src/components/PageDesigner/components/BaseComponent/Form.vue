@@ -88,6 +88,7 @@ const onSave = () => {
     formRef.value
         ?.onSave()
         .then((_data: any) => {
+          console.log('======',_data)
           resolve(_data)
         })
         .catch((err: any) => {
@@ -96,8 +97,8 @@ const onSave = () => {
   })
 }
 
-const { executionMounted } = useLifeCycle(props, {setVisible, onSave}, isEditModel)
-
+const { executionMounted } = useLifeCycle(props, {setVisible, onSave,setValue}, isEditModel)
+ 
 const onValueChange = (e: any) => {
   $self.value = e
 }
@@ -119,7 +120,7 @@ handleDataSourceFn(props?.request || {}, unref(isEditModel)).then((_val: any) =>
 
 onMounted(() => {
   executionMounted()
-  pageProvider.addRef?.(props._key, formRef)
+  pageProvider.addRef?.(props._key, {setVisible, onSave,setValue})
 })
 
 const myValue = computed(() => {
