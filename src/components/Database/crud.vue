@@ -48,6 +48,7 @@
               v-model:tree="tree"
               v-model:asset="asset"
               v-model:relation="relation"
+              v-model:audit="audit"
               :id="props.id"
               :parentId="props.parentId"
               @update="update"
@@ -141,6 +142,7 @@ const ownerId = computed(() => {
 const tableName = ref(props.configuration.tableName)
 const columns = ref(props.configuration.columns || defaultSetting)
 const relation = ref(props.configuration.relation || {})
+const audit = ref(props.configuration.audit || false)
 const asset = ref(props.configuration.asset || {})
 const tree = ref(props.configuration.tree || false)
 
@@ -152,7 +154,7 @@ const update = () => {
   if (errorTips.relation && (!relation.value.enabled || relation.value.assetIdColumn)) {
     errorTips.relation = []
   }
-
+  console.log(extra)
   project.update({
     ...extra,
     configuration: {
@@ -161,6 +163,7 @@ const update = () => {
       columns: columns.value,
       asset: asset.value,
       tree: tree.value,
+      audit: audit.value,
     },
   })
 }

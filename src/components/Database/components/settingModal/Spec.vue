@@ -1,5 +1,5 @@
 <template>
-  <j-card-select v-model:value="myValue" :options="DataActions" :column="2" :showImage="false" :multiple="true" @change="change"/>
+  <j-card-select v-model:value="myValue" style="width: calc(100% - 8px)" :options="DataActions" :column="2" :showImage="false" :multiple="true" @change="change"/>
 </template>
 
 <script setup name="SettingSpec">
