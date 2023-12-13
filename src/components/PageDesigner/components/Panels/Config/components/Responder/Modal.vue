@@ -18,9 +18,10 @@
         <j-select
             v-model:value="formModel.dependencies"
             placeholder="请选择依赖项"
-            :options="options"
             mode="tags"
-        />
+        >
+          <j-select-option v-for="item in options" :value="item.value">{{item.label}}({{item.value}})</j-select-option>
+        </j-select>
       </j-form-item>
       <j-form-item
           label="响应器"
@@ -62,12 +63,7 @@ const formModel = reactive({
 
 const options = computed(() => {
   // 过滤自己
-  return designer.pubsub?.value?.filter(key => key !== props.id).map((key) => {
-    return {
-      label: key,
-      value: key
-    }
-  })
+  return designer.pubsub?.value?.filter(item => item?.value !== props.id)
 })
 
 const onSave = () => {

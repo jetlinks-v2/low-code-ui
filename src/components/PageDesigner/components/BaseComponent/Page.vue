@@ -19,6 +19,10 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  name: {
+    type: String,
+    default: ''
+  },
   value: {
     type: Object,
     default: () => ({}),
@@ -76,7 +80,7 @@ const handleResponderFn = ($dep?: string, $depValue?: any) => {
   }
 }
 
-usePubsub(props._key, $self, props.responder?.dependencies, handleResponderFn)
+usePubsub(props._key, $self, props.responder?.dependencies, handleResponderFn, props?.name)
 
 handleDataSourceFn(props?.request || {}, unref(isEditModel)).then((_val: any) => {
   if (_val) {

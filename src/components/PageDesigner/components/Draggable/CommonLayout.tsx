@@ -28,7 +28,7 @@ export default defineComponent({
             }
             return (
                 <Selection {...params} hasCopy={true} hasDel={true} hasDrag={true} hasMask={true}>
-                    <TypeComponent {..._props.componentProps} _key={props.data.key} />
+                    <TypeComponent {..._props.componentProps} _key={props.data.key} name={props.data.name} />
                 </Selection>
             )
         }

@@ -1,16 +1,20 @@
 import {publish, subscribe} from '@jetlinks-web/utils';
 import useTool from './useTool';
+import { map } from 'lodash-es'
 
-export const usePubsub = (publishKey: string, subValue: any, _depKeys: string | string[], _cb: ($dep?: string, $depValue?: any) => void) => {
+export const usePubsub = (publishKey: string, subValue: any, _depKeys: string | string[], _cb: ($dep?: string, $depValue?: any) => void, publishName?: string) => {
     const designer: any = inject('PageDesigner')
     const {isEditModel} = useTool()
     // 发布
-    const onPublish = (key?: string, data?: any) => {
+    const onPublish = (key?: string, _name?: string, data?: any) => {
         if (key && !unref(isEditModel)) {
             publish(key, data)
         }
-        if (key && designer?.pubsub && !designer?.pubsub?.value?.includes(key)) {
-            designer.pubsub.value.push(key)
+        if (key && designer?.pubsub && !map(designer?.pubsub?.value, 'value')?.includes(key)) {
+            designer.pubsub.value.push({
+                label: _name || key,
+                value: key
+            })
         }
     }
 
@@ -26,7 +30,7 @@ export const usePubsub = (publishKey: string, subValue: any, _depKeys: string | 
     }
 
     watch(() => JSON.stringify(subValue), () => {
-        onPublish(publishKey, subValue)
+        onPublish(publishKey, publishName, subValue)
     }, {
         immediate: true
     })
