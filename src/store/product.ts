@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+import { defineStore } from "@jetlinks-web/stores";
 import {addDraft, queryProjectDraft, updateDraft,deleteDraft,moveDraft} from "@LowCode/api/project";
 import { useEngine } from './engine'
 import dayjs from 'dayjs';
@@ -79,7 +79,7 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
 //     }
 //   })
 // }, 100)
-export const useProduct = defineStore('product', () => {
+export const useProduct = defineStore('lowcode_product', () => {
   const data = ref<TreeData[]>([]) // 项目
   const dataMap: Map<string, any> = new Map()
   const dataById = ref()

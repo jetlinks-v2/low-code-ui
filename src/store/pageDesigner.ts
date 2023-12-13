@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash-es'
-import { defineStore } from 'pinia'
+import { defineStore } from '@jetlinks-web/stores'
 
 export const usePageDesigner = defineStore('page-designer', () => {
     const copyData = ref<Record<string, any>>({})
