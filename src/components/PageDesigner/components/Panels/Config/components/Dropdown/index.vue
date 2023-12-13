@@ -10,6 +10,7 @@
           language="javascript"
           @change="onDataChange"
           text="配置"
+          tip="function (util, global)"
       />
     </j-form-item>
     <j-form-item
@@ -22,6 +23,7 @@
           language="javascript"
           @change="onDataChange"
           text="配置"
+          tip="function (util, global)"
       />
     </j-form-item>
     <j-form-item
