@@ -596,7 +596,8 @@ const descVisible = computed(() => {
     'product',
     'device',
     'geo',
-    'editor'
+    'editor',
+    'number-step'
   ].includes(unref(type))
 })
 
@@ -612,6 +613,10 @@ const typeList = [
   {
     label: '数字输入',
     value: 'input-number',
+  },
+  {
+    label: '数字Pro',
+    value: 'number-step',
   },
   {
     label: '密码框',
@@ -637,6 +642,10 @@ const typeList = [
     label: '时间选择',
     value: 'time-picker',
   },
+  {
+    label: '富文本',
+    value: 'editor',
+  }
 ]
 
 const rules = [

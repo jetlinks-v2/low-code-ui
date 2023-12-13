@@ -1,5 +1,5 @@
 import { InputNumber, Textarea, Select, InputPassword, Switch, TreeSelect, DatePicker, TimePicker, CheckboxGroup, RadioGroup } from 'jetlinks-ui-components'
-import { Text,Org,Role,User,Product,Device,Upload, Geo, Form, CardSelect , Input ,CostStructure , Editor} from '../components/Components/index'
+import { Text,Org,Role,User,Product,Device,Upload, Geo, Form, CardSelect , Input ,CostStructure, Editor, NumberStep} from '../components/Components/index'
 
 const componentMap = {
     // 'input': Input,
@@ -26,7 +26,8 @@ const componentMap = {
     'cost-structure' : CostStructure,
     'checkbox': CheckboxGroup,
     'radio': RadioGroup,
-    'editor': Editor
+    'editor': Editor,
+    'number-step': NumberStep
 }
 
 export default componentMap;
