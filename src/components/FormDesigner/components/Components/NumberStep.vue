@@ -66,29 +66,24 @@ const _props = computed(() => {
 })
 
 const onChange = (_val: number) => {
-  emits('update:value', _val)
+  if(props.max !== undefined && props.max !== null && _val > props.max){
+    emits('update:value', props.max)
+    emits('change', props.max)
+  } else if (props.min !== undefined && props.min !== null && _val < props.min){
+    emits('update:value', props.min)
+    emits('change', props.min)
+  } else {
+    emits('update:value', _val)
+    emits('change', _val)
+  }
 }
 
 const onClick = (flag: boolean) => {
   const _step = props?.step || 1
   if(flag){
-    const __value = (_value?.value || 0) + _step
-    if(props.max !== undefined && props.max !== null && __value > props.max){
-      emits('update:value', props.max)
-      emits('change', props.max)
-    } else {
-      emits('update:value', __value)
-      emits('change', __value)
-    }
+    onChange((_value?.value || 0) + _step)
   } else {
-    const __value = (_value?.value || 0) - _step
-    if(props.min !== undefined && props.min !== null && __value < props.min){
-      emits('update:value', props.min)
-      emits('change', props.min)
-    } else {
-      emits('update:value', __value)
-      emits('change', __value)
-    }
+    onChange((_value?.value || 0) - _step)
   }
 }
 </script>
