@@ -2,5 +2,5 @@ import { request } from '@jetlinks-web/core'
 
 export const basicField = () => request.get('/dictionary/basic-field-types/items')
 
-export const dictionaryItemList = () => request.post('/dictionary-item/_query/no-paging', {})
-export const dictionaryList = (data) => request.post('/dictionary/_query/no-paging', data)
+export const dictionaryItemList = (data: any) => request.post('/dictionary-item/_query/no-paging', data)
+export const dictionaryList = (data: any) => request.post('/dictionary/_query/no-paging', data)

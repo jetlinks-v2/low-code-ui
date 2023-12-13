@@ -22,6 +22,10 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  name: {
+    type: String,
+    default: ''
+  },
   value: {
     type: Object,
     default: () => ({}),
@@ -84,6 +88,7 @@ const onSave = () => {
     formRef.value
         ?.onSave()
         .then((_data: any) => {
+          console.log('======',_data)
           resolve(_data)
         })
         .catch((err: any) => {
@@ -105,7 +110,7 @@ const handleResponderFn = ($dep?: string, $depValue?: any) => {
   }
 }
 
-usePubsub(props._key, $self, props.responder?.dependencies, handleResponderFn)
+usePubsub(props._key, $self, props.responder?.dependencies, handleResponderFn, props?.name)
 
 handleDataSourceFn(props?.request || {}, unref(isEditModel)).then((_val: any) => {
   if (_val) {

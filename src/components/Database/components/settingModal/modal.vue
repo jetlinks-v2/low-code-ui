@@ -9,13 +9,15 @@
     :get-container="warp"
     @close="cancel"
   >
-    <j-form
-      ref="formRef"
-      :model="formModel"
-      layout="vertical"
-    >
-      <component :is="componentName" :warp="warp" :publish="publish" />
-    </j-form>
+    <j-scrollbar>
+      <j-form
+        ref="formRef"
+        :model="formModel"
+        layout="vertical"
+      >
+        <component :is="componentName" :warp="warp" :publish="publish" />
+      </j-form>
+    </j-scrollbar>
     <template #footer>
       <j-button style="margin-right: 8px" @click="cancel">取消</j-button>
       <j-button type="primary" @click="save">确定</j-button>
@@ -29,7 +31,9 @@ import ListItem from './List.vue'
 import MapItem from './Map.vue'
 import NumberItem from './Number.vue'
 import StringItem from './String.vue'
+import BooleanItem from './Boolean.vue'
 import { SETTING_FORM_MODEL, SETTING_FORM_REF } from '../../util'
+import { omit } from 'lodash-es'
 
 const props = defineProps({
   data: {
@@ -60,7 +64,9 @@ const componentName = computed(() => {
     canImport: false,
     canExport: false
   }
-  console.log(javaType)
+
+  const conditionData = props.data.defaultValueSpec?.template?.parts[0].condition.condition
+
   switch(javaType) {
     case 'Enum':
       formModel.value = {
@@ -69,6 +75,8 @@ const componentName = computed(() => {
           multiple: undefined
         },
         spec,
+        fixValue: props.defaultValueSpec?.fixValue,
+        conditionData,
         ...props.data
       }
       return EnumItem;
@@ -76,9 +84,7 @@ const componentName = computed(() => {
     case 'Byte':
     case 'Long':
       formModel.value = {
-        defaultValueSpec: {
-          fixValue: undefined
-        },
+        defaultValueSpec: undefined,
         validator: {
           provider: undefined,
           configuration: {
@@ -86,6 +92,8 @@ const componentName = computed(() => {
             group: ['save', 'update', 'insert'],
           }
         },
+        fixValue: props.defaultValueSpec?.fixValue,
+        conditionData,
         spec,
         ...props.data
       }
@@ -96,9 +104,7 @@ const componentName = computed(() => {
     case 'BigDecimal':
     case 'BigInteger':
       formModel.value = {
-        defaultValueSpec: {
-          fixValue: undefined
-        },
+        defaultValueSpec: undefined,
         validator: {
           provider: undefined,
           configuration: {
@@ -111,6 +117,8 @@ const componentName = computed(() => {
           }
         },
         spec,
+        fixValue: props.defaultValueSpec?.fixValue,
+        conditionData,
         ...props.data
       }
       return NumberItem;
@@ -133,6 +141,13 @@ const componentName = computed(() => {
         ...props.data
       }
       return MapItem;
+    case 'Boolean':
+    case 'DateTime':
+      formModel.value = {
+        spec,
+        ...props.data
+      }
+      return BooleanItem;
   }
 })
 
@@ -142,10 +157,31 @@ const cancel = () => {
 const save = () => {
   formRef.value.validate().then(res => {
     if (res) {
-      emit('save', {
+      const conditionData = formModel.value.conditionData
+      const _fixValue = formModel.value.fixValue
+      const newData = omit({
         ...props.data,
         ...formModel.value
-      })
+      }, ['conditionData'])
+      console.log(_fixValue, conditionData)
+      if (_fixValue) {
+        newData.defaultValueSpec = {
+          fixValue: _fixValue
+        }
+      } else if (conditionData) {
+        newData.defaultValueSpec = {
+          template: {
+            parts: [{
+              type: 'condition',
+              condition: {
+                condition: conditionData
+              }
+            }]
+          }
+        }
+      }
+
+      emit('save', newData)
     }
   })
 }
