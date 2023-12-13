@@ -1,6 +1,33 @@
  <template>
-  <j-form-item label="默认值" :name="['defaultValueSpec', 'fixValue']" :rules="rules.fixValue">
-    <j-input v-model:value="model.defaultValueSpec.fixValue" placeholder="请输入默认值" :maxLength="256" />
+   <j-form-item
+       label="配置默认值"
+       required
+       :rules="[{ required: true, message: '请选择生成编码'}]"
+   >
+     <TypeSelect
+         v-model:value="mySpecType"
+         :options="[
+                  { label: '不提供', value: 'no'},
+                  { label: '固定值', value: 'fixValue'},
+                  { label: '动态值', value: 'rule'},
+              ]"
+         @change="specChange"
+     />
+   </j-form-item>
+   <j-form-item
+       v-if="mySpecType === 'rule'"
+       label="规则配置"
+       name="conditionData"
+       required
+       :rules="[{ validator: validator }]"
+   >
+     <IDConfig
+         v-model:value="model.conditionData"
+         :id="model?.name"
+     />
+   </j-form-item>
+  <j-form-item v-if="mySpecType === 'fixValue'" label="默认值" name="fixValue" :rules="rules.fixValue">
+    <j-input v-model:value="model.fixValue" placeholder="请输入默认值" />
   </j-form-item>
   <j-form-item label="校验规则" :name="['validator', 'provider']">
     <SelectNull
@@ -53,10 +80,14 @@
 import { SETTING_FORM_MODEL } from "@LowCode/components/Database/util";
 import {inject} from "vue";
 import Spec from './Spec.vue'
-import { regular } from '@jetlinks-web/utils'
 import SelectNull from './SelectNull.vue'
+import {addItem, ruleValidator } from './ID/util'
+import IDConfig from './ID/config.vue'
+import TypeSelect from "./ID/typeSelect.vue";
 
 const model = inject(SETTING_FORM_MODEL, {})
+
+const mySpecType = ref('no')
 
 const showRegexp = computed(() => {
   return model.value.validator.providerType === 'pattern'
@@ -85,6 +116,23 @@ const rulesOptions = [
   },
 ]
 
+const validator = (_, val) => {
+  return ruleValidator(val)
+}
+
+const specChange = (key) => {
+  model.value.defaultValueSpec = undefined
+  model.value.fixValue = undefined
+
+  if (key === 'rule') {
+    const item = addItem()
+    model.value.conditionData = [item]
+  } else {
+    model.value.conditionData = undefined
+  }
+
+  mySpecType.value = key
+}
 const groupChange = (v) => {
   const groupSet = new Set(v)
   if (groupSet.has('insert')) {
@@ -97,7 +145,7 @@ const groupChange = (v) => {
 
 const rules = {
   fixValue: [
-    { max: model.value.length, message: `请输入长度在${model.value.length}以内的字符`}
+    { max: model.value.length ?? 256, message: `请输入长度在${model.value.length ?? 256}以内的字符`}
   ],
   regexp: [
     { required: true, message: '请输入正则表达式' },
@@ -168,6 +216,16 @@ const providerChange = (key) => {
       break
   }
 }
+
+watch([model.value.conditionData, model.value.fixValue], () => {
+  if (model.value.conditionData) {
+    mySpecType.value = 'rule'
+  } else if (model.value.fixValue) {
+    mySpecType.value = 'fixValue'
+  } else {
+    mySpecType.value = 'no'
+  }
+}, { immediate: true })
 
 </script>
 

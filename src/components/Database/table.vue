@@ -3,62 +3,72 @@
     <div class="crud-query">
       <j-form ref="queryForm" :model="formModel">
         <j-form-item name="tableName" :rules="tableNameRule" :validateFirst="true">
-          <j-input v-model:value="formModel.tableName" placeholder="表名" @change="tableNameChange" />
+          <j-input v-model:value="formModel.tableName" placeholder="表名" @change="tableNameChange"/>
         </j-form-item>
       </j-form>
     </div>
     <div style="height: calc(100% - 60px)">
       <QuickEditTable
-        serial
-        validate
-        ref="tableRef"
-        :data="dataSource"
-        :columns="myColumns"
-        :height="500"
-        :scroll="{x: 1600, y: 500}"
+          serial
+          validate
+          ref="tableRef"
+          :data="dataSource"
+          :columns="myColumns"
+          :height="500"
+          :scroll="{x: 1600, y: 500}"
       >
         <template #serial="{record, index}">
           <div class="serial">
-            <AIcon type="KeyOutlined" :class="{primary: index === 1}" />
+            <AIcon type="KeyOutlined" :class="{primary: index === 1}"/>
             <span>{{ index }}</span>
           </div>
         </template>
-        <template #name="{record, index, valueChange}" >
+        <template #name="{record, index, valueChange}">
           <span v-if="index <= maxLen">{{ record.name }}</span>
-          <j-input v-else v-model:value="record.name" @change="() => { valueChange(record.name); alias(record.name, record) }" />
+          <j-input v-else v-model:value="record.name"
+                   @change="() => { valueChange(record.name); alias(record.name, record) }"/>
         </template>
         <template #comment="{record, index, valueChange}">
           <span v-if="index <= maxLen">{{ record.comment }}</span>
-          <j-input v-else v-model:value="record.comment" :maxLength="16" @change="() => { valueChange(record.comment); emitUpdateDataSource()}"/>
+          <j-input v-else v-model:value="record.comment" :maxLength="16"
+                   @change="() => { valueChange(record.comment); emitUpdateDataSource()}"/>
         </template>
         <template #javaType="{record, index, valueChange}">
-          <span v-if="index <= maxLen">{{record.javaType}}</span>
-          <JavaTypeSelect v-else v-model:value="record.javaType" @change="() => { valueChange(record.javaType); JavaTypeChange(record)}" :disabled="publishColumns.includes(record.alias)"/>
+          <span v-if="index <= maxLen">{{ record.javaType }}</span>
+          <JavaTypeSelect v-else v-model:value="record.javaType"
+                          @change="() => { valueChange(record.javaType); JavaTypeChange(record)}"
+                          :disabled="publishColumns.includes(record.alias)"/>
         </template>
         <template #jdbcType="{record, index, valueChange}">
-          <span v-if="index <= maxLen">{{record.jdbcType}}</span>
-          <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType" @change="() => { valueChange(record.jdbcType);emitUpdateDataSource()}" :disabled="publishColumns.includes(record.alias)" />
+          <span v-if="index <= maxLen">{{ record.jdbcType }}</span>
+          <JdbcTypeSelect v-else v-model:value="record.jdbcType" :javaType="record.javaType"
+                          @change="() => { valueChange(record.jdbcType);emitUpdateDataSource()}"
+                          :disabled="publishColumns.includes(record.alias)"/>
         </template>
         <template #length="{ record, index }">
-          <span v-if="index <= maxLen">{{record.length}}</span>
+          <span v-if="index <= maxLen">{{ record.length }}</span>
           <span v-else-if="!['DECIMAL','VARCHAR','LONGVARCHAR'].includes(record.jdbcType)"></span>
-          <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" :disabled="publishColumns.includes(record.alias)" />
+          <j-input-number v-else v-model:value="record.length" :min="0" :precision="0" :max="999999999999999"
+                          style="width: 100%;" @change="emitUpdateDataSource"
+                          :disabled="publishColumns.includes(record.alias)"/>
         </template>
         <template #scale="{ record, index }">
-          <span v-if="index <= maxLen || !['DECIMAL'].includes(record.jdbcType)">{{record.scale}}</span>
-          <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999" style="width: 100%;" @change="emitUpdateDataSource" :disabled="publishColumns.includes(record.alias)" />
+          <span v-if="index <= maxLen || !['DECIMAL'].includes(record.jdbcType)">{{ record.scale }}</span>
+          <j-input-number v-else v-model:value="record.scale" :min="0" :precision="0" :max="999999999999999"
+                          style="width: 100%;" @change="emitUpdateDataSource"
+                          :disabled="publishColumns.includes(record.alias)"/>
         </template>
         <template #updatable="{ record, index }">
-          <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" :disabled="index <= maxLen" />
+          <ReadOnly v-model:value="record.updatable" @change="emitUpdateDataSource" :disabled="index <= maxLen"/>
         </template>
         <template #setting="{ record, index }">
-          <template v-if="index <= maxLen">
+          <template v-if="index === 1">
             <j-button @click="() => settingClick(record, index)">配置</j-button>
           </template>
-          <template v-else>
+          <template v-if="index > maxLen">
             <j-tooltip
-              v-if="!record.javaType || ['Boolean', 'DateTime'].includes(record.javaType)"
-              :title=" ['Boolean', 'DateTime'].includes(record.javaType) ? '该javaType不支持配置' : '请先选择javaType'"
+                v-if="!record.javaType "
+                title="请先选择javaType"
             >
               <j-button disabled>
                 配置
@@ -73,39 +83,39 @@
         <template #action="{ record, index }">
           <j-space>
             <PermissionButton
-              v-if="index > (maxLen ? maxLen - 1 : maxLen)"
-              type="link"
-              class="action-btn"
-              :hasPermission="true"
-              :tooltip="{ title: '新增'}"
-              @click="() => add(index)"
+                v-if="index > (maxLen ? maxLen - 1 : maxLen)"
+                type="link"
+                class="action-btn"
+                :hasPermission="true"
+                :tooltip="{ title: '新增'}"
+                @click="() => add(index)"
             >
-              <AIcon type="PlusCircleOutlined" />
+              <AIcon type="PlusCircleOutlined"/>
             </PermissionButton>
             <PermissionButton
-              v-if="index > maxLen"
-              type="link"
-              class="action-btn"
-              :hasPermission="true"
-              :tooltip="{ title: '复制'}"
-              @click="() => copy(record, index)"
+                v-if="index > maxLen"
+                type="link"
+                class="action-btn"
+                :hasPermission="true"
+                :tooltip="{ title: '复制'}"
+                @click="() => copy(record, index)"
             >
-              <AIcon type="CopyOutlined" />
+              <AIcon type="CopyOutlined"/>
             </PermissionButton>
             <PermissionButton
-              v-if="index > maxLen"
-              danger
-              type="link"
-              class="action-btn"
-              placement="topRight"
-              :hasPermission="true"
-              :tooltip="{ title: '删除'}"
-              :popConfirm="{
+                v-if="index > maxLen"
+                danger
+                type="link"
+                class="action-btn"
+                placement="topRight"
+                :hasPermission="true"
+                :tooltip="{ title: '删除'}"
+                :popConfirm="{
                 title: '确认删除？',
                 onConfirm: () => deleteFn(index)
               }"
             >
-              <AIcon type="DeleteOutlined" />
+              <AIcon type="DeleteOutlined"/>
             </PermissionButton>
           </j-space>
         </template>
@@ -113,27 +123,27 @@
     </div>
   </div>
   <SettingModal
-    v-if="setting.visible && setting.data?.index !== 1"
-    :data="setting.data"
-    :warp="WarpRef"
-    :publish="setting.data ? publishColumns.includes(setting.data.name) : false"
-    @cancel="settingCancel"
-    @save="settingSave"
+      v-if="setting.visible && setting.data?.index !== 1"
+      :data="setting.data"
+      :warp="WarpRef"
+      :publish="setting.data ? publishColumns.includes(setting.data.name) : false"
+      @cancel="settingCancel"
+      @save="settingSave"
   />
   <IDConfigModal
-    v-if="setting.visible && setting.data?.index === 1"
-    :data="setting.data"
-    :warp="WarpRef"
-    :publish="setting.data ? publishColumns.includes(setting.data.name) : false"
-    @cancel="settingCancel"
-    @save="settingSave"
+      v-if="setting.visible && setting.data?.index === 1"
+      :data="setting.data"
+      :warp="WarpRef"
+      :publish="setting.data ? publishColumns.includes(setting.data.name) : false"
+      @cancel="settingCancel"
+      @save="settingSave"
   />
 </template>
 
 <script setup name="CRUDTable">
-import { upperCase } from "@LowCode/utils/comm";
-import { executeReq } from '@LowCode/api/basis'
-import { cloneDeep, debounce, omit } from 'lodash-es'
+import {upperCase} from "@LowCode/utils/comm";
+import {executeReq} from '@LowCode/api/basis'
+import {cloneDeep, debounce, omit} from 'lodash-es'
 import {
   TYPE_PROVIDE,
   CRUD_COLUMNS,
@@ -142,11 +152,11 @@ import {
   formErrorFieldsToObj,
   settingValidate
 } from "@LowCode/components/Database/util";
-import { JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly, IDConfigModal } from './components'
-import { provide } from 'vue'
-import { defaultSetting, defaultTreeSetting } from './setting'
-import { regular } from '@jetlinks-web/utils'
-import { useProduct } from '@LowCode/store'
+import {JavaTypeSelect, JdbcTypeSelect, SettingModal, ReadOnly, IDConfigModal} from './components'
+import {provide} from 'vue'
+import {defaultSetting, defaultTreeSetting} from './setting'
+import {regular} from '@jetlinks-web/utils'
+import {useProduct} from '@LowCode/store'
 import {QuickEditTable} from '@LowCode/components/index'
 
 const props = defineProps({
@@ -194,8 +204,8 @@ const myColumns = [
               return Promise.reject('请以小写字母开头，使用字母、数字和下划线完成命名')
             }
             if (typesOptions.value.some(item =>
-              item.javaType === upperCase(value) ||
-              item.javaType === (value.charAt(0).toUpperCase() + value.slice(1))
+                item.javaType === upperCase(value) ||
+                item.javaType === (value.charAt(0).toUpperCase() + value.slice(1))
             )) {
               return Promise.reject('不能与保留字重名')
             }
@@ -354,13 +364,13 @@ const dataSourceChange = () => {
 }
 
 const emitUpdateDataSource = () => {
-  const isTreeNow = dataSource.value[1].name === 'parent_id'
+  // const isTreeNow = dataSource.value[1].name === 'parent_id'
   let myValue = cloneDeep(dataSource.value)
-  if (isTreeNow) { // 后端不需要defaultTreeSetting或者defaultSetting中的值，需要剔除
-    myValue = myValue.slice(9, myValue.length )
-  } else {
-    myValue = myValue.slice(5, myValue.length )
-  }
+  // if (isTreeNow) { // 后端不需要defaultTreeSetting或者defaultSetting中的值，需要剔除
+  //   myValue = myValue.slice(9, myValue.length)
+  // } else {
+  //   myValue = myValue.slice(5, myValue.length)
+  // }
   emit('update:columns', myValue)
   emit('update')
 }
@@ -398,8 +408,8 @@ const copy = (record, index) => {
 }
 
 const deleteFn = async (index) => {
-  const _value = dataSource.value[index-1]
-  dataSource.value.splice(index-1, 1)
+  const _value = dataSource.value[index - 1]
+  dataSource.value.splice(index - 1, 1)
   // dataSourceChange()
   // 删除
   emitUpdateDataSource()
@@ -407,7 +417,7 @@ const deleteFn = async (index) => {
 
 const JavaTypeChange = (record) => {
   record.jdbcType = undefined
-  switch(record.javaType) {
+  switch (record.javaType) {
     case 'Enum':
       Object.assign(record, {
         dictionary: {
@@ -475,7 +485,7 @@ const JavaTypeChange = (record) => {
       break;
   }
 
-  if (!['Double','BigDecimal','Float'].includes(record.javaType)) {
+  if (!['Double', 'BigDecimal', 'Float'].includes(record.javaType)) {
     record.scale = undefined
   }
   emitUpdateDataSource()
@@ -531,37 +541,53 @@ const getTypes = () => {
 }
 
 watch(() => props.tree, () => {
-    const cloneTreeSetting = cloneDeep(defaultTreeSetting)
-    const cloneSetting = cloneDeep(defaultSetting)
+  const cloneTreeSetting = cloneDeep(defaultTreeSetting)
+  const cloneSetting = cloneDeep(defaultSetting)
+  console.log(dataSource.value.length)
   if (dataSource.value.length) {
     const isTreeNow = dataSource.value[1].name === 'parent_id'
     const arr = JSON.parse(JSON.stringify(dataSource.value))
+    const idItem = arr[0]
     if (props.tree) {
       if (!isTreeNow) {
-        const other = arr.slice(5, arr.length )
-        dataSource.value = cloneTreeSetting.concat(other)
+        const other = arr.slice(5, arr.length)
+        // dataSource.value = cloneTreeSetting.concat(other)
+        dataSource.value = [
+          idItem,
+          ...cloneTreeSetting.slice(1, cloneTreeSetting.length),
+          ...other
+        ]
         maxLen.value = 9
       }
     } else {
       if (isTreeNow) {
-        dataSource.value = cloneSetting.concat(arr.slice(9, arr.length))
+        // dataSource.value = cloneSetting.concat(arr.slice(9, arr.length))
+        dataSource.value = [
+          idItem,
+          ...cloneSetting.slice(1, cloneTreeSetting.length),
+          ...arr.slice(9, arr.length)
+        ]
         maxLen.value = 5
       }
     }
   } else { // 新增数据
     maxLen.value = props.tree ? 9 : 5
-    dataSource.value = props.tree ? [...cloneTreeSetting, ...props.columns] : [...cloneSetting, ...props.columns]
+    if (props.columns.length) {
+      dataSource.value = props.columns
+    } else {
+      dataSource.value = props.tree ? [...cloneTreeSetting] : [...cloneSetting]
+    }
   }
 
-}, { immediate: true })
+}, {immediate: true})
 
 watch(() => props.tableName, () => {
   formModel.tableName = props.tableName
-}, { immediate: true })
+}, {immediate: true})
 
 watch(() => JSON.stringify(dataSource.value), () => {
   dataSourceChange()
-}, { immediate: true })
+}, {immediate: true})
 
 defineExpose({
   validates: () => {
@@ -573,9 +599,9 @@ defineExpose({
         resolve(r)
       }).catch(e => {
         const errorMsg = {}
-        console.log('table-validates',e)
+        console.log('table-validates', e)
         e.forEach(item => {
-          if(item.errorFields) {
+          if (item.errorFields) {
             Object.assign(errorMsg, formErrorFieldsToObj(item.errorFields))
           } else {
             Object.assign(errorMsg, item)
@@ -599,9 +625,11 @@ dataSourceChange()
   :deep(.quick-table-warp) {
     height: 100%;
   }
+
   .crud-query {
     width: 400px;
   }
+
   :deep(.action-btn) {
     padding: 4px 8px !important;
   }
