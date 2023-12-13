@@ -54,6 +54,7 @@ const useTool = () => {
                 name: unref(designer.pageData).componentProps?.pageName,
                 icon: unref(designer.pageData).componentProps?.pageIcon,
                 code: unref(designer.pageData).componentProps?.pageCode,
+                hideInMenu: unref(designer.pageData).componentProps?.onlyRouter,
             }
         } else {
             menu = {

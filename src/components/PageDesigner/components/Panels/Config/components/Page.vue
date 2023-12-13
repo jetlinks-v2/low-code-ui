@@ -34,7 +34,7 @@
     </j-form-item>
     <template v-if="target.componentProps.isPage">
       <j-form-item
-          label="是否只为路由"
+          label="是否为隐藏菜单"
           :name="['componentProps', 'onlyRouter']"
           :validateFirst="true"
       >
