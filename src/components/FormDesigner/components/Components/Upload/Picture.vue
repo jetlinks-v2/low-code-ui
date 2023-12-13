@@ -17,7 +17,8 @@
         <p class="icon">
           <AIcon type="CloudUploadOutlined" />
         </p>
-        <p>将图片拖动到此处，或点击上传</p>
+<!--        将图片拖动到此处，或-->
+        <p>点击上传</p>
       </div>
       <div class="uploading" v-if="uploading" >
           <div class="loadingContainer">

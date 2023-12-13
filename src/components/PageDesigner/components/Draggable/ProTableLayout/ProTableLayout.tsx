@@ -77,7 +77,7 @@ export default defineComponent({
             }
         }
 
-        usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn)
+        usePubsub(props.data.key, $self, props.data?.componentProps?.responder?.dependencies, handleResponderFn, props.data?.name)
         const handleAdd = () => {
             const _item = generatorData({
                 type: 'table-item',
