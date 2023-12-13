@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Canvas></Canvas>
+    <Canvas ref="canvasRef"></Canvas>
   </div>
 </template>
 
@@ -24,6 +24,8 @@ const props = defineProps({
 // const emit = defineEmits([]);
 const pageData = ref<ISchema>(initData); // 表单数据
 const dependencies = ref({}) // 依赖项
+const canvasRef = ref()
+
 watch(
   () => JSON.stringify(props.data),
   () => {
@@ -40,7 +42,12 @@ provide("PageDesigner", {
   dependencies,
   pageValue: props.pageValue
 });
-
+const getRefs = () => {
+  return canvasRef.value?.$refs
+}
+defineExpose({
+  getRefs,
+})
 </script>
 
 <style lang="less" scoped>
