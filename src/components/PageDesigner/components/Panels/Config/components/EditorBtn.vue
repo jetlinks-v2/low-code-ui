@@ -70,13 +70,16 @@ const onErrorChange = (error: any[]) => {
 };
 
 const handleOk = () => {
-  if (!_error.value?.length) {
-    emits("update:value", _value.value);
+  // if (!_error.value?.length) {
+  //   emits("update:value", _value.value);
+  //   emits("change", _value.value);
+  //   visible.value = false;
+  // } else {
+  //   onlyMessage("代码有误，请检查", "error");
+  // }
+  emits("update:value", _value.value);
     emits("change", _value.value);
     visible.value = false;
-  } else {
-    onlyMessage("代码有误，请检查", "error");
-  }
 };
 
 const handleCancel = () => {
