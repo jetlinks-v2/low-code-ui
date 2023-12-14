@@ -1,21 +1,37 @@
 import { extractCssClass, insertCustomCssToHead } from "@LowCode/components/PageDesigner/utils/utils"
 import DraggableLayout from "../../Draggable/DraggableLayout"
 import './index.less'
-import { PageProvider } from "../../../core";
-import { useKeys, useTool } from '../../../hooks'
+import {useKeys, useTool} from '../../../hooks'
 import { Dropdown, Menu, MenuItem, Button } from 'jetlinks-ui-components'
 import {map} from "lodash-es";
+import {provide, reactive} from "vue";
+import {PageSymbol} from "@LowCode/components/PageDesigner/core/context";
 
 const Canvas = defineComponent({
   name: 'Canvas',
   inheritAttrs: false,
   customOptions: {},
-  setup() {
-    const { isEditModel, setSelection, onPaste } = useTool()
+  setup(props, {expose}) {
+    const { isEditModel, setSelection, onPaste, paramsUtil, _global } = useTool()
     const designer: any = inject('PageDesigner')
     const cssClassList = ref<string[]>([])
     const canvasRef = ref<any>()
     const { } = useKeys(canvasRef)
+    const $refs = reactive({})
+
+    const pageEntity = {
+      // context,
+      $refs: $refs,
+      addRef(key: string, data: any) {
+        $refs[key] = data
+      },
+      removeRef(key: string) {
+        delete $refs[key]
+      },
+    }
+
+    provide(PageSymbol, pageEntity)
+
     const handleClick = () => {
       setSelection('root')
     }
@@ -41,9 +57,8 @@ const Canvas = defineComponent({
 
     onMounted(() => {
       if(!unref(isEditModel) && designer.pageData.value?.componentProps?.mountedCode){
-        // TODO: 参数问题需要解决
-        let customFn = new Function(designer.pageData.value?.componentProps?.mountedCode)
-        customFn()
+        let customFn = new Function('refs', 'util', 'global', designer.pageData.value?.componentProps?.mountedCode)
+        customFn({}, paramsUtil, _global)
       }
     })
 
@@ -77,27 +92,29 @@ const Canvas = defineComponent({
       return 'none'
     })
 
+    expose({
+      $refs: pageEntity?.$refs
+    })
+
     return () => {
       return (
-        <PageProvider>
           <div
-            onClick={() => {
-              if (unref(isEditModel)) {
-                handleClick()
-              }
-            }}
-            data-id="root"
-            class={['subject', ...unref(cssClassList)]}
-            ref={canvasRef}
-            style={{
-              border: _error.value,
-              backgroundImage: `url(${designer.pageData.value?.componentProps?.backgroundImage})`,
-              backgroundSize: 'cover',
-            }}
+              onClick={() => {
+                if (unref(isEditModel)) {
+                  handleClick()
+                }
+              }}
+              data-id="root"
+              class={['subject', ...unref(cssClassList)]}
+              ref={canvasRef}
+              style={{
+                border: _error.value,
+                backgroundImage: `url(${designer.pageData.value?.componentProps?.backgroundImage})`,
+                backgroundSize: 'cover',
+              }}
           >
             { isEditModel.value ? renderChildren() : renderContent()}
           </div>
-        </PageProvider>
       )
     }
   }

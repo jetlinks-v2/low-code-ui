@@ -573,7 +573,11 @@ watch(() => props.tree, () => {
   } else { // 新增数据
     maxLen.value = props.tree ? 9 : 5
     if (props.columns.length) {
-      dataSource.value = props.columns
+      if (props.columns.some(item => item.name === 'id')) {
+        dataSource.value = props.columns
+      } else {
+        dataSource.value = props.tree ? [...cloneTreeSetting, ...props.columns] : [...cloneSetting, ...props.columns] // 兼容历史数据
+      }
     } else {
       dataSource.value = props.tree ? [...cloneTreeSetting] : [...cloneSetting]
     }

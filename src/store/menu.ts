@@ -1,4 +1,4 @@
-import {defineStore} from 'pinia'
+import {defineStore} from '@jetlinks-web/stores'
 import {router} from '@jetlinks-web/router'
 import {cloneDeep} from 'lodash-es'
 import {setParamsValue} from '@jetlinks-web/hooks'
@@ -32,7 +32,7 @@ const defaultOwnParams = [
   }
 ]
 
-export const useMenuStore = defineStore('menu', () => {
+export const useMenuStore = defineStore('lowcode_menu', () => {
   const menu = ref<any[]>([])
   const menusMap = ref<Map<string, any>>(new Map())
   const siderMenus = ref([])

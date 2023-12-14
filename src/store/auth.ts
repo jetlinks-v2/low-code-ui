@@ -1,9 +1,9 @@
-import { defineStore } from 'pinia'
+import { defineStore } from '@jetlinks-web/stores'
 import { ref } from 'vue'
 import { isArray } from 'lodash-es'
 import { handleAuthMenu } from '@LowCode/utils'
 
-export const useAuthStore = defineStore('auth', () => {
+export const useAuthStore = defineStore('lowcode_auth', () => {
     const permissions = ref<Record<string, string[]>>({})
 
     const setPermission = (code: string, buttons: string[]) => {

@@ -88,7 +88,6 @@ const onSave = () => {
     formRef.value
         ?.onSave()
         .then((_data: any) => {
-          console.log('======',_data)
           resolve(_data)
         })
         .catch((err: any) => {

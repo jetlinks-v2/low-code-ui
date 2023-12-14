@@ -1,7 +1,7 @@
 <template>
   <div v-if="$self.visible">
     <j-space v-if="visible && _item.key">
-      <j-popconfirm v-if="_item?.event?.type === 'confirm'" :title="_item?.event?.title" @confirm="onConfirm">
+      <j-popconfirm v-if="_item?.event?.type === 'confirm'" :title="_item?.event?.confirmText" @confirm="onConfirm(_item)">
         <j-button v-bind="getProps(_item)">
           <template #icon v-if="_item?.icon">
             <AIcon :type="_item?.icon"></AIcon>
@@ -134,8 +134,8 @@ const handleMenuClick = (e: any) => {
   _item.value = val
   visible.value = true
   if (props.clickCode) {
-    const handleResultFn = new Function('util', 'global', props.clickCode)
-    handleResultFn(paramsUtil, _global)
+    const handleResultFn = new Function('e','util', 'global', props.clickCode)
+    handleResultFn(e, paramsUtil, _global)
   }
 }
 const reload = () => {
@@ -224,7 +224,7 @@ const handleRequestFn = (_okCode: string) => {
 }
 
 const onClick = (item: any) => {
-  if(item?.event?.type === 'common'){
+  if(item?.event?.type === 'common' || item?.event?.type === 'confirm'){
     handleRequestFn(item?.event?.okCode)
   } else {
     dataModal.value = {
