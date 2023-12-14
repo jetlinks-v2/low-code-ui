@@ -10,7 +10,7 @@ import CommonLayout from './CommonLayout';
 import InlineLayout from './InlineLayout';
 import SearchLayout from './SearchLayout'
 import CardLayout from './CardLayout';
-import TabsLayout from './TabsLayout';
+import TabsLayout from './TabsLayout/index';
 import ListLayout from './ListLayout';
 import TitleLayout from './TitleLayout';
 

@@ -32,7 +32,7 @@ export const getConfigList = (_type: string) => {
         })
     }
 
-    if (['page'].includes(unref(_type))) {
+    if (['page', 'timeline', 'list'].includes(unref(_type))) {
         arr.push({
             key: 'SourcePage',
             header: '页面设置',

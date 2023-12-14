@@ -84,8 +84,8 @@ const useTool = () => {
         } else {
             designer.selected.value = [node]
         }
-        onSaveData()
-        const arr= ['inline-item', 'card-item', 'timeline-item', 'table-item', 'list-item', 'info-item-item-item']
+        onSaveData() // 'timeline-item'
+        const arr= ['inline-item', 'card-item', 'table-item', 'list-item', 'info-item-item-item']
         designer.isShowConfig.value = !arr.includes(node?.type)
     }
 
