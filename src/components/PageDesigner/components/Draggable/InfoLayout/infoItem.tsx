@@ -92,7 +92,7 @@ export default defineComponent({
                             class={!props.isBordered && "info-label"}>
                             <span>{props.data?.componentProps?.label}</span>
                         </div>
-                        <div style={{flex: 1, padding: '16px 24px'}}>
+                        <div style={{flex: 1, padding: '16px 24px', overflowX: 'hidden'}}>
                             {
                                 (props.data?.children || []).map((_item: any) => {
                                     return <Selection

@@ -1,18 +1,18 @@
 <template>
   <template v-if="$self.visible">
-    <j-popconfirm v-if="evetn?.type === 'confirm'" :title="event?.title" @confirm="onConfirm">
-      <j-button v-bind="_props" :loading="_loading" :disabled="disabled">
-        <template v-if="_icon" #icon>
-          <AIcon :type="_icon"/>
+    <j-popconfirm v-if="event?.type === 'confirm'" :title="event?.title" @confirm="onConfirm">
+      <j-button v-bind="_props" :loading=" $self.loading" :disabled=" $self.disabled">
+        <template v-if=" $self.icon" #icon>
+          <AIcon :type=" $self.icon"/>
         </template>
-        {{ _value }}
+        {{ $self.text }}
       </j-button>
     </j-popconfirm>
-    <j-button v-else v-bind="_props" @click="onClick" :loading="_loading" :disabled="disabled">
-      <template v-if="_icon" #icon>
-        <AIcon :type="_icon"/>
+    <j-button v-else v-bind="_props" @click="onClick" :loading=" $self.loading" :disabled=" $self.disabled">
+      <template v-if=" $self.icon" #icon>
+        <AIcon :type=" $self.icon"/>
       </template>
-      {{ _value }}
+      {{ $self.text }}
     </j-button>
     <Modal v-if="visible" :data="dataModal" @save="onClose" @close="onClose" />
   </template>
@@ -102,10 +102,10 @@ const visible = ref(false)
 
 const $self = reactive({
   visible: true,
-  text: '',
-  loading: false,
-  disabled: false,
-  icon: ''
+  text: props.text,
+  loading: props.loading,
+  disabled: props.disabled,
+  icon: props.icon
 })
 
 const setVisible = (flag: boolean) => {
@@ -151,20 +151,18 @@ onMounted(() => {
   executionMounted()
 })
 
-const _value = computed(() => {
-  return $self?.text || props.text
+watchEffect(() => {
+  $self.text = props.text
 })
 
-const _loading = computed(() => {
-  return $self?.loading || props.loading
+watchEffect(() => {
+  $self.loading = props.loading
 })
-
-const _disabled = computed(() => {
-  return $self?.disabled || props.disabled
+watchEffect(() => {
+  $self.disabled = props.disabled
 })
-
-const _icon = computed(() => {
-  return $self?.icon || props.icon
+watchEffect(() => {
+  $self.icon = props.icon
 })
 
 const _props = computed(() => {
