@@ -82,6 +82,10 @@ export const useMenuStore = defineStore('lowcode_menu', () => {
     }
   }
 
+  const handleMenuMapFn = (data: any[]) => {
+    handleMenusMap(data, handleMenusMapById)
+  }
+
   const queryMenus = async () => {
     const resp = await getOwnMenuThree({paging: false, terms: defaultOwnParams})
     const asyncRoutes = getGlobModules()
@@ -131,6 +135,7 @@ export const useMenuStore = defineStore('lowcode_menu', () => {
     hasMenu,
     jumpPage,
     queryMenus,
-    jumpPageByCode
+    jumpPageByCode,
+    handleMenuMapFn
   }
 })
