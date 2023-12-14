@@ -1,0 +1,72 @@
+.selectElement {
+  position: relative;
+  box-sizing: border-box;
+
+  .mask {
+    content: ' ';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+  }
+}
+
+.edit-hover {
+  padding: 10px;
+  &:hover {
+    outline: 1px dashed #315efb !important;
+  }
+}
+
+.Selected {
+  outline: 1px solid #315efb !important;
+
+  .dragIcon {
+    padding: 0;
+    font-size: 20px;
+    margin: 0 !important;
+  }
+
+  .action, .dragIcon {
+    border-radius: 4px;
+    background: #315efb;
+    width: 24px;
+    height: 24px;
+    color: #fff;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 4px;
+  }
+
+  .topLeft,
+  .bottomRight
+   {
+    position: absolute;
+    bottom: 0;
+    height: 30px;
+    align-items: center;
+    z-index: 20;
+    display: flex;
+  }
+
+  .topLeft {
+    left: 1px;
+    top: 1px;
+    height: 24px;
+  }
+
+  .bottomRight {
+    right: 0;
+    bottom: -15px;
+  }
+}
+
+.Warning {
+  outline: 1px solid #FD3E3E !important;
+}
