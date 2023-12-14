@@ -90,12 +90,13 @@ handleDataSourceFn(props?.request || {}, unref(isEditModel)).then((_val: any) =>
 
 onMounted(() => {
   executionMounted()
-  pageProvider.addRef?.(props._key, pageRef)
+  pageProvider.addRef?.(props._key, {setVisible, setValue})
 })
 
 const myValue = computed(() => {
   return $self.value || props.value
 })
+
 </script>
 <style scoped>
 .form-warp {

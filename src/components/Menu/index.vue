@@ -129,14 +129,15 @@ const toRight = () => {
             icon: it.others.menu?.icon,
             parentId: undefined,
             buttons:it.others.menu?.buttons || [],
-            meta:{
-                hideInMenu:it.others.menu?.hideInMenu || false
-            },
+            // meta:{
+            //     hideInMenu:it.others.menu?.hideInMenu || false
+            // },
             options: {
                 pageId: it.id,
                 projectId: props.projectId,
                 LowCode:true,
                 show:true,
+                hideInMenu:it.others.menu?.hideInMenu || false,
                 code
             }
         }

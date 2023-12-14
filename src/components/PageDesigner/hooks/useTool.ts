@@ -8,7 +8,7 @@ import { useRoute, useRouter } from 'vue-router';
 import {request as axiosRequest} from '@jetlinks-web/core'
 import {usePageProvider} from "./usePageProvider";
 import { useMenuStore } from '@LowCode/store'
-
+import * as utils from '@jetlinks-web/utils'
 const useTool = () => {
     const designer: any = inject('PageDesigner')
     const delVisible = ref<boolean>(false)
@@ -23,6 +23,7 @@ const useTool = () => {
         router: useRouter(),
         axios: axiosRequest,
         jumpPageByCode: jumpPageByCode,
+        utils
     }
 
     const _global = {

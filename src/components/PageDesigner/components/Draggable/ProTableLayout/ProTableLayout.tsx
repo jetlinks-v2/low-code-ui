@@ -11,7 +11,6 @@ import {Card, BadgeStatus} from '@LowCode/components'
 import {get} from "lodash-es";
 import ProTableModal from '../../BaseComponent/MyModal';
 import dayjs from 'dayjs'
-// import {handleDataSourceFn} from "../../../utils/utils";
 export default defineComponent({
     name: 'ProTableLayout',
     inheritAttrs: false,
@@ -70,6 +69,10 @@ export default defineComponent({
             setSelectedRowKeys: (arr: any[]) => {
                 if(unref(isEditModel)) return
                 selectedRowKeys.value = arr
+            },
+            getSelectedRowKeys: () => {
+                if(unref(isEditModel)) return
+                return selectedRowKeys.value
             },
         }
         const handleResponderFn = ($dep?: string, $depValue?: any) => {
@@ -480,11 +483,9 @@ export default defineComponent({
                         }}
                     >
                     </ProTable>
-                    {modalVisible.value && <ProTableModal type={'table'} data={dataModal.value} onSave={(flag: boolean) => {
-                        if (flag) {
-                            tableRef.value?.reload()
-                            modalVisible.value = false
-                        }
+                    {modalVisible.value && <ProTableModal type={'table'} data={dataModal.value} onSave={() => {
+                        tableRef.value?.reload()
+                        modalVisible.value = false
                     }} onClose={() => {
                         modalVisible.value = false
                     }}/>}

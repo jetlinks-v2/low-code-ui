@@ -46,7 +46,7 @@ export default defineComponent({
 
         const renderChildren = () => {
             if (pageType === 'page') {
-                return <PagePreview ref={pageRef.value} data={config.value} pageValue={myValue.value}/>
+                return <PagePreview ref={pageRef} data={config.value} pageValue={myValue.value}/>
             }
             return <FormPreview
                 value={myValue.value}
@@ -58,12 +58,15 @@ export default defineComponent({
         }
 
         const onSave = async () => {
-            if (!okCode) return
+            if (!okCode) {
+                emit('save')
+                return
+            }
             const handleResultFn = new Function('refs', 'util', 'global', okCode)
             const _refs = pageType === 'page' ? {pageRef, myValue} : {formRef, myValue}
             const resp = await handleResultFn(_refs, paramsUtil, _global)
             if (resp) {
-                props.type === 'table' ? emit('save', true) : emit('save')
+                emit('save')
             }
         }
 
