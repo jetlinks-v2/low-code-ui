@@ -304,7 +304,7 @@ const validateAll = async (id, cb) => {
             emit('update:status', Object.values(statusMsg).filter(item => item.length).length)
           }
         })
-      }, 1000)
+      }, 1)
     })
   }
 }
