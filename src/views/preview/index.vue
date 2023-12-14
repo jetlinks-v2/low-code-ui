@@ -1,8 +1,8 @@
 <template>
   <template v-if="!isEmpty">
-    <ListPage v-if="showList" :data="data" :show="true" :projectId="route.params.project" :pageId="route.params.id" />
+    <ListPage v-if="showList" :data="data" :show="true" :projectId="routeParams.project" :pageId="routeParams.id" />
     <HtmlPage v-if="showHtml" :code="data" />
-    <PageView v-if="showPage" :key="route.params.id + '_' +route.params.sid" :data="data ? JSON.parse(data) : {}" />
+    <PageView v-if="showPage" :key="routeParams.id + '_' + routeParams.sid" :data="data ? JSON.parse(data) : {}" />
   </template>
   <template v-else>
     <Result status="404" title="404"></Result>
@@ -17,28 +17,51 @@ import HtmlPage from '@LowCode/components/CustomHTML/output/Preview.vue'
 import PageView from '@LowCode/components/PageDesigner/preview.vue'
 import { queryProject } from "@LowCode/api/project";
 import { Result } from 'jetlinks-ui-components'
-import { useRoute } from 'vue-router'
+import { useRoute } from '@jetlinks-web/router'
 
 const route = useRoute()
 const data = ref()
 const isEmpty = ref(false)
 
+const routeParams = reactive({
+  project: undefined,
+  id: undefined,
+  sid: undefined,
+  type: undefined,
+  module: undefined
+})
+
 const showList = computed(() => {
-  return route.params?.type === 'list' && !!data.value
+  return routeParams.type === 'list' && !!data.value
 })
 
 const showHtml = computed(() => {
-  return route.params?.type === 'html' && !!data.value
+  return routeParams.type === 'html' && !!data.value
 })
 
 const showPage = computed(() => {
-  return route.params?.type === 'page' && !!data.value
+  return routeParams.type === 'page' && !!data.value
 })
+
+const handleParams = (path) => {
+  const [ name, project, module, id, type, sid ] = path.substring(1).split('/')
+
+  routeParams.id = id
+  routeParams.module = module
+  routeParams.type = type
+  routeParams.project = project
+  routeParams.sid = sid
+
+  return {
+    project, module, id, type, sid, name
+  }
+}
 
 const getInfo = async () => {
   data.value = undefined
   isEmpty.value = false
-  const { project, module, id } = route.params
+  const { project, module, id } = handleParams(route.path)
+
   queryProject({ terms: [{ value: project, termType: 'eq', column: 'id'}]}).then(resp => {
     if (resp.result && resp.result.data?.length && resp.result.data[0].runningState?.value === 'enabled') {
       isEmpty.value = false
@@ -59,10 +82,9 @@ const getInfo = async () => {
   })
 }
 
-
-
-watch(() => route.params.sid, () => {
-  if (route.name === 'preview') {
+watch(() => route.path, () => {
+  const { name } = handleParams(route.path)
+  if (name === 'preview') {
     getInfo()
   }
 }, { immediate: true })
