@@ -6,7 +6,7 @@ type UserInfo = {
     icon: string
 }
 
-export const useUserStore = defineStore('user', () => {
+export const useUserStore = defineStore('lowcode_user', () => {
     const userInfo = ref<Partial<UserInfo>>({})
     const isAdmin = ref(false)
 
@@ -18,6 +18,10 @@ export const useUserStore = defineStore('user', () => {
         userInfo.value = data
     }
 
+    const setIsAdmin = (type: boolean) => {
+        isAdmin.value = type
+    }
+
     /**
     * 获取用户信息
     */
@@ -25,13 +29,15 @@ export const useUserStore = defineStore('user', () => {
         const resp = await detail()
         if (resp.success) {
           setUserInfo(resp.result)
-          isAdmin.value = resp.result.username === 'admin'
+          setIsAdmin(resp.result.username === 'admin')
         }
     }
 
     return {
+        isAdmin,
         userInfo,
         getUserInfo,
-        setUserInfo
+        setUserInfo,
+        setIsAdmin
     }
 })
