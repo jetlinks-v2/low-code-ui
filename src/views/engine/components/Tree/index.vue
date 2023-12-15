@@ -67,14 +67,14 @@ watch(() => route.params.id, () => {
     product.initProjectState()
     product.queryProduct(route.params.id,()=>{
       const data = product.data[0]
-      
+
       const files = data?.others?.files?.map(item=>{
         if(isString(item)){
           return product.getById(item)
         }
         return item
-      })
-      console.log('====',data?.others?.files)
+      })?.filter(item => item)
+
       if(files && files.length!==0){
         if (data?.state?.value !== 'published') {
         engine.selectFiles(files)

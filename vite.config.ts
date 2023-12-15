@@ -71,8 +71,8 @@ export default defineConfig(({ mode}) => {
 
       proxy: {
         [env.VITE_APP_BASE_API]: {
-          // target: 'http://192.168.32.66:8800', // 本地开发环境
-          target: 'http://192.168.33.1:8849', // 本地开发环境
+          target: 'http://192.168.32.66:8800', // 本地开发环境
+          // target: 'http://192.168.33.1:8849', // 本地开发环境
           ws: 'ws://192.168.32.66:8800',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')

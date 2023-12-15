@@ -107,6 +107,11 @@ const getConfiguration = (type) => {
         tableName: tableName,
         columns: []
       };
+    case providerEnum.CIDE:
+
+      return {
+
+      }
     case providerEnum.Function:
       return {
         lang: undefined,

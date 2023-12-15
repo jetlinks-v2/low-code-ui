@@ -20,6 +20,7 @@ import CardBox from './CardBox/index.vue'
 import CheckSpin from './CheckSpin/index.vue'
 import CheckButton from './CheckButton/index.vue'
 import PageDesigner from './PageDesigner/index.vue'
+import CIAE from './Database/CIAE'
 
 export {
     TitleComponent,
@@ -47,5 +48,6 @@ export {
     CheckButton,
     PageDesigner,
     FormDesigner,
-    CustomHTML
+    CustomHTML,
+    CIAE,
 }

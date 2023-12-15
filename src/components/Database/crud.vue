@@ -154,7 +154,7 @@ const update = () => {
   if (errorTips.relation && (!relation.value.enabled || relation.value.assetIdColumn)) {
     errorTips.relation = []
   }
-  console.log(extra)
+
   project.update({
     ...extra,
     configuration: {
