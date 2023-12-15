@@ -140,13 +140,7 @@ export const layout: ISchema[] = [
         componentProps: {
             mode: "left"
         },
-        children: [
-            {
-                type: 'timeline-item',
-                componentProps: {},
-                children: [],
-            },
-        ]
+        children: []
     },
     {
         type: 'inline',
@@ -184,13 +178,7 @@ export const layout: ISchema[] = [
         type: 'list',
         name: '列表',
         componentProps: {},
-        children: [
-            {
-                type: 'list-item',
-                componentProps: {},
-                children: [],
-            },
-        ]
+        children: []
     },
     {
         type: 'title',

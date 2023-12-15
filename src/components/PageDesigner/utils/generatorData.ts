@@ -16,7 +16,7 @@ const handleProps = (node: any) => {
             methods: 'post'
         }
     }
-    if(['form', 'page'].includes(node.type)){
+    if(['form', 'page', 'timeline', 'list'].includes(node.type)){
         if (!result?.source) {
             result.source = {}
         }

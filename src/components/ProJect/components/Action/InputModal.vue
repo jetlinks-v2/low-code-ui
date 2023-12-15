@@ -62,13 +62,25 @@ const props = defineProps({
 
 const modelRef = reactive({
   title: props.data.title || '',
-  id: props.data.id || randomString(16),
+  id: props.data.id,
   type: props.data.type || props.provider,
   parentId: props.data.parentId || engine.activeFile,
   children: props.data.children || []
 })
 const formRef = ref()
 const inputRef = ref()
+
+const typeMap = new Map()
+typeMap.set(providerEnum.Module,'Module')
+typeMap.set(providerEnum.SQL,'SQL')
+typeMap.set(providerEnum.CRUD,'CRUD')
+typeMap.set(providerEnum.Page,'PAGE')
+typeMap.set(providerEnum.HtmlPage,'HTML')
+typeMap.set(providerEnum.FormPage,'FORM')
+typeMap.set(providerEnum.Function,'Func')
+typeMap.set(providerEnum.ListPage,'List')
+typeMap.set(providerEnum.PageDesign,'DESIGN')
+typeMap.set('project','PROJECT')
 
 const titleType = computed(() => props.type === 'Add' ? '新增' : '重命名')
 
@@ -161,6 +173,7 @@ onKeyStroke('Enter', async () => {
     emit('save', {
       ...modelRef,
       name: modelRef.title,
+      id:props.data.id?props.data.id:`${typeMap.get(modelRef.type)}_${randomString(8)}`,
       configuration: props.data.configuration ? props.data.configuration : getConfiguration(modelRef.type),
       others: props.data.others ? props.data.others : handleOthers(modelRef.type, modelRef.title)
     })

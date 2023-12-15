@@ -21,11 +21,11 @@
       </j-button>
     </j-space>
     <j-dropdown v-else>
-      <j-button v-bind="getProps(props)" :disabled="_disabled" :loading="_loading">
-        <template #icon v-if="_icon">
-          <AIcon :type="_icon"></AIcon>
+      <j-button v-bind="getProps(props)" :disabled="$self.disabled" :loading="$self.loading">
+        <template #icon v-if="$self.icon">
+          <AIcon :type="$self.icon"></AIcon>
         </template>
-        {{ _value }}
+        {{ $self.text }}
       </j-button>
       <template #overlay>
         <j-menu @click="handleMenuClick">
@@ -35,7 +35,7 @@
                 <AIcon :type="item?.icon"></AIcon>
               </template>
               {{
-                item?.text
+                $self.text
               }}
             </j-button>
           </j-menu-item>
@@ -196,20 +196,18 @@ onMounted(() => {
   executionMounted()
 })
 
-const _value = computed(() => {
-  return $self?.text || props.text
+watchEffect(() => {
+  $self.text = props.text
 })
 
-const _loading = computed(() => {
-  return $self?.loading || props.loading
+watchEffect(() => {
+  $self.loading = props.loading
 })
-
-const _disabled = computed(() => {
-  return $self?.disabled || props.disabled
+watchEffect(() => {
+  $self.disabled = props.disabled
 })
-
-const _icon = computed(() => {
-  return $self?.icon || props.icon
+watchEffect(() => {
+  $self.icon = props.icon
 })
 
 const getProps = (item: any) => {

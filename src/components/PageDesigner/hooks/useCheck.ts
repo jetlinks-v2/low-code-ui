@@ -4,10 +4,9 @@ import { useProduct } from '@LowCode/store'
 const useCheck = (validateData?: any) => {
     const designer: any = inject('PageDesigner')
     const project = useProduct()
-    const { getFormList } = useTool()
+    const { getFormList, getPageList } = useTool()
     const errorMap = new Map()
 
-    // const noCheckArr = ['root']
     const nameCheckArr = ['text', 'button', 'dropdown', 'tag', 'form', 'steps', 'info', 'timeline', 'card', 'inline', 'tabs']
 
     const checkedConfigItem = (node: ISchema) => {
@@ -36,7 +35,7 @@ const useCheck = (validateData?: any) => {
                 return obj
             }
             // 校验text
-            if(_type === 'text' && !node.componentProps?.value) {
+            if(_type === 'text' && !node.componentProps?.text) {
                 return obj
             }
             // 下拉菜单
@@ -49,6 +48,16 @@ const useCheck = (validateData?: any) => {
                     return obj
                 } else {
                     const flag = getFormList.value.find((i) => i.value === node.componentProps?.source?.value)
+                    if (!flag) {
+                        return obj
+                    }
+                }
+            }
+            if(['page', 'timeline', 'list'].includes(_type)){
+                if (!(node.componentProps.source.value)) {
+                    return obj
+                } else {
+                    const flag = getPageList.value.find((i) => i.value === node.componentProps?.source?.value)
                     if (!flag) {
                         return obj
                     }

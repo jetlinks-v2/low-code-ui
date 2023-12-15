@@ -5,7 +5,7 @@
         v-model:visible="visible"
         title="配置按钮事件"
         @ok="onSave"
-        :width="800"
+        :width="1000"
         @cancel="visible = false"
     >
       <div>function (refs, util, global)</div>
