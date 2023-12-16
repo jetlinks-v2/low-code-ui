@@ -348,8 +348,8 @@ const tableNameRule = [{
   }
 },
   {
-    max: 16,
-    message: '最多可输入16位字符'
+    max: 30,
+    message: '最多可输入30位字符'
   }
 ]
 

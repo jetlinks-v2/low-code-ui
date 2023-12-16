@@ -1,6 +1,6 @@
 <template>
   <j-button @click="visible = true">配置</j-button>
-  <Modal v-if="visible" :id="id" :warp="warp" @save="onSave" @cancel="onCancel" />
+  <Modal v-if="visible" :id="id" :value="value" :warp="warp" @save="onSave" @cancel="onCancel" />
 </template>
 
 <script setup name="SettingConfig">
@@ -21,7 +21,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['save'])
 
 const visible = ref(false)
 
@@ -30,7 +30,7 @@ const onCancel = () => {
 }
 
 const onSave = (data) => {
-  emit('update:value', data)
+  emit('save', data)
   onCancel()
 }
 

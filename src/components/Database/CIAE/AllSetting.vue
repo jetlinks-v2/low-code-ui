@@ -117,7 +117,16 @@ const cancel = () => {
 const save = () => {
   formRef.value.validate().then(res => {
     if (res) {
-      emit('save', omit(formModel, ['sourceType']))
+      const newData = {...formModel}
+
+      if (!formModel.sourceType.includes('importCommand')) {
+        newData.importCommand = undefined
+      }
+      if (!formModel.sourceType.includes('exportCommand')) {
+        newData.exportCommand = undefined
+      }
+
+      emit('save', omit(newData, ['sourceType']))
     }
   })
 }
