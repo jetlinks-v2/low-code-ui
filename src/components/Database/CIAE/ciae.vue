@@ -23,8 +23,8 @@
         <template #type="{record, valueChange}">
           <j-select v-model:value="record.type" :options="typeOptions" style="width: 100%" @change="() => { valueChange(record.type); updateProject()}" />
         </template>
-        <template #command="{record}">
-          <SettingConfig v-model:value="record.command" :id="data.id" :warp="warpRef" />
+        <template #command="{record, index}">
+          <SettingConfig :value="record" :id="id" :warp="warpRef" @save="(val) => {updateDataSourceItem(val, index)}" />
         </template>
         <template #action="{record, index}">
           <j-space>
@@ -76,6 +76,7 @@
     <AllSetting
       v-if="allSettingData.visible"
       :value="allSettingData.data"
+      :id="id"
       :warp="warpRef"
       @save="allSettingSave"
       @cancel="allSettingData.visible = false"
@@ -84,7 +85,7 @@
 </template>
 
 <script setup name="CIAE">
-import { regular } from "@jetlinks-web/utils";
+import {onlyMessage, regular} from "@jetlinks-web/utils";
 import { upperCase } from "@LowCode/utils/comm";
 import { typeOptions } from './util'
 import SettingConfig from './settingConfig.vue'
@@ -96,27 +97,62 @@ import { defineExpose } from 'vue'
 import { CheckSpin } from '@LowCode/components'
 
 const props = defineProps({
-  data: {
+  configuration: {
     type: Object,
     default: () => ({})
   },
+  provider: {
+    type: String,
+    default: undefined
+  },
+  title: {
+    type: String,
+    default: undefined
+  },
+  name:{
+    type: String,
+    default: undefined
+  },
+  type: {
+    type: String,
+    default: undefined
+  },
+  parentId: {
+    type: String,
+    default: undefined
+  },
+  fullId: {
+    type: String,
+    default: undefined
+  },
+  id: {
+    type: String,
+    default: undefined
+  },
+  others: {
+    type: Object,
+    default: () => ({})
+  },
+  showTip: {
+    type: Boolean,
+    default: true
+  }
 })
 
 const tableRef = ref()
 const project = useProduct()
-const dataSource = ref(props.data?.headers || [])
+const dataSource = ref(props.configuration?.headers || [])
 const warpRef = ref()
 const loading = ref(false)
 
 const allSettingData = reactive({
   data: {
-    importCommand: props.data?.importCommand,
-    exportCommand: props.data?.exportCommand,
-    fileName: props.data?.fileName,
+    importCommand: props.configuration?.importCommand,
+    exportCommand: props.configuration?.exportCommand,
+    fileName: props.configuration?.fileName,
   },
   visible: false
 })
-
 
 const myColumns = [
   {
@@ -195,12 +231,16 @@ const myColumns = [
 ]
 
 const updateProject = debounce(() => {
+  const { configuration, showTip, ...extra} = props
   const obj = {
-    ...props.data,
     headers: dataSource.value?.map(record => omit(record, ['index', '_quick_id', 'offsetTop'])) || [],
     ...allSettingData.data
   }
-  project.update(obj)
+  console.log(extra)
+  project.update({
+    ...extra,
+    configuration: obj,
+  })
 }, 300)
 
 const updateDataSource = (record, index) => {
@@ -208,6 +248,12 @@ const updateDataSource = (record, index) => {
   dataSource.value.splice(index, 0, _record)
   updateProject()
 }
+
+const updateDataSourceItem = (record, index) => {
+  dataSource.value[index - 1] = record
+  updateProject()
+}
+
 
 const add = (index) => {
   const record = {
@@ -246,17 +292,29 @@ const validate = () => {
   return new Promise(async (resolve, reject) => {
     loading.value = true
 
+    if (!dataSource.value.length) {
+      reject({message: '请添加列'})
+      if (props.showTip) {
+        onlyMessage('校验失败，请添加列', 'error')
+      }
+      return
+    }
+
     try {
       tableRef.value.validates()
+      resolve()
     } catch (e) {
       reject(e)
+    }
+    if (props.showTip) {
+      onlyMessage('校验成功')
     }
     loading.value = false
   })
 }
 
 defineExpose({
-  validate: validate
+  validate
 })
 
 </script>

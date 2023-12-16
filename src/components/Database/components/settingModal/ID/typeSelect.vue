@@ -41,7 +41,6 @@ const changeValue = (val) => {
 
 const onClick = (key) => {
   if (props.multiple) {
-    console.log(myValue.value, key)
     const valueSet = new Set(myValue.value || [])
     if (valueSet.has(key)) {
       valueSet.delete(key)
@@ -55,6 +54,10 @@ const onClick = (key) => {
     changeValue(key)
   }
 }
+
+watch(() => props.value, () =>{
+  myValue.value = props.multiple ? props.value : [props.value]
+})
 
 </script>
 

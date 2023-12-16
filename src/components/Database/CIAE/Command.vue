@@ -3,6 +3,7 @@
     <div v-if="title" style="width: 76px"> {{ title }}: </div>
     <j-select
         showSearch
+        :filter-option="filterOption"
         :options="commandSupportOptions"
         v-model:value="myValue.commandSupportId"
         placeholder="请选择"
@@ -13,6 +14,7 @@
     </j-select>
     <j-select
         showSearch
+        :filter-option="filterOption"
         :options="dictOptions"
         v-model:value="myValue.commandId"
         placeholder="请选择指令"
@@ -52,6 +54,12 @@ const myValue = reactive({
   commandId: undefined,
   ...props.value
 })
+
+const filterOption = (input, option) => {
+  const str = option.label || option.value;
+  console.log(str, option)
+  return String(str).toLowerCase().indexOf(input.toLowerCase()) >= 0;
+};
 
 const project = useProduct()
 

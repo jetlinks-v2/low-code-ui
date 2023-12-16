@@ -262,7 +262,7 @@ export const useProduct = defineStore('lowcode_product', () => {
 //获取后端type
   const getType = (type:string)=>{
     const modules = [providerEnum.Module,'project']
-    const functions = [providerEnum.CRUD,providerEnum.Function,providerEnum.SQL,providerEnum.CIDE]
+    const functions = [providerEnum.CRUD,providerEnum.Function,providerEnum.SQL,providerEnum.CIAE]
     const resources = [providerEnum.FormPage,providerEnum.HtmlPage,providerEnum.Page,providerEnum.PageDesign,providerEnum.ListPage]
     if(modules.includes(type)){
       return 'modules'

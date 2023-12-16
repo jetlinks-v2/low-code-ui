@@ -9,7 +9,7 @@
     <SQLCode v-else-if="data.type === providerEnum.SQL" v-bind="data"/>
     <FunctionCode v-else-if="data.type === providerEnum.Function" v-bind="data"/>
     <PageDesigner v-else-if="data.type === providerEnum.PageDesign" :data="props.data"/>
-    <CIAE v-else-if="data.type === providerEnum.CIDE" :data="props.data"/>
+    <CIAE v-else-if="data.type === providerEnum.CIAE" v-bind="data"/>
   </div>
 </template>
 

@@ -16,7 +16,7 @@ export const providerEnum = {
   ListPage: 'page-list',
   FormPage: 'page-form',
   PageDesign:'page-design',
-  CIDE:'custom-file-data',
+  CIAE:'custom-file-data',
 }
 
 export const providerMap = {
@@ -29,7 +29,7 @@ export const providerMap = {
   [providerEnum.FormPage]: '表单页',
   [providerEnum.Function]: '函数',
   [providerEnum.PageDesign]: '页面设计器',
-  [providerEnum.CIDE]: '自定义导入导出',
+  [providerEnum.CIAE]: '自定义导入导出',
   'project': '项目'
 }
 
@@ -60,7 +60,7 @@ export const typeImages = {
   [providerEnum.FormPage]: getImage('/project/form.svg'),
   [providerEnum.Function]: getImage('/project/function.svg'),
   [providerEnum.PageDesign]: getImage('/project/page_designer.svg'),
-  [providerEnum.CIDE]: getImage('/project/curd.svg'),
+  [providerEnum.CIAE]: getImage('/project/curd.svg'),
   'project': getImage('/project/project.svg'),
 }
 
@@ -114,7 +114,7 @@ export const projectList = [
         text: '使用脚本自定义业务逻辑'
       },
       {
-        type: providerEnum.CIDE,
+        type: providerEnum.CIAE,
         img: getImage('/project/curd.png'),
         text: '用于管理业务数据'
       },
@@ -159,7 +159,7 @@ export const projectListMenu = [
     text: '使用脚本自定义业务逻辑'
   },
   {
-    type: providerEnum.CIDE,
+    type: providerEnum.CIAE,
     img: getImage('/project/curd.svg'),
     text: '用于管理业务数据'
   },

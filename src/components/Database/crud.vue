@@ -149,7 +149,7 @@ const tree = ref(props.configuration.tree || false)
 const loading = ref(false)
 
 const update = () => {
-  const { configuration, ...extra} = props
+  const { configuration, showTip, ...extra} = props
 
   if (errorTips.relation && (!relation.value.enabled || relation.value.assetIdColumn)) {
     errorTips.relation = []
