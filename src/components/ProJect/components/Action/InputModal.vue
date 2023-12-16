@@ -80,6 +80,7 @@ typeMap.set(providerEnum.FormPage,'FORM')
 typeMap.set(providerEnum.Function,'Func')
 typeMap.set(providerEnum.ListPage,'List')
 typeMap.set(providerEnum.PageDesign,'DESIGN')
+typeMap.set(providerEnum.CIDE,'CIDE')
 typeMap.set('project','PROJECT')
 
 const titleType = computed(() => props.type === 'Add' ? '新增' : '重命名')
@@ -103,6 +104,13 @@ const isOnlyName = async (_, value) => {
   }
 }
 
+const getTableName = () => {
+  const productId = product.info.id.substr(0, 4)
+  const _moduleId = props.data.parentId || engine.activeFile
+  const moduleId = _moduleId.substr(0, 4)
+  return product.info.id === _moduleId ? `${productId}_${generateSerialNumber(3)}` : `${productId}_${moduleId}_${generateSerialNumber(3)}`
+}
+
 const getConfiguration = (type) => {
   switch (type) {
     case providerEnum.SQL:
@@ -110,17 +118,11 @@ const getConfiguration = (type) => {
         sql: undefined
       };
     case providerEnum.CRUD:
-      const productId = product.info.id.substr(0, 4)
-      const _moduleId = props.data.parentId || engine.activeFile
-      const moduleId = _moduleId.substr(0, 4)
-      console.log(product.info.id, _moduleId)
-      const tableName = product.info.id === _moduleId ? `${productId}_${generateSerialNumber(3)}` : `${productId}_${moduleId}_${generateSerialNumber(3)}`
       return {
-        tableName: tableName,
+        tableName: getTableName(),
         columns: []
       };
     case providerEnum.CIDE:
-
       return {
 
       }

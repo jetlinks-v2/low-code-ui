@@ -1,6 +1,6 @@
 <template>
   <j-button @click="visible = true">配置</j-button>
-  <Modal v-if="visible" @save="onSave" @cancel="onCancel" />
+  <Modal v-if="visible" :id="id" :warp="warp" @save="onSave" @cancel="onCancel" />
 </template>
 
 <script setup name="SettingConfig">
@@ -10,6 +10,14 @@ const props = defineProps({
   value: {
     type: Object,
     default: () => ({})
+  },
+  warp: {
+    type: Object,
+    default: undefined
+  },
+  id: {
+    type: String,
+    default: undefined
   }
 })
 
