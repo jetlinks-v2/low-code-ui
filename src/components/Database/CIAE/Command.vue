@@ -3,6 +3,7 @@
     <div v-if="title" style="width: 76px"> {{ title }}: </div>
     <j-select
         showSearch
+        :filter-option="filterOption"
         :options="commandSupportOptions"
         v-model:value="myValue.commandSupportId"
         placeholder="请选择"
@@ -13,6 +14,7 @@
     </j-select>
     <j-select
         showSearch
+        :filter-option="filterOption"
         :options="dictOptions"
         v-model:value="myValue.commandId"
         placeholder="请选择指令"
@@ -53,6 +55,12 @@ const myValue = reactive({
   ...props.value
 })
 
+const filterOption = (input, option) => {
+  const str = option.label || option.value;
+  console.log(str, option)
+  return String(str).toLowerCase().indexOf(input.toLowerCase()) >= 0;
+};
+
 const project = useProduct()
 
 const dictOptionsMap = ref(new Map())
@@ -69,16 +77,18 @@ const {data: commandSupportOptions, run: apiRun} = useRequest(queryDraftCommands
         const filterArr = res.result.filter(item => item.id !== props.id)
 
         const arr = filterArr.map(item => {
-          const commands = item.command.map(a => ({
+          const commands = item.command?.map(a => ({
             value: a.id,
             label: a.name
-          }))
+          })) || []
 
-          dictOptionsMap.value.set(item.id, commands)
+          const _commandId = `${item.moduleId}.${item.id}`
+
+          dictOptionsMap.value.set(_commandId, commands)
 
           return {
             label: item.name,
-            value: item.id,
+            value: _commandId,
           }
         })
 

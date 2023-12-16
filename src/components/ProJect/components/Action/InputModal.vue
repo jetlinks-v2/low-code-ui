@@ -80,7 +80,7 @@ typeMap.set(providerEnum.FormPage,'FORM')
 typeMap.set(providerEnum.Function,'Func')
 typeMap.set(providerEnum.ListPage,'List')
 typeMap.set(providerEnum.PageDesign,'DESIGN')
-typeMap.set(providerEnum.CIDE,'CIDE')
+typeMap.set(providerEnum.CIAE,'CIAE')
 typeMap.set('project','PROJECT')
 
 const titleType = computed(() => props.type === 'Add' ? '新增' : '重命名')
@@ -122,9 +122,9 @@ const getConfiguration = (type) => {
         tableName: getTableName(),
         columns: []
       };
-    case providerEnum.CIDE:
+    case providerEnum.CIAE:
       return {
-
+        configuration: {}
       }
     case providerEnum.Function:
       return {

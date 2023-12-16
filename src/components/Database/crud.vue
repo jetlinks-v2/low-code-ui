@@ -135,7 +135,7 @@ provide(CRUD_COLUMNS, tableColumns)
 provide(WARP_REF, warpRef)
 
 const ownerId = computed(() => {
-  const stId = project.info?.id === props.parentId ? [project.info?.id,project.info?.id] : [project.info?.id,project.info?.id,props.parentId]
+  const stId = project.info?.id === props.parentId ? [project.info?.id,project.info?.id] : [project.info?.id,props.parentId]
   return `${stId.join('.')}.${props.id}`
 })
 
@@ -149,7 +149,7 @@ const tree = ref(props.configuration.tree || false)
 const loading = ref(false)
 
 const update = () => {
-  const { configuration, ...extra} = props
+  const { configuration, showTip, ...extra} = props
 
   if (errorTips.relation && (!relation.value.enabled || relation.value.assetIdColumn)) {
     errorTips.relation = []
