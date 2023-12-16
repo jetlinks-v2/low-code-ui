@@ -1,13 +1,12 @@
-import DraggableLayout from './DraggableLayout'
-import Selection from '../Selection/index'
-import {Tabs, TabPane, Badge} from 'jetlinks-ui-components'
-import './index.less'
+import Selection from '../../Selection'
+import {Tabs, Badge, TabPane} from 'jetlinks-ui-components'
+import '../index.less'
 import {withModifiers} from 'vue'
-import { map, omit} from 'lodash-es'
-import {useLifeCycle, usePubsub, useTool} from '../../hooks'
-import generatorData from '../../utils/generatorData'
-import {handleDataSourceFn} from "../../utils/utils";
-
+import {map, omit} from 'lodash-es'
+import {useLifeCycle, usePubsub, useTool} from '../../../hooks'
+import generatorData from '../../../utils/generatorData'
+import {handleDataSourceFn} from "../../../utils/utils";
+import Item from './Item'
 export default defineComponent({
     name: 'TabsLayout',
     inheritAttrs: false,
@@ -94,25 +93,9 @@ export default defineComponent({
                         unref(list).length ? <Tabs data-layout-type={'tabs'} {...props.data.componentProps}>
                             {
                                 unref(list).map((element: any) => {
-                                    return (
-                                        <TabPane key={element.key} {...omit(element.componentProps, 'name')}
-                                                 tab={_tabContent(element)}>
-                                            <Selection
-                                                class={unref(isDragArea) && 'drag-area'}
-                                                data={element}
-                                                tag="div"
-                                                hasCopy={false}
-                                                hasDel={true}
-                                                parent={unref(list)}
-                                            >
-                                                <DraggableLayout
-                                                    data-layout-type={'tabs-item'}
-                                                    data={element.children}
-                                                    parent={element}
-                                                />
-                                            </Selection>
-                                        </TabPane>
-                                    )
+                                    return <TabPane key={element?.key} {...omit(element?.componentProps, ['name', 'createdCode', 'cssCode', 'mountedCode', 'request'])} tab={_tabContent(element)}>
+                                        <Item data={element} parent={unref(list)} />
+                                    </TabPane>
                                 })
                             }
                         </Tabs> : (unref(isEditModel) ? <div class="draggable-empty">选项卡</div> : <div></div>)

@@ -5,6 +5,7 @@ import { withModifiers } from 'vue'
 import {useLifeCycle, usePubsub, useTool} from '../../hooks'
 import generatorData from '../../utils/generatorData'
 import {handleDataSourceFn} from "../../utils/utils";
+import {omit} from "lodash-es";
 
 export default defineComponent({
     name: 'InlineLayout',
@@ -81,10 +82,10 @@ export default defineComponent({
                         unref(list)?.length ?
                             <div
                                 data-layout-type={'inline'}
-                                {...props.data.componentProps}
+                                {...omit(props.data.componentProps, ['cssCode', 'createdCode', 'mountedCode', 'request', 'gap', 'justifyContent', 'alignItems'])}
                                 style={{
                                     display: "flex",
-                                    gap: (props.data.componentProps?.gap || 24) + 'px',
+                                    gap: (props.data.componentProps?.gap ?? 24) + 'px',
                                     justifyContent: props.data.componentProps?.justifyContent || 'flex-start',
                                     alignItems: props.data.componentProps?.alignItems || 'center'
                                 }}
@@ -92,7 +93,7 @@ export default defineComponent({
                                 {
                                     unref(list).map((element: any) => {
                                         return (
-                                            <div key={element.key} {...element.componentProps}>
+                                            <div key={element.key} {...omit(element.componentProps, ['cssCode', 'createdCode', 'mountedCode', 'request'])}>
                                                 <Selection
                                                     class={unref(isDragArea) && 'drag-area'}
                                                     hasDel={unref(list).length > 1}

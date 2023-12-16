@@ -331,7 +331,6 @@ const myAsset = reactive(props.asset || {
   correlatesAssets: false
 })
 
-
 const updateRelation = () => { // 关系数据发生变化
   emit('update:relation', myRelation)
   emit('update')

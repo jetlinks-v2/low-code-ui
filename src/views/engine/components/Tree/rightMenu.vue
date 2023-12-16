@@ -47,6 +47,12 @@
         </template>
         {{ providerMap[providerEnum.Function] }}
       </j-menu-item>
+      <j-menu-item :key="providerEnum.CIDE">
+        <template #icon>
+          <img :src="getImage('/project/curd.svg')" style="width: 24px; height: 24px;">
+        </template>
+        {{ providerMap[providerEnum.CIDE] }}
+      </j-menu-item>
       <j-menu-item :key="providerEnum.PageDesign">
         <template #icon>
           <img :src="getImage('/project/page_designer.svg')" style="width: 24px; height: 24px;">
@@ -140,6 +146,7 @@ const onContextMenuClick = (node, menuKey) => {
     case providerEnum.CRUD:
     case providerEnum.SQL:
     case providerEnum.Function:
+    case providerEnum.CIDE:
       const isModule = node.type === providerEnum.Module
       let _arr = node.data.children || []
       if (!isModule) {

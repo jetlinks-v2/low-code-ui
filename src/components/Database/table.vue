@@ -408,9 +408,8 @@ const copy = (record, index) => {
 }
 
 const deleteFn = async (index) => {
-  const _value = dataSource.value[index - 1]
   dataSource.value.splice(index - 1, 1)
-  // dataSourceChange()
+
   // 删除
   emitUpdateDataSource()
 }
@@ -543,7 +542,7 @@ const getTypes = () => {
 watch(() => props.tree, () => {
   const cloneTreeSetting = cloneDeep(defaultTreeSetting)
   const cloneSetting = cloneDeep(defaultSetting)
-  console.log(dataSource.value.length)
+
   if (dataSource.value.length) {
     const isTreeNow = dataSource.value[1].name === 'parent_id'
     const arr = JSON.parse(JSON.stringify(dataSource.value))

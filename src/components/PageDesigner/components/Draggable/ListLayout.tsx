@@ -1,7 +1,9 @@
 import {useLifeCycle, usePubsub, useTool} from "../../hooks"
 import Selection from '../Selection/index'
-import DraggableLayout from "./DraggableLayout"
+import PagePreview from '@LowCode/components/PageDesigner/preview.vue'
 import {handleDataSourceFn} from "../../utils/utils";
+import {Empty} from 'jetlinks-ui-components'
+import {computed} from "vue";
 
 export default defineComponent({
     name: 'ListLayout',
@@ -19,26 +21,22 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const {isDragArea, isEditModel} = useTool()
+        const {isEditModel} = useTool()
 
         const _data = computed(() => {
             return props.data
         })
 
-        const list = computed(() => {
-            return unref(_data)?.children || []
-        })
-
         const $self = reactive({
             visible: true,
-            dataSource: [1]
+            dataSource: [{}]
         })
         const setDataSource = (arr: any[]) => {
-            if(unref(isEditModel)) return
+            if (unref(isEditModel)) return
             $self.dataSource = arr
         }
         const setVisible = (flag: boolean) => {
-            if(unref(isEditModel)) return
+            if (unref(isEditModel)) return
             $self.visible = flag
         }
 
@@ -63,33 +61,25 @@ export default defineComponent({
             executionMounted()
         })
 
+        const config = computed(() => {
+            return JSON.parse(props.data.componentProps?.source?.code || '{}')
+        })
+
         return () => {
             return $self.visible && (
                 <Selection {...useAttrs()} hasDrag={true} hasDel={true} hasCopy={true} data={unref(_data)} parent={props.parent}>
                     <div>
                         {
-                            $self.dataSource.map(() => {
-                                return <div>
-                                    {
-                                        unref(list).map((item: any) => {
-                                            return <Selection
-                                                class={unref(isDragArea) && 'drag-area'}
-                                                data={item}
-                                                tag="div"
-                                                hasCopy={false}
-                                                hasDel={unref(list).length > 1}
-                                                parent={unref(list)}
-                                            >
-                                                <DraggableLayout
-                                                    data-layout-type={'timeline-item'}
-                                                    data={item?.children || []}
-                                                    parent={item}
-                                                />
-                                            </Selection>
-                                        })
-                                    }
-                                </div>
-                            })
+                            $self.dataSource?.length ?
+                                $self.dataSource.map((item) => {
+                                    return <div>
+                                        <PagePreview
+                                            pageValue={item}
+                                            data={config.value}
+                                        />
+                                    </div>
+                                }) :
+                                <Empty style={{padding: '100px'}}/>
                         }
                     </div>
                 </Selection>
