@@ -293,10 +293,11 @@ const validate = () => {
     loading.value = true
 
     if (!dataSource.value.length) {
-      reject({message: '请添加列'})
+      reject([{message: '请添加列'}])
       if (props.showTip) {
         onlyMessage('校验失败，请添加列', 'error')
       }
+      loading.value = false
       return
     }
 

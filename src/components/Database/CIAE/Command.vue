@@ -77,16 +77,18 @@ const {data: commandSupportOptions, run: apiRun} = useRequest(queryDraftCommands
         const filterArr = res.result.filter(item => item.id !== props.id)
 
         const arr = filterArr.map(item => {
-          const commands = item.command.map(a => ({
+          const commands = item.command?.map(a => ({
             value: a.id,
             label: a.name
-          }))
+          })) || []
 
-          dictOptionsMap.value.set(item.id, commands)
+          const _commandId = `${item.moduleId}.${item.id}`
+
+          dictOptionsMap.value.set(_commandId, commands)
 
           return {
             label: item.name,
-            value: item.id,
+            value: _commandId,
           }
         })
 

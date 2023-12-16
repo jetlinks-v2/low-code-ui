@@ -106,7 +106,7 @@
       <CRUD v-else-if="validateContent.type === providerEnum.CRUD" :key="validateContent.key" v-bind="validateContent.data" ref="validateRef" :showTip="false"/>
       <ListPage v-else-if="validateContent.type === providerEnum.ListPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef" :showTip="false"/>
       <PageDesigner v-else-if="validateContent.type === providerEnum.PageDesign" :key="validateContent.key" :data="validateContent.data" ref="validateRef" :showTip="false"/>
-      <CIAE v-else-if="validateContent.type === providerEnum.CIAE" :key="validateContent.key" v-bind="modelData.data" ref="validateRef" :showTip="false"/>
+      <CIAE v-else-if="validateContent.type === providerEnum.CIAE" :key="validateContent.key" v-bind="validateContent.data" ref="validateRef" :showTip="false"/>
     </div>
   </div>
 </template>
