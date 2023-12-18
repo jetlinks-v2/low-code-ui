@@ -86,6 +86,10 @@ const props = defineProps({
     type: String,
     default: undefined
   },
+  moduleId: {
+    type: String,
+    default: undefined
+  },
   name:{
     type: String,
     default: undefined
@@ -135,8 +139,7 @@ provide(CRUD_COLUMNS, tableColumns)
 provide(WARP_REF, warpRef)
 
 const ownerId = computed(() => {
-  const stId = project.info?.id === props.parentId ? [project.info?.id,project.info?.id] : [project.info?.id,props.parentId]
-  return `${stId.join('.')}.${props.id}`
+  return `${props.moduleId}.${props.id}`
 })
 
 const tableName = ref(props.configuration.tableName)

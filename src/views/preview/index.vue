@@ -1,8 +1,10 @@
 <template>
   <template v-if="!isEmpty">
+  <page-container>
     <ListPage v-if="showList" :data="data" :show="true" :projectId="routeParams.project" :pageId="routeParams.id" />
     <HtmlPage v-if="showHtml" :code="data" />
     <PageView v-if="showPage" :key="routeParams.id + '_' + routeParams.sid" :data="data ? JSON.parse(data) : {}" />
+  </page-container>
   </template>
   <template v-else>
     <Result status="404" title="404"></Result>
