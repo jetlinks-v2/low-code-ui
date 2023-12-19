@@ -63,6 +63,21 @@ const handleChildren = (children: any, parentId: string): TreeData[] => {
     return treeData.sort((a, b) => a.others.tree_index - b.others.tree_index)
 }
 
+const findItemById = (data:any[], id: string) => {
+    let obj = {}
+    data.some(item => {
+        if (item.id === id) {
+            obj = item
+            return true
+        } else if(item.children) {
+            obj = findItemById(item.children, id)
+            return !!obj
+        }
+        return false
+    })
+    return obj
+}
+
 /**
  * 保存草稿
  */
@@ -287,9 +302,16 @@ export const useProduct = defineStore('lowcode_product', () => {
             ...record.others,
         }
 
-        addDraft(info.value.draftId, getType(record.others.type || record.type), _record, parentId ? {moduleId: parentId} : {})
-        updateDataCache()
-        engine.updateFile(record, 'add', open)
+        addDraft(info.value.draftId, getType(record.others.type || record.type), _record, parentId ? {moduleId: parentId} : {}).then(res => {
+            if (res.success) {
+                const {modules, ...extra} = res.result
+                const children: TreeData[] = modules?.[0] ? handleChildren(modules[0],  extra.id) : []
+                const newRecord = findItemById(children, record.id)
+                updateDataCache()
+                engine.updateFile(newRecord, 'add', open)
+            }
+        })
+
         // updateProductReq(record, (result) => {
         //   handleProjectData(result)
         // })
@@ -336,8 +358,8 @@ export const useProduct = defineStore('lowcode_product', () => {
     }
 
     //通过id查找所属全部父节点
-    const getParent = (record) => {
-        const arr = []
+    const getParent = (record: any) => {
+        const arr:any[] = []
         findParent(data.value, record, arr)
         return arr;
     }
