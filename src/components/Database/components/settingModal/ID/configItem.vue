@@ -143,6 +143,8 @@ const termTypeOptions = [
   {label: '不为空', value: 'notnull'},
   {label: '包含', value: 'like'},
   {label: '不包含', value: 'nlike'},
+  {label: '=', value: 'eq'},
+  {label: '!=', value: 'not'},
   {label: '>', value: 'gt'},
   {label: '>=', value: 'gte'},
   {label: '<', value: 'lt'},
