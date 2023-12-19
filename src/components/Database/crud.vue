@@ -139,8 +139,7 @@ provide(CRUD_COLUMNS, tableColumns)
 provide(WARP_REF, warpRef)
 
 const ownerId = computed(() => {
-  console.log(props)
-  return `${props.fullId}`
+  return `${project.info.id}.${props.fullId}`
 })
 
 const tableName = ref(props.configuration.tableName)
