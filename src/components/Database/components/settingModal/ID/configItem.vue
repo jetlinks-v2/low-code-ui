@@ -8,7 +8,7 @@
                   { label: '并且', value: 'and' },
                   { label: '或者', value: 'or' },
               ]"
-          v-model:value="condition[0].terms[0].type"
+          v-model:value="condition.terms[0].type"
           @change="changeValue"
       />
       <div class="item-body">
@@ -30,21 +30,21 @@
             </div>
             <div class="terms">
               <j-select
-                  v-model:value="condition[0].terms[0].column"
+                  v-model:value="condition.terms[0].column"
                   placeholder="请选择条件变量"
                   :options="columnOptions"
                   @change="columnChange"
               />
               <j-select
-                  v-model:value="condition[0].terms[0].termType"
+                  v-model:value="condition.terms[0].termType"
                   placeholder="请选择运算符"
                   :options="termTypeOptions"
                   @change="columnChange"
               />
               <j-input
-                  v-model:value="condition[0].terms[0].value"
+                  v-model:value="condition.terms[0].value"
                   placeholder="请输入条件值"
-                  :disabled="['notnull', 'isnull'].includes(condition[0].terms[0].termType)"
+                  :disabled="['notnull', 'isnull'].includes(condition.terms[0].termType)"
                   @change="changeValue"
               />
             </div>
@@ -77,14 +77,14 @@
                   <template v-if="matchedType === 'string'">
                     <j-input
                         placeholder="请输入常量"
-                        v-model:value="condition[0].matched[matchedIndex].string"
+                        v-model:value="condition.matched[matchedIndex].string"
                         @change="changeValue"
                     />
                   </template>
                   <template v-else-if="matchedType === 'var'">
                     <j-select
                         placeholder="请选择数据变量"
-                        v-model:value="condition[0].matched[matchedIndex].var.key"
+                        v-model:value="condition.matched[matchedIndex].var.key"
                         :options="columnOptions"
                         @change="changeValue"
                     />
@@ -92,7 +92,7 @@
                   <template v-else-if="matchedType ===  'now'">
                     <j-select
                         placeholder="请选择日期"
-                        v-model:value="condition[0].matched[matchedIndex].now.format"
+                        v-model:value="condition.matched[matchedIndex].now.format"
                         :options="[
                             { label: 'yyyy-mm-dd', value: 'yyyy-mm-dd'},
                             { label: 'yyyy-mm', value: 'yyyy-mm'},
@@ -104,7 +104,7 @@
                   <template v-else-if="matchedType === 'sn'">
                     <j-select
                         placeholder="请选择序列号"
-                        v-model:value="condition[0].matched[matchedIndex].sn.length"
+                        v-model:value="condition.matched[matchedIndex].sn.length"
                         :options="snOptions"
                         @change="changeValue"
                     />
@@ -198,9 +198,9 @@ const emit = defineEmits(['update:value', 'addRule', 'onDelete', 'change'])
 const matchedMax = 8
 const CrudColumns = inject(CRUD_COLUMNS)
 
-const condition = reactive([
-    ...(props.value)
-])
+const condition = reactive({
+  ...(props.value)
+})
 
 const snOptions = new Array(7).fill(0).map((_, index) => ({
   label: index,
@@ -233,7 +233,7 @@ const getMatchedValue = (type) => {
 
 const matched = computed(
     () => {
-      return condition[0].matched.map(item => item.type)
+      return condition.matched.map(item => item.type)
     }
 )
 
@@ -248,7 +248,7 @@ const changeValue = () => {
 }
 
 const columnChange = () => {
-  condition[0].terms[0].value = undefined
+  condition.terms[0].value = undefined
   changeValue()
 }
 
@@ -261,17 +261,17 @@ const onDelete = (index) => {
 }
 
 const matchedDelete = (index) => {
-  condition[0].matched.splice(index, 1)
+  condition.matched.splice(index, 1)
   changeValue()
 }
 
 const matchedTypeChange = (type) => {
-  const len = condition[0].matched.length
+  const len = condition.matched.length
   if (len > matchedMax) {
     onlyMessage(`编码生成规则条数不能超过 ${matchedMax}`, 'warning')
     return
   }
-  condition[0].matched.push({
+  condition.matched.push({
     type: type,
     [type]: getMatchedValue(type)
   })
