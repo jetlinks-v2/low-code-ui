@@ -16,7 +16,7 @@
                     <FormPreview v-if="!item.multiple" :value="item.data" :data="item.configuration" ref="formRef"
                         :disabled="disable" @state-change="(data) => getFormData(data, index)" />
                     <div v-else style="background-color: #fff;">
-                        <QuickEditTable validate ref="tableRef" :data="item.data" :columns="item.configuration"
+                        <QuickEditTable validate ref="tableRef" style="height: 700px" :data="item.data" :columns="item.configuration"
                             :scroll="{ x: 1300, y: 700 }">
                             <template v-for="(i, index) in item.configuration"
                                 #[i.dataIndex]="{ record, index, valueChange }">
