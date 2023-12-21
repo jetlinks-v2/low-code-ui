@@ -21,6 +21,7 @@ import CheckSpin from './CheckSpin/index.vue'
 import CheckButton from './CheckButton/index.vue'
 import PageDesigner from './PageDesigner/index.vue'
 import CIAE from './Database/CIAE'
+import CopyButton from './CopyButton'
 
 export {
     TitleComponent,
@@ -50,4 +51,5 @@ export {
     FormDesigner,
     CustomHTML,
     CIAE,
+    CopyButton
 }
