@@ -124,7 +124,7 @@
 
 <script setup lang="ts">
 import { onlyMessage, regular } from '@jetlinks-web/utils'
-import { saveProcess_api } from '@LowCode/api/process/model'
+import { saveProcess_api, validateProcess_api } from '@LowCode/api/process/model'
 import { useRequest } from '@jetlinks-web/hooks'
 import { isImg } from '@LowCode/utils/comm'
 import { providerEnum } from '@LowCode/api/process/model'
@@ -180,13 +180,28 @@ const form = reactive<Partial<FormType>>({
 const keyRules = [
   { required: true, message: '请输入流程key' },
   {
-  validator: (_: any, value: string) => {
-    if (value && !regular.isEnglishOrNumber(value)) {
-      return Promise.reject('只允许输入英文或者数字')
-    }
-    return Promise.resolve()
-  }
-}]
+    validator: async (_: any, value: string) => {
+      if (value) {
+
+        if (!regular.isEnglishOrNumber(value)) {
+          return Promise.reject('只允许输入英文或者数字')
+        }
+
+        // const res = await validateProcess_api({ key: value})
+        //
+        // if (res.success && !res.result) {
+        //   return Promise.reject('流程key重复')
+        // }
+        return Promise.resolve()
+      }
+      return Promise.resolve()
+    },
+  },
+  {
+    max: 64,
+    message: '最多输入64个字符',
+  },
+]
 
 const filterOption = (input: string, option: any) => {
   return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
