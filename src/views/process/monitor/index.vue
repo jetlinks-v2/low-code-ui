@@ -121,6 +121,7 @@ import dayjs from 'dayjs'
 import { providerEnum } from '@LowCode/api/process/model'
 import Drawer from '@LowCode/views/process/me/Detail/index.vue'
 import { Search as ProSearch} from '@LowCode/components/index'
+import {queryDictionaryData} from "@LowCode/api/form";
 
 const tableRef = ref()
 const history = ref(false)
@@ -166,6 +167,24 @@ const defaultColumns = [
         placeholder: '请输入流程名称',
       },
     },
+  },
+  {
+    title: '所属系统',
+    dataIndex: 'ownerName',
+    search: {
+      type: 'select',
+      rename: 'owner',
+      options: () => new Promise((resolve) => {
+        queryDictionaryData('sys_process_owner').then(res => {
+          if (res.success) {
+            resolve(res.result.map(item => ({
+              label: item.text,
+              value: item.value
+            })))
+          }
+        })
+      })
+    }
   },
   {
     title: '标题',

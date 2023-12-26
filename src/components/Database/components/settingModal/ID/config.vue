@@ -7,10 +7,10 @@
           :index="index"
           :key="item.key"
           :dataId="id"
-          v-model:value="item.condition"
+          :value="item"
           @addRule="addRule"
           @deleteRule="onDelete"
-          @change="change"
+          @change="(d) => { change(d, index) }"
       />
   </div>
 </template>
@@ -42,7 +42,8 @@ const myValue = ref((props.value || []).map( item => ({
   key: randomString(6)
 })))
 
-const change = () => {
+const change = (data, index) => {
+  myValue.value[index] = data
   const newValue = myValue.value.map(item => omit(item, ['key']))
   emit('update:value', newValue)
   formItemContext.onFieldChange()

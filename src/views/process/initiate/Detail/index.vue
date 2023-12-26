@@ -30,6 +30,7 @@
                       serial
                       validate
                       ref="tableRef"
+                      style="height: 500px"
                       :data="tableData[item.formId]"
                       :columns="item._columns"
                       :height="500"

@@ -50,6 +50,7 @@
               v-model:relation="relation"
               v-model:audit="audit"
               :id="props.id"
+              :fullId="props.fullId"
               :parentId="props.parentId"
               @update="update"
             />
