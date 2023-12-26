@@ -2,24 +2,26 @@ import { request } from '@jetlinks-web/core'
 
 /**
  * 条件查询流程模型
- * @returns 
+ * @returns
  */
 export const getProcess_api = (data: any) => request.post(`/process/definition/detail/_query`, data);
 
 /**
  * 条件查询所有流程模型
- * @returns 
+ * @returns
  */
 export const getAllProcess_api = (data: any) => request.post(`/process/definition/detail/_query/no-paging`, data);
 
 /**
  * 保存模型
- * @returns 
+ * @returns
  */
 export const saveProcess_api = (data: any) => request.patch(`/process/definition`, data);
+
+export const validateProcess_api = (data: any) => request.get(`/process/definition/_validate`, data);
 /**
  * 获取模型类型
- * @returns 
+ * @returns
  */
 export const providerEnum = () => request.get('/dictionary/sys_process_classification/items')
 
