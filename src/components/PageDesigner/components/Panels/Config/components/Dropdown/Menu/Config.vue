@@ -10,6 +10,7 @@
       <QuickEditTable
           validate
           ref="tableRef"
+          style="height: 332px"
           :data="dataSource"
           :columns="myColumns"
           :height="300"

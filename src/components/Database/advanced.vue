@@ -225,9 +225,16 @@
           >
             <template #bodyCell="{ column, text }">
               <template v-if="column.dataIndex === 'api'">
-                <j-ellipsis>
-                  {{ text }}
-                </j-ellipsis>
+                <div style="display: flex; align-items: center;">
+                  <div style="flex: 1">
+                    <j-ellipsis>
+                      {{ text }}
+                    </j-ellipsis>
+                  </div>
+                  <CopyButton v-slot="{ copy, copied }" :source="text">
+                    <AIcon type="CopyOutlined" @click="() => { copy(); onlyMessage('复制成功')}" />
+                  </CopyButton>
+                </div>
               </template>
               <template v-if="column.dataIndex === 'description'">
                 <j-ellipsis>
@@ -248,12 +255,12 @@
 <script setup name="CRUDAdvanced">
 import {getAssetType} from '@LowCode/api/basis'
 import {useRequest} from '@jetlinks-web/hooks'
-import {regular} from '@jetlinks-web/utils'
+import {onlyMessage, regular} from '@jetlinks-web/utils'
 import {CRUD_COLUMNS, formErrorFieldsToObj, proAll} from "@LowCode/components/Database/util";
 import {queryDraftCommands, queryEndCommands} from '@LowCode/api/form'
 import {useProduct} from '@LowCode/store'
 import {AdvancedApiColumns} from './util'
-import { CardBox } from '@LowCode/components/index'
+import { CardBox, CopyButton } from '@LowCode/components/index'
 
 const props = defineProps({
   tree: {
@@ -276,11 +283,17 @@ const props = defineProps({
     type: String,
     default: undefined
   },
+  fullId: {
+    type: String,
+    default: undefined
+  },
   parentId: {
     type: String,
     default: undefined
   }
 })
+
+
 
 const emit = defineEmits(['update:tree', 'update:asset', 'update:relation', 'update'])
 
@@ -303,7 +316,7 @@ const {data: apiDataSource, run: apiRun} = useRequest(queryDraftCommands,
       const arr = item?.command?.map(a => {
         return {
           ability: a.name,
-          api: `/low-code/runtime/${project.info.id}/${props.parentId}/${a.id}`,
+          api: `/low-code/runtime/${project.info.id}/${props.fullId}/${a.id}`,
           instruction: a.id,
           description: a.description
         }

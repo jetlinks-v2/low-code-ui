@@ -28,6 +28,9 @@
           <j-input v-else v-model:value="record.name"
                    @change="() => { valueChange(record.name); alias(record.name, record) }"/>
         </template>
+        <template #alias="{ record }">
+          <span style="user-select: all">{{ record.alias }}</span>
+        </template>
         <template #comment="{record, index, valueChange}">
           <span v-if="index <= maxLen">{{ record.comment }}</span>
           <j-input v-else v-model:value="record.comment" :maxLength="16"
@@ -226,7 +229,6 @@ const myColumns = [
     title: '别名',
     dataIndex: 'alias',
     tooltip: '驼峰命名',
-    ellipsis: true,
     width: 200
   },
   {

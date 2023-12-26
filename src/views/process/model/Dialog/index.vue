@@ -14,6 +14,19 @@
   >
     <j-form ref="formRef" :model="form" autocomplete="off" layout="vertical">
       <j-form-item
+        name="key"
+        label="流程key"
+        :rules="keyRules"
+        validateFirst
+      >
+        <j-input
+          :disabled="props.data.id"
+          v-model:value="form.key"
+          placeholder="请输入流程key"
+          style="width: 576px"
+        />
+      </j-form-item>
+      <j-form-item
         name="name"
         label="流程名称"
         :rules="[
@@ -110,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { onlyMessage, randomString } from '@jetlinks-web/utils'
+import { onlyMessage, regular } from '@jetlinks-web/utils'
 import { saveProcess_api } from '@LowCode/api/process/model'
 import { useRequest } from '@jetlinks-web/hooks'
 import { isImg } from '@LowCode/utils/comm'
@@ -158,11 +171,22 @@ const formRef = ref<any>()
 const selected = ref<string>()
 // 表单相关
 const form = reactive<Partial<FormType>>({
-  key: randomString(),
+  key: '',
   model: '',
   provider: 'wflow',
   classifiedId: undefined
 })
+
+const keyRules = [
+  { required: true, message: '请输入流程key' },
+  {
+  validator: (_: any, value: string) => {
+    if (value && !regular.isEnglishOrNumber(value)) {
+      return Promise.reject('只允许输入英文或者数字')
+    }
+    return Promise.resolve()
+  }
+}]
 
 const filterOption = (input: string, option: any) => {
   return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
