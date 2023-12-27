@@ -195,14 +195,14 @@ export const handleAuthMenu = (menuData: any, cb: (code, buttons) => void) => {
   }
 }
 
-export const handleMenuInit = (menus: any[]) => {
+export const handleMenuInit = (menus: any[], mode?: string) => {
     return menus?.map(item => {
         if (item.code === 'process') {
             item.redirect = `${item.url}/home`
             item.children =  [
                 {
                     code: 'process/home',
-                    name: '',
+                    name: mode === 'tags' ? item.name : '',
                     url: item.redirect,
                 },
                 ...(item.children || [])
