@@ -189,9 +189,9 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
             }
         }
         //  && !node.formItemProps?.label
-        if (['tabs', 'collapse', 'card', 'title'].includes(_type) && node?.formItemProps?.isLayout) {
-            return obj
-        }
+        // if (['tabs', 'collapse', 'card', 'title'].includes(_type) && node?.formItemProps?.isLayout) {
+        //     return obj
+        // }
         if (['input', 'textarea', 'input-password', 'date-picker', 'time-picker'].includes(_type)) {
             const ___item = (node?.formItemProps?.rules || []).find(item => {
                 return !item?.trigger?.length
