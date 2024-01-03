@@ -47,7 +47,7 @@ type StateType = {
 const router = useRouter();
 const route = useRoute();
 const systemStore = useSystemStore()
-const menuStore = store.MenuStore()
+const menuStore = store.useMenuStore()
 
 const { theme, layout } = storeToRefs(systemStore)
 

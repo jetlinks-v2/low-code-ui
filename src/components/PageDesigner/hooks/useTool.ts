@@ -16,7 +16,7 @@ const useTool = () => {
     const pageDesigner = usePageDesigner();
     const pageProvider = usePageProvider()
     const _noCopyData = ['steps-item', 'info-item', 'info-item-item', 'info-item-item-item', 'timeline-item', 'inline-item', 'card-item', 'tabs-item']
-    const { jumpPageByCode } = store.MenuStore()
+    const { jumpPageByCode } = store.useMenuStore()
 
     const paramsUtil = {
         route: useRoute(),
