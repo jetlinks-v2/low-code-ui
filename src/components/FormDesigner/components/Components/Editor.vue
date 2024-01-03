@@ -53,7 +53,6 @@ const handleChange = (editor: any) => {
 
 watchEffect(() => {
   valueHtml.value = props.value || ''
-  console.log(editorRef.value?.getAllMenuKeys())
 })
 
 onBeforeUnmount(() => {// 组件销毁时，也及时销毁编辑
