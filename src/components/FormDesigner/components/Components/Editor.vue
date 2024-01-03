@@ -34,18 +34,21 @@ const props = defineProps({
   }
 })
 const emits = defineEmits(['update:value', 'change'])
-
 const editorRef = shallowRef()
 const valueHtml = ref('') // 内容 HTML
-const toolbarConfig = {}
+const toolbarConfig = {
+  excludeKeys: ['fullScreen', 'uploadVideo', 'uploadImage']
+}
 const editorConfig = {placeholder: props.placeholder}
 const handleCreated = (editor: any) => {
   editorRef.value = editor // 记录 editor 实例，重要！
 }
 
 const handleChange = (editor: any) => {
-  emits('update:value', editor.getHtml())
-  emits('change', editor.getHtml())
+  if(editor.getText()){
+    emits('update:value', editor.getHtml())
+    emits('change', editor.getHtml())
+  }
 }
 
 watchEffect(() => {

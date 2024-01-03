@@ -207,13 +207,13 @@ watch(
   }
 }
 
-
 :deep(.ant-upload-list){
   flex:1;
 }
 :deep(.ant-upload-list-text-container) {
         display: flex;
-        width: 100%;
+        width: calc(100% - 20px);
+        margin: 10px;
   }
 .render {
   display: flex;
