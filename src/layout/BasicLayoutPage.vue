@@ -32,7 +32,7 @@
 import { useRouter, useRoute } from '@jetlinks-web/router'
 import { reactive, computed, watchEffect } from 'vue'
 import { useSystemStore } from '@LowCode/store/system'
-import { useMenuStore } from '@LowCode/store/menu'
+import { store } from '@jetlinks-web/stores'
 import { User, Notice } from './components'
 import { storeToRefs } from 'pinia'
 
@@ -47,7 +47,7 @@ type StateType = {
 const router = useRouter();
 const route = useRoute();
 const systemStore = useSystemStore()
-const menuStore = useMenuStore()
+const menuStore = store.MenuStore()
 
 const { theme, layout } = storeToRefs(systemStore)
 

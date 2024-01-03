@@ -12,7 +12,7 @@
 </template>
 <script setup lang="ts">
 import { getImage } from '@jetlinks-web/utils'
-import { useMenuStore } from '@LowCode/store'
+import { store } from '@jetlinks-web/stores'
 import { ProImage } from '@LowCode/components/index'
 
 const props = defineProps({
@@ -23,7 +23,7 @@ const props = defineProps({
 })
 const router = useRouter()
 
-const menu = useMenuStore()
+const menu = store.useMenuStore()
 
 const handleClick = () => {
   // router.push({

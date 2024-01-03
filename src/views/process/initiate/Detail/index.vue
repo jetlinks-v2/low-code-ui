@@ -106,7 +106,7 @@ import FormPreview from '@LowCode/components/FormDesigner/preview.vue'
 import md5 from 'md5'
 import { getMeProcessList } from '@LowCode/api/process/me'
 import { getImage } from '@jetlinks-web/utils'
-import { useMenuStore } from '@LowCode/store'
+import { store } from '@jetlinks-web/stores'
 import FormItem from '@LowCode/views/process/me/Detail/components/FormItem.vue'
 import { handleRules } from '@LowCode/components/FormDesigner/hooks/useProps'
 import { isArray } from 'lodash-es'
@@ -122,7 +122,7 @@ interface FormsProps {
   _columns?: any[]
 }
 
-const menu = useMenuStore()
+const menu = store.useMenuStore()
 const loading = ref<boolean>(false)
 const router = useRouter()
 const route = useRoute()

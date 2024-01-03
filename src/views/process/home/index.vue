@@ -20,11 +20,11 @@
 import MyCard from '../components/MyCard/index.vue'
 import { getMeProcessList } from '@LowCode/api/process/me'
 import { useUserStore } from '@LowCode/store/user'
-import { useMenuStore } from '@LowCode/store'
+import { store } from '@jetlinks-web/stores'
 import { TitleComponent } from '@LowCode/components/index'
 
 const userStore = useUserStore()
-const menu = useMenuStore()
+const menu = store.useMenuStore()
 
 const build = computed(()=>{
   return processBuild.filter(item => {
