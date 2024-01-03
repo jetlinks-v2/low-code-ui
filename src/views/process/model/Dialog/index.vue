@@ -14,6 +14,19 @@
   >
     <j-form ref="formRef" :model="form" autocomplete="off" layout="vertical">
       <j-form-item
+        name="key"
+        label="流程key"
+        :rules="keyRules"
+        validateFirst
+      >
+        <j-input
+          :disabled="props.data.id"
+          v-model:value="form.key"
+          placeholder="请输入流程key"
+          style="width: 576px"
+        />
+      </j-form-item>
+      <j-form-item
         name="name"
         label="流程名称"
         :rules="[
@@ -110,8 +123,8 @@
 </template>
 
 <script setup lang="ts">
-import { onlyMessage, randomString } from '@jetlinks-web/utils'
-import { saveProcess_api } from '@LowCode/api/process/model'
+import { onlyMessage, regular } from '@jetlinks-web/utils'
+import { saveProcess_api, validateProcess_api } from '@LowCode/api/process/model'
 import { useRequest } from '@jetlinks-web/hooks'
 import { isImg } from '@LowCode/utils/comm'
 import { providerEnum } from '@LowCode/api/process/model'
@@ -158,11 +171,37 @@ const formRef = ref<any>()
 const selected = ref<string>()
 // 表单相关
 const form = reactive<Partial<FormType>>({
-  key: randomString(),
+  key: '',
   model: '',
   provider: 'wflow',
   classifiedId: undefined
 })
+
+const keyRules = [
+  { required: true, message: '请输入流程key' },
+  {
+    validator: async (_: any, value: string) => {
+      if (value) {
+
+        if (!regular.isEnglishOrNumber(value)) {
+          return Promise.reject('只允许输入英文或者数字')
+        }
+
+        // const res = await validateProcess_api({ key: value})
+        //
+        // if (res.success && !res.result) {
+        //   return Promise.reject('流程key重复')
+        // }
+        return Promise.resolve()
+      }
+      return Promise.resolve()
+    },
+  },
+  {
+    max: 64,
+    message: '最多输入64个字符',
+  },
+]
 
 const filterOption = (input: string, option: any) => {
   return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;

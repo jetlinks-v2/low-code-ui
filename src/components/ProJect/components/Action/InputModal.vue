@@ -62,13 +62,26 @@ const props = defineProps({
 
 const modelRef = reactive({
   title: props.data.title || '',
-  id: props.data.id || randomString(16),
+  id: props.data.id,
   type: props.data.type || props.provider,
   parentId: props.data.parentId || engine.activeFile,
   children: props.data.children || []
 })
 const formRef = ref()
 const inputRef = ref()
+
+const typeMap = new Map()
+typeMap.set(providerEnum.Module,'Module')
+typeMap.set(providerEnum.SQL,'SQL')
+typeMap.set(providerEnum.CRUD,'CRUD')
+typeMap.set(providerEnum.Page,'PAGE')
+typeMap.set(providerEnum.HtmlPage,'HTML')
+typeMap.set(providerEnum.FormPage,'FORM')
+typeMap.set(providerEnum.Function,'Func')
+typeMap.set(providerEnum.ListPage,'List')
+typeMap.set(providerEnum.PageDesign,'DESIGN')
+typeMap.set(providerEnum.CIAE,'CIAE')
+typeMap.set('project','PROJECT')
 
 const titleType = computed(() => props.type === 'Add' ? '新增' : '重命名')
 
@@ -91,6 +104,13 @@ const isOnlyName = async (_, value) => {
   }
 }
 
+const getTableName = () => {
+  const productId = product.info.id.substr(0, 4)
+  const _moduleId = props.data.parentId || engine.activeFile
+  const moduleId = _moduleId.substr(0, 4)
+  return product.info.id === _moduleId ? `${productId}_${generateSerialNumber(3)}` : `${productId}_${moduleId}_${generateSerialNumber(3)}`
+}
+
 const getConfiguration = (type) => {
   switch (type) {
     case providerEnum.SQL:
@@ -98,15 +118,14 @@ const getConfiguration = (type) => {
         sql: undefined
       };
     case providerEnum.CRUD:
-      const productId = product.info.id.substr(0, 4)
-      const _moduleId = props.data.parentId || engine.activeFile
-      const moduleId = _moduleId.substr(0, 4)
-      console.log(product.info.id, _moduleId)
-      const tableName = product.info.id === _moduleId ? `${productId}_${generateSerialNumber(3)}` : `${productId}_${moduleId}_${generateSerialNumber(3)}`
       return {
-        tableName: tableName,
+        tableName: getTableName(),
         columns: []
       };
+    case providerEnum.CIAE:
+      return {
+        configuration: {}
+      }
     case providerEnum.Function:
       return {
         lang: undefined,
@@ -156,6 +175,7 @@ onKeyStroke('Enter', async () => {
     emit('save', {
       ...modelRef,
       name: modelRef.title,
+      id:props.data.id?props.data.id:`${typeMap.get(modelRef.type)}_${randomString(8)}`,
       configuration: props.data.configuration ? props.data.configuration : getConfiguration(modelRef.type),
       others: props.data.others ? props.data.others : handleOthers(modelRef.type, modelRef.title)
     })

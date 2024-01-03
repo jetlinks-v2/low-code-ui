@@ -1,7 +1,8 @@
 <template>
 
-  <j-form-item label="元素类型" :name="['others', 'valueJavaType']" required :rules="[{ required: true, message: '请选择元素类型'}]">
+  <j-form-item label="元素类型" :name="['others', 'valueJavaType']">
     <j-select
+        allowClear
       v-model:value="model.others.valueJavaType"
       :options="options"
       :fieldNames="{

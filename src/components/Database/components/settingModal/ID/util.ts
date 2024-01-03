@@ -1,16 +1,12 @@
 export const addItem = () => {
     return {
-        condition: [
-            {
-                terms: [{
-                    column: undefined,
-                    termType: undefined,
-                    value: undefined,
-                    type: 'and'
-                }],
-                matched: []
-            }
-        ]
+        terms: [{
+            column: undefined,
+            termType: undefined,
+            value: undefined,
+            type: 'and'
+        }],
+        matched: []
     }
 }
 
@@ -34,8 +30,9 @@ export const validatorTerms = (terms: any[]) => {
 export const ruleValidator = (val: any[]) => {
     if (val?.length) {
         let errorMes = ''
+        console.log(val)
         val.some((item, index) => {
-            const { terms, matched } = item.condition[0]
+            const { terms, matched } = item
             const termsError = validatorTerms(terms)
 
             if (termsError) {

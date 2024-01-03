@@ -163,7 +163,7 @@ const save = () => {
         ...props.data,
         ...formModel.value
       }, ['conditionData'])
-      console.log(_fixValue, conditionData)
+
       if (_fixValue) {
         newData.defaultValueSpec = {
           fixValue: _fixValue

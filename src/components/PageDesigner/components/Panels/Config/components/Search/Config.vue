@@ -11,6 +11,7 @@
       ref="tableRef"
       :data="dataSource"
       :columns="myColumns"
+      style="height: 532px"
       :height="500"
       :scroll="{ x: 1600, y: 500 }"
     >

@@ -11,6 +11,10 @@
          </div>
       </div>
       <div class="content">
+         <div class="content-title">ID：</div>
+         <div class="right">{{ props.data.id }}</div>
+      </div>
+      <div class="content">
          <div class="content-title">添加时间：</div>
          <div class="right">{{ props.data.others.createTime }}</div>
       </div>

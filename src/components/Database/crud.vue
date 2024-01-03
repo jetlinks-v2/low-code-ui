@@ -50,6 +50,7 @@
               v-model:relation="relation"
               v-model:audit="audit"
               :id="props.id"
+              :fullId="props.fullId"
               :parentId="props.parentId"
               @update="update"
             />
@@ -83,6 +84,10 @@ const props = defineProps({
     default: undefined
   },
   title: {
+    type: String,
+    default: undefined
+  },
+  moduleId: {
     type: String,
     default: undefined
   },
@@ -135,8 +140,7 @@ provide(CRUD_COLUMNS, tableColumns)
 provide(WARP_REF, warpRef)
 
 const ownerId = computed(() => {
-  const stId = project.info?.id === props.parentId ? [project.info?.id,project.info?.id] : [project.info?.id,project.info?.id,props.parentId]
-  return `${stId.join('.')}.${props.id}`
+  return `${project.info.id}.${props.fullId}`
 })
 
 const tableName = ref(props.configuration.tableName)
@@ -149,12 +153,12 @@ const tree = ref(props.configuration.tree || false)
 const loading = ref(false)
 
 const update = () => {
-  const { configuration, ...extra} = props
+  const { configuration, showTip, ...extra} = props
 
   if (errorTips.relation && (!relation.value.enabled || relation.value.assetIdColumn)) {
     errorTips.relation = []
   }
-  console.log(extra)
+
   project.update({
     ...extra,
     configuration: {
