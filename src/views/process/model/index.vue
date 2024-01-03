@@ -165,10 +165,10 @@ import FlowDesign from '@LowCode/views/process/model/Detail/FlowDesign/index.vue
 import ShowCopy from '@LowCode/views/process/model/Detail/ShowCopy/index.vue'
 import { useFlowStore } from '@LowCode/store/flow'
 import { Modal } from 'jetlinks-ui-components'
-import { useMenuStore } from '@LowCode/store'
+import { store } from '@jetlinks-web/stores'
 import { Card , Search as ProSearch , BadgeStatus , ProImage} from '@LowCode/components/index'
 
-const menu = useMenuStore()
+const menu = store.useMenuStore()
 const flowStore = useFlowStore()
 const step1 = ref()
 const step2 = ref()
