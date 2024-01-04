@@ -48,6 +48,9 @@ const handleChange = (editor: any) => {
   if(editor.getText()){
     emits('update:value', editor.getHtml())
     emits('change', editor.getHtml())
+  } else {
+    emits('update:value', '')
+    emits('change', '')
   }
 }
 
