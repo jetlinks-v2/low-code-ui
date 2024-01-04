@@ -10,5 +10,6 @@ export async function initStoreBus() {
     MenuStore: useMenuStore(),
     SystemStore: useSystemStore(),
     AuthStore: useAuthStore(),
+    useMenuStore: useMenuStore,
   })
 }
