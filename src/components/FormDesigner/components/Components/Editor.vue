@@ -37,7 +37,7 @@ const emits = defineEmits(['update:value', 'change'])
 const editorRef = shallowRef()
 const valueHtml = ref('') // 内容 HTML
 const toolbarConfig = {
-  excludeKeys: ['fullScreen', 'uploadVideo', 'uploadImage']
+  excludeKeys: ['fullScreen', 'uploadVideo', 'insertImage', 'uploadImage', 'insertLink', 'insertTable', 'redo', 'codeBlock', 'insertVideo']
 }
 const editorConfig = {placeholder: props.placeholder}
 const handleCreated = (editor: any) => {
