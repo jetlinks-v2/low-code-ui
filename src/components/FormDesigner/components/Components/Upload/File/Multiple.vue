@@ -1,66 +1,252 @@
 <template>
-  <div style="border: 1px solid #ccc">
-    <Toolbar
-        style="border-bottom: 1px solid #ccc"
-        :editor="editorRef"
-        :defaultConfig="toolbarConfig"
-    />
-    <Editor
-        :style="{height: height + 'px', overflowY: 'hidden'}"
-        v-model="valueHtml"
-        :defaultConfig="editorConfig"
-        @onCreated="handleCreated"
-        @onChange="handleChange"
-    />
+  <div class="content">
+    <a-upload-dragger
+        v-model:file-list="fileList"
+        :maxCount="maxCount"
+        :action="_fileUpload"
+        :headers="headers"
+        :accept="accept"
+        name="file"
+        :multiple="maxCount > 1"
+        :disabled="disabled"
+        :before-upload="beforeUpload"
+        @change="handleChange"
+        @drop="handleDrop"
+    >
+      <div>
+        <div class="ant-upload-drag-icon">
+          <img src="/images/form-designer/upload-img.png" />
+        </div>
+        <p class="ant-upload-drag-tip">点击上方”选择文件"或将文件拖拽到此区域</p>
+        <p class="ant-upload-drag-sub-tip">{{ props.accept?.length ? `支持格式:${props?.accept?.join('、')}` : `支持所有格式` }}</p>
+      </div>
+      <template #itemRender="{ file }">
+        <div class="render">
+          <j-input
+              v-model:value="file.name"
+              v-if="dbId === file.uid && dbRef"
+              @blur="onBlur"
+              class="render-left"
+              ref="nameRef"
+          ></j-input>
+          <div class="render-left" @dblclick="onDbClick(file)" v-else>
+            <div class="render-left-image">
+              <img :src="imgTypeMap.get(file.type) || imgTypeMap.get('other')" :width="32" />
+              <j-ellipsis>{{ file.name }}</j-ellipsis>
+            </div>
+            <j-progress :percent="file.percent.toFixed(2)" size="small" trailColor="#eaf2fe" v-if="file.status === 'uploading'"></j-progress>
+          </div>
+          <j-space>
+            <j-button
+                type="link"
+                style="padding: 0"
+                @click="onDelete(file)"
+                :disabled="disabled"
+                danger
+            >
+              <AIcon type="DeleteOutlined" />
+            </j-button>
+            <j-button
+                type="link"
+                style="padding: 0"
+                @click="onLoad(file)"
+            >
+              <AIcon type="DownloadOutlined" />
+            </j-button>
+          </j-space>
+        </div>
+      </template>
+    </a-upload-dragger>
   </div>
 </template>
 
-<script setup lang="ts">
-import {Editor, Toolbar} from '@wangeditor/editor-for-vue'
-import '@wangeditor/editor/dist/css/style.css' // 引入 css
+<script lang="ts" setup>
+import { nextTick, ref, watch } from 'vue'
+import type { UploadProps, UploadChangeParam } from 'jetlinks-ui-components'
+import { _fileUpload } from '@LowCode/api/comm'
+import { TOKEN_KEY } from '@jetlinks-web/constants'
+import { LocalStore } from '@jetlinks-web/utils/src/storage'
+import {downloadFileByUrl, onlyMessage} from '@jetlinks-web/utils'
+import { downloadFile } from '@LowCode/api/form'
+import {imgTypeMap} from "../data";
 
 const props = defineProps({
-  value: {
-    type: String,
-    default: ''
-  },
-  height: {
+  fileSize: {
     type: Number,
-    default: 200
+    default: 2,
   },
-  placeholder: {
+  unit: {
     type: String,
-    default: '请输入'
+    default: 'M',
+  },
+  accept: {
+    type: Array,
+  },
+  maxCount: {
+    type: Number,
+    default: 1,
+  },
+  headers: {
+    type: Object,
+    default: {
+      [TOKEN_KEY]: LocalStore.get(TOKEN_KEY),
+    },
+  },
+  value: Array,
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+const emits = defineEmits(['change'])
+
+const fileList = ref<any[]>([])
+const dbRef = ref<boolean>(false)
+const dbId = ref<string>('')
+const nameRef = ref()
+const beforeUpload = (file: UploadProps['fileList'][number]) => {
+  // console.log('props.accept----', props.accept, file)
+  const maxSize =
+      props.unit === 'M' ? props.fileSize * 1024 * 1024 : props.fileSize * 1024
+  const arr = file.name.split('.')
+  const isType = props.accept?.length
+      ? props.accept?.join('').includes(arr[arr.length - 1])
+      : true
+
+  return new Promise((resolve) => {
+    if (maxSize < file.size) {
+      onlyMessage(
+          `该文件超过${props.fileSize}${props.unit}, 请重新上传`,
+          'error',
+      )
+      // reject(file)
+      return false
+    } else if (!isType) {
+      onlyMessage(`格式错误，请重新上传`, 'error')
+      return false
+    } else {
+      resolve(file)
+    }
+  })
+}
+
+const handleChange = async (info: UploadChangeParam) => {
+  if (!info.file.status) return
+  if (info.file.status === 'done') {
+    const arr = fileList.value.map((item) => ({
+      name: item.name,
+      url: item.response?.result?.accessUrl || item.url,
+      uid: item.uid,
+      type: item.extension || item.name?.split('.')?.pop()
+    }))
+    emits('change', arr)
+    onlyMessage('上传成功！', 'success')
   }
-})
-const emits = defineEmits(['update:value', 'change'])
-const editorRef = shallowRef()
-const valueHtml = ref('') // 内容 HTML
-const toolbarConfig = {
-  excludeKeys: ['fullScreen', 'insertLink', 'editLink', 'unLink', 'viewLink', 'redo', 'insertTable', 'codeBlock', 'uploadVideo', 'editVideoSize', 'insertVideo', 'uploadImage', 'insertImage'],
-}
-const editorConfig = {placeholder: props.placeholder}
-const handleCreated = (editor: any) => {
-  editorRef.value = editor // 记录 editor 实例，重要！
 }
 
-const handleChange = (editor: any) => {
-  if(editor.getText()){
-    emits('update:value', editor.getHtml())
-    emits('change', editor.getHtml())
-  } else {
-    emits('update:value', '')
-    emits('change', '')
+const handleDrop = (e) => {
+  // console.log(e, 'drop')
+}
+
+const onDelete = (file: any) => {
+  const _index = fileList.value.findIndex((item) => item.uid === file?.uid)
+  if (_index !== -1) {
+    fileList.value.splice(_index, 1)
+    emits('change', fileList.value)
   }
 }
 
-watchEffect(() => {
-  valueHtml.value = props.value || ''
-})
+const onLoad = (_file: any) => {
+  downloadFile(_file?.url).then(resp => {
+    const blob = new Blob([resp.data]);
+    const _url = URL.createObjectURL(blob);
+    downloadFileByUrl(_url, _file?.name)
+  })
+}
 
-onBeforeUnmount(() => {// 组件销毁时，也及时销毁编辑
-  const editor = editorRef.value
-  if (editor == null) return
-  editor.destroy()
-})
+const onDbClick = (file) => {
+  dbId.value = file.uid
+  dbRef.value = true
+  nextTick(() => {
+    nameRef.value.focus()
+  })
+}
+
+const onBlur = () => {
+  dbId.value = ''
+  dbRef.value = false
+}
+
+watch(
+    () => props.value,
+    (val) => {
+      fileList.value = val || []
+    },
+    {
+      immediate: true,
+    },
+)
 </script>
+
+<style scoped lang='less'>
+.content {
+  & > span {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  :deep(.ant-upload.ant-upload-drag) {
+    padding: 20px 0;
+    background-color: #FFFFFF;
+    width: calc(50% - 12px);
+    min-width: 500px;
+    border: 2px dashed rgba(224, 226, 233);
+  }
+  .ant-upload-drag-tip {
+    color: #191C27;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+
+  .ant-upload-drag-sub-tip {
+    color: #6B6F7F;
+    font-size: 12px;
+  }
+}
+
+:deep(.ant-upload-list){
+  width: calc(50% - 12px);
+  min-width: 500px;
+  overflow-y: auto;
+  height: 256px;
+  padding: 0 10px;
+}
+
+:deep(.ant-upload-list-text-container) {
+  display: flex;
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 12px;
+  border: 1px solid #E0E2E9;
+}
+
+.render {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+  width: 100%;
+  height: 56px;
+
+  .render-left {
+
+    .render-left-image {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+  }
+}
+</style>
