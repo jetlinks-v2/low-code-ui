@@ -201,7 +201,7 @@ watch(
     padding: 20px 0;
     background-color: #FFFFFF;
     width: calc(50% - 12px);
-    min-width: 500px;
+    min-width: 350px;
     border: 2px dashed rgba(224, 226, 233);
   }
   .ant-upload-drag-tip {
@@ -218,7 +218,7 @@ watch(
 
 :deep(.ant-upload-list){
   width: calc(50% - 12px);
-  min-width: 500px;
+  min-width: 350px;
   overflow-y: auto;
   height: 256px;
   padding: 0 10px;
