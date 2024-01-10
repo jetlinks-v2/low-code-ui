@@ -202,7 +202,7 @@ const formData = reactive({
         ? flowStore.model.config.variables
         : initVariables.value,
     set: (val) => {
-      flowStore.model.config.variables = [...initVariables.value, ...val]
+      // flowStore.model.config.variables = [...initVariables.value, ...val]
     },
   }),
   // nameGenerator: computed({
