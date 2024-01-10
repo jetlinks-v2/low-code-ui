@@ -119,13 +119,13 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
       ? props.accept?.join('').includes(arr[arr.length - 1])
       : props.listType === 'picture' ? imgType.includes(file.type) : true
   return new Promise((resolve) => {
-    if(props.maxCount >= fileList.value?.length){
+    if(props.maxCount <= fileList.value?.length){
       onlyMessage(
           `上传图片数量不能超出最大上传数量${props.maxCount || 1}个`,
           'error',
       )
       return false
-    }else  if (maxSize < file.size) {
+    } else  if (maxSize < file.size) {
       onlyMessage(
           `该文件超过${props.fileSize}${props.unit}, 请重新上传`,
           'error',

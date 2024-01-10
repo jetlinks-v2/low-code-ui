@@ -17,7 +17,7 @@
         <div class="ant-upload-drag-icon">
           <img src="/images/form-designer/upload-img.png" />
         </div>
-        <p class="ant-upload-drag-tip">点击此区域或将文件拖拽到此区域</p>
+        <p class="ant-upload-drag-tip">点击或将文件拖拽到此区域</p>
         <p class="ant-upload-drag-sub-tip">{{ props.accept?.length ? `支持格式:${props?.accept?.join('、')}` : `支持所有格式` }}</p>
       </div>
       <template #itemRender="{ file }">
@@ -114,7 +114,7 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
       : true
 
   return new Promise((resolve) => {
-    if(props.maxCount >= fileList.value?.length){
+    if(props.maxCount <= fileList.value?.length){
       onlyMessage(
           `上传图片数量不能超出最大上传数量${props.maxCount || 1}个`,
           'error',
