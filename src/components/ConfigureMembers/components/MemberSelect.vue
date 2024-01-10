@@ -333,6 +333,7 @@ watch(
   () => props.type,
   () => {
     active.value = props.type
+    searchText.value = ''
     if (infoState.isNode) {
       const tree = treeFilter(
         setLevel(infoState.dataMap.value.get('var')),
