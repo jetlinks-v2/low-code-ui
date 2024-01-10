@@ -18,6 +18,7 @@
 <script setup lang="ts">
 import {Editor, Toolbar} from '@wangeditor/editor-for-vue'
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
+import {fileUpload} from '@LowCode/api/comm'
 
 const props = defineProps({
   value: {
@@ -37,9 +38,23 @@ const emits = defineEmits(['update:value', 'change'])
 const editorRef = shallowRef()
 const valueHtml = ref('') // 内容 HTML
 const toolbarConfig = {
-  excludeKeys: ['fullScreen', 'uploadVideo', 'uploadImage']
+  excludeKeys: ['fullScreen', 'insertImage', 'codeBlock', 'redo', '|', 'group-video'] // insertLink
 }
-const editorConfig = {placeholder: props.placeholder}
+const editorConfig = {
+  placeholder: props.placeholder,
+  MENU_CONF: {
+    uploadImage: {
+      async customUpload(file: any, insertFn: any) {
+        const formData = new FormData()
+        formData.append('file',file)
+        const resp = await fileUpload(formData)
+        if(resp.success){
+          insertFn(resp?.result?.accessUrl, resp.result?.name, resp?.result?.accessUrl)
+        }
+      }
+    }
+  }
+}
 const handleCreated = (editor: any) => {
   editorRef.value = editor // 记录 editor 实例，重要！
 }

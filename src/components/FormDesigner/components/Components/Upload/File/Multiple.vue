@@ -1,52 +1,55 @@
 <template>
   <div class="content">
     <a-upload-dragger
-      v-model:file-list="fileList"
-      :maxCount="maxCount"
-      :action="_fileUpload"
-      :headers="headers"
-      :accept="accept"
-      name="file"
-      :multiple="maxCount > 1"
-      :disabled="disabled"
-      :before-upload="beforeUpload"
-      @change="handleChange"
-      @drop="handleDrop"
+        v-model:file-list="fileList"
+        :maxCount="maxCount"
+        :action="_fileUpload"
+        :headers="headers"
+        :accept="accept"
+        name="file"
+        :multiple="maxCount > 1"
+        :disabled="disabled"
+        :before-upload="beforeUpload"
+        @change="handleChange"
+        @drop="handleDrop"
     >
       <div>
-        <p class="ant-upload-drag-icon">
-          <AIcon type="CloudUploadOutlined" />
-        </p>
-        <j-button>选择文件</j-button>
-        <p class="ant-upload-hint">{{ props.accept?.length ? `支持格式:${props?.accept?.join('、')}` : `支持所有格式` }}</p>
+        <div class="ant-upload-drag-icon">
+          <img src="/images/form-designer/upload-img.png" />
+        </div>
+        <p class="ant-upload-drag-tip">点击上方”选择文件"或将文件拖拽到此区域</p>
+        <p class="ant-upload-drag-sub-tip">{{ props.accept?.length ? `支持格式:${props?.accept?.join('、')}` : `支持所有格式` }}</p>
       </div>
       <template #itemRender="{ file }">
         <div class="render">
           <j-input
-            v-model:value="file.name"
-            v-if="dbId === file.uid && dbRef"
-            @blur="onBlur"
-            class="render-left"
-            ref="nameRef"
+              v-model:value="file.name"
+              v-if="dbId === file.uid && dbRef"
+              @blur="onBlur"
+              class="render-left"
+              ref="nameRef"
           ></j-input>
           <div class="render-left" @dblclick="onDbClick(file)" v-else>
-            <j-ellipsis>{{ file.name }}</j-ellipsis>
+            <div class="render-left-image">
+              <img :src="imgTypeMap.get(file.type) || imgTypeMap.get('other')" :width="32" />
+              <j-ellipsis>{{ file.name }}</j-ellipsis>
+            </div>
             <j-progress :percent="file.percent.toFixed(2)" size="small" trailColor="#eaf2fe" v-if="file.status === 'uploading'"></j-progress>
           </div>
           <j-space>
             <j-button
-              type="link"
-              style="width: 10%"
-              @click="onDelete(file)"
-              :disabled="disabled"
-              danger
+                type="link"
+                style="padding: 0"
+                @click="onDelete(file)"
+                :disabled="disabled"
+                danger
             >
               <AIcon type="DeleteOutlined" />
             </j-button>
             <j-button
-              type="link"
-              style="width: 10%"
-              @click="onLoad(file)"
+                type="link"
+                style="padding: 0"
+                @click="onLoad(file)"
             >
               <AIcon type="DownloadOutlined" />
             </j-button>
@@ -54,7 +57,6 @@
         </div>
       </template>
     </a-upload-dragger>
-    <!-- <div class="bottom">单个大小限制{{ fileSize }}{{ unit }}</div> -->
   </div>
 </template>
 
@@ -64,8 +66,9 @@ import type { UploadProps, UploadChangeParam } from 'jetlinks-ui-components'
 import { _fileUpload } from '@LowCode/api/comm'
 import { TOKEN_KEY } from '@jetlinks-web/constants'
 import { LocalStore } from '@jetlinks-web/utils/src/storage'
-import { downloadFileByUrl, onlyMessage } from '@jetlinks-web/utils'
+import {downloadFileByUrl, onlyMessage} from '@jetlinks-web/utils'
 import { downloadFile } from '@LowCode/api/form'
+import {imgTypeMap} from "../data";
 
 const props = defineProps({
   fileSize: {
@@ -105,17 +108,17 @@ const nameRef = ref()
 const beforeUpload = (file: UploadProps['fileList'][number]) => {
   // console.log('props.accept----', props.accept, file)
   const maxSize =
-    props.unit === 'M' ? props.fileSize * 1024 * 1024 : props.fileSize * 1024
+      props.unit === 'M' ? props.fileSize * 1024 * 1024 : props.fileSize * 1024
   const arr = file.name.split('.')
   const isType = props.accept?.length
-    ? props.accept?.join('').includes(arr[arr.length - 1])
-    : true
+      ? props.accept?.join('').includes(arr[arr.length - 1])
+      : true
 
   return new Promise((resolve) => {
     if (maxSize < file.size) {
       onlyMessage(
-        `该文件超过${props.fileSize}${props.unit}, 请重新上传`,
-        'error',
+          `该文件超过${props.fileSize}${props.unit}, 请重新上传`,
+          'error',
       )
       // reject(file)
       return false
@@ -131,11 +134,11 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
 const handleChange = async (info: UploadChangeParam) => {
   if (!info.file.status) return
   if (info.file.status === 'done') {
-    // console.log(fileList.value)
     const arr = fileList.value.map((item) => ({
       name: item.name,
       url: item.response?.result?.accessUrl || item.url,
       uid: item.uid,
+      type: item.extension || item.name?.split('.')?.pop()
     }))
     emits('change', arr)
     onlyMessage('上传成功！', 'success')
@@ -176,13 +179,13 @@ const onBlur = () => {
 }
 
 watch(
-  () => props.value,
-  (val) => {
-    fileList.value = val || []
-  },
-  {
-    immediate: true,
-  },
+    () => props.value,
+    (val) => {
+      fileList.value = val || []
+    },
+    {
+      immediate: true,
+    },
 )
 </script>
 
@@ -190,39 +193,60 @@ watch(
 .content {
   & > span {
     display: flex;
-    // flex-direction: column-reverse;
-    :deep(.ant-upload-list){
-      overflow: auto;
-      height: 160px;
-    }
+    gap: 24px;
+    flex-wrap: wrap;
   }
 
   :deep(.ant-upload.ant-upload-drag) {
-    margin-top: 10px;
-    flex: 1;
+    padding: 20px 0;
+    background-color: #FFFFFF;
+    width: calc(50% - 12px);
+    min-width: 350px;
+    border: 2px dashed rgba(224, 226, 233);
   }
-  .bottom {
-    margin-top: 20px;
-    color: #9c9c9c;
+  .ant-upload-drag-tip {
+    color: #191C27;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+
+  .ant-upload-drag-sub-tip {
+    color: #6B6F7F;
+    font-size: 12px;
   }
 }
 
 :deep(.ant-upload-list){
-  flex:1;
+  width: calc(50% - 12px);
+  min-width: 350px;
+  overflow-y: auto;
+  height: 256px;
+  padding: 0 10px;
 }
+
 :deep(.ant-upload-list-text-container) {
-        display: flex;
-        width: calc(100% - 20px);
-        margin: 10px;
-  }
+  display: flex;
+  width: 100%;
+  margin-top: 0;
+  margin-bottom: 12px;
+  border: 1px solid #E0E2E9;
+}
+
 .render {
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
+  padding: 0 15px;
   width: 100%;
+  height: 56px;
 
   .render-left {
-    width: 50%;
+
+    .render-left-image {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
   }
 }
 </style>

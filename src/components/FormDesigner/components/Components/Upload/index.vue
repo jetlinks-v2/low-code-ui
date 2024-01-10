@@ -1,7 +1,8 @@
 <template>
   <div style="height: 100%;">
     <template v-if="listType === 'text' && !isButton">
-      <File v-bind="_componentProps" :value="_value" @change="onChange" />
+      <Single v-if="maxCount === 1" v-bind="_componentProps" :value="_value" @change="onChange" />
+      <Multiple v-else v-bind="_componentProps" :value="_value" @change="onChange" />
     </template>
     <template v-else-if="!isButton">
       <Picture v-bind="_componentProps" :value="_value" @change="onChange" />
@@ -15,7 +16,8 @@
   <script lang="ts" setup>
 import { omit } from 'lodash-es'
 import { computed, ref, watch } from 'vue'
-import File from './File.vue'
+import Single from './File/Single.vue'
+import Multiple from './File/Multiple.vue'
 import Picture from './Picture.vue'
 import ButtonUpload from './ButtonUpload.vue'
 
