@@ -16,7 +16,7 @@
     "@jetlinks-web/hooks": "^1.0.7",
     "@jetlinks-web/router": "^1.0.5",
     "@jetlinks-web/stores": "^1.0.1",
-    "@jetlinks-web/utils": "^1.0.3",
+    "@jetlinks-web/utils": "^1.0.5",
     "@vue/compiler-sfc": "^3.3.4",
     "@vue/shared": "^3.3.4",
     "@vuemap/vue-amap": "^2.0.13",
