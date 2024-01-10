@@ -409,14 +409,14 @@ const getActions = (record, type = 'card') => {
                     data.loading = false
                 })
               } else {
+                data.loading = false
                 Modal.error({
                   title: '部署失败，流程配置内容不合规',
                 })
               }
             })
-          } catch (error) {
           } finally {
-            // data.loading = false
+            data.loading = false
           }
         },
       }),
