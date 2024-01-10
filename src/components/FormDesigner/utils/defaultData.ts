@@ -16,26 +16,6 @@ export const basic: ISchema[] = [
             }
         }
     },
-    // {
-    //     type:'input-group',
-    //     name:'输入框组合',
-    //     componentProps:{
-    //         preComponent:{
-    //             type:'select',
-    //             show:false,
-    //             col:8,
-    //             options:[],
-    //             preText:''
-    //         },
-    //         afterComponent:{
-    //             type:'select',
-    //             show:false,
-    //             col:8,
-    //             options:[],
-    //             preText:''
-    //         }
-    //     }
-    // },
     {
         type: 'text',
         name: '文本',

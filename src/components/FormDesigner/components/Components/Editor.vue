@@ -1,5 +1,5 @@
 <template>
-  <div style="border: 1px solid #ccc">
+  <div class="editor">
     <Toolbar
         style="border-bottom: 1px solid #ccc"
         :editor="editorRef"
@@ -29,10 +29,15 @@ const props = defineProps({
     type: Number,
     default: 200
   },
+
   placeholder: {
     type: String,
     default: '请输入'
-  }
+  },
+  disabled: {
+    type: Boolean,
+    default: false
+  },
 })
 const emits = defineEmits(['update:value', 'change'])
 const editorRef = shallowRef()
@@ -42,6 +47,7 @@ const toolbarConfig = {
 }
 const editorConfig = {
   placeholder: props.placeholder,
+  readOnly: props.disabled,
   MENU_CONF: {
     uploadImage: {
       async customUpload(file: any, insertFn: any) {
@@ -79,3 +85,11 @@ onBeforeUnmount(() => {// 组件销毁时，也及时销毁编辑
   editor.destroy()
 })
 </script>
+
+<style scoped lang="less">
+.editor {
+  border: 1px solid #ccc;
+  position: relative;
+  width: 100%;
+}
+</style>

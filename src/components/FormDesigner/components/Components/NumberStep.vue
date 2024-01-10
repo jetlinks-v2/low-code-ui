@@ -1,13 +1,13 @@
 <template>
   <div class="box">
-    <j-button @click="onClick(false)">-</j-button>
+    <j-button @click="onClick(false)" :disabled="disabled">-</j-button>
     <j-input-number
         v-bind="_props"
         :value="_value"
         :controls="false"
         @change="onChange"
     />
-    <j-button @click="onClick(true)">+</j-button>
+    <j-button @click="onClick(true)" :disabled="disabled">+</j-button>
   </div>
 </template>
 

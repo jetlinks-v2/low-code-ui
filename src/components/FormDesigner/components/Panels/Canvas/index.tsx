@@ -33,14 +33,18 @@ const Canvas = defineComponent({
         watch(
             () => [keys?.['Ctrl']?.value, keys?.['Meta']?.value],
             ([v1, v2]) => {
-                designer._ctrl.value = v1 || v2
+                if(designer._ctrl?.value){
+                    designer._ctrl.value = v1 || v2
+                }
             },
         )
 
         watch(
             () => [keys?.['Ctrl+C']?.value, keys?.['Meta+C']?.value],
             ([v1, v2]) => {
-                designer._other.value = v1 || v2
+                if(designer._other?.value){
+                    designer._other.value = v1 || v2
+                }
                 if ((v1 || v2) && isEditModel?.value && designer?.focus?.value) {
                     designer?.onCopy?.()
                 }
