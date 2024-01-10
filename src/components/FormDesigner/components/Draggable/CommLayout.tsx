@@ -48,13 +48,20 @@ export default defineComponent({
         const options = ref<any[]>(props.data?.componentProps.options || [])
         const treeData = ref<any[]>(props.data?.componentProps.treeData || [])
         const __value = ref<any>(get(designer.formState, _path))
-        const _props = useProps(props.data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
+        const __data = reactive(props.data)
+        const _props = useProps(__data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
 
         const visible = ref<boolean>(true)
         const disabled = ref<boolean>(_props.componentProps?.disabled || false)
 
         const _index = computed(() => {
             return isNumber(props?.index) ? props.index : 0
+        })
+
+        watch(() => JSON.stringify(props.data), () => {
+            Object.assign(__data, props.data)
+        }, {
+            immediate: true
         })
 
         if (props.data?.formItemProps?.name) {
@@ -86,6 +93,11 @@ export default defineComponent({
             if (unref(isEditModel)) return
             disabled.value = bool
         }
+
+        watchEffect(() => {
+
+            disabled.value = _props.componentProps?.disabled
+        })
 
         const onChange = (...arg) => {
             if (unref(isEditModel)) return

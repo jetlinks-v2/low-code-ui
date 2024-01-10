@@ -17,7 +17,7 @@
         <div class="ant-upload-drag-icon">
           <img src="/images/form-designer/upload-img.png" />
         </div>
-        <p class="ant-upload-drag-tip">点击上方”选择文件"或将文件拖拽到此区域</p>
+        <p class="ant-upload-drag-tip">点击此区域或将文件拖拽到此区域</p>
         <p class="ant-upload-drag-sub-tip">{{ props.accept?.length ? `支持格式:${props?.accept?.join('、')}` : `支持所有格式` }}</p>
       </div>
       <template #itemRender="{ file }">
@@ -106,7 +106,6 @@ const dbRef = ref<boolean>(false)
 const dbId = ref<string>('')
 const nameRef = ref()
 const beforeUpload = (file: UploadProps['fileList'][number]) => {
-  // console.log('props.accept----', props.accept, file)
   const maxSize =
       props.unit === 'M' ? props.fileSize * 1024 * 1024 : props.fileSize * 1024
   const arr = file.name.split('.')
@@ -115,12 +114,17 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
       : true
 
   return new Promise((resolve) => {
-    if (maxSize < file.size) {
+    if(props.maxCount >= fileList.value?.length){
+      onlyMessage(
+          `上传图片数量不能超出最大上传数量${props.maxCount || 1}个`,
+          'error',
+      )
+      return false
+    } else if (maxSize < file.size) {
       onlyMessage(
           `该文件超过${props.fileSize}${props.unit}, 请重新上传`,
           'error',
       )
-      // reject(file)
       return false
     } else if (!isType) {
       onlyMessage(`格式错误，请重新上传`, 'error')
@@ -220,7 +224,7 @@ watch(
   width: calc(50% - 12px);
   min-width: 350px;
   overflow-y: auto;
-  height: 256px;
+  max-height: 256px;
   padding: 0 10px;
 }
 
