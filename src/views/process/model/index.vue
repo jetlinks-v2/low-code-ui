@@ -115,13 +115,16 @@
                             }}
                           </span>
                         </div>
-                        <div>
-                          <span class="text"> 流程标识： </span>
-                          <span class="value">
+                        <div style="flex: 1">
+                          <j-ellipsis >
+                            <span class="text"> 流程标识： </span>
+                            <span class="value">
                             {{
-                              record.key
-                            }}
+                                record.key
+                              }}
                           </span>
+                          </j-ellipsis>
+
                         </div>
                       </div>
                     </div>
