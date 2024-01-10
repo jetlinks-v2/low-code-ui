@@ -95,7 +95,6 @@ export default defineComponent({
         }
 
         watchEffect(() => {
-
             disabled.value = _props.componentProps?.disabled
         })
 
