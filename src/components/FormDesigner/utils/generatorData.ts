@@ -80,6 +80,10 @@ const handleProps = (node: any) => {
             result.showSearch = false
             result.multiple = false
             result.treeCheckStrictly = false
+            result.source = {
+                dictionary: undefined,
+                type: 'dic',
+            }
             break
         case 'upload':
             result.listType = 'text'

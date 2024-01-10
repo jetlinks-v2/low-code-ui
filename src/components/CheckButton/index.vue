@@ -12,8 +12,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, watchEffect } from 'vue'
-
 const props = defineProps({
   options: {
     type: Array,
@@ -33,10 +31,6 @@ const onClick = (_val: string) => {
   emits('update:value', _val)
   emits('change', _val)
 }
-
-watchEffect(() => {
-  console.log(props.value)
-})
 </script>
 
 <style lang="less" scoped>
