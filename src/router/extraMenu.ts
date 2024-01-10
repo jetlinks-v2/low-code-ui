@@ -19,7 +19,11 @@ export const extraMenu = {
   process: [{
     code: 'process/monitor',
     name: '流程监控',
-    url: '/monitor'
+    url: '/monitor',
+    isShow: true,
+    options: {
+      show: true
+    }
   }],
   'process/model': [{
     code: 'process/model/Detail',
