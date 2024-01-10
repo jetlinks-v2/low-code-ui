@@ -102,16 +102,24 @@
                       </j-ellipsis>
                       <div class="other">
                         <j-ellipsis style="width: 200px">
-                          <span class="text">创建人：</span>
+                          <span class="text">部署人：</span>
                           <span class="value">{{ record.creatorName }}</span>
                         </j-ellipsis>
-                        <div>
-                          <span class="text"> 创建时间： </span>
+                        <div style="width: 248px;padding-right: 24px">
+                          <span class="text"> 部署时间： </span>
                           <span class="value">
                             {{
-                              dayjs(record.createTime).format(
+                              dayjs(record.deployTime).format(
                                 'YYYY-MM-DD HH:mm:ss',
                               )
+                            }}
+                          </span>
+                        </div>
+                        <div>
+                          <span class="text"> 流程标识： </span>
+                          <span class="value">
+                            {{
+                              record.key
                             }}
                           </span>
                         </div>
