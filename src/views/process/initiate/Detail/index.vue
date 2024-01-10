@@ -11,10 +11,7 @@
               <div class="form">
                 <template v-for="(item, index) in formList" :key="index">
                   <j-space>
-                    <img
-                      :src="getImage(`/flow-designer/preview-form.png`)"
-                      style="height: 16px"
-                    />
+                    <img :src="getImage(`/flow-designer/preview-form.png`)" style="height: 16px" />
                     <span>
                       {{ item.formName }}
                     </span>
@@ -36,10 +33,7 @@
                       :height="500"
                       :scroll="{ x: 1600 }"
                     >
-                      <template
-                        v-for="j in item._columns"
-                        #[j.dataIndex]="{ index, record, valueChange }"
-                      >
+                      <template v-for="j in item._columns" #[j.dataIndex]="{ index, record, valueChange }">
                         <FormItem
                           v-model="record[j.dataIndex]"
                           :item-type="j.type"
@@ -53,12 +47,7 @@
                         />
                       </template>
                     </QuickEditTable>
-                    <j-button
-                      @click="() => addTableData(item)"
-                      block
-                      style="margin-top: 10px"
-                      >新增</j-button
-                    >
+                    <j-button @click="() => addTableData(item)" block style="margin-top: 10px">新增</j-button>
                   </span>
                 </template>
               </div>
@@ -75,13 +64,7 @@
             <j-affix :offset-bottom="24">
               <div class="btn-list">
                 <j-button class="btn" @click="cancel">取消</j-button>
-                <j-button
-                  class="btn"
-                  type="primary"
-                  :loading="loading"
-                  @click="submit"
-                  >提交</j-button
-                >
+                <j-button class="btn" type="primary" :loading="loading" @click="submit">提交</j-button>
               </div>
             </j-affix>
           </j-col>
@@ -94,13 +77,7 @@
 import { onlyMessage } from '@jetlinks-web/utils'
 import FlowDesigner from '@LowCode/components/FlowDesigner'
 import { Modal } from 'jetlinks-ui-components'
-import {
-  create_api,
-  start_api,
-  getList_api,
-  processDetail_api,
-  save_api,
-} from '@LowCode/api/process/initiate'
+import { create_api, start_api, getList_api, processDetail_api, save_api } from '@LowCode/api/process/initiate'
 import { handleFormToTable } from '@LowCode/views/process/model/Detail/FlowDesign/components/TableFormPreviewUtil'
 import FormPreview from '@LowCode/components/FormDesigner/preview.vue'
 import md5 from 'md5'
@@ -110,7 +87,7 @@ import { store } from '@jetlinks-web/stores'
 import FormItem from '@LowCode/views/process/me/Detail/components/FormItem.vue'
 import { handleRules } from '@LowCode/components/FormDesigner/hooks/useProps'
 import { isArray } from 'lodash-es'
-import {QuickEditTable} from '@LowCode/components/index'
+import { QuickEditTable } from '@LowCode/components/index'
 
 interface FormsProps {
   formId: string
@@ -152,12 +129,7 @@ const addTableData = (item: any) => {
   tableData[item.formId].push(obj)
 }
 
-const getTableColumns = (
-  fields: any[],
-  formId: string,
-  data: any,
-  multiple: boolean,
-) => {
+const getTableColumns = (fields: any[], formId: string, data: any, multiple: boolean) => {
   const _columns = fields?.map((m) => ({
     title: m.formItemProps?.label,
     dataIndex: m.formItemProps?.name,
@@ -194,11 +166,7 @@ const hasData = (array: any[] = []) => {
     // tableList?.forEach((item: any) => {
     // flag = Object.values(item[0]).some((key: any) => key || key?.length > 0)
     // })
-    flag = tableList
-      .flat(2)
-      ?.some((item) =>
-        Object.values(item)?.some((key: any) => key || key?.length > 0),
-      )
+    flag = flag || tableList.flat(2)?.some((item) => Object.values(item)?.some((key: any) => key || key?.length > 0))
     return flag
   }
 }
@@ -326,9 +294,7 @@ const startProcess = (list: any, start: boolean | undefined = undefined) => {
     // id: draftId.value || route.query.id,
     data: {
       form: formList.value?.map((i) => ({
-        formId: editDraft.value
-          ? i.formId
-          : md5(i.formId + '|' + formVersion[i.formId]),
+        formId: editDraft.value ? i.formId : md5(i.formId + '|' + formVersion[i.formId]),
         data: i.multiple ? tableData[i.formId] : list[flag++],
         formKey: i.formKey ?? i.formId,
       })),
@@ -337,6 +303,24 @@ const startProcess = (list: any, start: boolean | undefined = undefined) => {
     start,
   }
   return param
+}
+
+const isDisabled = (_fields, bindMap, formId) => {
+  _fields?.forEach((p) => {
+    const formBind = bindMap.get(formId)?.find((k) => (k.ownerBy ?? k.id) === p.formItemProps.name)
+    if(p.formItemProps.isLayout){
+      const realCheck = formBind.realCheck
+      p.children.forEach(i => {
+        i.children?.forEach(j => {
+          j.componentProps.disabled = realCheck?.includes(j.formItemProps.name) ? false : true
+        })
+      })
+    } else if (!p.children?.length) {
+      p.componentProps.disabled = !formBind?.accessModes?.includes('write')
+    } else {
+      isDisabled(p.children, bindMap, formId)
+    }
+  })
 }
 
 // 处理数据
@@ -349,25 +333,22 @@ const handleData = (data: any, model: string) => {
     //详情接口nodeId
     const bindMap = new Map()
     Object.keys(obj.nodes.props.formBinds || {}).forEach((item) => {
-      bindMap.set(
-        editDraft.value ? md5(item + '|' + formVersion[item]) : item,
-        obj.nodes.props.formBinds[item],
-      )
+      bindMap.set(editDraft.value ? md5(item + '|' + formVersion[item]) : item, obj.nodes.props.formBinds[item])
     })
     const forms = editDraft.value ? data.form : obj.config.forms
-
     formList.value = forms?.map((m) => {
-      const _fields = editDraft.value
-        ? m.configuration?.children
-        : m.fullInfo.configuration?.children
-      _fields?.forEach((p) => {
-        const accessModes = bindMap
-          .get(m.formId)
-          ?.find(
-            (k) => (k.ownerBy ?? k.id) === p.formItemProps.name,
-          )?.accessModes
-        p.componentProps.disabled = !accessModes?.includes('write')
-      })
+      const _fields = editDraft.value ? m.configuration?.children : m.fullInfo.configuration?.children
+
+      // _fields?.forEach((p) => {
+      //   const accessModes = bindMap
+      //     .get(m.formId)
+      //     ?.find(
+      //       (k) => (k.ownerBy ?? k.id) === p.formItemProps.name,
+      //     )?.accessModes
+      //   p.componentProps.disabled = !accessModes?.includes('write')
+      // })
+      isDisabled(_fields, bindMap, m.formId)
+
       if (m.multiple) {
         tableData[m.formId] = [{}]
         m._columns = getTableColumns(_fields, m.formId, m.data, m.multiple)
