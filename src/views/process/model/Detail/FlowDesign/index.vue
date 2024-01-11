@@ -198,8 +198,6 @@ const getUserAllData = async () => {
     )
     userData.value.user = res[1].result
     userData.value.role = res[2].result
-
-    console.log(userData.value)
   })
 }
 

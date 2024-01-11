@@ -112,6 +112,12 @@
       </template>
       <div class="model-content">页面改动数据未保存</div>
     </j-modal>
+    <SaveDialog
+      v-if="dialog.visible"
+      v-model:visible="dialog.visible"
+      :data="dialog.selectItem"
+      @refresh="refresh"
+    />
   </page-container>
 </template>
 
@@ -126,10 +132,17 @@ import { useFlowStore, defaultModel } from '@LowCode/store/flow'
 import { cloneDeep } from 'lodash-es'
 import { TOKEN_KEY } from '@jetlinks-web/constants'
 import {setEmptyNodeProps} from "@LowCode/views/process/model/Detail/FlowDesign/components/utils";
+import SaveDialog from '../Dialog/index.vue'
 
 const flowStore = useFlowStore()
 const route = useRoute()
 const router = useRouter()
+
+const dialog = reactive({
+  selectItem: {},
+  isDeploy: false,
+  visible: false,
+})
 
 const current = ref(0)
 // 每个步骤的状态
@@ -265,7 +278,12 @@ const handleDeploy = async () => {
           valid.every((item) => item.status === 'fulfilled')
         ) {
           // 所有步骤验证通过, 开始部署
-          saveAndDeploy()
+          dialog.selectItem = flowDetail.value
+          dialog.selectItem.model = JSON.stringify(flowStore.model)
+          dialog.selectItem.state = !isChange.value ? flowDetail.value?.state?.value : 'undeployed'
+          dialog.visible = true
+          dialog.isDeploy = true
+          // saveAndDeploy()
         } else {
           onlyMessage('部署失败，流程配置内容不合规', 'error')
           deployLoading.value = false
@@ -282,32 +300,47 @@ const handleDeploy = async () => {
   })
 }
 
+const refresh = () => {
+  saveAndDeploy()
+}
 /**
  * 保存数据并部署
  */
 const saveAndDeploy = () => {
   setEmptyNodeProps(flowStore.model.nodes)
-  const params = {
-    id: route.query.id,
-    state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
-    model: JSON.stringify(flowStore.model),
-  }
   deployLoading.value = true
-  update_api(params)
-    .then(() => {
-      deploy_api(route.query.id as string).then((res) => {
-        if (res.success) {
-          onlyMessage('部署成功', 'success')
-          isModal.value = true
-          router.go(-1)
-        } else {
-          onlyMessage('部署失败', 'error')
-        }
-      })
-    })
-    .finally(() => {
-      deployLoading.value = false
-    })
+  deploy_api(route.query.id as string).then((res) => {
+    if (res.success) {
+      onlyMessage('部署成功', 'success')
+      isModal.value = true
+      router.go(-1)
+    } else {
+      onlyMessage('部署失败', 'error')
+    }
+  }).finally(() => {
+    deployLoading.value = false
+  })
+  // const params = {
+  //   id: route.query.id,
+  //   state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
+  //   model: JSON.stringify(flowStore.model),
+  // }
+  // deployLoading.value = true
+  // update_api(params)
+  //   .then(() => {
+  //     deploy_api(route.query.id as string).then((res) => {
+  //       if (res.success) {
+  //         onlyMessage('部署成功', 'success')
+  //         isModal.value = true
+  //         router.go(-1)
+  //       } else {
+  //         onlyMessage('部署失败', 'error')
+  //       }
+  //     })
+  //   })
+  //   .finally(() => {
+  //     deployLoading.value = false
+  //   })
 }
 
 const onOk = async () => {
