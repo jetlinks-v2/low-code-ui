@@ -392,6 +392,8 @@
           'device',
           'geo',
           'form',
+          'radio',
+          'checkbox'
         ].includes(type)
       "
     >
@@ -406,14 +408,6 @@
           },
         ]"
       >
-        <!-- <j-radio-group
-          v-model:value="target.formItemProps.required"
-          button-style="solid"
-          @change="onDataChange"
-        >
-          <j-radio-button :value="true">必填</j-radio-button>
-          <j-radio-button :value="false">非必填</j-radio-button>
-        </j-radio-group> -->
         <CheckButton
           :options="[
             { label: '必填', value: true },
@@ -547,10 +541,6 @@ const list = computed(() =>
   target.value.componentProps?.listType === 'text' ? textType : imgType,
 )
 
-// const { data: options, run } = useRequest(getGeoType, {
-//   immediate: false,
-// })
-
 const rulesVisible = computed(() => {
   return [
     'input',
@@ -652,10 +642,4 @@ const onDateChange = (e) => {
   target.value.componentProps.showTime = !(e === 'YYYY-MM-DD')
   emits('refresh', target.value)
 }
-
-// watchEffect(() => {
-//   if (target.value?.type === 'geo') {
-//     run()
-//   }
-// })
 </script>

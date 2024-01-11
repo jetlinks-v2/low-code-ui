@@ -7,9 +7,12 @@ export const handleRules = (element?: any) => {
       required: true,
       message: `请输入${element?.formItemProps?.label}`
     }
-    if (['org', 'user', 'role', 'device', 'product', 'select-card', 'switch', 'tree-select', 'select', 'date-picker', 'time-picker'].includes(element.type)) {
+    if (['org', 'user', 'role', 'device', 'product', 'select-card', 'switch', 'tree-select', 'select', 'date-picker', 'time-picker', 'radio', 'checkbox'].includes(element.type)) {
       ruleItem.message = `请选择${element?.formItemProps?.label}`
-      return rules
+      return [ruleItem]
+    } else if(['upload'].includes(element.type)){
+      ruleItem.message = `请上传${element?.formItemProps?.label}`
+      return [ruleItem]
     } else {
       rules.push(ruleItem)
     }
@@ -75,11 +78,17 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
     disabled: _disabled
   })
 
+  const _formItemProps = reactive({...element?.formItemProps})
+
   watch(() => element, () => {
     Object.assign(_componentProps, {
       ...omit(element?.componentProps, ['description', 'cssCode', 'editable', 'onChange', 'visible', 'source', 'mountedCode']),
       size: _data?.componentProps.size,
       disabled: element?.componentProps?.disabled || __disabled || !editable || (mode === 'edit' && !element?.componentProps?.editable)
+    })
+    Object.assign(_formItemProps, {
+      ...element?.formItemProps,
+      rules: handleRules(element)
     })
   }, {
     immediate: true,
@@ -104,7 +113,7 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
 
   return {
     ...element,
-    formItemProps: { ...element?.formItemProps, rules: handleRules(element) },
+    formItemProps: _formItemProps,
     componentProps: _componentProps
   }
 }

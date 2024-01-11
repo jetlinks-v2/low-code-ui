@@ -165,6 +165,7 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
                 }
             }
         }
+
         if ('upload' === _type && ((node?.componentProps?.maxCount !== 0 && !node?.componentProps?.maxCount) || (node?.componentProps?.fileSize !== 0 && !node?.componentProps?.fileSize))) {
             // 个数和单位
             return obj
@@ -261,7 +262,7 @@ const _valEndData = async (info: any, node: ISchema) => {
 const errorMap = new Map()
 // 校验配置项必填
 const checkConfig = async (info: any, node: ISchema, allData: any[], formList: any[], type: 'workflow' | 'low-code') => {
-    if (['select', 'tree-select', 'select-card'].includes(node.type)) {
+    if (['select', 'tree-select', 'select-card', 'radio', 'checkbox'].includes(node.type)) {
         await _valEndData(info, node)
     }
     const _data: any = checkedConfigItem(node, allData, formList, _source, _commandsMap, type);
