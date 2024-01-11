@@ -12,7 +12,7 @@
       model="TABLE"
       :request="_query"
       :defaultParams="{
-        sorts: [{ name: 'createTime', order: 'desc' }],
+        sorts: [{ name: 'modifyTime', order: 'desc' }],
         terms: [
           {
             value: true,
