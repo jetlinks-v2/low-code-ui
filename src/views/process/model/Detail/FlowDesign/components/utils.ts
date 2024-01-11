@@ -180,25 +180,54 @@ export function handleArrToObj(arr: string[] = []) {
     return obj
 }
 
+const handleFormChildren = (data: any[], name: string) => {
+    return data.filter(item => {
+        const _label = item.formItemProps.label || item.componentProps?.name || ''
+
+        if (name && _label.includes(name)) {
+            return true
+        }
+
+        if (item.children?.length) {
+            item.children = handleFormChildren(item.children, name)
+            return !!item.children.length
+        }
+
+        return !name
+    })
+}
+
 /**
  * 前端筛选字段名称
  * @param list
  * @param name
  * @returns
  */
-export function filterFormByName(list, name) {
+export function filterFormByName(list: any[], name: string) {
     // console.log('list: ', list);
-    const _res = []
-    list?.forEach(item => {
+    return list?.map(item => {
         // 平铺字段
         const _filterFields = item.flattenFields?.filter(f => {
-            if (f.formItemProps.label) {
-                // 常规组件
-                return f.formItemProps.label.includes(name)
-            } else {
-                // 布局组件没有formItemProps.label, 直接用componentProps?.name匹配
-                return f.componentProps?.name?.includes(name)
+            const _label = f.formItemProps.label || f.componentProps?.name || ''
+
+            if (name && _label.includes(name)) {
+                return true
             }
+
+            if (item.children?.length) {
+                item.children = handleFormChildren(item.children, name)
+                return !!item.children.length
+            }
+
+            return !name
+
+            // if (f.formItemProps.label) {
+            //     // 常规组件
+            //     return f.formItemProps.label.includes(name)
+            // } else {
+            //     // 布局组件没有formItemProps.label, 直接用componentProps?.name匹配
+            //     return f.componentProps?.name?.includes(name)
+            // }
         })
         // if (_filterFields.length) {
         //     // @ts-ignore
@@ -210,21 +239,33 @@ export function filterFormByName(list, name) {
 
         // 预览字段
         const _previewFields = item.previewFields?.filter(f => {
+            const _label = f.formItemProps.label || f.componentProps?.name || ''
+
+            if (name && _label.includes(name)) {
+                return true
+            }
+
             if (!f.type.includes('item')) {
                 // 常规组件
                 return f.formItemProps.label.includes(name)
             } else {
                 // 布局组件从内部组件筛选
-                return f.children?.some(s => s.formItemProps.label.includes(name))
+                if (f.children) {
+                    f.children = handleFormChildren(f.children, name)
+                    console.log(f.children)
+                    return f.children.length
+                }
+                return !name
             }
         })
-        _res.push({
+
+        return {
             ...item,
             flattenFields: _filterFields,
             previewFields: _previewFields,
-        })
-    })
-    return _res
+        }
+    }) || []
+
 }
 
 /**
