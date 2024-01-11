@@ -7,9 +7,12 @@ export const handleRules = (element?: any) => {
       required: true,
       message: `请输入${element?.formItemProps?.label}`
     }
-    if (['org', 'user', 'role', 'device', 'product', 'select-card', 'switch', 'tree-select', 'select', 'date-picker', 'time-picker'].includes(element.type)) {
+    if (['org', 'user', 'role', 'device', 'product', 'select-card', 'switch', 'tree-select', 'select', 'date-picker', 'time-picker', 'radio', 'checkbox'].includes(element.type)) {
       ruleItem.message = `请选择${element?.formItemProps?.label}`
-      return rules
+      return [ruleItem]
+    } else if(['upload'].includes(element.type)){
+      ruleItem.message = `请上传${element?.formItemProps?.label}`
+      return [ruleItem]
     } else {
       rules.push(ruleItem)
     }
@@ -83,7 +86,10 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
       size: _data?.componentProps.size,
       disabled: element?.componentProps?.disabled || __disabled || !editable || (mode === 'edit' && !element?.componentProps?.editable)
     })
-    Object.assign(_formItemProps, element?.formItemProps)
+    Object.assign(_formItemProps, {
+      ...element?.formItemProps,
+      rules: handleRules(element)
+    })
   }, {
     immediate: true,
     deep: true
@@ -104,8 +110,6 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
   if (element?.componentProps?.treeData) {
     _componentProps.treeData = element?.componentProps?.treeData || []
   }
-
-  _formItemProps.rules = handleRules(element)
 
   return {
     ...element,
