@@ -97,6 +97,7 @@
         <SQLCode v-else-if="modelData.type === providerEnum.SQL"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
         <FunctionCode v-else-if="modelData.type === providerEnum.Function"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
         <PageDesigner v-else-if="modelData.type === providerEnum.PageDesign"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
+        <CIAE v-else-if="modelData.type === providerEnum.CIAE"  v-bind="modelData.data" :key="modelData.data.id" ref="modelRef"/>
       </div>
     </div>
     <div class="release-validate-box">
@@ -105,6 +106,7 @@
       <CRUD v-else-if="validateContent.type === providerEnum.CRUD" :key="validateContent.key" v-bind="validateContent.data" ref="validateRef" :showTip="false"/>
       <ListPage v-else-if="validateContent.type === providerEnum.ListPage" :key="validateContent.key" :data="validateContent.data" ref="validateRef" :showTip="false"/>
       <PageDesigner v-else-if="validateContent.type === providerEnum.PageDesign" :key="validateContent.key" :data="validateContent.data" ref="validateRef" :showTip="false"/>
+      <CIAE v-else-if="validateContent.type === providerEnum.CIAE" :key="validateContent.key" v-bind="validateContent.data" ref="validateRef" :showTip="false"/>
     </div>
   </div>
 </template>
@@ -113,7 +115,7 @@
 import { useEngine, useProduct } from '@LowCode/store'
 import { providerEnum } from '@LowCode/components/ProJect/index'
 import { validateDraft } from "@LowCode/api/project";
-import { TitleComponent , ListPage , CRUD , SQLCode , FunctionCode, PageDesigner, CustomHTML, FormDesigner } from '@LowCode/components/index'
+import { TitleComponent , ListPage , CRUD , SQLCode , FunctionCode, PageDesigner, CustomHTML, FormDesigner, CIAE } from '@LowCode/components/index'
 import { regular } from '@jetlinks-web/utils'
 
 const props = defineProps({
@@ -286,7 +288,7 @@ const validateAll = async (id, cb) => {
     nextTick(async () => {
       setTimeout(() => {
         console.log(validateRef.value)
-        validateRef.value.validate().then(ref => {
+        validateRef.value?.validate().then(ref => {
           status[item.id] = 2
           handleStatusItem(item.id, 2, [] )
           if (cb) {

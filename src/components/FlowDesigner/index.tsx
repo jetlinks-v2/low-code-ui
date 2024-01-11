@@ -71,8 +71,8 @@ const FlowDesigner = defineComponent({
 
     const nodeMap = computed(() => flowStore.nodeMap)
     const dom = computed(() =>
-      nodesData && Object.keys(nodesData).length
-        ? nodesData
+      props.nodesData && Object.keys(props.nodesData).length
+        ? props.nodesData
         : flowStore.model.nodes,
     )
 

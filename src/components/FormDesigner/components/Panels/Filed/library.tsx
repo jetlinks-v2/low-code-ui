@@ -41,10 +41,18 @@ const Library = defineComponent({
             clone: handleClone
         }
 
+        const _showFormComponents = inject('showFormComponents', ['pro', 'iot'])
+
+        const _filedData = computed(() => {
+            return filedData.filter((i) => {
+                return ['basic', 'layout', ..._showFormComponents].includes(i.id)
+            })
+        })
+
         return () => {
             return (
                 <div class="filed-container">
-                    {filedData.map((element) => {
+                    {_filedData.value.map((element) => {
                         return (
                             <div key={element.id} class="filed-item">
                                 <div class="filed-item-title">{element.name}</div>

@@ -28,6 +28,9 @@
           <j-input v-else v-model:value="record.name"
                    @change="() => { valueChange(record.name); alias(record.name, record) }"/>
         </template>
+        <template #alias="{ record }">
+          <span style="user-select: all">{{ record.alias }}</span>
+        </template>
         <template #comment="{record, index, valueChange}">
           <span v-if="index <= maxLen">{{ record.comment }}</span>
           <j-input v-else v-model:value="record.comment" :maxLength="16"
@@ -226,7 +229,6 @@ const myColumns = [
     title: '别名',
     dataIndex: 'alias',
     tooltip: '驼峰命名',
-    ellipsis: true,
     width: 200
   },
   {
@@ -348,8 +350,8 @@ const tableNameRule = [{
   }
 },
   {
-    max: 16,
-    message: '最多可输入16位字符'
+    max: 30,
+    message: '最多可输入30位字符'
   }
 ]
 
@@ -408,9 +410,8 @@ const copy = (record, index) => {
 }
 
 const deleteFn = async (index) => {
-  const _value = dataSource.value[index - 1]
   dataSource.value.splice(index - 1, 1)
-  // dataSourceChange()
+
   // 删除
   emitUpdateDataSource()
 }
@@ -543,7 +544,7 @@ const getTypes = () => {
 watch(() => props.tree, () => {
   const cloneTreeSetting = cloneDeep(defaultTreeSetting)
   const cloneSetting = cloneDeep(defaultSetting)
-  console.log(dataSource.value.length)
+
   if (dataSource.value.length) {
     const isTreeNow = dataSource.value[1].name === 'parent_id'
     const arr = JSON.parse(JSON.stringify(dataSource.value))

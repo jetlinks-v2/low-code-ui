@@ -120,4 +120,4 @@ export const advancedComponents = [
 ]
 
 // 布局组件
-export const layoutComponents = ['card', 'grid', 'tabs', 'collapse', 'space']
+export const layoutComponents = ['card', 'grid', 'tabs', 'collapse', 'space', 'inline', 'title']

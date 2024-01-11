@@ -78,7 +78,7 @@
               <j-empty v-if="!formList.length" />
               <div
                 class="form-list-item"
-                :class="{ active: isActive(item.key) }"
+                :class="{ active: selectedKeys.includes(item.key) }"
                 v-for="(item, index) in formList"
                 :key="index"
                 @click="onSelectChange(item)"
@@ -172,6 +172,7 @@ import { onlyMessage } from '@jetlinks-web/utils'
 import { queryFormNoPage_api } from '@LowCode/api/process/model'
 import { useFlowStore } from '@LowCode/store/flow'
 import { getImage } from '@jetlinks-web/utils'
+import draggable from 'vuedraggable'
 
 const flowStore = useFlowStore()
 
@@ -188,12 +189,15 @@ const visible = ref(false)
 const searchText = ref('')
 // 选中项
 const selectedRow = ref<any>([])
+const selectedKeys = computed(() => {
+  return selectedRow.value?.map((i) => i.formId)
+})
 // 表单列表
 const formList = ref<any>([])
 // 是否选中
-const isActive = computed(() => (key) => {
-  return selectedRow.value?.map((i) => i.formId).includes(key)
-})
+// const isActive = computed(() => (key) => {
+//   return selectedRow.value?.map((i) => i.formId).includes(key)
+// })
 
 const params = ref<any>({
   paging: false,

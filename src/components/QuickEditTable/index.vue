@@ -8,6 +8,7 @@
         />
         <Body
           ref="bodyRef"
+          v-if="data.length > 0"
           :columns="myColumns"
           :serial="serial"
           :data="data"
@@ -19,6 +20,11 @@
             <slot :name="name" v-bind="slotData || {}" />
           </template>
         </Body>
+        <template v-else>
+          <slot name="empty">
+            <j-empty />
+          </slot>
+        </template>
       </div>
     </ResizeObserver>
 

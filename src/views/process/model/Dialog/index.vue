@@ -52,7 +52,26 @@
           </template>
         </a-select>
       </j-form-item>
-
+      <j-form-item
+        name="key"
+        :rules="keyRules"
+        validateFirst
+      >
+        <template #label>
+          <span style="padding-right: 8px">流程标识</span>
+          <j-tooltip
+            title="根据标识调用流程模型/实例"
+          >
+            <AIcon type="QuestionCircleOutlined" />
+          </j-tooltip>
+        </template>
+        <j-input
+          :disabled="props.data.id"
+          v-model:value="form.key"
+          placeholder="请输入流程key"
+          style="width: 576px"
+        />
+      </j-form-item>
       <j-form-item
         name="icon"
         label="流程图标"
@@ -110,8 +129,8 @@
 </template>
 
 <script setup lang="ts">
-import { onlyMessage, randomString } from '@jetlinks-web/utils'
-import { saveProcess_api } from '@LowCode/api/process/model'
+import { onlyMessage, regular } from '@jetlinks-web/utils'
+import { saveProcess_api, getProcess_api } from '@LowCode/api/process/model'
 import { useRequest } from '@jetlinks-web/hooks'
 import { isImg } from '@LowCode/utils/comm'
 import { providerEnum } from '@LowCode/api/process/model'
@@ -158,11 +177,38 @@ const formRef = ref<any>()
 const selected = ref<string>()
 // 表单相关
 const form = reactive<Partial<FormType>>({
-  key: randomString(),
+  key: '',
   model: '',
   provider: 'wflow',
   classifiedId: undefined
 })
+
+const keyRules = [
+  { required: true, message: '请输入流程key' },
+  {
+    validator: async (_: any, value: string) => {
+      if (value) {
+
+        if (!regular.isEnglishOrNumber(value)) {
+          return Promise.reject('只允许输入英文或者数字')
+        }
+
+        const res = await getProcess_api({ terms:[{ column: 'key', termType: 'eq', value: value}]})
+
+        if (res.success && res.result && res.result.total > 0) {
+          return Promise.reject('流程key重复')
+        }
+        return Promise.resolve()
+      }
+      return Promise.resolve()
+    },
+    trigger: 'blur'
+  },
+  {
+    max: 64,
+    message: '最多输入64个字符',
+  },
+]
 
 const filterOption = (input: string, option: any) => {
   return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;

@@ -102,18 +102,29 @@
                       </j-ellipsis>
                       <div class="other">
                         <j-ellipsis style="width: 200px">
-                          <span class="text">创建人：</span>
+                          <span class="text">部署人：</span>
                           <span class="value">{{ record.creatorName }}</span>
                         </j-ellipsis>
-                        <div>
-                          <span class="text"> 创建时间： </span>
+                        <div style="width: 248px;padding-right: 24px">
+                          <span class="text"> 部署时间： </span>
                           <span class="value">
                             {{
-                              dayjs(record.createTime).format(
+                              dayjs(record.deployTime).format(
                                 'YYYY-MM-DD HH:mm:ss',
                               )
                             }}
                           </span>
+                        </div>
+                        <div style="flex: 1">
+                          <j-ellipsis >
+                            <span class="text"> 流程标识： </span>
+                            <span class="value">
+                            {{
+                                record.key
+                              }}
+                          </span>
+                          </j-ellipsis>
+
                         </div>
                       </div>
                     </div>
@@ -165,10 +176,10 @@ import FlowDesign from '@LowCode/views/process/model/Detail/FlowDesign/index.vue
 import ShowCopy from '@LowCode/views/process/model/Detail/ShowCopy/index.vue'
 import { useFlowStore } from '@LowCode/store/flow'
 import { Modal } from 'jetlinks-ui-components'
-import { useMenuStore } from '@LowCode/store'
+import { store } from '@jetlinks-web/stores'
 import { Card , Search as ProSearch , BadgeStatus , ProImage} from '@LowCode/components/index'
 
-const menu = useMenuStore()
+const menu = store.useMenuStore()
 const flowStore = useFlowStore()
 const step1 = ref()
 const step2 = ref()
@@ -401,14 +412,14 @@ const getActions = (record, type = 'card') => {
                     data.loading = false
                 })
               } else {
+                data.loading = false
                 Modal.error({
                   title: '部署失败，流程配置内容不合规',
                 })
               }
             })
-          } catch (error) {
           } finally {
-            // data.loading = false
+            data.loading = false
           }
         },
       }),

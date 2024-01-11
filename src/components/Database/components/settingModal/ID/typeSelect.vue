@@ -4,7 +4,7 @@
       v-for="item in options"
       :class="{
         'code-item': true,
-        'active': myValue === item.value
+        'active': myValue.includes(item.value)
       }"
       @click="() => { onClick(item.value) }"
     >
@@ -23,18 +23,41 @@ const props = defineProps({
   options: {
     type: Array,
     default: () => ([])
+  },
+  multiple: {
+    type: Boolean,
+    default: false
   }
 })
 
-const myValue = ref(props.value)
+const myValue = ref(props.multiple ? props.value : [props.value])
 
 const emit = defineEmits(['update:value', 'change'])
 
-const onClick = (key) => {
-  myValue.value = key
-  emit('update:value', key)
-  emit('change', key)
+const changeValue = (val) => {
+  emit('update:value', val)
+  emit('change', val)
 }
+
+const onClick = (key) => {
+  if (props.multiple) {
+    const valueSet = new Set(myValue.value || [])
+    if (valueSet.has(key)) {
+      valueSet.delete(key)
+    } else {
+      valueSet.add(key)
+    }
+    myValue.value = [...valueSet.values()]
+    changeValue([...valueSet.values()])
+  } else {
+    myValue.value = [key]
+    changeValue(key)
+  }
+}
+
+watch(() => props.value, () =>{
+  myValue.value = props.multiple ? props.value : [props.value]
+})
 
 </script>
 

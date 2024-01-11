@@ -114,7 +114,7 @@ import FormVariables from './components/FormVariables.vue'
 import { useFlowStore } from '@LowCode/store/flow'
 import { separateData, filterFormVariables } from './utils'
 import TemplateText from './components/TemplateText1.vue'
-import { TitleComponent } from '@LowCode/components/index'
+import { TitleComponent, ConfigureMembers } from '@LowCode/components'
 
 const flowStore = useFlowStore()
 
@@ -202,7 +202,7 @@ const formData = reactive({
         ? flowStore.model.config.variables
         : initVariables.value,
     set: (val) => {
-      flowStore.model.config.variables = [...initVariables.value, ...val]
+      // flowStore.model.config.variables = [...initVariables.value, ...val]
     },
   }),
   // nameGenerator: computed({

@@ -1,8 +1,9 @@
 <template>
-  <div>
+  <div style="height: 332px">
     <QuickEditTable
         validate
         ref="tableRef"
+        style="height: calc(100% - 32px)"
         :data="dataSource"
         :columns="myColumns"
         :height="300"

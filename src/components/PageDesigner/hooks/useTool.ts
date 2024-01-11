@@ -7,7 +7,7 @@ import {providerEnum} from "@LowCode/components/ProJect";
 import { useRoute, useRouter } from 'vue-router';
 import {request as axiosRequest} from '@jetlinks-web/core'
 import {usePageProvider} from "./usePageProvider";
-import { useMenuStore } from '@LowCode/store'
+import { store } from '@jetlinks-web/stores'
 import * as utils from '@jetlinks-web/utils'
 const useTool = () => {
     const designer: any = inject('PageDesigner')
@@ -16,7 +16,7 @@ const useTool = () => {
     const pageDesigner = usePageDesigner();
     const pageProvider = usePageProvider()
     const _noCopyData = ['steps-item', 'info-item', 'info-item-item', 'info-item-item-item', 'timeline-item', 'inline-item', 'card-item', 'tabs-item']
-    const { jumpPageByCode } = useMenuStore()
+    const { jumpPageByCode } = store.useMenuStore()
 
     const paramsUtil = {
         route: useRoute(),
@@ -84,8 +84,8 @@ const useTool = () => {
         } else {
             designer.selected.value = [node]
         }
-        onSaveData()
-        const arr= ['inline-item', 'card-item', 'timeline-item', 'table-item', 'list-item', 'info-item-item-item']
+        onSaveData() // 'timeline-item'
+        const arr= ['inline-item', 'card-item', 'table-item', 'list-item', 'info-item-item-item']
         designer.isShowConfig.value = !arr.includes(node?.type)
     }
 
