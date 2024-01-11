@@ -115,13 +115,16 @@
                             }}
                           </span>
                         </div>
-                        <div>
-                          <span class="text"> 流程标识： </span>
-                          <span class="value">
+                        <div style="flex: 1">
+                          <j-ellipsis >
+                            <span class="text"> 流程标识： </span>
+                            <span class="value">
                             {{
-                              record.key
-                            }}
+                                record.key
+                              }}
                           </span>
+                          </j-ellipsis>
+
                         </div>
                       </div>
                     </div>
@@ -409,14 +412,14 @@ const getActions = (record, type = 'card') => {
                     data.loading = false
                 })
               } else {
+                data.loading = false
                 Modal.error({
                   title: '部署失败，流程配置内容不合规',
                 })
               }
             })
-          } catch (error) {
           } finally {
-            // data.loading = false
+            data.loading = false
           }
         },
       }),
