@@ -272,7 +272,7 @@ const handleDeploy = async () => {
           })
           validLoading.value = false
         }, 500)
-        console.log('valid', valid, await step2.value?.validateSteps())
+
         if (
           Array.isArray(valid) &&
           valid.every((item) => item.status === 'fulfilled')
@@ -293,9 +293,6 @@ const handleDeploy = async () => {
         //   console.log('handleDeploy err: ', err)
         deployLoading.value = false
           onlyMessage('部署失败，流程配置内容不合规', 'error')
-      })
-      .finally(() => {
-        deployLoading.value = false
       })
   })
 }
@@ -370,7 +367,6 @@ const isChange = computed(
   () => JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model),
 )
 onBeforeRouteLeave((to, form, next) => {
-  console.log('to===', to)
   if (!isModal.value && isChange.value && LocalStore.get(TOKEN_KEY)) {
     visible.value = true
     routerNext = next
