@@ -75,12 +75,15 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
     disabled: _disabled
   })
 
+  const _formItemProps = reactive({...element?.formItemProps})
+
   watch(() => element, () => {
     Object.assign(_componentProps, {
       ...omit(element?.componentProps, ['description', 'cssCode', 'editable', 'onChange', 'visible', 'source', 'mountedCode']),
       size: _data?.componentProps.size,
       disabled: element?.componentProps?.disabled || __disabled || !editable || (mode === 'edit' && !element?.componentProps?.editable)
     })
+    Object.assign(_formItemProps, element?.formItemProps)
   }, {
     immediate: true,
     deep: true
@@ -102,9 +105,11 @@ const useProps = (element: any, _data: any, editable: boolean, __disabled: boole
     _componentProps.treeData = element?.componentProps?.treeData || []
   }
 
+  _formItemProps.rules = handleRules(element)
+
   return {
     ...element,
-    formItemProps: { ...element?.formItemProps, rules: handleRules(element) },
+    formItemProps: _formItemProps,
     componentProps: _componentProps
   }
 }
