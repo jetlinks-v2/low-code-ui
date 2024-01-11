@@ -510,7 +510,7 @@ const initPreviewData = (data) => {
 }
 
 const handleSearch = debounce(() => {
-  filterFormList.value = filterFormByName(cloneDeep(allFormList.value)!, keywords.value)
+  filterFormList.value = filterFormByName(allFormList.value, keywords.value)
 
   filterFormList.value?.forEach((item) => {
     // 所有布局组件内部字段
@@ -522,7 +522,7 @@ const handleSearch = debounce(() => {
       : ['read']
   })
   setCheckAll()
-}, 300)
+}, 100)
 
 /**
  * 设置全部内容全选状态
@@ -647,7 +647,7 @@ const getTableColumns = (fields: any[]) => {
  * 确认之后, 将数据同步至父组件的basicFormData.forms
  */
 const handleOk = () => {
-  filterFormList.value?.forEach((item) => {
+  allFormList.value?.forEach((item) => {
     forms.value[item.key] = []
     item.flattenFields?.forEach((p) => {
       // 处理单选高级组件, 平铺keys至formBinds
