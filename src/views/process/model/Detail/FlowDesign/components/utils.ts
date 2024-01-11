@@ -1,4 +1,4 @@
-import {cloneDeep, isArray, isString, pick} from 'lodash-es'
+import { cloneDeep, isArray, isString, pick } from 'lodash-es'
 import { advancedComponents } from './const'
 import { useFlowStore } from '@LowCode/store/flow'
 import { layoutComponents } from './const'
@@ -203,31 +203,19 @@ const handleFormChildren = (data: any[], name: string) => {
  * @param name
  * @returns
  */
-export function filterFormByName(list: any[], name: string) {
+export function filterFormByName(list, name) {
     // console.log('list: ', list);
-    return list?.map(item => {
+    const _res = []
+    list?.forEach(item => {
         // 平铺字段
         const _filterFields = item.flattenFields?.filter(f => {
-            const _label = f.formItemProps.label || f.componentProps?.name || ''
-
-            if (name && _label.includes(name)) {
-                return true
+            if (f.formItemProps.label) {
+                // 常规组件
+                return f.formItemProps.label.includes(name)
+            } else {
+                // 布局组件没有formItemProps.label, 直接用componentProps?.name匹配
+                return f.componentProps?.name?.includes(name) || f.componentProps?.title?.includes(name)
             }
-
-            if (item.children?.length) {
-                item.children = handleFormChildren(item.children, name)
-                return !!item.children.length
-            }
-
-            return !name
-
-            // if (f.formItemProps.label) {
-            //     // 常规组件
-            //     return f.formItemProps.label.includes(name)
-            // } else {
-            //     // 布局组件没有formItemProps.label, 直接用componentProps?.name匹配
-            //     return f.componentProps?.name?.includes(name)
-            // }
         })
         // if (_filterFields.length) {
         //     // @ts-ignore
@@ -239,33 +227,21 @@ export function filterFormByName(list: any[], name: string) {
 
         // 预览字段
         const _previewFields = item.previewFields?.filter(f => {
-            const _label = f.formItemProps.label || f.componentProps?.name || ''
-
-            if (name && _label.includes(name)) {
-                return true
-            }
-
             if (!f.type.includes('item')) {
                 // 常规组件
                 return f.formItemProps.label.includes(name)
             } else {
                 // 布局组件从内部组件筛选
-                if (f.children) {
-                    f.children = handleFormChildren(f.children, name)
-                    console.log(f.children)
-                    return f.children.length
-                }
-                return !name
+                return f.children?.some(s => s.formItemProps.label.includes(name))
             }
         })
-
-        return {
+        _res.push({
             ...item,
             flattenFields: _filterFields,
             previewFields: _previewFields,
-        }
-    }) || []
-
+        })
+    })
+    return _res
 }
 
 /**
@@ -503,37 +479,37 @@ export function getFieldByKey(data: any, key: string) {
 }
 
 export const handleLikeValue = (v: string) => {
-  if (isString(v)) {
-    return v.split('').reduce((pre: string, next: string) => {
-      let _next = next;
-      if (next === '\\') {
-        _next = '\\\\';
-      } else if (next === '%') {
-        _next = '\\%';
-      }
-      return pre + _next;
-    }, '');
-  }
-  return v;
+    if (isString(v)) {
+        return v.split('').reduce((pre: string, next: string) => {
+            let _next = next;
+            if (next === '\\') {
+                _next = '\\\\';
+            } else if (next === '%') {
+                _next = '\\%';
+            }
+            return pre + _next;
+        }, '');
+    }
+    return v;
 };
 
 const isEmpty = (v) => {
-  return (
-    v === undefined ||
-    v === null ||
-    v === '' ||
-    (isArray(v) && v.length === 0)
-  );
+    return (
+        v === undefined ||
+        v === null ||
+        v === '' ||
+        (isArray(v) && v.length === 0)
+    );
 };
 
 export const handleTermsData = (terms) => {
-  return terms.map(item => {
-    if (['like', 'nlike'].includes(item.termType) && !isEmpty(item.viewValue)) {
-      item.value = `%${handleLikeValue(item.viewValue)}%`;
-    } else {
-      item.value = item.value || item.viewValue
-    }
+    return terms.map(item => {
+        if (['like', 'nlike'].includes(item.termType) && !isEmpty(item.viewValue)) {
+            item.value = `%${handleLikeValue(item.viewValue)}%`;
+        } else {
+            item.value = item.value || item.viewValue
+        }
 
-    return item
-  })
+        return item
+    })
 }
