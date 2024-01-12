@@ -17,7 +17,7 @@
         <p class="icon">
           <AIcon type="PlusOutlined"/>
         </p>
-        <p style="color: #AAADB5;">点击上传图片</p>
+        <p style="color: #AAADB5;">{{ imgDescription}}</p>
       </div>
       <div class="uploading" v-if="uploading">
         <div class="loadingContainer">
@@ -109,6 +109,10 @@ const props = defineProps({
     type:Array,
     // default:['.png']
     default:[]
+  },
+  imgDescription:{
+    type:String,
+    default:'请上传图片'
   }
 })
 

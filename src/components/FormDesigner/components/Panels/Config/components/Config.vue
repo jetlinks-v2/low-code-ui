@@ -180,22 +180,6 @@
         </j-select>
       </j-form-item>
       <j-form-item
-        :validateFirst="true"
-        :name="['componentProps', 'noAccept']"
-        label="说明"
-      >
-        <j-select
-          mode="multiple"
-          placeholder="请选择"
-          v-model:value="target.componentProps.noAccept"
-          @change="onDataChange"
-        >
-          <j-select-option :key="item" v-for="item in NoType" :value="item">{{
-            item
-          }}</j-select-option>
-        </j-select>
-      </j-form-item>
-      <j-form-item
         required
         :name="['componentProps', 'fileSize']"
         label="单个大小"
@@ -257,6 +241,17 @@
           v-model:value="target.componentProps.width"
         />
       </j-form-item>
+        <j-form-item
+        v-if="!target.componentProps.isButton && target.componentProps.listType !== 'text' && target.componentProps.maxCount === 1"
+          :validateFirst="true"
+          :name="['componentProps', 'imgDescription']"
+          label="组件内部说明"
+        >
+        <j-input
+            @change="onChange"
+            v-model:value="target.componentProps.imgDescription"
+          />
+        </j-form-item>
     </template>
     <template v-if="['tree-select', 'select-card'].includes(type)">
       <j-form-item
