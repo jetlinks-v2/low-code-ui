@@ -164,6 +164,38 @@
         </j-select>
       </j-form-item>
       <j-form-item
+        :validateFirst="true"
+        :name="['componentProps', 'noAccept']"
+        label="非格式"
+      >
+        <j-select
+          mode="multiple"
+          placeholder="请选择"
+          v-model:value="target.componentProps.noAccept"
+          @change="onDataChange"
+        >
+          <j-select-option :key="item" v-for="item in NoType" :value="item">{{
+            item
+          }}</j-select-option>
+        </j-select>
+      </j-form-item>
+      <j-form-item
+        :validateFirst="true"
+        :name="['componentProps', 'noAccept']"
+        label="说明"
+      >
+        <j-select
+          mode="multiple"
+          placeholder="请选择"
+          v-model:value="target.componentProps.noAccept"
+          @change="onDataChange"
+        >
+          <j-select-option :key="item" v-for="item in NoType" :value="item">{{
+            item
+          }}</j-select-option>
+        </j-select>
+      </j-form-item>
+      <j-form-item
         required
         :name="['componentProps', 'fileSize']"
         label="单个大小"
@@ -542,6 +574,7 @@ const onChange = () => {
 
 const textType = ['.xlsx', '.xls', '.csv', '.zip', '.json']
 const imgType = ['.jpg', '.png', '.jpeg']
+const NoType = ['.xlsx', '.xls', '.csv', '.zip', '.json','.jpg', '.png', '.jpeg','.exe']
 
 const list = computed(() =>
   target.value.componentProps?.listType === 'text' ? textType : imgType,

@@ -87,6 +87,7 @@ const props = defineProps({
   },
   accept: {
     type: Array,
+    default:['.png','.jpg','.jpeg']
   },
   maxCount: {
     type: Number,
@@ -103,6 +104,11 @@ const props = defineProps({
   },
   width: {
     type: Number,
+  },
+  noAccept:{
+    type:Array,
+    // default:['.png']
+    default:[]
   }
 })
 
@@ -151,15 +157,29 @@ const saveImage = async (url: string) => {
   }
 }
 
+const text = computed(()=>{
+  let str = ''
+  if(props.accept?.length!==0){
+    str = str + props.accept?.join('、')
+  }
+  if(props.noAccept?.length!==0){
+    str = str +' 非'+ props.noAccept?.join('、非')
+  }
+  return str && str!=='undefined' ? str:''
+})
+
 const beforeUpload = (file: UploadProps['fileList'][number]) => {
   const maxSize =
       props.unit === 'M' ? props.fileSize * 1024 * 1024 : props.fileSize * 1024
   const arr = file.name.split('.')
-  const imgType = ['image/jpeg', 'image/png', 'image/jpg']
+  // const imgType = ['image/jpeg', 'image/png', 'image/jpg']
   const isType = props.accept?.length
       ? props.accept?.join('').includes(arr[arr.length - 1])
-      : imgType.includes(file.type)
+      : true
   // return false
+  const isNotType= props.noAccept?.length
+      ? props.noAccept?.join('').includes(arr[arr.length - 1])
+      : false
   return new Promise(() => {
     if (maxSize < file.size) {
       onlyMessage(
@@ -168,9 +188,15 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
       )
       return false
     } else if (!isType) {
-      onlyMessage(`格式错误，请重新上传`, 'error')
+      console.log('=====')
+      onlyMessage(`格式错误,支持${text.value}格式，请重新上传`, 'error')
       return false
-    } else {
+    }else if(isNotType){
+      console.log('-----',props.noAccept)
+      onlyMessage(`格式错误,支持${text.value}格式，请重新上传`, 'error')
+      return false
+    } 
+    else {
       fileToUpload.value = file
       getBase64ByImg(file, (base64Url) => {
         cropper.img = base64Url

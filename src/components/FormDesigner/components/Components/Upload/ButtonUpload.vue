@@ -74,6 +74,12 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  noAccept:{
+    type:Array,
+    // default:['.exe','.xlsx']
+    default:[]
+  }
+  
 })
 
 const emits = defineEmits(['change'])
@@ -89,6 +95,17 @@ const fileList = ref<any>([])
 const dbRef = ref<boolean>(false)
 const dbId = ref<string>('')
 const nameRef = ref()
+
+const text = computed(()=>{
+  let str = ''
+  if(props.accept?.length!==0){
+    str = str + props.accept?.join('、')
+  }
+  if(props.noAccept?.length!==0){
+    str = str +' 非'+ props.noAccept?.join('、非')
+  }
+  return str && str!=='undefined' ? str:''
+})
 
 const saveImage = async (url: string) => {
   cropper.visible = false
@@ -118,6 +135,9 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   const isType = props.accept?.length
       ? props.accept?.join('').includes(arr[arr.length - 1])
       : props.listType === 'picture' ? imgType.includes(file.type) : true
+  const isNotType= props.noAccept?.length
+      ? props.noAccept?.join('').includes(arr[arr.length - 1])
+      : false
   return new Promise((resolve) => {
     if(props.maxCount <= fileList.value?.length){
       onlyMessage(
@@ -132,9 +152,12 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
       )
       return false
     } else if (!isType) {
-      onlyMessage(`格式错误，请重新上传`, 'error')
+      onlyMessage(`格式错误,支持${text.value}格式，请重新上传`, 'error')
       return false
-    } else if (props.listType === 'picture') {
+    } else if(isNotType){
+      onlyMessage(`格式错误,支持${text.value}格式，请重新上传`, 'error')
+      return false
+    }else if (props.listType === 'picture') {
       fileToUpload.value = file
       getBase64ByImg(file, (base64Url) => {
         cropper.img = base64Url
