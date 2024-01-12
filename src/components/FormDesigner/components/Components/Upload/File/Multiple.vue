@@ -136,7 +136,7 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   return new Promise((resolve) => {
     if(props.maxCount <= fileList.value?.length){
       onlyMessage(
-          `上传图片数量不能超出最大上传数量${props.maxCount || 1}个`,
+          `上传文件数量不能超出最大上传数量${props.maxCount || 1}个`,
           'error',
       )
       return false
@@ -240,6 +240,10 @@ watch(
   .ant-upload-drag-sub-tip {
     color: #6B6F7F;
     font-size: 12px;
+    width: 100%;
+    text-align: center;
+    height: 20px;
+    overflow: hidden;
   }
 }
 
