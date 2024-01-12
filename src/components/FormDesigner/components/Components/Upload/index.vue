@@ -58,6 +58,10 @@ const props = defineProps({
   },
   noAccept:{
     type:Array,
+  },
+  imgDescription:{
+    type:String,
+    default:'请上传图片'
   }
 })
 const _value: any = ref([])

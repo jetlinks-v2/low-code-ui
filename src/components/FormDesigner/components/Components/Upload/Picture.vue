@@ -17,7 +17,7 @@
         <p class="icon">
           <AIcon type="PlusOutlined"/>
         </p>
-        <p style="color: #AAADB5;">点击上传图片</p>
+        <p style="color: #AAADB5;">{{ imgDescription}}</p>
       </div>
       <div class="uploading" v-if="uploading">
         <div class="loadingContainer">
@@ -109,6 +109,10 @@ const props = defineProps({
     type:Array,
     // default:['.png']
     default:[]
+  },
+  imgDescription:{
+    type:String,
+    default:'请上传图片'
   }
 })
 
@@ -159,13 +163,13 @@ const saveImage = async (url: string) => {
 
 const text = computed(()=>{
   let str = ''
-  if(props.accept?.length!==0){
+  if(props.accept && props.accept?.length!==0){
     str = str + props.accept?.join('、')
   }
-  if(props.noAccept?.length!==0){
+  if(props.noAccept &&props.noAccept?.length!==0){
     str = str +' 非'+ props.noAccept?.join('、非')
   }
-  return str && str!=='undefined' ? str:''
+  return str
 })
 
 const beforeUpload = (file: UploadProps['fileList'][number]) => {

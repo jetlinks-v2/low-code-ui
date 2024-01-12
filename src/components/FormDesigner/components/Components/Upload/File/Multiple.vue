@@ -113,13 +113,13 @@ const nameRef = ref()
 
 const text = computed(()=>{
   let str = ''
-  if(props.accept?.length!==0){
-    str = str+ props.accept?.join('、')
+  if(props.accept && props.accept?.length!==0){
+    str = str + props.accept?.join('、')
   }
-  if(props.noAccept?.length!==0){
+  if(props.noAccept &&props.noAccept?.length!==0){
     str = str +' 非'+ props.noAccept?.join('、非')
   }
-  return str && str!=='undefined' ? str:''
+  return str
 })
 
 const beforeUpload = (file: UploadProps['fileList'][number]) => {
@@ -136,7 +136,7 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   return new Promise((resolve) => {
     if(props.maxCount <= fileList.value?.length){
       onlyMessage(
-          `上传图片数量不能超出最大上传数量${props.maxCount || 1}个`,
+          `上传文件数量不能超出最大上传数量${props.maxCount || 1}个`,
           'error',
       )
       return false
@@ -240,6 +240,10 @@ watch(
   .ant-upload-drag-sub-tip {
     color: #6B6F7F;
     font-size: 12px;
+    width: 100%;
+    text-align: center;
+    height: 20px;
+    overflow: hidden;
   }
 }
 
