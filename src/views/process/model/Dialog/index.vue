@@ -193,11 +193,11 @@ const keyRules = [
           return Promise.reject('只允许输入英文或者数字')
         }
 
-        const res = await getProcess_api({ terms:[{ column: 'key', termType: 'eq', value: value}]})
-
-        if (res.success && res.result && res.result.total > 0) {
-          return Promise.reject('流程标识重复')
-        }
+        // const res = await getProcess_api({ terms:[{ column: 'key', termType: 'eq', value: value}]})
+        //
+        // if (res.success && res.result && res.result.total > 0) {
+        //   return Promise.reject('流程标识重复')
+        // }
         return Promise.resolve()
       }
       return Promise.resolve()
