@@ -55,6 +55,13 @@ const props = defineProps({
   },
   width:{
     type:Number,
+  },
+  noAccept:{
+    type:Array,
+  },
+  imgDescription:{
+    type:String,
+    default:'请上传图片'
   }
 })
 const _value: any = ref([])
