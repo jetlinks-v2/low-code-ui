@@ -2,7 +2,7 @@
   <div class="content">
     <div class="ant-upload-image">
       <img v-if="!fileList?.length" src="/images/form-designer/upload-single-img.png" :width="32" />
-      <img v-else :src="imgTypeMap.get(fileList.value?.[0]?.type) || imgTypeMap.get('other')" :width="32" />
+      <img v-else :src="imgTypeMap.get(fileList?.[0]?.type) || imgTypeMap.get('other')" :width="32" />
     </div>
     <j-upload
         v-model:file-list="fileList"
@@ -116,12 +116,12 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
 const text = computed(()=>{
   let str = ''
   if(props.accept?.length!==0){
-    str = str + props.accept?.join('、')
+    str = str + props.accept?.[0] + '等'
   }
   if(props.noAccept?.length!==0){
     str = str +' 非'+ props.noAccept?.join('、非')
   }
-  return str &&str!=='undefined' ? str:''
+  return str && str !=='undefined' ? str:''
 })
 
 const handleChange = async (info: UploadChangeParam) => {
@@ -195,6 +195,10 @@ watch(
   .ant-upload-drag-sub-tip {
     color: #6B6F7F;
     font-size: 12px;
+    width: 200px;
+    text-align: center;
+    height: 20px;
+    overflow: hidden;
   }
 }
 
