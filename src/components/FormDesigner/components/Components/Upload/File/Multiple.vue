@@ -18,7 +18,7 @@
           <img src="/images/form-designer/upload-img.png" />
         </div>
         <p class="ant-upload-drag-tip">点击或将文件拖拽到此区域</p>
-        <p class="ant-upload-drag-sub-tip">{{ props.accept?.length ? `支持格式:${props?.accept?.join('、')}` : `支持所有格式` }}</p>
+        <p class="ant-upload-drag-sub-tip">{{ text ? `支持格式:${text}` : `支持所有格式` }}</p>
       </div>
       <template #itemRender="{ file }">
         <div class="render">
@@ -97,6 +97,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  noAccept:{
+    type:Array,
+    // default:['.exe','.xlsx']
+    default:[]
+  }
 })
 
 const emits = defineEmits(['change'])
@@ -105,6 +110,18 @@ const fileList = ref<any[]>([])
 const dbRef = ref<boolean>(false)
 const dbId = ref<string>('')
 const nameRef = ref()
+
+const text = computed(()=>{
+  let str = ''
+  if(props.accept?.length!==0){
+    str = str+ props.accept?.join('、')
+  }
+  if(props.noAccept?.length!==0){
+    str = str +' 非'+ props.noAccept?.join('、非')
+  }
+  return str && str!=='undefined' ? str:''
+})
+
 const beforeUpload = (file: UploadProps['fileList'][number]) => {
   const maxSize =
       props.unit === 'M' ? props.fileSize * 1024 * 1024 : props.fileSize * 1024
@@ -112,6 +129,9 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   const isType = props.accept?.length
       ? props.accept?.join('').includes(arr[arr.length - 1])
       : true
+  const isNotType= props.noAccept?.length
+      ? props.noAccept?.join('').includes(arr[arr.length - 1])
+      : false
 
   return new Promise((resolve) => {
     if(props.maxCount <= fileList.value?.length){
@@ -129,7 +149,10 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
     } else if (!isType) {
       onlyMessage(`格式错误，请重新上传`, 'error')
       return false
-    } else {
+    } else if(isNotType){
+      onlyMessage(`格式错误，请重新上传`, 'error')
+      return false
+    }else {
       resolve(file)
     }
   })
