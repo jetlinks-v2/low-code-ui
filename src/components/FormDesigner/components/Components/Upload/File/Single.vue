@@ -25,11 +25,11 @@
             class="render-left"
             ref="nameRef"
         ></j-input>
-        <j-ellipsis v-else>{{ file.name }}</j-ellipsis>
+        <j-ellipsis v-else @dblclick="onDbClick(file)">{{ file.name }}</j-ellipsis>
       </template>
     </j-upload>
     <p v-if="!fileList?.length" class="ant-upload-drag-sub-tip">{{ text ? `支持格式:${text}` : `支持所有格式` }}</p>
-    <j-button style="color: #6B6F7F;" v-else size="small" @click="onDelete(fileList?.[0])">删除</j-button>
+    <j-button style="color: #6B6F7F;" v-else size="small" @click="onDelete(fileList?.[0])" :disabled="disabled">删除</j-button>
   </div>
 </template>
 
@@ -155,6 +155,9 @@ const onLoad = (_file: any) => {
 }
 
 const onDbClick = (file) => {
+  if(props.disabled){
+    return
+  }
   dbId.value = file.uid
   dbRef.value = true
   nextTick(() => {

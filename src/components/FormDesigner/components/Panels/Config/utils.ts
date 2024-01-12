@@ -37,7 +37,9 @@ export const getConfigList = (_type: string, obj: any, type: 'workflow' | 'low-c
             'geo',
             'form',
             'editor',
-            'number-step'
+            'number-step',
+            'radio',
+            'checkbox'
         ].includes(unref(_type))) {
         arr.push({
             key: 'Config',
@@ -89,7 +91,7 @@ export const getConfigList = (_type: string, obj: any, type: 'workflow' | 'low-c
         'collapse',
         'form',
         'editor',
-        'number-step'
+        'number-step',
     ]
     const _list = ['geo', 'device', 'product', 'org', 'user', 'role']
 

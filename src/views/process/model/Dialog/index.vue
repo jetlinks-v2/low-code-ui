@@ -130,7 +130,7 @@
 
 <script setup lang="ts">
 import { onlyMessage, regular } from '@jetlinks-web/utils'
-import { saveProcess_api, getProcess_api } from '@LowCode/api/process/model'
+import {saveProcess_api, getProcess_api, update_api} from '@LowCode/api/process/model'
 import { useRequest } from '@jetlinks-web/hooks'
 import { isImg } from '@LowCode/utils/comm'
 import { providerEnum } from '@LowCode/api/process/model'
@@ -187,7 +187,7 @@ const keyRules = [
   { required: true, message: '请输入流程key' },
   {
     validator: async (_: any, value: string) => {
-      if (value) {
+      if (value && !props.data.id) {
 
         if (!regular.isEnglishOrNumber(value)) {
           return Promise.reject('只允许输入英文或者数字')
@@ -230,7 +230,7 @@ const { data: classified } = useRequest(providerEnum, {
   },
 })
 
-const { loading, run } = useRequest(saveProcess_api, {
+const { loading, run } = useRequest(props.data.id ? update_api : saveProcess_api, {
   immediate: false,
   onSuccess(resp) {
     if (resp.success) {
@@ -243,7 +243,7 @@ const { loading, run } = useRequest(saveProcess_api, {
 
 const confirm = () => {
   formRef.value?.validate().then((_data: any) => {
-    run([form])
+    run(form)
   })
 }
 

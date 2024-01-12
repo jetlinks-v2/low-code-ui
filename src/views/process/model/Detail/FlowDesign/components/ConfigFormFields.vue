@@ -31,7 +31,7 @@
       <j-col :span="8">
         <j-input
           v-model:value="keywords"
-          @keyup.enter="handleSearch"
+          @change="handleSearch"
           placeholder="搜索字段名称"
         >
           <template #suffix>
@@ -203,7 +203,7 @@ import {
   flattenTree,
   getFieldByKey,
 } from './utils'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, debounce } from 'lodash-es'
 import FormPreview from '@LowCode/components/FormDesigner/preview.vue'
 import TableFormPreview from './TableFormPreview.vue'
 import { PropType } from 'vue'
@@ -509,10 +509,9 @@ const initPreviewData = (data) => {
   })
 }
 
-const handleSearch = () => {
-  filterFormList.value = cloneDeep(
-    filterFormByName(allFormList.value, keywords.value),
-  )
+const handleSearch = debounce(() => {
+  filterFormList.value = filterFormByName(cloneDeep(allFormList.value)!, keywords.value)
+
   filterFormList.value?.forEach((item) => {
     // 所有布局组件内部字段
     const _allFields = getAllFields(item)
@@ -523,7 +522,7 @@ const handleSearch = () => {
       : ['read']
   })
   setCheckAll()
-}
+}, 300)
 
 /**
  * 设置全部内容全选状态

@@ -24,7 +24,7 @@
           </div>
         </div>
         <j-space>
-          <j-button danger type="link" @click="onDelete(file)">
+          <j-button danger type="link" @click="onDelete(file)" :disabled="disabled">
             <AIcon type="DeleteOutlined"/>
           </j-button>
         </j-space>

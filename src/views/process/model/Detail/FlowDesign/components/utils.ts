@@ -1,4 +1,4 @@
-import {cloneDeep, isArray, isString, pick} from 'lodash-es'
+import { cloneDeep, isArray, isString, pick } from 'lodash-es'
 import { advancedComponents } from './const'
 import { useFlowStore } from '@LowCode/store/flow'
 import { layoutComponents } from './const'
@@ -180,6 +180,23 @@ export function handleArrToObj(arr: string[] = []) {
     return obj
 }
 
+const handleFormChildren = (data: any[], name: string) => {
+    return data.filter(item => {
+        const _label = item.formItemProps.label || item.componentProps?.name || ''
+
+        if (name && _label.includes(name)) {
+            return true
+        }
+
+        if (item.children?.length) {
+            item.children = handleFormChildren(item.children, name)
+            return !!item.children.length
+        }
+
+        return !name
+    })
+}
+
 /**
  * 前端筛选字段名称
  * @param list
@@ -197,7 +214,7 @@ export function filterFormByName(list, name) {
                 return f.formItemProps.label.includes(name)
             } else {
                 // 布局组件没有formItemProps.label, 直接用componentProps?.name匹配
-                return f.componentProps?.name?.includes(name)
+                return f.componentProps?.name?.includes(name) || f.componentProps?.title?.includes(name)
             }
         })
         // if (_filterFields.length) {
@@ -462,37 +479,37 @@ export function getFieldByKey(data: any, key: string) {
 }
 
 export const handleLikeValue = (v: string) => {
-  if (isString(v)) {
-    return v.split('').reduce((pre: string, next: string) => {
-      let _next = next;
-      if (next === '\\') {
-        _next = '\\\\';
-      } else if (next === '%') {
-        _next = '\\%';
-      }
-      return pre + _next;
-    }, '');
-  }
-  return v;
+    if (isString(v)) {
+        return v.split('').reduce((pre: string, next: string) => {
+            let _next = next;
+            if (next === '\\') {
+                _next = '\\\\';
+            } else if (next === '%') {
+                _next = '\\%';
+            }
+            return pre + _next;
+        }, '');
+    }
+    return v;
 };
 
 const isEmpty = (v) => {
-  return (
-    v === undefined ||
-    v === null ||
-    v === '' ||
-    (isArray(v) && v.length === 0)
-  );
+    return (
+        v === undefined ||
+        v === null ||
+        v === '' ||
+        (isArray(v) && v.length === 0)
+    );
 };
 
 export const handleTermsData = (terms) => {
-  return terms.map(item => {
-    if (['like', 'nlike'].includes(item.termType) && !isEmpty(item.viewValue)) {
-      item.value = `%${handleLikeValue(item.viewValue)}%`;
-    } else {
-      item.value = item.value || item.viewValue
-    }
+    return terms.map(item => {
+        if (['like', 'nlike'].includes(item.termType) && !isEmpty(item.viewValue)) {
+            item.value = `%${handleLikeValue(item.viewValue)}%`;
+        } else {
+            item.value = item.value || item.viewValue
+        }
 
-    return item
-  })
+        return item
+    })
 }

@@ -52,7 +52,7 @@
       </j-form-item>
       <j-form-item
         name="nameGenerator"
-        :rules="[{ required: true, trigger: 'change' }]"
+        :rules="[{ required: true, trigger: 'change', message: '请配置标题模板' }]"
       >
         <template #label>
           <j-space>
@@ -76,7 +76,7 @@
       </j-form-item>
       <j-form-item
         name="summaryGenerator"
-        :rules="[{ required: true, trigger: 'change' }]"
+        :rules="[{ required: true, trigger: 'change', message: '请配置摘要模板' }]"
       >
         <template #label>
           <div>
@@ -205,20 +205,20 @@ const formData = reactive({
       // flowStore.model.config.variables = [...initVariables.value, ...val]
     },
   }),
-  // nameGenerator: computed({
-  //   get: () => formatToName(flowStore.model.config.nameGenerator),
-  //   set: (val) => {
-  //     flowStore.model.config.nameGenerator = formatToVariable(val)
-  //   },
-  // }),
-  nameGenerator: props.data?.nameGenerator,
-  // summaryGenerator: computed({
-  //   get: () => formatToName(flowStore.model.config.summaryGenerator),
-  //   set: (val) => {
-  //     flowStore.model.config.summaryGenerator = formatToVariable(val)
-  //   },
-  // }),
-  summaryGenerator: props.data?.summaryGenerator,
+  nameGenerator: computed({
+    get: () => flowStore.model.config.nameGenerator,
+    set: (val) => {
+      flowStore.model.config.nameGenerator = val
+    },
+  }),
+  // nameGenerator: props.data?.nameGenerator,
+  summaryGenerator: computed({
+    get: () => flowStore.model.config.summaryGenerator,
+    set: (val) => {
+      flowStore.model.config.summaryGenerator = val
+    },
+  }),
+  // summaryGenerator: props.data?.summaryGenerator,
   ccMember: computed({
     get: () => flowStore.model.config.ccMember,
     set: (val) => {
@@ -268,6 +268,7 @@ const validateSteps = () => {
         resolve(2)
       })
       .catch((err) => {
+        console.log('showCopy error',err)
         // reject(err)
         // 返回当前步骤序号
         reject(2)
