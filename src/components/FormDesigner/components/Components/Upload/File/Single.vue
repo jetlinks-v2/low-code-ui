@@ -28,7 +28,7 @@
         <j-ellipsis v-else @dblclick="onDbClick(file)">{{ file.name }}</j-ellipsis>
       </template>
     </j-upload>
-    <p v-if="!fileList?.length" class="ant-upload-drag-sub-tip">{{ props.accept?.length ? `支持格式:${props?.accept?.join('、')}` : `支持所有格式` }}</p>
+    <p v-if="!fileList?.length" class="ant-upload-drag-sub-tip">{{ text ? `支持格式:${text}` : `支持所有格式` }}</p>
     <j-button style="color: #6B6F7F;" v-else size="small" @click="onDelete(fileList?.[0])" :disabled="disabled">删除</j-button>
   </div>
 </template>
@@ -70,6 +70,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  noAccept:{
+    type:Array,
+    // default:['.exe','.xlsx']
+    default:[]
+  }
 })
 
 const emits = defineEmits(['change'])
@@ -85,6 +90,9 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   const isType = props.accept?.length
       ? props.accept?.join('').includes(arr[arr.length - 1])
       : true
+  const isNotType= props.noAccept?.length
+      ? props.noAccept?.join('').includes(arr[arr.length - 1])
+      : false
 
   return new Promise((resolve) => {
     if (maxSize < file.size) {
@@ -94,13 +102,27 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
       )
       return false
     } else if (!isType) {
-      onlyMessage(`格式错误，请重新上传`, 'error')
+      onlyMessage(`格式错误,支持${text.value}格式，请重新上传`, 'error')
+      return false
+    }else if (isNotType) {
+      onlyMessage(`格式错误,支持${text.value}格式，请重新上传`, 'error')
       return false
     } else {
       resolve(file)
     }
   })
 }
+
+const text = computed(()=>{
+  let str = ''
+  if(props.accept?.length!==0){
+    str = str + props.accept?.join('、')
+  }
+  if(props.noAccept?.length!==0){
+    str = str +' 非'+ props.noAccept?.join('、非')
+  }
+  return str &&str!=='undefined' ? str:''
+})
 
 const handleChange = async (info: UploadChangeParam) => {
   if (!info.file.status) return

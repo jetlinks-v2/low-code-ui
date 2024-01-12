@@ -55,6 +55,9 @@ const props = defineProps({
   },
   width:{
     type:Number,
+  },
+  noAccept:{
+    type:Array,
   }
 })
 const _value: any = ref([])
