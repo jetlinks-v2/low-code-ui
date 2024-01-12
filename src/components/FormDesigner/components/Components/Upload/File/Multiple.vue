@@ -18,7 +18,9 @@
           <img src="/images/form-designer/upload-img.png" />
         </div>
         <p class="ant-upload-drag-tip">点击或将文件拖拽到此区域</p>
-        <p class="ant-upload-drag-sub-tip">{{ text ? `支持格式:${text}` : `支持所有格式` }}</p>
+        <p class="ant-upload-drag-sub-tip">
+          <j-ellipsis>{{ text ? `支持格式:${text}` : `支持所有格式` }}</j-ellipsis>
+        </p>
       </div>
       <template #itemRender="{ file }">
         <div class="render">
@@ -242,8 +244,7 @@ watch(
     font-size: 12px;
     width: 100%;
     text-align: center;
-    height: 20px;
-    overflow: hidden;
+    padding: 0 20px;
   }
 }
 

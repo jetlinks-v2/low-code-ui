@@ -28,7 +28,7 @@
         <j-ellipsis v-else @dblclick="onDbClick(file)">{{ file.name }}</j-ellipsis>
       </template>
     </j-upload>
-    <p v-if="!fileList?.length" class="ant-upload-drag-sub-tip">{{ text ? `支持格式:${text}` : `支持所有格式` }}</p>
+    <p v-if="!fileList?.length" class="ant-upload-drag-sub-tip"><j-ellipsis>{{ text ? `支持格式:${text}` : `支持所有格式` }}</j-ellipsis></p>
     <j-button style="color: #6B6F7F;" v-else size="small" @click="onDelete(fileList?.[0])" :disabled="disabled">删除</j-button>
   </div>
 </template>
@@ -195,10 +195,8 @@ watch(
   .ant-upload-drag-sub-tip {
     color: #6B6F7F;
     font-size: 12px;
-    width: 200px;
     text-align: center;
-    height: 20px;
-    overflow: hidden;
+    padding: 0 10px;
   }
 }
 
