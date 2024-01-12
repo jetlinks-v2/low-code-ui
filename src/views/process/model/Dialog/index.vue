@@ -68,7 +68,7 @@
         <j-input
           :disabled="props.data.id"
           v-model:value="form.key"
-          placeholder="请输入流程key"
+          placeholder="请输入流程标识"
           style="width: 576px"
         />
       </j-form-item>
@@ -184,7 +184,7 @@ const form = reactive<Partial<FormType>>({
 })
 
 const keyRules = [
-  { required: true, message: '请输入流程key' },
+  { required: true, message: '请输入流程标识' },
   {
     validator: async (_: any, value: string) => {
       if (value && !props.data.id) {
@@ -196,7 +196,7 @@ const keyRules = [
         const res = await getProcess_api({ terms:[{ column: 'key', termType: 'eq', value: value}]})
 
         if (res.success && res.result && res.result.total > 0) {
-          return Promise.reject('流程key重复')
+          return Promise.reject('流程标识重复')
         }
         return Promise.resolve()
       }
