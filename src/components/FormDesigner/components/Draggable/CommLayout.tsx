@@ -42,17 +42,15 @@ export default defineComponent({
     setup(props) {
         const {isEditModel} = useTool()
         const designer: any = inject('FormDesigner')
-        const TypeComponent = componentMap?.[props?.data?.type] || 'div'
         const _path: string[] = cloneDeep(props?.path || []);
         const _formRef = ref<any>(null)
-        const options = ref<any[]>(props.data?.componentProps.options || [])
-        const treeData = ref<any[]>(props.data?.componentProps.treeData || [])
         const __value = ref<any>(get(designer.formState, _path))
         const __data = reactive(props.data)
         const _props = useProps(__data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
-
         const visible = ref<boolean>(true)
         const disabled = ref<boolean>(_props.componentProps?.disabled || false)
+        const options = ref<any[]>(_props.componentProps.options || [])
+        const treeData = ref<any[]>(_props.componentProps.treeData || [])
 
         const _index = computed(() => {
             return isNumber(props?.index) ? props.index : 0
@@ -60,6 +58,8 @@ export default defineComponent({
 
         watch(() => JSON.stringify(props.data), () => {
             Object.assign(__data, props.data)
+            options.value = __data.componentProps?.options
+            treeData.value = __data.componentProps?.treeData
         }, {
             immediate: true
         })
@@ -94,8 +94,10 @@ export default defineComponent({
             disabled.value = bool
         }
 
-        watchEffect(() => {
+        watch(() => JSON.stringify(_props.componentProps), () => {
             disabled.value = _props.componentProps?.disabled
+        }, {
+            immediate: true
         })
 
         const onChange = (...arg) => {
@@ -208,11 +210,11 @@ export default defineComponent({
         })
 
         return () => {
+            const TypeComponent = componentMap?.[props?.data?.type] || 'div'
             const params = {
                 data: props.data,
                 parent: props.parent
             }
-
             const _description = () => {
                 if (props.data?.componentProps?.description) {
                     return <div class="form-designer-description">
