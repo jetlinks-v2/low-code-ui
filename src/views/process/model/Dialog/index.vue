@@ -155,6 +155,10 @@ const props = defineProps({
     type: Boolean,
     default: () => false,
   },
+  isDeploy: {
+    type: Boolean,
+    default: () => false,
+  },
 })
 
 const emits = defineEmits<{
@@ -248,7 +252,7 @@ const confirm = () => {
 }
 
 const init = () => {
-  title.value = '编辑'
+  title.value = props.isDeploy ? '部署' : '编辑'
   Object.assign(form, props.data)
   selected.value = baseIcon.some((i) => i === form.icon) ? '' : form.icon
 }

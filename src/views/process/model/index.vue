@@ -140,6 +140,7 @@
       v-if="dialog.visible"
       v-model:visible="dialog.visible"
       :data="dialog.selectItem"
+      :isDeploy="dialog.isDeploy"
       @refresh="refresh"
     />
     <Drawer
@@ -483,6 +484,7 @@ const handleSearch = (data) => {
 const handleSave = (data) => {
   dialog.selectItem = { ...data }
   dialog.visible = true
+  dialog.isDeploy = false
 }
 
 /**

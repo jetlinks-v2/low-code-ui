@@ -116,6 +116,7 @@
       v-if="dialog.visible"
       v-model:visible="dialog.visible"
       :data="dialog.selectItem"
+      :isDeploy="true"
       @refresh="refresh"
     />
   </page-container>
