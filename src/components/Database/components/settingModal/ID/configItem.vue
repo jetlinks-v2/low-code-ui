@@ -90,7 +90,7 @@
                     />
                   </template>
                   <template v-else-if="matchedType ===  'now'">
-                    <j-select
+                    <j-auto-complete
                         placeholder="请选择日期"
                         v-model:value="condition.matched[matchedIndex].now.format"
                         :options="[

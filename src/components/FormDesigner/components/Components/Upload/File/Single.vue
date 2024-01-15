@@ -2,7 +2,7 @@
   <div class="content">
     <div class="ant-upload-image">
       <img v-if="!fileList?.length" src="/images/form-designer/upload-single-img.png" :width="32" />
-      <img v-else :src="imgTypeMap.get(fileList.value?.[0]?.type) || imgTypeMap.get('other')" :width="32" />
+      <img v-else :src="imgTypeMap.get(fileList?.[0]?.type) || imgTypeMap.get('other')" :width="32" />
     </div>
     <j-upload
         v-model:file-list="fileList"
@@ -28,7 +28,7 @@
         <j-ellipsis v-else @dblclick="onDbClick(file)">{{ file.name }}</j-ellipsis>
       </template>
     </j-upload>
-    <p v-if="!fileList?.length" class="ant-upload-drag-sub-tip">{{ text ? `支持格式:${text}` : `支持所有格式` }}</p>
+    <p v-if="!fileList?.length" class="ant-upload-drag-sub-tip"><j-ellipsis>{{ text ? `支持格式:${text}` : `支持所有格式` }}</j-ellipsis></p>
     <j-button style="color: #6B6F7F;" v-else size="small" @click="onDelete(fileList?.[0])" :disabled="disabled">删除</j-button>
   </div>
 </template>
@@ -195,6 +195,8 @@ watch(
   .ant-upload-drag-sub-tip {
     color: #6B6F7F;
     font-size: 12px;
+    text-align: center;
+    padding: 0 10px;
   }
 }
 

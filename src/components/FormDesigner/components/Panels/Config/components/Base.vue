@@ -745,6 +745,7 @@ const onTypeChange = (val: string) => {
     ...designer.formData.value,
     children: arr,
   }
+  console.log(arr)
   designer.setSelection(obj)
 }
 
