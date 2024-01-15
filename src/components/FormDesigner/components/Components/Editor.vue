@@ -12,6 +12,7 @@
         @onCreated="handleCreated"
         @onChange="handleChange"
     />
+    <div class="mask" v-if="disabled"></div>
   </div>
 </template>
 
@@ -48,7 +49,6 @@ const toolbarConfig = {
 
 const init = {
   placeholder: props.placeholder,
-  readOnly: props.disabled,
   MENU_CONF: {
     uploadImage: {
       async customUpload(file: any, insertFn: any) {
@@ -79,10 +79,10 @@ const handleChange = (editor: any) => {
 }
 
 watchEffect(() => {
+  console.log(props.disabled)
   valueHtml.value = props.value || ''
   editorConfig.value = {
     ...cloneDeep(init),
-    readOnly: props.disabled,
     placeholder: props.placeholder,
   }
 })
@@ -99,5 +99,14 @@ onBeforeUnmount(() => {// 组件销毁时，也及时销毁编辑
   border: 1px solid #ccc;
   position: relative;
   width: 100%;
+
+  .mask {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    cursor: not-allowed;
+  }
 }
 </style>
