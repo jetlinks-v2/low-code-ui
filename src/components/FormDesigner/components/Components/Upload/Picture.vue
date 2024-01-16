@@ -7,8 +7,8 @@
         list-type="picture-card"
         :max-count="maxCount"
         :headers="{
-      [TOKEN_KEY]: LocalStore.get(TOKEN_KEY),
-    }"
+          [TOKEN_KEY]: LocalStore.get(TOKEN_KEY),
+        }"
         :before-upload="beforeUpload"
         :accept="accept"
         :disabled="fileList.length >= maxCount || disabled"
@@ -70,7 +70,7 @@
 <script lang="ts" setup>
 import {nextTick, reactive, ref, watch} from 'vue'
 import {fileUpload} from '@LowCode/api/comm'
-import {TOKEN_KEY} from '@jetlinks-web/constants'
+import { TOKEN_KEY } from '@jetlinks-web/constants';
 import {LocalStore} from '@jetlinks-web/utils/src/storage'
 import CropperModal from '@LowCode/components/Upload/Image/CropperModal'
 import {getBase64ByImg, onlyMessage, randomString} from '@jetlinks-web/utils'
@@ -113,6 +113,10 @@ const props = defineProps({
   imgDescription:{
     type:String,
     default:'请上传图片'
+  },
+  isCropper: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -130,12 +134,8 @@ const uploading = ref<Boolean>(false)
 const dbRef = ref<boolean>(false)
 const dbId = ref<string>('')
 const nameRef = ref()
-const saveImage = async (url: string) => {
-  cropper.visible = false
-  imageUrl.value = url
-  const file = new File([url], fileToUpload.value.name, {
-    type: fileToUpload.value.type,
-  })
+
+const saveRequest = async (file: any) => {
   const formData = new FormData()
   formData.append('file', file)
   const timer = setInterval(() => {
@@ -150,6 +150,7 @@ const saveImage = async (url: string) => {
     if (timer) {
       clearInterval(timer)
     }
+    console.log('fileUpload', file)
     fileList.value.push({
       url: res.result?.accessUrl,
       name: res.result?.name,
@@ -159,6 +160,14 @@ const saveImage = async (url: string) => {
     uploading.value = false
     percent.value = 0
   }
+}
+const saveImage = async (url: string) => {
+  cropper.visible = false
+  imageUrl.value = url
+  const file = new File([url], fileToUpload.value.name, {
+    type: fileToUpload.value.type,
+  })
+  saveRequest(file)
 }
 
 const text = computed(()=>{
@@ -184,30 +193,32 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   const isNotType= props.noAccept?.length
       ? props.noAccept?.join('').includes(arr[arr.length - 1])
       : false
+
   return new Promise(() => {
     if (maxSize < file.size) {
       onlyMessage(
-          `该文件超过${props.fileSize}${props.unit}, 请重新上传`,
-          'error',
+        `该文件超过${props.fileSize}${props.unit}, 请重新上传`,
+        'error',
       )
       return false
     } else if (!isType) {
-      console.log('=====')
       onlyMessage(`格式错误,支持${text.value}格式，请重新上传`, 'error')
       return false
     }else if(isNotType){
-      console.log('-----',props.noAccept)
       onlyMessage(`格式错误,支持${text.value}格式，请重新上传`, 'error')
       return false
-    } 
+    }
     else {
       fileToUpload.value = file
-      getBase64ByImg(file, (base64Url) => {
-        cropper.img = base64Url
-        cropper.visible = true
-      })
+      if (props.isCropper) {
+        getBase64ByImg(file, (base64Url) => {
+          cropper.img = base64Url
+          cropper.visible = true
+        })
+      } else {
+        saveRequest(file)
+      }
       return false
-      // resolve(file)
     }
   })
 }
