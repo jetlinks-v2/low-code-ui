@@ -66,7 +66,6 @@
           </j-tooltip>
         </template>
         <j-input
-          :disabled="props.data.id"
           v-model:value="form.key"
           placeholder="请输入流程标识"
           style="width: 576px"
