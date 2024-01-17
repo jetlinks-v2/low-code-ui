@@ -48,6 +48,7 @@
           v-model:variables="formData.variables"
           :previewData="previewData"
           :treeData="treeData"
+          @change="varChange"
         />
       </j-form-item>
       <j-form-item
@@ -159,7 +160,7 @@ const getVariables = async () => {
     nodeId: flowStore.model.nodes.id || 'ROOT_1', // 展示及抄送直接传根节点id
   }
   const { result } = await queryVariables_api(params)
-  console.log('otherFields',result)
+
   const { formList, otherFields } = separateData(result, {formList: [], otherFields: []})
   //   treeData.value = formList || []
   treeData.value = formList.map(m => {
@@ -196,15 +197,16 @@ const getFormFields = async (data) => {
 }
 
 const formData = reactive({
-  variables: computed({
-    get: () =>
-      flowStore.model.config.variables?.length
-        ? flowStore.model.config.variables
-        : initVariables.value,
-    set: (val) => {
-      // flowStore.model.config.variables = [...initVariables.value, ...val]
-    },
-  }),
+  // variables: computed({
+  //   get: () =>
+  //     flowStore.model.config.variables?.length
+  //       ? flowStore.model.config.variables
+  //       : initVariables.value,
+  //   set: (val) => {
+  //     flowStore.model.config.variables = [...initVariables.value, ...val]
+  //   },
+  // }),
+  variables: [],
   nameGenerator: computed({
     get: () => flowStore.model.config.nameGenerator,
     set: (val) => {
@@ -227,16 +229,28 @@ const formData = reactive({
   }),
 })
 
+const varChange = (v) => {
+  flowStore.model.config.variables = v
+}
 
-watch(() => props.noQuery, () => {
+const initData = async (val) => {
+  if (!val) {
+    await getVariables()
+  }
   formData.variables = props.data?.variables?.length ? props.data?.variables : initVariables.value
+  console.log('props.noQuery',props.data?.variables?.length ? props.data?.variables : initVariables.value)
   formData.nameGenerator = props.data?.nameGenerator
   formData.summaryGenerator = props.data?.summaryGenerator
   formData.ccMember = props.data?.ccMember ?? flowStore.model.config.ccMember
+}
+
+watch(() => props.noQuery, async (val) => {
+  initData(val)
 }, { immediate: true })
 
 
 const _variables = computed(() => {
+  console.log('checkedLeafNode.value', formData.variables)
   return formData.variables.filter(item => {
     if (['process.var.processOwner', 'process.function.processOwnerOrgIds', 'process.function.now'].includes(item.value)) {
       return false
@@ -283,19 +297,6 @@ const onNameChange = (val) => {
 const onSummaryChange = (val) => {
   flowStore.model.config.summaryGenerator = val
 }
-
-watch(() => props.noQuery, ( val ) => {
-  console.log('noQuery', val)
-  if (!val) {
-    getVariables()
-  }
-}, { immediate: true })
-
-// onMounted(() => {
-//   console.log('otherFields1')
-//   getVariables()
-//   // validateSteps()
-// })
 
 defineExpose({ validateSteps })
 </script>

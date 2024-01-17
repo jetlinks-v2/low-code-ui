@@ -1,4 +1,4 @@
-import { request } from '@jetlinks-web/core'
+import { request } from '@/utils/axios'
 
 /**
  * 系统版本

@@ -78,8 +78,11 @@ const props = defineProps({
     type:Array,
     // default:['.exe','.xlsx']
     default:[]
+  },
+  isCropper: {
+    type: Boolean,
+    default: true
   }
-  
 })
 
 const emits = defineEmits(['change'])
@@ -107,12 +110,7 @@ const text = computed(()=>{
   return str
 })
 
-const saveImage = async (url: string) => {
-  cropper.visible = false
-  imageUrl.value = url
-  const file = new File([url], fileToUpload.value.name, {
-    type: fileToUpload.value.type,
-  })
+const saveRequest = async (file: any) => {
   const formData = new FormData()
   formData.append('file', file)
   const res = await fileUpload(formData)
@@ -121,10 +119,19 @@ const saveImage = async (url: string) => {
       url: res.result?.accessUrl,
       name: res.result?.name,
       uid: res.result.id || randomString(16),
-      type: item.extension || item.name?.split('.')?.pop()
+      type: res.result.extension || res.result.name?.split('.')?.pop()
     })
     emits('change', fileList.value)
   }
+}
+
+const saveImage = async (url: string) => {
+  cropper.visible = false
+  imageUrl.value = url
+  const file = new File([url], fileToUpload.value.name, {
+    type: fileToUpload.value.type,
+  })
+  saveRequest(file)
 }
 
 const beforeUpload = (file: UploadProps['fileList'][number]) => {
@@ -159,10 +166,14 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
       return false
     }else if (props.listType === 'picture') {
       fileToUpload.value = file
-      getBase64ByImg(file, (base64Url) => {
-        cropper.img = base64Url
-        cropper.visible = true
-      })
+      if (props.isCropper) {
+        getBase64ByImg(file, (base64Url) => {
+          cropper.img = base64Url
+          cropper.visible = true
+        })
+      } else {
+        saveRequest(file)
+      }
       return false
       // resolve(file)
     } else {
