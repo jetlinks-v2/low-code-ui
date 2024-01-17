@@ -106,10 +106,10 @@
                           <span class="value">{{ record.creatorName }}</span>
                         </j-ellipsis>
                         <div style="width: 248px;padding-right: 24px">
-                          <span class="text"> 部署时间： </span>
+                          <span class="text"> 创建时间： </span>
                           <span class="value">
                             {{
-                              dayjs(record.deployTime).format(
+                              dayjs(record.createTime).format(
                                 'YYYY-MM-DD HH:mm:ss',
                               )
                             }}
