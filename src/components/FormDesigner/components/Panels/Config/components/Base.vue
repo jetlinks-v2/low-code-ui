@@ -725,6 +725,8 @@ const typeOptions = computed(() => {
       label: item.name,
       value: item.type,
     }
+  }).filter(i => {
+    return !(designer?.type === 'workflow' && i?.value === 'form')
   })
 })
 
