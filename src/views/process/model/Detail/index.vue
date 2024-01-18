@@ -118,6 +118,7 @@
       :data="dialog.selectItem"
       :isDeploy="true"
       @refresh="refresh"
+      @cancel="cancel"
     />
   </page-container>
 </template>
@@ -353,6 +354,10 @@ const onOk = async () => {
     visible.value = false
     routerNext()
   }
+}
+
+const cancel = () => {
+  deployLoading.value = false
 }
 const onCancel = () => {
   visible.value = false

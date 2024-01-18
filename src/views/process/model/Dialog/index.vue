@@ -5,7 +5,7 @@
     :maskClosable="false"
     :title="title"
     :width="700"
-    @cancel="emits('update:visible', false)"
+    @cancel="cancel"
     @ok="confirm"
     class="edit-dialog-container"
     cancelText="取消"
@@ -163,6 +163,7 @@ const props = defineProps({
 const emits = defineEmits<{
   (e: 'update:visible', flag: boolean): void
   (e: 'refresh'): void
+  (e: 'cancel'): void
 }>()
 
 // const { classified, getText } = useClassified()
@@ -254,6 +255,11 @@ const init = () => {
   title.value = props.isDeploy ? '部署' : '编辑'
   Object.assign(form, props.data)
   selected.value = baseIcon.some((i) => i === form.icon) ? '' : form.icon
+}
+
+const cancel = () => {
+  emits('update:visible', false)
+  emits('cancel')
 }
 
 watch(
