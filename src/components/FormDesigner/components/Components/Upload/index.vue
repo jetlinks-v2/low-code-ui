@@ -12,7 +12,7 @@
     </template>
   </div>
 </template>
-  
+
   <script lang="ts" setup>
 import { omit } from 'lodash-es'
 import { computed, ref, watch } from 'vue'
@@ -62,6 +62,10 @@ const props = defineProps({
   imgDescription:{
     type:String,
     default:'请上传图片'
+  },
+  isCropper: {
+    type: Boolean,
+    default: true
   }
 })
 const _value: any = ref([])
@@ -93,6 +97,7 @@ const onChange = (item: any) => {
 }
 
 const _componentProps = computed(() => {
+  console.log('listType',props)
   return omit(props, 'listType')
 })
 </script>

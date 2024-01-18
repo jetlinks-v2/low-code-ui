@@ -1,4 +1,4 @@
-import { request } from '@jetlinks-web/core'
+import { request } from '@/utils/axios'
 
 //新增项目
 export const addProject = (data: any) => request.post(`/low-code/info/_add`, data)

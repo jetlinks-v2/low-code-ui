@@ -252,6 +252,19 @@
             v-model:value="target.componentProps.imgDescription"
           />
         </j-form-item>
+      <j-form-item
+        v-if="['upload'].includes(type)"
+        :name="['componentProps','isCropper']"
+        label="是否开启裁剪"
+      >
+        <CheckButton
+          :options="[
+            { label: '否', value: false },
+            { label: '是', value: true },
+          ]"
+          v-model:value="target.componentProps.isCropper"
+        />
+      </j-form-item>
     </template>
     <template v-if="['tree-select', 'select-card'].includes(type)">
       <j-form-item
