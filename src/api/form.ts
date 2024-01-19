@@ -1,4 +1,4 @@
-import { request } from '@/utils/axios'
+import { request } from '@LowCode/utils/axios'
 
 //获取用户列表
 export const getUserList = (data: any) => request.post('/user/_query', data);
