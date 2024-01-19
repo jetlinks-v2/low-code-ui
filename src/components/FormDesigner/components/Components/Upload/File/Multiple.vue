@@ -75,7 +75,7 @@ import {imgTypeMap} from "../data";
 const props = defineProps({
   fileSize: {
     type: Number,
-    default: 2,
+    default: 5,
   },
   unit: {
     type: String,
