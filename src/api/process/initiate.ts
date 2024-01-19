@@ -1,4 +1,4 @@
-import { request } from '@/utils/axios'
+import { request } from '@LowCode/utils/axios'
 
 /**
  * 查询可发起流程
