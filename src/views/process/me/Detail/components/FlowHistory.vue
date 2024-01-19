@@ -27,7 +27,7 @@
                   <div class="item-right">{{ dayjs(item.timestamp).format('YYYY-MM-DD HH:mm:ss') }}</div>
                </div>
                <div v-if="item.changed && item.nodeType !== 'ROOT'">
-                  <a v-if="showChanged(item.changed, 'form').length"
+                  <a v-if="showChanged(item.changed, 'form').length && isDetail"
                      @click="toDetail(showChanged(item.changed, 'form'))">查看办理详情</a>
                   <div v-if="showChanged(item.changed, 'taskCommentChanged')" class="comment">
                      {{ showChanged(item.changed, 'taskCommentChanged')?.others.afterComment }}
@@ -110,6 +110,10 @@ const props = defineProps({
       type: Object,
       default: {}
    },
+   isDetail: {
+      type: Boolean,
+      default: true
+   }
 })
 
 const timelines = ref<any>([])
