@@ -27,7 +27,7 @@
       </div>
       <template #itemRender="{ file }">
         <div class="render">
-          <a-image :src="file.url" class="image">
+          <a-image :src="file.url" >
             <template #previewMask>
               <AIcon type="EyeOutlined"/>
               <AIcon
@@ -297,6 +297,15 @@ watch(
     margin-top: 10px;
     width: 100%;
   }
+  :deep(.ant-image){
+    height: 100%;
+    width: 100%;
+  }
+  :deep(.ant-image-img){
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+  }
 }
 
 .bottom {
@@ -315,6 +324,7 @@ watch(
     color: blue;
     font-size: 20px
   }
+  
 }
 
 </style>
