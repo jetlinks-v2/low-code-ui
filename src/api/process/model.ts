@@ -1,4 +1,4 @@
-import { request } from '@/utils/axios'
+import { request } from '@LowCode/utils/axios'
 
 /**
  * 条件查询流程模型

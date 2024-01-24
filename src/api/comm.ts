@@ -1,4 +1,4 @@
-import { request } from '@/utils/axios'
+import { request } from '@LowCode/utils/axios'
 
 export const FileStatic = '/file/upload'
 export const fileUpload = (data: any) => request.post(FileStatic, data)

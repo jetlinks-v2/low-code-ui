@@ -24,7 +24,7 @@ import ButtonUpload from './ButtonUpload.vue'
 const props = defineProps({
   fileSize: {
     type: Number,
-    default: 2,
+    default: 5,
   },
   unit: {
     type: String,
@@ -65,7 +65,7 @@ const props = defineProps({
   },
   isCropper: {
     type: Boolean,
-    default: true
+    default: false
   }
 })
 const _value: any = ref([])
