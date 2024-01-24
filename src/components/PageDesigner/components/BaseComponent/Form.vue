@@ -83,6 +83,11 @@ const setValue = (_val: any) => {
   $self.value = _val
 }
 
+const getValue = (_val: any) => {
+  if(unref(isEditModel)) return
+   return $self.value
+}
+
 const onSave = () => {
   return new Promise((resolve, reject) => {
     formRef.value
@@ -119,7 +124,7 @@ handleDataSourceFn(props?.request || {}, unref(isEditModel)).then((_val: any) =>
 
 onMounted(() => {
   executionMounted()
-  pageProvider.addRef?.(props._key, {setVisible, onSave,setValue})
+  pageProvider.addRef?.(props._key, {setVisible, onSave,setValue, getValue})
 })
 
 const myValue = computed(() => {
