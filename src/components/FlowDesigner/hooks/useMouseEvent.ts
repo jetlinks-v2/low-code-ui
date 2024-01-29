@@ -2,16 +2,16 @@ import {ref} from 'vue'
 import type {Ref} from 'vue'
 import {difference} from "lodash-es";
 
-export const useMouseEvent = (El: Ref<HTMLDivElement>, enabled) => {
+export const useMouseEvent = (El: Ref<HTMLDivElement>, enabled, pScale, offset) => {
   // 缩放
-  const scale = ref<number>(1)
+  const scale = ref<number>(pScale ?? 1)
 
   // 拖拽
   const isDragging = ref<boolean>(false)
 
   const diff = {
-    x: 0,
-    y: 0
+    x: offset.x || 0,
+    y: offset.y || 0
   }
 
   const lastPointermove = {
@@ -139,6 +139,10 @@ export const useMouseEvent = (El: Ref<HTMLDivElement>, enabled) => {
 
   onUnmounted(() => {
     removeEventListener()
+  })
+
+  onMounted(() => {
+    TransformRender()
   })
 
   return {

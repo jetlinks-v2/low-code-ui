@@ -60,6 +60,14 @@ const FlowDesigner = defineComponent({
     dragging: {
       type: Boolean,
       default: true
+    },
+    scale: {
+      type: Number,
+      default: 1
+    },
+    offset: {
+      type: Object,
+      default: () => ({ x:0, y:0 })
     }
   },
   setup(props, { emit, expose }) {
@@ -645,7 +653,7 @@ const FlowDesigner = defineComponent({
     expose({ validateProcess })
 
 
-    const { enlarge, zoomOut, scale } = useMouseEvent(DragRef, props.dragging)
+    const { enlarge, zoomOut, scale } = useMouseEvent(DragRef, props.dragging, props.scale, props.offset)
 
     // 渲染组件
     return () => {

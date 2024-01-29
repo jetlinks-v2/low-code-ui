@@ -27,6 +27,13 @@
           <j-button danger type="link" @click="onDelete(file)" :disabled="disabled">
             <AIcon type="DeleteOutlined"/>
           </j-button>
+          <j-button
+              type="link"
+              style="padding: 0"
+              @click="onLoad(file)"
+          >
+            <AIcon type="DownloadOutlined" />
+          </j-button>
         </j-space>
       </div>
     </template>
@@ -42,9 +49,10 @@ import {_fileUpload} from '@LowCode/api/comm'
 import {TOKEN_KEY} from '@jetlinks-web/constants'
 import {LocalStore} from '@jetlinks-web/utils/src/storage'
 import CropperModal from '@LowCode/components/Upload/Image/CropperModal'
-import {getBase64ByImg, onlyMessage, randomString} from '@jetlinks-web/utils'
+import {downloadFileByUrl, getBase64ByImg, onlyMessage, randomString} from '@jetlinks-web/utils'
 import type {UploadProps, UploadChangeParam} from 'jetlinks-ui-components'
 import {imgTypeMap} from "./data";
+import {downloadFile} from "@LowCode/api/form";
 
 const props = defineProps({
   fileSize: {
@@ -210,6 +218,14 @@ const onBlur = () => {
   dbId.value = ''
   dbRef.value = false
   emits('change', fileList.value)
+}
+
+const onLoad = (_file: any) => {
+  downloadFile(_file?.url).then(resp => {
+    const blob = new Blob([resp.data]);
+    const _url = URL.createObjectURL(blob);
+    downloadFileByUrl(_url, _file?.name)
+  })
 }
 
 const onDelete = (file: any) => {

@@ -95,10 +95,10 @@ export const filterFormVariables = (data: any[], id: string, formItem: any) => {
         // 高级组件单选模式
         return item.componentProps?.keys?.some((s) => s.config.source === id)
     } else {
-        if (key === id && item.formItemProps?.label) {
+        if (item.formItemProps.name === id && item.formItemProps?.label) {
           formItem.label = item.formItemProps.label
         }
-        return key === id
+        return item.formItemProps.name === id
     }
   })
 }
