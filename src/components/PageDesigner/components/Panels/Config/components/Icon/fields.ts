@@ -143,8 +143,17 @@ const data = [
     'Fund',
     'Sliders',
 ];
-const datum = [...direction, ...suggestion, ...editor, ...data];
 
-const iconKeys = datum.map((item) => item + 'Outlined');
+const iconfont = [
+    'icon-a-jibenxinxi1',
+    'icon-jiashicang',
+    'icon-fabu1',
+    'icon-buchongfujian',
+    'icon-a-kaipiaoxinxi7'
+]
+const datum = [...direction, ...suggestion, ...editor, ...data].map((item) => item + 'Outlined');
+
+
+const iconKeys = [...datum,...iconfont]
 
 export default iconKeys;
