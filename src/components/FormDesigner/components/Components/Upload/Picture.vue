@@ -132,6 +132,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  options: {
+    type: String,
+  }
 });
 
 const emits = defineEmits(["change"]);
@@ -159,7 +162,10 @@ const saveRequest = async (file: any) => {
     clearInterval(timer);
   }
   uploading.value = true;
-  const res = await fileUpload(formData);
+  const _options = props?.options ? {
+    options: props?.options
+  } : {};
+  const res = await fileUpload(formData, _options);
   if (res.status === 200) {
     if (timer) {
       clearInterval(timer);
