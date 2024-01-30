@@ -1,11 +1,11 @@
 import { request } from '@LowCode/utils/axios'
 
 export const FileStatic = '/file/upload'
-export const fileUpload = (data: any) => request.post(FileStatic, data)
+export const fileUpload = (data: any, params?: any) => request.post(FileStatic, data, {params})
 
 //上传接口
 const BASE_API_PATH= import.meta.env.VITE_APP_BASE_API
-export const _fileUpload = () => `${BASE_API_PATH}/file/upload`
+export const _fileUpload = (options?: string) => options ? `${BASE_API_PATH}/file/upload?options=${options}` : `${BASE_API_PATH}/file/upload`
 
 /**
  * 保存查询记录
