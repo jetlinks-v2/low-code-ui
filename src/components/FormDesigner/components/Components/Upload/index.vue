@@ -90,6 +90,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  options: {
+    type: String,
+  }
 });
 const _value: any = ref([]);
 const emit = defineEmits(["update:value", "change"]);
@@ -120,7 +123,7 @@ const onChange = (item: any) => {
 };
 
 const _componentProps = computed(() => {
-  console.log("listType", props);
+  // console.log("listType", props);
   return omit(props, "listType");
 });
 </script>
