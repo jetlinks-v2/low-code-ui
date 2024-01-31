@@ -17,9 +17,9 @@ import {LOGIN_ROUTE} from "@LowCode/router/basic";
 
     setupPinia(app)
 
-    await initPackages()
-
     const router = await initRoute({ Login: LOGIN_ROUTE})
+
+    await initPackages(router)
 
     app.use(router)
 

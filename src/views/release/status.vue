@@ -288,7 +288,7 @@ const validateAll = async (id, cb) => {
     nextTick(async () => {
       setTimeout(() => {
         console.log(validateRef.value)
-        validateRef.value.validate().then(ref => {
+        validateRef.value?.validate().then(ref => {
           status[item.id] = 2
           handleStatusItem(item.id, 2, [] )
           if (cb) {

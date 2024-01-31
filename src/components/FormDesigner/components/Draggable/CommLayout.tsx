@@ -42,17 +42,26 @@ export default defineComponent({
     setup(props) {
         const {isEditModel} = useTool()
         const designer: any = inject('FormDesigner')
-        const TypeComponent = componentMap?.[props?.data?.type] || 'div'
         const _path: string[] = cloneDeep(props?.path || []);
-        const visible = ref<boolean>(true)
-        const disabled = ref<boolean>(false)
         const _formRef = ref<any>(null)
-        const options = ref<any[]>(props.data?.componentProps.options || [])
-        const treeData = ref<any[]>(props.data?.componentProps.treeData || [])
         const __value = ref<any>(get(designer.formState, _path))
+        const __data = reactive(props.data)
+        const _props = useProps(__data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
+        const visible = ref<boolean>(true)
+        const disabled = ref<boolean>(_props.componentProps?.disabled || false)
+        const options = ref<any[]>(_props.componentProps.options || [])
+        const treeData = ref<any[]>(_props.componentProps.treeData || [])
 
         const _index = computed(() => {
             return isNumber(props?.index) ? props.index : 0
+        })
+
+        watch(() => JSON.stringify(props.data), () => {
+            Object.assign(__data, props.data)
+            options.value = __data.componentProps?.options
+            treeData.value = __data.componentProps?.treeData
+        }, {
+            immediate: true
         })
 
         if (props.data?.formItemProps?.name) {
@@ -85,6 +94,12 @@ export default defineComponent({
             disabled.value = bool
         }
 
+        watch(() => JSON.stringify(_props.componentProps), () => {
+            disabled.value = _props.componentProps?.disabled
+        }, {
+            immediate: true
+        })
+
         const onChange = (...arg) => {
             if (unref(isEditModel)) return
             designer?.onChange?.()
@@ -94,7 +109,9 @@ export default defineComponent({
             }
             if (!props.data?.componentProps?.eventCode && !unref(isEditModel)) return
             let obj: any = undefined
-            if (['select', 'switch', 'select-card', 'tree-select'].includes(props.data.type)) {
+            if (['switch'].includes(props.data.type)) {
+                obj = {checked: arg?.[0], event: arg?.[1]}
+            }else if (['select', 'select-card', 'tree-select'].includes(props.data.type)) {
                 obj = {value: arg?.[0], option: arg?.[1]}
             } else if (['time-picker'].includes(props.data?.type)) {
                 obj = {time: arg?.[0], timeString: arg?.[1]}
@@ -193,15 +210,11 @@ export default defineComponent({
         })
 
         return () => {
-            const _props = useProps(props.data, unref(designer.formData), props.editable, designer.disabled, unref(designer.mode))
-
-            disabled.value = _props.componentProps?.disabled
-
+            const TypeComponent = componentMap?.[props?.data?.type] || 'div'
             const params = {
                 data: props.data,
                 parent: props.parent
             }
-
             const _description = () => {
                 if (props.data?.componentProps?.description) {
                     return <div class="form-designer-description">

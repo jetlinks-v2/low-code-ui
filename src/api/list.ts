@@ -1,4 +1,4 @@
-import { request } from '@jetlinks-web/core'
+import { request } from '@LowCode/utils/axios'
 
 export const _export = (projectId: string, functionId: string, commandId: string, data?: any, ) => request.postStream(`/low-code/runtime/${projectId}/${functionId}/${commandId}/_file`, data, {})
 

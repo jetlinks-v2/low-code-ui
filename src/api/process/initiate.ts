@@ -1,4 +1,4 @@
-import { request } from '@jetlinks-web/core'
+import { request } from '@LowCode/utils/axios'
 
 /**
  * 查询可发起流程

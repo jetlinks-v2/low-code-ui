@@ -56,17 +56,33 @@ const handleProps = (node: any) => {
         case 'select-card':
             result.options = generateOptions(3)
             result.multiple = false
+            result.source = {
+                dictionary: undefined,
+                type: 'dic',
+            }
             break
         case 'radio':
             result.options = generateOptions(3)
+            result.source = {
+                dictionary: undefined,
+                type: 'dic',
+            }
             break
         case 'checkbox':
             result.options = generateOptions(3)
+            result.source = {
+                dictionary: undefined,
+                type: 'dic',
+            }
             break
         case 'select':
             result.options = generateOptions(3)
             result.mode = undefined
             result.showSearch = false
+            result.source = {
+                dictionary: undefined,
+                type: 'dic',
+            }
             break
         case 'tree-select':
             result.treeData = [
@@ -80,11 +96,15 @@ const handleProps = (node: any) => {
             result.showSearch = false
             result.multiple = false
             result.treeCheckStrictly = false
+            result.source = {
+                dictionary: undefined,
+                type: 'dic',
+            }
             break
         case 'upload':
             result.listType = 'text'
             result.maxCount = 1
-            result.fileSize = 2
+            result.fileSize = 5
             result.unit = 'M'
             break
         case 'geo':

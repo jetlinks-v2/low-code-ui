@@ -419,7 +419,7 @@ onUnmounted(() => {
 
 // 校验
 const onValidate = async () => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve) => {
     const resp: any = await checkedConfig(
         product.info,
         unref(formData),
@@ -427,11 +427,7 @@ const onValidate = async () => {
         props?.type
     );
     errorKey.value = resp;
-    if (errorKey.value?.length) {
-      reject(errorKey.value);
-    } else {
-      resolve(true);
-    }
+    resolve(!errorKey.value?.length);
   });
 };
 

@@ -5,7 +5,7 @@
     :maskClosable="false"
     :title="title"
     :width="700"
-    @cancel="emits('update:visible', false)"
+    @cancel="cancel"
     @ok="confirm"
     class="edit-dialog-container"
     cancelText="取消"
@@ -13,19 +13,6 @@
     :confirmLoading="loading"
   >
     <j-form ref="formRef" :model="form" autocomplete="off" layout="vertical">
-      <j-form-item
-        name="key"
-        label="流程key"
-        :rules="keyRules"
-        validateFirst
-      >
-        <j-input
-          :disabled="props.data.id"
-          v-model:value="form.key"
-          placeholder="请输入流程key"
-          style="width: 576px"
-        />
-      </j-form-item>
       <j-form-item
         name="name"
         label="流程名称"
@@ -65,7 +52,25 @@
           </template>
         </a-select>
       </j-form-item>
-
+      <j-form-item
+        name="key"
+        :rules="keyRules"
+        validateFirst
+      >
+        <template #label>
+          <span style="padding-right: 8px">流程标识</span>
+          <j-tooltip
+            title="根据标识调用流程模型/实例"
+          >
+            <AIcon type="QuestionCircleOutlined" />
+          </j-tooltip>
+        </template>
+        <j-input
+          v-model:value="form.key"
+          placeholder="请输入流程标识"
+          style="width: 576px"
+        />
+      </j-form-item>
       <j-form-item
         name="icon"
         label="流程图标"
@@ -124,7 +129,7 @@
 
 <script setup lang="ts">
 import { onlyMessage, regular } from '@jetlinks-web/utils'
-import { saveProcess_api, validateProcess_api } from '@LowCode/api/process/model'
+import {saveProcess_api, getProcess_api, update_api} from '@LowCode/api/process/model'
 import { useRequest } from '@jetlinks-web/hooks'
 import { isImg } from '@LowCode/utils/comm'
 import { providerEnum } from '@LowCode/api/process/model'
@@ -149,11 +154,16 @@ const props = defineProps({
     type: Boolean,
     default: () => false,
   },
+  isDeploy: {
+    type: Boolean,
+    default: () => false,
+  },
 })
 
 const emits = defineEmits<{
   (e: 'update:visible', flag: boolean): void
   (e: 'refresh'): void
+  (e: 'cancel'): void
 }>()
 
 // const { classified, getText } = useClassified()
@@ -178,24 +188,25 @@ const form = reactive<Partial<FormType>>({
 })
 
 const keyRules = [
-  { required: true, message: '请输入流程key' },
+  { required: true, message: '请输入流程标识' },
   {
     validator: async (_: any, value: string) => {
-      if (value) {
+      if (value && !props.data.id) {
 
         if (!regular.isEnglishOrNumber(value)) {
           return Promise.reject('只允许输入英文或者数字')
         }
 
-        // const res = await validateProcess_api({ key: value})
+        // const res = await getProcess_api({ terms:[{ column: 'key', termType: 'eq', value: value}]})
         //
-        // if (res.success && !res.result) {
-        //   return Promise.reject('流程key重复')
+        // if (res.success && res.result && res.result.total > 0) {
+        //   return Promise.reject('流程标识重复')
         // }
         return Promise.resolve()
       }
       return Promise.resolve()
     },
+    trigger: 'blur'
   },
   {
     max: 64,
@@ -223,7 +234,7 @@ const { data: classified } = useRequest(providerEnum, {
   },
 })
 
-const { loading, run } = useRequest(saveProcess_api, {
+const { loading, run } = useRequest(props.data.id ? update_api : saveProcess_api, {
   immediate: false,
   onSuccess(resp) {
     if (resp.success) {
@@ -236,14 +247,19 @@ const { loading, run } = useRequest(saveProcess_api, {
 
 const confirm = () => {
   formRef.value?.validate().then((_data: any) => {
-    run([form])
+    run(form)
   })
 }
 
 const init = () => {
-  title.value = '编辑'
+  title.value = props.isDeploy ? '部署' : '编辑'
   Object.assign(form, props.data)
   selected.value = baseIcon.some((i) => i === form.icon) ? '' : form.icon
+}
+
+const cancel = () => {
+  emits('update:visible', false)
+  emits('cancel')
 }
 
 watch(

@@ -22,6 +22,7 @@ import CheckButton from './CheckButton/index.vue'
 import PageDesigner from './PageDesigner/index.vue'
 import CIAE from './Database/CIAE'
 import CopyButton from './CopyButton'
+import ConfigureMembers from './ConfigureMembers/index.vue'
 
 export {
     TitleComponent,
@@ -51,5 +52,6 @@ export {
     FormDesigner,
     CustomHTML,
     CIAE,
-    CopyButton
+    CopyButton,
+    ConfigureMembers
 }

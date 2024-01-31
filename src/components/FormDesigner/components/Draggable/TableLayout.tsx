@@ -59,6 +59,10 @@ export default defineComponent({
             return props.data?.formItemProps
         })
 
+        watchEffect(() => {
+            disabled.value = !!props.data.componentProps?.disabled
+        })
+
         const __path = computed(() => {
             let _path: any[] = cloneDeep(props?.path || []);
             const _index: any = props.index || 0;

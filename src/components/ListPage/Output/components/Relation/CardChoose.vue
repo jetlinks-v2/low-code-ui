@@ -100,8 +100,7 @@
 <script setup lang="ts">
 import { queryProductList, queryDeviceList } from '@LowCode/api/form'
 import { cloneDeep } from 'lodash-es';
-import { Search as ProSearch} from '@LowCode/components/index'
-import { Card , BadgeStatus } from '@LowCode/components/index'
+import { Search as ProSearch, Card , BadgeStatus} from '@LowCode/components/index'
 const props = defineProps({
   type: {
     type: String,

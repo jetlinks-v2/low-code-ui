@@ -27,7 +27,7 @@
                   <div class="item-right">{{ dayjs(item.timestamp).format('YYYY-MM-DD HH:mm:ss') }}</div>
                </div>
                <div v-if="item.changed && item.nodeType !== 'ROOT'">
-                  <a v-if="showChanged(item.changed, 'form').length"
+                  <a v-if="showChanged(item.changed, 'form').length && isDetail"
                      @click="toDetail(showChanged(item.changed, 'form'))">查看办理详情</a>
                   <div v-if="showChanged(item.changed, 'taskCommentChanged')" class="comment">
                      {{ showChanged(item.changed, 'taskCommentChanged')?.others.afterComment }}
@@ -110,6 +110,10 @@ const props = defineProps({
       type: Object,
       default: {}
    },
+   isDetail: {
+      type: Boolean,
+      default: true
+   }
 })
 
 const timelines = ref<any>([])
@@ -154,7 +158,7 @@ const nodeState = (nodeType, auto) => {
       return 'submit'
    }
    if(nodeType === 'ROOT'){
-      return 'again'
+      return 'initiate'
    }
    return 'pass'
 }
@@ -305,28 +309,30 @@ const findRejectNode = (traceId) => {
 const handleTimelines = () => {
    const arr: any = []
    props.info.timelines?.forEach((item, index) => {
-      //默认第一节点
-      if (index === 0) {
-         arr.push({
-            ...item,
-            show: true,
-            nodeType: 'ROOT',
-            actionType: 'initiate',
-            actionColor: 'default',
-            childrenNode: {
-               others: { taskName: '发起流程', afterState: 'completed' }
-            }
-         })
-      } else {
-         const obj = filterLine(item, index)
+      const obj = filterLine(item, index)
          if (obj) {
             arr.push(obj)
          }
-      }
+      //默认第一节点
+      // if (index === 0) {
+      //    arr.push({
+      //       ...item,
+      //       show: true,
+      //       nodeType: 'ROOT',
+      //       actionType: 'initiate',
+      //       actionColor: 'default',
+      //       childrenNode: {
+      //          others: { taskName: '发起流程', afterState: 'completed' }
+      //       }
+      //    })
+      // } else {
+      //    const obj = filterLine(item, index)
+      //    if (obj) {
+      //       arr.push(obj)
+      //    }
+      // }
    });
    timelines.value = handleChange(arr)
-   // console.log('arr--------', arr,handleChang-e(arr))
-   // timelines.value = arr
 }
 
 const toDetail = (val) => {

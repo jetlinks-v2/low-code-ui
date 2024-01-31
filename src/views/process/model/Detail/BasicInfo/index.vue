@@ -45,7 +45,14 @@ import {
 } from '../FlowDesign/components/utils'
 import ConfigForm from './components/ConfigForm.vue'
 import { useFlowStore } from '@LowCode/store/flow'
-import { TitleComponent } from '@LowCode/components/index'
+import { TitleComponent, ConfigureMembers } from '@LowCode/components'
+
+const props = defineProps({
+  firstValidate: {
+    type: Boolean,
+    default: true
+  }
+})
 
 const flowStore = useFlowStore()
 const formRef = ref()
@@ -199,6 +206,7 @@ const validateSteps = () => {
       })
       .catch((err) => {
         // reject(err)
+        console.log(err)
         // 返回当前步骤序号
         reject(0)
       })
@@ -243,7 +251,9 @@ watch(
   { deep: true },
 )
 onMounted(() => {
-  validateSteps()
+  if (props.firstValidate) {
+    validateSteps()
+  }
   getLatestFormList()
 })
 </script>

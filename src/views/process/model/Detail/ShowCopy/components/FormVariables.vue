@@ -10,7 +10,7 @@
   >
     <template #title>
       <j-space>
-        <span>请确认当前节点需要候选人办理的表单内容</span>
+        <span>添加表单字段</span>
         <j-tooltip placement="right">
           <template #title>
             未提供“读”权限的表单子字段对当前节点的办理人加密展示
@@ -70,12 +70,13 @@ import { queryFormNoPage_api } from '@LowCode/api/process/model'
 import { useFlowStore } from '@LowCode/store/flow'
 import { treeFilter } from 'jetlinks-ui-components/es/Tree'
 import { generateRandomColor, rdmRgbColor } from '../utils'
-import { cloneDeep } from 'lodash-es'
+import { differenceBy } from 'lodash-es'
 import  {FormPreview}  from '@LowCode/components/index'
 
 type Emits = {
   (e: 'update:visible', data: boolean): void
   (e: 'update:variables', data: any[]): void
+  (e: 'change', data: any[]): void
 }
 
 const emits = defineEmits<Emits>()
@@ -165,6 +166,8 @@ const treeDataFilter = computed(() => {
  */
 const handleCheck = (_checkedKeys, { checkedNodes }) => {
   checkedKeys.value = _checkedKeys
+
+
   checkedLeafNode.value = checkedNodes
     ?.filter((f) => !f.children?.length)
     ?.map((m) => ({
@@ -178,7 +181,12 @@ const handleCheck = (_checkedKeys, { checkedNodes }) => {
  * 确认
  */
 const handleOk = () => {
-  emits('update:variables', checkedLeafNode.value)
+  const difference = differenceBy(checkedLeafNode.value, (props.variables || []), 'value')
+  console.log('handleOk', checkedLeafNode.value, difference)
+
+  const values = [...props.variables, ...difference]
+  emits('update:variables', values)
+  emits('change', values)
   _visible.value = false
 }
 
@@ -198,7 +206,7 @@ const handleCancel = ()=>{
 watch(
   () => props.variables,
   (val) => {
-    checkedKeys.value = cloneDeep(val.map((m) => m.value))
+    checkedKeys.value = val.map((m) => m.value)
   },
   { immediate: true, deep: true },
 )

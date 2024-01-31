@@ -1,4 +1,4 @@
-import { request } from '@jetlinks-web/core'
+import { request } from '@LowCode/utils/axios'
 
 export const basicField = () => request.get('/dictionary/basic-field-types/items')
 
