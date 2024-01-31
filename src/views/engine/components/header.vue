@@ -20,13 +20,14 @@
 </template>
 
 <script setup name="EngineHeader">
-import { useProduct, useEngine, useMenuStore } from '@LowCode/store'
+import { useProduct, useEngine } from '@LowCode/store'
 import { getImage } from '@jetlinks-web/utils';
 import { storeToRefs } from 'pinia'
+import { store } from '@jetlinks-web/stores'
 
 const product = useProduct()
 const engine = useEngine()
-const menu = useMenuStore()
+const menu = store.useMenuStore()
 
 const { files, activeFile } = storeToRefs(engine)
 

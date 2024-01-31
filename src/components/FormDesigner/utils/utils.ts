@@ -71,11 +71,6 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
     if (['root', 'table-item-index', 'table-item-actions'].includes(_type)) {
         return false
     } else {
-        // if (arr.includes(_type)) {
-        //     if (!node?.formItemProps?.label) {
-        //         return obj
-        //     }
-        // }
         if (!['space-item', 'inline-item', 'card-item', 'grid-item', 'table-item', 'grid', 'space', 'inline', 'tabs', 'collapse', 'card', 'collapse-item', 'tabs-item', 'title-item', 'title'].includes(_type) || (['tabs', 'collapse', 'card'].includes(_type) && node?.formItemProps?.isLayout)) {
             if (!node?.formItemProps?.name) {
                 return obj
@@ -95,15 +90,17 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
         if (['text'].includes(_type) && !node?.componentProps?.value) {
             return obj
         }
-        if ('input-number' === _type && (node?.componentProps?.max === undefined || node?.componentProps?.min === undefined || node?.componentProps?.precision === undefined)) {
-            return obj
-        }
-        if ('input-number' === _type && (node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined)) {
-            if (node?.componentProps?.max < node?.componentProps?.min) {
+        if(['number-step', 'input-number'].includes(_type)){
+            if ((node?.componentProps?.max === undefined || node?.componentProps?.min === undefined || node?.componentProps?.precision === undefined)) {
                 return obj
             }
+            if ((node?.componentProps?.max !== undefined && node?.componentProps?.min !== undefined)) {
+                if (node?.componentProps?.max < node?.componentProps?.min) {
+                    return obj
+                }
+            }
         }
-        if (['select', 'tree-select', 'select-card'].includes(_type)) {
+        if (['select', 'tree-select', 'select-card', 'checkbox', 'radio'].includes(_type)) {
             // 数据源
             if (!node?.componentProps.source?.type) {
                 return obj
@@ -168,6 +165,7 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
                 }
             }
         }
+
         if ('upload' === _type && ((node?.componentProps?.maxCount !== 0 && !node?.componentProps?.maxCount) || (node?.componentProps?.fileSize !== 0 && !node?.componentProps?.fileSize))) {
             // 个数和单位
             return obj
@@ -187,10 +185,6 @@ const checkedConfigItem = (node: ISchema, allData: any[], formList: any[], sourc
                     return obj
                 }
             }
-        }
-        //  && !node.formItemProps?.label
-        if (['tabs', 'collapse', 'card', 'title'].includes(_type) && node?.formItemProps?.isLayout) {
-            return obj
         }
         if (['input', 'textarea', 'input-password', 'date-picker', 'time-picker'].includes(_type)) {
             const ___item = (node?.formItemProps?.rules || []).find(item => {
@@ -268,7 +262,7 @@ const _valEndData = async (info: any, node: ISchema) => {
 const errorMap = new Map()
 // 校验配置项必填
 const checkConfig = async (info: any, node: ISchema, allData: any[], formList: any[], type: 'workflow' | 'low-code') => {
-    if (['select', 'tree-select', 'select-card'].includes(node.type)) {
+    if (['select', 'tree-select', 'select-card', 'radio', 'checkbox'].includes(node.type)) {
         await _valEndData(info, node)
     }
     const _data: any = checkedConfigItem(node, allData, formList, _source, _commandsMap, type);

@@ -3,7 +3,7 @@ import {initRequest, initWebSocket} from '@jetlinks-web/core'
 import { getToken } from '@jetlinks-web/utils'
 import { TOKEN_KEY, BASE_API } from '@jetlinks-web/constants'
 import { Modal } from 'jetlinks-ui-components'
-
+import {LOGIN_ROUTE} from "@LowCode/router/basic";
 // const LicenseModal = () => {
 //   Modal.error({
 //     key: 'License',
@@ -24,7 +24,7 @@ import { Modal } from 'jetlinks-ui-components'
 /**
  * 初始化package
  */
-export const initPackages = async () => {
+export const initPackages = async (router: any) => {
   // 初始化axios,获取环境变量中的代理标识
   const _initRequest = async () => {
     initRequest(() => ({
@@ -35,6 +35,9 @@ export const initPackages = async () => {
         //     LicenseModal()
         //   }
         // }
+      },
+      loginInvalid() {
+        router.push(LOGIN_ROUTE.path)
       },
       exit() {
         window.parent.postMessage({ token: 'LOSE' }, '*')

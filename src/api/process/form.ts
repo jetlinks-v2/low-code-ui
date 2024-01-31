@@ -1,4 +1,4 @@
-import { request } from '@jetlinks-web/core'
+import { request } from '@LowCode/utils/axios'
 
 //工作流表单
 // 保存

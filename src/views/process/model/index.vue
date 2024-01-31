@@ -102,10 +102,10 @@
                       </j-ellipsis>
                       <div class="other">
                         <j-ellipsis style="width: 200px">
-                          <span class="text">创建人：</span>
+                          <span class="text">部署人：</span>
                           <span class="value">{{ record.creatorName }}</span>
                         </j-ellipsis>
-                        <div>
+                        <div style="width: 248px;padding-right: 24px">
                           <span class="text"> 创建时间： </span>
                           <span class="value">
                             {{
@@ -114,6 +114,17 @@
                               )
                             }}
                           </span>
+                        </div>
+                        <div style="flex: 1">
+                          <j-ellipsis >
+                            <span class="text"> 流程标识： </span>
+                            <span class="value">
+                            {{
+                                record.key
+                              }}
+                          </span>
+                          </j-ellipsis>
+
                         </div>
                       </div>
                     </div>
@@ -129,6 +140,7 @@
       v-if="dialog.visible"
       v-model:visible="dialog.visible"
       :data="dialog.selectItem"
+      :isDeploy="dialog.isDeploy"
       @refresh="refresh"
     />
     <Drawer
@@ -138,7 +150,7 @@
     />
     <!-- 隐藏域, 仅用于部署校验每一步数据, noQuery: 不查询接口 -->
     <div class="validate-box">
-      <BasicInfo ref="step1" />
+      <BasicInfo ref="step1" :firstValidate="false" />
       <FlowDesign ref="step2" />
       <ShowCopy ref="step3" :noQuery="true" />
     </div>
@@ -165,10 +177,10 @@ import FlowDesign from '@LowCode/views/process/model/Detail/FlowDesign/index.vue
 import ShowCopy from '@LowCode/views/process/model/Detail/ShowCopy/index.vue'
 import { useFlowStore } from '@LowCode/store/flow'
 import { Modal } from 'jetlinks-ui-components'
-import { useMenuStore } from '@LowCode/store'
+import { store } from '@jetlinks-web/stores'
 import { Card , Search as ProSearch , BadgeStatus , ProImage} from '@LowCode/components/index'
 
-const menu = useMenuStore()
+const menu = store.useMenuStore()
 const flowStore = useFlowStore()
 const step1 = ref()
 const step2 = ref()
@@ -176,6 +188,7 @@ const step3 = ref()
 const { classified } = useClassified()
 const tableRef = ref()
 const params = ref({})
+
 const columns = [
   {
     title: '流程图标',
@@ -307,6 +320,7 @@ const columns = [
 // 弹窗
 const dialog = reactive({
   selectItem: {},
+  isDeploy: false,
   visible: false,
 })
 
@@ -372,43 +386,41 @@ const getActions = (record, type = 'card') => {
         onClick: async () => {
           data.loading = true
           try {
-            const { result } = await detail_api(data.id)
+            const { result } = await detail_api(data.id) // 获取详情
             const model = JSON.parse(result.model || '{}')
             flowStore.setModel(model)
             flowStore.setModelBaseInfo(result)
+
             await step1.value.getLatestFormList()
             Promise.allSettled([
               step1.value?.validateSteps(),
               step2.value?.validateSteps(),
               step3.value?.validateSteps(),
             ]).then(async (valid) => {
+              data.loading = false
               // 验证通过后保存新表单
-              const params = {
-                id: data.id,
-                model: JSON.stringify(flowStore.model),
-              }
-              const res = await update_api(params)
+              // const params = {
+              //   id: data.id,
+              //   model: JSON.stringify(flowStore.model),
+              // }
+              // if (!data.model) {
+              //   const res = await update_api(params)
+              // }
               if (
                 Array.isArray(valid) &&
                 valid.every((item) => item.status === 'fulfilled')
               ) {
-                deploy_api(data.id).then((resp) => {
-                  if (resp.success) {
-                    onlyMessage('操作成功')
-                    refresh()
-                  }
-                }).finally(() => {
-                    data.loading = false
-                })
+                dialog.selectItem = data
+                dialog.visible = true
+                dialog.isDeploy = true
               } else {
                 Modal.error({
                   title: '部署失败，流程配置内容不合规',
                 })
               }
             })
-          } catch (error) {
           } finally {
-            // data.loading = false
+            data.loading = false
           }
         },
       }),
@@ -472,6 +484,7 @@ const handleSearch = (data) => {
 const handleSave = (data) => {
   dialog.selectItem = { ...data }
   dialog.visible = true
+  dialog.isDeploy = false
 }
 
 /**
@@ -498,7 +511,18 @@ const handleView = (data) => {
  * 刷新
  */
 const refresh = () => {
-  tableRef.value.reload()
+  if (dialog.isDeploy) {
+    deploy_api(dialog.selectItem.id).then((resp) => {
+      if (resp.success) {
+        onlyMessage('操作成功')
+        tableRef.value.reload()
+      }
+    }).finally(() => {
+      dialog.isDeploy = false
+    })
+  } else {
+    tableRef.value.reload()
+  }
 }
 
 const _query = async (e) => {

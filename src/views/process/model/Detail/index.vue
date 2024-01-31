@@ -112,6 +112,14 @@
       </template>
       <div class="model-content">页面改动数据未保存</div>
     </j-modal>
+    <SaveDialog
+      v-if="dialog.visible"
+      v-model:visible="dialog.visible"
+      :data="dialog.selectItem"
+      :isDeploy="true"
+      @refresh="refresh"
+      @cancel="cancel"
+    />
   </page-container>
 </template>
 
@@ -123,14 +131,20 @@ import ShowCopy from './ShowCopy/index.vue'
 import { detail_api, update_api, deploy_api } from '@LowCode/api/process/model'
 import { onlyMessage, LocalStore } from '@jetlinks-web/utils'
 import { useFlowStore, defaultModel } from '@LowCode/store/flow'
-import { Modal } from 'ant-design-vue'
 import { cloneDeep } from 'lodash-es'
 import { TOKEN_KEY } from '@jetlinks-web/constants'
 import {setEmptyNodeProps} from "@LowCode/views/process/model/Detail/FlowDesign/components/utils";
+import SaveDialog from '../Dialog/index.vue'
 
 const flowStore = useFlowStore()
 const route = useRoute()
 const router = useRouter()
+
+const dialog = reactive({
+  selectItem: {},
+  isDeploy: false,
+  visible: false,
+})
 
 const current = ref(0)
 // 每个步骤的状态
@@ -260,13 +274,18 @@ const handleDeploy = async () => {
           })
           validLoading.value = false
         }, 500)
-        console.log('valid', valid, await step2.value?.validateSteps())
+
         if (
           Array.isArray(valid) &&
           valid.every((item) => item.status === 'fulfilled')
         ) {
           // 所有步骤验证通过, 开始部署
-          saveAndDeploy()
+          dialog.selectItem = flowDetail.value
+          dialog.selectItem.model = JSON.stringify(flowStore.model)
+          dialog.selectItem.state = !isChange.value ? flowDetail.value?.state?.value : 'undeployed'
+          dialog.visible = true
+          dialog.isDeploy = true
+          // saveAndDeploy()
         } else {
           onlyMessage('部署失败，流程配置内容不合规', 'error')
           deployLoading.value = false
@@ -277,38 +296,50 @@ const handleDeploy = async () => {
         deployLoading.value = false
           onlyMessage('部署失败，流程配置内容不合规', 'error')
       })
-      .finally(() => {
-        deployLoading.value = false
-      })
   })
 }
 
+const refresh = () => {
+  saveAndDeploy()
+}
 /**
  * 保存数据并部署
  */
 const saveAndDeploy = () => {
   setEmptyNodeProps(flowStore.model.nodes)
-  const params = {
-    id: route.query.id,
-    state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
-    model: JSON.stringify(flowStore.model),
-  }
   deployLoading.value = true
-  update_api(params)
-    .then(() => {
-      deploy_api(route.query.id as string).then((res) => {
-        if (res.success) {
-          onlyMessage('部署成功', 'success')
-          isModal.value = true
-          router.go(-1)
-        } else {
-          onlyMessage('部署失败', 'error')
-        }
-      })
-    })
-    .finally(() => {
-      deployLoading.value = false
-    })
+  deploy_api(route.query.id as string).then((res) => {
+    if (res.success) {
+      onlyMessage('部署成功', 'success')
+      isModal.value = true
+      router.go(-1)
+    } else {
+      onlyMessage('部署失败', 'error')
+    }
+  }).finally(() => {
+    deployLoading.value = false
+  })
+  // const params = {
+  //   id: route.query.id,
+  //   state: !isChange.value ? flowDetail.value?.state?.value : 'undeployed',
+  //   model: JSON.stringify(flowStore.model),
+  // }
+  // deployLoading.value = true
+  // update_api(params)
+  //   .then(() => {
+  //     deploy_api(route.query.id as string).then((res) => {
+  //       if (res.success) {
+  //         onlyMessage('部署成功', 'success')
+  //         isModal.value = true
+  //         router.go(-1)
+  //       } else {
+  //         onlyMessage('部署失败', 'error')
+  //       }
+  //     })
+  //   })
+  //   .finally(() => {
+  //     deployLoading.value = false
+  //   })
 }
 
 const onOk = async () => {
@@ -324,6 +355,10 @@ const onOk = async () => {
     routerNext()
   }
 }
+
+const cancel = () => {
+  deployLoading.value = false
+}
 const onCancel = () => {
   visible.value = false
   routerNext()
@@ -338,7 +373,6 @@ const isChange = computed(
   () => JSON.stringify(oldData.value) !== JSON.stringify(flowStore.model),
 )
 onBeforeRouteLeave((to, form, next) => {
-  console.log('to===', to)
   if (!isModal.value && isChange.value && LocalStore.get(TOKEN_KEY)) {
     visible.value = true
     routerNext = next

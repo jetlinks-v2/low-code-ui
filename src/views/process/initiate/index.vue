@@ -46,10 +46,10 @@ import { groupBy } from 'lodash-es'
 import { getList_api } from '@LowCode/api/process/initiate'
 import { useClassified } from '@LowCode/hooks/useClassified'
 import { isImg } from '@LowCode/utils/comm'
-import { useMenuStore } from '@LowCode/store'
+import { store } from '@jetlinks-web/stores'
 import { ProImage } from '@LowCode/components/index'
 
-const menu = useMenuStore()
+const menu = store.useMenuStore()
 const { getText, classified } = useClassified()
 const data = reactive({})
 const loading = ref(true)

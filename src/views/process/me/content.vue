@@ -82,11 +82,11 @@ import Detail from './Detail/index.vue'
 import { getMeProcessList, _claim, _delete, getInitiatorList, _claimBatch, _rejectBatch, _completeBatch } from '@LowCode/api/process/me'
 import BatchDropdown from '@LowCode/components/BatchDropdown/index.vue';
 import ActionModal from './ActionModal.vue';
-import { useMenuStore } from '@LowCode/store'
+import { store } from '@jetlinks-web/stores'
 import { useClassified } from '@LowCode/hooks/useClassified'
 import { Search as ProSearch} from '@LowCode/components/index'
 
-const menu = useMenuStore()
+const menu = store.useMenuStore()
 const { classified } = useClassified()
 
 

@@ -164,6 +164,22 @@
         </j-select>
       </j-form-item>
       <j-form-item
+        :validateFirst="true"
+        :name="['componentProps', 'noAccept']"
+        label="非格式"
+      >
+        <j-select
+          mode="multiple"
+          placeholder="请选择"
+          v-model:value="target.componentProps.noAccept"
+          @change="onDataChange"
+        >
+          <j-select-option :key="item" v-for="item in NoType" :value="item">{{
+            item
+          }}</j-select-option>
+        </j-select>
+      </j-form-item>
+      <j-form-item
         required
         :name="['componentProps', 'fileSize']"
         label="单个大小"
@@ -223,6 +239,30 @@
         <j-input
           @change="onChange"
           v-model:value="target.componentProps.width"
+        />
+      </j-form-item>
+        <j-form-item
+        v-if="!target.componentProps.isButton && target.componentProps.listType !== 'text' && target.componentProps.maxCount === 1"
+          :validateFirst="true"
+          :name="['componentProps', 'imgDescription']"
+          label="组件内部说明"
+        >
+        <j-input
+            @change="onChange"
+            v-model:value="target.componentProps.imgDescription"
+          />
+        </j-form-item>
+      <j-form-item
+        v-if="['upload'].includes(type)"
+        :name="['componentProps','isCropper']"
+        label="是否开启裁剪"
+      >
+        <CheckButton
+          :options="[
+            { label: '否', value: false },
+            { label: '是', value: true },
+          ]"
+          v-model:value="target.componentProps.isCropper"
         />
       </j-form-item>
     </template>
@@ -392,6 +432,8 @@
           'device',
           'geo',
           'form',
+          'radio',
+          'checkbox'
         ].includes(type)
       "
     >
@@ -406,14 +448,6 @@
           },
         ]"
       >
-        <!-- <j-radio-group
-          v-model:value="target.formItemProps.required"
-          button-style="solid"
-          @change="onDataChange"
-        >
-          <j-radio-button :value="true">必填</j-radio-button>
-          <j-radio-button :value="false">非必填</j-radio-button>
-        </j-radio-group> -->
         <CheckButton
           :options="[
             { label: '必填', value: true },
@@ -542,14 +576,11 @@ const onChange = () => {
 
 const textType = ['.xlsx', '.xls', '.csv', '.zip', '.json']
 const imgType = ['.jpg', '.png', '.jpeg']
+const NoType = ['.xlsx', '.xls', '.csv', '.zip', '.json','.jpg', '.png', '.jpeg','.exe']
 
 const list = computed(() =>
   target.value.componentProps?.listType === 'text' ? textType : imgType,
 )
-
-// const { data: options, run } = useRequest(getGeoType, {
-//   immediate: false,
-// })
 
 const rulesVisible = computed(() => {
   return [
@@ -652,10 +683,4 @@ const onDateChange = (e) => {
   target.value.componentProps.showTime = !(e === 'YYYY-MM-DD')
   emits('refresh', target.value)
 }
-
-// watchEffect(() => {
-//   if (target.value?.type === 'geo') {
-//     run()
-//   }
-// })
 </script>

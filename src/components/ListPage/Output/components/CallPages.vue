@@ -27,7 +27,7 @@
   </j-modal>
 </template>
 <script setup lang="ts">
-import { FormPreview } from '@LowCode/components/FormDesigner'
+import { FormPreview } from '@LowCode/components'
 import CustomHtml from '@LowCode/components/CustomHTML/output/Preview.vue'
 import { PropType } from 'vue'
 import { getResource } from '@LowCode/api/basis'

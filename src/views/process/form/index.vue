@@ -12,7 +12,7 @@
       model="TABLE"
       :request="_query"
       :defaultParams="{
-        sorts: [{ name: 'createTime', order: 'desc' }],
+        sorts: [{ name: 'modifyTime', order: 'desc' }],
         terms: [
           {
             value: true,
@@ -79,10 +79,10 @@ import dayjs from 'dayjs'
 import { _query, _delete, _queryCreator } from '@LowCode/api/process/form'
 import { onlyMessage } from '@LowCode/utils/comm'
 import { ref } from 'vue'
-import { useMenuStore } from '@LowCode/store'
+import { store } from '@jetlinks-web/stores'
 import { Search as ProSearch} from '@LowCode/components/index'
 
-const menu = useMenuStore()
+const menu = store.useMenuStore()
 const params = ref<any>({})
 const tableRef = ref<Record<string, any>>({})
 const current = ref({})

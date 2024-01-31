@@ -29,6 +29,7 @@
 import { onlyMessage } from '@jetlinks-web/utils'
 import { useRequest } from '@jetlinks-web/hooks'
 import { getMembers_api, updateMembers_api } from '@LowCode/api/process/instance'
+import { ConfigureMembers } from '@LowCode/components'
 
 const props = defineProps({
   data: {

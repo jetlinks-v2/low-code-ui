@@ -1,4 +1,4 @@
-import { request } from '@jetlinks-web/core'
+import { request } from '@LowCode/utils/axios'
 
 /**
  * 条件查询实例

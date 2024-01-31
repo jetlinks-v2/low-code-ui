@@ -16,26 +16,6 @@ export const basic: ISchema[] = [
             }
         }
     },
-    // {
-    //     type:'input-group',
-    //     name:'输入框组合',
-    //     componentProps:{
-    //         preComponent:{
-    //             type:'select',
-    //             show:false,
-    //             col:8,
-    //             options:[],
-    //             preText:''
-    //         },
-    //         afterComponent:{
-    //             type:'select',
-    //             show:false,
-    //             col:8,
-    //             options:[],
-    //             preText:''
-    //         }
-    //     }
-    // },
     {
         type: 'text',
         name: '文本',
@@ -84,7 +64,8 @@ export const basic: ISchema[] = [
         name: '上传',
         componentProps:{
             isButton:false,
-            width:100
+            isCropper: false,
+            width:100,
         }
     },
     {

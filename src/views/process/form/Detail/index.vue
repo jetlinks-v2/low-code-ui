@@ -11,11 +11,11 @@ import { _detail, _update } from '@LowCode/api/process/form'
 import { onlyMessage } from '@jetlinks-web/utils'
 import { onMounted, ref } from 'vue'
 import { omit } from 'lodash-es'
-import { useMenuStore } from '@LowCode/store'
+import { store } from '@jetlinks-web/stores'
 import { useRoute } from 'vue-router'
 import { FormDesigner } from '@LowCode/components/index'
 
-const menu = useMenuStore()
+const menu = store.useMenuStore()
 const route = useRoute()
 const data = ref<any>()
 
