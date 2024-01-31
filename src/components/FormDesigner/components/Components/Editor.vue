@@ -6,7 +6,7 @@
         :defaultConfig="toolbarConfig"
     />
     <Editor
-        :style="{height: height + 'px', overflowY: 'hidden'}"
+        :style="{height: height + 'px', overflowY: 'hidden', paddingBottom: '20px'}"
         v-model="valueHtml"
         :defaultConfig="editorConfig"
         @onCreated="handleCreated"
