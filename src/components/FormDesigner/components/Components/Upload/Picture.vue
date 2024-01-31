@@ -417,5 +417,6 @@ watch(
     color: blue;
     font-size: 20px;
   }
+  
 }
 </style>
