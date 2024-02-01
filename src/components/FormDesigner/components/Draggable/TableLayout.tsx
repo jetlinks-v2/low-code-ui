@@ -8,7 +8,6 @@ import generatorData from '../../utils/generatorData'
 import { uid } from '../../utils/uid'
 import componentMap from '../../utils/componentMap'
 import { queryOptions } from '../../utils/utils'
-import boolean from "async-validator/dist-types/validator/boolean";
 
 export default defineComponent({
     name: 'TableLayout',
