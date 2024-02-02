@@ -240,33 +240,19 @@ const beforeUpload = (file: UploadProps["fileList"][number]) => {
             ctx.drawImage(img, 0, 0, img.width, img.height);
             // 添加水印
             let data = "";
-            for (let i = 0; i < 6; i++) {
-              ctx.save();
-              ctx.translate(i + 50, i + 50);
-              ctx.rotate((45 * Math.PI) / 180);
-              ctx.fillStyle = "rgb(255,0,0,0.3)"; // 水印颜色，透明度
-              ctx.textBaseline = "center"; // 水印对其的基准线
-              ctx.font = `50px Verdana`; // 文字大小
-              ctx.fillText(
-                props.waterMark || dayjs().format("YYYY:MM:DD hh:mm:ss"),
-                img.width / 2 - i * 200,
-                img.height / 2 - i * 200
-              ); // 添加的文字
-              ctx.restore();
 
-              ctx.save();
-              ctx.translate(i + 600, i + 600);
-              ctx.rotate((45 * Math.PI) / 180);
-              ctx.fillStyle = "rgb(255,0,0,0.3)"; // 水印颜色，透明度
-              ctx.textBaseline = "center"; // 水印对其的基准线
-              ctx.font = `50px Verdana`; // 文字大小
-              ctx.fillText(
-                props.waterMark || dayjs().format("YYYY:MM:DD hh:mm:ss"),
-                img.width / 2 - i * 200,
-                img.height / 2 - i * 200
-              ); // 添加的文字
-              ctx.restore();
-            }
+            ctx.save();
+            ctx.translate(50, 50);
+            ctx.fillStyle = "rgb(255,255,255,0.5)"; // 水印颜色，透明度
+            ctx.textBaseline = "center"; // 水印对其的基准线
+            ctx.font = `50px Verdana`; // 文字大小
+            ctx.fillText(
+              props.waterMark || dayjs().format("YYYY:MM:DD hh:mm:ss"),
+              0,
+              img.height - 100
+            ); // 添加的文字
+            ctx.restore();
+
             data = canvas.toDataURL(file.type); // 输出压缩后的base64
             // base64转file
             const arr = data.split(",");
