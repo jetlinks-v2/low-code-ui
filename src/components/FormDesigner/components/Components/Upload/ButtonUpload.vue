@@ -1,8 +1,17 @@
 <template>
-  <a-upload name="file" v-model:file-list="fileList" :max-count="maxCount" :headers="{
+  <a-upload
+      name="file"
+      v-model:file-list="fileList"
+      :max-count="maxCount"
+      :headers="{
         [TOKEN_KEY]: LocalStore.get(TOKEN_KEY),
-    }" :before-upload="beforeUpload" :accept="accept" :disabled="fileList.length >= maxCount || disabled"
-            @change="handleChange" :action="listType ==='text' ? _fileUpload : ''">
+      }"
+      :before-upload="beforeUpload"
+      :accept="accept"
+      :disabled="fileList.length >= maxCount || disabled"
+      @change="handleChange"
+      :action="listType ==='text' ? _fileUpload(options) : ''"
+  >
     <j-button :disabled="fileList.length >= maxCount || disabled">
       <template #icon>
         <AIcon type="UploadOutlined"></AIcon>
@@ -44,8 +53,7 @@
 
 <script lang="ts" setup>
 import {nextTick, reactive, ref, watch} from 'vue'
-import {fileUpload} from '@LowCode/api/comm'
-import {_fileUpload} from '@LowCode/api/comm'
+import {_fileUpload, fileUpload} from '@LowCode/api/comm'
 import {TOKEN_KEY} from '@jetlinks-web/constants'
 import {LocalStore} from '@jetlinks-web/utils/src/storage'
 import CropperModal from '@LowCode/components/Upload/Image/CropperModal'
@@ -90,6 +98,9 @@ const props = defineProps({
   isCropper: {
     type: Boolean,
     default: false
+  },
+  options: {
+    type: String,
   }
 })
 
@@ -121,7 +132,10 @@ const text = computed(()=>{
 const saveRequest = async (file: any) => {
   const formData = new FormData()
   formData.append('file', file)
-  const res = await fileUpload(formData)
+  const _options = props?.options ? {
+    options: props?.options
+  } : {};
+  const res = await fileUpload(formData, _options)
   if (res.status === 200) {
     fileList.value.push({
       url: res.result?.accessUrl,

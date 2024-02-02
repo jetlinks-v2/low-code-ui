@@ -132,6 +132,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  options: {
+    type: String,
+  }
 });
 
 const emits = defineEmits(["change"]);
@@ -159,7 +162,10 @@ const saveRequest = async (file: any) => {
     clearInterval(timer);
   }
   uploading.value = true;
-  const res = await fileUpload(formData);
+  const _options = props?.options ? {
+    options: props?.options
+  } : {};
+  const res = await fileUpload(formData, _options);
   if (res.status === 200) {
     if (timer) {
       clearInterval(timer);
@@ -240,7 +246,6 @@ const beforeUpload = (file: UploadProps["fileList"][number]) => {
             ctx.drawImage(img, 0, 0, img.width, img.height);
             // 添加水印
             let data = "";
-
             ctx.save();
             ctx.translate(50, 50);
             ctx.fillStyle = "rgb(255,255,255,0.5)"; // 水印颜色，透明度

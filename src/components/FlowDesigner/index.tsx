@@ -650,7 +650,46 @@ const FlowDesigner = defineComponent({
         validate(err, node.children)
       }
     }
-    expose({ validateProcess })
+
+
+    const handleScreenshotStyle = (rootWarpDOM) => {
+      // 处理 根节点 居中
+      const rootDOM = rootWarpDOM.getElementsByClassName("_root")?.[0] || null;
+      const oldRootDOMTransform = rootDOM.style.transform;
+      const oldRootDOMTranslate3d = rootDOM.style.translate3d;
+      rootDOM.style.transform = "scale(1)";
+      rootDOM.style.translate3d = "0px 0px 0px";
+
+      // 处理 根容器 宽度
+      const rootChildDivs = rootDOM.querySelectorAll("div");
+      const maxWidth = Math.max(
+        ...Array.from(rootChildDivs).map((div) => div.clientWidth)
+      );
+      rootWarpDOM.style.width = maxWidth + "px";
+
+      // 处理 工具栏
+      const toolDOM =
+        rootWarpDOM.getElementsByClassName("flow-designer-tool")?.[0];
+      const oldDisplay = toolDOM.style.display;
+      toolDOM.style.display = "none";
+
+      // 复原样式
+      setTimeout(() => {
+        toolDOM.style.display = oldDisplay;
+
+        rootDOM.style.transform = oldRootDOMTransform;
+        rootDOM.style.translate3d = oldRootDOMTranslate3d;
+      }, 2000);
+    };
+
+    const getRootDOM = () => {
+      const rootWarpDOM =
+        DragRef?.value?.getElementsByClassName("_root-warp")?.[0] || null;
+      handleScreenshotStyle(rootWarpDOM);
+      return rootWarpDOM;
+    };
+
+    expose({ validateProcess, getRootDOM })
 
 
     const { enlarge, zoomOut, scale } = useMouseEvent(DragRef, props.dragging, props.scale, props.offset)
@@ -679,14 +718,17 @@ const FlowDesigner = defineComponent({
           class: 'drag-warp'
         },
         [
-          h(
-            'div',
-            {
-              class: { _root: true },
-            },
-            processTrees,
-          ),
-          ScaleRender(enlarge, zoomOut, scale.value)
+          h('div', { class: '_root-warp' }, [
+            h(
+              'div',
+              {
+                class: { _root: true },
+              },
+              processTrees,
+            ),
+            ScaleRender(enlarge, zoomOut, scale.value)
+          ])
+          
         ]
       )
     }

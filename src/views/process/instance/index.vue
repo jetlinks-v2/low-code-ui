@@ -366,6 +366,7 @@ const getActions = (record, type = 'card') => {
         hasPermission: 'process/instance:delete',
         popConfirm: {
           title: `确认删除`,
+          placement: 'topRight',
           onConfirm: () => {
             del_api(data.id).then((res) => {
               if (res.success) {

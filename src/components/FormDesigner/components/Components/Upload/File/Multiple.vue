@@ -3,7 +3,7 @@
     <a-upload-dragger
         v-model:file-list="fileList"
         :maxCount="maxCount"
-        :action="_fileUpload"
+        :action="_fileUpload(options)"
         :headers="headers"
         :accept="accept"
         name="file"
@@ -103,6 +103,9 @@ const props = defineProps({
     type:Array,
     // default:['.exe','.xlsx']
     default:[]
+  },
+  options: {
+    type: String,
   }
 })
 

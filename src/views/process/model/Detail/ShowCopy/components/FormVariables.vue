@@ -11,12 +11,12 @@
     <template #title>
       <j-space>
         <span>添加表单字段</span>
-        <j-tooltip placement="right">
-          <template #title>
-            未提供“读”权限的表单子字段对当前节点的办理人加密展示
-          </template>
-          <AIcon type="QuestionCircleOutlined" />
-        </j-tooltip>
+<!--        <j-tooltip placement="right">-->
+<!--          <template #title>-->
+<!--            未提供“读”权限的表单子字段对当前节点的办理人加密展示-->
+<!--          </template>-->
+<!--          <AIcon type="QuestionCircleOutlined" />-->
+<!--        </j-tooltip>-->
       </j-space>
     </template>
     <j-row :gutter="20">

@@ -50,6 +50,7 @@ import { onlyMessage } from '@jetlinks-web/utils'
 import { cloneDeep } from 'lodash-es'
 import {USER_DATA} from "@LowCode/views/process/model/Detail/FlowDesign/util";
 import {getAllDepartment_api, getAllRole_api, getAllUser_api} from "@LowCode/api/user";
+import html2canvas from "html2canvas";
 
 const flowStore = useFlowStore()
 const selectedNode = computed(() => flowStore.selectedNode)
@@ -237,8 +238,31 @@ const validateSteps = (type?: string) => {
 
     console.log('err: ', err)
 
+    if(!err.length){
+      const rootDOM = flowDesignerRef.value.getRootDOM()
+      getImgBase64(rootDOM).then((res) => {
+        flowStore.model.nodes.base64 = res as string
+      })
+    }
+    
+
     // reject时 返回当前步骤序号
     !err.length ? resolve(1) : reject(1)
+  })
+}
+
+const getImgBase64 = (element:HTMLElement) => {
+  return new Promise((resolve) => {
+    html2canvas(element, {
+      useCORS: true, // 【重要】开启跨域配置
+      scale: window.devicePixelRatio < 3 ? window.devicePixelRatio : 2,
+      allowTaint: true, // 允许跨域图片
+      width: element?.offsetWidth,
+      height: element?.offsetHeight, // 默认是px
+    }).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      resolve(imgData);
+    });
   })
 }
 
