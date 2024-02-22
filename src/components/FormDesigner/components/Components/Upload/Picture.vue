@@ -31,8 +31,12 @@
         </div>
       </div>
       <template #itemRender="{ file }">
-        <div class="render">
-          <a-image :src="file.url">
+        <div
+          class="render"
+          @mouseenter="showDelete = true"
+          @mouseleave="showDelete = false"
+        >
+          <a-image :src="file.url" @error="() => onError(file)">
             <template #previewMask>
               <AIcon type="EyeOutlined" />
               <AIcon
@@ -43,6 +47,15 @@
               />
             </template>
           </a-image>
+          <div class="deleteModal" v-if="file.error && showDelete ">
+            <AIcon
+              class="deleteIcon"
+              v-if="!disabled"
+              type="DeleteOutlined"
+              style="margin-left: 10px"
+              @click="onDelete(file)"
+            />
+          </div>
           <!-- <div class="render-name">
             <j-input
               v-model:value="file.name"
@@ -134,7 +147,7 @@ const props = defineProps({
   },
   options: {
     type: String,
-  }
+  },
 });
 
 const emits = defineEmits(["change"]);
@@ -151,7 +164,7 @@ const uploading = ref<Boolean>(false);
 const dbRef = ref<boolean>(false);
 const dbId = ref<string>("");
 const nameRef = ref();
-
+const showDelete = ref(false);
 const saveRequest = async (file: any) => {
   const formData = new FormData();
   formData.append("file", file);
@@ -162,9 +175,11 @@ const saveRequest = async (file: any) => {
     clearInterval(timer);
   }
   uploading.value = true;
-  const _options = props?.options ? {
-    options: props?.options
-  } : {};
+  const _options = props?.options
+    ? {
+        options: props?.options,
+      }
+    : {};
   const res = await fileUpload(formData, _options);
   if (res.status === 200) {
     if (timer) {
@@ -323,6 +338,9 @@ const onDelete = (file: any) => {
   }
 };
 
+const onError = (file: any) => {
+  file.error = true;
+};
 watch(
   () => props.value,
   (val) => {
@@ -370,7 +388,7 @@ watch(
   padding: 8px;
   border: 1px solid #d9d9d9;
   height: 100%;
-
+  position: relative;
   .render-name {
     margin-top: 10px;
     width: 100%;
@@ -401,6 +419,20 @@ watch(
   .loading {
     color: blue;
     font-size: 20px;
+  }
+}
+.deleteModal {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  .deleteIcon{
+    margin-left: 50% !important;
+    margin-top: 50%;
+    translate: -50% -50%;
+    color: white;
   }
 }
 </style>
