@@ -267,7 +267,7 @@ const beforeUpload = (file: UploadProps["fileList"][number]) => {
             ctx.textBaseline = "center"; // 水印对其的基准线
             ctx.font = `50px Verdana`; // 文字大小
             ctx.fillText(
-              props.waterMark || dayjs().format("YYYY:MM:DD hh:mm:ss"),
+              props.waterMark || dayjs().format("YYYY-MM-DD hh:mm:ss"),
               0,
               img.height - 100
             ); // 添加的文字
