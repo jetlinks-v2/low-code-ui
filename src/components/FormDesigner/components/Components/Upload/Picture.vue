@@ -31,8 +31,12 @@
         </div>
       </div>
       <template #itemRender="{ file }">
-        <div class="render">
-          <a-image :src="file.url">
+        <div
+          class="render"
+          @mouseenter="showDelete = true"
+          @mouseleave="showDelete = false"
+        >
+          <a-image :src="file.url" @error="() => onError(file)">
             <template #previewMask>
               <AIcon type="EyeOutlined" />
               <AIcon
@@ -43,6 +47,15 @@
               />
             </template>
           </a-image>
+          <div class="deleteModal" v-if="file.error && showDelete ">
+            <AIcon
+              class="deleteIcon"
+              v-if="!disabled"
+              type="DeleteOutlined"
+              style="margin-left: 10px"
+              @click="onDelete(file)"
+            />
+          </div>
           <!-- <div class="render-name">
             <j-input
               v-model:value="file.name"
@@ -134,7 +147,7 @@ const props = defineProps({
   },
   options: {
     type: String,
-  }
+  },
 });
 
 const emits = defineEmits(["change"]);
@@ -151,7 +164,7 @@ const uploading = ref<Boolean>(false);
 const dbRef = ref<boolean>(false);
 const dbId = ref<string>("");
 const nameRef = ref();
-
+const showDelete = ref(false);
 const saveRequest = async (file: any) => {
   const formData = new FormData();
   formData.append("file", file);
@@ -162,9 +175,11 @@ const saveRequest = async (file: any) => {
     clearInterval(timer);
   }
   uploading.value = true;
-  const _options = props?.options ? {
-    options: props?.options
-  } : {};
+  const _options = props?.options
+    ? {
+        options: props?.options,
+      }
+    : {};
   const res = await fileUpload(formData, _options);
   if (res.status === 200) {
     if (timer) {
@@ -246,33 +261,18 @@ const beforeUpload = (file: UploadProps["fileList"][number]) => {
             ctx.drawImage(img, 0, 0, img.width, img.height);
             // 添加水印
             let data = "";
-            for (let i = 0; i < 6; i++) {
-              ctx.save();
-              ctx.translate(i + 50, i + 50);
-              ctx.rotate((45 * Math.PI) / 180);
-              ctx.fillStyle = "rgb(255,0,0,0.3)"; // 水印颜色，透明度
-              ctx.textBaseline = "center"; // 水印对其的基准线
-              ctx.font = `50px Verdana`; // 文字大小
-              ctx.fillText(
-                props.waterMark || dayjs().format("YYYY:MM:DD hh:mm:ss"),
-                img.width / 2 - i * 200,
-                img.height / 2 - i * 200
-              ); // 添加的文字
-              ctx.restore();
+            ctx.save();
+            ctx.translate(50, 50);
+            ctx.fillStyle = "rgb(255,255,255,0.5)"; // 水印颜色，透明度
+            ctx.textBaseline = "center"; // 水印对其的基准线
+            ctx.font = `50px Verdana`; // 文字大小
+            ctx.fillText(
+              props.waterMark || dayjs().format("YYYY:MM:DD hh:mm:ss"),
+              0,
+              img.height - 100
+            ); // 添加的文字
+            ctx.restore();
 
-              ctx.save();
-              ctx.translate(i + 600, i + 600);
-              ctx.rotate((45 * Math.PI) / 180);
-              ctx.fillStyle = "rgb(255,0,0,0.3)"; // 水印颜色，透明度
-              ctx.textBaseline = "center"; // 水印对其的基准线
-              ctx.font = `50px Verdana`; // 文字大小
-              ctx.fillText(
-                props.waterMark || dayjs().format("YYYY:MM:DD hh:mm:ss"),
-                img.width / 2 - i * 200,
-                img.height / 2 - i * 200
-              ); // 添加的文字
-              ctx.restore();
-            }
             data = canvas.toDataURL(file.type); // 输出压缩后的base64
             // base64转file
             const arr = data.split(",");
@@ -338,6 +338,9 @@ const onDelete = (file: any) => {
   }
 };
 
+const onError = (file: any) => {
+  file.error = true;
+};
 watch(
   () => props.value,
   (val) => {
@@ -385,7 +388,7 @@ watch(
   padding: 8px;
   border: 1px solid #d9d9d9;
   height: 100%;
-
+  position: relative;
   .render-name {
     margin-top: 10px;
     width: 100%;
@@ -417,6 +420,19 @@ watch(
     color: blue;
     font-size: 20px;
   }
-  
+}
+.deleteModal {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  .deleteIcon{
+    margin-left: 50% !important;
+    margin-top: 50%;
+    translate: -50% -50%;
+    color: white;
+  }
 }
 </style>

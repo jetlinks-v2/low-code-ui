@@ -13,6 +13,7 @@ export const defaultModel = {
     nodes: {
         id: 'ROOT_1',
         parentId: null,
+        base64: undefined,
         type: 'ROOT',
         name: '发起申请',
         active: false,

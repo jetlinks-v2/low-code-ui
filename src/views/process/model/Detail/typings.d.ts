@@ -3,6 +3,7 @@ export interface INode {
     parentId: string | null;
     type: string;
     name?: string;
+    base64?: string | undefined;
     active: boolean;
     props?: Partial<INodeProps>;
     children?: INode;
