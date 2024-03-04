@@ -77,7 +77,7 @@
               <div class="title">
                 <div class="classification">
                   <j-ellipsis style="max-width: 200px">
-                    {{ record.classifiedName }}
+                    {{ record.name }}
                   </j-ellipsis>
                 </div>
                 <div class="card-content">
@@ -98,7 +98,7 @@
                     />
                     <div class="right">
                       <j-ellipsis style="max-width: 200px">
-                        <div class="name">{{ record.name }}</div>
+                        <div class="name">{{ record.classifiedName }}</div>
                       </j-ellipsis>
                       <div class="other">
                         <j-ellipsis style="width: 200px">
