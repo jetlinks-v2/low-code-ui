@@ -26,6 +26,7 @@
     "async-validator": "^4.2.5",
     "axios": "^1.6.7",
     "dayjs": "^1.11.8",
+    "html2canvas": "^1.4.1",
     "jetlinks-ui-components": "1.0.35-3",
     "less": "^4.2.0",
     "lodash-es": "^4.17.21",
