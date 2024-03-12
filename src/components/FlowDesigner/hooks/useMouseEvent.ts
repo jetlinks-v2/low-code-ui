@@ -112,11 +112,11 @@ export const useMouseEvent = (El: Ref<HTMLDivElement>, enabled, pScale, offset) 
   }
 
   const bindEventListener = () => {
-    El.value?.addEventListener('pointerdown', handlePointerdown)
-    El.value?.addEventListener('pointermove', handlePointermove);
-    El.value?.addEventListener('pointerup', handlePointerup);
-    El.value?.addEventListener('wheel', handleWheel)
-    document.addEventListener('pointerup', handlePointerup);
+    El.value?.addEventListener('pointerdown', handlePointerdown, { passive: true })
+    El.value?.addEventListener('pointermove', handlePointermove, { passive: true });
+    El.value?.addEventListener('pointerup', handlePointerup, { passive: true });
+    El.value?.addEventListener('wheel', handleWheel, { passive: true })
+    document.addEventListener('pointerup', handlePointerup, { passive: true });
   }
 
   const removeEventListener = () => {
