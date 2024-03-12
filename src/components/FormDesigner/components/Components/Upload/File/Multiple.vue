@@ -190,11 +190,11 @@ const onDelete = (file: any) => {
 }
 
 const onLoad = (_file: any) => {
-  downloadFile(_file?.url).then(resp => {
-    const blob = new Blob([resp.data]);
-    const _url = URL.createObjectURL(blob);
-    downloadFileByUrl(_url, _file?.name)
-  })
+  // downloadFile(_file?.url).then(resp => {
+  //   const blob = new Blob([resp.data]);
+  //   const _url = URL.createObjectURL(blob);
+    downloadFileByUrl(_file?.url, _file?.name)
+  // })
 }
 
 const onDbClick = (file) => {

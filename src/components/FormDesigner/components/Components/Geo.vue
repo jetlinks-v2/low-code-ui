@@ -119,6 +119,7 @@ const handleChange = (_, options, index) => {
     selectRef.list.length = index + 1
     if (options.children) {
         selectRef.list[index + 1] = options.children
+        emit('update:value',{})
     } else {
         emit('update:value', options)
         emit('change', options)
@@ -136,7 +137,8 @@ onMounted(() => {
 watch(
     () => props.value,
     (val) => {
-        if (val) {
+        console.log(props.value)
+        if (val && JSON.stringify(val) !== "{}") {
             // console.log('props.value', props.value)
             if (props.type === 'tree') {
                 _value.value = props.value?.code

@@ -117,7 +117,7 @@ watch(
 );
 
 const onChange = (item: any) => {
-  const _value = item && item?.length > 0 ? JSON.stringify(item) : null;
+  const _value = item && item?.length > 0 ? JSON.stringify(item) : '';
   emit("update:value", _value);
   emit("change", _value);
 };
