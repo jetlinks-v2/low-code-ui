@@ -82,7 +82,7 @@
           <j-col :span="18">
             <j-form-item>
               <ErrorItem :errorData="errorData('dataSource')">
-                <j-tree-select
+                <a-tree-select
                   showSearch
                   placeholder="请选择"
                   multiple
@@ -368,11 +368,20 @@ const sourceList = computed(() => {
   )
   const arr: any[] = []
   if (_item?.output && _item?.output?.properties?.length) {
+
+    const uniqMap = new Map()
+
+    _item.output.properties.forEach(a => {
+      if (!uniqMap.has(a.id)) {
+        uniqMap.set(a.id, a)
+      }
+    })
+
     arr.push({
       label: '输出',
       value: 'output',
       disabled: true,
-      children: getArray(_item?.output?.properties || [], 'output'),
+      children: getArray([...uniqMap.values()], 'output'),
     })
   }
   return arr
