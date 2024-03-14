@@ -396,13 +396,22 @@ const getArray = (arr: any[], parentId: string) => {
     if (i.valueType.type === 'object') {
       children = getArray(i.valueType?.properties || [], i.id)
     }
+
+    const uniqMap = new Map()
+
+    children.forEach(a => {
+      if (!uniqMap.has(a.id)) {
+        uniqMap.set(a.id, a)
+      }
+    })
+
     return {
       ...i,
       parentId,
       label: `${i.id}${i?.name ? '(' + i?.name + ')' : ''}`,
       value: `${i.id}_${parentId}`,
       disabled: children.length !== 0,
-      children,
+      children: [...uniqMap.values()],
     }
   })
 }
