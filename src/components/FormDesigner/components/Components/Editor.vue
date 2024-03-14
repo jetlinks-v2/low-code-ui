@@ -21,6 +21,7 @@ import {Editor, Toolbar} from '@wangeditor/editor-for-vue'
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import {fileUpload} from '@LowCode/api/comm'
 import {cloneDeep} from "lodash-es";
+import {Form} from "ant-design-vue";
 
 const props = defineProps({
   value: {
@@ -42,6 +43,7 @@ const props = defineProps({
 })
 const emits = defineEmits(['update:value', 'change'])
 const editorRef = shallowRef()
+const formItemContext = Form.useInjectFormItemContext()
 const valueHtml = ref('') // 内容 HTML
 const toolbarConfig = {
   excludeKeys: ['fullScreen', 'insertImage', 'codeBlock', 'redo', '|', 'group-video'] // insertLink
@@ -76,10 +78,10 @@ const handleChange = (editor: any) => {
     emits('update:value', '')
     emits('change', '')
   }
+  formItemContext?.onFieldChange()
 }
 
 watchEffect(() => {
-  console.log(props.disabled)
   valueHtml.value = props.value || ''
   editorConfig.value = {
     ...cloneDeep(init),
