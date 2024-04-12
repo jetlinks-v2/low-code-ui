@@ -1,6 +1,7 @@
 <template>
   <ConfigProvider :locale="zhCN">
-    <router-view />
+<!--    <router-view />-->
+    afasdfasdfasdf
   </ConfigProvider>
 </template>
 <script setup lang="ts">

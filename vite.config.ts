@@ -68,10 +68,10 @@ export default defineConfig(({ mode}) => {
     ],
     server: {
       host:'0.0.0.0',
-
+      post: 9012,
       proxy: {
         [env.VITE_APP_BASE_API]: {
-          target: 'http://192.168.33.46:8844', // 本地开发环境
+          target: 'http://192.168.33.1:8901', // 本地开发环境
           ws: 'ws://192.168.33.46:8844',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
