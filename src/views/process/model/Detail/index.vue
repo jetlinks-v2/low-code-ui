@@ -217,6 +217,8 @@ const handleNext = async () => {
  * 保存模型数据, 无需校验数据
  */
 const handleSave = (type?: string) => {
+  // 保存流程图截图
+  step2.value?.setBase64()
   step1.value.getLatestFormList().then(() => {
     setEmptyNodeProps(flowStore.model.nodes)
     const params = {
@@ -343,6 +345,8 @@ const saveAndDeploy = () => {
 }
 
 const onOk = async () => {
+  // 保存流程图截图
+  step2.value?.setBase64()
   const params = {
     id: route.query.id,
     state: 'undeployed',

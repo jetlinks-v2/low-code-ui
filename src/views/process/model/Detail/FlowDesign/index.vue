@@ -239,15 +239,23 @@ const validateSteps = (type?: string) => {
     console.log('err: ', err)
 
     if(!err.length){
-      const rootDOM = flowDesignerRef.value.getRootDOM()
-      getImgBase64(rootDOM).then((res) => {
-        flowStore.model.nodes.base64 = res as string
-      })
+      // const rootDOM = flowDesignerRef.value.getRootDOM()
+      // getImgBase64(rootDOM).then((res) => {
+      //   flowStore.model.nodes.base64 = res as string
+      // })
+      setBase64()
     }
     
 
     // reject时 返回当前步骤序号
     !err.length ? resolve(1) : reject(1)
+  })
+}
+
+const setBase64 = () => {
+  const rootDOM = flowDesignerRef.value.getRootDOM()
+  getImgBase64(rootDOM).then((res) => {
+    flowStore.model.nodes.base64 = res as string
   })
 }
 
@@ -293,7 +301,7 @@ const validateCondition = (err?) => {
     }
 }
 
-defineExpose({ validateSteps })
+defineExpose({ validateSteps, setBase64 })
 </script>
 
 <style lang="less" scoped></style>
