@@ -66,6 +66,7 @@ const init = {
 }
 
 const editorConfig = ref(cloneDeep(init))
+const editorChangeTimes = ref(0) // 编辑器内容变化次数
 const handleCreated = (editor: any) => {
   editorRef.value = editor // 记录 editor 实例，重要！
 }
@@ -78,7 +79,9 @@ const handleChange = (editor: any) => {
     emits('update:value', '')
     emits('change', '')
   }
-  formItemContext?.onFieldChange()
+  // 第一次设置内容时，不触发 onFieldChange, 处理第一次进入页面时, 自动校验必填
+  if(editorChangeTimes.value > 0) formItemContext?.onFieldChange()
+  editorChangeTimes.value++
 }
 
 watchEffect(() => {
